@@ -1,21 +1,21 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.3.0",
+  "versao": "0.4.0",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.2.4",
-  "scientificSchemaVersion": 2,
+  "scientificSchemaVersion": 3,
   "origens": [
     {
-      "arquivo": "SILM-0.2.1.zip",
-      "papel": "origem executável congelada da série 0.3.x",
-      "sha512": "379a2ff397603fd7f915006cdc24053f68d149e6066ba4663a5b31f1fcf30d1885a9177f660bdd36e1b96e71012e90f44e0334f35e17fc813a55144dddf9a992",
-      "verificado": true
+      "arquivo": "SILM-0.3.0.zip",
+      "papel": "origem executável da série 0.4.x (SHA-512 declarado no prompt 0.4.x)",
+      "sha512": "8378edfad55cc912fdfd55d83eb623292ca6dba10ae3d3e7e69b1dd02b93cdc936190703f4afe70a609038a4fe73c23c21a8138fda8cf86ac54d98eb20db97a2",
+      "verificado": false
     },
     {
-      "arquivo": "SILM-0.1.1.zip",
-      "papel": "origem executável congelada indicada pelo prompt 0.2.x",
-      "sha512": "f65dcdbe2fb86ce399559d310485e48df63a4200af7619cdf47889820e2e8081007d4908998aa2e100482c7b8737cdc584933cb079467e2cbbf8724e0255d7d4",
+      "arquivo": "SILM.zip",
+      "papel": "pacote 0.3.0 efetivamente recebido e utilizado como origem",
+      "sha512": "8c1422de85b0e6da41d3e75c6e3197104c2cc9a214a00ecf5f0e2af2b2b71dc7bdebf66215e2710b19047efa12ae787e66a13262bbb54b6045ee9d654a19c7c2",
       "verificado": true
     },
     {
@@ -35,10 +35,17 @@
       "papel": "referência SILM 0.1.0 e doadora de identidade",
       "sha512": "cf342341ce938d8370d4000907a6b833fef745f4e80f5064963aeea34ba09c740dac1a997ab87f7e798367a9c542d0cd295d5272144da3823ec9cb8a710a021a",
       "verificado": true
+    },
+    {
+      "arquivo": "qui-x/acidobase@f07047a",
+      "papel": "SIAB 1.0.0 congelada: referência comportamental da família, somente leitura",
+      "sha512": null,
+      "verificado": true
     }
   ],
-  "observacaoOrigem": "BASE-ESTRUTURAL(7).zip é byte a byte a Base citada como BASE-ESTRUTURAL(6).zip no prompt: SHA-512 idêntico.",
-  "status": "SILM 0.3.0: estado científico formal e investigação persistente. Relatório de homologação em docs/RELATORIO-BUILD-TESTES-0.3.0.md.",
+  "observacaoOrigem": "O SILM.zip recebido não é byte a byte o SILM-0.3.0.zip declarado (hashes diferentes) e não contém docs/ nem tests/. O código executável foi usado como origem; os documentos ausentes foram reconstruídos e identificados como tal. BASE-ESTRUTURAL(7).zip é byte a byte a Base citada como BASE-ESTRUTURAL(6).zip.",
+  "status": "SILM 0.4.0: montagem manual persistente da estrutura metálica, schema 3. Relatório em docs/RELATORIO-BUILD-TESTES-0.4.0.md. Aguarda homologação antes da série 0.5.x.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
-  "dataBuild": "2026-10-11"
+  "dataBuild": "2026-10-11",
+  "structureModelVersion": 1
 }

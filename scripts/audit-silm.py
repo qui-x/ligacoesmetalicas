@@ -7,11 +7,14 @@ def check(name,condition,detail=None):
     checks.append({'check':name,'status':'PASS' if condition else 'FAIL','detail':detail})
 version=(root/'VERSION').read_text().strip()
 lock=json.loads((root/'package-lock.json').read_text())
-check('Versão única do produto',version=='0.3.0' and json.loads((root/'package.json').read_text())['version']==version and lock['version']==version and lock['packages']['']['version']==version and json.loads((root/'BUILD-INFO.json').read_text())['versao']==version and f'data-app-version="{version}"' in (root/'index.html').read_text())
+check('Versão única do produto',version=='0.4.0' and json.loads((root/'package.json').read_text())['version']==version and lock['version']==version and lock['packages']['']['version']==version and json.loads((root/'BUILD-INFO.json').read_text())['versao']==version and f'data-app-version="{version}"' in (root/'index.html').read_text())
 core=json.loads((root/'docs/evidence/NUCLEO-PRESERVADO.json').read_text())
 changed=[p for p,h in core['unchanged'].items() if hashlib.sha512((root/p).read_bytes()).hexdigest()!=h]
-expected_integrations={'js/experience/teacher.js','js/experience/references.js'}
-check('Núcleo herdado preservado com integrações 0.2.x explícitas',set(changed)==expected_integrations,{'verifiedFiles':len(core['unchanged']),'approvedIntegrations':sorted(expected_integrations),'changedFiles':changed})
+# Base de comparação: núcleo da SILM 0.3.0 recebida. Única integração aprovada na 0.4.0: retomada direta (correção de origem 0.3.x).
+expected_integrations={'js/experience/activity.js'}
+check('Núcleo herdado preservado com integração 0.4.0 explícita',set(changed)==expected_integrations,{'verifiedFiles':len(core['unchanged']),'approvedIntegrations':sorted(expected_integrations),'changedFiles':changed})
+activity=(root/'js/experience/activity.js').read_text()
+check('Integração opcional por domínio (resumeFree)',"resumeFree==='direct'" in activity and "resumeFree:'direct'" in (root/'domain/silm/bootstrap.js').read_text())
 html=(root/'index.html').read_text()
 assets=re.findall(r'(?:src|href)="([^"?#]+)(?:[?#][^"]*)?"',html)
 missing=[x for x in assets if ':' not in x and not (root/x).is_file()]
@@ -33,9 +36,17 @@ for file in [*runtime_files[2:],root/'a11y.js',root/'sw.js']:
 check('Sintaxe JavaScript',not errors,errors)
 m=json.loads((root/'manifest.webmanifest').read_text());check('Identidade e ícones PWA',m['short_name']=='SILM' and all((root/icon['src']).is_file() for icon in m['icons']))
 sw=(root/'sw.js').read_text();check('Cache independente',f"const VERSION='{version}'" in sw and 'silm@${ROOT.href}' in sw)
-required=['ROADMAP-SILM.md','CONTRATO-VERSIONAMENTO.md','ARQUITETURA-CIENTIFICA.md','PARIDADE-SIAB-SILM.md','FONTES-E-PROVENIENCIA.md','SILM-0.2.0.md','SILM-0.2.1.md','SILM-0.3.0.md','SCIENTIFIC-STATE.md','INVESTIGACAO.md','SCHEMA-DADOS-CIENTIFICOS.md','COBERTURA-METAIS.md','AUDITORIA-FONTES-0.2.0.md','AREA-DO-PROFESSOR-0.2.0.md','RELATORIO-BUILD-TESTES-0.2.0.md','RELATORIO-BUILD-TESTES-0.2.1.md','RELATORIO-BUILD-TESTES-0.3.0.md']
+# Documentos históricos 0.1.1–0.3.0 não constavam do pacote recebido (ver docs/SILM-0.4.0.md).
+required=['SILM-0.4.0.md','MONTAGEM-ESTRUTURA-METALICA.md','SCIENTIFIC-STATE.md','ARQUITETURA-CIENTIFICA.md','ROADMAP-SILM.md','CONTRATO-VERSIONAMENTO.md','INVESTIGACAO.md','PARIDADE-SIAB-1.0.0.md','RELATORIO-BUILD-TESTES-0.4.0.md']
 check('Documentação obrigatória',all((root/'docs'/p).is_file() for p in required))
 roadmap=(root/'docs/ROADMAP-SILM.md').read_text();check('Roadmap integral até 1.0.0',all('SILM 0.'+str(i)+'.x' in roadmap for i in range(1,19)) and '# SILM 1.0.0-rc.x' in roadmap and '# SILM 1.0.0\n' in roadmap)
+assembly=[root/'domain/silm'/n for n in ('assembly.js','assembly-view.js','assembly.css')]
+check('Montagem 0.4.x presente e carregada',all(p.is_file() for p in assembly) and html.index('domain/silm/assembly.js')<html.index('domain/silm/state.js')<html.index('domain/silm/assembly-view.js')<html.index('domain/silm/bootstrap.js') and 'domain/silm/assembly.css' in html)
+view=re.sub(r'/\*[\s\S]*?\*/','',(root/'domain/silm/assembly-view.js').read_text())
+check('Sem linhas M—M nem elétrons na representação',not re.search(r"createElementNS\([^)]*,'(line|path|polyline)'\)|electron",view))
+check('Sem estados científicos paralelos',not any(re.search(r'routeStructure|missionStructure|routeScientificState|missionScientificState',f.read_text()) for f in (root/'domain').rglob('*.js')))
+state=subprocess.run(['node',str(root/'scripts/validate-scientific-state.cjs')],capture_output=True,text=True)
+check('Validador do estado (schema 3)',state.returncode==0 and '"schemaVersion": 3' in state.stdout,state.stderr[-500:] or None)
 result={'product':'SILM','version':version,'checks':checks,'passed':sum(c['status']=='PASS' for c in checks),'failed':sum(c['status']=='FAIL' for c in checks)}
 (root/'docs/evidence/AUDITORIA-SILM.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
 print(json.dumps(result,ensure_ascii=False,indent=2));raise SystemExit(bool(result['failed']))

@@ -1,31 +1,42 @@
-# SILM 0.3.0 — A Arquitetura dos Metais
+# SILM 0.4.0 — A Arquitetura dos Metais
 
-SILM 0.3.0 mantém o banco científico da 0.2.1 e acrescenta uma investigação persistente sobre um único metal. Selecione um elemento disponível na Tabela e use **Iniciar investigação**. A estrutura metálica ainda não é montada.
+**Simulador Interativo de Ligações Metálicas.** Esta versão mantém o banco científico (0.2.x) e a investigação persistente de um metal (0.3.x), e acrescenta a **montagem manual da estrutura metálica**. Com um metal ativo, use **Iniciar montagem** e **+ Adicionar unidade**. Depois selecione e mova as unidades por arrasto, por toque no destino ou pelas setas do teclado. A montagem é uma representação didática: ainda não é uma rede cristalina (série 0.5.x).
 
-## Executar e testar
+## Usar
 
-Sirva esta pasta por HTTP ou HTTPS. `npm run build` valida banco e estado e gera os recursos locais. `npm run test:scientific` valida dados, busca, migração e lifecycle; `npm run audit` confere a distribuição; `npm run test:030` executa a suíte Playwright quando os navegadores estão instalados.
+Sirva esta pasta por HTTP ou HTTPS (por exemplo, `python3 -m http.server 8080`) e abra `http://localhost:8080`. Abrir o `index.html` como arquivo não prepara o uso offline.
 
-## Banco de dados
+## Construir e testar
 
-- `domain/silm/data/elements.json`: registro canônico dos 118 elementos e proveniência por campo.
-- `domain/silm/data/sources.json`: referências científicas utilizadas.
-- `domain/silm/data/evidence/cif/`: registros cristalográficos preservados com hashes SHA-256.
-- `scripts/validate-scientific-data.cjs`: validação bloqueante do build.
-- `domain/silm/state.js` e `scripts/validate-scientific-state.cjs`: serviço único e validação bloqueante do estado.
+| Comando | O que faz |
+|---|---|
+| `npm install` | instala as ferramentas de teste (Playwright e axe-core) |
+| `npm run build` | valida o banco e o estado científico (bloqueante) e gera bundle, layout e service worker |
+| `npm run test:scientific` | regressão do banco (118 elementos, 43 metais) e validador do estado (schema 3) |
+| `npm run test:040` | suíte de navegador da 0.4.0, com capturas em `docs/evidence-0.4.0/` |
+| `npm run audit` | auditoria da distribuição e do núcleo herdado |
 
-## Documentação e evidências
+Sem o navegador do Playwright instalado, defina `SILM_CHROMIUM` com o caminho de um Chromium.
 
-- `docs/SILM-0.3.0.md`, `docs/SCIENTIFIC-STATE.md` e `docs/INVESTIGACAO.md`
-- `docs/SILM-0.2.1.md`
-- `docs/SILM-0.2.0.md` — escopo e dados de referência da implementação inicial.
-- `docs/SCHEMA-DADOS-CIENTIFICOS.md`
-- `docs/COBERTURA-METAIS.md`
-- `docs/AUDITORIA-FONTES-0.2.0.md`
-- `docs/FONTES-E-PROVENIENCIA.md`
-- `docs/ARQUITETURA-CIENTIFICA.md`
-- `docs/AREA-DO-PROFESSOR-0.2.0.md`
-- `docs/RELATORIO-BUILD-TESTES-0.3.0.md`
-- `docs/evidence-0.3.0/` — relatórios automatizados e capturas reais.
+## Estrutura
 
-Os resultados e limites da homologação desta versão constam no relatório. A série 0.4.x aguarda homologação da 0.3.0.
+| Caminho | Finalidade |
+|---|---|
+| `index.html`, `a11y.js`, `css/`, `js/` | núcleo herdado da Base Estrutural 0.2.4 |
+| `domain/silm/` | domínio SILM: banco, estado, montagem, Tabela, Manual, identidade |
+| `domain/silm/assembly.js` | contrato da cena e assistência de posicionamento |
+| `domain/silm/assembly-view.js`, `assembly.css` | representação 2D da montagem |
+| `domain/silm/state.js` | `scientificState` único (schema 3) |
+| `scripts/` | validação, build e auditoria |
+| `tests/` | testes do banco e do navegador |
+| `docs/` | documentação, evidências e relatórios |
+
+## Documentação
+
+- [SILM 0.4.0](docs/SILM-0.4.0.md) · [Montagem da estrutura metálica](docs/MONTAGEM-ESTRUTURA-METALICA.md) · [Estado científico (schema 3)](docs/SCIENTIFIC-STATE.md)
+- [Investigação](docs/INVESTIGACAO.md) · [Arquitetura científica](docs/ARQUITETURA-CIENTIFICA.md) · [Roadmap](docs/ROADMAP-SILM.md) · [Contrato de versionamento](docs/CONTRATO-VERSIONAMENTO.md)
+- [Paridade com o SIAB 1.0.0](docs/PARIDADE-SIAB-1.0.0.md) · [Relatório de build e testes](docs/RELATORIO-BUILD-TESTES-0.4.0.md) · [Registro de alterações](CHANGELOG.md)
+
+A série 0.5.x (estruturas cristalinas) aguarda a homologação desta versão.
+
+Licença: GNU GPL v3 (`LICENSE`).

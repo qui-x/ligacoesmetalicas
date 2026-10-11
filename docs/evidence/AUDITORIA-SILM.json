@@ -1,0 +1,104 @@
+{
+  "product": "SILM",
+  "version": "0.4.0",
+  "checks": [
+    {
+      "check": "Versão única do produto",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Núcleo herdado preservado com integração 0.4.0 explícita",
+      "status": "PASS",
+      "detail": {
+        "verifiedFiles": 42,
+        "approvedIntegrations": [
+          "js/experience/activity.js"
+        ],
+        "changedFiles": [
+          "js/experience/activity.js"
+        ]
+      }
+    },
+    {
+      "check": "Integração opcional por domínio (resumeFree)",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Recursos estáticos presentes",
+      "status": "PASS",
+      "detail": []
+    },
+    {
+      "check": "Scripts locais",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Demo removida do runtime",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Domínio automático SILM",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Dependências executáveis de domínio ácido-base",
+      "status": "PASS",
+      "detail": {
+        "count": 0,
+        "files": []
+      }
+    },
+    {
+      "check": "Sintaxe JavaScript",
+      "status": "PASS",
+      "detail": []
+    },
+    {
+      "check": "Identidade e ícones PWA",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Cache independente",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Documentação obrigatória",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Roadmap integral até 1.0.0",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Montagem 0.4.x presente e carregada",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Sem linhas M—M nem elétrons na representação",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Sem estados científicos paralelos",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Validador do estado (schema 3)",
+      "status": "PASS",
+      "detail": null
+    }
+  ],
+  "passed": 17,
+  "failed": 0
+}
