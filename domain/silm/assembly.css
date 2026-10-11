@@ -1,0 +1,64 @@
+/* Montagem metálica 0.4.x — apresentação do domínio. Layout, docas, sheets e botões pertencem à Base.
+   Unidades sem linhas de ligação e sem elétrons; destaque coletivo por região, não por pares. */
+.silm-laboratory>.silm-assembly{flex:1}
+.silm-assembly{display:flex;flex-direction:column;gap:8px;min-height:0;height:100%}
+.silm-assembly-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding:8px 12px;border:1px solid var(--silm-soft-border);border-radius:var(--radius);background:var(--panel)}
+.silm-assembly-identity{display:flex;align-items:center;gap:12px;min-width:0}
+.silm-assembly-symbol{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:2px solid var(--silm-bronze);font-weight:800;color:var(--accent);letter-spacing:.02em}
+.silm-assembly-identity h1{margin:0;font-size:1.15rem;line-height:1.2}
+.silm-assembly-heading{display:flex;align-items:center;gap:8px}
+.silm-assembly-eyebrow{margin:0 0 2px;font-size:.7rem}
+/* Link de ajuda contextual, como os “?” da bancada do SIAB. */
+.ajuda-link{display:inline-grid;place-items:center;flex:none;width:28px;height:28px;border:1px solid var(--border);border-radius:50%;font-size:.85rem;font-weight:700;text-decoration:none;color:var(--accent)}
+.ajuda-link:hover{background:var(--hover);border-color:var(--accent)}
+.silm-glyph{font-weight:800}
+.silm-assembly-meta{margin:2px 0 0;font-size:.85rem;color:var(--secondary)}
+.silm-assembly-tools{display:flex;flex-wrap:wrap;gap:8px}
+.silm-assembly-tools button{min-height:var(--control-min)}
+.silm-assembly-area{position:relative;flex:1 1 auto;min-height:180px;display:grid;place-items:center;overflow:auto;padding:2px}
+.silm-assembly-stage{--stage:300px;position:relative;flex:none;width:var(--stage);height:var(--stage);border:1px solid var(--silm-soft-border);border-radius:var(--radius-lg);background:radial-gradient(circle at 50% 46%,var(--panel2),var(--bg) 78%);touch-action:manipulation;user-select:none;-webkit-user-select:none;overflow:hidden}
+.silm-assembly-collective{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.silm-assembly-collective g{fill:var(--silm-bronze);opacity:.18}
+.silm-assembly-units{position:absolute;inset:0}
+.silm-assembly-empty{position:absolute;inset:auto 8% 50%;transform:translateY(50%);margin:0;text-align:center;color:var(--secondary);font-size:max(.8rem,calc(var(--stage)*.035));pointer-events:none}
+/* Área de toque igual ao espaçamento mínimo; a forma visível mantém o raio da unidade. */
+.silm-unit{position:absolute;width:10%;height:10%;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:50%;background:none;display:grid;place-items:center;transform:translate(-50%,-50%);touch-action:none;cursor:grab;transition:left 120ms ease-out,top 120ms ease-out}
+.silm-unit-core{width:84%;height:84%;display:grid;place-items:center;border-radius:50%;border:1px solid #2a2016;background:radial-gradient(circle at 34% 30%,#f3e7c2 0,#d4b465 34%,#a8743b 74%,#6e4a22 100%);box-shadow:inset 0 -2px 4px #0006,0 1px 3px #0005;color:#17181b;font-weight:800;font-size:max(10px,calc(var(--stage)*.03));line-height:1;letter-spacing:.01em}
+.silm-assembly[data-editable=false] .silm-unit{cursor:default}
+.silm-unit:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+/* Seleção: anel tracejado + contorno espesso; não depende somente de cor. */
+.silm-unit[aria-pressed=true]{z-index:1}
+.silm-unit[aria-pressed=true] .silm-unit-core{outline:3px solid var(--scientific-accent);outline-offset:1px}
+.silm-unit[aria-pressed=true]::after{content:'';position:absolute;inset:-16%;border:2px dashed var(--scientific-accent);border-radius:50%;pointer-events:none}
+.silm-unit[data-dragging]{cursor:grabbing;transition:none;z-index:2}
+.silm-unit[data-conflict] .silm-unit-core{opacity:.55;outline:3px dashed var(--danger);outline-offset:1px}
+.silm-assembly-footer{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:.8rem;color:var(--secondary)}
+.silm-assist-badge{padding:2px 8px;border:1px solid var(--scientific-accent);border-radius:999px;color:var(--text)}
+.silm-assembly-kind::before{content:'◇ ';color:var(--accent)}
+.silm-assembly-help{flex:1 1 280px;margin:0}
+/* Altura reservada: mensagens não alteram o tamanho da cena. */
+.silm-assembly-feedback{flex-basis:100%;height:2.7em;margin:0;overflow:hidden;line-height:1.35;color:var(--text);font-weight:600;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+[aria-disabled=true].primary-btn,[aria-disabled=true].secondary-btn,[aria-disabled=true].danger-btn{opacity:.5;cursor:not-allowed;filter:none}
+/* Painéis: controles contextuais da montagem. */
+.silm-panel-identity{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.silm-panel-identity strong{font-size:1.6rem;color:var(--accent);line-height:1}
+.silm-panel-identity span{font-weight:700}
+.silm-assembly-controls{display:grid;gap:8px;margin-top:12px}
+.dock-scroll .silm-assembly-controls button+button{margin-top:0}
+.silm-assembly-controls .check-row{display:flex;align-items:center;gap:8px;min-height:var(--control-min)}
+.silm-assembly-controls .check-row input{width:20px;height:20px}
+.silm-panel details{margin-top:16px;border-top:1px solid var(--border);padding-top:12px}
+.silm-panel details summary{min-height:var(--control-min);display:flex;align-items:center;cursor:pointer;font-weight:700}
+.silm-panel details .action-row{display:grid;gap:8px}
+.silm-structure-summary{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.silm-structure-summary .silm-limitation{margin-top:10px}
+.silm-panel-note{font-size:.85rem}
+/* Celular: barra e rodapé compactos para a cena dominar a área central. Ajuda completa no Manual; aviso cristalográfico em Informações. */
+@media(max-width:600px){.silm-assembly-eyebrow{display:none}.silm-assembly{gap:6px}.silm-assembly-bar{padding:6px 8px;gap:6px}.silm-assembly-symbol{display:none}.silm-assembly-identity h1{font-size:1rem}.silm-assembly-meta{font-size:.78rem}.silm-assembly-tools{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:6px}.silm-assembly-tools button{padding-inline:6px}.silm-assembly-help,.silm-assembly-kind{display:none}.silm-assembly-footer{font-size:.75rem;gap:2px 8px}.silm-assembly-area{min-height:200px}}
+@media(max-height:500px) and (orientation:landscape){.silm-assembly{flex-direction:row;flex-wrap:wrap}.silm-assembly-bar{flex:1 1 220px;flex-direction:column;align-items:stretch}.silm-assembly-area{flex:1 1 200px;min-height:160px}.silm-assembly-footer{flex-basis:100%}.silm-assembly-help{display:none}}
+:root[data-motion=on] .silm-unit{transition:none}
+@media(prefers-reduced-motion:reduce){.silm-unit{transition:none}}
+:root[data-contrast=on] .silm-unit-core{background:#000;border:2px solid #fff;color:#fff;box-shadow:none}
+:root[data-contrast=on] .silm-assembly-collective g{fill:#fff;opacity:.22}
+:root[data-contrast=on] .silm-unit[aria-pressed=true] .silm-unit-core{outline-width:4px}
+@media(forced-colors:active){.silm-unit-core{background:Canvas;border:2px solid CanvasText;color:CanvasText;forced-color-adjust:none}.silm-unit[aria-pressed=true] .silm-unit-core{outline:4px solid Highlight}.silm-unit[aria-pressed=true]::after{border-color:Highlight}.silm-assembly-collective g{fill:CanvasText;opacity:.15}}

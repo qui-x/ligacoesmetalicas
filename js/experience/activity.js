@@ -25,7 +25,7 @@ SimCore.createActivities=(ctx,experience)=>{
  async function confirmReplace(){if(!current)return true;const changes=dirty||await experience.options.session?.hasChanges?.(snapshot(),ctx);if(!changes&&current.type==='free')return true;
   return U.confirm(ctx,'Substituir investigação?','A sessão atual será salva antes de iniciar outra. Você poderá consultar seu relatório em Relatórios.','Salvar e continuar');}
  function archive(status){if(!current)return;if(current.status!=='completed')current.status=status;if(status==='closed')current.closedAt=new Date().toISOString();const old=ctx.storage.get('experience.history',[]);const list=Array.isArray(old)?old:[];store('history',[snapshot(),...list.filter(x=>x.sessionId!==current.sessionId)].slice(0,30));}
- async function begin(type,spec,{resume=null,restart=false,identity={}}={}){
+ async function begin(type,spec,{resume=null,restart=false,identity={},stay=false}={}){
   const previous=snapshot();if(!resume&&type!=='free'&&previous?.type==='free'){freeSession=previous;store('free-session',previous);}
   current=resume?U.clone(resume):metadata(type,spec);if(!resume)current.identity=identity;if(restart)current.status='restarted';dirty=false;
   try{
@@ -33,7 +33,7 @@ SimCore.createActivities=(ctx,experience)=>{
    else await experience.options.onStart?.(spec||{type:'free'},snapshot(),ctx);
    if(!alive||!ctx.scope.active)return false;
    if(current.module&&!await experience.modules.select(current.module))throw new Error('Módulo inicial indisponível');
-   await save();emit();const report=current.status==='completed'&&experience.options.report;if(report&&S.router.current?.id==='relatorios'&&S.router.current.param===current.sessionId)await S.router.refresh();else await S.router.navigate(report?'relatorios':'laboratorio',report?current.sessionId:'');return true;
+   await save();emit();const report=current.status==='completed'&&experience.options.report;if(report&&S.router.current?.id==='relatorios'&&S.router.current.param===current.sessionId)await S.router.refresh();else if(!stay)await S.router.navigate(report?'relatorios':'laboratorio',report?current.sessionId:'');return true;
   }catch(error){current=previous;if(previous&&alive&&ctx.scope.active){try{await experience.options.session?.restore?.(previous,ctx);await experience.modules.select(previous.module);}catch(restoreError){console.error('Falha ao restaurar investigação após erro',restoreError);}}emit();throw error;}
  }
  function start(type,id,options={}){return enqueue(async()=>{
@@ -59,6 +59,8 @@ SimCore.createActivities=(ctx,experience)=>{
    pending={schema:1,domain:ctx.manifest.id,sessionId:U.text(saved.sessionId,160),type:saved.type,id:U.text(saved.id,64),module:saved.module,status:['active','completed','interrupted','restarted'].includes(saved.status)?saved.status:'active',timestamp:Number.isFinite(Date.parse(saved.timestamp))?saved.timestamp:new Date().toISOString(),identity:{student:U.text(saved.identity?.student,160),group:U.text(saved.identity?.group,160)},title:spec?.title||'Laboratório Livre',restrictions:spec?.restrictions||{modules:null,resources:null},navigationMode:spec?.navigation||'free',...(saved.type==='teacher'?{configuration:spec}:{})};
   }catch(error){ctx.notify('A sessão anterior não corresponde aos registros atuais e não será retomada.',{type:'warning'});return false;}
   if(typeof experience.options.session?.restore!=='function'){ctx.notify('Há uma sessão anterior, mas este domínio não oferece retomada.',{type:'info'});return false;}
+  // Opção do domínio: a sessão livre é retomada diretamente, sem diálogo. Atividades continuam perguntando.
+  if(pending.type==='free'&&experience.options.session?.resumeFree==='direct'){const resume=pending;pending=null;await begin('free',definition(resume),{resume,stay:true});return true;}
   const handle=ctx.modal.open({title:'Retomar sessão?',dismissible:false,content:pending.title+' · '+experience.modules.get(pending.module).title,actions:[{id:'new',label:'Começar outra sessão'},{id:'resume',label:'Retomar',primary:true}]});
   const answer=await handle.result;if(!alive)return true;const resume=pending;pending=null;
   if(answer==='resume'){await begin(resume.type,definition(resume),{resume});return true;}const history=ctx.storage.get('experience.history',[]);store('history',[{...resume,status:resume.status==='completed'?'completed':'interrupted'},...(Array.isArray(history)?history:[]).filter(x=>x.sessionId!==resume.sessionId)].slice(0,30));return false;
