@@ -1,6 +1,6 @@
 {
   "product": "SILM",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "checks": [
     {
       "check": "Versão única do produto",
@@ -8,15 +8,19 @@
       "detail": null
     },
     {
-      "check": "Núcleo herdado preservado com integração 0.4.0 explícita",
+      "check": "Núcleo herdado preservado com integrações declaradas",
       "status": "PASS",
       "detail": {
         "verifiedFiles": 42,
         "approvedIntegrations": [
-          "js/experience/activity.js"
+          "js/core/domain.js",
+          "js/experience/activity.js",
+          "js/workspace/workspace.js"
         ],
         "changedFiles": [
-          "js/experience/activity.js"
+          "js/core/domain.js",
+          "js/experience/activity.js",
+          "js/workspace/workspace.js"
         ]
       }
     },
@@ -79,7 +83,12 @@
       "detail": null
     },
     {
-      "check": "Montagem 0.4.x presente e carregada",
+      "check": "Montagem (0.4.x) e cristalografia (0.5.x) presentes e carregadas em ordem",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Vista cristalina sem elétrons e sem ligações fora do contorno da célula",
       "status": "PASS",
       "detail": null
     },
@@ -94,11 +103,11 @@
       "detail": null
     },
     {
-      "check": "Validador do estado (schema 3)",
+      "check": "Validador do estado científico",
       "status": "PASS",
       "detail": null
     }
   ],
-  "passed": 17,
+  "passed": 18,
   "failed": 0
 }

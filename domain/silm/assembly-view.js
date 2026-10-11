@@ -10,7 +10,7 @@ SILM.actionButton=(text,run,scope,{id,primary=false,danger=false,glyph=null,labe
 /* Representação 2D funcional da montagem (0.4.x). Lê o estado científico e escreve somente pelas
    ações do domínio. Seleção, arrasto e prévia de teclado são estado transitório de interface.
    Sem linhas entre unidades, sem elétrons, sem escala física e sem loop de animação contínuo. */
-SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',reference='de referência',moduleTitle='Explorar',describeLast=()=>null,canExplore=()=>false,onExplore=()=>{}})=>{
+SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',reference='de referência',moduleTitle='Explorar',describeLast=()=>null,canExplore=()=>false,onExplore=()=>{},organize=null})=>{
  const U=SimCore.ExperienceUI,A=SILM.assembly,C=A.contract,name=element.name.toLocaleLowerCase('pt-BR');
  const statusLabel={empty:'Vazia',assembling:'Em construção',assembled:'Concluída pelo usuário'};
  const root=U.element('section',null,'silm-assembly');root.dataset.editable=String(editable);root.setAttribute('aria-labelledby','silm-assembly-title');
@@ -22,7 +22,10 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  const heading=U.element('div',null,'silm-assembly-heading');heading.append(title,help);
  const meta=U.element('p','','silm-assembly-meta');meta.id='silm-assembly-meta';titles.append(eyebrow,heading,meta);identity.append(badge,titles);
  const tools=U.element('div',null,'silm-assembly-tools');let add=null,undo=null;
- if(editable){add=SILM.actionButton('Adicionar unidade',()=>actions.add(),scope,{id:'silm-assembly-add',primary:true,glyph:'+'});undo=SILM.actionButton('Desfazer',()=>actions.undo(),scope,{id:'silm-assembly-undo',glyph:'↶',label:'Desfazer última ação'});tools.append(add,undo);}
+ let organizeButton=null;
+ if(editable){add=SILM.actionButton('Adicionar unidade',()=>actions.add(),scope,{id:'silm-assembly-add',primary:true,glyph:'+'});undo=SILM.actionButton('Desfazer',()=>actions.undo(),scope,{id:'silm-assembly-undo',glyph:'↶',label:'Desfazer última ação'});tools.append(add,undo);
+  // 0.5.x: organização cristalográfica segundo a estrutura de referência do banco.
+  if(organize){organizeButton=SILM.actionButton('Organizar estrutura',()=>organize.run(),scope,{id:'silm-assembly-organize'});organizeButton.setAttribute('aria-describedby','silm-assembly-crystal-reason');tools.append(organizeButton);}}
  else if(canExplore())tools.append(SILM.actionButton('Montar em Explorar',onExplore,scope,{id:'silm-assembly-explore'}));
  bar.append(identity,tools);
  const area=U.element('div',null,'silm-assembly-area'),stage=U.element('div',null,'silm-assembly-stage');stage.id='silm-assembly-stage';
@@ -35,7 +38,8 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  const kind=U.element('span','Representação didática, sem escala física · ainda não representa a geometria cristalográfica '+reference+'.','silm-assembly-kind');
  const instructions=U.element('p',editable?'Selecione uma unidade e toque no destino, arraste-a ou use as setas. Shift + seta move em passo fino; Esc solta a unidade.':(note?note+' ':'')+'A edição da montagem está disponível em Explorar.','silm-assembly-help');instructions.id='silm-assembly-help';
  const feedback=U.element('p','','silm-assembly-feedback');feedback.id='silm-assembly-feedback';
- footer.append(assist,kind,instructions,feedback);root.append(bar,area,footer);host.append(root);
+ const crystalReason=U.element('p','','silm-assembly-reason');crystalReason.id='silm-assembly-crystal-reason';
+ footer.append(assist,kind,instructions,crystalReason,feedback);root.append(bar,area,footer);host.append(root);
  if(editable){layer.setAttribute('role','group');layer.setAttribute('aria-label','Unidades da montagem de '+name);}
  else{stage.setAttribute('role','img');}
 
@@ -67,6 +71,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
   empty.hidden=n>0;assist.hidden=!s.assistance.enabled;root.dataset.status=s.status;
   if(!editable)stage.setAttribute('aria-label','Montagem de '+name+' com '+n+' '+(n===1?'unidade':'unidades')+'. Representação didática; a edição está disponível em Explorar.');
   add?.setAttribute('aria-disabled',String(n>=C.maxUnits));undo?.setAttribute('aria-disabled',String(!model.canUndo));if(undo){const last=describeLast();undo.title=last?'Desfazer: '+last:'Nada para desfazer';}
+  if(organize){const o=organize.state();crystalReason.textContent=o.reason||'';crystalReason.hidden=!o.reason;if(organizeButton){organizeButton.setAttribute('aria-disabled',String(o.disabled));organizeButton.title=o.reason||o.title||'';}}
  }
  function select(id,{announce=true,focus=false}={}){
   if(!editable)return;flushKeys();if(id&&!nodes.has(id))return;

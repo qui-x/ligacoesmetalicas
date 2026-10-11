@@ -1,5 +1,7 @@
 # Paridade de família: SIAB 1.0.0 × SILM 0.4.0
 
+> Atualização da 0.5.0: os itens 1 e 2 da seção C foram implementados como correção de origem 0.1.x (Montagem com Resumo, Metal, Estrutura e Módulo; Ver com Observar; Dados com Tabela, Histórico e Relatório). A apresentação larga/compacta e as setas entre famílias de Ver chegam com as vistas das séries seguintes.
+
 **Referência:** `qui-x/acidobase`, SIAB 1.0.0 congelada (commit `f07047a`, 2026-10-04), lida somente para comparação, sem modificação. **Objeto:** SILM 0.4.0, sobre a Base Estrutural 0.2.4.
 
 O SILM nasceu da Base Estrutural 0.2.4, extraída do SIAB numa fase anterior (SIAB(9)). Desde então o SIAB evoluiu até a 1.0.0 (RC.1 a RC.5), e várias mecânicas novas da família ainda não existem na Base. Este documento separa:
@@ -45,8 +47,8 @@ O prompt mestre (§48) manda reutilizar o comportamento do SIAB quando ele exist
 
 | # | Mecânica do SIAB 1.0.0 | Situação no SILM | Onde entra (proposta) |
 |---|---|---|---|
-| 1 | **Workspace Montagem / Ver / Dados**: três lançadores; Montagem com abas Resumo, Preparo, Objetos, Módulo e Missão; Ver com as famílias Observar, Medir e Analisar (setas entre abas); Dados com Tabela, Histórico e Relatório; apresentações compacta, padrão e larga; no celular, painéis inferiores com Voltar de nível | dois painéis: Elementos e Informações | **Correção de origem 0.1.x**, antes da 0.5.0: as séries 0.5 a 0.7 acrescentam vistas (célula/rede, elétrons, propriedades) que devem nascer dentro de Ver |
-| 2 | **Histórico da sessão** (Dados → Histórico): sequência cronológica de ações, distinta do Caderno e do Desfazer | eventos existem, mas não há tela | correção de origem 0.3.x, junto com o item 1 |
+| 1 | ✅ **0.5.0** — **Workspace Montagem / Ver / Dados**: três lançadores; Montagem com abas Resumo, Preparo, Objetos, Módulo e Missão; Ver com as famílias Observar, Medir e Analisar (setas entre abas); Dados com Tabela, Histórico e Relatório; apresentações compacta, padrão e larga; no celular, painéis inferiores com Voltar de nível | dois painéis: Elementos e Informações | **Correção de origem 0.1.x**, antes da 0.5.0: as séries 0.5 a 0.7 acrescentam vistas (célula/rede, elétrons, propriedades) que devem nascer dentro de Ver |
+| 2 | ✅ **0.5.0** — **Histórico da sessão** (Dados → Histórico): sequência cronológica de ações, distinta do Caderno e do Desfazer | eventos existem, mas não há tela | correção de origem 0.3.x, junto com o item 1 |
 | 3 | **Tabela de medições** compacta e completa | sem medidas | 0.9.x (Medir) |
 | 4 | **Caderno de investigação**: notas, práticas encerradas, filtros, CSV, impressão | motor presente, desativado (decisão adiada pelo prompt 0.1.1, §21) | decisão do autor; a proposta é a 0.15.x |
 | 5 | **Relatório em modos**: completo, para preencher à mão e atividade de análise; 5 a 60 linhas por campo; dados hipotéticos identificados; Atualizar dados da bancada | modo único | 0.15.x |

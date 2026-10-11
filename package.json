@@ -1,19 +1,19 @@
 {
   "name": "silm",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
-  "description": "SILM — Formação e montagem da estrutura metálica.",
+  "description": "SILM — Estruturas cristalinas e rede metálica.",
   "license": "GPL-3.0",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "build": "node scripts/validate-scientific-data.cjs && node scripts/validate-scientific-state.cjs && node scripts/build-scientific-data.cjs && node scripts/build-layout.cjs && node scripts/build-sw.cjs",
-    "test": "npm run test:scientific && node tests/silm040.cjs",
+    "build": "node scripts/validate-scientific-data.cjs && node scripts/validate-scientific-state.cjs && node scripts/build-scientific-data.cjs && node scripts/build-layout.cjs && node scripts/build-sw.cjs && node scripts/build-coverage.cjs",
+    "test": "npm run test:scientific && node tests/browser.cjs",
     "audit": "python3 scripts/audit-silm.py",
     "test:scientific": "node tests/scientific-data.cjs && node scripts/validate-scientific-state.cjs",
-    "test:040": "node tests/silm040.cjs",
-    "screenshots:040": "node tests/capturas040.cjs"
+    "coverage": "node scripts/build-coverage.cjs",
+    "test:browser": "node tests/browser.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1",

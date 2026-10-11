@@ -1,5 +1,16 @@
 # Registro de alterações
 
+## SILM 0.5.0 — Estruturas Cristalinas e Rede Metálica
+
+- Evolução do scientificState: schema 4, modelo da estrutura 2 (`mode` livre/cristalino, `crystallography`); migração 3 → 4 preservando a montagem livre.
+- CCC/BCC, CFC/FCC e HC/HCP a partir do banco: sítios expandidos pelas operações de simetria registradas e conferidos com o modelo; 34 metais com visualização.
+- Organização cristalográfica (Organizar estrutura): reaproveita as unidades, completa a célula com unidades marcadas como completadas pelo SILM e guarda a montagem livre para o retorno.
+- Célula unitária (mostrar/ocultar), rede extensa (vista Rede, SVG único esmaecido), vizinhança e coordenação (8, 12, 12) sem linhas de ligação.
+- Elegibilidade cristalográfica separada da investigação, com motivos `REFERENCE_STRUCTURE_MISSING`, `CRYSTAL_STRUCTURE_UNSUPPORTED`, `REFERENCE_CONDITION_UNSUPPORTED` e `DATA_CONFLICT`; cobertura por metal gerada (`docs/COBERTURA-METAIS.md`).
+- Persistência da representação (vista, célula, vizinhos, rótulos, seleção), reload e offline; acessibilidade (nome da estrutura, estado da célula, contagem de vizinhos, destaque não só por cor); mobile e redução de movimento.
+- **Correção de origem 0.1.x — paridade de família com o SIAB 1.0.0:** workspace Montagem (Resumo, Metal, Estrutura, Módulo), Ver (Observar) e Dados (Tabela, Histórico, Relatório); Histórico cronológico da investigação. Núcleo: fontes opcionais do painel direito (`workspace.js`, `domain.js`).
+- Testes reorganizados: kit compartilhado, uma suíte por série e executor único que roda as séries anteriores como regressão; relatório e entrega gerados por script.
+
 ## SILM 0.4.0 — Formação e Montagem da Estrutura Metálica
 
 - scientificState schema 3: `structure` passa a aceitar a montagem metálica formal (`metallic-assembly`, modelo 1); migração segura schema 2 → 3, sem montagem automática.

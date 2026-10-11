@@ -1,21 +1,15 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.4.0",
+  "versao": "0.5.0",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.2.4",
-  "scientificSchemaVersion": 3,
+  "scientificSchemaVersion": 4,
   "origens": [
     {
-      "arquivo": "SILM-0.3.0.zip",
-      "papel": "origem executável da série 0.4.x (SHA-512 declarado no prompt 0.4.x)",
-      "sha512": "8378edfad55cc912fdfd55d83eb623292ca6dba10ae3d3e7e69b1dd02b93cdc936190703f4afe70a609038a4fe73c23c21a8138fda8cf86ac54d98eb20db97a2",
-      "verificado": false
-    },
-    {
-      "arquivo": "SILM.zip",
-      "papel": "pacote 0.3.0 efetivamente recebido e utilizado como origem",
-      "sha512": "8c1422de85b0e6da41d3e75c6e3197104c2cc9a214a00ecf5f0e2af2b2b71dc7bdebf66215e2710b19047efa12ae787e66a13262bbb54b6045ee9d654a19c7c2",
+      "arquivo": "SILM-0.4.0.zip",
+      "papel": "origem executável da série 0.5.x (0.4.0 homologada pelo autor)",
+      "sha512": "058bc8642b93b4b8169abb88dcec9fbe0376866931d05e262e6753d73b0a1f755b4cb9658388a9795165f635c4ae181b5c0c95e6ec87d583cd395446939aa8cd",
       "verificado": true
     },
     {
@@ -43,9 +37,9 @@
       "verificado": true
     }
   ],
-  "observacaoOrigem": "O SILM.zip recebido não é byte a byte o SILM-0.3.0.zip declarado (hashes diferentes) e não contém docs/ nem tests/. O código executável foi usado como origem; os documentos ausentes foram reconstruídos e identificados como tal. BASE-ESTRUTURAL(7).zip é byte a byte a Base citada como BASE-ESTRUTURAL(6).zip.",
-  "status": "SILM 0.4.0: montagem manual persistente da estrutura metálica, schema 3. Relatório em docs/RELATORIO-BUILD-TESTES-0.4.0.md. Aguarda homologação antes da série 0.5.x.",
+  "observacaoOrigem": "Origem: entregas/SILM-0.4.0.zip deste repositório, verificado pelo SHA-512 externo. Histórico de origens anteriores em versões anteriores do BUILD-INFO.",
+  "status": "SILM 0.5.0: estruturas cristalinas CCC/CFC/HC, célula, rede e vizinhança; schema 4; paridade de workspace com o SIAB 1.0.0. Relatório em docs/RELATORIO-BUILD-TESTES-0.5.0.md.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
   "dataBuild": "2026-10-11",
-  "structureModelVersion": 1
+  "structureModelVersion": 2
 }

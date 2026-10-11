@@ -1,6 +1,6 @@
 # Arquitetura científica do SILM
 
-> Atualizada na 0.4.0 e reconstruída a partir do código, porque o arquivo da 0.3.0 não constava do pacote recebido.
+> Atualizada na 0.5.0. Reconstruída na 0.4.0 a partir do código, porque o arquivo da 0.3.0 não constava do pacote recebido.
 
 ## 1. Princípio
 
@@ -11,9 +11,11 @@ O SILM e o SIAB são instrumentos científicos diferentes da mesma família: **m
 ```text
 SILM CORE
 ├── data            domain/silm/data/ (JSON canônicos, bundle.js, evidências CIF) + data-api.js
-├── state           domain/silm/state.js — scientificState único, schema 3
+├── state           domain/silm/state.js — scientificState único, schema 4
 ├── mechanics       domain/silm/assembly.js — contrato da cena e assistência (0.4.x)
-├── representation  domain/silm/assembly-view.js + assembly.css — 2D funcional (0.4.x)
+│                   domain/silm/crystal.js — modelo cristalográfico CCC/CFC/HC, elegibilidade, vizinhança (0.5.x)
+├── representation  domain/silm/assembly-view.js + assembly.css — 2D funcional da montagem livre (0.4.x)
+│                   domain/silm/crystal-view.js — célula, rede e vizinhança pseudo-3D (0.5.x)
 │                   domain/silm/periodic-table.js + presentation.js — Tabela (0.2.x)
 ├── measurements    reservado (0.9.x)
 ├── calculations    reservado (0.10.x)
@@ -32,13 +34,13 @@ Tabela Periódica ──(Iniciar investigação)──┐
                                            │ eventos domain:silm:*
               ┌────────────────────────────┼─────────────────────────────┐
               ▼                            ▼                             ▼
-   Viewport (Tabela/cartão/       Painel Elementos                Painel Informações
-   montagem 2D)                   (identidade + controles)        (montagem + dados tabelados)
+   Viewport (Tabela/cartão/       Montagem (Resumo, Metal,        Ver (Observar) · Dados (Tabela,
+   montagem/estrutura)            Estrutura, Módulo)              Histórico, Relatório)
 ```
 
 - Componentes não se manipulam diretamente: a Tabela chama o serviço, e a interface observa o estado.
 - A seleção de apresentação do Professor (`presentationSelection`) é independente do metal da investigação.
-- Os dados do banco são imutáveis. A montagem é **representação didática**; a estrutura de referência é **dado tabelado**. Os dois rótulos aparecem lado a lado no painel Informações.
+- Os dados do banco são imutáveis. A montagem é **representação didática**; a estrutura de referência é **dado tabelado**. Os dois rótulos aparecem lado a lado no painel Montagem → Estrutura. A organização cristalográfica usa a estrutura de referência do banco e marca as unidades completadas pelo SILM.
 
 ## 4. Laboratório e módulos
 
@@ -46,7 +48,8 @@ Tabela Periódica ──(Iniciar investigação)──┐
 |---|---|
 | sem investigação | Tabela Periódica (seleção) |
 | metal ativo, `structure = null` | cartão da investigação com **Iniciar montagem** (Explorar) |
-| `structure` existente | área de montagem: editável em Explorar; somente leitura em Medir e Calcular |
+| `structure.mode = free` | área de montagem: editável em Explorar; somente leitura em Medir e Calcular |
+| `structure.mode = crystalline` | estrutura cristalina: vistas Célula/Rede, vizinhos e rótulos; organizar e voltar ao livre em Explorar |
 
 Trocar de módulo altera apenas a perspectiva (`module.active`): não cria investigação, não apaga o metal e não apaga a montagem.
 
@@ -61,8 +64,8 @@ Uma atividade muda o contexto (módulo permitido, restrições), mas usa o mesmo
 
 ## 6. Proveniência
 
-Toda informação é classificada como dado tabelado (com fonte), calculado pelo SILM ou representação qualitativa ou didática. Na 0.4.0 não há resultados calculados. A montagem é representação didática, e suas posições não são medidas.
+Toda informação é classificada como dado tabelado (com fonte), calculado pelo SILM ou representação qualitativa ou didática. Até a 0.5.0 não há resultados calculados. A montagem livre é representação didática, e suas posições não são medidas. Na estrutura cristalina, sítios, coordenação e distâncias vêm do banco (dado tabelado com fonte); a projeção na tela é representação.
 
 ## 7. Núcleo herdado
 
-A auditoria (`scripts/audit-silm.py`) confere que os arquivos do núcleo permanecem idênticos aos da 0.3.0 recebida (`docs/evidence/NUCLEO-PRESERVADO.json`). A única integração declarada na 0.4.0 é `js/experience/activity.js`: a opção de domínio `session.resumeFree: 'direct'`, correção de origem 0.3.x.
+A auditoria (`scripts/audit-silm.py`) confere que os arquivos do núcleo permanecem idênticos aos da 0.3.0 recebida (`docs/evidence/NUCLEO-PRESERVADO.json`). Integrações declaradas: `js/experience/activity.js` (0.4.0, opção `session.resumeFree`, correção de origem 0.3.x); `js/workspace/workspace.js` e `js/core/domain.js` (0.5.0, painel direito com fontes Ver/Dados, correção de origem 0.1.x — paridade SIAB 1.0.0).

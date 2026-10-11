@@ -1,6 +1,6 @@
-# Estado científico do SILM — schema 3
+# Estado científico do SILM — schema 4
 
-> Documento reconstruído na 0.4.0. O arquivo original da 0.3.0 não constava do pacote recebido. O conteúdo descreve o código vigente (`domain/silm/state.js`) e o histórico dos schemas.
+> Documento reconstruído na 0.4.0 e atualizado na 0.5.0. O arquivo original da 0.3.0 não constava do pacote recebido. O conteúdo descreve o código vigente (`domain/silm/state.js`) e o histórico dos schemas.
 
 O SILM possui **uma única fonte de verdade** para a ciência: o `scientificState`. Laboratório Livre, Explorar, Medir, Calcular e os futuros Roteiros e Missões observam e modificam o mesmo estado. Não existem estados paralelos (`routeScientificState`, `missionStructure` etc.).
 
@@ -17,15 +17,16 @@ metal selecionado → INVESTIGAÇÃO → scientificState → Explorar / Medir / 
 |---|---|---|
 | 1 | 0.2.1 | seleção provisória de metal |
 | 2 | 0.3.0 | investigação formal; `structure` sempre `null` |
-| **3** | **0.4.0** | `structure` passa a aceitar a montagem metálica formal |
+| 3 | 0.4.0 | `structure` passa a aceitar a montagem metálica formal |
+| **4** | **0.5.0** | `structure.mode` livre/cristalino e `structure.crystallography` (CCC, CFC, HC) |
 
 `schemaVersion` é a versão do contrato do estado, não a versão do produto.
 
-## 2. Estrutura do schema 3
+## 2. Estrutura do schema 4
 
 ```js
 {
-  schemaVersion: 3,
+  schemaVersion: 4,
   investigation: null | { id: 'inv-…', status: 'new'|'active'|'paused', type: 'free'|'route'|'mission'|'teacher', createdAt, updatedAt },
   metal: null | { atomicNumber: 29, symbol: 'Cu', sourceId: '…' },
   module: { active: 'explorar'|'medir'|'calcular' },
@@ -42,22 +43,25 @@ metal selecionado → INVESTIGAÇÃO → scientificState → Explorar / Medir / 
 
 O estado guarda apenas a identidade do metal. Os dados tabelados (estrutura de referência, massa atômica etc.) são resolvidos pelo banco e nunca copiados nem alterados.
 
-### 2.1 `structure` (montagem metálica, `modelVersion` 1)
+### 2.1 `structure` (montagem metálica, `modelVersion` 2)
 
 ```js
 {
-  modelVersion: 1,
+  modelVersion: 2,
   type: 'metallic-assembly',
   metalAtomicNumber: 29,                   // conferência; a fonte é scientificState.metal
+  mode: 'free'|'crystalline',
   status: 'empty'|'assembling'|'assembled',
-  units: [ { id: 'unit-…', position: { x, y }, createdAt, placement: 'manual'|'assisted' } ],
+  units: [ { id: 'unit-…', position: { x, y }, createdAt, placement: 'manual'|'assisted' } ],   // modo livre
+       // modo cristalino: { id, createdAt, placement: 'manual'|'assisted'|'crystallographic', site: { cell: [i,j,k], basis } }
   assistance: { enabled: true, mode: 'placement' },
-  referenceStructureId: null,              // reservado para a 0.5.x
+  referenceStructureId: null | 'cu-reference',   // registro do banco no modo cristalino
+  crystallography: null | { structureType: 'BCC'|'FCC'|'HCP', sourceId, coordination, representation, freeUnits, organizedAt },
   createdAt, updatedAt
 }
 ```
 
-Detalhes conceituais: [`MONTAGEM-ESTRUTURA-METALICA.md`](MONTAGEM-ESTRUTURA-METALICA.md).
+Detalhes conceituais: [`MONTAGEM-ESTRUTURA-METALICA.md`](MONTAGEM-ESTRUTURA-METALICA.md) (modo livre) e [`CONTRATO-CRISTALOGRAFICO.md`](CONTRATO-CRISTALOGRAFICO.md) (modo cristalino, regras e códigos de validação).
 
 ## 3. Validação (`SILM.validateScientificState`)
 
@@ -65,7 +69,8 @@ Bloqueante no build (`scripts/validate-scientific-state.cjs`) e aplicada a todo 
 
 | Regra | Código de recusa |
 |---|---|
-| `schemaVersion === 3` | `SCHEMA_INCOMPATIBLE` |
+| `schemaVersion === 4` | `SCHEMA_INCOMPATIBLE` |
+| modo cristalino: tipo, referência, fonte, coordenação, sítios, autoria, célula completa, representação | ver `CONTRATO-CRISTALOGRAFICO.md` |
 | módulo registrado | `MODULE_INVALID` |
 | `electrons === null` | `FUTURE_DATA_UNSUPPORTED` |
 | `measurements` e `calculations` vazios | `DATA_INVALID` |
@@ -82,7 +87,8 @@ Bloqueante no build (`scripts/validate-scientific-state.cjs`) e aplicada a todo 
 | no máximo 48 unidades | `UNITS_LIMIT` |
 | `empty` ⇔ 0 unidades; `assembled` exige 2 ou mais | `STATUS_INCONSISTENT` |
 | assistência `{enabled: boolean, mode: 'placement'}` | `ASSISTANCE_INVALID` |
-| `referenceStructureId === null` | `FUTURE_DATA_UNSUPPORTED` |
+| modo livre: `referenceStructureId === null` e `crystallography === null` | `FUTURE_DATA_UNSUPPORTED` |
+| modo cristalino: adicionar, mover e desfazer são recusados | `CRYSTALLINE_MODE` |
 
 ## 4. Serviço e lifecycle
 
@@ -100,6 +106,9 @@ Somente `SILM.createScientificState()` escreve no estado. Consumidores recebem c
 | `moveUnit(id, pos, {gesture})` | move, aplicando a assistência ou recusando a sobreposição |
 | `undo()` | desfaz a última adição ou movimento |
 | `clearStructure()` | `structure → null` |
+| `organize()` | organiza segundo a estrutura de referência do banco; completa a célula |
+| `restoreFree()` | volta exatamente à montagem livre anterior |
+| `setCrystalRepresentation(patch)` | vista, célula, vizinhos, rótulos e seleção (representação) |
 | `setAssistance(bool)` / `setAssemblyStatus(s)` | assistência; marcação `assembled`/`assembling` |
 | `restore(value)` / `load()` | valida, migra e restaura; em falha, recupera para o estado vazio |
 
@@ -109,7 +118,7 @@ Na interface, o domínio respeita `init`, `mount`, `activate`, `resize`, `reset`
 
 Cada escrita persiste o estado e emite o evento específico seguido de `investigation:updated` (prefixo `domain:silm:` no barramento da Base):
 
-`investigation:created`, `investigation:reset`, `investigation:closed`, `investigation:status`, `investigation:restored`, `metal:changed`, `scientific:module-changed`, `structure:created`, `structure:unit-added`, `structure:unit-moved`, `structure:undone`, `structure:cleared`, `structure:assistance`, `structure:status`.
+`investigation:created`, `investigation:reset`, `investigation:closed`, `investigation:status`, `investigation:restored`, `metal:changed`, `scientific:module-changed`, `structure:created`, `structure:unit-added`, `structure:unit-moved`, `structure:undone`, `structure:cleared`, `structure:assistance`, `structure:status`, `structure:organized`, `structure:free`, `structure:representation`.
 
 ## 6. Persistência
 
@@ -122,18 +131,19 @@ Cada escrita persiste o estado e emite o evento específico seguido de `investig
 
 | De → para | Regra |
 |---|---|
-| 1 → 3 | seleção provisória vira investigação `free` com o metal, se ele estiver disponível |
-| **2 → 3** | mesmo conteúdo, com `schemaVersion: 3`. Só é aceita se `structure` e `electrons` forem `null`. **Nenhuma montagem é criada automaticamente.** |
+| 1 → 4 | seleção provisória vira investigação `free` com o metal, se ele estiver disponível |
+| 2 → 4 | mesmo conteúdo, com `schemaVersion: 4`. Só é aceita se `structure` e `electrons` forem `null`. Nenhuma montagem é criada automaticamente. |
+| **3 → 4** | a montagem livre da 0.4.x é preservada: `modelVersion: 2`, `mode: 'free'`, `crystallography: null`; unidades, posições e status inalterados. |
 
-Exemplo da migração 2 → 3:
+Exemplo da migração 3 → 4:
 
 ```text
-schema 2: metal = Cu, structure = null, module = calcular, investigation = inv-030…
-schema 3: metal = Cu, structure = null, module = calcular, investigation = inv-030…
+schema 3: metal = Cu, structure = { modelVersion: 1, units: 5 }, module = explorar
+schema 4: metal = Cu, structure = { modelVersion: 2, mode: 'free', units: 5, crystallography: null }, module = explorar
 ```
 
-A migração roda na restauração (`restore`) e o resultado é gravado logo em seguida no schema 3. O evento `investigation:restored` informa `migrated: true` e `from: 2`.
+A migração roda na restauração (`restore`) e o resultado é gravado logo em seguida no schema 4. O evento `investigation:restored` informa `migrated: true` e `from` (1, 2 ou 3).
 
-## 8. Preparação para a 0.5.x
+## 8. Preparação para a 0.6.x
 
-A 0.5.x deverá migrar o schema 3 → 4 preservando `units[]` (a montagem livre continua existindo) e acrescentar a organização cristalográfica, usando `referenceStructureId`. Nada disso é antecipado na 0.4.x.
+A 0.6.x tornará `electrons` um objeto formal (modelo eletrônico qualitativo) com representação própria (`electrons.representation`), no mesmo padrão de `crystallography.representation`. Na 0.5.x `electrons` continua `null`.
