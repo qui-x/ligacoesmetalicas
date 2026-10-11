@@ -1,0 +1,44 @@
+{
+  "produto": "SILM",
+  "nome": "Simulador Interativo de Ligações Metálicas",
+  "versao": "0.3.0",
+  "tema": "A Arquitetura dos Metais",
+  "versaoBase": "0.2.4",
+  "scientificSchemaVersion": 2,
+  "origens": [
+    {
+      "arquivo": "SILM-0.2.1.zip",
+      "papel": "origem executável congelada da série 0.3.x",
+      "sha512": "379a2ff397603fd7f915006cdc24053f68d149e6066ba4663a5b31f1fcf30d1885a9177f660bdd36e1b96e71012e90f44e0334f35e17fc813a55144dddf9a992",
+      "verificado": true
+    },
+    {
+      "arquivo": "SILM-0.1.1.zip",
+      "papel": "origem executável congelada indicada pelo prompt 0.2.x",
+      "sha512": "f65dcdbe2fb86ce399559d310485e48df63a4200af7619cdf47889820e2e8081007d4908998aa2e100482c7b8737cdc584933cb079467e2cbbf8724e0255d7d4",
+      "verificado": true
+    },
+    {
+      "arquivo": "BASE-ESTRUTURAL(7).zip",
+      "papel": "origem estrutural executável — Base 0.2.4",
+      "sha512": "2d17f5e1ac6309af69fbddc1fa2af0be1705bb9b3b61b46c1a627c9e1266fe9dda790865ede51e0a5581478271e105fe41ef802be3d409c4033a4b009358080f",
+      "verificado": true
+    },
+    {
+      "arquivo": "SIAB(9).zip",
+      "papel": "referência comportamental, sem modificação",
+      "sha512": "ff81556ce175bbc6e527eb922a193599b31d127ee07a0cb43a80639e45570c20a75e5660a876f29fbdb435dc636b0556e527d8d1b394739a3cf9fe1b583983b3",
+      "verificado": true
+    },
+    {
+      "arquivo": "ligacoesmetalicas(1).zip",
+      "papel": "referência SILM 0.1.0 e doadora de identidade",
+      "sha512": "cf342341ce938d8370d4000907a6b833fef745f4e80f5064963aeea34ba09c740dac1a997ab87f7e798367a9c542d0cd295d5272144da3823ec9cb8a710a021a",
+      "verificado": true
+    }
+  ],
+  "observacaoOrigem": "BASE-ESTRUTURAL(7).zip é byte a byte a Base citada como BASE-ESTRUTURAL(6).zip no prompt: SHA-512 idêntico.",
+  "status": "SILM 0.3.0: estado científico formal e investigação persistente. Relatório de homologação em docs/RELATORIO-BUILD-TESTES-0.3.0.md.",
+  "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
+  "dataBuild": "2026-10-11"
+}

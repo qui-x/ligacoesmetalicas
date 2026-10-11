@@ -1,0 +1,16 @@
+/* Somente conteúdo do domínio. Layout, docas, botões e mobile pertencem à Base. */
+.silm-welcome{width:min(100%,680px);margin:auto;padding:clamp(20px,4vw,48px);text-align:center;display:grid;justify-items:center;gap:16px}
+.silm-welcome h1{font-size:clamp(1.45rem,3vw,2.15rem);line-height:1.2;max-width:24ch;margin:0}
+.silm-welcome p{max-width:54ch;margin:0;color:var(--secondary)}
+.silm-welcome .action-row{justify-content:center}
+.silm-symbol{width:80px;height:80px}
+.silm-wordmark{font-size:1.3rem;font-weight:800;letter-spacing:.16em;color:var(--accent)}
+.silm-stage-status{font-size:.85rem;color:var(--secondary)}
+.silm-panel p{color:var(--secondary)}
+.silm-panel .action-row{margin-top:16px}
+.silm-panel hr{border:0;border-top:1px solid var(--border);margin:20px 0}
+.silm-panel-symbol{width:48px;height:48px}
+.silm-context{padding:12px;border:1px solid var(--border);border-radius:var(--radius)}
+.silm-context strong{display:block;margin-bottom:6px}
+.silm-limitation{border-inline-start:3px solid var(--scientific-accent);padding-inline-start:12px}
+.silm-opening-setting .check-row{align-items:center}
