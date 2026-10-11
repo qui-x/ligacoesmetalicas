@@ -1,0 +1,31 @@
+{
+  "product": "SILM",
+  "version": "0.2.1",
+  "schemaVersion": 1,
+  "accessedAt": "2026-10-10",
+  "referencePolicy": "Condição de referência próxima de ambiente. Números medidos apenas quando publicados; condições qualitativas explicitamente distintas das condições numéricas.",
+  "dataKinds": {
+    "TABULATED": "Dado tabelado",
+    "CALCULATED": "Calculado pelo SILM",
+    "QUALITATIVE": "Representação qualitativa"
+  },
+  "evidenceTypes": [
+    "experimental",
+    "evaluated",
+    "computed",
+    "convention"
+  ],
+  "group3Convention": "Grupo 3 reservado na tabela destacada: Sc e Y têm grupo 3. La–Lu e Ac–Lr são séries sem grupo individual atribuído. Esta decisão não resolve a discussão IUPAC sobre grupo 3.",
+  "minimumDataset": [
+    "identity",
+    "metallic-classification",
+    "neutral-ground-configuration",
+    "valence-convention",
+    "reference-structure",
+    "reference-conditions",
+    "structure-source",
+    "six-cell-parameters-with-units",
+    "fractional-basis-or-equivalent"
+  ],
+  "scope": "Documentação e seleção de um único metal; nenhuma simulação, liga ou cálculo."
+}

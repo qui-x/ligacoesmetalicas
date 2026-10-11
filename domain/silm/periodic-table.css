@@ -1,0 +1,51 @@
+.silm-laboratory{width:100%;min-width:0;padding:12px;align-self:stretch}
+.silm-periodic{--periodic-cell:52px;display:flex;flex-direction:column;min-width:0;max-width:100%;gap:10px;color:var(--text)}
+.periodic-heading{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.periodic-heading h1{font-size:1.35rem;margin:0}.periodic-heading .eyebrow{margin:0 0 4px;color:var(--accent);font-size:.7rem;letter-spacing:.12em}
+.periodic-search{display:grid;grid-template-columns:minmax(100px,1fr) auto;align-items:center;gap:6px;max-width:100%;min-width:0;width:310px}
+.periodic-search label{grid-column:1/-1;font-size:.78rem}.periodic-search input{width:100%;min-width:0;min-height:44px}
+.periodic-search button{min-height:44px}.periodic-status{font-size:.78rem;margin:0;color:var(--secondary);min-height:1.3em}
+.periodic-scroll{min-width:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;flex:1 1 auto;min-height:120px;max-width:100%;padding:5px 3px 10px}
+.periodic-grid{display:grid;grid-template-columns:20px repeat(18,var(--periodic-cell));grid-template-rows:20px repeat(7,calc(var(--periodic-cell)*1.13)) 8px repeat(2,calc(var(--periodic-cell)*1.13));gap:4px;width:max-content;margin-inline:auto}
+.periodic-group,.periodic-period{font-size:.7rem;color:var(--secondary);display:grid;place-items:center;font-weight:600}
+.periodic-series-mark{display:grid;place-items:center;font-size:.65rem;border:1px dotted var(--border);border-radius:4px;color:var(--secondary)}
+.periodic-series-label{font-size:.73rem;text-align:right;align-self:center;padding-right:10px;color:var(--secondary)}
+.periodic-element{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0;min-height:44px;max-width:100%;padding:3px 2px;border:1px solid var(--border);border-radius:5px;background:var(--panel);color:var(--text);cursor:pointer;line-height:1.1;box-shadow:none}
+.periodic-element[data-availability=available]{border:2px solid var(--accent);background:color-mix(in srgb,var(--accent) 9%,var(--panel))}
+.periodic-element[data-availability=unavailable]{border:1px dashed var(--secondary)}
+.periodic-element[data-availability=outside]{background:var(--bg);border-color:var(--border)}
+.element-z{font-size:max(.6rem,calc(var(--periodic-cell)*.14));align-self:flex-start;line-height:1.15;margin-left:2px}
+.element-symbol{font-size:clamp(1.15rem,calc(var(--periodic-cell)*.40),2.25rem);font-weight:750;line-height:1.15}
+.element-name{display:block;width:100%;font-size:max(.55rem,calc(var(--periodic-cell)*.137));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;line-height:1.3}
+.element-badge{position:absolute;right:3px;top:2px;font-size:.7rem;font-weight:bold}
+.periodic-element.is-match{outline:2px dotted var(--scientific-accent);outline-offset:-4px}
+.periodic-element.is-selected{outline:3px solid var(--text);outline-offset:1px;z-index:1;background:var(--primary);color:var(--on-primary,var(--bg))}
+.periodic-element:focus-visible{outline:4px solid var(--scientific-accent);outline-offset:1px;z-index:2;text-decoration:underline;text-underline-offset:3px}
+.periodic-element:hover{filter:brightness(1.12)}
+.periodic-footer{display:grid;gap:8px;border-top:1px solid var(--border);padding-top:10px;flex:0 0 auto}
+.periodic-legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.76rem}
+.periodic-legend span{padding:4px 8px;border-radius:4px;border:1px solid var(--border)}.periodic-legend [data-availability=available]{border:2px solid var(--accent)}.periodic-legend [data-availability=unavailable]{border-style:dashed}
+.periodic-summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;line-height:1.35;font-size:.85rem;min-height:1.5em}
+.periodic-summary p{margin:0}.periodic-summary strong{font-size:1rem}.periodic-summary small{flex-basis:100%;color:var(--secondary)}
+.periodic-actions,.presentation-toolbar{display:flex;flex-wrap:wrap;gap:6px}.periodic-actions button,.presentation-toolbar button{min-height:44px}
+.silm-metal-card{max-width:760px;margin:clamp(12px,5vh,60px) auto;padding:clamp(16px,4vw,40px);border:1px solid var(--border);border-radius:var(--radius);background:var(--panel)}
+.silm-metal-card h1{font-size:clamp(1.5rem,4vw,2.5rem);margin:8px 0}.silm-metal-card .metal-symbol{font-size:4rem;line-height:1.1;color:var(--accent)}
+.silm-investigation-status{font-weight:700;border-inline-start:4px solid var(--accent);padding-inline-start:12px}
+.silm-facts{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin:12px 0}.silm-facts dt{font-size:.75rem;color:var(--secondary);margin-top:12px}.silm-facts dd{margin:3px 0 0;overflow-wrap:anywhere}
+.silm-panel details{margin-block:12px;border-top:1px solid var(--border);padding-top:10px}.silm-panel summary{cursor:pointer;font-weight:600;min-height:44px;display:list-item;align-content:center}.silm-datum-kind{font-size:.7rem;letter-spacing:.08em;color:var(--accent)}
+.silm-reference-fields{display:grid;gap:8px;padding:0;list-style:none}.silm-reference-fields li{padding:8px;border:1px solid var(--border);border-radius:5px}
+.silm-presentation.app-dialog{width:min(1280px,96vw);max-width:96vw;height:min(920px,94dvh);max-height:94dvh;padding:12px;overflow:hidden}
+.silm-presentation>.dialog-heading{display:none}.silm-presentation>.dialog-body{height:100%;max-height:none;overflow:hidden;padding:0;display:flex;flex-direction:column}
+.silm-presentation.is-expanded.app-dialog{position:fixed;inset:0;margin:0;width:100%;height:100dvh;max-width:100vw;max-height:100dvh;border-radius:0;border:0;padding:12px}
+.silm-presentation:fullscreen{width:100vw;height:100vh}.silm-presentation .silm-periodic{flex:1;min-height:0;height:100%}.silm-presentation .periodic-scroll{min-height:100px}
+.silm-presentation .periodic-heading{flex-shrink:0}.silm-presentation .periodic-summary small{font-size:.72rem}
+.presentation-preferences{flex:0 0 auto;max-height:45vh;overflow:auto;border:1px solid var(--border);padding:12px;margin-bottom:10px}.presentation-preferences[hidden]{display:none}
+.silm-teacher-resource{margin:18px 0;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:center}.silm-teacher-resource h2{margin:0}.silm-teacher-resource p{max-width:60ch}
+.silm-inline-sources{overflow:auto;max-height:60vh;flex:0 0 auto;padding:12px;border:1px solid var(--border);margin-bottom:8px}.silm-inline-sources[hidden]{display:none}
+@media(max-width:600px){.silm-laboratory{padding:10px 6px}.periodic-heading{align-items:flex-start}.periodic-search{width:100%}.periodic-heading h1{font-size:1.1rem}.periodic-legend{font-size:.68rem;gap:4px}.periodic-legend span{padding:4px}.periodic-summary{font-size:.78rem}.periodic-actions{gap:4px}.periodic-actions button{flex:1}.silm-presentation.app-dialog,.silm-presentation.is-expanded.app-dialog{inset:0;margin:0;width:100%;height:100dvh;max-width:100vw;max-height:100dvh;padding:8px;border-radius:0}.presentation-toolbar{width:100%;display:grid;grid-template-columns:1fr 1fr}.silm-presentation .periodic-heading{gap:8px}.silm-presentation .periodic-status{font-size:.68rem}.silm-presentation .periodic-summary small{display:none}.silm-presentation .periodic-scroll{min-height:120px}.silm-presentation>.dialog-body{overflow:auto}.silm-presentation .silm-periodic{min-height:550px}.silm-periodic .periodic-scroll{touch-action:pan-x pan-y}}
+@media(max-height:550px){.silm-presentation>.dialog-body{overflow:auto}.silm-presentation .silm-periodic{min-height:500px}.silm-presentation .periodic-heading{gap:6px}.silm-presentation .periodic-heading .eyebrow{display:none}}
+@media(forced-colors:active){.periodic-element,.periodic-legend span{forced-color-adjust:auto;border-color:ButtonText}.periodic-element[data-availability=available]{border:3px solid ButtonText}.periodic-element[data-availability=unavailable]{border:2px dashed ButtonText}.periodic-element.is-selected{outline:4px solid Highlight}.periodic-element:focus-visible{outline:4px double Highlight}}
+@media(prefers-reduced-motion:reduce){.silm-periodic *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+/* A região central e o diálogo dimensionam a tabela pelo espaço efetivo. */
+.silm-laboratory{height:100%;display:flex;flex-direction:column;min-height:0}
+.silm-laboratory>.silm-periodic{height:100%;min-height:0;flex:1}

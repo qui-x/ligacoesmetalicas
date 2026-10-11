@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">SILM</title>
+  <desc id="desc">Centros metálicos organizados e um fluxo contínuo que atravessa o conjunto.</desc>
+  <rect x="2" y="2" width="124" height="124" rx="27" fill="#1f2329" stroke="#59616d" stroke-width="2"/>
+  <g fill="#c7a54a" stroke="#e1c476" stroke-width="1.5">
+    <circle cx="32" cy="32" r="8"/><circle cx="64" cy="32" r="8"/><circle cx="96" cy="32" r="8"/>
+    <circle cx="32" cy="64" r="8"/><circle cx="64" cy="64" r="8"/><circle cx="96" cy="64" r="8"/>
+    <circle cx="32" cy="96" r="8"/><circle cx="64" cy="96" r="8"/><circle cx="96" cy="96" r="8"/>
+  </g>
+  <path d="M13 81C35 81 42 46 64 47S92 80 115 48" fill="none" stroke="#4fc3f7" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="79" cy="56" r="4" fill="#f2f1ec" stroke="#1f2329" stroke-width="1.5"/>
+</svg>

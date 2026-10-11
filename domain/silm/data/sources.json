@@ -1,0 +1,1495 @@
+[
+  {
+    "id": "src-iupac-2022",
+    "institution": "IUPAC",
+    "authors": [],
+    "title": "Tabela Periódica IUPAC · edição de 4 de maio de 2022",
+    "year": 2022,
+    "url": "https://iupac.org/wp-content/uploads/2022/07/IUPAC_Periodic_Table-04May22_CRA.pdf",
+    "doi": null,
+    "accessedAt": "2026-10-11",
+    "license": "Direitos da publicação original; fatos transcritos com atribuição.",
+    "notes": "Identidade, numeração, grupos e números de massa entre colchetes. Tradução editorial pt-BR; a tabela gráfica original não é redistribuída.",
+    "type": "dados"
+  },
+  {
+    "id": "src-ciaaw-2024",
+    "institution": "IUPAC / CIAAW",
+    "authors": [],
+    "title": "Standard Atomic Weights 2024",
+    "year": 2024,
+    "url": "https://www.ciaaw.org/atomic-weights.htm",
+    "doi": null,
+    "accessedAt": "2026-10-11",
+    "license": "Direitos da publicação original; fatos transcritos com atribuição.",
+    "notes": "Tabela 2021 com revisões 2024 de Gd, Lu e Zr. Intervalos e notação de incerteza preservados; grandeza adimensional.",
+    "type": "dados"
+  },
+  {
+    "id": "src-nist-asd-2024",
+    "institution": "NIST",
+    "authors": [
+      "Kramida, A.",
+      "Ralchenko, Yu.",
+      "Reader, J.",
+      "NIST ASD Team"
+    ],
+    "title": "NIST Atomic Spectra Database · estados fundamentais de átomos neutros",
+    "year": 2024,
+    "url": "https://physics.nist.gov/PhysRefData/ASD/ionEnergy.html",
+    "doi": "10.18434/T4W30F",
+    "accessedAt": "2026-10-11",
+    "license": "Direitos da publicação original; fatos transcritos com atribuição.",
+    "notes": "ASD 5.12. Configurações neutras no estado fundamental. A configuração reportada é a maior componente do autovetor calculado para o nível fundamental; o NIST alerta para incertezas, especialmente em átomos complexos ou pesados. Notação abreviada normalizada para caroço de gás nobre. Sem extrapolação para superpesados.",
+    "type": "dados"
+  },
+  {
+    "id": "src-iupac-valence",
+    "institution": "IUPAC",
+    "authors": [],
+    "title": "Gold Book · valence",
+    "year": null,
+    "url": "https://goldbook.iupac.org/terms/view/V06588",
+    "doi": "10.1351/goldbook.V06588",
+    "accessedAt": "2026-10-10",
+    "license": "Direitos da publicação original; fatos transcritos com atribuição.",
+    "notes": "Valência química não equivale a uma contagem universal de elétrons deslocalizados. O modelo descritivo do SILM não atribui elétrons livres.",
+    "type": "conceitual"
+  },
+  {
+    "id": "src-silm-conventions",
+    "institution": "Projeto SILM",
+    "authors": [
+      "SILM · curadoria desta versão"
+    ],
+    "title": "Convenções científicas do SILM 0.2.0",
+    "year": 2026,
+    "url": "docs/SCHEMA-DADOS-CIENTIFICOS.md",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "GNU GPL v3",
+    "notes": "Convenções editoriais e condições de referência adotadas, nunca medidas experimentais. Grupo 3 não atribuído às linhas destacadas; bloco f como convenção de organização das séries. Não é fonte independente de valores experimentais.",
+    "type": "tecnica"
+  },
+  {
+    "id": "src-rsc-periodic",
+    "institution": "Royal Society of Chemistry",
+    "authors": [],
+    "title": "Periodic Table · classificação e fronteiras pedagógicas",
+    "year": null,
+    "url": "https://www.rsc.org/periodic-table/element/84/polonium",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "Direitos da publicação original; fatos transcritos com atribuição.",
+    "notes": "Fonte pedagógica para a convenção de Po como metal; não é usada como referência de valores numéricos.",
+    "type": "conceitual"
+  },
+  {
+    "id": "src-nbs-539-v1",
+    "institution": "National Bureau of Standards (atual NIST)",
+    "authors": [
+      "Swanson, H. E.",
+      "Tatge, E."
+    ],
+    "title": "Standard X-ray Diffraction Powder Patterns · NBS Circular 539, volume 1",
+    "year": 1953,
+    "url": "https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular539v1.pdf",
+    "doi": "10.6028/NBS.CIRC.539v1",
+    "accessedAt": "2026-10-10",
+    "license": "Publicação do governo federal dos Estados Unidos.",
+    "notes": "Valores da linha Swanson and Tatge 1953 nas tabelas de célula a 25 °C. O NBS converteu kX para Å; não são os números kX dos artigos de 1935. Pressão numérica não reportada. Espelho oficial consultado: govinfo.gov, documento GOVPUB-C13-f2a5ff42fffeb0ad99cc234023c5e011.",
+    "type": "dados"
+  },
+  {
+    "id": "src-ames-rare-earths",
+    "institution": "Ames Laboratory / Iowa State University / U.S. Atomic Energy Commission",
+    "authors": [
+      "Spedding, F. H.",
+      "Hanak, J. J.",
+      "Daane, A. H."
+    ],
+    "title": "High temperature allotropy and thermal expansion of the rare-earth metals",
+    "year": 1960,
+    "url": "https://www.osti.gov/servlets/purl/1114463",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "Direitos da publicação original; fatos transcritos com atribuição.",
+    "notes": "Relatório primário, contribuição 940. Introdução p.2: estruturas das terras raras à temperatura ambiente. Usado para a atribuição de fase ambiente; não atribui uma temperatura numérica aos parâmetros do artigo de 1956.",
+    "type": "dados"
+  },
+  {
+    "id": "src-cod-1509138",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "William H. Beamer",
+      "Charles R. Maxwell"
+    ],
+    "title": "COD 1509138 · Physical Properties of Polonium. II. X-Ray Studies and Crystal Structure",
+    "year": 1949,
+    "url": "https://www.crystallography.net/cod/1509138.html",
+    "doi": "10.1063/1.1747155",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Physical Properties of Polonium. II. X-Ray Studies and Crystal Structure | Journal of Chemical Physics 17, p. 1293–1298",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/1509138.cif",
+      "sha256": "0287ad20317b7611592dc40d2b78f27406304a649927bad71d323fa5c25d5279"
+    }
+  },
+  {
+    "id": "src-cod-1509139",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Weigel, F.",
+      "Trinkl, A."
+    ],
+    "title": "COD 1509139 · Zur Kristallchemie des Radiums, III. Darstellung, Kristallstruktur und",
+    "year": 1968,
+    "url": "https://www.crystallography.net/cod/1509139.html",
+    "doi": "10.1524/ract.1968.10.12.78",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Zur Kristallchemie des Radiums, III. Darstellung, Kristallstruktur und\n Atomradius des metallischen Radiums | Radiochimica Acta 10, p. 78–82",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/1509139.cif",
+      "sha256": "5ddf40708714cee71ba4bc0870fc8423d05a86b4981dd3b78a6f9b6fade95728"
+    }
+  },
+  {
+    "id": "src-cod-1527120",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Barrett, C.S.",
+      "Mueller, M.H.",
+      "Hitterman, R.L."
+    ],
+    "title": "COD 1527120 · Crystal structure in alpha uranium at low temperature",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/1527120.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Crystal structure in alpha uranium at low temperature | Physical Review (1,1893-132,1963/141,1966-188,1969) 129, p. 625–629",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/1527120.cif",
+      "sha256": "975856054eb0cc217de8d5d842bc826cd249ef507643185bd2484294142031ee"
+    }
+  },
+  {
+    "id": "src-cod-1534910",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Haglund, J.",
+      "Fernandez Guillermet, F.",
+      "Grimvall, G.",
+      "Korling, M."
+    ],
+    "title": "COD 1534910 · Theory of bonding in transition-metal carbides and nitrides",
+    "year": 1993,
+    "url": "https://www.crystallography.net/cod/1534910.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Theory of bonding in transition-metal carbides and nitrides | Physical Review, Serie 3. B - Condensed Matter (18,1978-) 48, p. 11685–11691",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/1534910.cif",
+      "sha256": "3d98d81a70726218356432fd3f50155872c87e55cde93fb20712fb3030d30298"
+    }
+  },
+  {
+    "id": "src-cod-1539076",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Russell, R."
+    ],
+    "title": "COD 1539076 · On the Zr-Hf system",
+    "year": 1953,
+    "url": "https://www.crystallography.net/cod/1539076.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "On the Zr-Hf system | Journal of Applied Physics 24, p. 232–233",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/1539076.cif",
+      "sha256": "0f22b0c7df50da2ea8d473bcc49211dc06a7a64b5f9df96060f5ea61e6ba9bb2"
+    }
+  },
+  {
+    "id": "src-cod-1541062",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Trzebiatowski, W.",
+      "Rudzinski, J."
+    ],
+    "title": "COD 1541062 · The composition and structure of technetium nitride and technetium",
+    "year": 1964,
+    "url": "https://www.crystallography.net/cod/1541062.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The composition and structure of technetium nitride and technetium\n borides | Journal of the Less-Common Metals 6, p. 244–245",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/1541062.cif",
+      "sha256": "40d7086c55362c972b18076ded2ae5d3b765a6f601128c7a5a503a793ffb3330"
+    }
+  },
+  {
+    "id": "src-cod-1541266",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Mueller, M. H."
+    ],
+    "title": "COD 1541266 · The lattice parameter of tantalum",
+    "year": 1977,
+    "url": "https://www.crystallography.net/cod/1541266.html",
+    "doi": "10.1016/0036-9748(77)90141-7",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The lattice parameter of tantalum | Scripta Metallurgica 11, p. 693–693",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/1541266.cif",
+      "sha256": "3a77590aba6f28e05f1dfdb809848cb6f103e020706b2e5f3dd3b830cad6d242"
+    }
+  },
+  {
+    "id": "src-cod-2310022",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "W. H. Zachariasen"
+    ],
+    "title": "COD 2310022 · Crystal chemical studies of the 5f - series of elements. XVI.",
+    "year": 1952,
+    "url": "https://www.crystallography.net/cod/2310022.html",
+    "doi": "10.1107/S0365110X5200006X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Crystal chemical studies of the 5f - series of elements. XVI.\n Identification and crystal structure of protactinium metal and of\n protactinium monoxide | Acta Crystallographica 5, p. 19–21",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/2310022.cif",
+      "sha256": "3eedeaba5dca3485fce51e9b9c7a6466789b2dd3688df1e40be23ff38ff79e58"
+    }
+  },
+  {
+    "id": "src-cod-5000220",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Swanson, H E",
+      "Gilfrich, N T",
+      "Ugrinic, G M"
+    ],
+    "title": "COD 5000220 · Standard X-ray diffraction powder patterns",
+    "year": 1955,
+    "url": "https://www.crystallography.net/cod/5000220.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Standard X-ray diffraction powder patterns | National Bureau of Standards (U.S.), Circular 539, p. 5–5",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/5000220.cif",
+      "sha256": "552ef5151251876ca87407be168c9c98c91ac0566b96469ff1ed9932c3004eda"
+    }
+  },
+  {
+    "id": "src-cod-9006486",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Dubrovinsky, L. S.",
+      "Saxena, S. K."
+    ],
+    "title": "COD 9006486 · Thermal expansion of periclase (MgO) and tungsten (W)",
+    "year": 1997,
+    "url": "https://www.crystallography.net/cod/9006486.html",
+    "doi": "10.1007/s002690050070",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Thermal expansion of periclase (MgO) and tungsten (W)\n to melting temperatures\n Sample: T = 298 K | Physics and Chemistry of Minerals 24, p. 547–550",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9006486.cif",
+      "sha256": "0ad824c270e2dc66886543130bf6e02735eda7816a314f231804adf80e9914f1"
+    }
+  },
+  {
+    "id": "src-cod-9006587",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Zhang, J.",
+      "Guyot, F."
+    ],
+    "title": "COD 9006587 · Thermal equation of iron and Fe0.91Si0.09",
+    "year": 1999,
+    "url": "https://www.crystallography.net/cod/9006587.html",
+    "doi": "10.1007/s002690050178",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Thermal equation of iron and Fe0.91Si0.09\n Sample: P = 0.0 GPa, T = 298 K, prior to experiment | Physics and Chemistry of Minerals 26, p. 206–211",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9006587.cif",
+      "sha256": "5fc173ceb1b648b440fd8cf6d79354b6dc44828c61d06c87f8b2b39b99919275"
+    }
+  },
+  {
+    "id": "src-cod-9008458",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008458 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008458.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Cubic closest packed, ccp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008458.cif",
+      "sha256": "41eedf3dc33f2254571643f6127ad1232a5d7f48dfa58145e71816959d9a4a59"
+    }
+  },
+  {
+    "id": "src-cod-9008463",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008463 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008463.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Cubic closest packed, ccp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008463.cif",
+      "sha256": "84ace61591afe36e1d0ac64b6521e6e0ab80f4e61d66069000eb1dbaf23ac833"
+    }
+  },
+  {
+    "id": "src-cod-9008470",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008470 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008470.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Cubic closest packed, ccp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008470.cif",
+      "sha256": "fd1275778188d9c3f1afe5801f40a2397064528bd8423d40447f1f81d27cceb6"
+    }
+  },
+  {
+    "id": "src-cod-9008478",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008478 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008478.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Cubic closest packed, ccp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008478.cif",
+      "sha256": "b25f3e291c2aa0c640cabf777af2a9f0050efba643683606457103742bd5e002"
+    }
+  },
+  {
+    "id": "src-cod-9008480",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008480 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008480.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Cubic closest packed, ccp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008480.cif",
+      "sha256": "847a2ceb96f7eacb724c49116253311d53f6fd2cb1d679f7edae5b579ef04b53"
+    }
+  },
+  {
+    "id": "src-cod-9008482",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008482 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008482.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Cubic closest packed, ccp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008482.cif",
+      "sha256": "19042bb4e309b7be9b34d1bcaaa82b5f915a2c26b5cad99f715c019f0e66bc8d"
+    }
+  },
+  {
+    "id": "src-cod-9008485",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008485 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008485.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Cubic closest packed, ccp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008485.cif",
+      "sha256": "8c30da8e5f576fe71ba7bc92a7079967446f8aed56fcd0cc13c551beee279a50"
+    }
+  },
+  {
+    "id": "src-cod-9008490",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008490 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008490.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Hexagonal closest packed, hcp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008490.cif",
+      "sha256": "18bb37117f3e2819d7288782f52f264e5415f87a8f8a36b010437c7710eb7d12"
+    }
+  },
+  {
+    "id": "src-cod-9008510",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008510 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008510.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Hexagonal closest packed, hcp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008510.cif",
+      "sha256": "c5f65670a8eb31c89e5480161046b96c58426e0dac8d1248aa70de4e7988b832"
+    }
+  },
+  {
+    "id": "src-cod-9008512",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008512 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008512.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Hexagonal closest packed, hcp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008512.cif",
+      "sha256": "65fda178352289fa065867c6e6e9161d610bd0013f622c99c58035b000a104e2"
+    }
+  },
+  {
+    "id": "src-cod-9008513",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008513 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008513.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Hexagonal closest packed, hcp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008513.cif",
+      "sha256": "1770efee37f4b9bfbfb93baf24b72fb980be0c967fc9a0fe3b7386aa3c35e747"
+    }
+  },
+  {
+    "id": "src-cod-9008517",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008517 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008517.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Hexagonal closest packed, hcp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008517.cif",
+      "sha256": "2f20ea6027038fb6b2e17d4615e43cd79ef9168b61314d11ade5d1129bdb065b"
+    }
+  },
+  {
+    "id": "src-cod-9008519",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008519 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008519.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Sample at T = 297 K\n Hexagonal closest packed, hcp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008519.cif",
+      "sha256": "93125b55c68ef3b03db0079f8d8efb2b0ccbf9e537a69bc60dbcf7742b043f69"
+    }
+  },
+  {
+    "id": "src-cod-9008520",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008520 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008520.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Hexagonal closest packed, hcp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008520.cif",
+      "sha256": "959d2c7976f6777e8411f709680e6725e8594bcf96d8830cb888a96bbcdf9057"
+    }
+  },
+  {
+    "id": "src-cod-9008521",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008521 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008521.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Hexagonal closest packed, hcp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008521.cif",
+      "sha256": "6d566f2c4d27c057ee4d2bd70d51bc714d6117d15c03bc94d8a70ed38652b405"
+    }
+  },
+  {
+    "id": "src-cod-9008524",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008524 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008524.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Double hexagonal closest packed, dhcp, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008524.cif",
+      "sha256": "feda6fb80a5b9d673c3ce080be43dfde2455056e6a84ef9e4984b6200eb1a3c8"
+    }
+  },
+  {
+    "id": "src-cod-9008532",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008532 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008532.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Sample at T = 5 K\n Body centered cubic, bcc, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008532.cif",
+      "sha256": "d15d25ee1a2fc046dc5d16834491dbe71e6f9d3a89edda5bc687f9d1d6061bd2"
+    }
+  },
+  {
+    "id": "src-cod-9008542",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008542 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008542.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Sample at T = 293 K\n Body centered cubic, bcc, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008542.cif",
+      "sha256": "a8705a8dbe69ecf7e3a03503b851721311111682be84a9665d38d8e0de3ce495"
+    }
+  },
+  {
+    "id": "src-cod-9008543",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008543 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008543.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Body centered cubic, bcc, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008543.cif",
+      "sha256": "6091e3e0faf78d13c14fa7a9eacfd16531f2ff2104594f8fe70a47d74ecdb3b4"
+    }
+  },
+  {
+    "id": "src-cod-9008545",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008545 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008545.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Sample at T = 293 K\n Body centered cubic, bcc, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008545.cif",
+      "sha256": "5b83399b80048f6547b838d9a2c0cbee39edaf72865cb3af0c8304f09880552a"
+    }
+  },
+  {
+    "id": "src-cod-9008546",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008546 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008546.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Body centered cubic, bcc, structure | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008546.cif",
+      "sha256": "6027412a1aa8155a0dd4ccb6e7fef2ea02f0978889d94bcce31cfa2aeed6daff"
+    }
+  },
+  {
+    "id": "src-cod-9008585",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008585 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008585.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Sample is stable at room conditions | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008585.cif",
+      "sha256": "2875c73aa3acb2fe4ae509cc00300b437c5a9a3ed92c5aca2ce32a06d5700cd6"
+    }
+  },
+  {
+    "id": "src-cod-9008587",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Wyckoff, R. W. G."
+    ],
+    "title": "COD 9008587 · Second edition. Interscience Publishers, New York, New York",
+    "year": 1963,
+    "url": "https://www.crystallography.net/cod/9008587.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Second edition. Interscience Publishers, New York, New York\n Sample is stable room conditions to 110 C | Crystal Structures 1, p. 7–83",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9008587.cif",
+      "sha256": "a53210cd68d506b502482f4bc0210fbec8788606ffaed853fb2bad376c9ee8ef"
+    }
+  },
+  {
+    "id": "src-cod-9009658",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Schiferl, D.",
+      "Barrett, C. S."
+    ],
+    "title": "COD 9009658 · The crystal structure of arsenic at 4.2, 78 and 299 K",
+    "year": 1969,
+    "url": "https://www.crystallography.net/cod/9009658.html",
+    "doi": "10.1107/S0021889869006443",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structure of arsenic at 4.2, 78 and 299 K\n Sample: T = 298 K | Journal of Applied Crystallography 2, p. 30–36",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9009658.cif",
+      "sha256": "fa41bfe20224332f551a53d184581f84053bd8ba1ebd1058a10c9d7f54fe2e04"
+    }
+  },
+  {
+    "id": "src-cod-9010984",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010984 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010984.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Locality: synthetic\n Note: sample 99.4% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010984.cif",
+      "sha256": "ff47a7abc343c24ddbfdf5d3b2bb9ee442d2207f3280b17c1717f28e4f32ea89"
+    }
+  },
+  {
+    "id": "src-cod-9010985",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010985 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010985.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Locality: synthetic\n Note: sample 99.6% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010985.cif",
+      "sha256": "57bb1212a7dab3fa6e4d65c093087a9e027dfc873b952fcf64a3b8ccc4598fa9"
+    }
+  },
+  {
+    "id": "src-cod-9010986",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010986 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010986.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Note: sample 99.8% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010986.cif",
+      "sha256": "7a8af991b0a916a34cce284b656c90ae1063eb2a21eea41ae6744ab7dcd2d03c"
+    }
+  },
+  {
+    "id": "src-cod-9010987",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010987 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010987.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Locality: synthetic\n Note: sample 99.9% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010987.cif",
+      "sha256": "5b05749782725b1acd17db07249e04f48515b4e4f6b2d07693f0eeae2dd446e2"
+    }
+  },
+  {
+    "id": "src-cod-9010988",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010988 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010988.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Note: sample 99.9% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010988.cif",
+      "sha256": "b3248de5bbee485b127d2504352e01d3ced5d8af3c5d1c33ca718b47768303a0"
+    }
+  },
+  {
+    "id": "src-cod-9010989",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010989 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010989.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Note: sample 99.8% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010989.cif",
+      "sha256": "17b1340137a7028c1832791b93a826cb09be46573dcacbcaa01f61205e3fe2cc"
+    }
+  },
+  {
+    "id": "src-cod-9010990",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010990 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010990.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Locality: synthetic\n Note: sample 98-99% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010990.cif",
+      "sha256": "85c6f13f68171754dbf853115ffd045eca2e098df1aaadb2c964e65e17a526d0"
+    }
+  },
+  {
+    "id": "src-cod-9010991",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010991 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010991.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Note: sample 99.7% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010991.cif",
+      "sha256": "7752cd1e810d179a3935ff56b0ee994d90d8f498762e280bfe4e57c9b4446b8c"
+    }
+  },
+  {
+    "id": "src-cod-9010992",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010992 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010992.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Locality: synthetic\n Note: sample 99.9% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010992.cif",
+      "sha256": "4390761ec8c9d5fbe3d211edb15ad06156721912b2ad5c84def672fc3973addf"
+    }
+  },
+  {
+    "id": "src-cod-9010993",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010993 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010993.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Note: sample 99.8% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010993.cif",
+      "sha256": "44622dba91d7d7c3afe09fad9f6e9252ea00713edcd5e50a0e11db775140ee58"
+    }
+  },
+  {
+    "id": "src-cod-9010994",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010994 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010994.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Locality: synthetic\n Note: sample 99.4% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010994.cif",
+      "sha256": "c1e52f96c3b968ec0eeb1629f7e4a75a05f5211d883653e5e5dedb5cfa3a5f5c"
+    }
+  },
+  {
+    "id": "src-cod-9010995",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010995 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010995.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Locality: synthetic\n Note: sample 99.8% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010995.cif",
+      "sha256": "303ffd0ee7f9ecbb39048b57080bff2058639c230c8577524ed3e5e75d5dd988"
+    }
+  },
+  {
+    "id": "src-cod-9010996",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010996 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010996.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Locality: synthetic\n Note: sample 99.9% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010996.cif",
+      "sha256": "df6c590768c5abde9d6bfa193343375a256655ce242a89f84ff8fc0c4567311b"
+    }
+  },
+  {
+    "id": "src-cod-9010997",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010997 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010997.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Locality: synthetic\n Note: sample 99.9% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010997.cif",
+      "sha256": "dd9d4db0ad36576da10e93bb922af5913fd76c50b8d4297c7425432bdc130867"
+    }
+  },
+  {
+    "id": "src-cod-9010998",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Spedding, F. H.",
+      "Daane, A. H.",
+      "Herrmann, K. W."
+    ],
+    "title": "COD 9010998 · The crystal structures and lattice parameters of high-purity scandium,",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9010998.html",
+    "doi": "10.1107/S0365110X5600156X",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structures and lattice parameters of high-purity scandium,\n yttrium and the rare earth metals\n Locality: synthetic\n Note: sample 99.9% pure | Acta Crystallographica 9, p. 559–563",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9010998.cif",
+      "sha256": "0ee2e5352b4835072498870ff5da888ee45ec8020ebdd0ccdd2c4795dd730898"
+    }
+  },
+  {
+    "id": "src-cod-9011068",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Gazzara, C. P.",
+      "Middleton, R. M.",
+      "Weiss, R. J.",
+      "Hall, E. O."
+    ],
+    "title": "COD 9011068 · A refinement of the parameters of alpha manganese",
+    "year": 1967,
+    "url": "https://www.crystallography.net/cod/9011068.html",
+    "doi": "10.1107/S0365110X67001689",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "A refinement of the parameters of alpha manganese\n Localilty: synthetic\n Sample: at T = 298K | Acta Crystallographica 22, p. 859–862",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9011068.cif",
+      "sha256": "141d46af2a6950378f7c14f1b8487104a6f1fb8c8572af06edfae69df9dbd196"
+    }
+  },
+  {
+    "id": "src-cod-9011615",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Marick, L."
+    ],
+    "title": "COD 9011615 · Variation of resistance and structure of cobalt with temperature",
+    "year": 1936,
+    "url": "https://www.crystallography.net/cod/9011615.html",
+    "doi": "10.1103/PhysRev.49.831",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Variation of resistance and structure of cobalt with temperature\n and a discussion of its photoelectric emission\n Sample: at room T\n Note: cell edge a is average of photographs 1 & 2 | Physical Review 49, p. 831–837",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9011615.cif",
+      "sha256": "aa46ec741fc45380c5fda97f982a067c7213407520d849a1d599360bebb93136"
+    }
+  },
+  {
+    "id": "src-cod-9011970",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Liu, L."
+    ],
+    "title": "COD 9011970 · Compression and polymorphism of potassium to 400 Kbar",
+    "year": 1986,
+    "url": "https://www.crystallography.net/cod/9011970.html",
+    "doi": "10.1016/0022-3697(86)90073-9",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Compression and polymorphism of potassium to 400 Kbar\n Sample: bcc at P = 0 GPa | Journal of Physics and Chemistry of Solids 47, p. 1067–1072",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9011970.cif",
+      "sha256": "98ecd16bf5fc1cacbec13ca21427dd4e9420846d9658856ddc7d4d07118f97af"
+    }
+  },
+  {
+    "id": "src-cod-9012001",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Straumanis, M. E."
+    ],
+    "title": "COD 9012001 · The precision determination of lattice constants by the powder and rotation",
+    "year": 1949,
+    "url": "https://www.crystallography.net/cod/9012001.html",
+    "doi": "10.1063/1.1698520",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The precision determination of lattice constants by the powder and rotation\n crystal methods and applications\n Sample: at T = 25 C | Journal of Applied Physics 20, p. 726–734",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9012001.cif",
+      "sha256": "3390cb7a27fa6f969bd8f8a4f0d8a6cf35c5e238e82582376b30d0fda0e13fe1"
+    }
+  },
+  {
+    "id": "src-cod-9012002",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Straumanis, M. E."
+    ],
+    "title": "COD 9012002 · The precision determination of lattice constants by the powder and rotation",
+    "year": 1949,
+    "url": "https://www.crystallography.net/cod/9012002.html",
+    "doi": "10.1063/1.1698520",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The precision determination of lattice constants by the powder and rotation\n crystal methods and applications\n Locality: synthetic\n Sample: at T = 25 C | Journal of Applied Physics 20, p. 726–734",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9012002.cif",
+      "sha256": "4cab384c1cdef62eb8d082fa43e098758fc55f99075ce505097c92aa195a4ab3"
+    }
+  },
+  {
+    "id": "src-cod-9012004",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Straumanis, M. E."
+    ],
+    "title": "COD 9012004 · The precision determination of lattice constants by the powder and rotation",
+    "year": 1949,
+    "url": "https://www.crystallography.net/cod/9012004.html",
+    "doi": "10.1063/1.1698520",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The precision determination of lattice constants by the powder and rotation\n crystal methods and applications\n Locality: synthetic\n Sample: at T = 25 C | Journal of Applied Physics 20, p. 726–734",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9012004.cif",
+      "sha256": "0306f874c7705faf04b4a76513c060dfc92a21b468c153d04d4f7e1b7140017d"
+    }
+  },
+  {
+    "id": "src-cod-9012005",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Straumanis, M. E."
+    ],
+    "title": "COD 9012005 · The precision determination of lattice constants by the powder and rotation",
+    "year": 1949,
+    "url": "https://www.crystallography.net/cod/9012005.html",
+    "doi": "10.1063/1.1698520",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The precision determination of lattice constants by the powder and rotation\n crystal methods and applications\n Locality: synthetic\n Sample: at T = 25 C | Journal of Applied Physics 20, p. 726–734",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9012005.cif",
+      "sha256": "bfeedf8a80dd124967075fef7ed2ed83fdf04cfc836bd8343cd88d4db8a0f7ed"
+    }
+  },
+  {
+    "id": "src-cod-9012008",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Gordon, P."
+    ],
+    "title": "COD 9012008 · A high temperature precision X-ray camera: some measurements of the thermal",
+    "year": 1949,
+    "url": "https://www.crystallography.net/cod/9012008.html",
+    "doi": "10.1063/1.1698252",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "A high temperature precision X-ray camera: some measurements of the thermal\n coefficients of expansion of beryllium\n Sample: at T = 25 C | Journal of Applied Physics 20, p. 908–917",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9012008.cif",
+      "sha256": "e4b6d0b0e367a213908842874761c1e2e86c7a4b90bd50538363a5086afcd483"
+    }
+  },
+  {
+    "id": "src-cod-9012484",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Bosio, L."
+    ],
+    "title": "COD 9012484 · Crystal structures of Ga(II) and Ga(III)",
+    "year": 1978,
+    "url": "https://www.crystallography.net/cod/9012484.html",
+    "doi": "10.1063/1.435841",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Crystal structures of Ga(II) and Ga(III)\n Loclailty: synthetic\n Sample: at P = 2.6 GPa, T = 313 K\n Note: structure known as Ga(II) phase | Journal of Chemical Physics 68, p. 1221–1223",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9012484.cif",
+      "sha256": "bb8d4dedfe196fc4bf0d0005ae883562eb3ba917fee571351486f36dbf7be065"
+    }
+  },
+  {
+    "id": "src-cod-9012726",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Hirst, R. G.",
+      "King, A. J.",
+      "Kanda, F. A."
+    ],
+    "title": "COD 9012726 · The barium-strontium equilibrium system",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9012726.html",
+    "doi": "10.1021/j150537a011",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The barium-strontium equilibrium system\n Sample: at T = 25 C\n note: known as alpha-strontium | Journal of Physical Chemistry 60, p. 302–304",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9012726.cif",
+      "sha256": "08bcb314d5ff325f4310877443668150ec910cbcf6923ce27d05ef0c24dfc25c"
+    }
+  },
+  {
+    "id": "src-cod-9012729",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Hirst, R. G.",
+      "King, A. J.",
+      "Kanda, F. A."
+    ],
+    "title": "COD 9012729 · The barium-strontium equilibrium system",
+    "year": 1956,
+    "url": "https://www.crystallography.net/cod/9012729.html",
+    "doi": "10.1021/j150537a011",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The barium-strontium equilibrium system\n Sample: at T = 25 C | Journal of Physical Chemistry 60, p. 302–304",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9012729.cif",
+      "sha256": "a9a7786758e2008c8958f1b2dd1e70fae51f78cd67a72f5981204872b34ed30d"
+    }
+  },
+  {
+    "id": "src-cod-9012731",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Schottmiller, J. C.",
+      "King, A. J.",
+      "Kanda, F. A."
+    ],
+    "title": "COD 9012731 · The calcium-strontium metal phase system",
+    "year": 1958,
+    "url": "https://www.crystallography.net/cod/9012731.html",
+    "doi": "10.1021/j150569a024",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The calcium-strontium metal phase system\n Sample: at T = 25 C | Journal of Physical Chemistry 62, p. 1446–1449",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9012731.cif",
+      "sha256": "dbdb5c777abb8783f56279d60002ac9e63f4a2ae9894a5eaf86f3e3965ccda96"
+    }
+  },
+  {
+    "id": "src-cod-9012770",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "James, W. J.",
+      "Straumanis, M. E."
+    ],
+    "title": "COD 9012770 · Lattice parameter and expansion coefficient of vanadium",
+    "year": 1960,
+    "url": "https://www.crystallography.net/cod/9012770.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Lattice parameter and expansion coefficient of vanadium\n Sample: at T = 25C | Journal of the Electrochemical Society 107, p. 69–69",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9012770.cif",
+      "sha256": "3f81e29961c91b096d22f3dc3313b08dd87e56bd1449e0b7a24eb2dc01e41548"
+    }
+  },
+  {
+    "id": "src-cod-9012879",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Kelly, F. M.",
+      "Pearson, W. B."
+    ],
+    "title": "COD 9012879 · The rubidium transition at ~180 K",
+    "year": 1955,
+    "url": "https://www.crystallography.net/cod/9012879.html",
+    "doi": "10.1139/p55-003",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The rubidium transition at ~180 K\n Sample: at T = 297 K\n Note: specimen IV lattice parameter for this T is estimated | Canadian Journal of Physics 33, p. 17–24",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9012879.cif",
+      "sha256": "9d626e7bfebcdf8dda0d61c576f54dcc33410ce023e31770344ffad4da88927c"
+    }
+  },
+  {
+    "id": "src-cod-9013014",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Suh, I.-K.",
+      "Ohta, H.",
+      "Waseda, Y."
+    ],
+    "title": "COD 9013014 · High-temperature thermal expansion of six metallic elements measured",
+    "year": 1988,
+    "url": "https://www.crystallography.net/cod/9013014.html",
+    "doi": "10.1007/BF01174717",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "High-temperature thermal expansion of six metallic elements measured\n by dilatation method and X-ray diffraction\n Sample: at T = 293 K | Journal of Materials Science 23, p. 757–760",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9013014.cif",
+      "sha256": "c266ea973a3255de7429c589438af39005b9748229e9ae1ab3bbf8b7dc2b4f31"
+    }
+  },
+  {
+    "id": "src-cod-9013024",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Suh, I.-K.",
+      "Ohta, H.",
+      "Waseda, Y."
+    ],
+    "title": "COD 9013024 · High-temperature thermal expansion of six metallic elements measured",
+    "year": 1988,
+    "url": "https://www.crystallography.net/cod/9013024.html",
+    "doi": "10.1007/BF01174717",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "High-temperature thermal expansion of six metallic elements measured\n by dilatation method and X-ray diffraction\n Sample: at T = 293 K | Journal of Materials Science 23, p. 757–760",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9013024.cif",
+      "sha256": "94ea4add9a98d44ed77a4b987711f11d7380f25ffa0f10d1f90a892b5a456b96"
+    }
+  },
+  {
+    "id": "src-cod-9013045",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Suh, I.-K.",
+      "Ohta, H.",
+      "Waseda, Y."
+    ],
+    "title": "COD 9013045 · High-temperature thermal expansion of six metallic elements measured",
+    "year": 1988,
+    "url": "https://www.crystallography.net/cod/9013045.html",
+    "doi": "10.1007/BF01174717",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "High-temperature thermal expansion of six metallic elements measured\n by dilatation method and X-ray diffraction\n Sample: at T = 293 K | Journal of Materials Science 23, p. 757–760",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9013045.cif",
+      "sha256": "0c8aee566ef1cba3f79ab72af4ac0f7fc5b426d272abb987371189063561b8bf"
+    }
+  },
+  {
+    "id": "src-cod-9014498",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Daane, A. H.",
+      "Rundle, R. E.",
+      "Smith, H. G.",
+      "Spedding, F. H."
+    ],
+    "title": "COD 9014498 · The crystal structure of samarium",
+    "year": 1954,
+    "url": "https://www.crystallography.net/cod/9014498.html",
+    "doi": "10.1107/S0365110X54001818",
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "The crystal structure of samarium\n Note: sample 99% pure | Acta Crystallographica 7, p. 532–535",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9014498.cif",
+      "sha256": "a0a590f8c48cbc0e7bc16b79aa3e71a6b22d77d5668cf5df98a838ac19f29e49"
+    }
+  },
+  {
+    "id": "src-cod-9017521",
+    "institution": "Crystallography Open Database / AMCSD",
+    "authors": [
+      "Smith, J. F.",
+      "Schneider, V. L."
+    ],
+    "title": "COD 9017521 · Anisotropic thermal expansion of indium",
+    "year": 1964,
+    "url": "https://www.crystallography.net/cod/9017521.html",
+    "doi": null,
+    "accessedAt": "2026-10-10",
+    "license": "COD: CC0; atribuição ao artigo original preservada no CIF.",
+    "notes": "Anisotropic thermal expansion of indium\n Sample: 99.9999% indium\n Note: converted from kx units | Journal of the Less-Common Metals 7, p. 17–22",
+    "type": "dados",
+    "evidence": {
+      "path": "domain/silm/data/evidence/cif/9017521.cif",
+      "sha256": "29423a57b9b9f65a63b6d589207aac03608f5359c4bc7c6e0acacfccfd61ef8a"
+    }
+  }
+]
