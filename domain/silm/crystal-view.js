@@ -3,7 +3,7 @@ window.SILM=window.SILM||{};
 /* Representação 2D/pseudo-3D da estrutura cristalina (0.5.x). Lê o estado científico; vista, camadas e
    seleção são gravadas pelas ações do domínio. Unidades são botões acessíveis; a rede extensa é um
    único grupo SVG decorativo. Sem linhas de ligação: o contorno da célula é geométrico e tracejado. */
-SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle='Explorar',note='',animateFrom=null,reducedMotion=()=>false,electrons:electronOptions=null,properties:propertyOptions=null,measure:measureOptions=null})=>{
+SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle='Explorar',note='',animateFrom=null,reducedMotion=()=>false,electrons:electronOptions=null,properties:propertyOptions=null,measure:measureOptions=null,calc:calcOptions=null})=>{
  const U=SimCore.ExperienceUI,X=SILM.crystal,m=g.model,name=element.name.toLocaleLowerCase('pt-BR'),NS='http://www.w3.org/2000/svg';
  const structureName='Estrutura cristalina '+m.name+' de '+name;
  const root=U.element('section',null,'silm-assembly silm-crystal');root.dataset.editable='true';root.setAttribute('aria-labelledby','silm-assembly-title');
@@ -55,6 +55,11 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const st=()=>model.state.structure,rep=()=>st().crystallography.representation;
  const unitsList=()=>st().units;
  const shortRole={corner:'V',face:'F',body:'C','base-vertex':'A','base-center':'A',interior:'B',outside:''};
+ /* 0.10.x: fração de cada centro que pertence à célula (contagem do número efetivo). */
+ const SHARE={BCC:{corner:'1/8',body:'1'},FCC:{corner:'1/8',face:'1/2'},HCP:{'base-vertex':'1/6','base-center':'1/2',interior:'1'}};
+ /* Par de centros em contato (vizinhos mais próximos), para o destaque de raio e empacotamento. */
+ function contactPair(list){const byKey=new Map(list.map(u=>[X.key(u.site),u])),corner=list.find(u=>g.role(u.site).role==='corner'||g.role(u.site).role==='base-vertex')||list[0];if(!corner)return null;
+  const near=g.neighbors(corner.site).list.find(n=>byKey.has(n.key));return near?[corner,byKey.get(near.key)]:null;}
  function computeLayout(extra=[]){
   // Com vizinhos visíveis, os vizinhos fora da célula também entram no enquadramento (todos ficam inteiros na cena).
   const list=unitsList(),fit=[...g.cell.map(s=>s.cart),...list.map(u=>g.site(u.site).cart),...extra].map(D);
@@ -82,6 +87,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  }
  function render(){
   const s=st();if(!s||s.mode!=='crystalline')return;const r=rep(),list=s.units,pr=model.state.properties,active=pr?.active||null;deform=P.deformer(model.state,g);
+  const calcMark=calcOptions?.marks?.()||null;root.dataset.calc=calcMark?.mode||'';
   root.dataset.view=r.view;root.dataset.labels=String(r.labels);root.dataset.cell=String(r.unitCell);
   for(const [id,node]of nodes)if(!list.some(u=>u.id===id)){node.remove();nodes.delete(id);}
   const selected=r.selectedUnitId,neighbors=r.neighbors&&selected?g.neighbors(list.find(u=>u.id===selected).site):null,neighborKeys=new Set(neighbors?.list.map(x=>x.key)||[]);
@@ -91,7 +97,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    const p=layout.project(D(g.site(u.site).cart)),info=g.role(u.site);
    if(!node.dataset.animating){node.style.left=(p.x*100)+'%';node.style.top=(p.y*100)+'%';}
    node.style.zIndex=String(10+Math.round((1-p.depth)*100));node.style.setProperty('--depth-scale',(1.08-.16*p.depth).toFixed(3));node.style.setProperty('--depth-fade',(1-.22*p.depth).toFixed(3));
-   node.dataset.role=info.role;node.dataset.layer=info.layer||'';node.dataset.placement=u.placement;node.querySelector('.silm-site-label').textContent=shortRole[info.role]||'';
+   node.dataset.role=info.role;node.dataset.layer=info.layer||'';node.dataset.placement=u.placement;node.querySelector('.silm-site-label').textContent=calcMark?.mode==='fractions'?(SHARE[m.id][info.role]||''):(shortRole[info.role]||'');
    const flag=neighborKeys.has(X.key(u.site));if(flag)node.dataset.neighbor='';else delete node.dataset.neighbor;
    node.setAttribute('aria-pressed',String(selected===u.id));
    node.setAttribute('aria-label','Unidade de '+name+' '+(i+1)+' de '+list.length+': '+info.label+(u.placement==='crystallographic'?', completada pelo SILM':'')+(flag?', vizinha imediata da unidade selecionada':''));
@@ -117,7 +123,9 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   let measureText='';
   if(measureOverlay){const marks=measureOptions.marks();root.dataset.measuring=String(!!measureOptions.pickActive());
    if(marks){const pts=marks.points.map(p=>{const site=p.site||list.find(u=>u.id===p.unitId)?.site;if(!site)return null;const q=layout.project(D(g.site(site).cart));return {x:q.x,y:q.y,label:p.label};}).filter(Boolean);
-    measureOverlay.update(pts.length===marks.points.length?{points:pts,kind:marks.kind,text:marks.text}:{});measureText=marks.spoken||'';}else measureOverlay.update({});}
+    measureOverlay.update(pts.length===marks.points.length?{points:pts,kind:marks.kind,text:marks.text}:{});measureText=marks.spoken||'';}
+   else if(calcMark?.mode==='contact'){const pair=contactPair(list);if(pair){const q=pair.map(u=>layout.project(D(g.site(u.site).cart)));measureOverlay.update({points:[{x:q[0].x,y:q[0].y,label:''},{x:q[1].x,y:q[1].y,label:''}],kind:'distance',text:'d = 2r'});}else measureOverlay.update({});}
+   else measureOverlay.update({});}
   const narrative=active?P.narrative(active,pr[active],{reduced:reducedMotion(),electronsVisible:shownElectrons}):null;
   root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;electronControls?.update();
   const inCell=list.filter(u=>g.cellKeys.has(X.key(u.site))).length,added=list.filter(u=>u.placement==='crystallographic').length;

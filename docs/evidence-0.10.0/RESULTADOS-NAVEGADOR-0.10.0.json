@@ -1,0 +1,161 @@
+{
+  "product": "SILM",
+  "version": "0.10.0",
+  "date": "2026-10-12T12:34:11.570Z",
+  "browser": "Chromium (Playwright 1.62.1)",
+  "passed": 15,
+  "failed": 0,
+  "partialRerun": [
+    "0.10-"
+  ],
+  "results": [
+    {
+      "id": "0.10-MIG",
+      "name": "Migração da 0.9.x (schema 7) sem perda",
+      "status": "PASS",
+      "details": {
+        "from": 7,
+        "to": 8
+      },
+      "durationMs": 1556
+    },
+    {
+      "id": "0.10-FREE",
+      "name": "Sem estrutura cristalina não há cálculo absoluto; fora do módulo, convite a ativar Calcular",
+      "status": "PASS",
+      "details": {
+        "free": "sem cálculo absoluto"
+      },
+      "durationMs": 1237
+    },
+    {
+      "id": "0.10-CFC",
+      "name": "CFC (Cu): n, V, r, FE e ρ calculados pelo catálogo, com decomposição e intermediários",
+      "status": "PASS",
+      "details": {
+        "n": 4,
+        "V": "47,24 Å³",
+        "r": "1,278 Å",
+        "FE": "0,7405",
+        "rho": "8,935 g/cm³"
+      },
+      "durationMs": 2996
+    },
+    {
+      "id": "0.10-CCC",
+      "name": "CCC (Fe): n = 2, r = √3·a/4 e FE = π√3/8",
+      "status": "PASS",
+      "details": {
+        "FE": 0.6801747615878316
+      },
+      "durationMs": 1900
+    },
+    {
+      "id": "0.10-HC",
+      "name": "HC (Mg): prisma hexagonal (n = 6), V = (3√3/2)a²c, c/a ≠ ideal e densidade com peso atômico em intervalo",
+      "status": "PASS",
+      "details": {
+        "ca": 1.6235004518119218,
+        "rho": [
+          1.7367721882154161,
+          1.7369865692458906
+        ]
+      },
+      "durationMs": 2371
+    },
+    {
+      "id": "0.10-ORIGIN",
+      "name": "Medida do modelo × referência: escolha explícita, nunca substituição silenciosa",
+      "status": "PASS",
+      "details": {
+        "measured": 47.241633375000006,
+        "tabulated": 47.241633375000006
+      },
+      "durationMs": 2149
+    },
+    {
+      "id": "0.10-INPUT",
+      "name": "Valor informado: número com vírgula aceito; inválido recusado com erro associado ao campo",
+      "status": "PASS",
+      "details": {
+        "user": 3.6
+      },
+      "durationMs": 2121
+    },
+    {
+      "id": "0.10-HIST",
+      "name": "Dados → Cálculos: reabrir com fórmula, entradas e origens; remover e limpar (estrutura e medições intactas)",
+      "status": "PASS",
+      "details": {
+        "cleared": true
+      },
+      "durationMs": 2746
+    },
+    {
+      "id": "0.10-RELOAD",
+      "name": "Reload: cálculos persistem com proveniência; registro de estado anterior é identificado, não recalculado",
+      "status": "PASS",
+      "details": {
+        "persisted": 1,
+        "flagged": true
+      },
+      "durationMs": 3073
+    },
+    {
+      "id": "0.10-METAL",
+      "name": "Troca de módulo preserva os cálculos; nova investigação (outro metal) não os herda",
+      "status": "PASS",
+      "details": {
+        "preserved": true,
+        "newMetal": "sem cálculos herdados"
+      },
+      "durationMs": 2482
+    },
+    {
+      "id": "0.10-KBD",
+      "name": "Fluxo completo sem mouse, com anúncio do resultado",
+      "status": "PASS",
+      "details": {
+        "keyboard": true
+      },
+      "durationMs": 1547
+    },
+    {
+      "id": "0.10-A11Y",
+      "name": "Acessibilidade: fórmulas com equivalente textual, campos rotulados; axe-core",
+      "status": "PASS",
+      "details": {
+        "violations": 0
+      },
+      "durationMs": 2685
+    },
+    {
+      "id": "0.10-MOB-360",
+      "name": "Mobile 360: calcular na folha inferior com teclado numérico",
+      "status": "PASS",
+      "details": {
+        "overflow": 0
+      },
+      "durationMs": 1945
+    },
+    {
+      "id": "0.10-MOB-390",
+      "name": "Mobile 390: calcular na folha inferior com teclado numérico",
+      "status": "PASS",
+      "details": {
+        "overflow": 0
+      },
+      "durationMs": 1856
+    },
+    {
+      "id": "0.10-MOB-landscape",
+      "name": "Mobile landscape: calcular na folha inferior com teclado numérico",
+      "status": "PASS",
+      "details": {
+        "overflow": 0
+      },
+      "durationMs": 2096
+    }
+  ],
+  "consoleErrors": []
+}

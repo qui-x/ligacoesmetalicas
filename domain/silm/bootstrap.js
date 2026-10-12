@@ -7,11 +7,11 @@ SILM.create = () => {
   const modules = [
     {id:'explorar',title:'Explorar',description:'Investigação qualitativa integrada: monte, organize, observe célula, rede, elétrons e propriedades, use camadas e compare representações.',icon:'grid'},
     {id:'medir',title:'Medir',description:'Meça distâncias, ângulos, parâmetros de rede e coordenação no modelo cristalográfico (medidas do modelo).',icon:'lab'},
-    {id:'calcular',title:'Calcular',description:'Investigue relações quantitativas. As fórmulas e os cálculos serão incorporados após validação.',icon:'report'}
+    {id:'calcular',title:'Calcular',description:'Relacione estrutura e dados: número efetivo, volume da célula, raio, fator de empacotamento, densidade teórica e c/a, com fórmula, entradas e origem de cada valor.',icon:'report'}
   ];
   const C=SILM.assembly.contract;
   const crystalline=()=>model.state.structure?.mode==='crystalline';
-  const moduleMessage=id=>({explorar:crystalline()?'Observe a estrutura cristalina: célula, rede e vizinhança.':model.state.structure?'Adicione, selecione e mova unidades; depois, organize a estrutura.':model.state.metal?'A estrutura ainda não foi montada. Use Iniciar montagem.':'A estrutura ainda não foi montada.',medir:'Use Ver → Medir: distância, ângulo, parâmetro de rede e coordenação sobre a estrutura cristalina (medidas do modelo, não de uma amostra real).',calcular:'Os cálculos ainda não estão disponíveis nesta versão.'})[id];
+  const moduleMessage=id=>({explorar:crystalline()?'Observe a estrutura cristalina: célula, rede e vizinhança.':model.state.structure?'Adicione, selecione e mova unidades; depois, organize a estrutura.':model.state.metal?'A estrutura ainda não foi montada. Use Iniciar montagem.':'A estrutura ainda não foi montada.',medir:'Use Ver → Medir: distância, ângulo, parâmetro de rede e coordenação sobre a estrutura cristalina (medidas do modelo, não de uma amostra real).',calcular:'Use Ver → Calcular: número efetivo, volume da célula, raio, fator de empacotamento, densidade teórica e c/a, com a origem de cada valor (calculado pelo SILM).'})[id];
   const moduleName = () => ctx?.modules.get(model.state.module.active)?.title || 'Explorar';
   const D=SILM.data,tableState={query:'',selection:null};
   let viewScope=null,showTable=true,presentation=null,restoringModule=false,view=null,viewKey=null,pendingAnimation=null;
@@ -189,7 +189,7 @@ SILM.create = () => {
     view=null;viewKey=key;viewScope?.destroy();viewScope=SimCore.createScope();host.replaceChildren();
     if(table){SILM.createPeriodicTable(host,{scope:viewScope,state:tableState,onInvestigate:investigate,onSources:openSources,canInvestigate});return;}
     const e=selected();
-    if(key&&structure.mode==='crystalline'){const animateFrom=pendingAnimation;pendingAnimation=null;view=SILM.createCrystalView(host,{scope:viewScope,model,element:e,geometry:geometry(),moduleTitle:moduleName(),note:editable()?'':moduleMessage(model.state.module.active),animateFrom,reducedMotion,electrons:electronOptions(),properties:propertyOptions(),measure:measureOptions(),actions:{represent,select:selectCrystal,toggleNeighbors}});return;}
+    if(key&&structure.mode==='crystalline'){const animateFrom=pendingAnimation;pendingAnimation=null;view=SILM.createCrystalView(host,{scope:viewScope,model,element:e,geometry:geometry(),moduleTitle:moduleName(),note:editable()?'':moduleMessage(model.state.module.active),animateFrom,reducedMotion,electrons:electronOptions(),properties:propertyOptions(),measure:measureOptions(),calc:calcOptions(),actions:{represent,select:selectCrystal,toggleNeighbors}});return;}
     if(key){view=SILM.createAssemblyView(host,{scope:viewScope,model,element:e,editable:editable(),note:moduleMessage(model.state.module.active),reference:referenceName(e),moduleTitle:moduleName(),describeLast,actions:{add:addUnit,undo:undoAction,move:moveUnit},canExplore:()=>ctx.modules.available('explorar'),onExplore:explore,organize:{run:organizeStructure,state:organizeState},reducedMotion,electrons:electronOptions(),properties:propertyOptions()});return;}
     const card=U.element('section',null,'silm-metal-card');
     card.append(U.element('p','LABORATÓRIO · '+moduleName().toUpperCase(),'eyebrow'));
@@ -416,6 +416,140 @@ SILM.create = () => {
         li.append(row);return li;}));};
     watch(local.scope,update);update();el.append(box);
   }
+  /* ---------- Calcular (0.10.x): fórmulas do catálogo, entradas com origem e proveniência; a operação em curso é transitória ---------- */
+  const CA=SILM.calculation,calc={formula:null,choice:{},user:{},errors:{},review:null};
+  const CALC_REASON={NO_STRUCTURE:'Monte e organize uma estrutura para calcular.',NO_SCALE:'A montagem livre não tem escala física: organize a estrutura cristalina para calcular.',DEFORMED:'Restaure a experiência de deformação: os cálculos usam a estrutura de referência.'};
+  const CALC_FAIL={PHYSICALLY_INVALID:'Valores fisicamente impossíveis: as esferas ocupariam mais que o volume da célula.',INPUT_INVALID:'Informe um número positivo e finito.',INPUT_MISSING:'Escolha a origem de cada entrada.',RESULT_INVALID:'O resultado não é um número finito e positivo.',FORMULA_NOT_APPLICABLE:'Esta fórmula não se aplica à estrutura atual.',CALCULATIONS_LIMIT:'Limite de '+CA.limit+' cálculos: remova registros em Dados → Cálculos.'};
+  const CALC_LABEL={effectiveAtoms:'Número efetivo',cellVolume:'Volume da célula',radius:'Raio (a → r)',latticeParameter:'Parâmetro (r → a)',packingFactor:'Fator de empacotamento',density:'Densidade teórica',caRatio:'Razão c/a'};
+  const CALC_LIMITS=['Os cálculos usam o modelo científico representado pelo SILM (célula ideal, sem defeitos, na condição de referência dos parâmetros); não são medidas de uma amostra real.','O fator de empacotamento usa esferas rígidas: não é a fração do volume ocupada pela densidade eletrônica real.','Dados tabelados, medidas do modelo, valores informados e resultados calculados são identificados separadamente; o SILM nunca troca uma medida por um valor tabelado sem mostrar.','A diferença entre um valor calculado e uma referência não é chamada de erro experimental: decorre do modelo, do arredondamento e das condições.'];
+  const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+  const sci=v=>{if(!Number.isFinite(v))return '—';const exp=Math.floor(Math.log10(Math.abs(v))),mant=v/10**exp;return CA.sig(mant)+' × 10'+String(exp).split('').map(c=>SUP[c]).join('');};
+  function calcAvailability(){if(model.state.module.active!=='calcular')return {ok:false,module:true,reason:'Os cálculos funcionam no módulo Calcular.'};const r=model.calculationAvailability();return r.ok?{ok:true}:{ok:false,reason:CALC_REASON[r.reason]||'Indisponível.'};}
+  const structureType=()=>model.state.structure?.mode==='crystalline'?model.state.structure.crystallography.structureType:null;
+  const calcFormulas=()=>{const t=structureType();return t?CA.applicable(t):[];};
+  const calcTime=at=>new Date(at).toLocaleTimeString('pt-BR');
+  /* Opções de origem para cada entrada (modo assistido: o SILM preenche o que conhece e mostra de onde veio). */
+  function inputOptions(spec){
+    const e=selected(),s=model.state,out=[];
+    if(spec.origins.includes('TABULATED')){const t=CA.tabulated(e,spec.key);if(t)out.push({id:'tab',origin:'TABULATED',value:t.value,ref:t.ref,label:'Dado tabelado',detail:spec.symbol+' = '+t.display,note:t.note||''});}
+    if(spec.origins.includes('MODEL_MEASUREMENT'))for(const m of s.measurements.filter(m=>m.type==='latticeParameter'&&m.parameter===spec.key&&MS.current(m,s.structure)).slice(-3))
+     out.push({id:'meas-'+m.id,origin:'MODEL_MEASUREMENT',value:m.value,ref:{measurementId:m.id},label:'Medida do modelo',detail:spec.symbol+' = '+UN.format(m.value,'Å')+' · medição das '+calcTime(m.createdAt)});
+    if(spec.origins.includes('CALCULATED')){
+     if(spec.key==='n'){const t=structureType(),n=CA.effective(t);out.push({id:'calc-n',origin:'CALCULATED',value:n,ref:{formulaId:'effective-atoms-'+t.toLowerCase()},label:'Calculado pelo SILM',detail:'n = '+n+' (contagem geométrica da célula)'});}
+     else for(const c of s.calculations.filter(c=>c.type===spec.quantity&&c.result.value!==null&&CA.current(c,s.structure)).slice(-3))
+      out.push({id:'calc-'+c.id,origin:'CALCULATED',value:c.result.value,ref:{calculationId:c.id},label:'Calculado pelo SILM',detail:spec.symbol+' = '+CA.format(c.result,c.unit)+' · cálculo das '+calcTime(c.createdAt)});
+    }
+    if(spec.origins.includes('USER'))out.push({id:'user',origin:'USER',value:null,ref:null,label:'Valor informado',detail:'em '+spec.unit});
+    return out;
+  }
+  const parseUser=text=>{const t=String(text||'').trim().replace(/\s/g,'').replace(',','.');if(!/^[+]?\d*\.?\d+(e[+-]?\d+)?$/i.test(t))return NaN;return Number(t);};
+  function chooseCalc(id){const able=calcAvailability();if(!able.ok){say(able.reason);return false;}const f=SILM.formulas[id];if(!f||!calcFormulas().includes(f))return false;
+    calc.formula=id;calc.choice={};calc.user={};calc.errors={};structureChanged();say(f.name+': '+f.expression+'. Escolha a origem de cada entrada e use Calcular.');return true;}
+  function cancelCalc(){if(!calc.formula)return;calc.formula=null;calc.choice={};calc.user={};calc.errors={};structureChanged();say('Cálculo desligado.');}
+  function calcInputs(f){
+    calc.errors={};const inputs=[];
+    for(const spec of f.requiredInputs){const options=inputOptions(spec),chosen=options.find(o=>o.id===calc.choice[spec.key])||options[0];
+     if(!chosen){calc.errors[spec.key]='Sem valor disponível: escolha Valor informado ou calcule esta grandeza antes.';continue;}
+     let value=chosen.value;if(chosen.origin==='USER'){value=parseUser(calc.user[spec.key]);if(!(Number.isFinite(value)&&value>0)){calc.errors[spec.key]='Informe um número positivo e finito, em '+spec.unit+'.';continue;}}
+     inputs.push({key:spec.key,symbol:spec.symbol,name:spec.name,value,unit:spec.unit,origin:chosen.origin,ref:chosen.ref});}
+    return Object.keys(calc.errors).length?null:inputs;
+  }
+  const spokenUnit={'Å':' ångströms','Å³':' ångströms cúbicos','g/cm³':' gramas por centímetro cúbico','1':''};
+  function calcResultText(c){const f=SILM.formulas[c.formulaId],v=CA.format(c.result,c.unit);return f.name+': '+f.outputSymbol+' = '+(c.unit==='1'?v:v.replace(' '+c.unit,spokenUnit[c.unit]||' '+c.unit))+(c.type==='packingFactor'?' ('+CA.percent(c.result.value)+')':'')+'.';}
+  function runCalc(){
+    const able=calcAvailability();if(!able.ok){say(able.reason);return;}const f=SILM.formulas[calc.formula];if(!f)return;
+    const inputs=calcInputs(f);if(!inputs){structureChanged();say('Verifique as entradas: '+Object.values(calc.errors).join(' '));return;}
+    const r=model.addCalculation(f.id,inputs);if(!r.ok){structureChanged();say(CALC_FAIL[r.reason]||'Não foi possível calcular: '+r.reason+'.');return;}
+    calc.review=r.calculation.id;logEvent('Cálculo registrado (calculado pelo SILM): '+f.name+' = '+CA.format(r.calculation.result,r.calculation.unit)+'.');
+    structureChanged();say(calcResultText(r.calculation)+' Calculado pelo SILM.');
+  }
+  /* Destaque geométrico na cena, enquanto um cálculo está escolhido. */
+  const CALC_MARK={effectiveAtoms:'fractions',packingFactor:'contact',radius:'contact',latticeParameter:'contact',cellVolume:'edges',density:'edges',caRatio:'edges'};
+  const calcOptions=()=>({marks:()=>{const f=calc.formula&&SILM.formulas[calc.formula];if(!f||model.state.module.active!=='calcular'||measure.tool)return null;return {mode:CALC_MARK[f.quantity]};}});
+  /* Valor de cada entrada como foi usado: tabelado e informado sem arredondar; calculado com 4 algarismos; constante pela sua definição. */
+  function inputValue(x){const unit=x.unit==='1'?'':' '+x.unit;
+   if(x.origin==='CONSTANT')return Object.values(SILM.constants).find(k=>k.key===x.key)?.display||String(x.value);
+   if(Array.isArray(x.value))return '['+x.value.map(v=>String(v).replace('.',',')).join('; ')+']'+unit;
+   if(Number.isInteger(x.value))return x.value+unit;
+   return (x.origin==='CALCULATED'?CA.sig(x.value):String(x.value).replace('.',','))+unit;}
+  function calcRecord(c,{detailed=true}={}){
+    const f=SILM.formulas[c.formulaId],dl=U.element('dl',null,'silm-facts'),add=(k,v,kind)=>{const dd=U.element('dd',v);if(kind)dd.append(U.element('br'),kind);dl.append(U.element('dt',k),dd);};
+    add(f.name,f.outputSymbol+' = '+CA.format(c.result,c.unit)+(c.type==='packingFactor'?' ('+CA.percent(c.result.value)+')':''),tag('Calculado pelo SILM'));
+    if(c.type==='cellVolume'&&c.result.value)add('Conversões',CA.sig(c.result.value/1000)+' nm³ · '+sci(c.result.value*SILM.constants.angstrom3ToCm3.value)+' cm³');
+    if(c.type==='density'){const vals=c.result.interval||[c.result.value];add('Conversões',vals.map(v=>CA.sig(v*1000)).filter((v,i,a)=>a.indexOf(v)===i).join(' a ')+' kg/m³');}
+    if(['radius','latticeParameter'].includes(c.type))add('Conversões',CA.sig(c.result.value*100)+' pm');
+    const formula=U.element('dd',null,'silm-formula-dd'),fx=U.element('span',f.expression,'silm-formula');fx.setAttribute('aria-hidden','true');formula.append(fx,U.element('span',f.spoken,'sr-only'));dl.append(U.element('dt','Fórmula'),formula);
+    if(detailed){
+     add('Entradas',c.inputs.map(x=>x.symbol+' = '+inputValue(x)+' · '+(CA.origins[x.origin]||x.origin)).join('; '));
+     const r=CA.compute(c.formulaId,c.inputs);   // intermediários: mesma fórmula e mesmas entradas do registro (não é recálculo com dados novos)
+     if(r.ok&&r.intermediates.length)add('Intermediários',r.intermediates.map(x=>x.symbol+' = '+(x.interval?x.interval.map(v=>sci(v)).join(' a '):x.unit==='g'||x.unit==='cm³'?sci(x.value):CA.sig(x.value))+(x.unit==='1'?'':' '+x.unit)+' ('+x.name+')').join('; '));
+     add('Modelo',f.model);add('Nota',f.notes);
+     if(c.type==='caRatio')add('Referência geométrica','(c/a)ideal = √(8/3) ≈ 1,633 · valor do empilhamento ideal de esferas rígidas, não dado do metal');
+     const sources=c.provenance.references.map(id=>D.source(id)).filter(Boolean).map(x=>x.institution+' · '+x.title);if(sources.length)add('Fontes',sources.join('; '));
+     if(!CA.current(c,model.state.structure))add('Contexto','Cálculo realizado em estado anterior da estrutura.');
+    }
+    return dl;
+  }
+  function calcPanel(el,local){
+    const box=U.element('section',null,'silm-panel'),e=selected();box.append(U.element('p','CALCULAR','eyebrow'));
+    if(!e){box.append(U.element('p','Selecione um metal e monte sua estrutura.','silm-panel-note'));el.append(box);return;}
+    const status=U.element('p','','silm-calc-status');status.id='silm-calc-status';status.setAttribute('aria-live','polite');
+    const goCalc=SILM.actionButton('Ativar o módulo Calcular',()=>ctx.modules.select('calcular'),local.scope,{id:'silm-calc-module'});
+    const list=U.element('div',null,'silm-layer-list');list.setAttribute('role','group');list.setAttribute('aria-label','Cálculos compatíveis com a estrutura');
+    const form=U.element('section',null,'silm-calc-form');form.id='silm-calc-form';
+    const result=U.element('div',null,'silm-calc-result');result.id='silm-calc-result';
+    const limits=U.element('details'),ul=U.element('ul');limits.append(U.element('summary','Limitações dos cálculos'),ul);for(const t of CALC_LIMITS)ul.append(U.element('li',t));
+    box.append(status,goCalc,list,form,result,limits);
+    let rendered='';
+    const renderList=()=>{const fs=calcFormulas(),key=fs.map(f=>f.id).join();if(list.dataset.key===key)return;list.dataset.key=key;
+      list.replaceChildren(...fs.map(f=>SILM.actionButton(CALC_LABEL[f.quantity],()=>chooseCalc(f.id),local.scope,{id:'silm-calc-'+f.id,label:f.name})));};
+    const renderForm=()=>{
+      const f=calc.formula&&SILM.formulas[calc.formula],sig=f?f.id+'|'+model.state.calculations.length+'|'+model.state.measurements.length+'|'+(model.state.structure?.crystallography?.organizedAt||''):'';
+      if(sig===rendered){for(const spec of f?.requiredInputs||[]){const err=form.querySelector('#silm-calc-error-'+spec.key);if(err)err.textContent=calc.errors[spec.key]||'';const field=form.querySelector('#silm-calc-'+spec.key+'-value');if(field)field.setAttribute('aria-invalid',String(!!calc.errors[spec.key]));}return;}
+      rendered=sig;form.replaceChildren();form.hidden=!f;if(!f)return;
+      const fx=U.element('p',null,'silm-formula-line'),expr=U.element('span',f.expression,'silm-formula');expr.setAttribute('aria-hidden','true');fx.append(expr,U.element('span',f.spoken,'sr-only'));
+      form.append(U.element('h3',f.name),fx,U.element('p','Modelo: '+f.model+'.','silm-panel-note'));
+      for(const spec of f.requiredInputs){
+       const options=inputOptions(spec),fs=U.element('fieldset',null,'silm-calc-input');fs.id='silm-calc-in-'+spec.key;fs.append(U.element('legend',spec.symbol+' — '+spec.name+(spec.unit==='1'?'':' ('+spec.unit+')')));
+       if(!calc.choice[spec.key]||!options.some(o=>o.id===calc.choice[spec.key]))calc.choice[spec.key]=options[0]?.id;
+       const err=U.element('p','','silm-field-error');err.id='silm-calc-error-'+spec.key;
+       for(const o of options){const label=U.element('label',null,'check-row silm-calc-option'),radio=U.element('input');radio.type='radio';radio.name='silm-calc-'+spec.key;radio.id='silm-calc-'+spec.key+'-'+o.id.replace(/[^a-zA-Z0-9-]/g,'');radio.checked=calc.choice[spec.key]===o.id;
+        local.scope.listen(radio,'change',()=>{calc.choice[spec.key]=o.id;calc.errors[spec.key]='';user.disabled=o.origin!=='USER';if(o.origin==='USER')user.focus();});
+        const text=U.element('span');text.append(U.element('strong',o.label),document.createTextNode(o.detail?' · '+o.detail:''));if(o.note)text.append(U.element('small',' '+o.note));label.append(radio,text);fs.append(label);}
+       const user=U.element('input');user.type='text';user.inputMode='decimal';user.id='silm-calc-'+spec.key+'-value';user.autocomplete='off';user.value=calc.user[spec.key]||'';user.disabled=options.find(o=>o.id===calc.choice[spec.key])?.origin!=='USER';
+       user.setAttribute('aria-label','Valor informado de '+spec.symbol+(spec.unit==='1'?'':' em '+spec.unit));user.setAttribute('aria-describedby',err.id);
+       if(options.some(o=>o.origin==='USER')){local.scope.listen(user,'input',()=>{calc.user[spec.key]=user.value;});const row=U.element('div',null,'silm-calc-user');row.append(user,U.element('span',spec.unit==='1'?'':spec.unit,'silm-calc-unit'));fs.append(row);}
+       if(!options.some(o=>o.origin!=='USER')&&spec.quantity){const pre=CA.applicable(structureType()).find(x=>x.quantity===spec.quantity);if(pre)fs.append(SILM.actionButton('Calcular '+spec.symbol+' antes',()=>chooseCalc(pre.id),local.scope,{id:'silm-calc-before-'+spec.key}));}
+       fs.append(err);form.append(fs);}
+      for(const k of f.constants||[]){const c=SILM.constants[k];form.append(U.element('p',c.symbol+' = '+c.display+' · Constante definida'+(c.sourceId?' ('+(D.source(c.sourceId)?.institution||c.sourceId)+')':''),'silm-panel-note'));}
+      const row=U.element('div',null,'action-row');row.append(SILM.actionButton('Calcular',runCalc,local.scope,{id:'silm-calc-run',primary:true}),SILM.actionButton('Desligar cálculo',cancelCalc,local.scope,{id:'silm-calc-cancel'}));form.append(row);
+    };
+    const update=()=>{
+      const able=calcAvailability();goCalc.hidden=!able.module;list.hidden=!able.ok;renderList();
+      for(const b of list.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.id==='silm-calc-'+calc.formula));
+      if(!able.ok&&calc.formula){calc.formula=null;}
+      renderForm();
+      const t=structureType();status.textContent=!able.ok?able.reason:calc.formula?SILM.formulas[calc.formula].name+': escolha a origem de cada entrada e use Calcular.':'Escolha um cálculo compatível com a estrutura '+(t?X.models[t].code:'')+'. Os cálculos ficam em Dados → Cálculos.';
+      result.replaceChildren();const c=model.state.calculations.find(x=>x.id===calc.review)||model.state.calculations.at(-1);if(!c)return;
+      result.append(U.element('p','ÚLTIMO CÁLCULO','silm-datum-kind'),calcRecord(c));
+    };
+    watch(local.scope,update);update();el.append(box);
+  }
+  function calculationsPanel(el,local){
+    const box=U.element('section',null,'silm-panel');box.append(U.element('p','CÁLCULOS','eyebrow'),U.element('p','Grandezas calculadas pelo SILM nesta investigação, com fórmula, entradas e origem de cada valor. Registros antigos não são recalculados.','silm-panel-note'));
+    const list=U.element('ol',null,'silm-history silm-calculations');list.id='silm-calculations';const empty=U.element('p','','panel-empty');
+    const clear=SILM.actionButton('Limpar cálculos',async()=>{if(!model.state.calculations.length)return;if(!await confirmDestructive('Limpar cálculos?','Os cálculos registrados serão removidos. A estrutura, as medições e a investigação continuam.','Limpar cálculos'))return;model.clearCalculations();calc.review=null;logEvent('Cálculos removidos (estrutura e medições mantidas).');structureChanged();say('Cálculos removidos. A estrutura continua.');},local.scope,{id:'silm-calculations-clear',danger:true});
+    box.append(empty,list,clear);
+    const update=()=>{const cs=model.state.calculations;empty.textContent=cs.length?'':'Nenhum cálculo registrado.';empty.hidden=!!cs.length;clear.hidden=!cs.length;
+      list.replaceChildren(...cs.map(c=>{const f=SILM.formulas[c.formulaId],li=U.element('li',null,'silm-calculation'),t=U.element('time',calcTime(c.createdAt));t.dateTime=c.createdAt;
+        const origins=[...new Set(c.inputs.filter(x=>x.origin!=='CONSTANT').map(x=>x.symbol+': '+(CA.origins[x.origin]||x.origin)))].join('; ');
+        li.append(t,U.element('strong',f.name+': '+f.outputSymbol+' = '+CA.format(c.result,c.unit)),U.element('span',' · Calculado pelo SILM'+(origins?' · '+origins:'')));
+        if(!CA.current(c,model.state.structure))li.append(U.element('p','Cálculo realizado em estado anterior da estrutura.','silm-limitation'));
+        const more=U.element('details',null,'silm-calc-record');more.id='silm-calc-record-'+c.id;more.append(U.element('summary','Reabrir: fórmula, entradas e origens'),calcRecord(c));
+        const row=U.element('div',null,'action-row');row.append(SILM.actionButton('Remover',()=>{model.removeCalculation(c.id);if(calc.review===c.id)calc.review=null;structureChanged();say('Cálculo removido.');},local.scope,{id:'silm-calc-remove-'+c.id,label:'Remover '+f.name+' '+CA.format(c.result,c.unit)}));
+        li.append(more,row);return li;}));};
+    watch(local.scope,update);update();el.append(box);
+  }
   /* ---------- Explorar (0.8.x): foco contextual, camadas e comparação — representação fora do estado científico ---------- */
   const EX=SILM.exploration;let exploration=EX.sanitize(null);
   function applyLayers(){if(!host)return;host.dataset.centers=exploration.layers.centers?'on':'dim';host.dataset.hints=exploration.layers.propertyHints?'on':'off';}
@@ -569,8 +703,9 @@ SILM.create = () => {
     if(s?.mode==='crystalline'){const m=X.models[s.crystallography.structureType],added=s.units.filter(u=>u.placement==='crystallographic').length;structure='Estrutura organizada segundo a referência: '+X.label(m.id)+'; '+s.units.length+' unidades ('+(s.units.length-added)+' do estudante, '+added+' completadas pelo SILM). Número de coordenação do modelo: '+s.crystallography.coordination+'. Representação didática com esferas reduzidas, sem escala física absoluta.';}
     const el=state.electrons,electrons=el?' Modelo eletrônico ativo (representação qualitativa): elétrons de valência deslocalizados pela estrutura metálica, '+(el.representation.visible?'visíveis':'ocultos')+'; os marcadores não indicam o número real de elétrons e o movimento visual não representa corrente.':' Modelo eletrônico não ativado.';
     const pr=state.properties,pn=pr.active?PR.narrative(pr.active,pr[pr.active],{reduced:reducedMotion(),electronsVisible:!!el?.representation.visible}):null,properties=pr.active?' Experiência de propriedade em estudo: '+PR.catalog[pr.active].title+' (representação qualitativa). '+pn.action+' '+pn.observation+' Dados tabelados de propriedades não homologados nesta versão.':' Nenhuma experiência de propriedade ativa.';
+    const cs=state.calculations,calculations=cs.length?' Cálculos (calculados pelo SILM): '+cs.map(c=>SILM.formulas[c.formulaId].name+' '+SILM.formulas[c.formulaId].outputSymbol+' = '+CA.format(c.result,c.unit)+' ['+[...new Set(c.inputs.filter(x=>x.origin!=='CONSTANT').map(x=>x.symbol+': '+(CA.origins[x.origin]||x.origin)))].join('; ')+']').join('; ')+'.':' Nenhum cálculo registrado.';
     const ms=state.measurements,measurements=ms.length?' Medições (medidas do modelo, não de amostra real): '+ms.map(m=>TOOL_LABEL[m.type]+(m.parameter?' '+m.parameter:'')+' = '+displayValue(m,'Å')).join('; ')+'.':' Nenhuma medição registrada.';
-    return 'SILM '+VERSION+' · ID: '+i.id+' · '+e.name+' ('+e.symbol+'), Z = '+e.atomicNumber+' · Início: '+i.createdAt+' · Módulo ativo: '+(ctx.modules.get(state.module.active)?.title||state.module.active)+'. Dado tabelado: '+D.structure(e).label+'; '+D.structure(e).conditions.temperature.display+'. Fonte: '+D.source(D.structure(e).sourceId).title+'. '+structure+electrons+properties+measurements+' Sem cálculos científicos.';
+    return 'SILM '+VERSION+' · ID: '+i.id+' · '+e.name+' ('+e.symbol+'), Z = '+e.atomicNumber+' · Início: '+i.createdAt+' · Módulo ativo: '+(ctx.modules.get(state.module.active)?.title||state.module.active)+'. Dado tabelado: '+D.structure(e).label+'; '+D.structure(e).conditions.temperature.display+'. Fonte: '+D.source(D.structure(e).sourceId).title+'. '+structure+electrons+properties+measurements+calculations;
   }
   return {
     manifest:{id:'silm',nome:'SILM',nomeCurto:'SILM',versao:VERSION,titulo:'SILM — A Arquitetura dos Metais',subtitulo:'Simulador Interativo de Ligações Metálicas',icone:icon,
@@ -581,8 +716,8 @@ SILM.create = () => {
       manual:SILM.manual,viewport:{label:'Área de investigação da estrutura metálica'},
       // Paridade com o SIAB 1.0.0 (correção de origem 0.1.x): Montagem / Ver / Dados.
       painelEsquerdo:{title:'Montagem',sections:[{id:'resumo',title:'Resumo',render:summaryPanel},{id:'metal',title:'Metal',visible:context=>!context?.restricted,render:metalPanel},{id:'estrutura',title:'Estrutura',render:structurePanel},{id:'propriedades',title:'Propriedades',render:propertiesPanel},{id:'modulo',title:'Módulo',render:(el,local)=>local.modules.render(el,local)}]},
-      painelDireito:{title:'Ver',sources:[{id:'ver',title:'Ver',sections:[{id:'observar',title:'Observar',render:observePanel},{id:'camadas',title:'Camadas',render:layersPanel},{id:'comparar',title:'Comparar',render:comparePanel},{id:'medir',title:'Medir',render:measurePanel}]},{id:'dados',title:'Dados',sections:[{id:'tabela',title:'Tabela',render:tablePanel},{id:'medicoes',title:'Medições',render:measurementsPanel},{id:'historico',title:'Histórico',render:historyPanel},{id:'relatorio',title:'Relatório',render:reportPanel}]}]},
-      recursos:['domain/entry.js','domain/silm/prelude.js','domain/silm/data/bundle.js','domain/silm/data-api.js','domain/silm/periodic-table.js','domain/silm/presentation.js','domain/silm/periodic-table.css','domain/silm/assembly.js','domain/silm/crystal.js','domain/silm/state.js','domain/silm/assembly-view.js','domain/silm/crystal-view.js','domain/silm/electron-view.js','domain/silm/properties.js','domain/silm/property-view.js','domain/silm/exploration.js','domain/silm/measurements.js','domain/silm/measure-view.js','domain/silm/assembly.css','domain/silm/bootstrap.js','domain/silm/manual.js','domain/silm/styles.css','domain/silm/identidade.css','domain/silm/abertura.js','domain/silm/abertura.css','domain/silm/abertura/silm-opening.js','domain/silm/abertura/silm-opening.css','assets/silm-icone.svg','assets/silm-logo-vertical.svg',icon]
+      painelDireito:{title:'Ver',sources:[{id:'ver',title:'Ver',sections:[{id:'observar',title:'Observar',render:observePanel},{id:'camadas',title:'Camadas',render:layersPanel},{id:'comparar',title:'Comparar',render:comparePanel},{id:'medir',title:'Medir',render:measurePanel},{id:'calcular',title:'Calcular',render:calcPanel}]},{id:'dados',title:'Dados',sections:[{id:'tabela',title:'Tabela',render:tablePanel},{id:'medicoes',title:'Medições',render:measurementsPanel},{id:'calculos',title:'Cálculos',render:calculationsPanel},{id:'historico',title:'Histórico',render:historyPanel},{id:'relatorio',title:'Relatório',render:reportPanel}]}]},
+      recursos:['domain/entry.js','domain/silm/prelude.js','domain/silm/data/bundle.js','domain/silm/data-api.js','domain/silm/periodic-table.js','domain/silm/presentation.js','domain/silm/periodic-table.css','domain/silm/assembly.js','domain/silm/crystal.js','domain/silm/state.js','domain/silm/assembly-view.js','domain/silm/crystal-view.js','domain/silm/electron-view.js','domain/silm/properties.js','domain/silm/property-view.js','domain/silm/exploration.js','domain/silm/measurements.js','domain/silm/calculations.js','domain/silm/measure-view.js','domain/silm/assembly.css','domain/silm/bootstrap.js','domain/silm/manual.js','domain/silm/styles.css','domain/silm/identidade.css','domain/silm/abertura.js','domain/silm/abertura.css','domain/silm/abertura/silm-opening.js','domain/silm/abertura/silm-opening.css','assets/silm-icone.svg','assets/silm-logo-vertical.svg',icon]
     },
     init(context) {
       ctx=context;model.connect({storage:ctx.storage,emit:(name,detail)=>ctx.events.emit(name,detail)});
