@@ -1,11 +1,17 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.9.0",
+  "versao": "0.9.1",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.2.4",
   "scientificSchemaVersion": 7,
   "origens": [
+    {
+      "arquivo": "SILM-0.9.0.zip",
+      "papel": "origem executável da 0.9.1 (correção de homologação)",
+      "sha512": "691748fcdd31d4aa887a727bdabbd875def07651eb5a1efc8f83b8e300079a20e4e536c4289465330a1346f7a0898e3bdb3bce3eaf7aba90051e4010eb76dd1e",
+      "verificado": true
+    },
     {
       "arquivo": "SILM-0.8.0.zip",
       "papel": "origem executável da série 0.9.x",
@@ -67,8 +73,8 @@
       "verificado": true
     }
   ],
-  "observacaoOrigem": "Origem: entregas/SILM-0.8.0.zip deste repositório, verificado pelo SHA-512 externo.",
-  "status": "SILM 0.9.0: módulo Medir (medidas do modelo: distância, ângulo, parâmetro de rede, coordenação; Å/pm/nm; registro em Dados → Medições); schema 7; identidade oficial (logo e abertura) e correção de origem da rota inicial. Relatório em docs/RELATORIO-BUILD-TESTES-0.9.0.md.",
+  "observacaoOrigem": "Origem: entregas/SILM-0.9.0.zip deste repositório, verificado pelo SHA-512 externo.",
+  "status": "SILM 0.9.1: correção de homologação da 0.9.0 — cena prioritária no celular e no tablet (explicações em \"Como ler esta cena\", sem a linha de título repetida) e esferas sempre redondas. Schema 7 inalterado. Relatório em docs/RELATORIO-BUILD-TESTES-0.9.1.md.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
   "dataBuild": "2026-10-12",
   "structureModelVersion": 2,

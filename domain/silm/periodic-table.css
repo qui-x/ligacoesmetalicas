@@ -49,3 +49,6 @@
 /* A região central e o diálogo dimensionam a tabela pelo espaço efetivo. */
 .silm-laboratory{height:100%;display:flex;flex-direction:column;min-height:0}
 .silm-laboratory>.silm-periodic{height:100%;min-height:0;flex:1}
+/* 0.9.1: rótulos dos botões quebram só entre palavras (a Base aplica overflow-wrap:anywhere); a ação principal ganha a linha inteira quando falta espaço. */
+.periodic-actions button{overflow-wrap:normal;word-break:normal;hyphens:manual;flex:1 1 auto}
+@media(max-width:420px){.periodic-actions [id$="-investigate"]{order:-1;flex-basis:100%}}

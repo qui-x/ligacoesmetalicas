@@ -1,5 +1,13 @@
 # Registro de alterações
 
+## SILM 0.9.1 — Correção de homologação: cena prioritária no celular e no tablet
+
+- Explicações, legendas e instruções da cena em "Como ler esta cena" (recolhível; fechado até 900 px, aberto no desktop; escolha lembrada).
+- Na cena ficam a estrutura, os controles e uma linha de retorno; estado eletrônico e observação compacta só para leitores de tela até 900 px; metadados em até duas linhas.
+- Sem a linha "SILM — A Arquitetura dos Metais" repetida no espaço de trabalho do celular e do tablet.
+- Esferas sempre redondas: símbolo sem quebra, proporcional ao diâmetro e omitido abaixo de 16 px (fonte simplificada não deforma mais as unidades).
+- Botões do cartão do elemento quebram só entre palavras ("Iniciar investigação" não aparece mais como "investigaçã/o" no celular).
+
 ## SILM 0.9.0 — Módulo Medir
 
 - Ver → Medir com quatro instrumentos de modelo quantitativo: distância, ângulo, parâmetro de rede (`a`; `a` e `c` no HC) e vizinhança/coordenação.
