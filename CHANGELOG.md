@@ -1,5 +1,17 @@
 # Registro de alterações
 
+## SILM 0.9.0 — Módulo Medir
+
+- Ver → Medir com quatro instrumentos de modelo quantitativo: distância, ângulo, parâmetro de rede (`a`; `a` e `c` no HC) e vizinhança/coordenação.
+- Valores calculados das coordenadas científicas em Å (parâmetros tabelados); zoom, redimensionamento e projeção não alteram a medida.
+- Cota de medição (não ligação M—M), arco do ângulo e marcadores com letras A/B/C; anúncios "Ponto A selecionado. Selecione o ponto B." e resultado falado por extenso.
+- Unidades Å, pm e nm com conversão exata e centralizada; valor canônico em Å; resolução explícita, sem `±`.
+- Dados → Medições: rever, remover e limpar (sem limpar a estrutura); medições de estado anterior identificadas; reload, troca de módulo e de metal.
+- Schema científico 7 (`measurements[]`), com migração 6 → 7 e validação que recalcula cada registro.
+- Identidade oficial do SILM (pacote do autor): símbolo mestre, ícone de aplicação, PNG do PWA e abertura oficial com o contrato da família SIAB; correção do quadrado preto do filtro térmico sem editar o pacote.
+- Correção de origem 0.1.x: abrir uma tela do domínio diretamente (ex.: `#/inicio`, atalho do PWA) não mostra mais "Tela não encontrada".
+- Documentação: `docs/MODULO-MEDIR.md`, `docs/CONTRATO-MEDICOES.md`, `docs/INSTRUMENTOS-E-UNIDADES.md`, `docs/IDENTIDADE-VISUAL.md`.
+
 ## SILM 0.8.0 — Módulo Explorar
 
 - Ver → Observar contextual: foco em Síntese, Centro, Célula/Montagem, Elétrons ou Propriedade, acompanhando a última ação; foco Centro com posição, coordenação e vizinhos (distância calculada a partir dos parâmetros tabelados).

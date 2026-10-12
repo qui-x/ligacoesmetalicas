@@ -4,7 +4,7 @@
   "checks": [
     {
       "check": "Versão única do produto",
-      "status": "FAIL",
+      "status": "PASS",
       "detail": null
     },
     {
@@ -82,7 +82,7 @@
     },
     {
       "check": "Documentação obrigatória",
-      "status": "FAIL",
+      "status": "PASS",
       "detail": null
     },
     {
@@ -122,7 +122,27 @@
     },
     {
       "check": "Explorar: comparação somente leitura, sem laço extra e sem novo schema",
-      "status": "FAIL",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Medir: scripts presentes e carregados em ordem (medições antes do estado; vista depois da cena)",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Medir: schema 7, validador recalcula cada registro e só há medida com escala cristalina",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Medir: sem ± (resolução não é incerteza) e sem instrumentos sem modelo",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Medir: medições só no scientificState",
+      "status": "PASS",
       "detail": null
     },
     {
@@ -148,6 +168,6 @@
       }
     }
   ],
-  "passed": 21,
-  "failed": 3
+  "passed": 28,
+  "failed": 0
 }

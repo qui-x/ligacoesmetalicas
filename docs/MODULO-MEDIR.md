@@ -67,7 +67,7 @@ Os marcadores trazem as letras A, B e C, para não depender só de cor. Escolher
 
 ## Mobile
 
-No celular, Ver → Medir abre na folha inferior. A cena continua como prioridade e o painel pode ser fechado durante a escolha dos pontos. Cada ponto é um centro metálico inteiro: tocar qualquer parte da esfera escolhe o sítio. É um encaixe (snap) por construção, e não é preciso precisão de pixel. Retrato e paisagem são verificados no teste 0.9-MOB.
+No celular, Ver → Medir abre na folha inferior. A cena continua como prioridade e o painel pode ser fechado durante a escolha dos pontos. Cada ponto é um centro metálico inteiro: tocar qualquer parte da esfera escolhe o sítio. É um encaixe (snap) por construção, e não é preciso precisão de pixel. Os testes 0.9-MOB verificam 320, 360 e 390 px, paisagem e tablet.
 
 ## Limitações obrigatórias (§22)
 
