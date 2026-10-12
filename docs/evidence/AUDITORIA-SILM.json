@@ -1,6 +1,6 @@
 {
   "product": "SILM",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "checks": [
     {
       "check": "Versão única do produto",
@@ -83,7 +83,7 @@
       "detail": null
     },
     {
-      "check": "Montagem (0.4.x), cristalografia (0.5.x) e camada eletrônica (0.6.x) presentes e carregadas em ordem",
+      "check": "Montagem (0.4.x), cristalografia (0.5.x), camada eletrônica (0.6.x) e propriedades (0.7.x) presentes e carregadas em ordem",
       "status": "PASS",
       "detail": null
     },
@@ -103,6 +103,16 @@
       "detail": null
     },
     {
+      "check": "Propriedades: sem valores típicos embutidos; dados só do banco com fonte",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Propriedades: sem circuito, instrumentos ou setas por elétron; fora da série",
+      "status": "PASS",
+      "detail": null
+    },
+    {
       "check": "Marcadores eletrônicos não são estado científico",
       "status": "PASS",
       "detail": null
@@ -118,6 +128,6 @@
       "detail": null
     }
   ],
-  "passed": 20,
+  "passed": 22,
   "failed": 0
 }

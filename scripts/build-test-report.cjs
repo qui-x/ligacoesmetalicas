@@ -33,7 +33,7 @@ ${state.ok&&s?'```json\n'+JSON.stringify(s,null,2)+'\n```':'❌ Falhou:\n\n```\n
 
 ## 4. Navegador — todas as suítes (${series.join(', ')})
 
-${browser?`${browser.browser} · ${browser.date.slice(0,10)} · **${browser.passed} aprovados, ${browser.failed} reprovados** · erros de console: **${browser.consoleErrors.length}**.
+${browser?`${browser.browser} · ${browser.date.slice(0,10)} · **${browser.passed} aprovados, ${browser.failed} reprovados** · erros de console: **${browser.consoleErrors.length}**.${browser.partialRerun?' Após a execução completa, foram reexecutados depois de correção os itens com prefixo: '+browser.partialRerun.join(', ')+' (resultados mesclados).':''}
 
 As suítes das séries anteriores rodam inteiras como regressão. Prefixo do item = série do prompt.
 

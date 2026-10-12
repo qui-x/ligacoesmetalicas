@@ -3,11 +3,12 @@ window.SILM=window.SILM||{};
 /* Contrato formal. Somente este serviço escreve o estado; consumidores recebem cópias.
    Schema 1: seleção provisória (0.2.1). Schema 2: investigação (0.3.0). Schema 3: montagem metálica (0.4.0).
    Schema 4: modo livre/cristalino da montagem e cristalografia (0.5.0).
-   Schema 5: modelo eletrônico qualitativo de elétrons de valência deslocalizados (0.6.0). */
-SILM.scientificSchemaVersion=5;
+   Schema 5: modelo eletrônico qualitativo de elétrons de valência deslocalizados (0.6.0).
+   Schema 6: propriedades metálicas — experiência ativa e seus parâmetros (0.7.0). */
+SILM.scientificSchemaVersion=6;
 SILM.scientificModules=Object.freeze(['explorar','medir','calcular']);
 SILM.emptyScientificState=(active='explorar')=>({
- schemaVersion:5,investigation:null,metal:null,module:{active},structure:null,electrons:null,
+ schemaVersion:6,investigation:null,metal:null,module:{active},structure:null,electrons:null,properties:SILM.properties.fresh(),
  conditions:{temperature:null,pressure:null},observations:[],measurements:[],calculations:[],
  representation:{dimension:null,layers:[]},metadata:{}
 });
@@ -26,6 +27,25 @@ SILM.validateElectrons=(el,structure,metal,data=SILM.data)=>{
  if(!e?.valenceModel||src.valenceSourceId!==e.valenceModel.sourceId||src.configurationSourceId!==e.electronConfiguration.sourceId)return fail('ELECTRON_SOURCE_MISMATCH');
  const r=el.representation;
  if(!plain(r)||!keys(r,['visible','motion','densityMode','representationType'])||typeof r.visible!=='boolean'||typeof r.motion!=='boolean'||!M.densityModes.includes(r.densityMode)||r.representationType!==M.representationType)return fail('ELECTRON_REPRESENTATION_INVALID');
+ return {ok:true};
+};
+/* Propriedades (0.7.x): uma experiência ativa por vez; as demais ficam no estado-base. Os parâmetros são estado
+   da experiência e nunca alteram structure, cristalografia ou modelo eletrônico. */
+SILM.validateProperties=(pr,state,data=SILM.data)=>{
+ const P=SILM.properties,L=P.limits,fail=reason=>({ok:false,reason}),plain=v=>!!v&&typeof v==='object'&&!Array.isArray(v),keys=(o,list)=>plain(o)&&Object.keys(o).sort().join()===[...list].sort().join();
+ if(!keys(pr,['modelVersion','active','startedAt',...P.ids])||pr.modelVersion!==1)return fail('PROPERTIES_INVALID');
+ const shapes={electrical:o=>keys(o,['field'])&&typeof o.field==='boolean',thermal:o=>keys(o,['heating','stage'])&&typeof o.heating==='boolean'&&Number.isInteger(o.stage)&&o.stage>=0&&o.stage<=L.heatStages,
+  malleability:o=>keys(o,['compression'])&&Number.isInteger(o.compression)&&o.compression>=0&&o.compression<=L.compression,ductility:o=>keys(o,['elongation'])&&Number.isInteger(o.elongation)&&o.elongation>=0&&o.elongation<=L.elongation,luster:o=>keys(o,['light'])&&typeof o.light==='boolean'};
+ for(const id of P.ids)if(!shapes[id](pr[id]))return fail('PROPERTY_PARAMS_INVALID');
+ if(pr.active!==null&&!P.ids.includes(pr.active))return fail('PROPERTY_UNKNOWN');
+ // Só a propriedade ativa pode estar fora do estado-base: trocar ou encerrar não deixa resíduo.
+ for(const id of P.ids)if(id!==pr.active&&JSON.stringify(pr[id])!==JSON.stringify(P.defaults[id]))return fail('PROPERTY_STATE_RESIDUAL');
+ if(pr.active===null)return pr.startedAt===null?{ok:true}:fail('PROPERTIES_INVALID');
+ if(!Number.isFinite(Date.parse(pr.startedAt)))return fail('PROPERTIES_INVALID');
+ const s=state.structure;if(!state.investigation||!state.metal||!s)return fail('PROPERTY_CONTEXT_INVALID');
+ const el=P.eligibility(data.get(state.metal.atomicNumber))[pr.active];if(el.status==='unavailable')return fail('PROPERTY_UNAVAILABLE');
+ if(el.requires==='crystalline'&&s.mode!=='crystalline')return fail('PROPERTY_CONTEXT_INVALID');
+ if(el.requires==='electrons'&&(!state.electrons||s.units.length<SILM.electronModel.minUnits))return fail('PROPERTY_CONTEXT_INVALID');
  return {ok:true};
 };
 SILM.crystalRepresentation=Object.freeze({views:Object.freeze(['cell','lattice']),defaults:Object.freeze({view:'cell',unitCell:true,neighbors:false,labels:false,selectedUnitId:null})});
@@ -86,7 +106,7 @@ SILM.validateStructure=(s,metal,data=SILM.data)=>{
 };
 SILM.validateScientificState=(value,data=SILM.data)=>{
  const fail=reason=>({ok:false,reason});
- if(!value||typeof value!=='object'||Array.isArray(value)||value.schemaVersion!==5)return fail('SCHEMA_INCOMPATIBLE');
+ if(!value||typeof value!=='object'||Array.isArray(value)||value.schemaVersion!==6)return fail('SCHEMA_INCOMPATIBLE');
  if(!value.module||!SILM.scientificModules.includes(value.module.active))return fail('MODULE_INVALID');
  if(!Array.isArray(value.observations)||!Array.isArray(value.measurements)||!Array.isArray(value.calculations)||value.measurements.length||value.calculations.length)return fail('DATA_INVALID');
  if(value.observations.some(x=>typeof x!=='string'||x.length>12000))return fail('OBSERVATIONS_INVALID');
@@ -103,6 +123,7 @@ SILM.validateScientificState=(value,data=SILM.data)=>{
   if(value.structure!==null){const structure=SILM.validateStructure(value.structure,m,data);if(!structure.ok)return structure;}
   if(value.electrons!==null){const electrons=SILM.validateElectrons(value.electrons,value.structure,m,data);if(!electrons.ok)return electrons;}
  }
+ const properties=SILM.validateProperties(value.properties,value,data);if(!properties.ok)return properties;
  return {ok:true,value:JSON.parse(JSON.stringify(value))};
 };
 SILM.createScientificState=()=>{
@@ -177,10 +198,10 @@ SILM.createScientificState=()=>{
   const previous=snapshot();history.pop();
   if(entry.type==='add')s.units=s.units.filter(u=>u.id!==entry.unitId);
   else{unit.position={...entry.from.position};unit.placement=entry.from.placement;}
-  s.status=A.statusFor(s.units);const dropped=dropElectrons();touched(now());publish('structure:undone',previous,{action:entry.type,unitId:entry.unitId,electronsCleared:dropped});return {ok:true,action:entry.type,unitId:entry.unitId,electronsCleared:dropped};
+  s.status=A.statusFor(s.units);const dropped=dropElectrons();settleProperties();touched(now());publish('structure:undone',previous,{action:entry.type,unitId:entry.unitId,electronsCleared:dropped});return {ok:true,action:entry.type,unitId:entry.unitId,electronsCleared:dropped};
  }
  /* Limpar estrutura: structure → null; investigação, metal e módulo permanecem. */
- function clearStructure(){if(!state.structure)return false;const previous=snapshot();state.structure=null;state.electrons=null;state.investigation.updatedAt=now();history=[];publish('structure:cleared',previous);return true;}
+ function clearStructure(){if(!state.structure)return false;const previous=snapshot();state.structure=null;state.electrons=null;state.properties=SILM.properties.fresh();state.investigation.updatedAt=now();history=[];publish('structure:cleared',previous);return true;}
  function setAssistance(enabled){const s=state.structure;if(!s||!free()||typeof enabled!=='boolean')return false;if(s.assistance.enabled===enabled)return true;
   const previous=snapshot();s.assistance.enabled=enabled;touched(now());publish('structure:assistance',previous);return true;
  }
@@ -206,7 +227,7 @@ SILM.createScientificState=()=>{
  function restoreFree(){
   const s=state.structure;if(!s||free())return false;const previous=snapshot(),date=now();
   state.structure={...s,mode:'free',units:JSON.parse(JSON.stringify(s.crystallography.freeUnits)),referenceStructureId:null,crystallography:null,updatedAt:date};
-  const dropped=dropElectrons();state.investigation.updatedAt=date;history=[];publish('structure:free',previous,{electronsCleared:dropped});return true;
+  const dropped=dropElectrons();const ended=settleProperties();state.investigation.updatedAt=date;history=[];publish('structure:free',previous,{electronsCleared:dropped,propertyEnded:ended});return true;
  }
  /* Camadas e vista são estado de representação: não alteram a estrutura cristalina nem updatedAt. */
  function setCrystalRepresentation(patch){
@@ -239,11 +260,43 @@ SILM.createScientificState=()=>{
   if(JSON.stringify(next)===JSON.stringify(el.representation))return true;
   const previous=snapshot();el.representation=next;publish('electrons:representation',previous,{patch});return true;
  }
+ /* ---------- Propriedades (0.7.x) ---------- */
+ const P=SILM.properties;
+ // Encerra a experiência se o contexto deixou de valer (ex.: voltou ao modo livre, ficou sem elétrons).
+ function settleProperties(){const pr=state.properties;if(!pr.active)return null;const r=SILM.validateProperties(pr,state);if(r.ok)return null;const ended=pr.active;state.properties=P.fresh();return ended;}
+ function propertyAvailability(id){
+  if(!P.ids.includes(id))return {ok:false,reason:'PROPERTY_UNKNOWN'};const s=state.structure;if(!state.investigation||!s)return {ok:false,reason:'NO_STRUCTURE'};
+  const el=P.eligibility(SILM.data.get(state.metal.atomicNumber))[id];if(el.status==='unavailable')return {ok:false,reason:el.reasonCode};
+  if(el.requires==='crystalline'&&s.mode!=='crystalline')return {ok:false,reason:'NEEDS_CRYSTALLINE'};
+  if(el.requires==='electrons'&&s.units.length<SILM.electronModel.minUnits)return {ok:false,reason:'TOO_FEW_UNITS'};
+  return {ok:true};
+ }
+ /* Iniciar: o estado-base é a própria estrutura (as experiências não a alteram). Condutividade elétrica ativa
+    e mostra o modelo eletrônico, se necessário. Trocar de propriedade devolve a anterior ao estado-base. */
+ function startProperty(id){
+  const able=propertyAvailability(id);if(!able.ok)return able;if(state.properties.active===id)return {ok:true,unchanged:true};
+  const previous=snapshot(),date=now();let electrons=false;
+  if(id==='electrical'){if(!state.electrons){const e=SILM.data.get(state.metal.atomicNumber),M=SILM.electronModel;state.electrons={modelVersion:M.modelVersion,type:M.types[0],status:'active',metalAtomicNumber:state.metal.atomicNumber,source:{model:M.sourceModel,valenceSourceId:e.valenceModel.sourceId,configurationSourceId:e.electronConfiguration.sourceId},representation:{...M.defaults},createdAt:date};electrons=true;}
+   else if(!state.electrons.representation.visible){state.electrons.representation.visible=true;electrons=true;}}
+  const switched=state.properties.active;state.properties={...P.fresh(),active:id,startedAt:date};state.investigation.updatedAt=date;
+  publish('properties:started',previous,{property:id,switchedFrom:switched,electrons});return {ok:true,switchedFrom:switched,electrons};
+ }
+ function setPropertyParams(patch){
+  const pr=state.properties,id=pr.active;if(!id||!patch||typeof patch!=='object')return false;
+  const next={...pr,[id]:{...pr[id],...patch}};if(Object.keys(next[id]).length!==Object.keys(P.defaults[id]).length)return false;
+  if(!SILM.validateProperties(next,{...state,properties:next}).ok)return false;if(JSON.stringify(next[id])===JSON.stringify(pr[id]))return true;
+  const previous=snapshot();state.properties=next;publish('properties:changed',previous,{property:id,patch});return true;
+ }
+ /* Restaurar: volta ao estado-base da experiência; não reseta a investigação nem troca o metal. */
+ function restoreProperty(){const pr=state.properties;if(!pr.active)return false;const previous=snapshot();state.properties={...pr,[pr.active]:JSON.parse(JSON.stringify(P.defaults[pr.active]))};publish('properties:restored',previous,{property:pr.active});return true;}
+ function endProperty(){const pr=state.properties;if(!pr.active)return false;const previous=snapshot(),id=pr.active;state.properties=P.fresh();state.investigation.updatedAt=now();publish('properties:ended',previous,{property:id});return true;}
  function upgradeStructure(s){return s===null?null:{...s,modelVersion:2,mode:'free',crystallography:null};}
  function migrate(value){
-  if(value?.schemaVersion===4)return value.electrons===null?{...value,schemaVersion:5}:null;   // 0.5.0 → 0.6.0: estrutura e representação preservadas
-  if(value?.schemaVersion===3)return value.electrons===null?{...value,schemaVersion:5,structure:upgradeStructure(value.structure)}:null; // 0.4.0: montagem em modo livre
-  if(value?.schemaVersion===2)return value.structure===null&&value.electrons===null?{...value,schemaVersion:5}:null;     // 0.3.0: sem montagem automática
+  const fresh=SILM.properties.fresh();
+  if(value?.schemaVersion===5)return 'properties' in value?null:{...value,schemaVersion:6,properties:fresh};       // 0.6.0 → 0.7.0: tudo preservado, nenhuma experiência ativa
+  if(value?.schemaVersion===4)return value.electrons===null?{...value,schemaVersion:6,properties:fresh}:null;   // 0.5.0: estrutura e representação preservadas
+  if(value?.schemaVersion===3)return value.electrons===null?{...value,schemaVersion:6,properties:fresh,structure:upgradeStructure(value.structure)}:null; // 0.4.0: montagem em modo livre
+  if(value?.schemaVersion===2)return value.structure===null&&value.electrons===null?{...value,schemaVersion:6,properties:fresh}:null;     // 0.3.0: sem montagem automática
   if(value?.schemaVersion!==1||!['number','object'].includes(typeof value.metal))return null;
   if(value.metal===null)return SILM.emptyScientificState();
   const z=typeof value.metal==='number'?value.metal:value.metal?.atomicNumber;
@@ -252,14 +305,14 @@ SILM.createScientificState=()=>{
   next.metal={atomicNumber:e.atomicNumber,symbol:e.symbol,sourceId:e.identityProvenance.atomicNumber.sourceId};return next;
  }
  function restore(value,{allowLegacy=true}={}){
-  const legacy=allowLegacy&&[1,2,3,4].includes(value?.schemaVersion),candidate=legacy?migrate(value):value;
+  const legacy=allowLegacy&&[1,2,3,4,5].includes(value?.schemaVersion),candidate=legacy?migrate(value):value;
   const result=SILM.validateScientificState(candidate);
   if(!result.ok)return result;
-  const previous=snapshot();history=[];replace(result.value);persist();emit?.('investigation:restored',{previous,current:snapshot(),migrated:legacy,from:legacy?value.schemaVersion:5});return {ok:true,migrated:legacy,from:legacy?value.schemaVersion:5};
+  const previous=snapshot();history=[];replace(result.value);persist();emit?.('investigation:restored',{previous,current:snapshot(),migrated:legacy,from:legacy?value.schemaVersion:6});return {ok:true,migrated:legacy,from:legacy?value.schemaVersion:6};
  }
  function connect(options){storage=options.storage;emit=options.emit;}
  return Object.freeze({get state(){return snapshot();},snapshot,connect,begin,setModule,resetInvestigation,close,setStatus,restore,
-  beginAssembly,addUnit,moveUnit,undo,clearStructure,setAssistance,setAssemblyStatus,organize,restoreFree,setCrystalRepresentation,activateElectrons,setElectronRepresentation,
+  beginAssembly,addUnit,moveUnit,undo,clearStructure,setAssistance,setAssemblyStatus,organize,restoreFree,setCrystalRepresentation,activateElectrons,setElectronRepresentation,startProperty,setPropertyParams,restoreProperty,endProperty,propertyAvailability,
   get canUndo(){return !!state.structure&&free()&&history.length>0;},get historySize(){return history.length;},
   get lastAction(){const last=history[history.length-1];return state.structure&&last?{type:last.type,unitId:last.unitId}:null;},
   load(){const missing={};const saved=storage?.get('scientific.state',missing);if(saved===missing)return {ok:true,empty:true};const result=restore(saved);if(!result.ok){history=[];replace(SILM.emptyScientificState());persist();return result;}return result;}

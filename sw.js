@@ -1,5 +1,5 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.6.0';
+const VERSION='0.7.0';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION,DOMAINS=CACHE+'::domains';
 const FILES=[
   "./",
@@ -103,6 +103,8 @@ const FILES=[
   "domain/silm/periodic-table.js",
   "domain/silm/prelude.js",
   "domain/silm/presentation.js",
+  "domain/silm/properties.js",
+  "domain/silm/property-view.js",
   "domain/silm/state.js",
   "domain/silm/styles.css",
   "vendor/dialog-polyfill/dialog-polyfill.css",

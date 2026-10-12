@@ -15,7 +15,7 @@ module.exports={series:'0.6',async run(kit,{screenshots=false}={}){
   const page=await use();await crystal(page,'Cu',4);await page.click('#silm-crystal-view-lattice');await page.click('#silm-crystal-neighbors');const s5=await state(page);
   const v050=JSON.parse(JSON.stringify(s5));v050.schemaVersion=4;
   const migrated=await use({seed:v050});await go(migrated);await migrated.waitForSelector('.silm-crystal');const s=await state(migrated);
-  assert.equal(s.schemaVersion,5);assert.deepEqual(s.structure,s5.structure);assert.equal(s.electrons,null);assert.equal(s.investigation.id,s5.investigation.id);assert.equal(s.metal.symbol,'Cu');
+  assert.equal(s.schemaVersion,await migrated.evaluate(()=>SILM.scientificSchemaVersion));assert.deepEqual(s.structure,s5.structure);assert.equal(s.electrons,null);assert.equal(s.investigation.id,s5.investigation.id);assert.equal(s.metal.symbol,'Cu');
   assert.equal(await migrated.getAttribute('.silm-crystal','data-view'),'lattice');assert.equal(await migrated.getAttribute('#silm-crystal-neighbors','aria-pressed'),'true');
   return {from:4,to:5,representation:'lattice + vizinhos preservados'};
  });
@@ -204,7 +204,8 @@ module.exports={series:'0.6',async run(kit,{screenshots=false}={}){
   assert.equal(await page.getAttribute('#silm-electrons-toggle','aria-disabled'),'true');assert.match(await page.locator('#silm-electron-status').textContent(),/Ative os elétrons em Explorar/);
   await switchModule(page,'explorar');await electrons(page);await switchModule(page,'calcular');assert.ok((await snap(page)).visible,'Representação acompanha a troca de módulo');
   await page.click('#silm-electrons-toggle');assert.equal((await state(page)).electrons.representation.visible,false);
-  const text=await page.locator('#workspace').textContent();assert.ok(!/voltagem|corrente elétrica aplicada|Aplicar|circuito|bateria|resistividade/i.test(text.replace(/não representa corrente elétrica orientada|não representa corrente/g,'')),'Sem condutividade antecipada');
+  const text=await page.locator('#workspace').textContent();// Fronteira que continua valendo após a 0.7.x (que introduz o campo elétrico qualitativo): sem voltagem, circuito ou instrumentos.
+  assert.ok(!/voltagem|circuito|bateria|amperímetro|voltímetro/i.test(text),'Sem circuito nem instrumentos');
   return {medir:'ativação indisponível',calcular:'visibilidade alterável'};
  });
 

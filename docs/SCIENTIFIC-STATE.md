@@ -1,6 +1,6 @@
-# Estado científico do SILM — schema 5
+# Estado científico do SILM — schema 6
 
-> Documento reconstruído na 0.4.0 e atualizado na 0.5.0 e na 0.6.0. O arquivo original da 0.3.0 não constava do pacote recebido. O conteúdo descreve o código vigente (`domain/silm/state.js`) e o histórico dos schemas.
+> Documento reconstruído na 0.4.0 e atualizado na 0.5.0, na 0.6.0 e na 0.7.0. O arquivo original da 0.3.0 não constava do pacote recebido. O conteúdo descreve o código vigente (`domain/silm/state.js`) e o histórico dos schemas.
 
 O SILM possui **uma única fonte de verdade** para a ciência: o `scientificState`. Laboratório Livre, Explorar, Medir, Calcular e os futuros Roteiros e Missões observam e modificam o mesmo estado. Não existem estados paralelos (`routeScientificState`, `missionStructure` etc.).
 
@@ -19,20 +19,22 @@ metal selecionado → INVESTIGAÇÃO → scientificState → Explorar / Medir / 
 | 2 | 0.3.0 | investigação formal; `structure` sempre `null` |
 | 3 | 0.4.0 | `structure` passa a aceitar a montagem metálica formal |
 | 4 | 0.5.0 | `structure.mode` livre/cristalino e `structure.crystallography` (CCC, CFC, HC) |
-| **5** | **0.6.0** | `electrons`: modelo eletrônico qualitativo de elétrons de valência deslocalizados |
+| 5 | 0.6.0 | `electrons`: modelo eletrônico qualitativo de elétrons de valência deslocalizados |
+| **6** | **0.7.0** | `properties`: experiência de propriedade ativa e seus parâmetros |
 
 `schemaVersion` é a versão do contrato do estado, não a versão do produto.
 
-## 2. Estrutura do schema 5
+## 2. Estrutura do schema 6
 
 ```js
 {
-  schemaVersion: 5,
+  schemaVersion: 6,
   investigation: null | { id: 'inv-…', status: 'new'|'active'|'paused', type: 'free'|'route'|'mission'|'teacher', createdAt, updatedAt },
   metal: null | { atomicNumber: 29, symbol: 'Cu', sourceId: '…' },
   module: { active: 'explorar'|'medir'|'calcular' },
   structure: null | MetallicAssembly,      // novo no schema 3
-  electrons: null | DelocalizedElectronModel, // novo no schema 5 (0.6.x)
+  electrons: null | DelocalizedElectronModel, // schema 5 (0.6.x)
+  properties: PropertiesState,              // novo no schema 6 (0.7.x); ver CONTRATO-PROPRIEDADES.md
   conditions: { temperature: null, pressure: null },
   observations: [],                        // textos, até 12 000 caracteres cada
   measurements: [],                        // vazio até a 0.9.x
@@ -86,7 +88,8 @@ Bloqueante no build (`scripts/validate-scientific-state.cjs`) e aplicada a todo 
 
 | Regra | Código de recusa |
 |---|---|
-| `schemaVersion === 5` | `SCHEMA_INCOMPATIBLE` |
+| `schemaVersion === 6` | `SCHEMA_INCOMPATIBLE` |
+| `properties`: chaves, parâmetros, uma ativa, sem resíduo, contexto e elegibilidade | `PROPERTIES_INVALID`, `PROPERTY_PARAMS_INVALID`, `PROPERTY_UNKNOWN`, `PROPERTY_STATE_RESIDUAL`, `PROPERTY_CONTEXT_INVALID`, `PROPERTY_UNAVAILABLE` |
 | modo cristalino: tipo, referência, fonte, coordenação, sítios, autoria, célula completa, representação | ver `CONTRATO-CRISTALOGRAFICO.md` |
 | módulo registrado | `MODULE_INVALID` |
 | `electrons`: contrato, metal, estrutura com 2 ou mais unidades, fontes do banco, representação qualitativa | `ELECTRONS_INVALID`, `ELECTRONS_METAL_MISMATCH`, `ELECTRONS_WITHOUT_STRUCTURE`, `ELECTRON_SOURCE_INVALID`, `ELECTRON_SOURCE_MISMATCH`, `ELECTRON_REPRESENTATION_INVALID` |
@@ -122,12 +125,13 @@ Somente `SILM.createScientificState()` escreve no estado. Consumidores recebem c
 | `addUnit(pos?)` | adiciona uma unidade do metal ativo (posição assistida ou destino resolvido) |
 | `moveUnit(id, pos, {gesture})` | move, aplicando a assistência ou recusando a sobreposição |
 | `undo()` | desfaz a última adição ou movimento |
-| `clearStructure()` | `structure → null` e `electrons → null` |
+| `clearStructure()` | `structure → null`, `electrons → null`, `properties` no estado-base |
 | `organize()` | organiza segundo a estrutura de referência do banco; completa a célula |
 | `restoreFree()` | volta exatamente à montagem livre anterior |
 | `setCrystalRepresentation(patch)` | vista, célula, vizinhos, rótulos e seleção (representação) |
 | `activateElectrons()` | cria o modelo eletrônico (2 ou mais unidades) ou torna visíveis os elétrons ocultos |
 | `setElectronRepresentation(patch)` | `visible` e `motion` (representação; não altera `updatedAt`) |
+| `startProperty(id)` / `setPropertyParams(patch)` / `restoreProperty()` / `endProperty()` | experiência de propriedade (não altera a estrutura) |
 | `setAssistance(bool)` / `setAssemblyStatus(s)` | assistência; marcação `assembled`/`assembling` |
 | `restore(value)` / `load()` | valida, migra e restaura; em falha, recupera para o estado vazio |
 
@@ -137,7 +141,7 @@ Na interface, o domínio respeita `init`, `mount`, `activate`, `resize`, `reset`
 
 Cada escrita persiste o estado e emite o evento específico seguido de `investigation:updated` (prefixo `domain:silm:` no barramento da Base):
 
-`investigation:created`, `investigation:reset`, `investigation:closed`, `investigation:status`, `investigation:restored`, `metal:changed`, `scientific:module-changed`, `structure:created`, `structure:unit-added`, `structure:unit-moved`, `structure:undone`, `structure:cleared`, `structure:assistance`, `structure:status`, `structure:organized`, `structure:free`, `structure:representation`, `electrons:activated`, `electrons:representation`.
+`investigation:created`, `investigation:reset`, `investigation:closed`, `investigation:status`, `investigation:restored`, `metal:changed`, `scientific:module-changed`, `structure:created`, `structure:unit-added`, `structure:unit-moved`, `structure:undone`, `structure:cleared`, `structure:assistance`, `structure:status`, `structure:organized`, `structure:free`, `structure:representation`, `electrons:activated`, `electrons:representation`, `properties:started`, `properties:changed`, `properties:restored`, `properties:ended`.
 
 ## 6. Persistência
 
@@ -150,10 +154,11 @@ Cada escrita persiste o estado e emite o evento específico seguido de `investig
 
 | De → para | Regra |
 |---|---|
-| 1 → 5 | seleção provisória vira investigação `free` com o metal, se ele estiver disponível |
-| 2 → 5 | mesmo conteúdo, com `schemaVersion: 5`. Só é aceita se `structure` e `electrons` forem `null`. Nenhuma montagem é criada automaticamente. |
-| 3 → 5 | a montagem livre da 0.4.x é preservada: `modelVersion: 2`, `mode: 'free'`, `crystallography: null`; unidades, posições e status inalterados. |
-| **4 → 5** | estrutura (livre ou cristalina), representação, metal e investigação preservados; `electrons` continua `null` (o modelo eletrônico não é criado automaticamente). |
+| 1 → 6 | seleção provisória vira investigação `free` com o metal, se ele estiver disponível |
+| 2 → 6 | mesmo conteúdo, com `schemaVersion: 6`. Só é aceita se `structure` e `electrons` forem `null`. Nenhuma montagem é criada automaticamente. |
+| 3 → 6 | a montagem livre da 0.4.x é preservada: `modelVersion: 2`, `mode: 'free'`, `crystallography: null`; unidades, posições e status inalterados. |
+| 4 → 6 | estrutura (livre ou cristalina), representação, metal e investigação preservados; `electrons` continua `null`. |
+| **5 → 6** | tudo preservado (inclusive `electrons`); `properties` entra no estado-base, sem experiência ativa. |
 
 Exemplo da migração 3 → 4:
 
@@ -162,8 +167,8 @@ schema 3: metal = Cu, structure = { modelVersion: 1, units: 5 }, module = explor
 schema 4: metal = Cu, structure = { modelVersion: 2, mode: 'free', units: 5, crystallography: null }, module = explorar
 ```
 
-A migração roda na restauração (`restore`) e o resultado é gravado logo em seguida no schema 5. O evento `investigation:restored` informa `migrated: true` e `from` (1, 2, 3 ou 4).
+A migração roda na restauração (`restore`) e o resultado é gravado logo em seguida no schema 6. O evento `investigation:restored` informa `migrated: true` e `from` (1 a 5).
 
-## 8. Preparação para a 0.7.x
+## 8. Preparação para a 0.8.x
 
-As propriedades metálicas (0.7.x) devem derivar de estrutura e modelo eletrônico (estrutura → comportamento → propriedade), sem gravar corrente, campo ou temperatura no modelo eletrônico.
+A série 0.8.x organiza o módulo Explorar sobre estes objetos (estrutura, elétrons, propriedades), sem criar estado paralelo. Medidas (0.9.x) e cálculos (0.10.x) continuam vazios.

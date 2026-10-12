@@ -141,3 +141,50 @@
  .silm-electron-bar button{font-size:.72rem;padding:3px 7px}
  .silm-electron-bar .ajuda-link{width:24px;height:24px;font-size:.75rem}
 }
+/* 0.7.x — propriedades metálicas: sobreposição fora da estrutura, energia térmica por anéis (não só cor),
+   superfície iluminada e controles da experiência ativa. */
+:root{--silm-heat:#ff7a3d;--silm-light:#fff1b8}
+:root[data-theme=light]{--silm-heat:#b4400a;--silm-light:#b38600}
+:root[data-contrast=on]{--silm-heat:#ffffff;--silm-light:#ffff00}
+.silm-property-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.silm-arrow-head{fill:var(--text)}
+.silm-field-arrow{stroke:var(--accent);stroke-width:1.1}
+.silm-drift-arrow{stroke:var(--silm-electron);stroke-width:1;stroke-dasharray:2 1.2}
+.silm-force-arrow{stroke:var(--text);stroke-width:1.2}
+.silm-overlay-label{font-size:4px;font-weight:700;fill:var(--text)}
+.silm-overlay-small{font-size:2.8px;font-weight:600}
+.silm-hatch-line{fill:var(--silm-heat)}
+.silm-heat-band{stroke:var(--silm-heat);stroke-width:.4}
+.silm-ray-line{fill:var(--silm-light)}
+.silm-light-in{stroke:var(--silm-light);stroke-width:.3;opacity:.9}
+.silm-light-out{fill:var(--silm-light);opacity:.28;stroke:var(--silm-light);stroke-width:.3}
+.silm-unit[data-heat="1"] .silm-unit-core{box-shadow:0 0 0 1.5px var(--silm-heat)}
+.silm-unit[data-heat="2"] .silm-unit-core{box-shadow:0 0 0 1.5px var(--silm-heat),0 0 0 3px var(--bg),0 0 0 4.5px var(--silm-heat)}
+.silm-unit[data-heat="3"] .silm-unit-core{box-shadow:0 0 0 1.5px var(--silm-heat),0 0 0 3px var(--bg),0 0 0 4.5px var(--silm-heat),0 0 0 6px var(--bg),0 0 0 7.5px var(--silm-heat)}
+.silm-unit[data-heat="4"] .silm-unit-core{box-shadow:0 0 0 1.5px var(--silm-heat),0 0 0 3px var(--bg),0 0 0 4.5px var(--silm-heat),0 0 0 6px var(--bg),0 0 0 7.5px var(--silm-heat),0 0 0 9px var(--bg),0 0 0 10.5px var(--silm-heat)}
+@keyframes silm-vibrate{from{translate:calc(var(--amp,1px)*-1) 0}to{translate:var(--amp,1px) 0}}
+.silm-unit[data-heat="2"]{--amp:.6px}.silm-unit[data-heat="3"]{--amp:1px}.silm-unit[data-heat="4"]{--amp:1.5px}
+:root:not([data-motion=on]) .silm-unit[data-heat]:not([data-heat="0"]):not([data-heat="1"]) .silm-unit-core{animation:silm-vibrate .11s infinite alternate}
+@media(prefers-reduced-motion:reduce){.silm-unit[data-heat] .silm-unit-core{animation:none!important}}
+.silm-unit[data-lit] .silm-unit-core{background:radial-gradient(circle at 38% 22%,#fff 0,#fff8d8 16%,#e8cd7e 38%,#a8743b 78%,#6e4a22 100%);outline:2px solid var(--silm-light);outline-offset:1px}
+.silm-property-controls{display:grid;gap:8px}
+.silm-property-title{margin:0;font-weight:700}
+.silm-property-status{margin:0;font-size:.85rem;color:var(--secondary)}
+.silm-property-actions{display:flex;flex-wrap:wrap;gap:6px}
+.silm-property-actions[hidden],.silm-property-list[hidden]{display:none}
+.silm-property-list{display:grid;gap:6px}
+.silm-property-item{display:grid;gap:2px}
+.silm-property-reason{font-size:.78rem;color:var(--secondary)}
+.silm-property-compact{gap:6px;padding-top:6px;border-top:1px solid var(--silm-soft-border)}
+.silm-property-compact[data-active=""]{display:none}
+.silm-property-compact .silm-property-actions button{padding:4px 10px;font-size:.82rem}
+.silm-property-host{flex-basis:100%}
+.silm-property-summary{margin-top:14px;padding-top:12px;border-top:1px solid var(--silm-soft-border)}
+.silm-property-blocks{display:grid;gap:8px;margin:8px 0}
+.silm-property-block{padding:8px 10px;border:1px solid var(--silm-soft-border);border-radius:var(--radius)}
+.silm-property-block h4{margin:0 0 4px;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;color:var(--secondary)}
+.silm-property-block p{margin:0}
+@media(max-width:600px){.silm-property-host{display:none}}
+@media(forced-colors:active){.silm-unit[data-heat] .silm-unit-core{box-shadow:none;outline:3px double CanvasText}.silm-field-arrow,.silm-force-arrow,.silm-drift-arrow{stroke:CanvasText}.silm-arrow-head,.silm-overlay-label{fill:CanvasText}}
+/* Abas da Montagem (5 desde a 0.7.x): rótulos inteiros; se não couberem, as abas passam para outra linha. */
+#dock-left-tabs button,#dock-right-tabs button{flex:1 1 auto;white-space:nowrap;overflow-wrap:normal}

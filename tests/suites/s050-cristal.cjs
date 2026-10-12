@@ -161,7 +161,8 @@ module.exports={series:'0.5',async run(kit,{screenshots=false}={}){
  await test('0.5-PAR','Paridade SIAB: Montagem / Ver / Dados e Histórico',async use=>{
   const page=await use();await crystal(page,'Cu',3);
   const labels=await page.evaluate(()=>['workspace-left','workspace-right','workspace-right-alt'].map(id=>document.getElementById(id).textContent));assert.deepEqual(labels,['Montagem','Ver','Dados']);
-  await openLeft(page,'Resumo');const tabs=await page.locator('#dock-left-tabs button').allTextContents();assert.deepEqual(tabs,['Resumo','Metal','Estrutura','Módulo']);await shot(page,'14-montagem-resumo');await closeLeft(page);
+  await openLeft(page,'Resumo');const tabs=await page.locator('#dock-left-tabs button').allTextContents();// Paridade 0.5: Resumo, Metal, Estrutura … Módulo, nesta ordem; séries seguintes podem inserir abas antes de Módulo (0.7: Propriedades).
+  assert.deepEqual(tabs.slice(0,3),['Resumo','Metal','Estrutura']);assert.equal(tabs.at(-1),'Módulo');await shot(page,'14-montagem-resumo');await closeLeft(page);
   await openRight(page,'ver');assert.match(await page.locator('#dock-right-content').textContent(),/Número de coordenação\s*12[\s\S]*Resultado do modelo cristalográfico/);assert.match(await page.locator('#dock-right-content').textContent(),/Estrutura de referência\s*CFC \(FCC\)[\s\S]*Dado tabelado/);
   assert.equal(await page.getAttribute('#workspace-right','aria-expanded'),'true');await shot(page,'15-ver-observar');
   await openRight(page,'dados','Histórico');assert.equal(await page.getAttribute('#workspace-right-alt','aria-expanded'),'true');

@@ -65,8 +65,14 @@ function createKit({version,only=null}){
  h.organize=async page=>{await page.click('#silm-assembly-organize');await h.answer(page,'Organizar estrutura');await page.waitForSelector('.silm-crystal');};
  h.crystal=async(page,symbol='Cu',n=4)=>{await h.investigate(page,symbol);await h.assemble(page,n);await h.organize(page);};
  kit.finish=()=>{
-  const report={product:'SILM',version,date:new Date().toISOString(),browser:'Chromium (Playwright '+require('playwright/package.json').version+')',passed:results.filter(r=>r.status==='PASS').length,failed:results.filter(r=>r.status==='FAIL').length,results,consoleErrors};
-  fs.writeFileSync(path.join(evidence,'RESULTADOS-NAVEGADOR-'+version+'.json'),JSON.stringify(report,null,2)+'\n');
+  const file=path.join(evidence,'RESULTADOS-NAVEGADOR-'+version+'.json');let all=results,errors=consoleErrors;
+  // Execução parcial (prefixos): mescla com o último resultado completo, substituindo só os itens reexecutados.
+  if(only&&fs.existsSync(file)){const previous=JSON.parse(fs.readFileSync(file,'utf8')),ran=new Set(results.map(r=>r.id));
+   all=[...previous.results.filter(r=>!ran.has(r.id)),...results];const order=previous.results.map(r=>r.id);all.sort((a,b)=>(order.indexOf(a.id)+1||1e9)-(order.indexOf(b.id)+1||1e9));
+   const rerunConsole=ran.has('CONSOLE');errors=[...previous.consoleErrors.filter(e=>!ran.has(e.test)&&!rerunConsole),...consoleErrors];
+   const consoleItem=all.find(r=>r.id==='CONSOLE');if(consoleItem&&!ran.has('CONSOLE')){consoleItem.status=errors.length?'FAIL':'PASS';}}
+  const report={product:'SILM',version,date:new Date().toISOString(),browser:'Chromium (Playwright '+require('playwright/package.json').version+')',passed:all.filter(r=>r.status==='PASS').length,failed:all.filter(r=>r.status==='FAIL').length,partialRerun:only?[...new Set([...(fs.existsSync(file)?JSON.parse(fs.readFileSync(file,'utf8')).partialRerun||[]:[]),...only])]:undefined,results:all,consoleErrors:errors};
+  fs.writeFileSync(file,JSON.stringify(report,null,2)+'\n');
   console.log(`\n${report.passed} aprovados · ${report.failed} reprovados`);return report;
  };
  return kit;

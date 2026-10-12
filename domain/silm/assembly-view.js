@@ -10,7 +10,7 @@ SILM.actionButton=(text,run,scope,{id,primary=false,danger=false,glyph=null,labe
 /* Representação 2D funcional da montagem (0.4.x). Lê o estado científico e escreve somente pelas
    ações do domínio. Seleção, arrasto e prévia de teclado são estado transitório de interface.
    Sem linhas entre unidades e sem escala física. Elétrons (0.6.x): camada própria, qualitativa, sobre a mesma cena. */
-SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',reference='de referência',moduleTitle='Explorar',describeLast=()=>null,canExplore=()=>false,onExplore=()=>{},organize=null,reducedMotion=()=>false,electrons:electronOptions=null})=>{
+SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',reference='de referência',moduleTitle='Explorar',describeLast=()=>null,canExplore=()=>false,onExplore=()=>{},organize=null,reducedMotion=()=>false,electrons:electronOptions=null,properties:propertyOptions=null})=>{
  const U=SimCore.ExperienceUI,A=SILM.assembly,C=A.contract,name=element.name.toLocaleLowerCase('pt-BR');
  const statusLabel={empty:'Vazia',assembling:'Em construção',assembled:'Concluída pelo usuário'};
  const root=U.element('section',null,'silm-assembly');root.dataset.editable=String(editable);root.setAttribute('aria-labelledby','silm-assembly-title');
@@ -45,6 +45,9 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  const electronLegend=U.element('p','Pontos ciano: elétrons de valência deslocalizados, marcadores qualitativos (não indicam o número real de elétrons). Na montagem livre, a distribuição é uma representação didática preliminar da ligação metálica coletiva.','silm-electron-legend');electronLegend.id='silm-electron-legend';electronLegend.hidden=true;
  const electronControls=electronOptions?SILM.createElectronControls(footer,{scope,state:()=>model.state,actions:electronOptions.actions,reducedMotion,canActivate:electronOptions.canActivate}):null;
  if(electronControls)footer.prepend(electronControls.root,electronLegend);
+ // 0.7.x: na montagem livre, somente a condutividade elétrica (observação básica sobre os elétrons).
+ const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:layer}),propertyHost=U.element('div',null,'silm-property-host');
+ footer.insertBefore(propertyHost,electronLegend.nextSibling);const propertyControls=propertyOptions?.controls?.(propertyHost,scope)||null;
  const known=new Set();let drawn=false;
  const freeSpacing=list=>{if(list.length<2)return .12;const nn=list.map(u=>Math.min(...list.filter(v=>v!==u).map(v=>A.distance(u.position,v.position)))).sort((a,b)=>a-b);return Math.max(.1,Math.min(.2,nn[Math.floor(nn.length/2)]));};
  if(editable){layer.setAttribute('role','group');layer.setAttribute('aria-label','Unidades da montagem de '+name);}
@@ -75,13 +78,15 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
   if(lostFocus)(nodes.get(roving)||title).focus();
   collective.replaceChildren(...list.map(u=>{const c=document.createElementNS(svg.namespaceURI,'circle');c.setAttribute('cx',String(u.position.x*100));c.setAttribute('cy',String(u.position.y*100));c.setAttribute('r',String(C.minDistance*78));return c;}));
   const el=model.state.electrons,shownElectrons=!!el?.representation.visible&&list.length>=2;
-  electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,centers:list.map(u=>u.position),spacing:freeSpacing(list),connect:true});
+  const pr=model.state.properties,fieldOn=pr?.active==='electrical'&&pr.electrical.field;
+  electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:list.map(u=>u.position),spacing:freeSpacing(list),connect:true});
+  overlay.update({field:fieldOn});root.dataset.property=pr?.active||'';propertyControls?.update();
   for(const u of list)if(!known.has(u.id)){known.add(u.id);if(drawn&&shownElectrons)electronLayer.incorporate(u.position);}
   for(const id of [...known])if(!list.some(u=>u.id===id))known.delete(id);drawn=true;
   root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;electronControls?.update();
   const n=list.length;meta.textContent='Montagem metálica · '+n+' '+(n===1?'unidade':'unidades')+' · '+statusLabel[s.status];
   empty.hidden=n>0;assist.hidden=!s.assistance.enabled;root.dataset.status=s.status;
-  if(!editable)stage.setAttribute('aria-label','Montagem de '+name+' com '+n+' '+(n===1?'unidade':'unidades')+'. Representação didática; a edição está disponível em Explorar.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica.':''));
+  if(!editable)stage.setAttribute('aria-label','Montagem de '+name+' com '+n+' '+(n===1?'unidade':'unidades')+'. Representação didática; a edição está disponível em Explorar.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica.':'')+(fieldOn?' Campo elétrico aplicado: a representação eletrônica apresenta deslocamento coletivo orientado.':''));
   add?.setAttribute('aria-disabled',String(n>=C.maxUnits));undo?.setAttribute('aria-disabled',String(!model.canUndo));if(undo){const last=describeLast();undo.title=last?'Desfazer: '+last:'Nada para desfazer';}
   if(organize){const o=organize.state();crystalReason.textContent=o.reason||'';crystalReason.hidden=!o.reason;if(organizeButton){organizeButton.setAttribute('aria-disabled',String(o.disabled));organizeButton.title=o.reason||o.title||'';}}
  }
