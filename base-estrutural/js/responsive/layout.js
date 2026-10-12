@@ -1,8 +1,0 @@
-'use strict';
-/* Um medidor compartilhado para header, banner, launchers e navegação móvel. */
-SimCore.responsive=(()=>{
- let initialized=false,frame=0;
- function refresh(){if(!initialized||frame)return;frame=requestAnimationFrame(()=>{frame=0;const S=SimCore,root=document.documentElement,header=document.querySelector('.app-header'),banner=S.$('activity-banner'),bottom=S.$('bottom-nav'),toolbar=S.$('workspace-toolbar'),launchers=S.$('workspace-launchers');root.style.setProperty('--header-h',header.getBoundingClientRect().height+'px');root.style.setProperty('--activity-h',!banner.hidden?banner.getBoundingClientRect().height+'px':'0px');root.style.setProperty('--bottom-h',bottom.getClientRects().length?bottom.getBoundingClientRect().height+'px':'0px');root.style.setProperty('--launchers-h',matchMedia('(max-width:'+S.breakpoints.mobile+'px)').matches?launchers.getBoundingClientRect().height+'px':'0px');S.$('workspace').style.setProperty('--toolbar-h',toolbar.getBoundingClientRect().height+'px');S.workspace.refresh();S.viewport.measure();});}
- function init(){if(initialized)return;initialized=true;if(window.ResizeObserver){const observer=new ResizeObserver(refresh);for(const node of [document.querySelector('.app-header'),SimCore.$('activity-banner'),SimCore.$('bottom-nav'),SimCore.$('workspace-toolbar'),SimCore.$('workspace-launchers')])observer.observe(node);}window.addEventListener('resize',refresh);window.visualViewport?.addEventListener('resize',refresh);for(const event of ['a11y:changed','screen:changed','activity:changed','shell:projector'])SimCore.events.addEventListener(event,refresh);refresh();}
- return {init,refresh};
-})();

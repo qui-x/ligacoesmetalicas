@@ -1,2 +1,0 @@
-const pw=require('./browser.cjs');
-module.exports=async(fn,engine='chromium')=>{const service=await require('./server.cjs').start();const b=await pw[engine].launch({headless:true,env:{...process.env,MOZ_DISABLE_CONTENT_SANDBOX:'1'}});try{const ctx=await b.newContext({viewport:{width:1366,height:900}}),p=await ctx.newPage(),errors=[];p.setDefaultTimeout(7000);p.on('pageerror',e=>errors.push(e.message));await p.goto(service.url);await p.waitForFunction(()=>window.SimCore?.ready);await fn({p,ctx,b,service,errors});}finally{await b.close();service.server.close();}};

@@ -4,7 +4,7 @@ from pathlib import Path
 import hashlib, zipfile
 root = Path(__file__).resolve().parents[1]
 version = (root / 'VERSION').read_text().strip()
-skip = ('.git/', 'node_modules/', 'entregas/', 'base-estrutural/')   # a Base Estrutural é um produto próprio, com pacote próprio
+skip = ('.git/', 'node_modules/', 'entregas/')
 def files():
     return sorted(p for p in root.rglob('*') if p.is_file() and not str(p.relative_to(root)).startswith(skip))
 listed = [p for p in files() if p.name != 'SHA512SUMS.txt' or p.parent != root]

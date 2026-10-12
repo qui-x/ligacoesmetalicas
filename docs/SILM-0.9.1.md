@@ -48,7 +48,7 @@ Testes: itens 0.9.1-01 a 0.9.1-05 (suíte `s096-cena-compacta.cjs`) e a regress�
 
 ## O que não muda
 
-O schema científico continua 7, não há novas mecânicas e nenhuma série é antecipada. A paridade de família com o SIAB 1.0.0 continua em estudo e segue pela Base Estrutural 0.3.0. Isso inclui, por exemplo, ocultar a navegação inferior no Laboratório do celular, como faz o SIAB.
+O schema científico continua 7, não há novas mecânicas e nenhuma série é antecipada. A paridade de família com o SIAB 1.0.0 continua em estudo e segue pela Base Estrutural 0.3.0, produto próprio entregue diretamente ao autor e mantido fora deste repositório. Isso inclui, por exemplo, ocultar a navegação inferior no Laboratório do celular, como faz o SIAB.
 
 ## Documentos
 

@@ -1,5 +1,0 @@
-npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
-
-> base-estrutural@0.2.4 build
-> node scripts/build-layout.cjs && node scripts/build-sw.cjs
-

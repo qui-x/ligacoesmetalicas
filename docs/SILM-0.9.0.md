@@ -47,7 +47,7 @@
 O autor pediu, durante esta série, um estudo mais profundo da interface do SIAB 1.0.0, para que o SILM tenha a mesma dinâmica, e o enriquecimento da Base Estrutural com a estrutura consolidada do SIAB, de forma neutra.
 
 Esse trabalho é de fundação e não do módulo Medir:
-- segue como **Base Estrutural 0.3.0**, em `base-estrutural/`;
+- segue como **Base Estrutural 0.3.0**, um produto próprio entregue diretamente ao autor e mantido fora deste repositório (o repositório guarda somente o programa SILM);
 - o SILM adota essa Base como correção de origem 0.1.x, declarada na build seguinte.
 
 ## Documentos
