@@ -1,0 +1,111 @@
+{
+  "nome": "Base Estrutural",
+  "tipo": "núcleo universal",
+  "versao": "0.2.4",
+  "origem": "Base Estrutural 0.2.3",
+  "origem_zip": "BASE-ESTRUTURAL-0.2.3-CORRECOES.zip",
+  "origem_sha512": "7463c2c1a7acd2c1f92710acaa9d1cbd3d3a6a590b43fdebe7c6f2a941e7edd7a01eaa00d1375ba227c8298b07e9901bfd799dcdbb5c92967ac5aedb8d8fc9c2",
+  "referencia_comportamental": "SIAB(9).zip",
+  "referencia_siab": {
+    "arquivo": "SIAB(9).zip",
+    "versao_interna": "1.0.0",
+    "sha512": "ff81556ce175bbc6e527eb922a193599b31d127ee07a0cb43a80639e45570c20a75e5660a876f29fbdb435dc636b0556e527d8d1b394739a3cf9fe1b583983b3",
+    "status": "AVAILABLE_VERIFIED",
+    "identificacao": "Nome canônico e identidade por conteúdo confirmados expressamente pelo usuário no prompt 0.2.4; SHA-512 conferido nos bytes já disponíveis.",
+    "conteudo_alterado": false
+  },
+  "escopo": [
+    "concluir mantém contexto restrito e abre relatório; encerrar libera navegação",
+    "modal única de inicialização com preferência existente",
+    "marca retorna à atividade ou relatório contextual",
+    "identificação documental SIAB(9).zip com hash preservado"
+  ],
+  "entrada_vazia": "index.html#/laboratorio",
+  "entrada_demo": "index.html?demo=1#/inicio",
+  "status": "fechamento técnico validado; versão 0.2.4 congelada para entrega",
+  "data_utc": "2026-10-09T00:40:23.751624+00:00",
+  "regra_de_parada": "Parar na Base 0.2.4. Não iniciar SILM, rebase, novos recursos ou Base 0.2.5.",
+  "hash_distribuicao": "SHA-512 externo em BASE-ESTRUTURAL-0.2.4.sha512; sem hash autorreferente no ZIP.",
+  "historico": "docs/0.2.3-historico e demais históricos conservam a proveniência e as evidências anteriores; documentos atuais usam a identificação canônica SIAB(9).zip.",
+  "silm_preservado": {
+    "arquivo": "SILM-0.1.0.zip",
+    "sha512": "cf342341ce938d8370d4000907a6b833fef745f4e80f5064963aeea34ba09c740dac1a997ab87f7e798367a9c542d0cd295d5272144da3823ec9cb8a710a021a"
+  },
+  "produto": "Base Estrutural",
+  "validacao": {
+    "grupos_aprovados": 52,
+    "suites": {
+      "shell": {
+        "data_utc": "2026-10-09T00:35:50.040Z",
+        "grupos_aprovados": 16,
+        "status": "PASS"
+      },
+      "operational": {
+        "data_utc": "2026-10-09T00:36:17.203Z",
+        "grupos_aprovados": 10,
+        "status": "PASS"
+      },
+      "regression": {
+        "data_utc": "2026-10-09T00:36:42.696Z",
+        "grupos_aprovados": 16,
+        "status": "PASS"
+      },
+      "closing": {
+        "data_utc": "2026-10-09T00:37:04.920Z",
+        "grupos_aprovados": 9,
+        "status": "PASS"
+      },
+      "visual": {
+        "data_utc": "2026-10-09T00:37:27.292Z",
+        "grupos_aprovados": 1,
+        "status": "PASS"
+      }
+    },
+    "verificacoes_axe": 48,
+    "violacoes_axe": 0,
+    "contextos_com_diagnosticos": 56,
+    "erros_criticos_console": 0,
+    "falhas_http": 0,
+    "motores": [
+      {
+        "engine": "chromium",
+        "version": "153.0.8010.0",
+        "status": "AVAILABLE"
+      },
+      {
+        "engine": "firefox",
+        "status": "UNAVAILABLE",
+        "reason": "Error: browserType.launch: Executable doesn't exist at /root/.cache/ms-playwright/firefox-1543/firefox/firefox\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+      },
+      {
+        "engine": "webkit",
+        "status": "UNAVAILABLE",
+        "reason": "Error: browserType.launch: Executable doesn't exist at /root/.cache/ms-playwright/webkit-2359/pw_run.sh\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+      }
+    ],
+    "runtime_testes": {
+      "playwright-core": "1.63.0",
+      "@axe-core/playwright": "4.13.0",
+      "axe-core": "4.13.0"
+    },
+    "metodo": "npm test completo, sem TEST_FILTER, sobre os 51 arquivos de runtime congelados no snapshot da validação final.",
+    "limites": "Chromium headless; emulação de viewport/toque. Firefox/WebKit indisponíveis; sem aparelhos físicos, leitores de tela reais ou medição de heap.",
+    "build": "PASS",
+    "neutralidade": {
+      "status": "PASS",
+      "dependencias_cientificas": 0,
+      "arquivos_runtime": 51,
+      "referencias_html": 46
+    },
+    "referencia_documental": {
+      "status": "PASS",
+      "referencia_atual": "SIAB(9).zip",
+      "identificacoes_incorretas_atuais": 0
+    },
+    "precache": {
+      "status": "PASS",
+      "caminhos_verificados": 53,
+      "caminhos_quebrados": 0
+    }
+  }
+}

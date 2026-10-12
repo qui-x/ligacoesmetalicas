@@ -1,0 +1,109 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> base-estrutural@0.2.4 test
+> node tests/base024.cjs && node tests/operational024.cjs && node tests/regressions024.cjs && node tests/fechamento024.cjs && node tests/capturas024.cjs
+
+START chromium · shell desktop e hierarquia de início
+PASS chromium · shell desktop e hierarquia de início
+START chromium · gaveta, foco, contexto e preferências estruturais
+PASS chromium · gaveta, foco, contexto e preferências estruturais
+START chromium · Aprender, temas, relacionados e marcador simples
+PASS chromium · Aprender, temas, relacionados e marcador simples
+START chromium · atividade e shell restrito
+PASS chromium · atividade e shell restrito
+START chromium · mobile bottom nav, safe area e drawer
+PASS chromium · mobile bottom nav, safe area e drawer
+START chromium · acessibilidade e ciclo de vida
+PASS chromium · acessibilidade e ciclo de vida
+START chromium · percurso completo por links, histórico e Tema como hub
+PASS chromium · percurso completo por links, histórico e Tema como hub
+START chromium · teclado, clique externo, scroll e gaveta a 150%
+PASS chromium · teclado, clique externo, scroll e gaveta a 150%
+START chromium · startup removido, links diretos e Projetor no Professor
+PASS chromium · startup removido, links diretos e Projetor no Professor
+START chromium · API de recursos, visibilidade, tour e domínio destruído
+PASS chromium · API de recursos, visibilidade, tour e domínio destruído
+START chromium · Caderno opcional, rota configurável e registro do domínio
+PASS chromium · Caderno opcional, rota configurável e registro do domínio
+START chromium · drawer da missão, estados bloqueados, ajuda, relatório e finalização
+PASS chromium · drawer da missão, estados bloqueados, ajuda, relatório e finalização
+START chromium · matriz mobile de 320 a tablet, fonte 150% e sheets
+PASS chromium · matriz mobile de 320 a tablet, fonte 150% e sheets
+START chromium · atividade mobile, banner, viewport e saída segura
+PASS chromium · atividade mobile, banner, viewport e saída segura
+START chromium · novas superfícies, contraste, spacing e movimento reduzido
+PASS chromium · novas superfícies, contraste, spacing e movimento reduzido
+START contrato · domínio legado sem experiência continua carregável
+PASS contrato · domínio legado sem experiência continua carregável
+START 0.2.4 · header mobile normal e restrito, targets e foco a 150%
+PASS 0.2.4 · header mobile normal e restrito, targets e foco a 150%
+START 0.2.4 · disclosures por teclado, mouse, touch e estado na sessão
+PASS 0.2.4 · disclosures por teclado, mouse, touch e estado na sessão
+START 0.2.4 · acessibilidade bidirecional, storage, URL e workspace
+PASS 0.2.4 · acessibilidade bidirecional, storage, URL e workspace
+START 0.2.4 · animação lateral curta e redução por preferência ou sistema
+PASS 0.2.4 · animação lateral curta e redução por preferência ou sistema
+START 0.2.4 · atividade livre conserva menu e navegação gerais
+PASS 0.2.4 · atividade livre conserva menu e navegação gerais
+START 0.2.4 · Menu da atividade, ajuda contextual e recuperação de altura
+PASS 0.2.4 · Menu da atividade, ajuda contextual e recuperação de altura
+START 0.2.4 · permissão explícita, relatório opcional e instruções do Professor
+PASS 0.2.4 · permissão explícita, relatório opcional e instruções do Professor
+START 0.2.4 · Home canônica, Caderno opcional e mesma inicialização
+PASS 0.2.4 · Home canônica, Caderno opcional e mesma inicialização
+START 0.2.4 · nomenclatura em Home, nav, drawer, área e Manual
+PASS 0.2.4 · nomenclatura em Home, nav, drawer, área e Manual
+START 0.2.4 · ciclos finalizar, refazer, encerrar e limpar controles
+PASS 0.2.4 · ciclos finalizar, refazer, encerrar e limpar controles
+START chromium · 1–3 navegação, início, foco e histórico
+PASS chromium · 1–3 navegação, início, foco e histórico
+START chromium · 4 módulos, seleção única e preservação do workspace
+PASS chromium · 4 módulos, seleção única e preservação do workspace
+START chromium · 5 e 7 roteiro, cancelamento, módulo e retorno à investigação livre
+PASS chromium · 5 e 7 roteiro, cancelamento, módulo e retorno à investigação livre
+START chromium · 6 e 8 missão, restrições, conclusão e nova tentativa
+PASS chromium · 6 e 8 missão, restrições, conclusão e nova tentativa
+START chromium · 9 sessão, reload e restauração pelo domínio
+PASS chromium · 9 sessão, reload e restauração pelo domínio
+START chromium · 10 Professor, serialização, importação e permissões
+PASS chromium · 10 Professor, serialização, importação e permissões
+START chromium · 11 Sobre, referências, Manual e retorno de foco
+PASS chromium · 11 Sobre, referências, Manual e retorno de foco
+START chromium · 12 relatório, edição, histórico e impressão equivalente
+PASS chromium · 12 relatório, edição, histórico e impressão equivalente
+START chromium · acessibilidade, temas, fonte 150%, contraste e modais
+PASS chromium · acessibilidade, temas, fonte 150%, contraste e modais
+START chromium · mobile portrait/landscape e todas as telas a 150%
+PASS chromium · mobile portrait/landscape e todas as telas a 150%
+START chromium · regressão de lifecycle, 20 ciclos e ausência de resíduos
+PASS chromium · regressão de lifecycle, 20 ciclos e ausência de resíduos
+START chromium · reset confirmado, preferências e unload com retomada pendente
+PASS chromium · reset confirmado, preferências e unload com retomada pendente
+START chromium · contratos de derivação, tela customizada e falhas recuperáveis
+PASS chromium · contratos de derivação, tela customizada e falhas recuperáveis
+START PWA · atualização, isolamento de caches e retomada offline
+PASS PWA · atualização, isolamento de caches e retomada offline
+START Armazenamento bloqueado e sessão em memória
+PASS Armazenamento bloqueado e sessão em memória
+START Cores forçadas e redução de movimento
+PASS Cores forçadas e redução de movimento
+START 0.2.4 · concluir, guardar contexto, encerrar e refazer missão
+PASS 0.2.4 · concluir, guardar contexto, encerrar e refazer missão
+START 0.2.4 · retomada da sessão concluída preserva relatório e restrição
+PASS 0.2.4 · retomada da sessão concluída preserva relatório e restrição
+START 0.2.4 · marca normal, ativa e concluída com teclado e foco
+PASS 0.2.4 · marca normal, ativa e concluída com teclado e foco
+START 0.2.4 · modal única, três cancelamentos, Salvar, reload e storage único
+PASS 0.2.4 · modal única, três cancelamentos, Salvar, reload e storage único
+START 0.2.4 · destinos registrados, removidos, ocultos, indisponíveis e fallback
+PASS 0.2.4 · destinos registrados, removidos, ocultos, indisponíveis e fallback
+START 0.2.4 · roteiro com conclusão formal mantém contexto até Encerrar
+PASS 0.2.4 · roteiro com conclusão formal mantém contexto até Encerrar
+START 0.2.4 · relatório opcional e encerramento sem conclusão
+PASS 0.2.4 · relatório opcional e encerramento sem conclusão
+START 0.2.4 · quatro fluxos em mobile, tablet, landscape e fonte 150%
+PASS 0.2.4 · quatro fluxos em mobile, tablet, landscape e fonte 150%
+START 0.2.4 · modal, cancelamento e lifecycle em 20 ciclos
+PASS 0.2.4 · modal, cancelamento e lifecycle em 20 ciclos
+START 0.2.4 · controles expandidos em desktop/mobile, fonte 150% e contraste
+PASS 0.2.4 · controles expandidos em desktop/mobile, fonte 150% e contraste

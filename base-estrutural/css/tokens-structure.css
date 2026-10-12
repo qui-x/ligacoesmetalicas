@@ -1,0 +1,2 @@
+/* Dimensões herdadas: alvos 44px, docas 280–420px, mobile até 900px. */
+:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--radius:8px;--radius-lg:14px;--control-min:44px;--font-scale:1;--header-h:64px;--bottom-h:0px;--dock-gap:12px;--dock-radius:var(--radius-lg);--dock-left-width:clamp(280px,23vw,320px);--dock-right-width:clamp(300px,26vw,360px);--dock-shadow:0 6px 22px #0002;--transition-fast:140ms;--font-family:'Segoe UI',system-ui,sans-serif;--focus-width:3px}

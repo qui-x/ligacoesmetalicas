@@ -1,0 +1,282 @@
+{
+  "version": "0.2.4",
+  "date": "2026-10-09T00:35:50.040Z",
+  "environment": {
+    "node": "v24.19.0"
+  },
+  "filter": null,
+  "engines": [
+    {
+      "engine": "chromium",
+      "version": "153.0.8010.0",
+      "status": "AVAILABLE"
+    },
+    {
+      "engine": "firefox",
+      "status": "UNAVAILABLE",
+      "reason": "Error: browserType.launch: Executable doesn't exist at /root/.cache/ms-playwright/firefox-1543/firefox/firefox\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+    },
+    {
+      "engine": "webkit",
+      "status": "UNAVAILABLE",
+      "reason": "Error: browserType.launch: Executable doesn't exist at /root/.cache/ms-playwright/webkit-2359/pw_run.sh\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+    }
+  ],
+  "tests": [
+    {
+      "name": "chromium · shell desktop e hierarquia de início",
+      "status": "PASS",
+      "ms": 753,
+      "mainNavigation": [
+        "inicio",
+        "aprender",
+        "missoes",
+        "roteiros",
+        "laboratorio",
+        "caderno",
+        "manual"
+      ]
+    },
+    {
+      "name": "chromium · gaveta, foco, contexto e preferências estruturais",
+      "status": "PASS",
+      "ms": 1722
+    },
+    {
+      "name": "chromium · Aprender, temas, relacionados e marcador simples",
+      "status": "PASS",
+      "ms": 750,
+      "themes": 2,
+      "marker": "persisted"
+    },
+    {
+      "name": "chromium · atividade e shell restrito",
+      "status": "PASS",
+      "ms": 730
+    },
+    {
+      "name": "chromium · mobile bottom nav, safe area e drawer",
+      "status": "PASS",
+      "ms": 2346
+    },
+    {
+      "name": "chromium · acessibilidade e ciclo de vida",
+      "status": "PASS",
+      "ms": 2391,
+      "cycles": 20,
+      "addedRootListenersAfterUnload": 0
+    },
+    {
+      "name": "chromium · percurso completo por links, histórico e Tema como hub",
+      "status": "PASS",
+      "ms": 972,
+      "sequence": [
+        "inicio",
+        "aprender",
+        "tema",
+        "laboratorio",
+        "inicio",
+        "missoes",
+        "inicio",
+        "roteiros",
+        "inicio",
+        "laboratorio",
+        "manual",
+        "inicio"
+      ]
+    },
+    {
+      "name": "chromium · teclado, clique externo, scroll e gaveta a 150%",
+      "status": "PASS",
+      "ms": 1063,
+      "fontScale": 1.5,
+      "scroll": {
+        "scroll": 547,
+        "overflow": true
+      }
+    },
+    {
+      "name": "chromium · startup removido, links diretos e Projetor no Professor",
+      "status": "PASS",
+      "ms": 778
+    },
+    {
+      "name": "chromium · API de recursos, visibilidade, tour e domínio destruído",
+      "status": "PASS",
+      "ms": 1102
+    },
+    {
+      "name": "chromium · Caderno opcional, rota configurável e registro do domínio",
+      "status": "PASS",
+      "ms": 256
+    },
+    {
+      "name": "chromium · drawer da missão, estados bloqueados, ajuda, relatório e finalização",
+      "status": "PASS",
+      "ms": 2368
+    },
+    {
+      "name": "chromium · matriz mobile de 320 a tablet, fonte 150% e sheets",
+      "status": "PASS",
+      "ms": 6475,
+      "sizes": [
+        [
+          320,
+          568
+        ],
+        [
+          360,
+          740
+        ],
+        [
+          390,
+          844
+        ],
+        [
+          600,
+          800
+        ],
+        [
+          768,
+          1024
+        ],
+        [
+          844,
+          390
+        ],
+        [
+          900,
+          700
+        ],
+        [
+          901,
+          700
+        ]
+      ],
+      "screens": [
+        "inicio",
+        "aprender",
+        "tema",
+        "caderno",
+        "laboratorio",
+        "roteiros",
+        "missoes",
+        "professor",
+        "manual",
+        "relatorios"
+      ],
+      "fontScale": 1.5
+    },
+    {
+      "name": "chromium · atividade mobile, banner, viewport e saída segura",
+      "status": "PASS",
+      "ms": 1363,
+      "sizes": [
+        [
+          320,
+          568
+        ],
+        [
+          360,
+          740
+        ],
+        [
+          390,
+          844
+        ],
+        [
+          768,
+          1024
+        ],
+        [
+          844,
+          390
+        ]
+      ],
+      "fontScale": 1.5
+    },
+    {
+      "name": "chromium · novas superfícies, contraste, spacing e movimento reduzido",
+      "status": "PASS",
+      "ms": 3497,
+      "scans": 10,
+      "violations": 0
+    },
+    {
+      "name": "contrato · domínio legado sem experiência continua carregável",
+      "status": "PASS",
+      "ms": 161
+    }
+  ],
+  "browserDiagnostics": [
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    },
+    {
+      "errors": [],
+      "httpFailures": []
+    }
+  ],
+  "limitations": [
+    "firefox indisponível neste ambiente: Error: browserType.launch: Executable doesn't exist at /root/.cache/ms-playwright/firefox-1543/firefox/firefox\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ P",
+    "webkit indisponível neste ambiente: Error: browserType.launch: Executable doesn't exist at /root/.cache/ms-playwright/webkit-2359/pw_run.sh\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please r"
+  ],
+  "status": "PASS"
+}

@@ -1,0 +1,117 @@
+{
+  "status": "PASS",
+  "arquivos_runtime": 47,
+  "referencias_html": 42,
+  "dependencias_cientificas": 0,
+  "ocorrencias_classificadas": [
+    {
+      "arquivo": "manifest.webmanifest",
+      "linha": 1,
+      "termo": "Base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "manifest.webmanifest",
+      "linha": 1,
+      "termo": "Base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "index.html",
+      "linha": 2,
+      "termo": "Base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "index.html",
+      "linha": 32,
+      "termo": "Base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "css/components.css",
+      "linha": 2,
+      "termo": "BASE",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "css/components.css",
+      "linha": 3,
+      "termo": "base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "domain/demo/manual.js",
+      "linha": 7,
+      "termo": "Base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "domain/demo/manual.js",
+      "linha": 9,
+      "termo": "Base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "domain/demo/bootstrap.js",
+      "linha": 28,
+      "termo": "Base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "domain/demo/bootstrap.js",
+      "linha": 28,
+      "termo": "Base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "domain/demo/bootstrap.js",
+      "linha": 29,
+      "termo": "Base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "js/core/identity.js",
+      "linha": 3,
+      "termo": "Base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "js/core/identity.js",
+      "linha": 3,
+      "termo": "Base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "js/core/identity.js",
+      "linha": 3,
+      "termo": "Base",
+      "justificativa": "nome técnico Base / camada CSS"
+    },
+    {
+      "arquivo": "js/experience/teacher.js",
+      "linha": 37,
+      "termo": "KB",
+      "justificativa": "unidade de tamanho de arquivo (kilobytes)"
+    },
+    {
+      "arquivo": "js/storage/migration.js",
+      "linha": 2,
+      "termo": "siab_*",
+      "justificativa": "migração exclusiva de preferências de interface"
+    },
+    {
+      "arquivo": "js/storage/migration.js",
+      "linha": 7,
+      "termo": "siab_a11y_prefs",
+      "justificativa": "migração exclusiva de preferências de interface"
+    },
+    {
+      "arquivo": "js/storage/migration.js",
+      "linha": 13,
+      "termo": "siab_workspace_v1",
+      "justificativa": "migração exclusiva de preferências de interface"
+    }
+  ],
+  "metodo": "Busca por termos completos e inspeção das referências locais; nenhuma dependência ou catálogo científico no runtime. A palavra Base nomeia a plataforma. A migração herdada lê apenas preferências de interface."
+}

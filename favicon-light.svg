@@ -1,12 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
-  <title id="title">SILM</title>
-  <desc id="desc">Centros metálicos organizados e um fluxo contínuo que atravessa o conjunto.</desc>
-  <rect x="2" y="2" width="124" height="124" rx="27" fill="#1f2329" stroke="#805f25" stroke-width="2"/>
-  <g fill="#c7a54a" stroke="#e1c476" stroke-width="1.5">
-    <circle cx="32" cy="32" r="8"/><circle cx="64" cy="32" r="8"/><circle cx="96" cy="32" r="8"/>
-    <circle cx="32" cy="64" r="8"/><circle cx="64" cy="64" r="8"/><circle cx="96" cy="64" r="8"/>
-    <circle cx="32" cy="96" r="8"/><circle cx="64" cy="96" r="8"/><circle cx="96" cy="96" r="8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+<title id="title">Ícone oficial SILM</title>
+<defs>
+  <radialGradient id="gold" cx="30%" cy="24%" r="78%">
+    <stop offset="0" stop-color="#fff5cf"/><stop offset=".14" stop-color="#efcb70"/>
+    <stop offset=".42" stop-color="#db9f31"/><stop offset=".72" stop-color="#b2770d"/>
+    <stop offset="1" stop-color="#6f4704"/>
+  </radialGradient>
+  <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#9fe9ff"/><stop offset=".52" stop-color="#4fc3f7"/><stop offset="1" stop-color="#86e3ff"/>
+  </linearGradient>
+  <filter id="goldShadow" x="-70%" y="-70%" width="240%" height="240%">
+    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#7f560a" flood-opacity=".24"/>
+  </filter>
+  <filter id="blueGlow" x="-80%" y="-80%" width="260%" height="260%">
+    <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#4fc3f7" flood-opacity=".75"/>
+  </filter>
+</defs>
+<rect x="8" y="8" width="240" height="240" rx="44" fill="#1f2329"/>
+<g transform="translate(2 10) scale(.98)">
+  <g fill="none" stroke="#d8ab4c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M68 86 H160 V178 H68 Z"/>
+    <path d="M108 50 H200 V142 H108 Z" opacity=".72"/>
+    <path d="M68 86 L108 50 M160 86 L200 50 M160 178 L200 142 M68 178 L108 142" opacity=".9"/>
   </g>
-  <path d="M13 81C35 81 42 46 64 47S92 80 115 48" fill="none" stroke="#4fc3f7" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="79" cy="56" r="4" fill="#f2f1ec" stroke="#1f2329" stroke-width="1.5"/>
+  <path d="M82 133 C98 132 109 112 126 110 C143 108 151 127 167 127 C181 127 190 118 202 109"
+        fill="none" stroke="url(#cyan)" stroke-width="5.6" stroke-linecap="round" filter="url(#blueGlow)"/>
+  <g fill="url(#gold)" filter="url(#goldShadow)">
+    <circle cx="68" cy="86" r="12.8"/><circle cx="160" cy="86" r="12.8"/>
+    <circle cx="160" cy="178" r="12.8"/><circle cx="68" cy="178" r="12.8"/>
+    <circle cx="108" cy="50" r="11"/><circle cx="200" cy="50" r="11"/>
+    <circle cx="200" cy="142" r="10.2"/><circle cx="108" cy="142" r="10.2"/>
+    <circle cx="130" cy="110" r="13.2"/>
+  </g>
+</g>
 </svg>

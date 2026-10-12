@@ -1,0 +1,404 @@
+[
+  {
+    "phase": 1,
+    "objective": "Auditar aplicação íntegra antes da neutralização",
+    "changes": "Cópia nova da 0.1.0; inventário 307 arquivos, mapa e estado documentados",
+    "tests": [
+      "Bootstrap herdado pronto",
+      "Cálculo representativo íntegro",
+      "Zero pageerror",
+      "Referência ZIP preservada"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T20:52:09.499Z",
+    "runtime_snapshot_sha256": "a564369642138f95689e900928612e46908d78cb9a7d6ecffaba9ceae2d42c42"
+  },
+  {
+    "phase": 2,
+    "objective": "Executar aplicação sem domínio",
+    "changes": "Shell neutro; serviços estruturais reaproveitados e sem scripts científicos ativos",
+    "tests": [
+      "Bootstrap sem SIAB global",
+      "Painéis desktop/mobile",
+      "Manual vazio",
+      "A11Y",
+      "Zero pageerror"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T20:54:23.726Z",
+    "runtime_snapshot_sha256": "33df54a8a36984bfbc551e7dc8c443a5f5f7f47585b1654cb106e60792189f70"
+  },
+  {
+    "phase": 3,
+    "objective": "Universalizar painéis e host",
+    "changes": "Remoção pós-checkpoint dos recursos excluídos; host substituído em cada montagem; contexto externo",
+    "tests": [
+      "Conteúdo A/B independente",
+      "Disponibilidade decidida por contexto",
+      "Desktop/tablet/mobile",
+      "Host antigo desconectado",
+      "Zero pageerror"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T20:55:03.027Z",
+    "runtime_snapshot_sha256": "9d54ef3a11e3a422752fa8001dfd33ddfb8a656aaccb18873b22a6dc678dc2b6"
+  },
+  {
+    "phase": 4,
+    "objective": "Lifecycle e estado estrutural",
+    "changes": "Registro serializado, hooks init/mount/activate/resize/reset/deactivate/destroy, escopo cancelável e snapshot de estado",
+    "tests": [
+      "5 ciclos mount/reset/destroy",
+      "Listener chamado uma vez por uso",
+      "Zero recursos geridos ao desmontar",
+      "Nenhum canvas órfão",
+      "Estado neutro restaurado"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T20:56:09.977Z",
+    "runtime_snapshot_sha256": "5ed9739f26f8f83a397914560f9224f03fb38363094987270270cc0494533a66"
+  },
+  {
+    "phase": 5,
+    "objective": "Domínio plugável",
+    "changes": "Identidade parametrizada, ações com prioridade/estado e entrada externa; demo mínima sem mudanças especiais no core",
+    "tests": [
+      "Título da demo",
+      "Ação e ferramenta independentes",
+      "Viewport e contexto",
+      "Unload limpa identidade e ações"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T20:56:57.044Z",
+    "runtime_snapshot_sha256": "ba93e11133e40137549efd55c070151fbd8ea3aec5655bcb1db898b51755dfd1"
+  },
+  {
+    "phase": 6,
+    "objective": "Separar tema de estrutura",
+    "changes": "Tokens temáticos com whitelist e variantes claro/escuro; alto contraste tem prioridade",
+    "tests": [
+      "Cores trocadas",
+      "Token de geometria recusado",
+      "Contraste preservado",
+      "Largura do workspace estável"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T20:57:25.602Z",
+    "runtime_snapshot_sha256": "520cbff2151a4cb076f678f75b4be103ca3816518a5b5db728962b26a3b676a6"
+  },
+  {
+    "phase": 7,
+    "objective": "Acessibilidade universal",
+    "changes": "Escala mínima 75%, alias colorVision e contrato reducedMotion; motor único sem serviços científicos",
+    "tests": [
+      "75% e 150%",
+      "Tema/contraste/espaçamento",
+      "Cores e motion",
+      "Enter/Escape e foco de retorno",
+      "Focus trap"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T20:57:42.585Z",
+    "runtime_snapshot_sha256": "9a953610abf69fed42a8fc8d32000e6b5870d2238c960b661e94bd51560b220c"
+  },
+  {
+    "phase": 8,
+    "objective": "Responsividade centralizada",
+    "changes": "Config única gera breakpoints JS/CSS; sheets e safe areas sem controles científicos",
+    "tests": [
+      "320/360/390",
+      "Tablet e desktop",
+      "Portrait e landscape",
+      "Alvos 44px",
+      "Sem overflow horizontal",
+      "Sheets no viewport"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T20:58:27.414Z",
+    "runtime_snapshot_sha256": "ec12ee255eec8815e8738098c5358c3f8af447ab1e1a7dc767a64eabad30d270"
+  },
+  {
+    "phase": 9,
+    "objective": "Manual universal",
+    "changes": "Registro externo de seção/tópico/ação; busca e navegação reaproveitadas sem geradores científicos",
+    "tests": [
+      "Card e busca sem acento",
+      "Hierarquia e deep link",
+      "Acordeão Enter/Espaço/ARIA",
+      "Ação do domínio",
+      "Unload limpa conteúdo"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T20:58:49.046Z",
+    "runtime_snapshot_sha256": "0efadc18ff7f846cbbfa26ec549734f4a60ea90bfc760dbf406d6d497abf6615"
+  },
+  {
+    "phase": 10,
+    "objective": "Notificações e modais neutros",
+    "changes": "Demo usa serviços com owner; destruição de modal imediata; mensagens de falha neutras",
+    "tests": [
+      "4 tipos de notificação",
+      "Texto literal",
+      "Focus trap e Escape",
+      "Foco restaurado",
+      "Modal removido no unload"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T20:59:21.378Z",
+    "runtime_snapshot_sha256": "d6630b3900bb1b10e094ec92c6ba0864bd6cd7ece419b1de385485470eef3369"
+  },
+  {
+    "phase": 11,
+    "objective": "Storage separado",
+    "changes": "Namespaces core/domínio; migração seletiva e log técnico em dados inválidos",
+    "tests": [
+      "Preferências migradas e persistentes",
+      "Campos científicos não migrados",
+      "Domínios A/B sem colisão",
+      "Unload conserva core",
+      "JSON inválido recuperado"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T20:59:51.543Z",
+    "runtime_snapshot_sha256": "40563673bc4e922b6f26aece7d4343972a425dfe099c619cf0340afe5be0c3ab"
+  },
+  {
+    "phase": 12,
+    "objective": "PWA neutra e atualização real",
+    "changes": "Manifest/ícones/cache neutros; recursos adicionais sob demanda; cache isolado por escopo",
+    "tests": [
+      "Instalação de SW anterior de teste",
+      "reg.update troca versão e remove cache antigo",
+      "Cache alheio preservado",
+      "Reload online",
+      "Reload offline",
+      "Manifest relativo"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T21:01:08.923Z",
+    "runtime_snapshot_sha256": "36989a0f2f8ef0d12ced290ddd97dcba97a240ff27b0c068015bb1533074387e"
+  },
+  {
+    "phase": 13,
+    "objective": "Auditoria DOM/CSS",
+    "changes": "Seletores científicos eliminados; vínculos de acessibilidade verificados nos estados dinâmicos",
+    "tests": [
+      "IDs únicos",
+      "aria-controls resolvido",
+      "aria-labelledby resolvido",
+      "UI vazia/demo/manual/modal funcional",
+      "Zero pageerror"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T21:01:43.081Z",
+    "runtime_snapshot_sha256": "36989a0f2f8ef0d12ced290ddd97dcba97a240ff27b0c068015bb1533074387e"
+  },
+  {
+    "phase": 14,
+    "objective": "Amnésia científica",
+    "changes": "Auditoria explícita dos termos, nomes, CSS e dependências do runtime",
+    "tests": [
+      "Zero domínio científico no runtime",
+      "Namespace legado somente na migração",
+      "Base como nome técnico classificado",
+      "PWA sem recursos excluídos"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T21:02:40.146Z",
+    "runtime_snapshot_sha256": "36989a0f2f8ef0d12ced290ddd97dcba97a240ff27b0c068015bb1533074387e"
+  },
+  {
+    "phase": 15,
+    "objective": "Demo Estrutural completa",
+    "changes": "Módulo externo com SVG neutro, tema, ferramentas, contexto, ações, Manual, modal, notificações, storage e reset",
+    "tests": [
+      "Entrada ?demo=1",
+      "Mouse/teclado",
+      "Manual/modal/notificação",
+      "Persistência própria",
+      "Reset",
+      "Destroy remove DOM e estilo"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T21:03:19.294Z",
+    "runtime_snapshot_sha256": "e85d926d15a0f09a02d1b9acc94649a30b0e79064289ab26d37eec0b0d84a620"
+  },
+  {
+    "phase": 16,
+    "objective": "Reset e recuperação",
+    "changes": "Reset estrutural distinto do reset do módulo; overlays geridos; dados inválidos recuperados",
+    "tests": [
+      "5 resets estruturais preservam dados da demo",
+      "Reset do módulo limpa seu estado",
+      "Modais/toasts/sheets encerrados",
+      "A11Y JSON inválido e panels null sem travar"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T21:03:44.927Z",
+    "runtime_snapshot_sha256": "829d371dd09f5a3488b543a3472fb701a63f9d4113aa830876c169401c2146fb"
+  },
+  {
+    "phase": 17,
+    "objective": "Falhas controladas",
+    "changes": "Limpeza defensiva de painéis e mensagens neutras para ações; erro técnico permanece no console",
+    "tests": [
+      "Falha mount",
+      "Falha timer gerido",
+      "Rejeição em ação",
+      "Falha resize/renderer",
+      "Zero stack na interface",
+      "Recuperação para domínio null"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T21:04:19.126Z",
+    "runtime_snapshot_sha256": "c865b12af1049c49c22f2c38d7e3ac53bea1c566dc1f2d555bd0e6634564daf8"
+  },
+  {
+    "phase": 18,
+    "objective": "Performance e memória",
+    "changes": "Escopo contabiliza recursos únicos; destruição do host e recursos externos exercitada",
+    "tests": [
+      "65 ciclos totais",
+      "6 medições pós-GC",
+      "Listeners/DOM sem crescimento contínuo",
+      "Timers/RAF/observers encerrados",
+      "Overlay removido",
+      "WebGL testado quando disponível",
+      "Escrita por contexto destruído bloqueada"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-03T21:04:57.242Z",
+    "runtime_snapshot_sha256": "3ce9a79b35edb6444906aec98ad9475f6ec4f9be50041c2794343dd70e0b0a1e"
+  },
+  {
+    "phase": 19,
+    "objective": "Compatibilidade e regressão final",
+    "changes": "Chromium e Gecko em desktop/mobile; ajustes de busca, skip link, impressão e foco do reset; log da migração inválida",
+    "tests": [
+      "Chromium desktop/mobile PASS",
+      "Firefox desktop/mobile touch PASS",
+      "8 scans axe sem violações",
+      "Escalas 75/150/200% e 320 a 1440px",
+      "15 grupos de regressão PASS",
+      "Manual/recuperação Firefox PASS",
+      "WebKit indisponível: dependências nativas ausentes"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-04T02:06:06.978Z",
+    "runtime_snapshot_sha256": "8d6234614d66ea2cc90bdce5057cba289108345ebb7f55c624f1df40a268fad2"
+  },
+  {
+    "phase": 20,
+    "objective": "Documentação técnica e de homologação",
+    "changes": "Arquitetura, guia de integração, contratos, auditoria e relatório com limitações explícitas",
+    "tests": [
+      "Documentos exigidos presentes",
+      "API conferida contra implementação",
+      "Origem e evidências referenciadas",
+      "WebKit e limites de testes explicitados"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-04T02:11:08.414Z",
+    "runtime_snapshot_sha256": "8d6234614d66ea2cc90bdce5057cba289108345ebb7f55c624f1df40a268fad2"
+  },
+  {
+    "phase": 21,
+    "objective": "Versionamento consistente",
+    "changes": "VERSION, BUILD-INFO, package e CHANGELOG 0.2.0; SW e layout gerados",
+    "tests": [
+      "VERSION 0.2.0",
+      "Origem 0.1.0 explícita",
+      "Tipo núcleo universal",
+      "Build concluído"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-04T02:13:05.636Z",
+    "runtime_snapshot_sha256": "185b5605d328aadbd111d59cf912f42871641ba043cf570ee47d2ca7911b64df"
+  },
+  {
+    "phase": 23,
+    "objective": "Critérios de aceite interno",
+    "changes": "Matriz de cada requisito com evidência e ressalvas de escopo",
+    "tests": [
+      "Neutralidade auditada",
+      "Contratos pluggáveis documentados",
+      "Compatibilidade aprovada nos motores disponíveis",
+      "PWA/storage/lifecycle aprovados",
+      "Limitações e homologação externa registradas"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-04T02:13:45.452Z",
+    "runtime_snapshot_sha256": "02cb2b385ac7f6a7ad5533bb9e0d203630fe315c33a7265edcd0cf82bd2203d0"
+  },
+  {
+    "phase": 24,
+    "objective": "Teste final base vazia",
+    "changes": "Versão final servida localmente; evidência ACEITE-FINAL.json",
+    "tests": [
+      "domain=null",
+      "header/menu",
+      "painéis",
+      "viewport",
+      "a11y",
+      "Manual vazio",
+      "mobile320",
+      "notificação",
+      "reload offline",
+      "preferência persistida"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-04T02:14:54.597Z",
+    "runtime_snapshot_sha256": "35ab66f8bab0a7bc727abd046af1778b303d81ecd66f4a142ad1103309ec0fc5"
+  },
+  {
+    "phase": 25,
+    "objective": "Teste final Demo Estrutural",
+    "changes": "Versão final servida localmente; evidência ACEITE-FINAL.json",
+    "tests": [
+      "identidade",
+      "tema",
+      "ferramenta",
+      "SVG",
+      "contexto",
+      "fullscreen",
+      "Manual",
+      "notificação",
+      "modal",
+      "demo offline",
+      "reset",
+      "destroy"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-04T02:14:54.600Z",
+    "runtime_snapshot_sha256": "35ab66f8bab0a7bc727abd046af1778b303d81ecd66f4a142ad1103309ec0fc5"
+  },
+  {
+    "phase": 26,
+    "objective": "Regra de parada",
+    "changes": "Nenhuma ciência nova integrada; encerramento na entrega para homologação",
+    "tests": [
+      "Sem SILM",
+      "Sem Base 0.3",
+      "Demo neutra e segundo domínio apenas de teste",
+      "ZIP somente após aceite interno"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-04T02:14:54.602Z",
+    "runtime_snapshot_sha256": "35ab66f8bab0a7bc727abd046af1778b303d81ecd66f4a142ad1103309ec0fc5"
+  },
+  {
+    "phase": 22,
+    "objective": "Aprovação para consolidação imutável",
+    "changes": "Todos os gates e testes finais aprovados; ZIP e SHA-512 serão registrados no documento externo de consolidação após geração, evitando autorreferência",
+    "tests": [
+      "Gates 1–21 e 23–26 presentes",
+      "Aceite vazio/demo PASS",
+      "Origem 0.1.0 íntegra",
+      "Destino ZIP ainda inexistente",
+      "Documentação e evidências completas"
+    ],
+    "status": "APROVADO",
+    "date": "2026-10-04T02:16:32.215Z",
+    "runtime_snapshot_sha256": "35ab66f8bab0a7bc727abd046af1778b303d81ecd66f4a142ad1103309ec0fc5"
+  }
+]

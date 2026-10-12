@@ -1,0 +1,114 @@
+{
+  "status": "PASS",
+  "version": "0.2.4",
+  "reference": "SIAB(9).zip",
+  "sha512": "ff81556ce175bbc6e527eb922a193599b31d127ee07a0cb43a80639e45570c20a75e5660a876f29fbdb435dc636b0556e527d8d1b394739a3cf9fe1b583983b3",
+  "incorrect_current_occurrences": [],
+  "historical_occurrences": [
+    {
+      "path": "docs/0.2.2-historico/PARIDADE-SHELL-SIAB.md",
+      "line": 3
+    },
+    {
+      "path": "docs/0.2.3-historico/PARIDADE-SHELL-SIAB.md",
+      "line": 3
+    },
+    {
+      "path": "docs/0.2.3-historico/BASE-ESTRUTURAL-0.2.3.md",
+      "line": 3
+    },
+    {
+      "path": "docs/0.2.3-historico/BASE-ESTRUTURAL-0.2.3.md",
+      "line": 37
+    },
+    {
+      "path": "docs/0.2.3-historico/CONFERENCIA-REFERENCIA-SIAB.md",
+      "line": 3
+    },
+    {
+      "path": "docs/0.2.3-historico/DIFERENCAS-RESIDUAIS.md",
+      "line": 5
+    },
+    {
+      "path": "docs/0.2.3-historico/ACEITE-BASE-0.2.3.md",
+      "line": 5
+    },
+    {
+      "path": "docs/0.2.3-historico/CHANGELOG.md",
+      "line": 11
+    },
+    {
+      "path": "docs/0.2.3-historico/CHANGELOG.md",
+      "line": 21
+    },
+    {
+      "path": "docs/0.2.3-historico/RELATORIO-REGRESSOES.md",
+      "line": 29
+    },
+    {
+      "path": "docs/0.2.3-historico/LIMITACOES-CONHECIDAS.md",
+      "line": 3
+    },
+    {
+      "path": "docs/0.2.3-historico/BUILD-INFO.json",
+      "line": 21
+    },
+    {
+      "path": "docs/0.2.3-historico/BUILD-INFO.json",
+      "line": 24
+    },
+    {
+      "path": "docs/0.2.3-historico/BUILD-INFO.json",
+      "line": 27
+    },
+    {
+      "path": "docs/0.2.3-historico/BUILD-INFO.json",
+      "line": 29
+    },
+    {
+      "path": "docs/0.2.1-historico/evidence/ORIGENS-PRESERVADAS.json",
+      "line": 5
+    },
+    {
+      "path": "docs/0.2.2-historico/evidence/INTEGRIDADE-ORIGENS.json",
+      "line": 10
+    },
+    {
+      "path": "docs/0.2.3-historico/evidence/INTEGRIDADE-ORIGENS.json",
+      "line": 11
+    },
+    {
+      "path": "docs/0.2.3-historico/evidence/INTEGRIDADE-ORIGENS.json",
+      "line": 144
+    },
+    {
+      "path": "docs/0.2.3-historico/evidence/INTEGRIDADE-ORIGENS.json",
+      "line": 147
+    },
+    {
+      "path": "docs/0.2.3-historico/evidence/INTEGRIDADE-ORIGENS.json",
+      "line": 150
+    },
+    {
+      "path": "docs/0.2.3-historico/evidence/INTEGRIDADE-ORIGENS.json",
+      "line": 152
+    },
+    {
+      "path": "docs/0.2.3-historico/evidence/CONFERENCIA-REFERENCIA-SIAB.json",
+      "line": 5
+    },
+    {
+      "path": "docs/0.2.3-historico/evidence/CONFERENCIA-REFERENCIA-SIAB.json",
+      "line": 8
+    },
+    {
+      "path": "docs/0.2.3-historico/evidence/CONFERENCIA-REFERENCIA-SIAB.json",
+      "line": 11
+    },
+    {
+      "path": "docs/0.2.3-historico/evidence/CONFERENCIA-REFERENCIA-SIAB.json",
+      "line": 13
+    }
+  ],
+  "historical_policy": "Registros anteriores preservados como histórico; nenhuma ocorrência antiga identifica a referência comportamental atual."
+}

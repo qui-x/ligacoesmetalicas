@@ -1,6 +1,6 @@
 {
   "product": "SILM",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "checks": [
     {
       "check": "Versão única do produto",
@@ -14,14 +14,20 @@
         "verifiedFiles": 42,
         "approvedIntegrations": [
           "js/core/domain.js",
+          "js/core/identity.js",
           "js/experience/activity.js",
+          "js/init/app.js",
           "js/manual/manual.js",
+          "js/navigation/router.js",
           "js/workspace/workspace.js"
         ],
         "changedFiles": [
           "js/core/domain.js",
+          "js/core/identity.js",
           "js/experience/activity.js",
+          "js/init/app.js",
           "js/manual/manual.js",
+          "js/navigation/router.js",
           "js/workspace/workspace.js"
         ]
       }
@@ -120,6 +126,26 @@
       "detail": null
     },
     {
+      "check": "Medir: scripts presentes e carregados em ordem (medições antes do estado; vista depois da cena)",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Medir: schema 7, validador recalcula cada registro e só há medida com escala cristalina",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Medir: sem ± (resolução não é incerteza) e sem instrumentos sem modelo",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Medir: medições só no scientificState",
+      "status": "PASS",
+      "detail": null
+    },
+    {
       "check": "Marcadores eletrônicos não são estado científico",
       "status": "PASS",
       "detail": null
@@ -133,8 +159,15 @@
       "check": "Validador do estado científico",
       "status": "PASS",
       "detail": null
+    },
+    {
+      "check": "Identidade oficial íntegra e abertura no início do <body>",
+      "status": "PASS",
+      "detail": {
+        "mismatch": []
+      }
     }
   ],
-  "passed": 23,
+  "passed": 28,
   "failed": 0
 }

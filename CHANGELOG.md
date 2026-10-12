@@ -1,5 +1,25 @@
 # Registro de alterações
 
+## SILM 0.9.1 — Correção de homologação: cena prioritária no celular e no tablet
+
+- Explicações, legendas e instruções da cena em "Como ler esta cena" (recolhível; fechado até 900 px, aberto no desktop; escolha lembrada).
+- Na cena ficam a estrutura, os controles e uma linha de retorno; estado eletrônico e observação compacta só para leitores de tela até 900 px; metadados em até duas linhas.
+- Sem a linha "SILM — A Arquitetura dos Metais" repetida no espaço de trabalho do celular e do tablet.
+- Esferas sempre redondas: símbolo sem quebra, proporcional ao diâmetro e omitido abaixo de 16 px (fonte simplificada não deforma mais as unidades).
+- Botões do cartão do elemento quebram só entre palavras ("Iniciar investigação" não aparece mais como "investigaçã/o" no celular).
+
+## SILM 0.9.0 — Módulo Medir
+
+- Ver → Medir com quatro instrumentos de modelo quantitativo: distância, ângulo, parâmetro de rede (`a`; `a` e `c` no HC) e vizinhança/coordenação.
+- Valores calculados das coordenadas científicas em Å (parâmetros tabelados); zoom, redimensionamento e projeção não alteram a medida.
+- Cota de medição (não ligação M—M), arco do ângulo e marcadores com letras A/B/C; anúncios "Ponto A selecionado. Selecione o ponto B." e resultado falado por extenso.
+- Unidades Å, pm e nm com conversão exata e centralizada; valor canônico em Å; resolução explícita, sem `±`.
+- Dados → Medições: rever, remover e limpar (sem limpar a estrutura); medições de estado anterior identificadas; reload, troca de módulo e de metal.
+- Schema científico 7 (`measurements[]`), com migração 6 → 7 e validação que recalcula cada registro.
+- Identidade oficial do SILM (pacote do autor): símbolo mestre, ícone de aplicação, PNG do PWA e abertura oficial com o contrato da família SIAB; correção do quadrado preto do filtro térmico sem editar o pacote.
+- Correção de origem 0.1.x: abrir uma tela do domínio diretamente (ex.: `#/inicio`, atalho do PWA) não mostra mais "Tela não encontrada".
+- Documentação: `docs/MODULO-MEDIR.md`, `docs/CONTRATO-MEDICOES.md`, `docs/INSTRUMENTOS-E-UNIDADES.md`, `docs/IDENTIDADE-VISUAL.md`.
+
 ## SILM 0.8.0 — Módulo Explorar
 
 - Ver → Observar contextual: foco em Síntese, Centro, Célula/Montagem, Elétrons ou Propriedade, acompanhando a última ação; foco Centro com posição, coordenação e vizinhos (distância calculada a partir dos parâmetros tabelados).

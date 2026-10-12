@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "data_utc": "2026-10-09T00:40:23.751624+00:00",
+  "arquivos_origem_conferidos": 925,
+  "origem": {
+    "arquivo": "BASE-ESTRUTURAL-0.2.3-CORRECOES.zip",
+    "sha512": "7463c2c1a7acd2c1f92710acaa9d1cbd3d3a6a590b43fdebe7c6f2a941e7edd7a01eaa00d1375ba227c8298b07e9901bfd799dcdbb5c92967ac5aedb8d8fc9c2",
+    "status": "PRESERVED"
+  },
+  "referencia": {
+    "arquivo": "SIAB(9).zip",
+    "sha512": "ff81556ce175bbc6e527eb922a193599b31d127ee07a0cb43a80639e45570c20a75e5660a876f29fbdb435dc636b0556e527d8d1b394739a3cf9fe1b583983b3",
+    "status": "PRESERVED"
+  },
+  "silm": {
+    "arquivo": "SILM-0.1.0.zip",
+    "sha512": "cf342341ce938d8370d4000907a6b833fef745f4e80f5064963aeea34ba09c740dac1a997ab87f7e798367a9c542d0cd295d5272144da3823ec9cb8a710a021a",
+    "status": "PRESERVED"
+  },
+  "metodo": "Comparação SHA-512 de todos os arquivos preservados contra snapshot anterior à criação da 0.2.4; fontes da Base 0.2.3, referência e SILM intactas."
+}

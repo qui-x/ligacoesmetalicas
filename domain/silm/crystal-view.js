@@ -32,15 +32,16 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const instructions=U.element('p','Selecione uma unidade (clique, toque ou Enter) e use Mostrar vizinhos. Setas percorrem as unidades; Esc limpa a seleção.'+(note?' '+note:''),'silm-assembly-help');instructions.id='silm-assembly-help';
  const legend=U.element('p',m.id==='HCP'?'Camadas A e B: empilhamento ABAB. Unidades da camada B têm anel interno tracejado.':'O sólido continua em todas as direções: a célula é a unidade que se repete.','silm-crystal-legend');
  const feedback=U.element('p','','silm-assembly-feedback');feedback.id='silm-assembly-feedback';
- footer.append(cellStatus,kind,legend,instructions,feedback);root.append(bar,area,footer);host.append(root);
+ footer.append(feedback);root.append(bar,area,footer);host.append(root);
  // 0.6.x: a distribuição eletrônica acompanha a rede; o contorno da célula não é parede.
  const electronLayer=SILM.createElectronLayer(stage,{scope,before:units,reducedMotion});
  const electronLegend=U.element('p','Pontos ciano: elétrons de valência deslocalizados pela estrutura inteira, marcadores qualitativos (não indicam o número real de elétrons). Não pertencem a um átomo nem a pares de átomos.','silm-electron-legend');electronLegend.id='silm-electron-legend';electronLegend.hidden=true;
  const electronControls=electronOptions?SILM.createElectronControls(footer,{scope,state:()=>model.state,actions:electronOptions.actions,reducedMotion,canActivate:electronOptions.canActivate}):null;
- if(electronControls)footer.prepend(electronControls.root,electronLegend);
+ if(electronControls)footer.prepend(electronControls.root);
  // 0.7.x: experiências de propriedades — sobreposição fora da estrutura e controles da propriedade ativa.
  const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:units}),propertyHost=U.element('div',null,'silm-property-host');
- footer.insertBefore(propertyHost,electronLegend.nextSibling);const propertyControls=propertyOptions?.controls?.(propertyHost,scope)||null;
+ footer.insertBefore(propertyHost,feedback);const propertyControls=propertyOptions?.controls?.(propertyHost,scope)||null;
+ SILM.createSceneNotes(footer,{scope,items:[instructions,legend,electronLegend,cellStatus,kind]});
  let deform=null,heatTimer=false;const D=c=>deform?deform(c):c;
  // 0.9.x: medição — pontos escolhidos nas unidades; sobreposição projetada dos sítios científicos.
  const measureOverlay=measureOptions?SILM.createMeasureOverlay(stage):null;
@@ -48,7 +49,9 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   heatTimer=true;scope.timeout(()=>{heatTimer=false;if(document.hidden){scheduleHeat();return;}propertyOptions.advanceHeat();},900);}
 
  const nodes=new Map(),say=(text,{announce=true}={})=>{feedback.textContent=text;if(announce)SimCore.notifications.announce(text);};
- let focusId=null,frame=0,layout=null;
+ let focusId=null,frame=0,layout=null,unitFraction=.1;
+ /* 0.9.1: o símbolo acompanha o diâmetro da esfera e some quando não cabe (a unidade continua nomeada por aria-label). */
+ const sizeSymbols=()=>{const px=(parseFloat(stage.style.getPropertyValue('--stage'))||300)*unitFraction;stage.style.setProperty('--unit-px',px.toFixed(1)+'px');root.dataset.symbols=px<16?'hidden':'shown';};
  const st=()=>model.state.structure,rep=()=>st().crystallography.representation;
  const unitsList=()=>st().units;
  const shortRole={corner:'V',face:'F',body:'C','base-vertex':'A','base-center':'A',interior:'B',outside:''};
@@ -82,7 +85,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   root.dataset.view=r.view;root.dataset.labels=String(r.labels);root.dataset.cell=String(r.unitCell);
   for(const [id,node]of nodes)if(!list.some(u=>u.id===id)){node.remove();nodes.delete(id);}
   const selected=r.selectedUnitId,neighbors=r.neighbors&&selected?g.neighbors(list.find(u=>u.id===selected).site):null,neighborKeys=new Set(neighbors?.list.map(x=>x.key)||[]);
-  const radius=computeLayout(neighbors?neighbors.list.map(n=>n.cart):[]);stage.style.setProperty('--unit-size',(radius*100).toFixed(3)+'%');
+  const radius=computeLayout(neighbors?neighbors.list.map(n=>n.cart):[]);unitFraction=radius;stage.style.setProperty('--unit-size',(radius*100).toFixed(3)+'%');sizeSymbols();
   list.forEach((u,i)=>{
    let node=nodes.get(u.id);if(!node){node=createNode(u);nodes.set(u.id,node);}
    const p=layout.project(D(g.site(u.site).cart)),info=g.role(u.site);
@@ -120,6 +123,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const inCell=list.filter(u=>g.cellKeys.has(X.key(u.site))).length,added=list.filter(u=>u.placement==='crystallographic').length;
   // Indicador compacto (0.8.x): estrutura e, quando houver, a propriedade em estudo.
   meta.textContent=m.code+' · '+m.name+' · '+list.length+' unidades'+(added?' ('+added+' completadas pelo SILM)':'')+(active?' · '+P.catalog[active].title+' em estudo':'');
+  meta.title=meta.textContent;   // 0.9.1: texto integral quando o celular limita a duas linhas
   stage.setAttribute('aria-label',structureName+'. '+(r.view==='lattice'?'Vista da rede extensa':'Vista da célula')+'; célula unitária '+(r.unitCell?'visível':'oculta')+'. '+inCell+' unidades na célula desenhada.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica; '+(moving?'movimento visual ativo.':'representação estática.'):'')+(narrative&&JSON.stringify(pr[active])!==JSON.stringify(P.defaults[active])?' '+P.catalog[active].title+': '+narrative.action+' '+narrative.observation:'')+(measureText?' '+measureText:''));
   cellStatus.textContent='Célula unitária '+(r.unitCell?'visível':'oculta');
   cellView.setAttribute('aria-pressed',String(r.view==='cell'));latticeView.setAttribute('aria-pressed',String(r.view==='lattice'));
@@ -142,7 +146,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const next={ArrowRight:k+1,ArrowDown:k+1,ArrowLeft:k-1,ArrowUp:k-1,Home:0,End:list.length-1}[event.key];
   if(next!=null){event.preventDefault();const target=list[Math.max(0,Math.min(list.length-1,next))];focusId=target.id;render();nodes.get(target.id).focus();}
  });
- const fit=()=>{const size=Math.max(160,Math.floor(Math.min(area.clientWidth,area.clientHeight))-2);stage.style.setProperty('--stage',size+'px');};
+ const fit=()=>{const size=Math.max(160,Math.floor(Math.min(area.clientWidth,area.clientHeight))-2);stage.style.setProperty('--stage',size+'px');sizeSymbols();};
  let resizeFrame=0;const schedule=()=>{if(!resizeFrame)resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;fit();});};
  if(window.ResizeObserver)scope.observe(new ResizeObserver(schedule),area);else scope.listen(window,'resize',schedule);
  scope.cleanup(()=>{if(resizeFrame)cancelAnimationFrame(resizeFrame);});

@@ -1,0 +1,215 @@
+{
+  "status": "PASS",
+  "data_utc": "2026-10-08T08:12:34.528791Z",
+  "base_testada": "BASE-ESTRUTURAL-0.2.3.zip",
+  "sha512_zip_testado": "2b9c5def55362e1bbeb823b9435e3e8ce72f7866c708aed686461ee2c42820ca05f7497d3bf7f4b70f4f3ef1df498b995bdbf525c1ad3a005d107ff7c24cc9d1",
+  "arquivos_runtime": [
+    {
+      "arquivo": "manifest.webmanifest",
+      "sha512": "c93d857d12f23d9b2a020f30c07b2ea6eac2851985383d3f88ea7e97f340e15f3a621e263b13a87d0d938bbe3675e613e08073c0845a6618db9decdedea59507"
+    },
+    {
+      "arquivo": "favicon-dark.svg",
+      "sha512": "4dedf65216b5b3d8841cbab0eab1e3fad112a8fdffc3d56bcc71f2d39016c12def1f8a4df94a0467577050ca284c494f3cc46892096c96743dc71d1543e2651b"
+    },
+    {
+      "arquivo": "index.html",
+      "sha512": "2f51fef450f33ec5f9e465a6cccd777d47729ae096a1b3c605a4beb6fbbdc3f7ba621d790a0fc766ddf32b1148f06134e355b936d887c04e7c63aaff85fe9ed8"
+    },
+    {
+      "arquivo": "a11y.js",
+      "sha512": "3e17d282318cb1f8041abcecc880640111891d051725d19cd44c6be0d5bf7f90aae3d0a11fc4225cfb52bd7592bc2c6d1c2ee8ef3fb8270f3085c4f5161496e2"
+    },
+    {
+      "arquivo": "favicon-light.svg",
+      "sha512": "1b3f944caed86a6ecc5cb736a81ff9dd72ca3abdcc1a80845f3cc6f9ed43cd4074be8dfeb923c8e5566d62a45e45e7317faf35fa738f62ac3ccb542855da33cb"
+    },
+    {
+      "arquivo": "sw.js",
+      "sha512": "823a3fe00f0b8241af5fe8c4bfa9fa5bd6f4123d5e4a68c6001da7d1f7d3ea6fd5d38ff5a1d224a04c6b52c5216b019864ecd21ac6aaf7e7d7d82bf1eab4222f"
+    },
+    {
+      "arquivo": "domain/entry.js",
+      "sha512": "01dbffec8d97fcf6ee94e65b17395ad077cbd9dc5f145729d3e4045127abc08a8a3061ff7de12db442ffe88ec1f466aea27434be3305567f17f6872c8b250e55"
+    },
+    {
+      "arquivo": "assets/core-icon.svg",
+      "sha512": "4dedf65216b5b3d8841cbab0eab1e3fad112a8fdffc3d56bcc71f2d39016c12def1f8a4df94a0467577050ca284c494f3cc46892096c96743dc71d1543e2651b"
+    },
+    {
+      "arquivo": "css/shell.css",
+      "sha512": "b2cfd826c8ddfcad792cd4d3020cbe6f4ee523361d9df84bf36ce49d86a7a960a941ff206184cf8ae919753d658142c9c395880f7dd28e09d2eee01db04e6a69"
+    },
+    {
+      "arquivo": "css/theme.css",
+      "sha512": "c9f076faa56293fc77b18c1e385d1fa82d1e905aad3667e695f84e86f5d9015288106553cf41a3c0a5d0a3068a064312afe6ab73c53caaae1369b4f96f98418e"
+    },
+    {
+      "arquivo": "css/components.css",
+      "sha512": "c81dce5b08182fc94f80710df17687e81b1f992916de6f6bb89d0c706c87ebcd6e0c6086c0ca0e5e269479546cd1e2b851d20bd15fafd515aac3ee3e2d4bcb72"
+    },
+    {
+      "arquivo": "css/tokens-structure.css",
+      "sha512": "c82a9dd6d3f6a793a3d9ca9e4a0da94407feb1798cd2d4e9e8ed856ced99c02da2009f1c63de89e2c58726f5735db300be3d859f7f28cdf3bdb9a9f5e001023c"
+    },
+    {
+      "arquivo": "css/manual.css",
+      "sha512": "3e5e643981492366011a811f98adfa99df108421dd50865b8d30caa77e47026105ecc2240a6ca2f95e54ca25c03fad65d114fd8d2bd0b83438d0eb7690dfb457"
+    },
+    {
+      "arquivo": "css/experience.css",
+      "sha512": "18fe92ae585048dda23df930afc20a99bef4f07291651d8c66ed786d7b5aec3dd501544ea401f14198d0f3da55fb613403a334974c2ae3bb6c53173291ec34ea"
+    },
+    {
+      "arquivo": "css/workspace.css",
+      "sha512": "6bc8ebf8ff8a63bd1919131443f0b99e6479e2489e82e52d8d0c673284b0873c3e178e7ef50d1695c9c2516051bc2849ef64c6e866e1f1b5cb0237b5f9a0f28d"
+    },
+    {
+      "arquivo": "js/workspace/viewport.js",
+      "sha512": "11e0409cf620c39986d9ae15f0d9621ff10d68a2c4dafec0baa0c49e6be4fa9b1d2b750c952223b91e0b26a03b43eb5384cba6aa8a9a6148ae28afafab9e2bca"
+    },
+    {
+      "arquivo": "js/workspace/workspace.js",
+      "sha512": "1fc30980196c1162d887d320fb3846e42ba88a0af5a783007421e6da5167e7c737ab24051db9d8fb3f9894cc0c6ab607653c0920bacae605951ce5168aad0d7c"
+    },
+    {
+      "arquivo": "js/init/app.js",
+      "sha512": "4557d10c0895a322130a2896840e1db113cc9b806d5d4d7d102b0c52d2622d9b76c66e0246715d2dbaeeeef8f0ae2401b60223a84720db6adfcecc8583abe9a6"
+    },
+    {
+      "arquivo": "js/init/pwa.js",
+      "sha512": "769ed567679c232921b481d9b69ff6abb9d397e145fa833aaa9c6243eaaa76e6606c38213f278a28bc1e6fe243851aec15bf43720fea52b8026bc123e03d2925"
+    },
+    {
+      "arquivo": "js/responsive/layout.js",
+      "sha512": "6101b6ca1caab43e1805a7bb6dfaf21ec57ec24929d8aae9ccf923d51f9c409e87821e243c97a62fd270d5d1884255396274411fd7d5731f7f05cba238dfb3d3"
+    },
+    {
+      "arquivo": "js/experience/teacher.js",
+      "sha512": "6b31cf1bf84ecf6a7e9f9f8b68967f1908dc4bbdb1963c6d84ef3100b05c54bf00d6f8994c8f708d7b94ab68b9b030ccdfdc202cc6661640d38c4cf636b1bca8"
+    },
+    {
+      "arquivo": "js/experience/common.js",
+      "sha512": "33b98e345131138b58218a353c76767249abd1ad55ed211587b944402baaa91a9e1138ed721ef24c95c5bbd000f83925fb9d6ceb14daded944349339c52b64b5"
+    },
+    {
+      "arquivo": "js/experience/activity.js",
+      "sha512": "9abc3777f406d1e67f0cbcabaaf67b9b55d124e92372c997cd95faeaecf97b7c374992958eacc72b9cdd995713fc66ad2de15ad3e6979d79bf49e68da1c4bcee"
+    },
+    {
+      "arquivo": "js/experience/shell.js",
+      "sha512": "ee18c104c944984769ab32a97a4802b26d5430be989049257279106aeb62954545934e98965841762e8a6f307210d7a1751df0c8a6f9198c249b5ac2b7492f92"
+    },
+    {
+      "arquivo": "js/experience/references.js",
+      "sha512": "fad3846cdd23b076338805d296dcf62d86e12a28aff0e37c44754e2533219d215a05bc4ba84854255a088d9ab08f830e5eddf5ae2c3308e2d32ea5d1f659e67d"
+    },
+    {
+      "arquivo": "js/experience/notebook.js",
+      "sha512": "d1fc605f084ec14f8ef4ba2c31ae0ac3f2bd13536b7568c840ab71a64a2a8b370595be4910b65eab97c8073032f69da20cdce98285756ed40d13f32a44d5979a"
+    },
+    {
+      "arquivo": "js/experience/experience.js",
+      "sha512": "32a56053cfe711088ac6777688de3cb937e9fe438d27f0fb3fe8b80c22dc9059cbb5b0d5293c4fe192d27980d3f35d68ad7fd28e75079e1de3bc7b9a0be4634b"
+    },
+    {
+      "arquivo": "js/experience/learning.js",
+      "sha512": "8028373528ab3c63f7ed1ce32ef5243103863a76414237911455efce3afd1936a6eff5294864ef22658dd6b4dd4bf155f9ff15f4b30cd77696bb0441eada8975"
+    },
+    {
+      "arquivo": "js/experience/modules.js",
+      "sha512": "c421e965a35be161447834ef2dfaaba949845c689b7a2e1fcd0b65d569d173485c085c53eff54e7754c92e9b85113684b68824e357bc6c1aadea669f66e4f4ca"
+    },
+    {
+      "arquivo": "js/experience/reports.js",
+      "sha512": "804a2f0cd7c3dcf36ca5bbd7fef29bf4c8e9a816e97baa5d6f0db5063aeaae33edbae76daa9b7d5f0991352a9907125ba64692484316f9df3c925a0d2e671c1d"
+    },
+    {
+      "arquivo": "js/core/theme.js",
+      "sha512": "9c3fc91f683edb26d9261836649b82e8a9501787d0a583d0f11317d34c46260a85c2b7ab630c61b90f38a48783c322a5b3d305cf233d0c0033607f93f7c2e41f"
+    },
+    {
+      "arquivo": "js/core/namespace.js",
+      "sha512": "a48950b012b4ad27f1c1611e2d2e82844e5c5d4ae3cca36fc0643175d693c56b325ba51ac4df05e44429abbfaa737f97e3c7e7c0281946480f0f809186a949b8"
+    },
+    {
+      "arquivo": "js/core/domain.js",
+      "sha512": "a645fd20eef46d7dc0817fca96f7be0abfcf1dc6c819e826ed40055635a999125a030e1c354e2ba29f510e4b2a59748dfff6af1393d8b50502572038490ae2db"
+    },
+    {
+      "arquivo": "js/core/breakpoints.js",
+      "sha512": "d5d69442a00fdc2dcb5b38edd8a8a77cf890503ea2c56cda4fedad8c901cdcfa1ba330a396ae15364138ba8b9aeb6deb6f2524819c15b8bec3c2ab323771e294"
+    },
+    {
+      "arquivo": "js/core/compatibilidade.js",
+      "sha512": "553bfe4bf275c46757590a9257bbf73572383f9cdb30be5f8bccb4e52880ad9099c1136112d3180fb393b7412866d8c0010a45a1ac43acd4199e9e93724a3f94"
+    },
+    {
+      "arquivo": "js/core/scope.js",
+      "sha512": "69cb0651deae4c246e7bb4ed1ed256fac96d5ab3e4b5878022b0a57eee2f81e21209458fc90fdb2a1f19ccc0d8a34aac73631a3e91d733742b4c3b19d7cc541c"
+    },
+    {
+      "arquivo": "js/core/identity.js",
+      "sha512": "9d85e85f3e88c95697f3ef57d8019f9b20956518f9d12d2cd79ee1c9dbf752bb703027177f1517b2bcd704ec2d201a56c2ba69b28da7edc55ba5b4c67cdf56b4"
+    },
+    {
+      "arquivo": "js/core/reset.js",
+      "sha512": "d8f15919f6add718672324fb06272419c3e00d4e2bebba8f706df17368b8c9aa94210883308da28d30345a1a29594ad80d0933b027a353bdcca77ee023a86202"
+    },
+    {
+      "arquivo": "js/a11y/preferencias.js",
+      "sha512": "b06d70cbeae49539369f9003c1e030a80eeae6c834d39b9fb66552db4ac146abb8ed1a515e904a37b0a7cf2ff6b8ce5d9f2865156e249c78e818fdfa02c23206"
+    },
+    {
+      "arquivo": "js/storage/storage.js",
+      "sha512": "754224b1a8ecc5bb46b83d80901e7d0a8a18929819a0e276db39a05dd54c649d6c6a69f2e5fa3ed1e49352bb6866aae8d9196f5d704a4426792edf447512c403"
+    },
+    {
+      "arquivo": "js/storage/migration.js",
+      "sha512": "e9577416b101f9d9a32bc3acc40d5200f44939af7f610cdcd4a2c5d9f1419fb693168b8fe3b4f86004d35eff81096e266cbb6183cbc7e91f16b1d09d227d20cf"
+    },
+    {
+      "arquivo": "js/navigation/router.js",
+      "sha512": "11bdb5e3462d6034ac0aab4823a20e66e123b7d78d50557072460082e13db767eeea126f63fe15ad37c0cb79b411bcee4316043c6f5350940fbde780a59a11b1"
+    },
+    {
+      "arquivo": "js/components/notifications.js",
+      "sha512": "42150816d9f01c49d73d5c3b5ab1387ea04f504dc28c05946bc487eca4bb9f1fa6137cca1ede84d5211aee465c4238b374b51766c59d2b69902d9941d1aa4b40"
+    },
+    {
+      "arquivo": "js/components/modal.js",
+      "sha512": "8be2277dc000b965d35dda1b645a9076f3da7d4d9ca64cc18d841706c9e4d1d52d7eaec58965e03e62467498de9eab8b2a9812eace0a43cdfd55cfc9641500c7"
+    },
+    {
+      "arquivo": "js/manual/manual.js",
+      "sha512": "43a68830c26da2bc896f8c43bd00e6e27539b3066d69bdfc547e0225bc7cb807498bdad44ccc5116451e43a8a6838d71b13b8a371b10b6fc9fbba23f57ab3256"
+    },
+    {
+      "arquivo": "js/manual/registry.js",
+      "sha512": "22f3e17def482b5196a6fbdb9bea9c8ffeff25c86bb12ce494112e177fd75afe4fc162e76aab5e0c98d2888acbba127e6d92184f7d0b56bfb57fb27edf1eace9"
+    },
+    {
+      "arquivo": "domain/demo/bootstrap.js",
+      "sha512": "d6f18b6b9732d5f4c36c0d03279eed98fc059f9b96e9ef1535d5f244e9ade17be64e7e13af1d735159869d6b7ca52764d82b80612cc7a5fc462daab1ff543d83"
+    },
+    {
+      "arquivo": "domain/demo/manual.js",
+      "sha512": "74bab4f9d7a39f6e5486acd70eb47f420ef0499bea3e11da7c3bbd56dca62e2f495c7d6ee750d36f079bac46a4d0bd385a6c58497c61e45b8b5331483bf39e49"
+    },
+    {
+      "arquivo": "domain/demo/styles.css",
+      "sha512": "5be2e1f1adab18f0d73c4862a0ff545aa037f4e260239ce0862696c4723091384e7b854dd701ebb01b115213e4bc97a86b8be121771a49d1926680c727a58921"
+    },
+    {
+      "arquivo": "vendor/dialog-polyfill/dialog-polyfill.js",
+      "sha512": "71bc44ea69d473e7d1ea202bbd3f7b975686e35065f2f8bc64fffee0639b8d291cc508ce33ae7bad972eee2c31b25ee9715ff1dce2e03bb7dadcf1e535d072d2"
+    },
+    {
+      "arquivo": "vendor/dialog-polyfill/dialog-polyfill.css",
+      "sha512": "4b06225d9e6afdf1f3017b6c68e6a0b184b74bcbcde8278ced0f67e193c0fb9e41a6340700b62a5fa3289b941a6dbb41f982b61d42e2ebbf9e650527d3ee97ee"
+    }
+  ],
+  "grupos_ja_aprovados": 43,
+  "analises_axe_ja_aprovadas": 32,
+  "nota": "Evidências mantidas com datas originais, sem nova execução da aplicação."
+}

@@ -1,6 +1,6 @@
 # Arquitetura científica do SILM
 
-> Atualizada na 0.8.0. Reconstruída na 0.4.0 a partir do código, porque o arquivo da 0.3.0 não constava do pacote recebido.
+> Atualizada na 0.9.0. Reconstruída na 0.4.0 a partir do código, porque o arquivo da 0.3.0 não constava do pacote recebido.
 
 ## 1. Princípio
 
@@ -11,7 +11,7 @@ O SILM e o SIAB são instrumentos científicos diferentes da mesma família: **m
 ```text
 SILM CORE
 ├── data            domain/silm/data/ (JSON canônicos, bundle.js, evidências CIF) + data-api.js
-├── state           domain/silm/state.js — scientificState único, schema 6
+├── state           domain/silm/state.js — scientificState único, schema 7
 ├── mechanics       domain/silm/assembly.js — contrato da cena e assistência (0.4.x)
 │                   domain/silm/crystal.js — modelo cristalográfico CCC/CFC/HC, elegibilidade, vizinhança (0.5.x)
 │                   domain/silm/properties.js — propriedades: elegibilidade, dados, transformações (0.7.x)
@@ -21,7 +21,8 @@ SILM CORE
 │                   domain/silm/property-view.js — sobreposição e controles das experiências (0.7.x)
 │                   domain/silm/exploration.js — Explorar: foco, camadas, comparação derivada (0.8.x)
 │                   domain/silm/periodic-table.js + presentation.js — Tabela (0.2.x)
-├── measurements    reservado (0.9.x)
+├── measurements    domain/silm/measurements.js — medidas do modelo, unidades e validação (0.9.x)
+│                   domain/silm/measure-view.js — cota, arco do ângulo e marcadores A/B/C (0.9.x)
 ├── calculations    reservado (0.10.x)
 └── pedagogy        domain/silm/manual.js; Aprender, Roteiros e Missões configurados em bootstrap.js
 ```

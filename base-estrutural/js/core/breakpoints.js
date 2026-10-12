@@ -1,0 +1,2 @@
+/* Gerado de config/breakpoints.json por scripts/build-layout.cjs. */
+SimCore.breakpoints=Object.freeze({"mobile":900,"desktopMin":901,"dualPanels":1280,"singlePanelMax":1279,"compactHeader":600,"manualMedium":1100,"manualSmall":460,"largeText":1800,"extraLargeText":2200,"shortLandscape":500});

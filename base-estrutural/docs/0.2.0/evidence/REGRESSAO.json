@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-04T02:02:55.526Z",
+  "rows": [
+    {
+      "test": 3,
+      "status": "PASS",
+      "stdout": "Regressão 3: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 4,
+      "status": "PASS",
+      "stdout": "Regressão 4: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 5,
+      "status": "PASS",
+      "stdout": "Regressão 5: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 6,
+      "status": "PASS",
+      "stdout": "Regressão 6: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 7,
+      "status": "PASS",
+      "stdout": "Regressão 7: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 8,
+      "status": "PASS",
+      "stdout": "Regressão 8: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 9,
+      "status": "PASS",
+      "stdout": "Regressão 9: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 10,
+      "status": "PASS",
+      "stdout": "Regressão 10: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 11,
+      "status": "PASS",
+      "stdout": "Regressão 11: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 12,
+      "status": "PASS",
+      "stdout": "first Base Estrutural\nreload Base Estrutural Ir para a área central\nBase Estrutural\nAplicações interativas\nManual\nAcessibilidade\nMenu\n\nÁrea de trabalho\n\nFerramentas\nInformações\nNenhum módulo científico carregado\n\nO espaço está pronto. As ferramentas e a visualização aparecem quando um módulo é conectado.\nreload Base Estrutural Ir para a área central\nBase Estrutural\nAplicações interativas\nManual\nAcessibilidade\nMenu\n\nÁrea de trabalho\n\nFerramentas\nInformações\nNenhum módulo científico carregado\n\nO espaço está pronto. As ferramentas e a visualização aparecem quando um módulo é conectado.\nRegressão 12: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 13,
+      "status": "PASS",
+      "stdout": "Regressão 13: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 15,
+      "status": "PASS",
+      "stdout": "Regressão 15: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 16,
+      "status": "PASS",
+      "stdout": "Regressão 16: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 17,
+      "status": "PASS",
+      "stdout": "Regressão 17: PASS\n",
+      "stderr": ""
+    },
+    {
+      "test": 18,
+      "status": "PASS",
+      "stdout": "Regressão 18: PASS\n",
+      "stderr": ""
+    }
+  ]
+}

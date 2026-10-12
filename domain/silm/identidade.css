@@ -3,6 +3,8 @@
 :root[data-theme=light]{--bg:#f5f3ee;--panel:#fffefa;--panel2:#ebe8e0;--hover:#e2ddd1;--border:#8d8980;--text:#20252c;--secondary:#505762;--muted:#5b616b;--primary:#725416;--on-primary:#fffefa;--accent:#725416;--scientific-accent:#006a91;--text-accent:#725416;--silm-soft-border:#d6d1c4;--silm-bronze:#805125}
 :root[data-contrast=on]{--scientific-accent:#fff!important;--text-accent:#ff0!important;--silm-soft-border:#fff;--silm-bronze:#ff0}
 .brand>span{min-width:0}.brand strong{letter-spacing:.12em;color:var(--accent)}.brand small{overflow-wrap:anywhere}.silm-action-icon{flex:none}.silm-action-label{white-space:nowrap}
-@media(forced-colors:active){.brand strong{color:LinkText}.silm-opening{border:2px solid CanvasText}}
+/* Símbolo mestre transparente (256×240) em caixas quadradas da Base: proporção preservada. */
+.brand img,.empty-symbol,.about-brand img{object-fit:contain}
+@media(forced-colors:active){.brand strong{color:LinkText}}
 /* A paleta do sistema prevalece mesmo quando o alto contraste do aplicativo está ligado. */
 @media(forced-colors:active){:root,:root[data-theme],:root[data-contrast]{--bg:Canvas!important;--panel:Canvas!important;--panel2:Canvas!important;--hover:Canvas!important;--text:CanvasText!important;--secondary:CanvasText!important;--muted:CanvasText!important;--border:ButtonText!important;--primary:ButtonFace!important;--on-primary:ButtonText!important;--accent:LinkText!important;--focus:Highlight!important;--scientific-accent:CanvasText!important;--text-accent:LinkText!important;--silm-soft-border:CanvasText;--silm-bronze:CanvasText}}

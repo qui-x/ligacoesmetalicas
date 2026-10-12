@@ -1,0 +1,154 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "path": "upload/BASE-ESTRUTURAL.zip",
+      "sha512": "f6ae851e2958c4017f8e726acfec075f864d54ed02b950e2b40b8c8aaa3c4e518088e8e5e556e3a3c34e4f952fe03d7418d2393c0124eb3a1e8da4965e51c780",
+      "status": "PRESERVED",
+      "papel": "entrada histórica preservada"
+    },
+    {
+      "path": "upload/SIAB(4).zip",
+      "sha512": "ff81556ce175bbc6e527eb922a193599b31d127ee07a0cb43a80639e45570c20a75e5660a876f29fbdb435dc636b0556e527d8d1b394739a3cf9fe1b583983b3",
+      "status": "PRESERVED",
+      "papel": "referência SIAB fornecida pelo usuário, conferida e preservada"
+    },
+    {
+      "path": "deliverables/SILM-0.1.0.zip",
+      "sha512": "cf342341ce938d8370d4000907a6b833fef745f4e80f5064963aeea34ba09c740dac1a997ab87f7e798367a9c542d0cd295d5272144da3823ec9cb8a710a021a",
+      "status": "PRESERVED",
+      "papel": "entrada histórica preservada"
+    },
+    {
+      "path": "references/BASE-ESTRUTURAL-0.2.0",
+      "files": 106,
+      "status": "PRESERVED",
+      "papel": "pasta histórica preservada"
+    },
+    {
+      "path": "references/SIAB-4",
+      "files": 102,
+      "status": "PRESERVED",
+      "papel": "fontes da referência SIAB conferidas e preservadas"
+    },
+    {
+      "path": "SILM",
+      "files": 162,
+      "status": "PRESERVED",
+      "papel": "pasta histórica preservada"
+    },
+    {
+      "path": "BASE-ESTRUTURAL-0.2.2",
+      "files_snapshot": 239,
+      "files_compared_to_zip": 238,
+      "sha512_zip": "5bf52424a8160477d944e76e803f3423fd0f8ea85803d05af05f26309f02124dfa6b9fb2632cc4721cb24d43dd4b92067c07ef418458aafb9498a516819c9aef",
+      "status": "PRESERVED"
+    },
+    {
+      "path": "BASE-ESTRUTURAL-0.2.1",
+      "sha512_zip": "1fc721bd0aed1e18cd6202da1433ed104adfb9f18a4142dd10dac39a1007904f3aad4da5ceb76f707565aec94bdf96043b237bf18e1ac0cafcfe4044ea497323",
+      "status": "PRESERVED"
+    },
+    {
+      "path": "a11y.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "3e17d282318cb1f8041abcecc880640111891d051725d19cd44c6be0d5bf7f90aae3d0a11fc4225cfb52bd7592bc2c6d1c2ee8ef3fb8270f3085c4f5161496e2"
+    },
+    {
+      "path": "js/core/domain.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "a645fd20eef46d7dc0817fca96f7be0abfcf1dc6c819e826ed40055635a999125a030e1c354e2ba29f510e4b2a59748dfff6af1393d8b50502572038490ae2db"
+    },
+    {
+      "path": "js/core/identity.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "9d85e85f3e88c95697f3ef57d8019f9b20956518f9d12d2cd79ee1c9dbf752bb703027177f1517b2bcd704ec2d201a56c2ba69b28da7edc55ba5b4c67cdf56b4"
+    },
+    {
+      "path": "js/responsive/layout.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "6101b6ca1caab43e1805a7bb6dfaf21ec57ec24929d8aae9ccf923d51f9c409e87821e243c97a62fd270d5d1884255396274411fd7d5731f7f05cba238dfb3d3"
+    },
+    {
+      "path": "js/workspace/workspace.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "1fc30980196c1162d887d320fb3846e42ba88a0af5a783007421e6da5167e7c737ab24051db9d8fb3f9894cc0c6ab607653c0920bacae605951ce5168aad0d7c"
+    },
+    {
+      "path": "js/experience/activity.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "9abc3777f406d1e67f0cbcabaaf67b9b55d124e92372c997cd95faeaecf97b7c374992958eacc72b9cdd995713fc66ad2de15ad3e6979d79bf49e68da1c4bcee"
+    },
+    {
+      "path": "js/experience/modules.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "c421e965a35be161447834ef2dfaaba949845c689b7a2e1fcd0b65d569d173485c085c53eff54e7754c92e9b85113684b68824e357bc6c1aadea669f66e4f4ca"
+    },
+    {
+      "path": "js/experience/learning.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "8028373528ab3c63f7ed1ce32ef5243103863a76414237911455efce3afd1936a6eff5294864ef22658dd6b4dd4bf155f9ff15f4b30cd77696bb0441eada8975"
+    },
+    {
+      "path": "js/experience/notebook.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "d1fc605f084ec14f8ef4ba2c31ae0ac3f2bd13536b7568c840ab71a64a2a8b370595be4910b65eab97c8073032f69da20cdce98285756ed40d13f32a44d5979a"
+    },
+    {
+      "path": "js/experience/teacher.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "6b31cf1bf84ecf6a7e9f9f8b68967f1908dc4bbdb1963c6d84ef3100b05c54bf00d6f8994c8f708d7b94ab68b9b030ccdfdc202cc6661640d38c4cf636b1bca8"
+    },
+    {
+      "path": "js/experience/reports.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "804a2f0cd7c3dcf36ca5bbd7fef29bf4c8e9a816e97baa5d6f0db5063aeaae33edbae76daa9b7d5f0991352a9907125ba64692484316f9df3c925a0d2e671c1d"
+    },
+    {
+      "path": "js/experience/references.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "fad3846cdd23b076338805d296dcf62d86e12a28aff0e37c44754e2533219d215a05bc4ba84854255a088d9ab08f830e5eddf5ae2c3308e2d32ea5d1f659e67d"
+    },
+    {
+      "path": "js/manual/manual.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "43a68830c26da2bc896f8c43bd00e6e27539b3066d69bdfc547e0225bc7cb807498bdad44ccc5116451e43a8a6838d71b13b8a371b10b6fc9fbba23f57ab3256"
+    },
+    {
+      "path": "js/manual/registry.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "22f3e17def482b5196a6fbdb9bea9c8ffeff25c86bb12ce494112e177fd75afe4fc162e76aab5e0c98d2888acbba127e6d92184f7d0b56bfb57fb27edf1eace9"
+    },
+    {
+      "path": "js/storage/storage.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "754224b1a8ecc5bb46b83d80901e7d0a8a18929819a0e276db39a05dd54c649d6c6a69f2e5fa3ed1e49352bb6866aae8d9196f5d704a4426792edf447512c403"
+    },
+    {
+      "path": "js/storage/migration.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "e9577416b101f9d9a32bc3acc40d5200f44939af7f610cdcd4a2c5d9f1419fb693168b8fe3b4f86004d35eff81096e266cbb6183cbc7e91f16b1d09d227d20cf"
+    },
+    {
+      "path": "js/components/modal.js",
+      "status": "BYTE_IDENTICAL_TO_0.2.2",
+      "sha512": "8be2277dc000b965d35dda1b645a9076f3da7d4d9ca64cc18d841706c9e4d1d52d7eaec58965e03e62467498de9eab8b2a9812eace0a43cdfd55cfc9641500c7"
+    },
+    {
+      "path": "BASE-ESTRUTURAL-0.2.3.zip",
+      "sha512": "2b9c5def55362e1bbeb823b9435e3e8ce72f7866c708aed686461ee2c42820ca05f7497d3bf7f4b70f4f3ef1df498b995bdbf525c1ad3a005d107ff7c24cc9d1",
+      "status": "PRESERVED"
+    }
+  ],
+  "referencia_atual": {
+    "arquivo": "SIAB(4).zip",
+    "versao_interna": "1.0.0",
+    "sha512": "ff81556ce175bbc6e527eb922a193599b31d127ee07a0cb43a80639e45570c20a75e5660a876f29fbdb435dc636b0556e527d8d1b394739a3cf9fe1b583983b3",
+    "arquivo_identico": "SIAB(3).zip",
+    "status": "AVAILABLE_VERIFIED",
+    "comparacao": "SOURCE_REVIEW_COMPLETED",
+    "criterio": "Referência já fornecida pelo usuário, confirmada após sua correção em 2026-10-08. SIAB(3) e SIAB(4) são byte a byte idênticos.",
+    "nome_citado_no_prompt": "SIAB(9).zip",
+    "nota_nome": "O nome citado no prompt fica como rastreabilidade. O hash pertence ao arquivo efetivamente inspecionado SIAB(4), sem afirmar identidade com um SIAB(9) não inspecionado."
+  }
+}

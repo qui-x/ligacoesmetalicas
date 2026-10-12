@@ -1,5 +1,5 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.9.0';
+const VERSION='0.9.1';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION,DOMAINS=CACHE+'::domains';
 const FILES=[
   "./",
@@ -13,7 +13,11 @@ const FILES=[
   "assets/icon-512.png",
   "assets/icon-maskable-512.png",
   "assets/silm-icone.svg",
+  "assets/silm-logo-vertical.svg",
+  "assets/silm-simbolo.svg",
   "domain/entry.js",
+  "domain/silm/abertura/silm-opening.css",
+  "domain/silm/abertura/silm-opening.js",
   "domain/silm/abertura.css",
   "domain/silm/abertura.js",
   "domain/silm/assembly-view.js",

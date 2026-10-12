@@ -1,21 +1,13 @@
-/* Segurança independente do controlador JS: a camada fica inerte e invisível em seis segundos. */
-.silm-opening{display:none;position:fixed;inset:0;z-index:1500;background:var(--bg);color:var(--text);place-items:center;padding:max(24px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(48px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));overflow:auto;animation:silm-safety .01s linear 6s forwards}
-:root[data-silm-opening=on] .silm-opening{display:grid}
-.silm-opening-stage{width:min(540px,100%);text-align:center;display:grid;justify-items:center;gap:16px;margin:auto}
-.silm-opening-scene{width:min(420px,100%);height:auto;max-height:36vh;color:var(--accent);transition:opacity .4s}
-.silm-center{fill:var(--primary);stroke:var(--accent);stroke-width:1.5;animation:silm-organize 1.5s ease both;transform-box:fill-box;transform-origin:center}
-.silm-flow{fill:none;stroke:var(--scientific-accent);stroke-width:2;stroke-dasharray:8 16;opacity:0;animation:silm-flow 1.4s 1.35s linear both}
-.silm-opening-brand{display:grid;gap:6px;justify-items:center;opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s}
-.silm-opening-brand img{width:56px;height:56px}.silm-opening-brand strong{font-size:2rem;letter-spacing:.18em;color:var(--accent);line-height:1.1}.silm-opening-brand span{font-size:.95rem}.silm-opening-brand em{font-style:normal;font-size:.85rem;color:var(--secondary)}
-.silm-opening.with-brand .silm-opening-brand{opacity:1;transform:none}.silm-opening.with-brand .silm-opening-scene{opacity:.35}
-.silm-opening-hint{position:absolute;bottom:max(16px,env(safe-area-inset-bottom));left:16px;right:16px;text-align:center;font-size:.75rem;color:var(--secondary)}
-.silm-opening.leaving{opacity:0;transition:opacity .3s}
-@keyframes silm-organize{0%{transform:translate(var(--dx),var(--dy));opacity:0}25%{opacity:1}100%{transform:translate(0,0);opacity:1}}
-@keyframes silm-flow{0%{opacity:0;stroke-dashoffset:100}20%{opacity:1}100%{opacity:.85;stroke-dashoffset:-65}}
-/* Ambos os extremos escondem a camada após o atraso, sem depender do arredondamento do último frame. */
+/* Adaptação da abertura oficial à família. O visual está em abertura/silm-opening.css (pacote oficial, intacto).
+   Segurança independente do controlador JS: a camada fica inerte e invisível em sete segundos. */
+#silm-opening{animation:silm-safety .01s linear 7s forwards}
 @keyframes silm-safety{0%,100%{opacity:0;visibility:hidden;pointer-events:none}}
-:root[data-motion=on] .silm-opening{display:none!important}
-@media(prefers-reduced-motion:reduce){.silm-opening{display:none!important}}
-@media(max-height:500px){.silm-opening-stage{gap:8px;grid-template-columns:1fr 1fr;align-items:center}.silm-opening-scene{max-height:55vh}.silm-opening-brand strong{font-size:1.3rem}.silm-opening-brand img{width:40px;height:40px}.silm-opening-brand span,.silm-opening-brand em{font-size:.7rem}}
-@media(forced-colors:active){.silm-opening{background:Canvas;color:CanvasText}.silm-center{fill:Canvas;stroke:CanvasText}.silm-flow{stroke:Highlight}.silm-opening-brand strong,.silm-opening-brand em,.silm-opening-hint{color:CanvasText}}
-@media print{.silm-opening{display:none!important}}
+:root[data-silm-opening=off] #silm-opening,:root[data-motion=on] #silm-opening{display:none!important}
+@media(prefers-reduced-motion:reduce){#silm-opening{display:none!important}}
+@media(forced-colors:active){#silm-opening{background:Canvas;color:CanvasText;border:2px solid CanvasText}#silm-opening .silm-opening__brand-mark,#silm-opening .silm-opening__brand-theme,#silm-opening .silm-opening__hint{color:CanvasText}}
+@media print{#silm-opening{display:none!important}}
+/* Correção do pacote oficial (sem editar os arquivos do pacote): no Chromium, um filtro aplicado a um grupo cujos
+   filhos estão todos transparentes desenha um quadrado preto na origem do SVG. O brilho térmico passa do grupo para
+   cada círculo; o resultado visual da onda de calor é o mesmo. */
+#silm-opening g[filter*=silmThermalGlow]{filter:none}
+#silm-opening .thermal-aura{filter:url(#silmThermalGlow)}
