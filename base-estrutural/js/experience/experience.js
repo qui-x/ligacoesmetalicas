@@ -52,7 +52,7 @@ SimCore.createExperience=ctx=>{
  }
  function openAbout(){
   const about=experience.options.about||{},content=U.element('div');const brand=U.element('div',null,'about-brand');const icon=U.element('img');icon.src=ctx.manifest.icone||'assets/core-icon.svg';icon.alt='';icon.width=48;icon.height=48;brand.append(icon,U.element('h3',ctx.manifest.nome));content.append(brand,U.element('p',ctx.manifest.subtitulo),U.element('p','Versão '+ctx.manifest.versao));U.block(content,'Sobre o programa',about.description||ctx.manifest.titulo);
-  if(about.model)U.block(content,'Modelo do domínio',about.model);
+  if(about.model)U.block(content,about.modelTitle||'Modelo do domínio',about.model);
   const refs=U.element('section');refs.append(U.element('h3','Referências e créditos'));experience.references.render(refs);content.append(refs);U.block(content,'Licenças',about.licenses||['Consulte as licenças da distribuição.']);
   return ctx.modal.open({title:'Sobre',content,size:'wide',actions:[{id:'manual',label:'Manual de uso',primary:true,run:()=>{S.modal.close();S.router.openManual(about.manualTopic||'');}}]});
  }

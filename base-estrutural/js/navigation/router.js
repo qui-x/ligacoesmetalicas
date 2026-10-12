@@ -20,14 +20,14 @@ SimCore.router=(()=>{
   try{await old.entry?.deactivate?.(old.local);}catch(error){console.error('Falha ao desativar tela',error);}
   try{await old.entry?.destroy?.(old.local);}catch(error){console.error('Falha ao liberar tela',error);}
  }
- async function display(target,{restore=false}={}){
+ async function display(target,{restore=false,quiet=false}={}){
   let next=parse(target);const exp=S.experience?.current;
   if(exp&&!exp.allowsRoute(next.id,next.param)){
    S.notifications.show('Navegação limitada à atividade. Ajuda da atividade, acessibilidade e saída continuam disponíveis.',{type:'warning'});
    next=current?{id:current.id,param:current.param}:{id:'laboratorio',param:''};
   }
   if(!['laboratorio','manual'].includes(next.id)&&!entries.has(next.id)){
-   S.notifications.show('Tela não encontrada. A navegação foi recuperada.',{type:'warning'});next={id:defaultRoute(),param:''};
+   if(!quiet)S.notifications.show('Tela não encontrada. A navegação foi recuperada.',{type:'warning'});next={id:defaultRoute(),param:''};
   }
   const canonical=href(next.id,next.param);if(location.hash!==canonical)history.replaceState(history.state,'',canonical);
   if(current&&key(current)===key(next))return current;
