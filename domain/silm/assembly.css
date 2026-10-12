@@ -216,3 +216,24 @@
 .silm-snapshot-edge{stroke:var(--scientific-accent);stroke-width:.25;stroke-dasharray:1 .8;opacity:.7}
 .silm-snapshot-lattice{fill:var(--silm-bronze);opacity:.35}
 @media(forced-colors:active){.silm-snapshot-unit{fill:Canvas;stroke:CanvasText}.silm-snapshot-symbol{fill:CanvasText}}
+/* 0.9.x — Medir: cota de medição (tracejada, com traços nas extremidades), arco de ângulo e marcadores com letra. */
+:root{--silm-measure:#ffd166;--silm-measure-ink:#1a1405}
+:root[data-theme=light]{--silm-measure:#8a5a00;--silm-measure-ink:#fffefa}
+:root[data-contrast=on]{--silm-measure:#ffff00;--silm-measure-ink:#000000}
+.silm-measure-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:300;overflow:visible}
+.silm-dimension-line,.silm-angle-ray{stroke:var(--silm-measure);stroke-width:.55;stroke-dasharray:1.6 1}
+.silm-dimension-tick{stroke:var(--silm-measure);stroke-width:.7}
+.silm-angle-arc{fill:none;stroke:var(--silm-measure);stroke-width:.7}
+.silm-dimension-label rect{fill:var(--silm-measure-ink);stroke:var(--silm-measure);stroke-width:.35}
+.silm-dimension-label text{font-size:3px;font-weight:700;fill:var(--silm-measure)}
+.silm-measure-marker circle{fill:var(--silm-measure);stroke:var(--silm-measure-ink);stroke-width:.5}
+.silm-measure-marker text{font-size:3.4px;font-weight:800;fill:var(--silm-measure-ink)}
+.silm-crystal[data-measuring=true] .silm-crystal-unit{cursor:crosshair}
+.silm-measure-status{font-weight:600}
+.silm-measure-label{margin:10px 0 4px;font-size:.8rem;color:var(--secondary)}
+.silm-measure-units{display:flex;gap:6px;margin-bottom:8px}
+.silm-measure-units button{flex:1}
+.silm-measure-units button[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent)}
+.silm-measure-result{margin-top:10px}
+.silm-measurement strong{display:inline-block;margin:0 6px}
+@media(forced-colors:active){.silm-dimension-line,.silm-angle-ray,.silm-dimension-tick,.silm-angle-arc{stroke:Highlight}.silm-measure-marker circle{fill:Highlight;stroke:CanvasText}.silm-measure-marker text,.silm-dimension-label text{fill:CanvasText}.silm-dimension-label rect{fill:Canvas}}
