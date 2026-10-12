@@ -1,5 +1,29 @@
 # Registro de alterações
 
+## SILM 0.8.0 — Módulo Explorar
+
+- Ver → Observar contextual: foco em Síntese, Centro, Célula/Montagem, Elétrons ou Propriedade, acompanhando a última ação; foco Centro com posição, coordenação e vizinhos (distância calculada a partir dos parâmetros tabelados).
+- Ver → Camadas: centros, célula, rede, vizinhos, elétrons, rótulos e indicações da propriedade, reutilizando os estados existentes.
+- Ver → Comparar: livre × cristalina, célula × rede, elétrons ocultos × visíveis, antes × depois da propriedade; cenas derivadas somente leitura; lado a lado no desktop, A/B no celular.
+- Indicador compacto da propriedade em estudo na linha da cena.
+- Continuidade entre módulos, Manual, Professor, reload e offline; schema científico inalterado (6); representação da exploração fora do estado científico.
+- Documentação: `docs/MODULO-EXPLORAR.md`, `docs/CONTRATO-EXPLORACAO.md`; tópico provisório no Manual.
+- Correção de origem 0.1.x: link direto para um tópico do Manual (`#/manual/<tópico>`) abre o tópico, e não o índice.
+
+## SILM 0.7.0 — Propriedades Metálicas
+
+- Elegibilidade por propriedade, calculada do banco por metal (experiência qualitativa, dado tabelado ou indisponível com motivo); cobertura por propriedade em `docs/COBERTURA-METAIS.md`.
+- Condutividade elétrica: campo elétrico qualitativo; sem campo, movimento não direcionado; com campo, deslocamento coletivo médio oposto ao campo, não uniforme.
+- Condutividade térmica: aquecer região e propagação qualitativa por etapas (anéis + vibração), sem fusão; rede e elétrons, não só elétrons.
+- Maleabilidade (compressão, lâmina) e ductilidade (tração, fio), distintas; brilho metálico (luz incidente e refletida, sem cor própria inventada).
+- Dados tabelados: contrato com valor, unidade, condição e fonte; σ = 1/ρ classificado como calculado; lacunas declaradas, sem valor típico (nesta versão, valores não homologados no banco).
+- Proveniência: `docs/FONTES-E-PROVENIENCIA.md` e `docs/CONTRATO-PROPRIEDADES.md`.
+- Estado das experiências no mesmo scientificState (schema 6), migração 5 → 6; Restaurar e Encerrar por experiência; resets gerais limpam as propriedades.
+- Persistência e reload da experiência; offline.
+- Acessibilidade: estado textual, níveis por quantidade de anéis, setas rotuladas, movimento reduzido, alto contraste e visão de cores.
+- Mobile: controles em Montagem → Propriedades; cena livre.
+- Limitações científicas declaradas por propriedade.
+
 ## SILM 0.6.0 — Modelo Eletrônico e Elétrons Deslocalizados
 
 - Novo scientificState (schema 5): `electrons` passa a ser um modelo formal (`delocalized-electron-model`, representação qualitativa) ligado ao metal e à estrutura; migração 4 → 5 sem perda de metal, investigação, estrutura e representação.

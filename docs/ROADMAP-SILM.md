@@ -11,9 +11,10 @@
 | 0.3.x | Estado científico e Laboratório Livre | concluída (0.3.0; homologação implícita no pedido da 0.4.x) |
 | 0.4.x | Formação e montagem da estrutura metálica | concluída (0.4.0, homologada pelo autor) |
 | 0.5.x | Estruturas cristalinas | 0.5.0 entregue |
-| **0.6.x** | **Elétrons deslocalizados** | **0.6.0 entregue** |
-| 0.7.x | Propriedades metálicas | prompt recebido |
-| 0.8.x – 0.18.x, 1.0.0-rc.x, 1.0.0 | ver abaixo | planejadas |
+| 0.6.x | Elétrons deslocalizados | 0.6.0 entregue |
+| 0.7.x | Propriedades metálicas | 0.7.0 entregue |
+| **0.8.x** | **Módulo Explorar** | **0.8.0 entregue** |
+| 0.9.x – 0.18.x, 1.0.0-rc.x, 1.0.0 | ver abaixo | planejadas |
 
 ---
 
@@ -46,6 +47,8 @@ Regra: não representar a ligação metálica prioritariamente como pares `M—M
 - 0.4.0 — montagem manual persistente e acessível, schema 3. Ver `SILM-0.4.0.md`.
 - 0.5.0 — estruturas cristalinas CCC/CFC/HC, célula, rede, vizinhança; schema 4; paridade de workspace com o SIAB 1.0.0 (correção de origem 0.1.x). Ver `SILM-0.5.0.md`.
 - 0.6.0 — modelo eletrônico qualitativo: elétrons de valência deslocalizados, movimento não direcional, mostrar/ocultar, movimento reduzido; schema 5. Ver `SILM-0.6.0.md`.
+- 0.7.0 — propriedades metálicas qualitativas (condutividade elétrica e térmica, maleabilidade, ductilidade, brilho), elegibilidade por propriedade; schema 6. Ver `SILM-0.7.0.md`.
+- 0.8.0 — módulo Explorar integrado: observação contextual, camadas, comparação qualitativa derivada; schema inalterado. Ver `SILM-0.8.0.md`.
 
 # SILM 0.5.x
 ## ESTRUTURAS CRISTALINAS

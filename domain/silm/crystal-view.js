@@ -3,7 +3,7 @@ window.SILM=window.SILM||{};
 /* Representação 2D/pseudo-3D da estrutura cristalina (0.5.x). Lê o estado científico; vista, camadas e
    seleção são gravadas pelas ações do domínio. Unidades são botões acessíveis; a rede extensa é um
    único grupo SVG decorativo. Sem linhas de ligação: o contorno da célula é geométrico e tracejado. */
-SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle='Explorar',note='',animateFrom=null,reducedMotion=()=>false,electrons:electronOptions=null})=>{
+SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle='Explorar',note='',animateFrom=null,reducedMotion=()=>false,electrons:electronOptions=null,properties:propertyOptions=null})=>{
  const U=SimCore.ExperienceUI,X=SILM.crystal,m=g.model,name=element.name.toLocaleLowerCase('pt-BR'),NS='http://www.w3.org/2000/svg';
  const structureName='Estrutura cristalina '+m.name+' de '+name;
  const root=U.element('section',null,'silm-assembly silm-crystal');root.dataset.editable='true';root.setAttribute('aria-labelledby','silm-assembly-title');
@@ -38,6 +38,12 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const electronLegend=U.element('p','Pontos ciano: elétrons de valência deslocalizados pela estrutura inteira, marcadores qualitativos (não indicam o número real de elétrons). Não pertencem a um átomo nem a pares de átomos.','silm-electron-legend');electronLegend.id='silm-electron-legend';electronLegend.hidden=true;
  const electronControls=electronOptions?SILM.createElectronControls(footer,{scope,state:()=>model.state,actions:electronOptions.actions,reducedMotion,canActivate:electronOptions.canActivate}):null;
  if(electronControls)footer.prepend(electronControls.root,electronLegend);
+ // 0.7.x: experiências de propriedades — sobreposição fora da estrutura e controles da propriedade ativa.
+ const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:units}),propertyHost=U.element('div',null,'silm-property-host');
+ footer.insertBefore(propertyHost,electronLegend.nextSibling);const propertyControls=propertyOptions?.controls?.(propertyHost,scope)||null;
+ let deform=null,heatTimer=false;const D=c=>deform?deform(c):c;
+ function scheduleHeat(){const pr=model.state.properties;if(heatTimer||!propertyOptions?.advanceHeat||pr?.active!=='thermal'||!pr.thermal.heating||pr.thermal.stage>=P.limits.heatStages||reducedMotion())return;
+  heatTimer=true;scope.timeout(()=>{heatTimer=false;if(document.hidden){scheduleHeat();return;}propertyOptions.advanceHeat();},900);}
 
  const nodes=new Map(),say=(text,{announce=true}={})=>{feedback.textContent=text;if(announce)SimCore.notifications.announce(text);};
  let focusId=null,frame=0,layout=null;
@@ -46,13 +52,13 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const shortRole={corner:'V',face:'F',body:'C','base-vertex':'A','base-center':'A',interior:'B',outside:''};
  function computeLayout(extra=[]){
   // Com vizinhos visíveis, os vizinhos fora da célula também entram no enquadramento (todos ficam inteiros na cena).
-  const list=unitsList(),fit=[...g.cell.map(s=>s.cart),...list.map(u=>g.site(u.site).cart),...extra];
+  const list=unitsList(),fit=[...g.cell.map(s=>s.cart),...list.map(u=>g.site(u.site).cart),...extra].map(D);
   layout=X.layout(g,fit,{margin:rep().view==='lattice'?.3:.12});
   // Esferas reduzidas: diâmetro ≈ 30% da distância entre vizinhos (projetada), para que a geometria fique visível.
   const d=g.neighbors(g.cell[0]).distances[0];return Math.min(.11,Math.max(.045,d*layout.scale*.3));
  }
  const svgEl=(tag,attrs)=>{const el=document.createElementNS(NS,tag);for(const [k,v]of Object.entries(attrs))el.setAttribute(k,String(v));return el;};
- const pt=p=>{const q=layout.project(p);return {x:q.x*100,y:q.y*100,depth:q.depth};};
+ const pt=p=>{const q=layout.project(D(p));return {x:q.x*100,y:q.y*100,depth:q.depth};};
  function drawCell(){
   cellLayer.replaceChildren();planeLayer.replaceChildren();if(!rep().unitCell)return;
   for(const [a,b]of g.edges()){const p=pt(a),q=pt(b);cellLayer.append(svgEl('line',{x1:p.x,y1:p.y,x2:q.x,y2:q.y,'data-back':String((p.depth+q.depth)/2>.55)}));}
@@ -70,14 +76,14 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   node.append(core,tag);units.append(node);return node;
  }
  function render(){
-  const s=st();if(!s||s.mode!=='crystalline')return;const r=rep(),list=s.units;
+  const s=st();if(!s||s.mode!=='crystalline')return;const r=rep(),list=s.units,pr=model.state.properties,active=pr?.active||null;deform=P.deformer(model.state,g);
   root.dataset.view=r.view;root.dataset.labels=String(r.labels);root.dataset.cell=String(r.unitCell);
   for(const [id,node]of nodes)if(!list.some(u=>u.id===id)){node.remove();nodes.delete(id);}
   const selected=r.selectedUnitId,neighbors=r.neighbors&&selected?g.neighbors(list.find(u=>u.id===selected).site):null,neighborKeys=new Set(neighbors?.list.map(x=>x.key)||[]);
   const radius=computeLayout(neighbors?neighbors.list.map(n=>n.cart):[]);stage.style.setProperty('--unit-size',(radius*100).toFixed(3)+'%');
   list.forEach((u,i)=>{
    let node=nodes.get(u.id);if(!node){node=createNode(u);nodes.set(u.id,node);}
-   const p=layout.project(g.site(u.site).cart),info=g.role(u.site);
+   const p=layout.project(D(g.site(u.site).cart)),info=g.role(u.site);
    if(!node.dataset.animating){node.style.left=(p.x*100)+'%';node.style.top=(p.y*100)+'%';}
    node.style.zIndex=String(10+Math.round((1-p.depth)*100));node.style.setProperty('--depth-scale',(1.08-.16*p.depth).toFixed(3));node.style.setProperty('--depth-fade',(1-.22*p.depth).toFixed(3));
    node.dataset.role=info.role;node.dataset.layer=info.layer||'';node.dataset.placement=u.placement;node.querySelector('.silm-site-label').textContent=shortRole[info.role]||'';
@@ -90,13 +96,25 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   ghostLayer.replaceChildren();
   if(neighbors){const occupied=new Set(list.map(u=>X.key(u.site)));for(const n of neighbors.list)if(!occupied.has(n.key)){const p=pt(n.cart);ghostLayer.append(svgEl('circle',{cx:p.x,cy:p.y,r:radius*50*(1.08-.16*p.depth)}));}}
   const el=model.state.electrons,shownElectrons=!!el?.representation.visible,moving=shownElectrons&&el.representation.motion&&!reducedMotion();
-  const centres=list.map(u=>layout.project(g.site(u.site).cart));
-  if(r.view==='lattice'){const occupied=new Set(list.map(u=>X.key(u.site)));for(const site of g.lattice())if(!occupied.has(site.key)){const q=layout.project(site.cart);if(q.x>-.05&&q.x<1.05&&q.y>-.05&&q.y<1.05)centres.push(q);}}
-  electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,centers:centres,spacing:g.neighbors(g.cell[0]).distances[0]*layout.scale,connect:false});
+  const centres=list.map(u=>layout.project(D(g.site(u.site).cart)));
+  if(r.view==='lattice'){const occupied=new Set(list.map(u=>X.key(u.site)));for(const site of g.lattice())if(!occupied.has(site.key)){const q=layout.project(D(site.cart));if(q.x>-.05&&q.x<1.05&&q.y>-.05&&q.y<1.05)centres.push(q);}}
+  const spacing=g.neighbors(g.cell[0]).distances[0]*layout.scale,fieldOn=active==='electrical'&&pr.electrical.field;
+  electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:centres,spacing,connect:false});
+  // Condução térmica: níveis 0–4 por unidade (anel e vibração), propagados a partir da região aquecida.
+  const heated=active==='thermal'&&(pr.thermal.heating||pr.thermal.stage>0),levels=heated?P.heat(centres.slice(0,list.length),spacing,pr.thermal.stage):[];
+  let light=null;const lit=new Set();
+  if(active==='luster'&&pr.luster.light){const zs=list.map(u=>g.site(u.site).cart[2]),top=Math.max(...zs);list.forEach((u,i)=>{if(zs[i]>=top-.05)lit.add(u.id);});
+   const tops=list.map((u,i)=>[u,centres[i]]).filter(([u])=>lit.has(u.id)).map(([,c])=>c);light={x:tops.reduce((a,c)=>a+c.x,0)/tops.length*100,y:tops.reduce((a,c)=>a+c.y,0)/tops.length*100};}   // centro da face superior
+  list.forEach((u,i)=>{const node=nodes.get(u.id);if(heated){node.dataset.heat=String(levels[i]);node.setAttribute('aria-label',node.getAttribute('aria-label')+', energia térmica '+P.heatWord(levels[i]));}else delete node.dataset.heat;
+   if(lit.has(u.id))node.dataset.lit='';else delete node.dataset.lit;});
+  overlay.update({field:fieldOn,force:active==='malleability'?'compress':active==='ductility'?'stretch':null,level:active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0,heat:active==='thermal'&&pr.thermal.heating,light});
+  root.dataset.property=active||'';propertyControls?.update();scheduleHeat();
+  const narrative=active?P.narrative(active,pr[active],{reduced:reducedMotion(),electronsVisible:shownElectrons}):null;
   root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;electronControls?.update();
   const inCell=list.filter(u=>g.cellKeys.has(X.key(u.site))).length,added=list.filter(u=>u.placement==='crystallographic').length;
-  meta.textContent=m.code+' · '+m.name+' · '+list.length+' unidades'+(added?' ('+added+' completadas pelo SILM)':'');
-  stage.setAttribute('aria-label',structureName+'. '+(r.view==='lattice'?'Vista da rede extensa':'Vista da célula')+'; célula unitária '+(r.unitCell?'visível':'oculta')+'. '+inCell+' unidades na célula desenhada.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica; '+(moving?'movimento visual ativo.':'representação estática.'):''));
+  // Indicador compacto (0.8.x): estrutura e, quando houver, a propriedade em estudo.
+  meta.textContent=m.code+' · '+m.name+' · '+list.length+' unidades'+(added?' ('+added+' completadas pelo SILM)':'')+(active?' · '+P.catalog[active].title+' em estudo':'');
+  stage.setAttribute('aria-label',structureName+'. '+(r.view==='lattice'?'Vista da rede extensa':'Vista da célula')+'; célula unitária '+(r.unitCell?'visível':'oculta')+'. '+inCell+' unidades na célula desenhada.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica; '+(moving?'movimento visual ativo.':'representação estática.'):'')+(narrative&&JSON.stringify(pr[active])!==JSON.stringify(P.defaults[active])?' '+P.catalog[active].title+': '+narrative.action+' '+narrative.observation:''));
   cellStatus.textContent='Célula unitária '+(r.unitCell?'visível':'oculta');
   cellView.setAttribute('aria-pressed',String(r.view==='cell'));latticeView.setAttribute('aria-pressed',String(r.view==='lattice'));
   neighborsButton.setAttribute('aria-pressed',String(r.neighbors));neighborsButton.textContent=r.neighbors?'Ocultar vizinhos':'Mostrar vizinhos';
