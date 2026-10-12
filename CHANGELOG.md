@@ -1,5 +1,47 @@
 # Registro de alterações
 
+## SILM 0.6.0 — Modelo Eletrônico e Elétrons Deslocalizados
+
+- Novo scientificState (schema 5): `electrons` passa a ser um modelo formal (`delocalized-electron-model`, representação qualitativa) ligado ao metal e à estrutura; migração 4 → 5 sem perda de metal, investigação, estrutura e representação.
+- Modelo eletrônico: centros metálicos positivos envolvidos por elétrons de valência deslocalizados pela estrutura inteira; sem pares M—M e sem pares eletrônicos localizados.
+- Valência: origem conceitual na convenção de valência e na configuração do átomo neutro registradas no banco, com fonte; sem contagem por grupo nem contagem visual literal.
+- Transição átomo isolado → estrutura: esquema em Ver e transição curta ao adicionar unidade; não é ionização em fase gasosa.
+- Partículas qualitativas num canvas único (24 a 150 marcadores; até 80 em telas pequenas), sobre montagem livre, célula e rede extensa; o contorno da célula não é parede.
+- Movimento por passeio aleatório isotrópico: sem direção predominante, sem órbitas, sem setas e sem corrente; pausa com a aba oculta.
+- Mostrar/Ocultar elétrons e Movimento eletrônico (alternância); ocultar não apaga o modelo.
+- Movimento reduzido (do sistema ou do SILM): representação estática equivalente.
+- Persistência e reload da configuração; as posições dos marcadores não são estado.
+- Acessibilidade: marcadores fora da ordem de tabulação, estado legível, contorno de contraste, alto contraste e visão de cores verificados.
+- Mobile: densidade reduzida em telas pequenas; em telas largas, as informações da cena ficam numa coluna lateral e a cena ganha altura.
+- Documentação das limitações (`docs/LIMITACOES-MODELO-ELETRONICO.md`) e do modelo (`docs/MODELO-ELETRONICO.md`); tópico "Elétrons deslocalizados" no Manual.
+
+## SILM 0.5.0 — Estruturas Cristalinas e Rede Metálica
+
+- Evolução do scientificState: schema 4, modelo da estrutura 2 (`mode` livre/cristalino, `crystallography`); migração 3 → 4 preservando a montagem livre.
+- CCC/BCC, CFC/FCC e HC/HCP a partir do banco: sítios expandidos pelas operações de simetria registradas e conferidos com o modelo; 34 metais com visualização.
+- Organização cristalográfica (Organizar estrutura): reaproveita as unidades, completa a célula com unidades marcadas como completadas pelo SILM e guarda a montagem livre para o retorno.
+- Célula unitária (mostrar/ocultar), rede extensa (vista Rede, SVG único esmaecido), vizinhança e coordenação (8, 12, 12) sem linhas de ligação.
+- Elegibilidade cristalográfica separada da investigação, com motivos `REFERENCE_STRUCTURE_MISSING`, `CRYSTAL_STRUCTURE_UNSUPPORTED`, `REFERENCE_CONDITION_UNSUPPORTED` e `DATA_CONFLICT`; cobertura por metal gerada (`docs/COBERTURA-METAIS.md`).
+- Persistência da representação (vista, célula, vizinhos, rótulos, seleção), reload e offline; acessibilidade (nome da estrutura, estado da célula, contagem de vizinhos, destaque não só por cor); mobile e redução de movimento.
+- **Correção de origem 0.1.x — paridade de família com o SIAB 1.0.0:** workspace Montagem (Resumo, Metal, Estrutura, Módulo), Ver (Observar) e Dados (Tabela, Histórico, Relatório); Histórico cronológico da investigação. Núcleo: fontes opcionais do painel direito (`workspace.js`, `domain.js`).
+- Testes reorganizados: kit compartilhado, uma suíte por série e executor único que roda as séries anteriores como regressão; relatório e entrega gerados por script.
+
+## SILM 0.4.0 — Formação e Montagem da Estrutura Metálica
+
+- scientificState schema 3: `structure` passa a aceitar a montagem metálica formal (`metallic-assembly`, modelo 1); migração segura schema 2 → 3, sem montagem automática.
+- Estrutura metálica como objeto científico persistente: Iniciar montagem cria a estrutura vazia; unidades do metal ativo, com IDs estáveis e posições normalizadas da cena (sem pixels, sem ångström).
+- Montagem manual: + Adicionar unidade (sempre do metal da investigação), seleção única, movimentação por arrasto (Pointer Events), por toque ou clique no destino e por setas do teclado.
+- Assistência de posicionamento (mecanismo de interface) e prevenção de sobreposição; sem rede CCC/CFC/HC, sem linhas M—M, sem elétrons.
+- Formação coletiva: uma única montagem com destaque coletivo por região.
+- Desfazer adição e movimento (30 ações, não persistido), Limpar estrutura com confirmação, reset e encerramento integrados.
+- Persistência e retomada após reload, troca de tela, troca de módulo e offline.
+- Integração mobile (cena dominante, alvos de toque, painéis da Base), acessibilidade (nomes "Unidade de cobre 3 de 5", anúncios, foco, alto contraste, movimento reduzido).
+- Medir e Calcular mostram a montagem sem editá-la; mensagens contextuais sem ferramentas falsas.
+- Painel Informações separa "Representação didática" (montagem) de "Dado tabelado" (estrutura de referência) e informa que a montagem ainda não representa a geometria cristalográfica.
+- Convenções do SIAB 1.0.0 na montagem: ↶ Desfazer com descrição, "+" na ação principal, "?" de ajuda, rótulo MÓDULO · EXPLORAR. Comparação completa em `docs/PARIDADE-SIAB-1.0.0.md`.
+- **Correção de origem 0.3.x — retomada:** o Laboratório Livre é retomado diretamente, sem o diálogo "Retomar sessão?" a cada abertura ou recarga. A Base recebe a opção de domínio `session.resumeFree: 'direct'` (`js/experience/activity.js`); atividades continuam perguntando.
+- Validador do estado com 45 estados inválidos, regressão do banco (`tests/scientific-data.cjs`) e suíte Playwright 0.4.0. Documentação: `SILM-0.4.0.md`, `MONTAGEM-ESTRUTURA-METALICA.md`, `SCIENTIFIC-STATE.md` (schema 3) e reconstrução dos documentos ausentes do pacote 0.3.0.
+
 ## SILM 0.3.0 — Estado Científico e Laboratório Livre
 
 - Estado científico formal schema 2, com investigação de um metal, ID, status, datas e módulo ativo; dados tabelados continuam no banco local.

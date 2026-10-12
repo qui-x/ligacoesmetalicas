@@ -1,21 +1,21 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.3.0",
+  "versao": "0.6.0",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.2.4",
-  "scientificSchemaVersion": 2,
+  "scientificSchemaVersion": 5,
   "origens": [
     {
-      "arquivo": "SILM-0.2.1.zip",
-      "papel": "origem executável congelada da série 0.3.x",
-      "sha512": "379a2ff397603fd7f915006cdc24053f68d149e6066ba4663a5b31f1fcf30d1885a9177f660bdd36e1b96e71012e90f44e0334f35e17fc813a55144dddf9a992",
+      "arquivo": "SILM-0.5.0.zip",
+      "papel": "origem executável da série 0.6.x",
+      "sha512": "e55d962314bd39be18b0ae4f76d6ee8a57a07739015076332a99ee8738d4fcf6b59ffebbb0cdbdc52c9b85c52019959f8f85654eeaf0923fca11ec0cf5cedc10",
       "verificado": true
     },
     {
-      "arquivo": "SILM-0.1.1.zip",
-      "papel": "origem executável congelada indicada pelo prompt 0.2.x",
-      "sha512": "f65dcdbe2fb86ce399559d310485e48df63a4200af7619cdf47889820e2e8081007d4908998aa2e100482c7b8737cdc584933cb079467e2cbbf8724e0255d7d4",
+      "arquivo": "SILM-0.4.0.zip",
+      "papel": "origem executável da série 0.5.x (0.4.0 homologada pelo autor)",
+      "sha512": "058bc8642b93b4b8169abb88dcec9fbe0376866931d05e262e6753d73b0a1f755b4cb9658388a9795165f635c4ae181b5c0c95e6ec87d583cd395446939aa8cd",
       "verificado": true
     },
     {
@@ -35,10 +35,18 @@
       "papel": "referência SILM 0.1.0 e doadora de identidade",
       "sha512": "cf342341ce938d8370d4000907a6b833fef745f4e80f5064963aeea34ba09c740dac1a997ab87f7e798367a9c542d0cd295d5272144da3823ec9cb8a710a021a",
       "verificado": true
+    },
+    {
+      "arquivo": "qui-x/acidobase@f07047a",
+      "papel": "SIAB 1.0.0 congelada: referência comportamental da família, somente leitura",
+      "sha512": null,
+      "verificado": true
     }
   ],
-  "observacaoOrigem": "BASE-ESTRUTURAL(7).zip é byte a byte a Base citada como BASE-ESTRUTURAL(6).zip no prompt: SHA-512 idêntico.",
-  "status": "SILM 0.3.0: estado científico formal e investigação persistente. Relatório de homologação em docs/RELATORIO-BUILD-TESTES-0.3.0.md.",
+  "observacaoOrigem": "Origem: entregas/SILM-0.5.0.zip deste repositório, verificado pelo SHA-512 externo.",
+  "status": "SILM 0.6.0: modelo eletrônico qualitativo de elétrons de valência deslocalizados; schema 5. Relatório em docs/RELATORIO-BUILD-TESTES-0.6.0.md.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
-  "dataBuild": "2026-10-11"
+  "dataBuild": "2026-10-11",
+  "structureModelVersion": 2,
+  "electronModelVersion": 1
 }

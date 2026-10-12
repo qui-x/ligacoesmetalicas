@@ -37,6 +37,8 @@
 .silm-assembly-kind::before{content:'◇ ';color:var(--accent)}
 .silm-assembly-help{flex:1 1 280px;margin:0}
 /* Altura reservada: mensagens não alteram o tamanho da cena. */
+/* Motivo de indisponibilidade cristalográfica: texto visível, não apenas dica. */
+.silm-assembly-reason{flex-basis:100%;margin:0;color:var(--text);font-size:.8rem}
 .silm-assembly-feedback{flex-basis:100%;height:2.7em;margin:0;overflow:hidden;line-height:1.35;color:var(--text);font-weight:600;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
 [aria-disabled=true].primary-btn,[aria-disabled=true].secondary-btn,[aria-disabled=true].danger-btn{opacity:.5;cursor:not-allowed;filter:none}
 /* Painéis: controles contextuais da montagem. */
@@ -54,7 +56,7 @@
 .silm-structure-summary .silm-limitation{margin-top:10px}
 .silm-panel-note{font-size:.85rem}
 /* Celular: barra e rodapé compactos para a cena dominar a área central. Ajuda completa no Manual; aviso cristalográfico em Informações. */
-@media(max-width:600px){.silm-assembly-eyebrow{display:none}.silm-assembly{gap:6px}.silm-assembly-bar{padding:6px 8px;gap:6px}.silm-assembly-symbol{display:none}.silm-assembly-identity h1{font-size:1rem}.silm-assembly-meta{font-size:.78rem}.silm-assembly-tools{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:6px}.silm-assembly-tools button{padding-inline:6px}.silm-assembly-help,.silm-assembly-kind{display:none}.silm-assembly-footer{font-size:.75rem;gap:2px 8px}.silm-assembly-area{min-height:200px}}
+@media(max-width:600px){.silm-assembly-eyebrow{display:none}.silm-assembly{gap:6px}.silm-assembly-bar{padding:6px 8px;gap:6px}.silm-assembly-symbol{display:none}.silm-assembly-identity h1{font-size:1rem}.silm-assembly-meta{font-size:.78rem}.silm-assembly-tools{width:100%;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px}.silm-assembly-tools button{font-size:.78rem;padding:4px 6px;line-height:1.2}.silm-assembly-tools button{padding-inline:6px}.silm-assembly-help,.silm-assembly-kind{display:none}.silm-assembly-footer{font-size:.75rem;gap:2px 8px}.silm-assembly-area{min-height:200px}}
 @media(max-height:500px) and (orientation:landscape){.silm-assembly{flex-direction:row;flex-wrap:wrap}.silm-assembly-bar{flex:1 1 220px;flex-direction:column;align-items:stretch}.silm-assembly-area{flex:1 1 200px;min-height:160px}.silm-assembly-footer{flex-basis:100%}.silm-assembly-help{display:none}}
 :root[data-motion=on] .silm-unit{transition:none}
 @media(prefers-reduced-motion:reduce){.silm-unit{transition:none}}
@@ -62,3 +64,80 @@
 :root[data-contrast=on] .silm-assembly-collective g{fill:#fff;opacity:.22}
 :root[data-contrast=on] .silm-unit[aria-pressed=true] .silm-unit-core{outline-width:4px}
 @media(forced-colors:active){.silm-unit-core{background:Canvas;border:2px solid CanvasText;color:CanvasText;forced-color-adjust:none}.silm-unit[aria-pressed=true] .silm-unit-core{outline:4px solid Highlight}.silm-unit[aria-pressed=true]::after{border-color:Highlight}.silm-assembly-collective g{fill:CanvasText;opacity:.15}}
+/* Estrutura cristalina (0.5.x): esferas reduzidas, profundidade por escala e ordem; contorno geométrico tracejado. */
+.silm-crystal-stage{--unit-size:10%}
+.silm-crystal-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.silm-lattice circle{fill:var(--silm-bronze)}
+.silm-cell-edges line{stroke:var(--scientific-accent);stroke-width:.45;stroke-dasharray:1.6 1.1;opacity:.85;vector-effect:non-scaling-stroke}
+.silm-cell-edges line[data-back=true]{opacity:.4}
+.silm-cell-planes polygon{fill:var(--scientific-accent);opacity:.07;stroke:none}
+.silm-neighbor-ghosts circle{fill:none;stroke:var(--scientific-accent);stroke-width:.5;stroke-dasharray:1 .8}
+.silm-crystal-unit{width:var(--unit-size);height:var(--unit-size);transform:translate(-50%,-50%) scale(var(--depth-scale,1));opacity:var(--depth-fade,1);cursor:pointer}
+.silm-crystal-unit .silm-unit-core{position:relative;width:100%;height:100%;font-size:max(9px,calc(var(--stage)*.028))}
+.silm-crystal-unit[aria-pressed=true],.silm-crystal-unit[data-neighbor]{opacity:1}
+.silm-crystal-unit[data-layer=B] .silm-unit-core::after{content:'';position:absolute;inset:16%;border:1.5px dashed #2a2016;border-radius:50%}
+.silm-crystal-unit[data-placement=crystallographic] .silm-unit-core{filter:saturate(.7) brightness(.96)}
+/* Vizinho imediato: anel pontilhado externo + contorno, sem depender só de cor. */
+.silm-crystal-unit[data-neighbor]::before{content:'';position:absolute;inset:-14%;border:2px dotted var(--scientific-accent);border-radius:50%;pointer-events:none}
+.silm-crystal-unit[data-neighbor] .silm-unit-core{outline:2px solid var(--scientific-accent);outline-offset:1px}
+.silm-site-label{display:none;position:absolute;right:-6%;bottom:-6%;min-width:1.4em;padding:0 .25em;border-radius:6px;background:var(--panel);border:1px solid var(--border);color:var(--text);font-size:max(9px,calc(var(--stage)*.022));font-weight:800;line-height:1.35;text-align:center}
+.silm-crystal[data-labels=true] .silm-site-label:not(:empty){display:block}
+.silm-crystal[data-organizing] .silm-crystal-unit{transition:left 450ms ease-in-out,top 450ms ease-in-out,opacity 450ms ease,transform 450ms ease}
+.silm-crystal-unit[data-appearing]{opacity:0;transform:translate(-50%,-50%) scale(.5)}
+.silm-segmented{display:inline-flex;gap:0}
+.silm-segmented button{border-radius:0}
+.silm-segmented button:first-child{border-radius:var(--radius) 0 0 var(--radius)}
+.silm-segmented button:last-child{border-radius:0 var(--radius) var(--radius) 0;margin-left:-1px}
+.silm-segmented button[aria-pressed=true],.silm-crystal-tools [aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 -3px var(--accent);font-weight:700}
+.silm-crystal-legend{flex:1 1 280px;margin:0}
+.silm-crystal-facts dd{overflow-wrap:anywhere}
+.silm-kind-tag{display:inline-block;margin-top:2px;padding:1px 6px;border:1px solid var(--border);border-radius:999px;font-size:.72rem;color:var(--secondary)}
+.silm-history{margin:8px 0 0;padding-left:1.4em;font-size:.88rem}
+.silm-history li+li{margin-top:4px}
+.silm-history time{color:var(--secondary);font-variant-numeric:tabular-nums;margin-right:6px}
+:root[data-motion=on] .silm-crystal[data-organizing] .silm-crystal-unit{transition:none}
+@media(prefers-reduced-motion:reduce){.silm-crystal[data-organizing] .silm-crystal-unit{transition:none}}
+:root[data-contrast=on] .silm-lattice circle{fill:#fff}
+:root[data-contrast=on] .silm-cell-edges line{stroke:#ff0;opacity:1}
+:root[data-contrast=on] .silm-crystal-unit[data-layer=B] .silm-unit-core::after{border-color:#fff}
+@media(forced-colors:active){.silm-lattice circle{fill:CanvasText}.silm-cell-edges line,.silm-neighbor-ghosts circle{stroke:LinkText}.silm-crystal-unit[data-neighbor]::before{border-color:Highlight}}
+@media(max-width:600px){.silm-crystal-legend{display:none}.silm-crystal-tools{grid-template-columns:1fr 1fr}.silm-segmented{width:100%}.silm-segmented button{flex:1}}
+/* 0.6.x — elétrons de valência deslocalizados: marcadores qualitativos (ciano com contorno de contraste). */
+:root{--silm-electron:#5fe3ff;--silm-electron-edge:#06202a}
+:root[data-theme=light]{--silm-electron:#007f9e;--silm-electron-edge:#ffffff}
+:root[data-contrast=on]{--silm-electron:#00ffff;--silm-electron-edge:#000000}
+.silm-electron-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.silm-assembly[data-electrons=visible] .silm-unit-core{box-shadow:inset 0 0 0 2px rgba(255,236,190,.38),0 1px 3px rgba(0,0,0,.35)}
+.silm-electron-bar{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.silm-electron-bar button{padding:4px 10px;font-size:.82rem}
+.silm-electron-bar button[aria-pressed=true]{border-color:var(--scientific-accent);box-shadow:inset 0 -3px 0 var(--scientific-accent)}
+.silm-electron-status{font-size:.8rem;color:var(--secondary)}
+.silm-electron-legend{flex-basis:100%;margin:0;font-size:.78rem;color:var(--secondary)}
+.silm-electron-legend::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--silm-electron);border:1.5px solid var(--silm-electron-edge);vertical-align:middle}
+.silm-electron-summary{margin-top:14px;padding-top:12px;border-top:1px solid var(--silm-soft-border)}
+.silm-electron-principle{font-weight:600}
+.silm-electron-diagram{display:block;width:100%;max-width:320px;height:auto;margin:8px 0}
+.silm-diagram-center{fill:var(--silm-bronze);stroke:var(--text);stroke-width:1}
+.silm-diagram-electron{fill:var(--silm-electron);stroke:var(--silm-electron-edge);stroke-width:1}
+.silm-diagram-arrow{fill:none;stroke:var(--secondary);stroke-width:2}
+.silm-diagram-label{font-size:10px;fill:var(--secondary)}
+.silm-inline-link{display:inline-block;margin-top:6px}
+@media(max-width:600px){.silm-electron-legend{display:none}.silm-electron-bar{gap:4px 6px}.silm-electron-bar button{font-size:.75rem;padding:3px 8px}.silm-electron-status{font-size:.72rem}}
+@media(max-height:500px) and (orientation:landscape){.silm-electron-legend{display:none}}
+@media(forced-colors:active){:root{--silm-electron:CanvasText;--silm-electron-edge:Canvas}.silm-electron-bar button[aria-pressed=true]{outline:2px solid Highlight}}
+/* Contêiner largo: informações ao lado da cena; a cena usa toda a altura disponível. */
+.silm-laboratory{container-type:inline-size}
+@container (min-width:900px){
+ .silm-assembly{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);grid-template-rows:auto minmax(0,1fr);column-gap:16px;row-gap:8px}
+ .silm-assembly-bar{grid-column:1/-1}
+ .silm-assembly-area{grid-column:1;grid-row:2}
+ .silm-assembly-footer{grid-column:2;grid-row:2;flex-direction:column;flex-wrap:nowrap;align-items:flex-start;align-self:start;max-height:100%;overflow:auto;gap:8px}
+ .silm-assembly-footer>*{flex:none;max-width:100%}
+}
+@media(max-width:600px){.silm-electron-status{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}}
+@media(max-width:600px){
+ .silm-electron-bar{flex-basis:auto;gap:4px}
+ .silm-electron-bar[data-visible=false] #silm-electrons-motion,.silm-electron-bar[data-visible=false] .ajuda-link{display:none}
+ .silm-electron-bar button{font-size:.72rem;padding:3px 7px}
+ .silm-electron-bar .ajuda-link{width:24px;height:24px;font-size:.75rem}
+}

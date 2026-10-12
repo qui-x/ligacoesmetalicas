@@ -1,0 +1,620 @@
+{
+  "product": "SILM",
+  "version": "0.5.0",
+  "date": "2026-10-11T23:51:24.901Z",
+  "browser": "Chromium (Playwright 1.62.1)",
+  "passed": 55,
+  "failed": 0,
+  "results": [
+    {
+      "id": "0.4-122",
+      "name": "Migração schema 2 (0.3.0) → schema 3",
+      "status": "PASS",
+      "details": {
+        "from": 2,
+        "to": 3,
+        "structure": null,
+        "investigationPreserved": true
+      },
+      "durationMs": 1210
+    },
+    {
+      "id": "0.4-123",
+      "name": "Iniciar montagem cria estrutura vazia",
+      "status": "PASS",
+      "details": {
+        "status": "empty",
+        "focus": "silm-assembly-add"
+      },
+      "durationMs": 815
+    },
+    {
+      "id": "0.4-124",
+      "name": "Adicionar 1, 2, 5 e 10 unidades",
+      "status": "PASS",
+      "details": {
+        "counts": [
+          1,
+          2,
+          5,
+          10
+        ],
+        "uniqueIds": true,
+        "noLines": true,
+        "noElectrons": true
+      },
+      "durationMs": 1474
+    },
+    {
+      "id": "0.4-125",
+      "name": "Movimentar unidade no desktop (arrasto por Pointer Events)",
+      "status": "PASS",
+      "details": {
+        "dragged": {
+          "x": 0.1504,
+          "y": 0.1504
+        },
+        "clickDestination": {
+          "x": 0.2,
+          "y": 0.8
+        }
+      },
+      "durationMs": 1880
+    },
+    {
+      "id": "0.4-126",
+      "name": "Mobile: selecionar e tocar no destino, sem arrasto",
+      "status": "PASS",
+      "details": {
+        "moved": {
+          "x": 0.1514,
+          "y": 0.1492
+        },
+        "touchTarget": "35px"
+      },
+      "durationMs": 1027
+    },
+    {
+      "id": "0.4-127",
+      "name": "Teclado: selecionar e reposicionar com setas",
+      "status": "PASS",
+      "details": {
+        "step": 0.02,
+        "fineStep": 0.005,
+        "undoMergesKeyboardGesture": true,
+        "globalArrowsIntercepted": false
+      },
+      "durationMs": 1277
+    },
+    {
+      "id": "0.4-128",
+      "name": "Prevenção de sobreposição",
+      "status": "PASS",
+      "details": {
+        "assisted": "ajuste discreto",
+        "free": "recusa com feedback"
+      },
+      "durationMs": 2013
+    },
+    {
+      "id": "0.4-129",
+      "name": "Desfazer adição",
+      "status": "PASS",
+      "details": {
+        "after": 3
+      },
+      "durationMs": 984
+    },
+    {
+      "id": "0.4-130",
+      "name": "Desfazer movimento",
+      "status": "PASS",
+      "details": {
+        "restored": {
+          "x": 0.5,
+          "y": 0.5
+        }
+      },
+      "durationMs": 1158
+    },
+    {
+      "id": "0.4-131",
+      "name": "Limpar estrutura com 10 unidades mantém o metal",
+      "status": "PASS",
+      "details": {
+        "structure": null,
+        "metal": "Cu"
+      },
+      "durationMs": 1629
+    },
+    {
+      "id": "0.4-132",
+      "name": "Cancelar limpeza preserva a estrutura",
+      "status": "PASS",
+      "details": {
+        "units": 4
+      },
+      "durationMs": 1355
+    },
+    {
+      "id": "0.4-133",
+      "name": "Reset remove a estrutura e preserva o metal",
+      "status": "PASS",
+      "details": {
+        "structure": null,
+        "metal": "Cu"
+      },
+      "durationMs": 1307
+    },
+    {
+      "id": "0.4-134",
+      "name": "Encerrar remove estrutura e investigação",
+      "status": "PASS",
+      "details": {
+        "returnedTo": "Tabela Periódica"
+      },
+      "durationMs": 1291
+    },
+    {
+      "id": "0.4-135",
+      "name": "Reload restaura montagem idêntica",
+      "status": "PASS",
+      "details": {
+        "units": 5,
+        "identical": true
+      },
+      "durationMs": 1899
+    },
+    {
+      "id": "0.4-135b",
+      "name": "Retomada direta: recarregar não exibe \"Retomar sessão?\" nem muda a tela",
+      "status": "PASS",
+      "details": {
+        "dialog": false,
+        "route": "inicio"
+      },
+      "durationMs": 2157
+    },
+    {
+      "id": "0.4-136",
+      "name": "Navegação Laboratório → Manual/Professor/Aprender → Laboratório",
+      "status": "PASS",
+      "details": {
+        "routes": [
+          "manual",
+          "professor",
+          "aprender",
+          "inicio"
+        ]
+      },
+      "durationMs": 3291
+    },
+    {
+      "id": "0.4-137",
+      "name": "Troca de módulo preserva a montagem",
+      "status": "PASS",
+      "details": {
+        "sequence": "Explorar → Medir → Calcular → Explorar"
+      },
+      "durationMs": 2470
+    },
+    {
+      "id": "0.4-138",
+      "name": "Troca de metal com estrutura exige confirmação",
+      "status": "PASS",
+      "details": {
+        "cancel": "Cu preservado",
+        "confirm": "Fe, structure = null"
+      },
+      "durationMs": 1553
+    },
+    {
+      "id": "0.4-139",
+      "name": "Offline: construir e persistir sem internet",
+      "status": "PASS",
+      "details": {
+        "metal": "Al",
+        "units": 4,
+        "offline": true
+      },
+      "durationMs": 3380
+    },
+    {
+      "id": "0.4-140-320",
+      "name": "Mobile 320 px",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 246,
+        "stageVisible": true,
+        "addVisible": true,
+        "unitsInside": true
+      },
+      "durationMs": 1196
+    },
+    {
+      "id": "0.4-140-360",
+      "name": "Mobile 360 px",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 276,
+        "stageVisible": true,
+        "addVisible": true,
+        "unitsInside": true
+      },
+      "durationMs": 1076
+    },
+    {
+      "id": "0.4-140-390",
+      "name": "Mobile 390 px",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 276,
+        "stageVisible": true,
+        "addVisible": true,
+        "unitsInside": true
+      },
+      "durationMs": 1274
+    },
+    {
+      "id": "0.4-141",
+      "name": "Landscape mobile",
+      "status": "PASS",
+      "details": {
+        "stage": 334,
+        "overflow": 0
+      },
+      "durationMs": 1075
+    },
+    {
+      "id": "0.4-142",
+      "name": "Texto em 150%",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "addHeight": 54,
+        "barInside": true
+      },
+      "durationMs": 1162
+    },
+    {
+      "id": "0.4-143",
+      "name": "Alto contraste: unidades e seleção distinguíveis",
+      "status": "PASS",
+      "details": {
+        "selectedOutline": "4px",
+        "otherOutline": "none",
+        "ring": "dashed",
+        "border": "rgb(255, 255, 255)"
+      },
+      "durationMs": 1059
+    },
+    {
+      "id": "0.4-144",
+      "name": "Movimento reduzido sem perda funcional",
+      "status": "PASS",
+      "details": {
+        "transition": "0s",
+        "resources": 34
+      },
+      "durationMs": 1228
+    },
+    {
+      "id": "0.4-147",
+      "name": "Regressão 0.2.x: Tabela, banco e Área do Professor",
+      "status": "PASS",
+      "details": {
+        "elements": 118,
+        "available": 43,
+        "teacher": "presentationSelection independente"
+      },
+      "durationMs": 31831
+    },
+    {
+      "id": "0.4-148",
+      "name": "Regressão 0.3.x: estado corrompido e scientificState único",
+      "status": "PASS",
+      "details": {
+        "recovered": true,
+        "keys": [
+          "simcore_domain_silm_v1_scientific.state"
+        ]
+      },
+      "durationMs": 1811
+    },
+    {
+      "id": "0.4-A11Y",
+      "name": "Acessibilidade automatizada (axe-core) da montagem",
+      "status": "PASS",
+      "details": {
+        "violations": 0,
+        "passes": 19,
+        "names": [
+          "Unidade de cobre 1 de 5",
+          "Unidade de cobre 2 de 5",
+          "Unidade de cobre 3 de 5",
+          "Unidade de cobre 4 de 5",
+          "Unidade de cobre 5 de 5"
+        ]
+      },
+      "durationMs": 2553
+    },
+    {
+      "id": "0.5-121",
+      "name": "Migração da 0.4.x (schema 3) sem perda da montagem",
+      "status": "PASS",
+      "details": {
+        "from": 3,
+        "mode": "free",
+        "units": 4
+      },
+      "durationMs": 1522
+    },
+    {
+      "id": "0.5-122",
+      "name": "Cu: montagem livre → Organizar estrutura → CFC do banco",
+      "status": "PASS",
+      "details": {
+        "structure": "CFC",
+        "units": 14,
+        "reused": 5,
+        "completed": 9
+      },
+      "durationMs": 2276
+    },
+    {
+      "id": "0.5-123",
+      "name": "Fe: estrutura definida pela referência registrada (não pelo símbolo)",
+      "status": "PASS",
+      "details": {
+        "structure": "CCC",
+        "condition": "298.0 K"
+      },
+      "durationMs": 1738
+    },
+    {
+      "id": "0.5-124",
+      "name": "Mg: HC quando corresponde ao registro homologado",
+      "status": "PASS",
+      "details": {
+        "structure": "HC",
+        "layers": {
+          "B": 3,
+          "A": 14
+        }
+      },
+      "durationMs": 1970
+    },
+    {
+      "id": "0.5-125",
+      "name": "Metal sem estrutura suportada (Mn): investigação e montagem seguem; motivo informado",
+      "status": "PASS",
+      "details": {
+        "metal": "Mn",
+        "reason": "CRYSTAL_STRUCTURE_UNSUPPORTED"
+      },
+      "durationMs": 1727
+    },
+    {
+      "id": "0.5-126",
+      "name": "Mostrar/ocultar célula repetidamente sem alterar o estado científico",
+      "status": "PASS",
+      "details": {
+        "toggles": 5,
+        "scienceChanged": false
+      },
+      "durationMs": 2221
+    },
+    {
+      "id": "0.5-127",
+      "name": "Alternar célula ↔ rede sem erro; rede extensa eficiente",
+      "status": "PASS",
+      "details": {
+        "lattice": 136,
+        "dom": 196
+      },
+      "durationMs": 2433
+    },
+    {
+      "id": "0.5-128",
+      "name": "Vizinhança: selecionar unidade e destacar vizinhos (sem ligações)",
+      "status": "PASS",
+      "details": {
+        "CFC": 12,
+        "CCC": 8,
+        "HC": 12
+      },
+      "durationMs": 6715
+    },
+    {
+      "id": "0.5-129",
+      "name": "Voltar à montagem livre: metal permanece e posições anteriores voltam",
+      "status": "PASS",
+      "details": {
+        "mode": "free",
+        "units": 5
+      },
+      "durationMs": 1556
+    },
+    {
+      "id": "0.5-130",
+      "name": "Retornar ao cristalino: estado volta corretamente",
+      "status": "PASS",
+      "details": {
+        "deterministic": true
+      },
+      "durationMs": 1664
+    },
+    {
+      "id": "0.5-131",
+      "name": "Reload restaura a estrutura cristalina e a representação",
+      "status": "PASS",
+      "details": {
+        "restored": true
+      },
+      "durationMs": 2632
+    },
+    {
+      "id": "0.5-132",
+      "name": "Limpar estrutura cristalina: structure = null, metal permanece",
+      "status": "PASS",
+      "details": {
+        "structure": null
+      },
+      "durationMs": 1413
+    },
+    {
+      "id": "0.5-133",
+      "name": "Troca de metal nunca reaproveita a estrutura anterior",
+      "status": "PASS",
+      "details": {
+        "metal": "Fe",
+        "structure": null
+      },
+      "durationMs": 1624
+    },
+    {
+      "id": "0.5-134",
+      "name": "Offline: organizar e restaurar a estrutura sem rede",
+      "status": "PASS",
+      "details": {
+        "metal": "Ag",
+        "structure": "CFC",
+        "offline": true
+      },
+      "durationMs": 3824
+    },
+    {
+      "id": "0.5-135-320",
+      "name": "Mobile/tablet 320",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 257,
+        "visible": true
+      },
+      "durationMs": 1869
+    },
+    {
+      "id": "0.5-135-360",
+      "name": "Mobile/tablet 360",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 277,
+        "visible": true
+      },
+      "durationMs": 1707
+    },
+    {
+      "id": "0.5-135-390",
+      "name": "Mobile/tablet 390",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 350,
+        "visible": true
+      },
+      "durationMs": 2344
+    },
+    {
+      "id": "0.5-135-landscape",
+      "name": "Mobile/tablet landscape",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 318,
+        "visible": true
+      },
+      "durationMs": 1963
+    },
+    {
+      "id": "0.5-135-tablet",
+      "name": "Mobile/tablet tablet",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 423,
+        "visible": true
+      },
+      "durationMs": 2055
+    },
+    {
+      "id": "0.5-136",
+      "name": "Texto em 150% não cobre a rede",
+      "status": "PASS",
+      "details": {
+        "stage": 251,
+        "overlap": false,
+        "overflow": 0
+      },
+      "durationMs": 2141
+    },
+    {
+      "id": "0.5-137",
+      "name": "Alto contraste: célula, unidades e vizinhos distinguíveis",
+      "status": "PASS",
+      "details": {
+        "edge": "rgb(255, 255, 0)",
+        "neighbor": "dotted",
+        "core": "2px"
+      },
+      "durationMs": 1737
+    },
+    {
+      "id": "0.5-138",
+      "name": "Movimento reduzido: organização instantânea e funcional",
+      "status": "PASS",
+      "details": {
+        "organizing": false,
+        "animating": 0,
+        "transition": "0s"
+      },
+      "durationMs": 1134
+    },
+    {
+      "id": "0.5-PAR",
+      "name": "Paridade SIAB: Montagem / Ver / Dados e Histórico",
+      "status": "PASS",
+      "details": {
+        "launchers": [
+          "Montagem",
+          "Ver",
+          "Dados"
+        ],
+        "history": 6
+      },
+      "durationMs": 3202
+    },
+    {
+      "id": "0.5-KBD",
+      "name": "Teclado na estrutura cristalina: percorrer, selecionar e soltar",
+      "status": "PASS",
+      "details": {
+        "ok": true
+      },
+      "durationMs": 1152
+    },
+    {
+      "id": "0.5-A11Y",
+      "name": "Acessibilidade automatizada (axe-core) da estrutura cristalina",
+      "status": "PASS",
+      "details": {
+        "violations": 0
+      },
+      "durationMs": 2644
+    },
+    {
+      "id": "CONSOLE",
+      "name": "Console sem erros críticos (todas as suítes)",
+      "status": "PASS",
+      "details": {
+        "errors": 0
+      },
+      "durationMs": 0
+    }
+  ],
+  "consoleErrors": []
+}

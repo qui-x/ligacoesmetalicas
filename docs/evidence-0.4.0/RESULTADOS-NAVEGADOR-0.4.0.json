@@ -1,7 +1,7 @@
 {
   "product": "SILM",
   "version": "0.4.0",
-  "date": "2026-10-11T14:42:31.278Z",
+  "date": "2026-10-11T18:42:29.968Z",
   "browser": "Chromium (Playwright 1.62.1)",
   "passed": 30,
   "failed": 0,
@@ -16,7 +16,7 @@
         "structure": null,
         "investigationPreserved": true
       },
-      "durationMs": 980
+      "durationMs": 2194
     },
     {
       "id": "123",
@@ -26,7 +26,7 @@
         "status": "empty",
         "focus": "silm-assembly-add"
       },
-      "durationMs": 798
+      "durationMs": 1181
     },
     {
       "id": "124",
@@ -43,7 +43,7 @@
         "noLines": true,
         "noElectrons": true
       },
-      "durationMs": 1244
+      "durationMs": 1709
     },
     {
       "id": "125",
@@ -59,7 +59,7 @@
           "y": 0.8
         }
       },
-      "durationMs": 1495
+      "durationMs": 2127
     },
     {
       "id": "126",
@@ -72,7 +72,7 @@
         },
         "touchTarget": "35px"
       },
-      "durationMs": 824
+      "durationMs": 1151
     },
     {
       "id": "127",
@@ -84,7 +84,7 @@
         "undoMergesKeyboardGesture": true,
         "globalArrowsIntercepted": false
       },
-      "durationMs": 844
+      "durationMs": 1026
     },
     {
       "id": "128",
@@ -94,7 +94,7 @@
         "assisted": "ajuste discreto",
         "free": "recusa com feedback"
       },
-      "durationMs": 1533
+      "durationMs": 1986
     },
     {
       "id": "129",
@@ -103,7 +103,7 @@
       "details": {
         "after": 3
       },
-      "durationMs": 757
+      "durationMs": 840
     },
     {
       "id": "130",
@@ -115,7 +115,7 @@
           "y": 0.5
         }
       },
-      "durationMs": 946
+      "durationMs": 951
     },
     {
       "id": "131",
@@ -125,7 +125,7 @@
         "structure": null,
         "metal": "Cu"
       },
-      "durationMs": 1253
+      "durationMs": 1606
     },
     {
       "id": "132",
@@ -134,7 +134,7 @@
       "details": {
         "units": 4
       },
-      "durationMs": 877
+      "durationMs": 925
     },
     {
       "id": "133",
@@ -144,7 +144,7 @@
         "structure": null,
         "metal": "Cu"
       },
-      "durationMs": 981
+      "durationMs": 1016
     },
     {
       "id": "134",
@@ -153,7 +153,7 @@
       "details": {
         "returnedTo": "Tabela Periódica"
       },
-      "durationMs": 974
+      "durationMs": 1020
     },
     {
       "id": "135",
@@ -163,7 +163,7 @@
         "units": 5,
         "identical": true
       },
-      "durationMs": 1677
+      "durationMs": 2034
     },
     {
       "id": "135b",
@@ -173,7 +173,7 @@
         "dialog": false,
         "route": "inicio"
       },
-      "durationMs": 1607
+      "durationMs": 1633
     },
     {
       "id": "136",
@@ -187,7 +187,7 @@
           "inicio"
         ]
       },
-      "durationMs": 2030
+      "durationMs": 2460
     },
     {
       "id": "137",
@@ -196,7 +196,7 @@
       "details": {
         "sequence": "Explorar → Medir → Calcular → Explorar"
       },
-      "durationMs": 1979
+      "durationMs": 2369
     },
     {
       "id": "138",
@@ -206,7 +206,7 @@
         "cancel": "Cu preservado",
         "confirm": "Fe, structure = null"
       },
-      "durationMs": 1163
+      "durationMs": 1238
     },
     {
       "id": "139",
@@ -217,7 +217,7 @@
         "units": 4,
         "offline": true
       },
-      "durationMs": 2519
+      "durationMs": 2719
     },
     {
       "id": "140-320",
@@ -230,7 +230,7 @@
         "addVisible": true,
         "unitsInside": true
       },
-      "durationMs": 907
+      "durationMs": 1198
     },
     {
       "id": "140-360",
@@ -243,7 +243,7 @@
         "addVisible": true,
         "unitsInside": true
       },
-      "durationMs": 860
+      "durationMs": 1207
     },
     {
       "id": "140-390",
@@ -256,7 +256,7 @@
         "addVisible": true,
         "unitsInside": true
       },
-      "durationMs": 1090
+      "durationMs": 1562
     },
     {
       "id": "141",
@@ -266,7 +266,7 @@
         "stage": 330,
         "overflow": 0
       },
-      "durationMs": 979
+      "durationMs": 1207
     },
     {
       "id": "142",
@@ -277,7 +277,7 @@
         "addHeight": 54,
         "barInside": true
       },
-      "durationMs": 1158
+      "durationMs": 1381
     },
     {
       "id": "143",
@@ -289,7 +289,7 @@
         "ring": "dashed",
         "border": "rgb(255, 255, 255)"
       },
-      "durationMs": 1119
+      "durationMs": 1528
     },
     {
       "id": "144",
@@ -299,7 +299,7 @@
         "transition": "0s",
         "resources": 42
       },
-      "durationMs": 1099
+      "durationMs": 1070
     },
     {
       "id": "147",
@@ -310,7 +310,7 @@
         "available": 43,
         "teacher": "presentationSelection independente"
       },
-      "durationMs": 31232
+      "durationMs": 31361
     },
     {
       "id": "148",
@@ -322,7 +322,7 @@
           "simcore_domain_silm_v1_scientific.state"
         ]
       },
-      "durationMs": 1075
+      "durationMs": 1092
     },
     {
       "id": "A11Y",
@@ -339,7 +339,7 @@
           "Unidade de cobre 5 de 5"
         ]
       },
-      "durationMs": 1997
+      "durationMs": 2261
     },
     {
       "id": "146",
