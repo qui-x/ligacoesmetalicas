@@ -1,6 +1,6 @@
 {
   "product": "SILM",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "checks": [
     {
       "check": "Versão única do produto",
