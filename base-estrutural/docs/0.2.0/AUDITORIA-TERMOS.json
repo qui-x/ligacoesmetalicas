@@ -1,0 +1,98 @@
+{
+  "arquivos_runtime": 38,
+  "ocorrencias": [
+    {
+      "arquivo": "index.html",
+      "linha": 2,
+      "termo": "Base",
+      "classificacao": "nome técnico Base Estrutural / camada base de CSS",
+      "trecho": "manifest\" href=\"manifest.webmanifest\"><title>Base Estrutural</title><link rel=\"icon\" type=\"image/svg+xml\" href=\"fa"
+    },
+    {
+      "arquivo": "index.html",
+      "linha": 32,
+      "termo": "Base",
+      "classificacao": "nome técnico Base Estrutural / camada base de CSS",
+      "trecho": "6\" height=\"36\"><span><strong id=\"brand-name\">Base Estrutural</strong><small id=\"brand-subtitle\">Aplicações interat"
+    },
+    {
+      "arquivo": "manifest.webmanifest",
+      "linha": 1,
+      "termo": "Base",
+      "classificacao": "nome técnico Base Estrutural / camada base de CSS",
+      "trecho": "{\"id\":\"./\",\"name\":\"Base Estrutural\",\"short_name\":\"Base Estrutural\",\"description\":\"Espaço"
+    },
+    {
+      "arquivo": "manifest.webmanifest",
+      "linha": 1,
+      "termo": "Base",
+      "classificacao": "nome técnico Base Estrutural / camada base de CSS",
+      "trecho": ":\"./\",\"name\":\"Base Estrutural\",\"short_name\":\"Base Estrutural\",\"description\":\"Espaço neutro para aplicações interat"
+    },
+    {
+      "arquivo": "css/components.css",
+      "linha": 2,
+      "termo": "BASE",
+      "classificacao": "nome técnico Base Estrutural / camada base de CSS",
+      "trecho": "/* 2. BASE ------------------------------------------------------------- */"
+    },
+    {
+      "arquivo": "css/components.css",
+      "linha": 3,
+      "termo": "base",
+      "classificacao": "nome técnico Base Estrutural / camada base de CSS",
+      "trecho": " Telas grandes (Full HD largo e 2K): a letra base cresce um pouco, para o"
+    },
+    {
+      "arquivo": "js/init/app.js",
+      "linha": 5,
+      "termo": "Base",
+      "classificacao": "nome técnico Base Estrutural / camada base de CSS",
+      "trecho": ")=>S.modal.open({title:'Aplicativo',content:'Base Estrutural · 0.2.0',actions:[{id:'layout-reset',label:'Reorganiz"
+    },
+    {
+      "arquivo": "js/storage/migration.js",
+      "linha": 2,
+      "termo": "siab_*",
+      "classificacao": "migração estrutural explícita",
+      "trecho": "   Chaves siab_* são lidas aqui uma única vez; nunca são escritas/apagadas. */"
+    },
+    {
+      "arquivo": "js/storage/migration.js",
+      "linha": 7,
+      "termo": "siab_a11y_prefs",
+      "classificacao": "migração estrutural explícita",
+      "trecho": "onst source=JSON.parse(localStorage.getItem('siab_a11y_prefs')||'null');"
+    },
+    {
+      "arquivo": "js/storage/migration.js",
+      "linha": 13,
+      "termo": "siab_workspace_v1",
+      "classificacao": "migração estrutural explícita",
+      "trecho": "t workspace=JSON.parse(localStorage.getItem('siab_workspace_v1')||'null');"
+    },
+    {
+      "arquivo": "js/core/identity.js",
+      "linha": 3,
+      "termo": "Base",
+      "classificacao": "nome técnico Base Estrutural / camada base de CSS",
+      "trecho": " const defaults={nome:'Base Estrutural',nomeCurto:'Base Estrutural',titulo:'Base Estrutural'"
+    },
+    {
+      "arquivo": "js/core/identity.js",
+      "linha": 3,
+      "termo": "Base",
+      "classificacao": "nome técnico Base Estrutural / camada base de CSS",
+      "trecho": " defaults={nome:'Base Estrutural',nomeCurto:'Base Estrutural',titulo:'Base Estrutural',subtitulo:'Aplicações inter"
+    },
+    {
+      "arquivo": "js/core/identity.js",
+      "linha": 3,
+      "termo": "Base",
+      "classificacao": "nome técnico Base Estrutural / camada base de CSS",
+      "trecho": "rutural',nomeCurto:'Base Estrutural',titulo:'Base Estrutural',subtitulo:'Aplicações interativas',icone:'assets/cor"
+    }
+  ],
+  "dependencias_cientificas": 0,
+  "metodo": "Termos completos e namespace legado; ocorrências de Base são nome técnico, não conceito químico. Backdrop é primitiva visual, não gotejamento. Diretórios docs/tests/scripts fora do runtime publicado pelo HTML."
+}

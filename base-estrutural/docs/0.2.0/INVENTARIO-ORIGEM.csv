@@ -1,0 +1,308 @@
+arquivo,classe,motivo,sha256
+.gitignore,A,Suporte de distribuição ou licença; preservação obrigatória.,ab47ffd127e4b232db4b4d2c9d9c9ce8c64f8ea541bd41b51e72784d3bb55550
+.nojekyll,A,Suporte de distribuição ou licença; preservação obrigatória.,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+BUILD-INFO.json,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",d8407a5f043eb7993e80d122b47f1ca4146f60a2e1815aa6bc6a0e5dd13c669a
+CHANGELOG.md,E,Documento histórico da origem; manter como referência e reavaliar antes da neutralização.,6781caf14375fe8270241dca4b968e9629217d3595aa6e99282f0f14ee53121b
+COMPATIBILIDADE.md,E,Documento histórico da origem; manter como referência e reavaliar antes da neutralização.,16912b280e2e17a844613740dec3ba011b004e1e6d83f01917f215c059e446f5
+LEIA-ME.md,E,Documento histórico da origem; manter como referência e reavaliar antes da neutralização.,0744560b76393251886c0651314387125c5cc19eaca70cb4d99bec825ea99b2d
+LICENSE,A,Suporte de distribuição ou licença; preservação obrigatória.,3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986
+README.md,E,Documento histórico da origem; manter como referência e reavaliar antes da neutralização.,246ea924125a71201fda09cbc22fcf25df61e12fc20fcf1aa1f98b5875e587b1
+SIAB-standalone.html,B,"Empacotamento, shell ou bootstrap ligados à identidade, conteúdo e lista de recursos SIAB.",cc30b8c28e660169d05d221fdc0464efc3c7d9ad970a1f2a815773eb06b4c451
+VALIDACAO.md,E,Documento histórico da origem; manter como referência e reavaliar antes da neutralização.,f114a34867948e3b0054f1be27f1da89430cae2846c5b6c3fc761bab96845d37
+VERSION,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",e9dd8507f4bf0c6f42458e41aea833ad0bd3f6127272335eee9bf4d58541ed67
+a11y.js,A,"Motor de preferências: estado, URL, DOM e memória; identidade da chave preservada.",dc146ee155ad4b7aa844968b6d0a0537bbd0b2bdbbe7224cd03acadd1535dbac
+assets/icones/apple-touch-icon.png,B,"Assets e identidade visual SIAB; formato reutilizável, marca preservada.",0a642c5e9d3fbfed897adaad4176744bdeac86c3934d048b4f23c2c9b365b172
+assets/icones/icone-192.png,B,"Assets e identidade visual SIAB; formato reutilizável, marca preservada.",f6cce26db8122d30d9e9c2e7cbd21b9513580dc00c9c6a5dce96b07782c36270
+assets/icones/icone-512.png,B,"Assets e identidade visual SIAB; formato reutilizável, marca preservada.",b7424b0214ca7eff787dd7c5190c359f5bd196de5772d64e63602af52de7b839
+assets/icones/icone-maskable-512.png,B,"Assets e identidade visual SIAB; formato reutilizável, marca preservada.",41b54b8b0da93ec494212249147e452373317ccd44f2c5f63ddb734da9e00f91
+assets/siab-icone.svg,B,"Assets e identidade visual SIAB; formato reutilizável, marca preservada.",9bc2aa8f7249a0662aa9acfcbde657af752575e690b8d76e0a7b1661dc759df0
+assets/sqab-icone.svg,B,"Assets e identidade visual SIAB; formato reutilizável, marca preservada.",2377e2083d10321d8e675592d1af04621878d4ae3465d5937bc4b42274cfb734
+build_manual_docs.cjs,B,"Empacotamento, shell ou bootstrap ligados à identidade, conteúdo e lista de recursos SIAB.",e023b55a18be37b4e55474417b37f1f01eccd08f150ec93a6df1bfa3fd97a0c0
+build_standalone.py,B,"Empacotamento, shell ou bootstrap ligados à identidade, conteúdo e lista de recursos SIAB.",19982abb49f6ac282d876fdab467305e7d4d19190d482f1bf0849834ded24b00
+css/investigacao.css,B,"Layout e acessibilidade reutilizáveis, seletores e apresentação específicos preservados.",2cfaaf7d19ad705e49db034a5be5ce10d453d0c078e429fe7fbdf0aa6d9bdabb
+css/manual.css,B,"Layout e acessibilidade reutilizáveis, seletores e apresentação específicos preservados.",98edd0753e3ff780db4abe4e58175ae30078ea714cc0fe1f5fcccee9bd1d04e6
+css/mobile-controls.css,B,"Layout e acessibilidade reutilizáveis, seletores e apresentação específicos preservados.",9d3c1a2edced6d815b866aaa82b4dadd9f9e064c3760a589b9b85484fb5e7c0f
+css/mobile-study.css,B,"Layout e acessibilidade reutilizáveis, seletores e apresentação específicos preservados.",03580c4d5abb610f8583d1c700a96c026854b5d461dd2adc92400b6adb532353
+css/refinements.css,B,"Layout e acessibilidade reutilizáveis, seletores e apresentação específicos preservados.",b426508093f585a49ddf987f9c627b441417d1522e98de5bf6167a3247e6a8c7
+css/stylesiab.css,B,"Layout e acessibilidade reutilizáveis, seletores e apresentação específicos preservados.",1026103bbb742cf96975720070209d965b20a5bf9d716f5dffe6f44dd26c2cca
+css/workspace.css,B,"Layout e acessibilidade reutilizáveis, seletores e apresentação específicos preservados.",f6b718ef4ce797fb9a39a2abc1038e939e1bbfc77227499d55eccf6b45c019b0
+docs/BASE-ESTRUTURAL-0.1.0.md,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",4d9ffaf39ae51f7c23bff4ba4d255946c47dae56aef9f7adc19696c1d1ce5253
+docs/BUGS-CORRIGIDOS.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,727b6bca4b9d1feb39a3858a78035b12adfa45ad1a758a2e3726cef329880ca4
+docs/COBERTURA-RC2.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,dffa47dcddd26aa2402bf6eaa03f99ec6008eed59ada4d447e8048950cd60be0
+docs/COBERTURA-RC3.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,6c6d59272e677bb10fac858247c867695897610b3dd12aac584376f7219099f9
+docs/COBERTURA-RC4.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,ef3beeb7e13e64ab894b12c6d85fb7418ae6d8d780a9b46e225fa0720fb8d02b
+docs/COBERTURA-RC41.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,ec5424d1bb150ef6b9cceaab866d3940c05d6c076fef82fd7f08080ad3e0f7b2
+docs/COBERTURA-RC45.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,c71e084b5b405a0314717441764831b4c504226e9d828264ee8e126c463cf20b
+docs/COMPARACAO-VISUAL.html,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,81a7cd1fdecd260542412616f55ab84f5155d665043c6819de0f1bdea9a0a3d8
+docs/EVIDENCIAS-RC45.html,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,786ea24ceebd1f4fe691e1e01e48052ff7e6fe2b4fb25032fbceaeb62d487e30
+docs/IMPLEMENTACAO.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,6320d461ad76d06f6e3967714743f1b0bb4171e8ac9087fcb6a9054711f5922c
+docs/INDICE-BUSCA.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,31561596766fdbc43e6daa6cdeb83697c9fd70377ba571dbbfd1499d80d4fac6
+docs/LIMITACOES.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,535a7e908d73ce8ff49caee39ee933d45549bc8648071711230da4caf774f971
+docs/MANUAL-RC4.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,b47ff01510c25dead76b94d9a694dd9f997c03e5d2ce09836b68e4528fbabc8b
+docs/MANUAL.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,b9630b0b500a0be2b157d130f8c302c7aaa6f7cfbd95c7aa968d261e7d348ded
+docs/MIGRACAO.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,26f8640442807aa5ea577b76b1c0a262eca1b2944b591ea2c6f5a2a6583ab7be
+docs/MOBILE-RC41.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,dcdd6adf167767c96132d5ac12276dd65aff743b0c26b1f73731b6e824f1dac9
+docs/MODELO-CIENTIFICO.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,364b29d3150f50e7194d90f0859f101289687d501e496ab9408fa23f8b915ef4
+docs/PAGINAS-MANUAL.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,baf20f6fca52eaae4518d3c1da32a7cc5eb2d17ea5064374e80492c298cb696e
+docs/RC45.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,a21835bd1d7bc3a63f1d779ea5ea23c293b709bdf6064aab1d1843ee157f6fd4
+docs/TERMOS-BUSCA.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,d2d2503fb1f9673cce2f8e7e01542971d22e354b916b71f481ef77750f47917f
+docs/VALIDACAO-RC3.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,81d1eba5015fcf6d0af5573951fc35d090465ef747607f4e1fe74b14117d1b95
+docs/VERIFICACAO-FINAL.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,05dc5823709acfe88095db0d053937afe95ee730e0ad022e4b68210e511ba306
+docs/WORKSPACE-RC3.md,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,113d4757ceafefd85dcfd7377952ec067f55e0fde981e828147f0a204eaa805d
+docs/base-estrutural-0.1.0/DEPENDENCIAS.json,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",e5b897a6aac412871b4534d592c89e50c17a79252b7d5edb221183d37f553d82
+docs/base-estrutural-0.1.0/INTEGRIDADE.json,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",9a13c6f32a4c5f2a3df1de2b80c7ed7cf4b0a8b05c6c93ce4d913d40e9b11b02
+docs/base-estrutural-0.1.0/INVENTARIO.csv,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",dab934331c4dcf8cc02bbd956454801e0d57170ce7a1446d146700c4ebedbae0
+docs/base-estrutural-0.1.0/RELATORIO-TESTES.md,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",0f6b6148da5e79b7093b547fc1300c55c7f691ff048735b30a2d9359f0bc1fd1
+docs/base-estrutural-0.1.0/evidencias/copy-1366.png,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",842c4eb38323a508314979f0a7c56cb67492f8be92093a002e0efcf76d6c95bd
+docs/base-estrutural-0.1.0/evidencias/copy-390.png,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",3a2e06cc8bf41ebd0cc8c4b83c8a956e37553f6b492a00793027ce09534c0c58
+docs/base-estrutural-0.1.0/evidencias/manual.json,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",b5ab94aa6363d58471eb6021ef45ecbb5839f4792108e474497c4dbd08205bc6
+docs/base-estrutural-0.1.0/evidencias/mobile-controls.json,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",ee3c29a5741f0bf827f431cb8235b993d489d9a3b996b6c6b567085ee870e194
+docs/base-estrutural-0.1.0/evidencias/paridade.json,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",ca6aedd8f4539e0d416a692a63e5d9c09f7e67271bf7bc4197640540f08fb658
+docs/base-estrutural-0.1.0/evidencias/rc45.json,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",58cf74391fd8a007f0074ee37ae7854907a66173d21163f17e39c83e27e2f717
+docs/base-estrutural-0.1.0/evidencias/unitarios.json,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",1e565f29433dc3e4d7d8d31015ac6b9c6a70556e18e9eab5ed0b9a569ed2be3c
+docs/base-estrutural-0.1.0/evidencias/workspace.json,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",a3d26b541c0cfa494f09275a5fd37641420a2ac9e6ac3a9cc3ed8fd2da9d7505
+docs/base-estrutural-0.1.0/paridade.cjs,E,"Documentação/evidência da extração 0.1.0; referência histórica, fora do runtime.",abd3dc68576a66a6d23f42d3415ccf3dd2afca38a20d0bb9ccdd5af7c68e102c
+docs/versoes.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,d43907a7c21816928acfd1784d60588dc8c4174dc355832967d0e034f0d47c50
+favicon-dark.svg,B,"Assets e identidade visual SIAB; formato reutilizável, marca preservada.",9bc2aa8f7249a0662aa9acfcbde657af752575e690b8d76e0a7b1661dc759df0
+favicon-light.svg,B,"Assets e identidade visual SIAB; formato reutilizável, marca preservada.",9bc2aa8f7249a0662aa9acfcbde657af752575e690b8d76e0a7b1661dc759df0
+index.html,B,"Empacotamento, shell ou bootstrap ligados à identidade, conteúdo e lista de recursos SIAB.",6be2ae6cff046eb100aa7c659ccd0ac4c8a40bb5d8d86ff85cbe98e874051f3b
+js/a11y/preferencias.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",d534ca65a249c962a0524efb1de5022f77cba102a234a7716055dbfded1e14fe
+js/core/activity-context.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",41e0666715b3397db44b29000461753ea5e0eda0a413a6ad572c68fa989948f2
+js/core/atividades.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",bb89cf78b6a473141698df67f4bca524543c7bf32dd800f3625f43a1801746a8
+js/core/compatibilidade.js,B,APIs genéricas e preparação de diálogos ligadas ao DOM e bootstrap SIAB.,0b7900f06c8ae85dedd8775a7a14121d7cb18fb46ca050ca6ecb2cbd5c92b505
+js/core/estado.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",37f1ccae0beff339571f30d61e87470d7d22964e7d9c8e29492afac33fc02901
+js/core/loja.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",c07662398a6b82b58965003c4ceedbf1dda34d8ae4fbb159118e58a2b169574d
+js/core/migracoes.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",92e6b54f223ea6ad9b90b450476e57ced4ba3138e9e24aff54ca6cf8a2921f61
+js/core/namespace.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",650a2397f07d961143d09d51108ba674277cc0499677c5aab19e5da12e9a9faa
+js/core/persistencia.js,A,"JSON, memória de contingência e aviso; usa SIAB.notice, sem payload químico próprio.",0ed4f7a34a51243bce19f5d4422ae9efa3951af0bf6d27c584e1893c65bbba9a
+js/core/progresso.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",9c99c6454809ce73e9856fabed9213fc8da590a5da4a92e36dffc68c5c091a3a
+js/core/roteador.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",cb33c3ed4ada4faec9e036a84ff3bd3aa3d79d074bb9c94c6195efc055c10d11
+js/core/util.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",1f51c9c19bafd0bdbaeb730fd5f4492f0b71d0cf7b85c9aa3aa208ad7ddd63fe
+js/data/ambiente-saude.js,C,"Catálogo, substâncias, missões, temas, montagens ou experimentos científicos.",5b1cce7d74c34ec37d5ba9673e5ce38a7b6e03d1c3a43879e9692d944969b1df
+js/data/amostras.js,C,"Catálogo, substâncias, missões, temas, montagens ou experimentos científicos.",d641353d4151c739e1a8314a15da3862ca19fd5827975073174f6cd32e0f1beb
+js/data/catalogo.js,C,"Catálogo, substâncias, missões, temas, montagens ou experimentos científicos.",666a4c6e37b36f94a7d10ea0a4439401e46e8db6918a737514322915ae73d46c
+js/data/cotidiano.js,C,"Catálogo, substâncias, missões, temas, montagens ou experimentos científicos.",44657e2feb3d31d1479b6647bcfed0e2c0f3d475a88c1881b82731216d9148bf
+js/data/experimentos.js,C,"Catálogo, substâncias, missões, temas, montagens ou experimentos científicos.",cf5a4441e4993d4e5c42b7eb66350477a23c4d634374735b4f3681e8f8b12736
+js/data/funcoes.js,C,"Catálogo, substâncias, missões, temas, montagens ou experimentos científicos.",b4c2d15364f8b470dd01754b5d63519fb98f64f4751763c9a061304b967d54f6
+js/data/manual.js,B,Registro/busca de tópicos reutilizáveis misturados com conteúdo e links SIAB.,98e6f8e64c32cc6f34ad5927a08a0d1247f7460a6ad95f80e18c3f81c08f3896
+js/data/missoes.js,C,"Catálogo, substâncias, missões, temas, montagens ou experimentos científicos.",4b6f17d9e379af1c82eae77180a98f5596fc8893ae05879fe52501ba887febb7
+js/data/montagens.js,C,"Catálogo, substâncias, missões, temas, montagens ou experimentos científicos.",19dc2e8c1baeee5bb6fe4b7b6fd91cf598f2945ebd1f5f65bb3da667f24e180d
+js/data/reagentes.js,C,"Catálogo, substâncias, missões, temas, montagens ou experimentos científicos.",1597d559256f94f03d528f750f5e542b084bc0f3b1d31aa30c136ee2a345bf9a
+js/data/sais.js,C,"Catálogo, substâncias, missões, temas, montagens ou experimentos científicos.",996bc7b2db5bf798af80b59272bf276fe708306dcac944799ebb7eab83264fcc
+js/data/temas.js,C,"Catálogo, substâncias, missões, temas, montagens ou experimentos científicos.",a07ccc19ca47082aeb045179f92d84f20c711e26a809899af8d426134ae41933
+js/init/app.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",b16f9ca654b161cf9fb3ee90ea9b6c573c5f2cefa685e812774b547297724e3d
+js/init/integracao.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",687eeb6c0bf3b25f1921b9918c4e1b2f4846884381cbbcfcff2d8ccfefa2541a
+js/init/pwa.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",6b3a64893fe4b8fbb9d04011772073992a16c02488a72fb8dfb85ee6fb27693d
+js/simulation/condutividade.js,C,"Motor, instrumentos, medições ou missões do domínio ácido-base.",88123f15a0f8d3f3cb1af25db5924e0b036bf77ff870f9c59a1d8a42be1ee1a9
+js/simulation/instrumentos.js,C,"Motor, instrumentos, medições ou missões do domínio ácido-base.",a783f343132677f692e9be0ebeffc732d22a9a1f3aa349c943f5534aebd8bc77
+js/simulation/medicoes.js,C,"Motor, instrumentos, medições ou missões do domínio ácido-base.",ea06d12e954326ac242543ce81eba61819957131b9ef9c2daf2bc551ec3e9794
+js/simulation/motor-missoes.js,C,"Motor, instrumentos, medições ou missões do domínio ácido-base.",3a2a642ef41f6ea46caf969a0a4795963f27d4482447037e9b173b443be2dbe3
+js/simulation/quimica.js,C,"Motor, instrumentos, medições ou missões do domínio ácido-base.",5715aee95575efcf86702887dd4baf656e0df1a0442cc885360bd2857fc114d0
+js/telas/aprender.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",21c1369b83d5310031e5d8050eea1668f4f22b8dba4e2ba04be134535a2692a3
+js/telas/bancada.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",ec2110f606a535d989d3639a2a8f1decb2d77d6306be8b5e93b148d700eeffa1
+js/telas/caderno.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",4b5e955a2461e9296130c0e98ab4b050b686563ad797c3a151d7278c3c6be15e
+js/telas/inicio.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",5615f84f159bb95e1b06f48481dd8ac35a0f7d9e368206721a97f44cc6901782
+js/telas/laboratorio.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",1f107a5a4cae2ebd08a15754078004dd72f20f7828c414d5faf3828b50572a52
+js/telas/manual.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",cd0d5fe9395ba0b8e481bb81a6ea755e18c07c2c5ca606815aba869b6bb22245
+js/telas/missao.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",be127bc84ee0e3f9201106e0e344838b9b4b9f33887ce9d9928af2a775e149d0
+js/telas/professor.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",631ab5693b01f32dc01f38d5fdb727c541d7f2fe8f142ca2f1a5c4afafb77d75
+js/telas/relatorios.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",a4808b6cc0ccdc70418a4566caab7794345d373d4e2d94cc9dd8ba9a18ac3994
+js/telas/roteiros.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",2e7f08b5666c5fcf28524c16972ad13a63afbcacfabf6b251933f7d0e4890e91
+js/ui/abertura.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",f427b7888efd91505ebe7304a8fcbee7e006af4f645c1f524369de5ca4a29e3f
+js/ui/activity-ui.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",bdb853ca7206e07819f974eb29da90e9a62e1f96aaf5b49afe3a329c60f718c9
+js/ui/condutimetro.js,C,"Representação ou interação com recipientes, pH, partículas ou medições.",034c4f62b3c135688c25c5aa0236914f3bf1ad2a29d638b6fa16fb13532e5b48
+js/ui/conta-gotas.js,C,"Representação ou interação com recipientes, pH, partículas ou medições.",893e5e6fd01b16aa85cfac892c54910a631878be28788122b48a3257949d793a
+js/ui/equacao.js,C,"Representação ou interação com recipientes, pH, partículas ou medições.",2838025eee1837086d994433330c019dd754e1674e880132aadb4c5182028406
+js/ui/gaveta.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",f3005f0c7671e8d31d8d5358d6aca3afccef876c3b9d51a563f868d8244c4e22
+js/ui/grafico.js,C,"Representação ou interação com recipientes, pH, partículas ou medições.",d09eeb94206356da194a20506a6982b8dcd809f30cbc42706d129cef2338f114
+js/ui/icons.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",56fcdc8c779e690e58f109e95a818da84aa5e4fe65fa627fd90aaaea03a5180b
+js/ui/impressao.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",dfd4c6a967d984e13601ba2e117d6e43528091b5f0832558b093df6d51ef6349
+js/ui/layout-bancada.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",23f999918b05ee0166d5bb84711fcc46bda171c2d41ecdba59a2f12c66bf347a
+js/ui/lupa.js,C,"Representação ou interação com recipientes, pH, partículas ou medições.",7ad4c629631530561b19f6edc086d44e4a3f690100b10f6f369cef8bff62d254
+js/ui/mobile-study.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",b6f4eefa09d1c8354e202b40da090387719b1b20ca3a37e3d68a08022d1b89db
+js/ui/modulos.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",aaece9acea7730f74cd6f418deb28e869076d337d26d459c6d5a50c82b73b420
+js/ui/prateleira.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",b368e8b26a2bcaf6b09364c7504d2309d519a83e9ad31acc15626a50f58f1bc1
+js/ui/regua-ph.js,C,"Representação ou interação com recipientes, pH, partículas ou medições.",57c4e8616c06926397153c74f79c58f83df84fe8479124206722ce00bab7f825
+js/ui/render.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",e0720a04b10e156c488c4c524ed9cb808b2bd63dd3a07deabede580064669393
+js/ui/segredo.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",484bfd737588f885d23a7807cf04dd81da12be525340a037ab11cf0744a1c00f
+js/ui/selecao-tubos.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",2e18d26b8b6a47ef664c1837b77f55edfe0887d8352d891d68eeacddfaa6e4b8
+js/ui/seletores.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",3abdab1a69bb2b8252a7c4467666db8f5e275629852e70f1a4b5355b4d03260c
+js/ui/som.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",67d925579da0df9305f8ea5c7d309bf4dda31bf972e4f08ff9053a7d3d6944b9
+js/ui/tour.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",1930a05260c96b7efdc05639dc57002432b1109f3a318a2897921fcf0603f208
+js/ui/trilho.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",fbe8e2a0bc7a60cb2b203db7edfcbf4d06a2a9667c83041c2f6300ca2547a638
+js/ui/tubo.js,C,"Representação ou interação com recipientes, pH, partículas ou medições.",4348dc1c7182a3e0c898abef11490656e9009e0e0840654ab1e001ee466e52bc
+js/ui/ver-investigacao.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",be81e89eaf4c4471940e1fa149121e38ae217e8d4ca4b00bcf04fba38f3f63c0
+js/ui/workspace.js,B,"Infraestrutura/interface com nomes, seletores, rotas ou estado de domínio SIAB; ver mapa de subsistemas.",70b729229e9088993ab921ceedf6bcc0966e0d39257faad491133d4a90e16a69
+manifest.webmanifest,B,"Empacotamento, shell ou bootstrap ligados à identidade, conteúdo e lista de recursos SIAB.",d1121aab434349a45697551d187b5dfcf5ca255f315e7f41cd5802f0cf3abd78
+package-lock.json,B,"Empacotamento, shell ou bootstrap ligados à identidade, conteúdo e lista de recursos SIAB.",96301ba830e2a5572d43bf74b48cfb91db7527dab6c0e8135e6bd378fdd08410
+package.json,B,"Empacotamento, shell ou bootstrap ligados à identidade, conteúdo e lista de recursos SIAB.",ee999d1c51acb9904394b614270fa9738585496143760084fc1afa70768e7624
+sw.js,B,"Empacotamento, shell ou bootstrap ligados à identidade, conteúdo e lista de recursos SIAB.",89c5e9c106653553499e037ef36e66e3d7b0735e5edc52b05747faaeb3e00365
+tests/ambiente.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,d8fbde1d2709ddddf3659c7833c32a6fa74f98c92a24089aea59c6bd66f3071a
+tests/ciencia.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,81cf5e70965864eee6154ba45031675eac8996ebd36164500bd048487b8a6c55
+tests/compactacao.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,f27a85d36ea3ba96133e70069f2c8d8fea9323a4878b1920b56c94916650dc15
+tests/entrega.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,0fdef6d1d9266fbf50c30e35474e0c6cdb045c5c8ff86bab301c3235edd24202
+tests/fluxos.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,eab9c1ba815d34243822f0b6945338bfed405bcf907aa2691a83ac01eae7738c
+tests/helpers.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,91eb575adaf425e948cb254c09a6226548e935564771c31ad01a990a189c7157
+tests/impressao.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,0843a538ec2a690d83f68e7b44111788a4064aac39704b7bf3659799b49a1e13
+tests/layout-bancada.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,c85df8debe7fd45291fe02a36ae3a341f4700951c4e3056eee9296007690e42f
+tests/manual.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,aca29f242705cac01fe9e64b5a973cdac036b22865bb59f123e73060ba0c13e9
+tests/migracao.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,3d562bd7357ff4915181c592377a9763c9cee029d9afba0fc193e02f709f8f06
+tests/mobile-controls.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,46ceb4f81f81c9da5f9004dec14e2b2ff4f06d01fe0c388802ce3705d8781f46
+tests/rc2.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,c07ba9ccd0d324977f391849c639bda8f0acb8a2fa4828855d906a79ad685c2f
+tests/rc45.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,ad2441a2c93ccdbf18eecbbae75b08478870d58c824e67753e4a6538a3058ed0
+tests/regressao.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,15f21d0afb776ec2113ac00aca1b9f52c78919f2a01f70dffa385a53d8a783f5
+tests/results/ambiente.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,c25129784385131484f683d1fcbc2aaf8df184809b7b19b3e711e0c860b1230c
+tests/results/auditoria-rc41.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,c8ca2e51354882267a889cfc24ca16f21b42c9e69d9399d4aaa9c7b55956bb55
+tests/results/chromium-bancada-1366.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,66e6558a1ee8324b142a05eac9c87a4c53244fb28afee295c7b68a5ba6442b66
+tests/results/chromium-bancada-320.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,86e571e3452e01b6943129b7f4e2697ef2f07bf393f485c54eed7d8c81b21807
+tests/results/chromium-bancada-390.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,1c88bb476537c24e92afae13c3fe940a2902877e0b2a6af7779ec867f468721a
+tests/results/chromium-falha-10.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,4f8bb6670ef3ddba03db9873dac4767bdf3171e7a9a5d87f45da117cd4d27962
+tests/results/chromium-falha-9.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,ebec57b4e9a1536ae9f6b8bbd336868ed9e4198d2cf8f25a15c49f34d8ab2688
+tests/results/chromium-instrumento-viewport-390.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,8367cd8264369cec8c1ce1352a93c7e78bcfeae76cd860001f628619a3e77403
+tests/results/chromium-manual-falha-1.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,0b6f8369f001ab7d47097d639ab4f09bc813ac52e0b35e5fa8d2993fb5c1cc8c
+tests/results/chromium-professor.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,1163752b3e479ef5f64d78fe0a4f7ddaf3d36f8fb818fa26275b1afd7ef4348a
+tests/results/chromium-toque-390.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,3a081046755fe7d7f89de2cbb655c913458530417095398199a7d7f58836415d
+tests/results/ciencia-rc4.log,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,c7ffbc4d99e81250f93fb176e8b0ea8884f2e29dd22af020c488465d726ae2db
+tests/results/ciencia.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,9a3cd346fc7d5976d0eae091ab4137d0728ab061f22735a04bc24d47b10ec19e
+tests/results/compactacao-rc4.log,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,db37bca668de66d1ad2debb0eaa5f35ea455ba918ec4fd278d19553db1ced98e
+tests/results/compactacao.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,eb6306315fe4515ba40c787e8f7208667167fc70a29070d6ddf5f617cc22c668
+tests/results/comparacao-mobile-rc3-rc4.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,33b8b5d326ffaafe65a9d5e40c39d689468707ceeda7d5470fb6cdfaf122171f
+tests/results/comparacao-rc2-rc3.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,3ff0aa0be390944eab069f8ec64756cbe8d71ff780c4a34649b40435b14441a5
+tests/results/entrega.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,383074a85ad0801224e2d7e10cdb8f3caedd1498210b3a2ea3a9ff457501a9a7
+tests/results/execucao-final.log,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,38a4c07f3b65e9a31cfbb1c6846952e3f6f6e070b0068277b19a6db1e57a651c
+tests/results/execucao-rc41.log,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,84f753e90e1a6867577ea35f85fe19d9ad8eb629b87868ab9d9e727172c89a09
+tests/results/execucao-rc45.log,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,762bbd83e4ad3d47928cbee75d6a0372fe03d43e4a6a584183ecffc59b4b2b6c
+tests/results/firefox-bancada-1366.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,568d6ac1ace5c87784b9024a072904e66f7320ce31712e1530be6c6f5bcddacd
+tests/results/firefox-bancada-320.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,c3a619e56b2649af865c5166f1f8e7061b008b148c0ec3e331619ee08b3e8f8c
+tests/results/firefox-bancada-390.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,72a0ef003b43928fbc28a63f484244d1996cf6a9e08dbdc97897924732ecb34e
+tests/results/firefox-professor.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,6eae2e4169523404c1f3e32fbbc885e0e1f0cdca6b2c0eabfc62e18058e076dc
+tests/results/firefox-toque-390.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,017483edc7a148020f3e949ca8eb35227225af3947837f308bfd6f5f80659399
+tests/results/impressao.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,da82bb4c5d350553dc24f6dba36b851d5acfad1d61d9cd88ef4baa740f8f027b
+tests/results/inicializacao-320.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,ae9a34120e49d2a9c81de3e1719f13e6df034e4f336f16c8fa1f0fee848330a6
+tests/results/inicializacao-desktop.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,761c073942a1bb9ee62f39f231d18acc0263cf5356035ef8698ce72eaa6a8a23
+tests/results/inicializacao-mobile.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,ee321ba444b8d34c720bc7a7695d960570da5f309d8737a5e97b1ffb3fbca9d8
+tests/results/inicio-mobile.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,30ef2f5f0d7ca907d46ce2cfff761d661dc0fb584225020dffa1f6ff61c52c35
+tests/results/inicio.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,467abc37f2a3062d24cc21f4417290d57a49bd620948b44b7aed388cff1c2870
+tests/results/laboratorio.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,bab640f5c8378f8e7843e54da2f9afc99139a44517ac8eee54d37d3661a0dd38
+tests/results/layout-rc4.log,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,e2ba5af8b7561f7f23cf074d2d5feb0f96e995a41bea849283271e2f3fc0f751
+tests/results/layout-rc41.log,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,bdcb32253c4b56bf6510fbdd9b2f7230753432be9bc9720d444ffc39b09ab1d5
+tests/results/layout-rc45.log,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,280464bcf3661f542e181167d8c90aff433550813ed9f346fae61ae9149c66f1
+tests/results/manual.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,eeaea9f6c6b7e853ba8dc2e00fea75f2e40571163f5a17cf8b620a01c05d4b35
+tests/results/migracao-rc4.log,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,8287c07b8bf61e7d01de586ac532ad6a150a36e56f960636c3097f4bdc206222
+tests/results/mobile-320-antes-rc3.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,191682f5baa3225e1080512bdebfb0baaf2beea2dfbed237810cd79fb0d602b3
+tests/results/mobile-320-antes-rc4.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,311ab28af216a5c8c5ba8ef3ea445e75e4f9412897cb278793ae47b90b2175c8
+tests/results/mobile-320-bancada.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,ec936779111b5cbf62eb9a590d5567800475e7aeda30587655baad538c793f7c
+tests/results/mobile-360-antes-rc3.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,0a804493b1d36c20510d20735a9d924b0e809d573f0102fcb7cab1824a378489
+tests/results/mobile-360-antes-rc4.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,4694fe280303adfaae0bc070ee553cd8fb63b51e764a6d75df1ed3a2412e2b64
+tests/results/mobile-360-bancada.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,6ad98aed71ef348e0c8182f4016fc62b7df22e7b1872be789252f90c706026e0
+tests/results/mobile-390-antes-rc3.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,de428e7b1fb9254f9180138ece21387ead13f664d7b27a1feaea4af8a2394bf2
+tests/results/mobile-390-antes-rc4.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,32160e49a5ac15729978dd02a3b2014f87b2c6991d4a901d68669cac6cc57d7e
+tests/results/mobile-390-bancada.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,5d51d5346abd276102233e0c9eff7b856e326d405ea72023c65c268bb16c0183
+tests/results/mobile-414-antes-rc3.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,208683b3072947022362dc94a49d5c2e6861d55b3d3cbba6fd709938c412766c
+tests/results/mobile-414-antes-rc4.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,d64c8f25be4b21364b9b944ca362b0c62e13871f7a5dae26027bdf65be0f361a
+tests/results/mobile-414-bancada.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,97d8e84af7890caa4d5267f758da7c1cf65f1989cf482d74ed94c7f0c53e78e3
+tests/results/mobile-controls.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,5d8e78ed8b6db2afe7f2e52b223e612ee77461a58d411a13b22877b4224754a5
+tests/results/mobile-dados.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,6035fda2979ad66ab66c24bf8f176345db0a3f09d71487358990a8a32f13025c
+tests/results/mobile-medir.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,970a0845f2bd480cfb94e303bd902017508234af9732fd6e62076d0efadd5a4a
+tests/results/mobile-montagem.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,f53e069a8915f16142271664af193f863f864bf3ab7f3ff5e697eec8dabff593
+tests/results/navegadores.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,f741feb6d5d02de82bbbe4d692f3b105fe0f406491403ff2f77c524e777adc8a
+tests/results/pdf-layout-rc45.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,14e3fe7aa3057fa5593c22bf0675aa88e14840d1b3a1c795c236e0336a42d50e
+tests/results/preservacao-rc2.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,ee9fbecee453c37415a786b0a3cfa5b2ad40d8f48e2fa1cb0d7686c8818aab93
+tests/results/preservacao-rc3.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,be5c5ad995e27dc89be492996b8661246c91cc01a81f2aa68fe7c641f3f3227c
+tests/results/preservacao-rc45.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,08d73396aa826a29a3931fecae94ec387048d9cfbe7cfa557d6ac4428f06aabe
+tests/results/rc2-alto-contraste.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,c040daf98066492507f6d0bd3d5380d204d3b8075d3a34d91f0b247fdfa51f4a
+tests/results/rc2-aluno-desktop.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,67e1dc17b970531776540c0d4376ffaf895bc19eaf3c4d8ee8f17186ae476b2f
+tests/results/rc2-aluno-mobile.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,e74538d0577f97d8c48343ef5ea2e7c8bbc516f4a2b2407e39b79adcc59e4d67
+tests/results/rc2-comparacao-1366.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,385d1e4b1c438201a9c463a76dedcf9cf2f43938f9b19fed1441f842e4a41047
+tests/results/rc2-comparacao-390.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,16f34d0254a86175af4da3cc599487ead956b349e468cfbb62b6ab0d400774ef
+tests/results/rc2-guia-professor.pdf,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,39997c0dcfd5f3a74f86e20d5c6ed20b40e03079ad533486a77d7f94a408854f
+tests/results/rc2-painel-analisar.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,c303175e5d03c3775886d80743fc7b1e2edccd9d60a5d619fd556e1b0c8410ae
+tests/results/rc2-painel-medir.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,8fa77cc3f63e83969d3293174b0144a992a89336c3a8cec76a2babad06e8c316
+tests/results/rc2-painel-observar.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,4826eadf52036ec5d07093ff6a09a992246d9aaeb1f689310bab53c51c5d3373
+tests/results/rc2-professor.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,40f59064250deb9bca3a9d68d30737c10afb9ffddbaf787183d6dafa84746fbe
+tests/results/rc2-relatorio-compactado.pdf,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,49f49ce57597976791a25af815fc29c7b45a5831d6e53a7b657aa8a08650c396
+tests/results/rc2-relatorio-fita.pdf,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,efe80e83274438c129d8c35a5dc10c7ac1afcb08481c93f5f4cb05cf388a03d8
+tests/results/rc2-relatorio-fita.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,842cd5df5c8476fc6c4c840ca7f97aca963b3d13169a7de2b362400cc41baef6
+tests/results/rc2-relatorio-phmetro.pdf,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,6e92654988b0fe37828f6edeb47d365396e4ad5f63455575bc670e41fce5b917
+tests/results/rc2-relatorio-phmetro.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,68405fd0b0852de8d68e442767c37e3eec4558742500a0a931153463b6dab01e
+tests/results/rc2-somente-fita.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,67e1dc17b970531776540c0d4376ffaf895bc19eaf3c4d8ee8f17186ae476b2f
+tests/results/rc2-tabela-compactada.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,da46980e9b0724b993c9331a7ece217125b7e77f2f687815d7db7fa98c391206
+tests/results/rc2-tabela-expandida.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,60a9f5a99a52abd528dbe51e64f39e81fbb09c98f859d55bdfcd79b94027077d
+tests/results/rc2-tema-claro.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,8313f8f925c5f4e4ab89a41d50e774a2f0ca9ffd75ac295c80f4843c730f0da9
+tests/results/rc2.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,9d07a73fec79f624b4dc6ebb88ae6b6acdee25f632a895098966adb5af206afc
+tests/results/rc3-alto-contraste.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,2b9b5867645d4639cb639adb99ed0b606ab07b0ea466e01158543ed2e7398ae0
+tests/results/rc3-atividade-somente-fita.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,92736cf51ddf2939bcfb2ab5190f27edacd728f29354e97a092f3a60b44e2953
+tests/results/rc3-comparacao-1366.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,7f5bbbc1ad82751750db3d9b6b4213aaf4caa591b731280e414cdb8123609176
+tests/results/rc3-comparacao-390.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,59709c7cfc4ae2f363d273c0589c46f847c52febc7e6e4d0618270272e13c630
+tests/results/rc3-desktop-analisar.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,ed5fdf78fc01a2a2cbb655a53be41b62501652f836a40ba108fa8b663373cff8
+tests/results/rc3-desktop-dock-esquerda.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,2ed33022982adc054ad6bbd611b9a2b81354f751b0c5cb37e2cfb62205f61674
+tests/results/rc3-desktop-foco.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,82b597ca92c440e138bf3855cb7ed57678b6e1fe60765fa78ab44f1f837549f6
+tests/results/rc3-desktop-medir.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,d27c1e4a561e93c2254745ab60215fd0ead305fd633e577b1b2cd12254c912c9
+tests/results/rc3-desktop-observar.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,355586cd8c3ae61a2c6469deff01f0ec55a1779cb27a1e420a7e8e1ab13a81ef
+tests/results/rc3-desktop-visao-geral.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,19771e624be95c801b112daa6d01bea084dc8fe39357e71c2be64b160a82f445
+tests/results/rc3-mobile-bancada.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,1cb0489be2f9f3d73455c5591ff948a9d84c7918bfc662990cc27206549da7da
+tests/results/rc3-mobile-dados.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,7bc8d87583736109c6d7b609e28792c898e1e8b0902c2e77cf69c9accc76de53
+tests/results/rc3-mobile-montagem.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,565ee0eca74b7ca0d76eaac84a3648f14e55db28ecade5918f7a0c0a026dd4dd
+tests/results/rc3-mobile-ver-medir.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,29130934560ada3c8391ba17818afa6cc59b9e1190cbe865621e4fe95f361ce2
+tests/results/rc3-professor.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,4f8bb6670ef3ddba03db9873dac4767bdf3171e7a9a5d87f45da117cd4d27962
+tests/results/rc3-projetor.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,c1c784a87823bb581e8ae782a3925eb3c2ddf9c4ea233e5826865373d1d86ac2
+tests/results/rc3-tabela-expandida.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,e71eb47f931fea80d6b537dc19ba41380929c99829cc764fbd58fcb15d5dc254
+tests/results/rc3-tablet-landscape.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,52a35257c2c806859c7367fbc36b6ab7caf500cdd6afc587b9b0e680ff860842
+tests/results/rc3-tablet-portrait.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,c2aad0f1e3d026d270ed517398ae561813d27bfd82a65b5925d6e78ce722c30e
+tests/results/rc4-ajuda-contextual.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,c2ffb256bb29f48b6fb7a209b80a0e74eb5350706c39522a4325a4da8f110813
+tests/results/rc4-ajuda-restrita.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,1ab47fec3c635420c71a4949bacfec6ca401d9012b7de3901b9b1b3cb450dbf3
+tests/results/rc4-manual-alto-contraste.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,25c7a12e66ec7bd16c0d633231e6cf6808016e80282b09a378565bdfb40419d4
+tests/results/rc4-manual-bancada.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,e467f087f01200226135f3231fbc77437450829a595046e1f97cb0dbd22b5073
+tests/results/rc4-manual-busca-mobile.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,5497ef09fad3ae74b1ed42d1eebf8d81ddd028f2e1c59867cf44d7c4254dd027
+tests/results/rc4-manual-busca.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,fce1b4d6d6bbde65af538da8ae344ea0e6378249079c0a3ffda06534304a1041
+tests/results/rc4-manual-guia-rapido.pdf,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,6cec52d2e7813e22d8cefcc96407a2f34502bf2bcc1b61911677a43605733f45
+tests/results/rc4-manual-home-dark.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,8f6f4c1b9a1aebeeb47a15db919a4b44a92d434707aa9c7bff8feacc28204881
+tests/results/rc4-manual-home-desktop.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,1047d82b108d6869e75cd4030017b145c4048a99c40cb349d7a4691f9b18f30e
+tests/results/rc4-manual-medir.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,3a31d08a572727a5978b22d50f4cf504aa98a2b31bdced948252aca6eefdf886
+tests/results/rc4-manual-mobile.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,1bdfa4d979c12d220815641eb8d436c2ecb6ff99ebac6b395b3b93e182b82559
+tests/results/rc4-manual-montagens.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,b81c9c5fc58a0e98bb33a83313e778d281ca7abf445d0b4268ad250e33c9ce12
+tests/results/rc4-manual-phmetro.pdf,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,cf12bb9a454c380fd603149a2132439ca5f05dcb56ef232a3991b65356d6aea9
+tests/results/rc4-manual-phmetro.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,ab8f61f287870399d46730ba89346051b7abec01afecddf27ce55f358d1fac3b
+tests/results/rc4-manual-roteiros.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,2435e5556a7d8fd2e700f816fda7e5a1558b2765bf7bca14e1f0856b8690731f
+tests/results/rc4-manual-tablet-landscape.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,d6ebf980ba0ecc9e70a5bad66685d71644a43bb9794f82eb9db0eac94ae9ff2a
+tests/results/rc4-manual-tablet-portrait.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,beeb3c78e4fc2882ef7e1f235be0e94e823d58b1fec778a26f20fbdccd6a387f
+tests/results/rc4-manual-topico-mobile.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,254cc076fab82cd5bab48cbce5c2d656dff01f2d8463b07692f3f7434a6c7523
+tests/results/rc45-menu-1024.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,23e119eb23d750b4c19afe45eb1935c8a6242f715d784d1162968e7f28a355ba
+tests/results/rc45-menu-1280.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,8c1a7f04ca05ac1d6b0c406b4b54a7a5fa0e24f3e07b0d1ab26401c6ac4133cd
+tests/results/rc45-menu-1366.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,387f6f1c0a6bca782b7e7c7c2a863fbecd19b4b093c434050a5d19506598e620
+tests/results/rc45-menu-1440.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,64b5abbed1e9b1a8060bb88ffadaeebd6adfd764f4dfe42e844163ba3e6c657b
+tests/results/rc45-menu-1920.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,8919801f13af672d29d4c63381ca040c58c297bc4b2a429bbdfd370be225acd2
+tests/results/rc45-menu-320.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,3290eb5e501a2f93191583a2ff99073ced5a5d716e9a93e0effc7d94599ff83b
+tests/results/rc45-menu-360.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,1ea88595bc33e7dcd559eff0f6c85a8cb1eb0d767b1543b122def318337f88d0
+tests/results/rc45-menu-390.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,b11a4da165764ca79bb271c86a20174b6bee9ac2a2b5bdc49f81c078eb64ec14
+tests/results/rc45-menu-414.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,e7087d6785df353aacd239257e3ebffdd7514d957a945dd02df8739d8ff4f465
+tests/results/rc45-menu-768.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,f18e0ce43c519c6fcc0ba602a9529eccd5bc81c6d94773303fb59e87e8def516
+tests/results/rc45-menu-desktop.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,d7c543c04a47f1da004e471d7a2f5551400677e685b55457b3a00815eadb38d9
+tests/results/rc45-menu-restrito.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,1ead9be2741e2288a37a0abb14326e9f8e4b3669b9702b4707386095810870c4
+tests/results/rc45-mobile-comparacao.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,9505bf25887b6c505bf38df27f2ddef706c11d3387891e6c47db63ae75b9c5f9
+tests/results/rc45-mobile-paineis.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,06fef401be136faaea833432fe5fdd1e785e6637b8203acb4afca6059666cf9b
+tests/results/rc45-professor.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,6992470d77991b2bfa94cd95450bd07479f1716bef4b42ac1b967a319061dc98
+tests/results/rc45-relatorio-25-linhas.pdf,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,dac00bc6ae15fd2770108d8bcb1d86ee1c1e2a4fabd9a81e503590fbb98df1cc
+tests/results/rc45-relatorio-analise.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,6b4e4031cc266f76c2b396f3969f77cd486217aa25ba4a6e3c55f10be6709e9f
+tests/results/rc45-relatorio-completo.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,afdc1523114e73fbe31f8a2b12415d64d31bb82c5130d385988b5a8c08446e7a
+tests/results/rc45-relatorio-mao.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,3817426f6e5f056e1ea42f189f2b9cce3af681924002232355f1db0944832a99
+tests/results/rc45-tema-contrast.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,0cc664a8c1ec284c671905e24a92bb568f40df39f90b64f1f8b5cf7d17244fe2
+tests/results/rc45-tema-cvd.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,2dc623a16c3a3f24e251e6856e51af702043ac83477cf32f6a0abff9cb51cbc9
+tests/results/rc45-tema-dark.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,250728bd1cc9b43451999b93bf6764eb4dca12aadde490e7461d6df726c736f8
+tests/results/rc45-tema-light.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,b7c68a1cbe0ea2be1dbc7adb96c98e132800c4e3c3466fd06861139afb28d609
+tests/results/rc45.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,cd8454fdd8e52dd8e4d45e2f2417dca98c0ab9943fa9b0dc457bff2928d6bb8e
+tests/results/regressao.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,f367c7dda56ea6532c22dc91eead12c4fc4465b40ada301b45f5353a6ddab558
+tests/results/relatorio-em-branco.pdf,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,26e89b406dc40710a005e2ca193502d41d228e52a2e5a7ff43789b1a67149686
+tests/results/relatorio-preenchido.pdf,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,c652bc9fc4f24563b4455b7e507afea75dd4cdc5ece7fc426c425d644dce1500
+tests/results/unitarios-rc45.log,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,94e061571757e6965f6cd3062a67458a2775bc31646f511e0d091c9aba9fba94
+tests/results/webkit-bancada-1366.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,85d9c6e819c2c9cef3267e860fd10639e020f4f5cc3633acba55b7f770a87346
+tests/results/webkit-bancada-320.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,b24a276f3313bec0cc833b17e750de76c397e88abee5b313345a3c56b76abd32
+tests/results/webkit-bancada-390.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,d81e3b72f5545b6b71afac9a8b0917b226c974c65e5ed37e462964f18ada7725
+tests/results/webkit-professor.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,ac804f82ecc65b93d4a817ce75fa21e89e3d60a67e58e38d89c442e43e849dbf
+tests/results/webkit-toque-390.png,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,3723b26074bb4b956898e65afb9a5b08492a550d9bfd59a2239a41aef069765f
+tests/results/workspace.json,E,Evidência/documentação histórica preservada; não prova uma nova execução nem remoção segura.,9af18967ce4aebc4f85fbe55b60a5431b0c35034ec6acaac22e8dd044e7b45ca
+tests/server.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,855bb3e9f56b2471a266d3eb7a25e1ffce73e37a981cf764cc3eeda14d350071
+tests/workspace.test.cjs,B,Infraestrutura de teste e cenários científicos/UI vinculados ao SIAB.,405d002ee40cba487534df67f9142c7e5c545737a38d15bae0b46f258d3cfe17
+vendor/dialog-polyfill/LICENSE,A,"Polyfill de dialog, estilo e licença de terceiro; compatibilidade estrutural.",c9a5bd7c8cc1267ddacdc5228c68ecd811cf6d74286e9141bc80d8af2eb1a025
+vendor/dialog-polyfill/dialog-polyfill.css,A,"Polyfill de dialog, estilo e licença de terceiro; compatibilidade estrutural.",f83b885fefa244a2d80ab2b13100c039d1fe4996fb8be7dfa18cd1207490282d
+vendor/dialog-polyfill/dialog-polyfill.js,A,"Polyfill de dialog, estilo e licença de terceiro; compatibilidade estrutural.",b443f359a959982de5d5bb7545471ef7e978e7cdf36e2092e17f214de22b9ba1

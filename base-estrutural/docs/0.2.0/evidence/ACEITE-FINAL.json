@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-04T02:13:47.027Z",
+  "engine": "Chromium",
+  "checks": [
+    {
+      "phase": 24,
+      "status": "PASS",
+      "cases": [
+        "domain=null",
+        "header/menu",
+        "painéis",
+        "viewport",
+        "a11y",
+        "Manual vazio",
+        "mobile320",
+        "notificação",
+        "reload offline",
+        "preferência persistida"
+      ]
+    },
+    {
+      "phase": 25,
+      "status": "PASS",
+      "cases": [
+        "identidade",
+        "tema",
+        "ferramenta",
+        "SVG",
+        "contexto",
+        "fullscreen",
+        "Manual",
+        "notificação",
+        "modal",
+        "demo offline",
+        "reset",
+        "destroy"
+      ]
+    }
+  ],
+  "pageErrors": []
+}

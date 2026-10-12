@@ -1,0 +1,121 @@
+{
+  "engine": "Chromium",
+  "warmup": 5,
+  "measuredCycles": 60,
+  "measurements": [
+    {
+      "cycles": 10,
+      "documents": 3,
+      "nodes": 391,
+      "jsEventListeners": 78,
+      "usedSize": 1716540,
+      "totalSize": 2678784,
+      "embedderHeapUsedSize": 1513896,
+      "backingStorageSize": 99281,
+      "scope": {
+        "scopes": 0,
+        "resources": 0,
+        "canvases": 0,
+        "overlays": 0
+      }
+    },
+    {
+      "cycles": 20,
+      "documents": 3,
+      "nodes": 244,
+      "jsEventListeners": 66,
+      "usedSize": 1702380,
+      "totalSize": 2678784,
+      "embedderHeapUsedSize": 1230304,
+      "backingStorageSize": 99287,
+      "scope": {
+        "scopes": 0,
+        "resources": 0,
+        "canvases": 0,
+        "overlays": 0
+      }
+    },
+    {
+      "cycles": 30,
+      "documents": 3,
+      "nodes": 232,
+      "jsEventListeners": 65,
+      "usedSize": 1704280,
+      "totalSize": 2678784,
+      "embedderHeapUsedSize": 1233792,
+      "backingStorageSize": 99287,
+      "scope": {
+        "scopes": 0,
+        "resources": 0,
+        "canvases": 0,
+        "overlays": 0
+      }
+    },
+    {
+      "cycles": 40,
+      "documents": 3,
+      "nodes": 235,
+      "jsEventListeners": 65,
+      "usedSize": 1714932,
+      "totalSize": 2678784,
+      "embedderHeapUsedSize": 1449480,
+      "backingStorageSize": 99287,
+      "scope": {
+        "scopes": 0,
+        "resources": 0,
+        "canvases": 0,
+        "overlays": 0
+      }
+    },
+    {
+      "cycles": 50,
+      "documents": 3,
+      "nodes": 235,
+      "jsEventListeners": 65,
+      "usedSize": 1715744,
+      "totalSize": 2678784,
+      "embedderHeapUsedSize": 1490440,
+      "backingStorageSize": 99287,
+      "scope": {
+        "scopes": 0,
+        "resources": 0,
+        "canvases": 0,
+        "overlays": 0
+      }
+    },
+    {
+      "cycles": 60,
+      "documents": 3,
+      "nodes": 232,
+      "jsEventListeners": 65,
+      "usedSize": 1719240,
+      "totalSize": 2678784,
+      "embedderHeapUsedSize": 1252368,
+      "backingStorageSize": 99287,
+      "scope": {
+        "scopes": 0,
+        "resources": 0,
+        "canvases": 0,
+        "overlays": 0
+      }
+    }
+  ],
+  "lifecycle": {
+    "calls": 1,
+    "webgl": true,
+    "webglLost": true,
+    "oldHostConnected": false,
+    "stale": null,
+    "stats": {
+      "scopes": 0,
+      "resources": 0
+    },
+    "overlays": 0
+  },
+  "limits": {
+    "heapGrowthBytes": 1000000,
+    "domNodeGrowth": 40,
+    "listenerGrowth": 5
+  },
+  "note": "Medição pós-GC do cenário controlado; não é garantia universal para código externo que ignore o escopo."
+}

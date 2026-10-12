@@ -1,0 +1,72 @@
+{
+  "data_utc": "2026-10-08T08:12:34.528791Z",
+  "tipo": "conferência de fonte e integridade",
+  "referencia": {
+    "arquivo": "SIAB(4).zip",
+    "versao_interna": "1.0.0",
+    "sha512": "ff81556ce175bbc6e527eb922a193599b31d127ee07a0cb43a80639e45570c20a75e5660a876f29fbdb435dc636b0556e527d8d1b394739a3cf9fe1b583983b3",
+    "arquivo_identico": "SIAB(3).zip",
+    "status": "AVAILABLE_VERIFIED",
+    "comparacao": "SOURCE_REVIEW_COMPLETED",
+    "criterio": "Referência já fornecida pelo usuário, confirmada após sua correção em 2026-10-08. SIAB(3) e SIAB(4) são byte a byte idênticos.",
+    "nome_citado_no_prompt": "SIAB(9).zip",
+    "nota_nome": "O nome citado no prompt fica como rastreabilidade. O hash pertence ao arquivo efetivamente inspecionado SIAB(4), sem afirmar identidade com um SIAB(9) não inspecionado."
+  },
+  "arquivos_zip_verificados": 102,
+  "fontes_lidas": [
+    {
+      "arquivo": "js/core/namespace.js",
+      "sha512": "7042fcd036dbbb82ec18f6bbae45dd8c49c085e6d63ec4687d3077c7215537bda311c63ed898f6c3b28237040a62b921b46196cb7b92ca65b80f9a4468dffe1f"
+    },
+    {
+      "arquivo": "index.html",
+      "sha512": "7145532962c7787e6f894e5c68241a3c6a1d127b6c07e3cf3442558a50919cc53985ae8d96fc29565bb458b7e9087174d357fe852ca11de1a761d1dd254cf6f3"
+    },
+    {
+      "arquivo": "js/ui/gaveta.js",
+      "sha512": "57fb6918bdff0f639f4c943d2b14cd0974204a1d499b21b24543d05482596545401e4203ee448f9274bf8b7dc01665674f6552351cc5ec88862b691d0525e233"
+    },
+    {
+      "arquivo": "js/ui/activity-ui.js",
+      "sha512": "f5e9d86ff744e6f718cf24f8782abd891b97a0bcd90970df64fafa60310f976b7cb34e7a58763505ef60d15759f34d24b9dcbb89e3f77a83b52b9f2ea9110115"
+    },
+    {
+      "arquivo": "js/a11y/preferencias.js",
+      "sha512": "82ccd5bca1f0a716de1371cde0d0248fac8989dfd3fb550233736bacf61690c2f89d9042439f9b993d43ee9e8cef77a0484777c84a15196c58f86b5b4bc6356c"
+    },
+    {
+      "arquivo": "js/telas/manual.js",
+      "sha512": "8a4f83a878e5b1a3f1b4cf992049939c9fa628ffec1446cf17063f6613df6dcb4d8158e4ca7d9de1e88647f74bbc3c310a780b646dd2b0982b6d0d276681a5db"
+    },
+    {
+      "arquivo": "js/init/integracao.js",
+      "sha512": "ebc445fac70381fd581e6490c1ce9f6d92345fe94fe472bb668499f52c59a18c1500de966023ff4a5668681fbf566657a2a7f54c28483215b040c235624f0410"
+    },
+    {
+      "arquivo": "js/core/activity-context.js",
+      "sha512": "a828f9e77dd34c14ef73a1cb6e8f1fa0e9e89a1e3d76c9e2cb80419a07adeb50e1ef948ede518a1dc7b104204565d6b7b78d91b0b4266a950840645ea7d6e17d"
+    },
+    {
+      "arquivo": "js/core/atividades.js",
+      "sha512": "a00ea5b710b8b5f7a57c53c63beb492f05d424a423ccbaaaac76a920877a576dcb74a5e2a406482ac6ae50171ce3022af8c0d3350e0da27e88d5aa37734ca318"
+    },
+    {
+      "arquivo": "js/core/roteador.js",
+      "sha512": "b24f45031976afce37664a67bf141be2088f7062eb1fe23c5fe92781e811a372f315f8cc1babdea28be90d74a606f15dbd2991d6334cb63122851e1686ab3c08"
+    },
+    {
+      "arquivo": "css/stylesiab.css",
+      "sha512": "1a0d43a407e87a22b220840a23bfb99ee75296a39030df7e0add4ff05fea97cf97e01921bad9b32686bb80911b36f3cbfd7be7a27853fb140ebc58bae88663cb"
+    },
+    {
+      "arquivo": "css/investigacao.css",
+      "sha512": "c38799961e4f49cce11f93f584b058b75d90a42a8efa47aea6baf60f0164dd9f7069e8384ee56fced56b143285037ba977e01a97fca5990433929b0743533fa9"
+    },
+    {
+      "arquivo": "css/workspace.css",
+      "sha512": "b9ed4c08c12c20618250feca7aa38755b2c1bdf4e28ee8f0dc5f9ac3585de9e3a3409143255a9930e98e3dfe9aebdc2cfc81bb618daf771fb6d2656520e35b0c"
+    }
+  ],
+  "runtime": "sem alterações nesta revisão documental",
+  "limite": "Comparação de fontes com a Base e seus resultados de testes já executados; não é novo teste em navegador do SIAB nem equivalência de conteúdo científico."
+}

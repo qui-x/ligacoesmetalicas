@@ -1,0 +1,6681 @@
+[
+  {
+    "arquivo": "SIAB-standalone.html",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "CAPACITY_ML",
+      "ESCALAS",
+      "MAX_TUBES",
+      "MEDIDAS_VIDRO",
+      "MODULOS",
+      "NIVEIS",
+      "TABELA_COMPACTA",
+      "TUBE_DEFAULTS",
+      "VER_SECTIONS",
+      "VIDRARIAS",
+      "abertura",
+      "acidFamilies",
+      "acidos",
+      "activeBench",
+      "activityUI",
+      "ajuda",
+      "alterar",
+      "ambiente",
+      "announce",
+      "armazenamento",
+      "atividades",
+      "baixarArquivo",
+      "bancada",
+      "bases",
+      "benches",
+      "bncc",
+      "cadernoCSV",
+      "capacidade",
+      "capacidadeDaBancada",
+      "chem",
+      "cientifico",
+      "compactarTabela",
+      "compartilha",
+      "concepcoes",
+      "condutimetro",
+      "condutividade",
+      "confirmar",
+      "contaGotas",
+      "contarAtomos",
+      "criarBancada",
+      "csvCampo",
+      "current",
+      "dataHora",
+      "desfazer",
+      "embaralhar",
+      "enhanceSelect",
+      "entradaEspecifica",
+      "equacao",
+      "escala",
+      "escape",
+      "experimentos",
+      "familySpecies",
+      "formaVidro",
+      "format",
+      "funcoes",
+      "gaveta",
+      "grafico",
+      "graficoMedido",
+      "historicoHTML",
+      "historicoTabela",
+      "historyCSV",
+      "icons",
+      "identificacaoHTML",
+      "impressao",
+      "indicators",
+      "iniciarInvestigacao",
+      "initPreferences",
+      "initSelects",
+      "instrumentos",
+      "irPara",
+      "isEveryday",
+      "layoutBancada",
+      "ligarVer",
+      "limparGrupos",
+      "loja",
+      "lupa",
+      "manual",
+      "manualContent",
+      "manualRegistry",
+      "manualTela",
+      "marcasDeVolume",
+      "massaMolar",
+      "massasAtomicas",
+      "medicoes",
+      "migrarDados",
+      "missaoAlias",
+      "missaoTela",
+      "missoes",
+      "misturarTubos",
+      "modulos",
+      "montagens",
+      "montarExperimento",
+      "montarMontagem",
+      "motor",
+      "newTube",
+      "nomeGrupo",
+      "nomeIndicador",
+      "normalizar",
+      "notaCompacta",
+      "notaTabelaHTML",
+      "notice",
+      "persistencia",
+      "phFormat",
+      "pontoFinal",
+      "prateleira",
+      "preparoTargets",
+      "professor",
+      "progresso",
+      "pwa",
+      "refreshSelects",
+      "registrar",
+      "regua",
+      "relatorios",
+      "render",
+      "renderRegua",
+      "renderVazia",
+      "renderVer",
+      "renderVidraria",
+      "resumoConteudo",
+      "rota",
+      "rotear",
+      "segredo",
+      "selecaoTubos",
+      "selecionarVer",
+      "solutionGroups",
+      "solutionSummary",
+      "solutions",
+      "som",
+      "state",
+      "syncForm",
+      "tabelaCSV",
+      "targets",
+      "telas",
+      "temas",
+      "temperaturaLocal",
+      "textoCompartilhado",
+      "tour",
+      "trilho",
+      "tubeSVG",
+      "usarBancada",
+      "verDisponivel",
+      "verFamiliasDisponiveis",
+      "verGrupos",
+      "verRenderers",
+      "version",
+      "vidro",
+      "volumePadrao",
+      "volumeTexto",
+      "workspace"
+    ],
+    "imports_scripts": [
+      "a11y.js",
+      "../a11y.js",
+      "...a11y.js"
+    ],
+    "state_reads_writes": [
+      "activeFamily",
+      "activeId",
+      "activeTool",
+      "baseline",
+      "capacidades",
+      "colorblind",
+      "contrast",
+      "controles",
+      "destaque",
+      "destination",
+      "experiencia",
+      "fontScale",
+      "graficoModo",
+      "history",
+      "identificacao",
+      "indicatorOnly",
+      "initialView",
+      "item",
+      "js",
+      "left",
+      "leftGroup",
+      "level",
+      "lupaLog",
+      "measurementTable",
+      "modo",
+      "montagem",
+      "motion",
+      "navegacao",
+      "nextGroup",
+      "nivel",
+      "ordemPH",
+      "presentation",
+      "reading",
+      "reportId",
+      "reportViews",
+      "right",
+      "scope",
+      "showPH",
+      "som",
+      "source",
+      "spacing",
+      "temperatura",
+      "theme",
+      "tipo",
+      "titulo",
+      "tool",
+      "tubes",
+      "ver",
+      "verFamily",
+      "verLastTabs",
+      "verTab",
+      "vibrar",
+      "vidraria",
+      "view"
+    ],
+    "events": [
+      "DOMContentLoaded",
+      "afterprint",
+      "appinstalled",
+      "beforeinstallprompt",
+      "beforeprint",
+      "blur",
+      "cancel",
+      "change",
+      "click",
+      "close",
+      "contextmenu",
+      "controllerchange",
+      "error",
+      "focus",
+      "focusin",
+      "hashchange",
+      "input",
+      "keydown",
+      "keyup",
+      "load",
+      "mousedown",
+      "mouseup",
+      "pagehide",
+      "pageshow",
+      "pointerdown",
+      "resize",
+      "scroll",
+      "siab:modo",
+      "siab:rota",
+      "submit",
+      "toggle"
+    ],
+    "dom_ids_literals": [
+      "a11y-restaurar",
+      "a11y-toggle",
+      "abertura",
+      "abertura-check",
+      "about-btn",
+      "about-dialog",
+      "about-version",
+      "access-btn",
+      "activity-banner",
+      "activity-caption",
+      "activity-exit",
+      "activity-finish",
+      "activity-help-content",
+      "activity-help-dialog",
+      "activity-help-title",
+      "activity-menu",
+      "activity-montagem",
+      "add-tube-btn",
+      "agitar-btn",
+      "ajustes",
+      "announcer",
+      "app-drawer",
+      "atividade-conteudo",
+      "atividades-recentes",
+      "bancada-vazia",
+      "bench-mode",
+      "boas-vindas",
+      "boas-vindas-fechar",
+      "boas-vindas-tour",
+      "caderno-anotacao",
+      "caderno-csv",
+      "caderno-filtro",
+      "caderno-imprimir",
+      "caderno-limpar",
+      "caderno-lista",
+      "capacidade-grupo",
+      "capacidade-opcoes",
+      "capacity-value",
+      "choice-count",
+      "choice-dialog",
+      "choice-empty",
+      "choice-options",
+      "choice-search",
+      "choice-search-field",
+      "choice-title",
+      "close-controls",
+      "color-name",
+      "color-swatch",
+      "colorblindOverlay",
+      "comparacao-corpo",
+      "comparacao-dialog",
+      "compare-btn",
+      "concentration",
+      "concentration-field",
+      "confirm-dialog",
+      "confirm-text",
+      "confirm-title",
+      "confirm-yes",
+      "contraste-check",
+      "controls",
+      "controls-title",
+      "cvd-select",
+      "dilution-field",
+      "dilution-select",
+      "dock-close-right",
+      "dock-expand",
+      "dock-left-content",
+      "dock-right-content",
+      "dose-area",
+      "dose-shortcuts",
+      "dose-summary",
+      "drawer-activity-context",
+      "drawer-continue",
+      "drawer-guia",
+      "drawer-install",
+      "drawer-now-detail",
+      "drawer-now-title",
+      "drawer-projector",
+      "drawer-title",
+      "drawer-tour",
+      "drawer-versao",
+      "drop-btn",
+      "drop-volume",
+      "drop1ml-btn",
+      "drop5-btn",
+      "drop5ml-btn",
+      "equivalence-note",
+      "espacamento-check",
+      "experiment",
+      "falha-abertura",
+      "focus-tab",
+      "focus-view",
+      "folha-impressao",
+      "font-minus",
+      "font-output",
+      "font-plus",
+      "group-notice",
+      "guide-dialog",
+      "imprimir-relatorio",
+      "indicator-chips",
+      "indicator-name",
+      "indicator-only",
+      "indicator-range",
+      "inicio-caderno-meta",
+      "inicio-missoes-meta",
+      "inicio-roteiros-meta",
+      "inicio-temas-meta",
+      "initial-volume",
+      "install-btn",
+      "large-tube",
+      "leitura-check",
+      "libras-check",
+      "manual-busca",
+      "manual-clear",
+      "manual-conteudo",
+      "manual-imprimir",
+      "manual-index-toggle",
+      "manual-indice",
+      "manual-print",
+      "manual-search-form",
+      "manual-status",
+      "manual-titulo",
+      "meia-gota-btn",
+      "menu-btn",
+      "menu-frasco-corpo",
+      "missao-feedback",
+      "mission-bar",
+      "missoes-lista",
+      "mistura-destino-dialog",
+      "mistura-destino-form",
+      "mistura-destino-select",
+      "mistura-erro",
+      "modulos",
+      "montagens-lista",
+      "motion-check",
+      "new-name",
+      "ordenar-ph-btn",
+      "overview-count",
+      "overview-grid",
+      "overview-group-summary",
+      "overview-hint",
+      "overview-tab",
+      "overview-view",
+      "painel-laboratorio",
+      "painel-missao",
+      "ph-delta",
+      "ph-phase",
+      "ph-toggle",
+      "ph-value",
+      "poe-btn",
+      "poe-comparacao",
+      "poe-contexto",
+      "poe-dialog",
+      "poe-explicacao",
+      "poe-form",
+      "poe-registrar",
+      "poe-resultado",
+      "poe-title",
+      "prepare-btn",
+      "prepare-form",
+      "prof-abrir",
+      "prof-cancel-edit",
+      "prof-copy",
+      "prof-erro",
+      "prof-form",
+      "prof-guide-content",
+      "prof-identificacao",
+      "prof-initial-view",
+      "prof-item",
+      "prof-link",
+      "prof-orientacoes",
+      "prof-permissoes",
+      "prof-print",
+      "prof-requisitos",
+      "prof-resultado",
+      "prof-resumo",
+      "prof-tipo",
+      "prof-ver-guia",
+      "projetor-check",
+      "pwa-recarregar",
+      "relatorio-atualizar",
+      "relatorio-baixar",
+      "relatorio-blank",
+      "relatorio-config",
+      "relatorio-conteudo",
+      "relatorio-print",
+      "relatorio-registrar",
+      "remove-btn",
+      "rename-btn",
+      "rename-dialog",
+      "rename-form",
+      "report-custom-label",
+      "report-custom-lines",
+      "report-hypotheses",
+      "report-hypotheses-error",
+      "restart-btn",
+      "roteiro-conteudo",
+      "roteiros-lista",
+      "sample-model-note",
+      "sample-summary",
+      "secao-frascos",
+      "selecao-cancelar-btn",
+      "selecao-comparar-btn",
+      "selecao-desvincular-btn",
+      "selecao-misturar-btn",
+      "selecao-registrar-btn",
+      "selecao-remover-btn",
+      "selecao-todos-btn",
+      "selecao-tubos",
+      "selecao-tubos-contagem",
+      "selecao-vincular-btn",
+      "selecionar-tubos-btn",
+      "sheet-backdrop",
+      "shelf",
+      "shelf-search",
+      "sound-check",
+      "startup-dialog",
+      "teacher-guide",
+      "teacher-guide-dialog",
+      "tema-conteudo",
+      "tema-escuro",
+      "temas-lista",
+      "temperature-value",
+      "titrant-concentration",
+      "titrant-concentration-field",
+      "titrant-dilution-field",
+      "titrant-dilution-select",
+      "titrant-label",
+      "toast",
+      "tour",
+      "tour-passo",
+      "tour-pontos",
+      "tour-proximo",
+      "tour-pular",
+      "tour-texto",
+      "tour-titulo",
+      "tour-voltar",
+      "tube-count",
+      "tube-index",
+      "tube-list",
+      "tube-name",
+      "undo-btn",
+      "unlink-btn",
+      "vazia-agua",
+      "vazia-desfazer",
+      "vazia-prateleira",
+      "vazia-titulo",
+      "ver-conteudo",
+      "ver-panel",
+      "ver-regua",
+      "ver-tabs",
+      "ver-title",
+      "vibrate-check",
+      "vidraria-dica",
+      "vidraria-grupo",
+      "vidro-nota",
+      "vlibras-script",
+      "volume-value",
+      "workspace",
+      "workspace-dados",
+      "workspace-launchers",
+      "workspace-quick-measure",
+      "workspace-toolbar",
+      "workspace-ver"
+    ],
+    "selectors_literals": [
+      "#a11y-toggle",
+      "#dose-area .dose-actions",
+      "#missao-concluir",
+      "#missao-refazer",
+      "#modulos .modulo",
+      "#report-use-hypotheses",
+      "#shelf",
+      "#ver-panel",
+      "*",
+      ".ab-formula",
+      ".ab-gota",
+      ".ab-liquido",
+      ".ab-ph",
+      ".ab-tubo",
+      ".abertura-tubos",
+      ".activity-banner",
+      ".ajuda-link,[data-activity-help]",
+      ".ajuda-link,[data-manual-help]",
+      ".app-header",
+      ".bolhas",
+      ".bottom-nav",
+      ".bu-liquido, .bu-ponta-liquido",
+      ".cg-bulbo",
+      ".cg-liquido",
+      ".chip, .vidraria-opcoes label, .segmented label, .opcao",
+      ".chip-ver,.chip-sep",
+      ".dock",
+      ".dock-header",
+      ".drawer-cat-expand, #a11y-toggle",
+      ".drawer-close",
+      ".drawer-section",
+      ".efeitos",
+      ".efeitos-dentro",
+      ".efeitos-superficie",
+      ".eq-formula.com-seta",
+      ".eq-seta",
+      ".experiment",
+      ".field",
+      ".focus-heading",
+      ".header-actions",
+      ".header-brand",
+      ".header-btn-texto",
+      ".indicadores-extra",
+      ".liquid-body",
+      ".liquido",
+      ".liquido-superficie",
+      ".lupa-evento",
+      ".lupa-eventos",
+      ".lupa-legenda [data-especie]",
+      ".lupa-svg",
+      ".lupa-svg[data-par]",
+      ".main-nav",
+      ".menisco",
+      ".menu-frasco",
+      ".menu-frasco-atual",
+      ".menu-frasco-cor",
+      ".modulo",
+      ".modulo-ativar",
+      ".modulo-ativar-texto",
+      ".modulo-ativo",
+      ".modulo-cab",
+      ".modulo-corpo",
+      ".nuvem-cor",
+      ".overview-details",
+      ".overview-heading-actions",
+      ".overview-tube",
+      ".painel-conteudo",
+      ".painel-secao",
+      ".sedimento",
+      ".sheet-handle",
+      ".stage-stats",
+      ".startup-opcao",
+      ".tela-manual",
+      ".tour-anel",
+      ".tour-cartao",
+      ".trilho",
+      ".tube-stage",
+      ".tube-strip",
+      ".turvacao",
+      ".vidro-corpo",
+      ".view-tabs",
+      ".volume-readout",
+      "[aria-controls=",
+      "[aria-invalid]",
+      "[autofocus]:not([disabled])",
+      "[data-acao=",
+      "[data-acao]",
+      "[data-activity-close]",
+      "[data-activity-report],[data-activity-finish]",
+      "[data-activity-resume]",
+      "[data-apagar-nota]",
+      "[data-app-icon]",
+      "[data-baixar-tabela]",
+      "[data-choice-index]",
+      "[data-close]",
+      "[data-dock-group]",
+      "[data-dock-tool]",
+      "[data-indicator],#compare-btn",
+      "[data-indicator],#compare-btn,[data-nivel],[data-montagem],[data-montar]",
+      "[data-ir-ver]",
+      "[data-manual-command]",
+      "[data-manual-expand]",
+      "[data-manual-help-link]",
+      "[data-montagem],[data-montar]",
+      "[data-montar]",
+      "[data-nav]",
+      "[data-objective]",
+      "[data-papel=",
+      "[data-recolher],.fechar-flutuante",
+      "[data-secao=",
+      "[data-solution]",
+      "[data-startup-settings],#drawer-tour,#drawer-guia,#guide-btn,#missao-refazer",
+      "[data-startup=",
+      "[data-tube]",
+      "[data-unrestricted-menu]",
+      "[data-ver-family][aria-selected=",
+      "[data-ver][aria-selected=",
+      "[hidden]",
+      "[inert]",
+      "[inert],[hidden]",
+      "[name=",
+      "[role=",
+      "[type=",
+      "a[href]",
+      "button",
+      "button,a",
+      "button,a,input",
+      "button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea,summary,a[href],[tabindex=",
+      "button:not([hidden])",
+      "circle, rect",
+      "details[data-grupo][open]",
+      "dialog",
+      "dialog[open]",
+      "ellipse",
+      "h1",
+      "input",
+      "input,select",
+      "input,textarea,select",
+      "input[name=",
+      "input[type=",
+      "label",
+      "link[rel=",
+      "main > [data-tela]",
+      "main [data-tela]:not([hidden])",
+      "meta[name=",
+      "select",
+      "span",
+      "strong",
+      "svg",
+      "svg .liquido",
+      "svg.vidro-foco"
+    ],
+    "functions_named": [
+      [
+        "",
+        "$"
+      ],
+      [
+        "",
+        "ActivityContext"
+      ],
+      [
+        "",
+        "abertura"
+      ],
+      [
+        "",
+        "activityUI"
+      ],
+      [
+        "",
+        "ajuda"
+      ],
+      [
+        "",
+        "alterar"
+      ],
+      [
+        "",
+        "announce"
+      ],
+      [
+        "",
+        "atividades"
+      ],
+      [
+        "",
+        "baixarArquivo"
+      ],
+      [
+        "",
+        "bancada"
+      ],
+      [
+        "",
+        "cadernoCSV"
+      ],
+      [
+        "",
+        "capacidade"
+      ],
+      [
+        "",
+        "capacidadeDaBancada"
+      ],
+      [
+        "",
+        "chem"
+      ],
+      [
+        "",
+        "cientifico"
+      ],
+      [
+        "",
+        "compactarTabela"
+      ],
+      [
+        "",
+        "compartilha"
+      ],
+      [
+        "",
+        "condutimetro"
+      ],
+      [
+        "",
+        "condutividade"
+      ],
+      [
+        "",
+        "confirmar"
+      ],
+      [
+        "",
+        "contarAtomos"
+      ],
+      [
+        "",
+        "criarBancada"
+      ],
+      [
+        "",
+        "csvCampo"
+      ],
+      [
+        "",
+        "current"
+      ],
+      [
+        "",
+        "desfazer"
+      ],
+      [
+        "",
+        "embaralhar"
+      ],
+      [
+        "",
+        "enhanceSelect"
+      ],
+      [
+        "",
+        "equacao"
+      ],
+      [
+        "",
+        "escape"
+      ],
+      [
+        "",
+        "experimentos"
+      ],
+      [
+        "",
+        "formaVidro"
+      ],
+      [
+        "",
+        "format"
+      ],
+      [
+        "",
+        "funcoes"
+      ],
+      [
+        "",
+        "gaveta"
+      ],
+      [
+        "",
+        "grafico"
+      ],
+      [
+        "",
+        "graficoMedido"
+      ],
+      [
+        "",
+        "historicoHTML"
+      ],
+      [
+        "",
+        "historicoTabela"
+      ],
+      [
+        "",
+        "historyCSV"
+      ],
+      [
+        "",
+        "icons"
+      ],
+      [
+        "",
+        "identificacaoHTML"
+      ],
+      [
+        "",
+        "impressao"
+      ],
+      [
+        "",
+        "iniciarInvestigacao"
+      ],
+      [
+        "",
+        "initPreferences"
+      ],
+      [
+        "",
+        "initSelects"
+      ],
+      [
+        "",
+        "instrumentos"
+      ],
+      [
+        "",
+        "irPara"
+      ],
+      [
+        "",
+        "isEveryday"
+      ],
+      [
+        "",
+        "layoutBancada"
+      ],
+      [
+        "",
+        "ligarVer"
+      ],
+      [
+        "",
+        "limparGrupos"
+      ],
+      [
+        "",
+        "loja"
+      ],
+      [
+        "",
+        "lupa"
+      ],
+      [
+        "",
+        "manualRegistry"
+      ],
+      [
+        "",
+        "manualTela"
+      ],
+      [
+        "",
+        "marcasDeVolume"
+      ],
+      [
+        "",
+        "massaMolar"
+      ],
+      [
+        "",
+        "medicoes"
+      ],
+      [
+        "",
+        "migrarDados"
+      ],
+      [
+        "",
+        "missaoTela"
+      ],
+      [
+        "",
+        "misturarTubos"
+      ],
+      [
+        "",
+        "modulos"
+      ],
+      [
+        "",
+        "montarExperimento"
+      ],
+      [
+        "",
+        "montarMontagem"
+      ],
+      [
+        "",
+        "motor"
+      ],
+      [
+        "",
+        "newTube"
+      ],
+      [
+        "",
+        "nomeGrupo"
+      ],
+      [
+        "",
+        "nomeIndicador"
+      ],
+      [
+        "",
+        "normalizar"
+      ],
+      [
+        "",
+        "notaCompacta"
+      ],
+      [
+        "",
+        "notaTabelaHTML"
+      ],
+      [
+        "",
+        "notice"
+      ],
+      [
+        "",
+        "persistencia"
+      ],
+      [
+        "",
+        "phFormat"
+      ],
+      [
+        "",
+        "pontoFinal"
+      ],
+      [
+        "",
+        "prateleira"
+      ],
+      [
+        "",
+        "preparoTargets"
+      ],
+      [
+        "",
+        "professor"
+      ],
+      [
+        "",
+        "progresso"
+      ],
+      [
+        "",
+        "pwa"
+      ],
+      [
+        "",
+        "refreshSelects"
+      ],
+      [
+        "",
+        "registrar"
+      ],
+      [
+        "",
+        "regua"
+      ],
+      [
+        "",
+        "relatorios"
+      ],
+      [
+        "",
+        "render"
+      ],
+      [
+        "",
+        "renderRegua"
+      ],
+      [
+        "",
+        "renderVazia"
+      ],
+      [
+        "",
+        "renderVer"
+      ],
+      [
+        "",
+        "renderVidraria"
+      ],
+      [
+        "",
+        "resumoConteudo"
+      ],
+      [
+        "",
+        "rotear"
+      ],
+      [
+        "",
+        "selecaoTubos"
+      ],
+      [
+        "",
+        "selecionarVer"
+      ],
+      [
+        "",
+        "solutionSummary"
+      ],
+      [
+        "",
+        "som"
+      ],
+      [
+        "",
+        "syncForm"
+      ],
+      [
+        "",
+        "tabelaCSV"
+      ],
+      [
+        "",
+        "targets"
+      ],
+      [
+        "",
+        "textoCompartilhado"
+      ],
+      [
+        "",
+        "tour"
+      ],
+      [
+        "",
+        "tubeSVG"
+      ],
+      [
+        "",
+        "usarBancada"
+      ],
+      [
+        "",
+        "verDisponivel"
+      ],
+      [
+        "",
+        "verFamiliasDisponiveis"
+      ],
+      [
+        "",
+        "vidro"
+      ],
+      [
+        "",
+        "volumePadrao"
+      ],
+      [
+        "",
+        "volumeTexto"
+      ],
+      [
+        "",
+        "workspace"
+      ],
+      [
+        "CustomEvent",
+        ""
+      ],
+      [
+        "abrir",
+        ""
+      ],
+      [
+        "abrirGuia",
+        ""
+      ],
+      [
+        "abrirPrevisao",
+        ""
+      ],
+      [
+        "absorbancia",
+        ""
+      ],
+      [
+        "accordion",
+        ""
+      ],
+      [
+        "actions",
+        ""
+      ],
+      [
+        "added",
+        ""
+      ],
+      [
+        "adicionarTubo",
+        ""
+      ],
+      [
+        "agendar",
+        ""
+      ],
+      [
+        "agitar",
+        ""
+      ],
+      [
+        "ajustarCabecalho",
+        ""
+      ],
+      [
+        "allows",
+        ""
+      ],
+      [
+        "alpha",
+        ""
+      ],
+      [
+        "alternar",
+        ""
+      ],
+      [
+        "alvoDe",
+        ""
+      ],
+      [
+        "aoCarregar",
+        ""
+      ],
+      [
+        "aplicar",
+        ""
+      ],
+      [
+        "aplicarDaltonismo",
+        ""
+      ],
+      [
+        "aplicarMedidas",
+        ""
+      ],
+      [
+        "aplicarNoBody",
+        ""
+      ],
+      [
+        "aplicarNoHtml",
+        ""
+      ],
+      [
+        "apply",
+        ""
+      ],
+      [
+        "applyLeft",
+        ""
+      ],
+      [
+        "article",
+        ""
+      ],
+      [
+        "assinatura",
+        ""
+      ],
+      [
+        "ativar",
+        ""
+      ],
+      [
+        "atualizar",
+        ""
+      ],
+      [
+        "atualizarCabecalho",
+        ""
+      ],
+      [
+        "atualizarEndereco",
+        ""
+      ],
+      [
+        "atualizarFavicon",
+        ""
+      ],
+      [
+        "atualizarOpcoes",
+        ""
+      ],
+      [
+        "avisarAtualizacao",
+        ""
+      ],
+      [
+        "barra",
+        ""
+      ],
+      [
+        "base",
+        ""
+      ],
+      [
+        "bind",
+        ""
+      ],
+      [
+        "bolhasHTML",
+        ""
+      ],
+      [
+        "buildBench",
+        ""
+      ],
+      [
+        "buretaSVG",
+        ""
+      ],
+      [
+        "button",
+        ""
+      ],
+      [
+        "cabecalho",
+        ""
+      ],
+      [
+        "calculosHTML",
+        ""
+      ],
+      [
+        "calibrar",
+        ""
+      ],
+      [
+        "cancelarEdicao",
+        ""
+      ],
+      [
+        "capacidade",
+        ""
+      ],
+      [
+        "capturar",
+        ""
+      ],
+      [
+        "carga",
+        ""
+      ],
+      [
+        "cargaDe",
+        ""
+      ],
+      [
+        "carimbarLinks",
+        ""
+      ],
+      [
+        "carregarLibras",
+        ""
+      ],
+      [
+        "catalogo",
+        ""
+      ],
+      [
+        "celulas",
+        ""
+      ],
+      [
+        "charge",
+        ""
+      ],
+      [
+        "choose",
+        ""
+      ],
+      [
+        "close",
+        ""
+      ],
+      [
+        "closeSheet",
+        ""
+      ],
+      [
+        "co2",
+        ""
+      ],
+      [
+        "codificar",
+        ""
+      ],
+      [
+        "colocar",
+        ""
+      ],
+      [
+        "color",
+        ""
+      ],
+      [
+        "colorMix",
+        ""
+      ],
+      [
+        "colorNames",
+        ""
+      ],
+      [
+        "colorRange",
+        ""
+      ],
+      [
+        "comecar",
+        ""
+      ],
+      [
+        "compact",
+        ""
+      ],
+      [
+        "compactHTML",
+        ""
+      ],
+      [
+        "comparar",
+        ""
+      ],
+      [
+        "compararIndicadores",
+        ""
+      ],
+      [
+        "concluido",
+        ""
+      ],
+      [
+        "concluir",
+        ""
+      ],
+      [
+        "conductivityChart",
+        ""
+      ],
+      [
+        "conferirPrevisao",
+        ""
+      ],
+      [
+        "config",
+        ""
+      ],
+      [
+        "configurar",
+        ""
+      ],
+      [
+        "configure",
+        ""
+      ],
+      [
+        "contexto",
+        ""
+      ],
+      [
+        "contextual",
+        ""
+      ],
+      [
+        "copiar",
+        ""
+      ],
+      [
+        "corDa",
+        ""
+      ],
+      [
+        "corDoFrasco",
+        ""
+      ],
+      [
+        "coresDaZona",
+        ""
+      ],
+      [
+        "create",
+        ""
+      ],
+      [
+        "createsStackingContext",
+        ""
+      ],
+      [
+        "criar",
+        ""
+      ],
+      [
+        "critical",
+        ""
+      ],
+      [
+        "curva",
+        ""
+      ],
+      [
+        "curvaTeorica",
+        ""
+      ],
+      [
+        "dados",
+        ""
+      ],
+      [
+        "decodificar",
+        ""
+      ],
+      [
+        "defaults",
+        ""
+      ],
+      [
+        "definir",
+        ""
+      ],
+      [
+        "derivada",
+        ""
+      ],
+      [
+        "desenhar",
+        ""
+      ],
+      [
+        "desfazer",
+        ""
+      ],
+      [
+        "desvincular",
+        ""
+      ],
+      [
+        "desvincularTubos",
+        ""
+      ],
+      [
+        "diagram",
+        ""
+      ],
+      [
+        "dialog",
+        ""
+      ],
+      [
+        "dialogPolyfillInfo",
+        ""
+      ],
+      [
+        "dissolved",
+        ""
+      ],
+      [
+        "distribuicao",
+        ""
+      ],
+      [
+        "editable",
+        ""
+      ],
+      [
+        "editar",
+        ""
+      ],
+      [
+        "eixoVolume",
+        ""
+      ],
+      [
+        "emUso",
+        ""
+      ],
+      [
+        "encerrar",
+        ""
+      ],
+      [
+        "enforce",
+        ""
+      ],
+      [
+        "equilibrio",
+        ""
+      ],
+      [
+        "erroForm",
+        ""
+      ],
+      [
+        "estado",
+        ""
+      ],
+      [
+        "estadoDoVidro",
+        ""
+      ],
+      [
+        "etapa",
+        ""
+      ],
+      [
+        "evento",
+        ""
+      ],
+      [
+        "expandir",
+        ""
+      ],
+      [
+        "fechar",
+        ""
+      ],
+      [
+        "field",
+        ""
+      ],
+      [
+        "fimSequencia",
+        ""
+      ],
+      [
+        "finalizar",
+        ""
+      ],
+      [
+        "findFocusableElementWithin",
+        ""
+      ],
+      [
+        "findFormSubmitter",
+        ""
+      ],
+      [
+        "findNearestDialog",
+        ""
+      ],
+      [
+        "focusOption",
+        ""
+      ],
+      [
+        "formatar",
+        ""
+      ],
+      [
+        "formulaHTML",
+        ""
+      ],
+      [
+        "fracaoBasica",
+        ""
+      ],
+      [
+        "fractions",
+        ""
+      ],
+      [
+        "generated",
+        ""
+      ],
+      [
+        "geometry",
+        ""
+      ],
+      [
+        "gota",
+        ""
+      ],
+      [
+        "gotaDaSequencia",
+        ""
+      ],
+      [
+        "gotejar",
+        ""
+      ],
+      [
+        "gravarMemoria",
+        ""
+      ],
+      [
+        "groupAllowed",
+        ""
+      ],
+      [
+        "guard",
+        ""
+      ],
+      [
+        "guardarRota",
+        ""
+      ],
+      [
+        "guia",
+        ""
+      ],
+      [
+        "higienizar",
+        ""
+      ],
+      [
+        "home",
+        ""
+      ],
+      [
+        "html",
+        ""
+      ],
+      [
+        "hydrate",
+        ""
+      ],
+      [
+        "hypotheses",
+        ""
+      ],
+      [
+        "hypotheticalGraph",
+        ""
+      ],
+      [
+        "imprimir",
+        ""
+      ],
+      [
+        "inNodeList",
+        ""
+      ],
+      [
+        "index",
+        ""
+      ],
+      [
+        "indicador",
+        ""
+      ],
+      [
+        "indicatorColor",
+        ""
+      ],
+      [
+        "iniciar",
+        ""
+      ],
+      [
+        "iniciarSequencia",
+        ""
+      ],
+      [
+        "init",
+        ""
+      ],
+      [
+        "isConnected",
+        ""
+      ],
+      [
+        "isFormMethodDialog",
+        ""
+      ],
+      [
+        "juntar",
+        ""
+      ],
+      [
+        "lambda",
+        ""
+      ],
+      [
+        "lampada",
+        ""
+      ],
+      [
+        "leitura",
+        ""
+      ],
+      [
+        "ler",
+        ""
+      ],
+      [
+        "lerMemoria",
+        ""
+      ],
+      [
+        "lerPermissoes",
+        ""
+      ],
+      [
+        "lerURL",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "limitarFonte",
+        ""
+      ],
+      [
+        "limiteDaGota",
+        ""
+      ],
+      [
+        "limpar",
+        ""
+      ],
+      [
+        "limparErros",
+        ""
+      ],
+      [
+        "linha",
+        ""
+      ],
+      [
+        "liquid",
+        ""
+      ],
+      [
+        "maybeHandleSubmit",
+        ""
+      ],
+      [
+        "meanCharge",
+        ""
+      ],
+      [
+        "medidas",
+        ""
+      ],
+      [
+        "medir",
+        ""
+      ],
+      [
+        "meiaGota",
+        ""
+      ],
+      [
+        "meniscoD",
+        ""
+      ],
+      [
+        "misturar",
+        ""
+      ],
+      [
+        "mix",
+        ""
+      ],
+      [
+        "mixture",
+        ""
+      ],
+      [
+        "montar",
+        ""
+      ],
+      [
+        "montarRecursos",
+        ""
+      ],
+      [
+        "mostrar",
+        ""
+      ],
+      [
+        "mostrarDelta",
+        ""
+      ],
+      [
+        "mostrarFalha",
+        ""
+      ],
+      [
+        "mudarRecipiente",
+        ""
+      ],
+      [
+        "mudariam",
+        ""
+      ],
+      [
+        "opcoes",
+        ""
+      ],
+      [
+        "open",
+        ""
+      ],
+      [
+        "openSheet",
+        ""
+      ],
+      [
+        "organizar",
+        ""
+      ],
+      [
+        "pKaDasEtapas",
+        ""
+      ],
+      [
+        "pKw",
+        ""
+      ],
+      [
+        "paint",
+        ""
+      ],
+      [
+        "paraBooleano",
+        ""
+      ],
+      [
+        "parar",
+        ""
+      ],
+      [
+        "parciais",
+        ""
+      ],
+      [
+        "paresConjugados",
+        ""
+      ],
+      [
+        "parte",
+        ""
+      ],
+      [
+        "partes",
+        ""
+      ],
+      [
+        "particulaSolta",
+        ""
+      ],
+      [
+        "passoRedondo",
+        ""
+      ],
+      [
+        "permissions",
+        ""
+      ],
+      [
+        "pingando",
+        ""
+      ],
+      [
+        "podeUsarServiceWorker",
+        ""
+      ],
+      [
+        "posicionar",
+        ""
+      ],
+      [
+        "preparar",
+        ""
+      ],
+      [
+        "preparePrint",
+        ""
+      ],
+      [
+        "previsoes",
+        ""
+      ],
+      [
+        "projetor",
+        ""
+      ],
+      [
+        "queryString",
+        ""
+      ],
+      [
+        "reacaoCompleta",
+        ""
+      ],
+      [
+        "reacaoIonica",
+        ""
+      ],
+      [
+        "reacaoPorEtapas",
+        ""
+      ],
+      [
+        "reagir",
+        ""
+      ],
+      [
+        "recentes",
+        ""
+      ],
+      [
+        "recomecar",
+        ""
+      ],
+      [
+        "referenciaDe",
+        ""
+      ],
+      [
+        "refresh",
+        ""
+      ],
+      [
+        "registrar",
+        ""
+      ],
+      [
+        "removerTubo",
+        ""
+      ],
+      [
+        "render",
+        ""
+      ],
+      [
+        "renderIndicadores",
+        ""
+      ],
+      [
+        "renderLista",
+        ""
+      ],
+      [
+        "renderMenus",
+        ""
+      ],
+      [
+        "renderRecentes",
+        ""
+      ],
+      [
+        "requirements",
+        ""
+      ],
+      [
+        "resource",
+        ""
+      ],
+      [
+        "responsive",
+        ""
+      ],
+      [
+        "restaurar",
+        ""
+      ],
+      [
+        "restaurarBancada",
+        ""
+      ],
+      [
+        "resumo",
+        ""
+      ],
+      [
+        "retomar",
+        ""
+      ],
+      [
+        "rich",
+        ""
+      ],
+      [
+        "rowsFor",
+        ""
+      ],
+      [
+        "safeBlur",
+        ""
+      ],
+      [
+        "safeDispatchEvent",
+        ""
+      ],
+      [
+        "sair",
+        ""
+      ],
+      [
+        "salvar",
+        ""
+      ],
+      [
+        "salvarExplicacao",
+        ""
+      ],
+      [
+        "salvarSessao",
+        ""
+      ],
+      [
+        "sampleStock",
+        ""
+      ],
+      [
+        "sanitize",
+        ""
+      ],
+      [
+        "save",
+        ""
+      ],
+      [
+        "schedule",
+        ""
+      ],
+      [
+        "search",
+        ""
+      ],
+      [
+        "selecionarTubo",
+        ""
+      ],
+      [
+        "selected",
+        ""
+      ],
+      [
+        "serie",
+        ""
+      ],
+      [
+        "setIndex",
+        ""
+      ],
+      [
+        "setas",
+        ""
+      ],
+      [
+        "settingsHTML",
+        ""
+      ],
+      [
+        "sistemas",
+        ""
+      ],
+      [
+        "solidos",
+        ""
+      ],
+      [
+        "solve",
+        ""
+      ],
+      [
+        "species",
+        ""
+      ],
+      [
+        "summary",
+        ""
+      ],
+      [
+        "suspender",
+        ""
+      ],
+      [
+        "svg",
+        ""
+      ],
+      [
+        "sync",
+        ""
+      ],
+      [
+        "syncViews",
+        ""
+      ],
+      [
+        "tabela",
+        ""
+      ],
+      [
+        "table",
+        ""
+      ],
+      [
+        "tocar",
+        ""
+      ],
+      [
+        "topicFor",
+        ""
+      ],
+      [
+        "topicLink",
+        ""
+      ],
+      [
+        "total",
+        ""
+      ],
+      [
+        "trocarCapacidade",
+        ""
+      ],
+      [
+        "trocarVidraria",
+        ""
+      ],
+      [
+        "update",
+        ""
+      ],
+      [
+        "validar",
+        ""
+      ],
+      [
+        "validate",
+        ""
+      ],
+      [
+        "vibrar",
+        ""
+      ],
+      [
+        "viewport",
+        ""
+      ],
+      [
+        "vincularTubos",
+        ""
+      ],
+      [
+        "vinculoIgual",
+        ""
+      ],
+      [
+        "visibility",
+        ""
+      ],
+      [
+        "visivel",
+        ""
+      ],
+      [
+        "writing",
+        ""
+      ],
+      [
+        "zona",
+        ""
+      ]
+    ],
+    "storage_literals": [
+      "siab_a11y_prefs",
+      "siab_abertura",
+      "siab_atividade_",
+      "siab_atividade_ativa",
+      "siab_atividades_criadas",
+      "siab_bancada_v2",
+      "siab_inicializacao",
+      "siab_investigacao_v2",
+      "siab_libras_v1",
+      "siab_manual_visto",
+      "siab_migracao_v2",
+      "siab_modo",
+      "siab_progresso_v1",
+      "siab_projetor",
+      "siab_relatorios_v1",
+      "siab_som_v1",
+      "siab_workspace_v1"
+    ]
+  },
+  {
+    "arquivo": "a11y.js",
+    "classe": "A",
+    "globals": [],
+    "imports_scripts": [
+      "a11y.js",
+      "../a11y.js",
+      "...a11y.js"
+    ],
+    "state_reads_writes": [
+      "colorblind",
+      "contrast",
+      "fontScale",
+      "motion",
+      "reading",
+      "spacing",
+      "theme"
+    ],
+    "events": [
+      "DOMContentLoaded",
+      "pageshow"
+    ],
+    "dom_ids_literals": [
+      "colorblindOverlay"
+    ],
+    "selectors_literals": [
+      "a[href]",
+      "link[rel="
+    ],
+    "functions_named": [
+      [
+        "alternar",
+        ""
+      ],
+      [
+        "aoCarregar",
+        ""
+      ],
+      [
+        "aplicarDaltonismo",
+        ""
+      ],
+      [
+        "aplicarNoBody",
+        ""
+      ],
+      [
+        "aplicarNoHtml",
+        ""
+      ],
+      [
+        "atualizarFavicon",
+        ""
+      ],
+      [
+        "carimbarLinks",
+        ""
+      ],
+      [
+        "gravarMemoria",
+        ""
+      ],
+      [
+        "higienizar",
+        ""
+      ],
+      [
+        "lerMemoria",
+        ""
+      ],
+      [
+        "lerURL",
+        ""
+      ],
+      [
+        "limitarFonte",
+        ""
+      ],
+      [
+        "paraBooleano",
+        ""
+      ],
+      [
+        "queryString",
+        ""
+      ]
+    ],
+    "storage_literals": [
+      "siab_a11y_prefs"
+    ]
+  },
+  {
+    "arquivo": "css/investigacao.css",
+    "classe": "B",
+    "globals": [],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "css/manual.css",
+    "classe": "B",
+    "globals": [],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "css/mobile-controls.css",
+    "classe": "B",
+    "globals": [],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "css/mobile-study.css",
+    "classe": "B",
+    "globals": [],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "css/refinements.css",
+    "classe": "B",
+    "globals": [],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "css/stylesiab.css",
+    "classe": "B",
+    "globals": [
+      "vidro"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "css/workspace.css",
+    "classe": "B",
+    "globals": [],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "index.html",
+    "classe": "B",
+    "globals": [],
+    "imports_scripts": [
+      "js/core/compatibilidade.js?v=1.0.0-rc.4.5",
+      "a11y.js?v=1.0.0-rc.4.5",
+      "vendor/dialog-polyfill/dialog-polyfill.js?v=1.0.0-rc.4.5",
+      "js/core/namespace.js?v=1.0.0-rc.4.5",
+      "js/ui/icons.js?v=1.0.0-rc.4.5",
+      "js/core/util.js?v=1.0.0-rc.4.5",
+      "js/data/catalogo.js?v=1.0.0-rc.4.5",
+      "js/data/cotidiano.js?v=1.0.0-rc.4.5",
+      "js/data/sais.js?v=1.0.0-rc.4.5",
+      "js/data/ambiente-saude.js?v=1.0.0-rc.4.5",
+      "js/data/reagentes.js?v=1.0.0-rc.4.5",
+      "js/data/amostras.js?v=1.0.0-rc.4.5",
+      "js/data/funcoes.js?v=1.0.0-rc.4.5",
+      "js/simulation/quimica.js?v=1.0.0-rc.4.5",
+      "js/simulation/condutividade.js?v=1.0.0-rc.4.5",
+      "js/core/estado.js?v=1.0.0-rc.4.5",
+      "js/ui/abertura.js?v=1.0.0-rc.4.5",
+      "js/core/loja.js?v=1.0.0-rc.4.5",
+      "js/core/persistencia.js?v=1.0.0-rc.4.5",
+      "js/core/migracoes.js?v=1.0.0-rc.4.5",
+      "js/core/progresso.js?v=1.0.0-rc.4.5",
+      "js/core/roteador.js?v=1.0.0-rc.4.5",
+      "js/data/missoes.js?v=1.0.0-rc.4.5",
+      "js/data/temas.js?v=1.0.0-rc.4.5",
+      "js/data/montagens.js?v=1.0.0-rc.4.5",
+      "js/data/experimentos.js?v=1.0.0-rc.4.5",
+      "js/data/manual.js?v=1.0.0-rc.4.5",
+      "js/core/activity-context.js?v=1.0.0-rc.4.5",
+      "js/simulation/motor-missoes.js?v=1.0.0-rc.4.5",
+      "js/ui/tubo.js?v=1.0.0-rc.4.5",
+      "js/ui/regua-ph.js?v=1.0.0-rc.4.5",
+      "js/ui/grafico.js?v=1.0.0-rc.4.5",
+      "js/ui/lupa.js?v=1.0.0-rc.4.5",
+      "js/ui/condutimetro.js?v=1.0.0-rc.4.5",
+      "js/ui/equacao.js?v=1.0.0-rc.4.5",
+      "js/ui/som.js?v=1.0.0-rc.4.5",
+      "js/ui/conta-gotas.js?v=1.0.0-rc.4.5",
+      "js/ui/seletores.js?v=1.0.0-rc.4.5",
+      "js/ui/prateleira.js?v=1.0.0-rc.4.5",
+      "js/ui/modulos.js?v=1.0.0-rc.4.5",
+      "js/ui/layout-bancada.js?v=1.0.0-rc.4.5",
+      "js/simulation/instrumentos.js?v=1.0.0-rc.4.5",
+      "js/ui/render.js?v=1.0.0-rc.4.5",
+      "js/simulation/medicoes.js?v=1.0.0-rc.4.5",
+      "js/ui/ver-investigacao.js?v=1.0.0-rc.4.5",
+      "js/ui/gaveta.js?v=1.0.0-rc.4.5",
+      "js/ui/workspace.js?v=1.0.0-rc.4.5",
+      "js/ui/trilho.js?v=1.0.0-rc.4.5",
+      "js/ui/tour.js?v=1.0.0-rc.4.5",
+      "js/ui/segredo.js?v=1.0.0-rc.4.5",
+      "js/ui/impressao.js?v=1.0.0-rc.4.5",
+      "js/ui/selecao-tubos.js?v=1.0.0-rc.4.5",
+      "js/telas/bancada.js?v=1.0.0-rc.4.5",
+      "js/telas/laboratorio.js?v=1.0.0-rc.4.5",
+      "js/telas/missao.js?v=1.0.0-rc.4.5",
+      "js/telas/inicio.js?v=1.0.0-rc.4.5",
+      "js/telas/aprender.js?v=1.0.0-rc.4.5",
+      "js/telas/roteiros.js?v=1.0.0-rc.4.5",
+      "js/telas/relatorios.js?v=1.0.0-rc.4.5",
+      "js/core/atividades.js?v=1.0.0-rc.4.5",
+      "js/telas/professor.js?v=1.0.0-rc.4.5",
+      "js/telas/caderno.js?v=1.0.0-rc.4.5",
+      "js/telas/manual.js?v=1.0.0-rc.4.5",
+      "js/a11y/preferencias.js?v=1.0.0-rc.4.5",
+      "js/init/pwa.js?v=1.0.0-rc.4.5",
+      "js/ui/activity-ui.js?v=1.0.0-rc.4.5",
+      "js/init/integracao.js?v=1.0.0-rc.4.5",
+      "js/init/app.js?v=1.0.0-rc.4.5",
+      "js/ui/mobile-study.js?v=1.0.0-rc.4.5"
+    ],
+    "state_reads_writes": [
+      "js"
+    ],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": [
+      "siab_abertura"
+    ]
+  },
+  {
+    "arquivo": "js/a11y/preferencias.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "abertura",
+      "armazenamento",
+      "initPreferences",
+      "loja",
+      "notice",
+      "refreshSelects",
+      "som"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "fontScale",
+      "som",
+      "vibrar"
+    ],
+    "events": [
+      "change",
+      "click"
+    ],
+    "dom_ids_literals": [
+      "a11y-restaurar",
+      "abertura-check",
+      "contraste-check",
+      "cvd-select",
+      "espacamento-check",
+      "font-minus",
+      "font-output",
+      "font-plus",
+      "leitura-check",
+      "libras-check",
+      "motion-check",
+      "sound-check",
+      "tema-escuro",
+      "vibrate-check",
+      "vlibras-script"
+    ],
+    "selectors_literals": [
+      "meta[name="
+    ],
+    "functions_named": [
+      [
+        "",
+        "initPreferences"
+      ],
+      [
+        "atualizarEndereco",
+        ""
+      ],
+      [
+        "carregarLibras",
+        ""
+      ],
+      [
+        "definir",
+        ""
+      ],
+      [
+        "sync",
+        ""
+      ]
+    ],
+    "storage_literals": [
+      "siab_libras_v1"
+    ]
+  },
+  {
+    "arquivo": "js/core/activity-context.js",
+    "classe": "B",
+    "globals": [
+      "ActivityContext",
+      "TUBE_DEFAULTS",
+      "atividades",
+      "criarBancada",
+      "experimentos",
+      "missoes",
+      "montagens",
+      "notice",
+      "state",
+      "version"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "baseline"
+    ],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "ActivityContext"
+      ],
+      [
+        "allows",
+        ""
+      ],
+      [
+        "buildBench",
+        ""
+      ],
+      [
+        "create",
+        ""
+      ],
+      [
+        "enforce",
+        ""
+      ],
+      [
+        "guard",
+        ""
+      ],
+      [
+        "permissions",
+        ""
+      ],
+      [
+        "requirements",
+        ""
+      ],
+      [
+        "resource",
+        ""
+      ],
+      [
+        "sanitize",
+        ""
+      ],
+      [
+        "validate",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/core/atividades.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "MODULOS",
+      "activityUI",
+      "atividades",
+      "benches",
+      "confirmar",
+      "criarBancada",
+      "escape",
+      "experimentos",
+      "format",
+      "identificacaoHTML",
+      "irPara",
+      "loja",
+      "missoes",
+      "montagens",
+      "motor",
+      "notice",
+      "persistencia",
+      "relatorios",
+      "state",
+      "telas",
+      "usarBancada"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "identificacao",
+      "item",
+      "navegacao",
+      "tipo",
+      "titulo"
+    ],
+    "events": [
+      "click",
+      "pagehide",
+      "submit"
+    ],
+    "dom_ids_literals": [
+      "activity-banner",
+      "activity-caption",
+      "activity-exit",
+      "activity-finish",
+      "atividade-conteudo"
+    ],
+    "selectors_literals": [
+      "[data-activity-close]",
+      "[data-activity-resume]"
+    ],
+    "functions_named": [
+      [
+        "",
+        "atividades"
+      ],
+      [
+        "abrir",
+        ""
+      ],
+      [
+        "atualizarCabecalho",
+        ""
+      ],
+      [
+        "codificar",
+        ""
+      ],
+      [
+        "decodificar",
+        ""
+      ],
+      [
+        "encerrar",
+        ""
+      ],
+      [
+        "finalizar",
+        ""
+      ],
+      [
+        "guardarRota",
+        ""
+      ],
+      [
+        "iniciar",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "render",
+        ""
+      ],
+      [
+        "restaurar",
+        ""
+      ],
+      [
+        "restaurarBancada",
+        ""
+      ],
+      [
+        "retomar",
+        ""
+      ],
+      [
+        "salvarSessao",
+        ""
+      ],
+      [
+        "validar",
+        ""
+      ]
+    ],
+    "storage_literals": [
+      "siab_atividade_",
+      "siab_atividade_ativa",
+      "siab_bancada_v2"
+    ]
+  },
+  {
+    "arquivo": "js/core/compatibilidade.js",
+    "classe": "B",
+    "globals": [
+      "rota"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [
+      "change",
+      "click",
+      "close",
+      "error",
+      "load"
+    ],
+    "dom_ids_literals": [
+      "abertura",
+      "falha-abertura"
+    ],
+    "selectors_literals": [
+      ".chip, .vidraria-opcoes label, .segmented label, .opcao",
+      "button",
+      "dialog",
+      "input"
+    ],
+    "functions_named": [
+      [
+        "atualizarOpcoes",
+        ""
+      ],
+      [
+        "mostrarFalha",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/core/estado.js",
+    "classe": "B",
+    "globals": [
+      "ActivityContext",
+      "CAPACITY_ML",
+      "ESCALAS",
+      "TUBE_DEFAULTS",
+      "VIDRARIAS",
+      "activeBench",
+      "benches",
+      "capacidade",
+      "capacidadeDaBancada",
+      "chem",
+      "compartilha",
+      "criarBancada",
+      "current",
+      "desfazer",
+      "escala",
+      "format",
+      "limparGrupos",
+      "misturarTubos",
+      "newTube",
+      "nomeGrupo",
+      "preparoTargets",
+      "registrar",
+      "state",
+      "targets",
+      "textoCompartilhado",
+      "usarBancada",
+      "volumePadrao",
+      "volumeTexto"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "activeId",
+      "tubes"
+    ],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "capacidade"
+      ],
+      [
+        "",
+        "capacidadeDaBancada"
+      ],
+      [
+        "",
+        "compartilha"
+      ],
+      [
+        "",
+        "criarBancada"
+      ],
+      [
+        "",
+        "current"
+      ],
+      [
+        "",
+        "desfazer"
+      ],
+      [
+        "",
+        "limparGrupos"
+      ],
+      [
+        "",
+        "misturarTubos"
+      ],
+      [
+        "",
+        "newTube"
+      ],
+      [
+        "",
+        "nomeGrupo"
+      ],
+      [
+        "",
+        "preparoTargets"
+      ],
+      [
+        "",
+        "registrar"
+      ],
+      [
+        "",
+        "targets"
+      ],
+      [
+        "",
+        "textoCompartilhado"
+      ],
+      [
+        "",
+        "usarBancada"
+      ],
+      [
+        "",
+        "volumePadrao"
+      ],
+      [
+        "",
+        "volumeTexto"
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/core/loja.js",
+    "classe": "B",
+    "globals": [
+      "ActivityContext",
+      "alterar",
+      "instrumentos",
+      "loja",
+      "registrar",
+      "state"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "alterar"
+      ],
+      [
+        "",
+        "loja"
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/core/migracoes.js",
+    "classe": "B",
+    "globals": [
+      "migrarDados",
+      "persistencia"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "migrarDados"
+      ]
+    ],
+    "storage_literals": [
+      "siab_inicializacao",
+      "siab_investigacao_v2",
+      "siab_migracao_v2",
+      "siab_modo",
+      "siab_progresso_v1"
+    ]
+  },
+  {
+    "arquivo": "js/core/namespace.js",
+    "classe": "B",
+    "globals": [],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/core/persistencia.js",
+    "classe": "A",
+    "globals": [
+      "notice",
+      "persistencia"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "persistencia"
+      ],
+      [
+        "ler",
+        ""
+      ],
+      [
+        "salvar",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/core/progresso.js",
+    "classe": "B",
+    "globals": [
+      "TABELA_COMPACTA",
+      "compactarTabela",
+      "migrarDados",
+      "notaCompacta",
+      "persistencia",
+      "progresso"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "compactarTabela"
+      ],
+      [
+        "",
+        "notaCompacta"
+      ],
+      [
+        "",
+        "progresso"
+      ]
+    ],
+    "storage_literals": [
+      "siab_investigacao_v2"
+    ]
+  },
+  {
+    "arquivo": "js/core/roteador.js",
+    "classe": "B",
+    "globals": [
+      "atividades",
+      "irPara",
+      "manualRegistry",
+      "missaoAlias",
+      "notice",
+      "persistencia",
+      "rota",
+      "rotear",
+      "telas"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [
+      "siab:rota"
+    ],
+    "dom_ids_literals": [],
+    "selectors_literals": [
+      "[data-nav]",
+      "main > [data-tela]"
+    ],
+    "functions_named": [
+      [
+        "",
+        "irPara"
+      ],
+      [
+        "",
+        "rotear"
+      ]
+    ],
+    "storage_literals": [
+      "siab_inicializacao"
+    ]
+  },
+  {
+    "arquivo": "js/core/util.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "announce",
+      "armazenamento",
+      "baixarArquivo",
+      "cientifico",
+      "csvCampo",
+      "dataHora",
+      "embaralhar",
+      "escape",
+      "format",
+      "normalizar",
+      "notice",
+      "phFormat"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [
+      "announcer",
+      "toast"
+    ],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "$"
+      ],
+      [
+        "",
+        "announce"
+      ],
+      [
+        "",
+        "baixarArquivo"
+      ],
+      [
+        "",
+        "cientifico"
+      ],
+      [
+        "",
+        "csvCampo"
+      ],
+      [
+        "",
+        "embaralhar"
+      ],
+      [
+        "",
+        "escape"
+      ],
+      [
+        "",
+        "format"
+      ],
+      [
+        "",
+        "normalizar"
+      ],
+      [
+        "",
+        "notice"
+      ],
+      [
+        "",
+        "phFormat"
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/data/ambiente-saude.js",
+    "classe": "C",
+    "globals": [
+      "solutions"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/data/amostras.js",
+    "classe": "C",
+    "globals": [
+      "acidFamilies",
+      "familySpecies",
+      "solutions"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/data/catalogo.js",
+    "classe": "C",
+    "globals": [
+      "indicators",
+      "solutions"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/data/cotidiano.js",
+    "classe": "C",
+    "globals": [
+      "acidFamilies",
+      "familySpecies",
+      "indicators",
+      "isEveryday",
+      "solutionGroups",
+      "solutions"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "isEveryday"
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/data/experimentos.js",
+    "classe": "C",
+    "globals": [
+      "experimentos",
+      "indicators",
+      "montagens",
+      "solutions"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "experimentos"
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/data/funcoes.js",
+    "classe": "C",
+    "globals": [
+      "acidos",
+      "bases",
+      "contarAtomos",
+      "funcoes",
+      "massaMolar",
+      "massasAtomicas"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "contarAtomos"
+      ],
+      [
+        "",
+        "funcoes"
+      ],
+      [
+        "",
+        "massaMolar"
+      ],
+      [
+        "juntar",
+        ""
+      ],
+      [
+        "parciais",
+        ""
+      ],
+      [
+        "parte",
+        ""
+      ],
+      [
+        "total",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/data/manual.js",
+    "classe": "B",
+    "globals": [
+      "manual",
+      "manualContent",
+      "manualRegistry"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "manualRegistry"
+      ],
+      [
+        "search",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/data/missoes.js",
+    "classe": "C",
+    "globals": [
+      "bncc",
+      "concepcoes",
+      "missoes"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "indicatorOnly",
+      "verTab"
+    ],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/data/montagens.js",
+    "classe": "C",
+    "globals": [
+      "indicators",
+      "montagens"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/data/reagentes.js",
+    "classe": "C",
+    "globals": [
+      "acidFamilies",
+      "familySpecies",
+      "indicators",
+      "solutionGroups",
+      "solutions"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/data/sais.js",
+    "classe": "C",
+    "globals": [
+      "acidFamilies",
+      "familySpecies",
+      "solutionGroups",
+      "solutions"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/data/temas.js",
+    "classe": "C",
+    "globals": [
+      "current",
+      "missaoAlias",
+      "missoes",
+      "temas"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/init/app.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "bancada",
+      "gaveta",
+      "impressao",
+      "iniciarInvestigacao",
+      "initPreferences",
+      "initSelects",
+      "layoutBancada",
+      "manualTela",
+      "missaoTela",
+      "professor",
+      "pwa",
+      "rotear",
+      "segredo",
+      "selecaoTubos",
+      "telas",
+      "tour",
+      "trilho",
+      "version"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [
+      "click",
+      "hashchange",
+      "resize",
+      "siab:modo"
+    ],
+    "dom_ids_literals": [
+      "about-version"
+    ],
+    "selectors_literals": [
+      ".app-header",
+      ".header-actions",
+      ".main-nav",
+      "[data-close]"
+    ],
+    "functions_named": [
+      [
+        "ajustarCabecalho",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/init/integracao.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "activeBench",
+      "activityUI",
+      "atividades",
+      "benches",
+      "criarBancada",
+      "entradaEspecifica",
+      "experimentos",
+      "gaveta",
+      "identificacaoHTML",
+      "iniciarInvestigacao",
+      "irPara",
+      "ligarVer",
+      "loja",
+      "montarExperimento",
+      "montarMontagem",
+      "motor",
+      "newTube",
+      "notice",
+      "persistencia",
+      "professor",
+      "progresso",
+      "relatorios",
+      "rota",
+      "solutions",
+      "telas",
+      "temas"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [
+      "click",
+      "focusin",
+      "pagehide",
+      "resize",
+      "scroll",
+      "submit"
+    ],
+    "dom_ids_literals": [
+      "abertura",
+      "prof-identificacao",
+      "startup-dialog"
+    ],
+    "selectors_literals": [
+      ".startup-opcao",
+      "[data-indicator],#compare-btn",
+      "[data-indicator],#compare-btn,[data-nivel],[data-montagem],[data-montar]",
+      "[data-montagem],[data-montar]",
+      "[data-startup=",
+      "button,a",
+      "dialog[open]",
+      "input,textarea,select"
+    ],
+    "functions_named": [
+      [
+        "",
+        "iniciarInvestigacao"
+      ],
+      [
+        "viewport",
+        ""
+      ]
+    ],
+    "storage_literals": [
+      "siab_bancada_v2",
+      "siab_inicializacao"
+    ]
+  },
+  {
+    "arquivo": "js/init/pwa.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "gaveta",
+      "irPara",
+      "notice",
+      "pwa"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [
+      "appinstalled",
+      "beforeinstallprompt",
+      "change",
+      "click",
+      "controllerchange"
+    ],
+    "dom_ids_literals": [
+      "drawer-install",
+      "install-btn",
+      "pwa-recarregar",
+      "toast"
+    ],
+    "selectors_literals": [
+      "link[rel="
+    ],
+    "functions_named": [
+      [
+        "",
+        "pwa"
+      ],
+      [
+        "avisarAtualizacao",
+        ""
+      ],
+      [
+        "iniciar",
+        ""
+      ],
+      [
+        "podeUsarServiceWorker",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/simulation/condutividade.js",
+    "classe": "C",
+    "globals": [
+      "chem",
+      "condutividade"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "condutividade"
+      ],
+      [
+        "carga",
+        ""
+      ],
+      [
+        "lambda",
+        ""
+      ],
+      [
+        "medir",
+        ""
+      ],
+      [
+        "serie",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/simulation/instrumentos.js",
+    "classe": "C",
+    "globals": [
+      "ActivityContext",
+      "ambiente",
+      "chem",
+      "format",
+      "indicators",
+      "instrumentos",
+      "loja",
+      "notice",
+      "render",
+      "renderVer",
+      "state",
+      "temperaturaLocal"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "level",
+      "tubes",
+      "vidraria"
+    ],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "instrumentos"
+      ],
+      [
+        "agendar",
+        ""
+      ],
+      [
+        "atualizar",
+        ""
+      ],
+      [
+        "calibrar",
+        ""
+      ],
+      [
+        "contexto",
+        ""
+      ],
+      [
+        "dados",
+        ""
+      ],
+      [
+        "evento",
+        ""
+      ],
+      [
+        "indicador",
+        ""
+      ],
+      [
+        "leitura",
+        ""
+      ],
+      [
+        "medir",
+        ""
+      ],
+      [
+        "parar",
+        ""
+      ],
+      [
+        "registrar",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/simulation/medicoes.js",
+    "classe": "C",
+    "globals": [
+      "ActivityContext",
+      "chem",
+      "escape",
+      "format",
+      "historicoHTML",
+      "historicoTabela",
+      "historyCSV",
+      "instrumentos",
+      "medicoes",
+      "state",
+      "tabelaCSV"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "measurementTable"
+    ],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "historicoHTML"
+      ],
+      [
+        "",
+        "historicoTabela"
+      ],
+      [
+        "",
+        "historyCSV"
+      ],
+      [
+        "",
+        "medicoes"
+      ],
+      [
+        "compact",
+        ""
+      ],
+      [
+        "compactHTML",
+        ""
+      ],
+      [
+        "critical",
+        ""
+      ],
+      [
+        "html",
+        ""
+      ],
+      [
+        "table",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/simulation/motor-missoes.js",
+    "classe": "C",
+    "globals": [
+      "ActivityContext",
+      "activeBench",
+      "benches",
+      "chem",
+      "criarBancada",
+      "current",
+      "missoes",
+      "motor",
+      "newTube",
+      "progresso",
+      "state",
+      "usarBancada"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "tubes"
+    ],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "motor"
+      ],
+      [
+        "atualizar",
+        ""
+      ],
+      [
+        "concluido",
+        ""
+      ],
+      [
+        "concluir",
+        ""
+      ],
+      [
+        "contexto",
+        ""
+      ],
+      [
+        "iniciar",
+        ""
+      ],
+      [
+        "restaurar",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/simulation/quimica.js",
+    "classe": "C",
+    "globals": [
+      "acidFamilies",
+      "chem",
+      "condutividade",
+      "familySpecies",
+      "indicators",
+      "solutions"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "chem"
+      ],
+      [
+        "absorbancia",
+        ""
+      ],
+      [
+        "added",
+        ""
+      ],
+      [
+        "alpha",
+        ""
+      ],
+      [
+        "assinatura",
+        ""
+      ],
+      [
+        "base",
+        ""
+      ],
+      [
+        "capacidade",
+        ""
+      ],
+      [
+        "cargaDe",
+        ""
+      ],
+      [
+        "charge",
+        ""
+      ],
+      [
+        "co2",
+        ""
+      ],
+      [
+        "color",
+        ""
+      ],
+      [
+        "colorMix",
+        ""
+      ],
+      [
+        "colorNames",
+        ""
+      ],
+      [
+        "colorRange",
+        ""
+      ],
+      [
+        "dissolved",
+        ""
+      ],
+      [
+        "estado",
+        ""
+      ],
+      [
+        "fracaoBasica",
+        ""
+      ],
+      [
+        "fractions",
+        ""
+      ],
+      [
+        "indicatorColor",
+        ""
+      ],
+      [
+        "liquid",
+        ""
+      ],
+      [
+        "meanCharge",
+        ""
+      ],
+      [
+        "mix",
+        ""
+      ],
+      [
+        "mixture",
+        ""
+      ],
+      [
+        "pKaDasEtapas",
+        ""
+      ],
+      [
+        "pKw",
+        ""
+      ],
+      [
+        "sampleStock",
+        ""
+      ],
+      [
+        "sistemas",
+        ""
+      ],
+      [
+        "solidos",
+        ""
+      ],
+      [
+        "solve",
+        ""
+      ],
+      [
+        "species",
+        ""
+      ],
+      [
+        "zona",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/telas/aprender.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "escape",
+      "experimentos",
+      "irPara",
+      "missoes",
+      "notice",
+      "progresso",
+      "telas",
+      "temas"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [
+      "missoes-lista",
+      "tema-conteudo",
+      "temas-lista"
+    ],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/telas/bancada.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "MAX_TUBES",
+      "VIDRARIAS",
+      "alterar",
+      "announce",
+      "atividades",
+      "baixarArquivo",
+      "bancada",
+      "capacidade",
+      "capacidadeDaBancada",
+      "chem",
+      "confirmar",
+      "contaGotas",
+      "current",
+      "desfazer",
+      "equacao",
+      "escape",
+      "format",
+      "historicoTabela",
+      "historyCSV",
+      "indicators",
+      "instrumentos",
+      "isEveryday",
+      "limparGrupos",
+      "loja",
+      "lupa",
+      "modulos",
+      "montarMontagem",
+      "newTube",
+      "nomeGrupo",
+      "nomeIndicador",
+      "normalizar",
+      "notice",
+      "prateleira",
+      "preparoTargets",
+      "progresso",
+      "registrar",
+      "render",
+      "resumoConteudo",
+      "rota",
+      "selecionarVer",
+      "solutionSummary",
+      "solutions",
+      "som",
+      "state",
+      "syncForm",
+      "targets",
+      "textoCompartilhado",
+      "trilho",
+      "verDisponivel",
+      "vidro",
+      "volumeTexto",
+      "workspace"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "activeId",
+      "capacidades",
+      "controles",
+      "destination",
+      "graficoModo",
+      "history",
+      "indicatorOnly",
+      "level",
+      "lupaLog",
+      "modo",
+      "motion",
+      "nextGroup",
+      "nivel",
+      "ordemPH",
+      "showPH",
+      "tubes",
+      "ver",
+      "verTab",
+      "vidraria",
+      "view"
+    ],
+    "events": [
+      "change",
+      "click",
+      "close",
+      "input",
+      "submit"
+    ],
+    "dom_ids_literals": [
+      "add-tube-btn",
+      "agitar-btn",
+      "capacidade-opcoes",
+      "close-controls",
+      "compare-btn",
+      "concentration",
+      "confirm-dialog",
+      "confirm-text",
+      "confirm-title",
+      "confirm-yes",
+      "controls",
+      "controls-title",
+      "dilution-select",
+      "dose-area",
+      "drop-btn",
+      "drop-volume",
+      "drop1ml-btn",
+      "drop5-btn",
+      "drop5ml-btn",
+      "focus-tab",
+      "indicator-chips",
+      "indicator-only",
+      "initial-volume",
+      "large-tube",
+      "meia-gota-btn",
+      "new-name",
+      "ordenar-ph-btn",
+      "overview-tab",
+      "painel-laboratorio",
+      "painel-missao",
+      "ph-delta",
+      "ph-toggle",
+      "poe-btn",
+      "poe-comparacao",
+      "poe-contexto",
+      "poe-dialog",
+      "poe-explicacao",
+      "poe-form",
+      "poe-registrar",
+      "poe-resultado",
+      "poe-title",
+      "prepare-btn",
+      "prepare-form",
+      "remove-btn",
+      "rename-btn",
+      "rename-dialog",
+      "rename-form",
+      "restart-btn",
+      "sheet-backdrop",
+      "titrant-concentration",
+      "titrant-dilution-select",
+      "undo-btn",
+      "unlink-btn",
+      "vazia-agua",
+      "vazia-desfazer",
+      "vazia-prateleira",
+      "vazia-titulo",
+      "ver-conteudo",
+      "ver-panel"
+    ],
+    "selectors_literals": [
+      "#shelf",
+      ".lupa-legenda [data-especie]",
+      ".view-tabs",
+      "[aria-invalid]",
+      "[data-acao=",
+      "[data-acao]",
+      "[data-ir-ver]",
+      "[data-solution]",
+      "[data-tube]",
+      "[hidden]",
+      "input[name="
+    ],
+    "functions_named": [
+      [
+        "",
+        "bancada"
+      ],
+      [
+        "",
+        "confirmar"
+      ],
+      [
+        "abrirPrevisao",
+        ""
+      ],
+      [
+        "adicionarTubo",
+        ""
+      ],
+      [
+        "agitar",
+        ""
+      ],
+      [
+        "aplicarMedidas",
+        ""
+      ],
+      [
+        "closeSheet",
+        ""
+      ],
+      [
+        "colocar",
+        ""
+      ],
+      [
+        "compararIndicadores",
+        ""
+      ],
+      [
+        "conferirPrevisao",
+        ""
+      ],
+      [
+        "configurar",
+        ""
+      ],
+      [
+        "desfazer",
+        ""
+      ],
+      [
+        "desvincular",
+        ""
+      ],
+      [
+        "desvincularTubos",
+        ""
+      ],
+      [
+        "erroForm",
+        ""
+      ],
+      [
+        "fimSequencia",
+        ""
+      ],
+      [
+        "gotaDaSequencia",
+        ""
+      ],
+      [
+        "gotejar",
+        ""
+      ],
+      [
+        "iniciarSequencia",
+        ""
+      ],
+      [
+        "leitura",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "limiteDaGota",
+        ""
+      ],
+      [
+        "limparErros",
+        ""
+      ],
+      [
+        "meiaGota",
+        ""
+      ],
+      [
+        "mostrarDelta",
+        ""
+      ],
+      [
+        "mudarRecipiente",
+        ""
+      ],
+      [
+        "mudariam",
+        ""
+      ],
+      [
+        "openSheet",
+        ""
+      ],
+      [
+        "recomecar",
+        ""
+      ],
+      [
+        "referenciaDe",
+        ""
+      ],
+      [
+        "removerTubo",
+        ""
+      ],
+      [
+        "responsive",
+        ""
+      ],
+      [
+        "salvarExplicacao",
+        ""
+      ],
+      [
+        "selecionarTubo",
+        ""
+      ],
+      [
+        "trocarCapacidade",
+        ""
+      ],
+      [
+        "trocarVidraria",
+        ""
+      ],
+      [
+        "vincularTubos",
+        ""
+      ],
+      [
+        "vinculoIgual",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/telas/caderno.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "baixarArquivo",
+      "cadernoCSV",
+      "confirmar",
+      "csvCampo",
+      "dataHora",
+      "escape",
+      "notaCompacta",
+      "notaTabelaHTML",
+      "progresso",
+      "tabelaCSV",
+      "telas"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [
+      "caderno-anotacao",
+      "caderno-csv",
+      "caderno-filtro",
+      "caderno-imprimir",
+      "caderno-limpar",
+      "caderno-lista"
+    ],
+    "selectors_literals": [
+      "[data-apagar-nota]",
+      "[data-baixar-tabela]"
+    ],
+    "functions_named": [
+      [
+        "",
+        "cadernoCSV"
+      ],
+      [
+        "",
+        "notaTabelaHTML"
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/telas/inicio.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "experimentos",
+      "missoes",
+      "progresso",
+      "telas",
+      "temas"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [
+      "inicio-caderno-meta",
+      "inicio-missoes-meta",
+      "inicio-roteiros-meta",
+      "inicio-temas-meta"
+    ],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/telas/laboratorio.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ajuda",
+      "atividades",
+      "bancada",
+      "render",
+      "state",
+      "telas",
+      "usarBancada"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "experiencia"
+    ],
+    "events": [],
+    "dom_ids_literals": [
+      "boas-vindas"
+    ],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/telas/manual.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "TUBE_DEFAULTS",
+      "ajuda",
+      "armazenamento",
+      "chem",
+      "current",
+      "escape",
+      "format",
+      "gaveta",
+      "icons",
+      "indicators",
+      "irPara",
+      "manualRegistry",
+      "manualTela",
+      "montarMontagem",
+      "phFormat",
+      "rota",
+      "solutions",
+      "state",
+      "telas",
+      "tour"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "verTab"
+    ],
+    "events": [
+      "afterprint",
+      "beforeprint",
+      "click",
+      "close",
+      "input",
+      "keydown",
+      "submit"
+    ],
+    "dom_ids_literals": [
+      "activity-help-content",
+      "activity-help-dialog",
+      "activity-help-title",
+      "boas-vindas",
+      "boas-vindas-fechar",
+      "manual-busca",
+      "manual-clear",
+      "manual-conteudo",
+      "manual-imprimir",
+      "manual-index-toggle",
+      "manual-indice",
+      "manual-print",
+      "manual-search-form",
+      "manual-status",
+      "manual-titulo"
+    ],
+    "selectors_literals": [
+      ".ajuda-link,[data-manual-help]",
+      ".tela-manual",
+      "[data-manual-command]",
+      "[data-manual-expand]",
+      "[data-manual-help-link]",
+      "[inert]",
+      "a[href]",
+      "span"
+    ],
+    "functions_named": [
+      [
+        "",
+        "ajuda"
+      ],
+      [
+        "",
+        "manualTela"
+      ],
+      [
+        "accordion",
+        ""
+      ],
+      [
+        "actions",
+        ""
+      ],
+      [
+        "article",
+        ""
+      ],
+      [
+        "bind",
+        ""
+      ],
+      [
+        "contextual",
+        ""
+      ],
+      [
+        "diagram",
+        ""
+      ],
+      [
+        "generated",
+        ""
+      ],
+      [
+        "home",
+        ""
+      ],
+      [
+        "index",
+        ""
+      ],
+      [
+        "preparePrint",
+        ""
+      ],
+      [
+        "render",
+        ""
+      ],
+      [
+        "rich",
+        ""
+      ],
+      [
+        "search",
+        ""
+      ],
+      [
+        "setIndex",
+        ""
+      ],
+      [
+        "topicFor",
+        ""
+      ],
+      [
+        "topicLink",
+        ""
+      ]
+    ],
+    "storage_literals": [
+      "siab_manual_visto"
+    ]
+  },
+  {
+    "arquivo": "js/telas/missao.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "atividades",
+      "bancada",
+      "escape",
+      "irPara",
+      "loja",
+      "missaoTela",
+      "missoes",
+      "motor",
+      "notice",
+      "render",
+      "rota",
+      "state",
+      "telas",
+      "usarBancada"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "level"
+    ],
+    "events": [
+      "click",
+      "input"
+    ],
+    "dom_ids_literals": [
+      "boas-vindas",
+      "missao-feedback",
+      "mission-bar",
+      "painel-missao"
+    ],
+    "selectors_literals": [
+      "#missao-concluir",
+      "#missao-refazer",
+      "[data-objective]",
+      "strong"
+    ],
+    "functions_named": [
+      [
+        "",
+        "missaoTela"
+      ],
+      [
+        "atualizar",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "render",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/telas/professor.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "MODULOS",
+      "TUBE_DEFAULTS",
+      "VER_SECTIONS",
+      "ambiente",
+      "atividades",
+      "chem",
+      "confirmar",
+      "escape",
+      "experimentos",
+      "format",
+      "gaveta",
+      "missoes",
+      "montagens",
+      "notice",
+      "persistencia",
+      "professor",
+      "refreshSelects",
+      "solutions",
+      "telas",
+      "temperaturaLocal"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "titulo"
+    ],
+    "events": [
+      "change"
+    ],
+    "dom_ids_literals": [
+      "atividades-recentes",
+      "folha-impressao",
+      "prof-abrir",
+      "prof-cancel-edit",
+      "prof-copy",
+      "prof-erro",
+      "prof-form",
+      "prof-guide-content",
+      "prof-initial-view",
+      "prof-item",
+      "prof-link",
+      "prof-orientacoes",
+      "prof-permissoes",
+      "prof-print",
+      "prof-requisitos",
+      "prof-resultado",
+      "prof-resumo",
+      "prof-tipo",
+      "prof-ver-guia",
+      "projetor-check",
+      "teacher-guide",
+      "teacher-guide-dialog"
+    ],
+    "selectors_literals": [
+      "[name=",
+      "[type=",
+      "button",
+      "input",
+      "input[type="
+    ],
+    "functions_named": [
+      [
+        "",
+        "professor"
+      ],
+      [
+        "abrirGuia",
+        ""
+      ],
+      [
+        "cancelarEdicao",
+        ""
+      ],
+      [
+        "catalogo",
+        ""
+      ],
+      [
+        "copiar",
+        ""
+      ],
+      [
+        "criar",
+        ""
+      ],
+      [
+        "editar",
+        ""
+      ],
+      [
+        "guia",
+        ""
+      ],
+      [
+        "imprimir",
+        ""
+      ],
+      [
+        "lerPermissoes",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "montarRecursos",
+        ""
+      ],
+      [
+        "opcoes",
+        ""
+      ],
+      [
+        "previsoes",
+        ""
+      ],
+      [
+        "recentes",
+        ""
+      ],
+      [
+        "renderRecentes",
+        ""
+      ],
+      [
+        "resumo",
+        ""
+      ],
+      [
+        "syncViews",
+        ""
+      ]
+    ],
+    "storage_literals": [
+      "siab_atividades_criadas"
+    ]
+  },
+  {
+    "arquivo": "js/telas/relatorios.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "MODULOS",
+      "VIDRARIAS",
+      "activeBench",
+      "activityUI",
+      "atividades",
+      "baixarArquivo",
+      "chem",
+      "cientifico",
+      "escape",
+      "experimentos",
+      "format",
+      "grafico",
+      "graficoMedido",
+      "historicoTabela",
+      "identificacaoHTML",
+      "indicators",
+      "instrumentos",
+      "isEveryday",
+      "medicoes",
+      "motor",
+      "nomeIndicador",
+      "notice",
+      "persistencia",
+      "progresso",
+      "refreshSelects",
+      "relatorios",
+      "resumoConteudo",
+      "solutions",
+      "state",
+      "telas",
+      "verDisponivel",
+      "version"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "reportId"
+    ],
+    "events": [
+      "change",
+      "click",
+      "input"
+    ],
+    "dom_ids_literals": [
+      "folha-impressao",
+      "relatorio-atualizar",
+      "relatorio-baixar",
+      "relatorio-blank",
+      "relatorio-config",
+      "relatorio-conteudo",
+      "relatorio-print",
+      "relatorio-registrar",
+      "report-custom-label",
+      "report-custom-lines",
+      "report-hypotheses",
+      "report-hypotheses-error"
+    ],
+    "selectors_literals": [
+      "#report-use-hypotheses"
+    ],
+    "functions_named": [
+      [
+        "",
+        "relatorios"
+      ],
+      [
+        "abrir",
+        ""
+      ],
+      [
+        "calculosHTML",
+        ""
+      ],
+      [
+        "capturar",
+        ""
+      ],
+      [
+        "conductivityChart",
+        ""
+      ],
+      [
+        "config",
+        ""
+      ],
+      [
+        "configure",
+        ""
+      ],
+      [
+        "defaults",
+        ""
+      ],
+      [
+        "field",
+        ""
+      ],
+      [
+        "html",
+        ""
+      ],
+      [
+        "hypotheses",
+        ""
+      ],
+      [
+        "hypotheticalGraph",
+        ""
+      ],
+      [
+        "imprimir",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "preparar",
+        ""
+      ],
+      [
+        "render",
+        ""
+      ],
+      [
+        "rowsFor",
+        ""
+      ],
+      [
+        "salvar",
+        ""
+      ],
+      [
+        "settingsHTML",
+        ""
+      ],
+      [
+        "tabela",
+        ""
+      ],
+      [
+        "table",
+        ""
+      ],
+      [
+        "writing",
+        ""
+      ]
+    ],
+    "storage_literals": [
+      "siab_relatorios_v1"
+    ]
+  },
+  {
+    "arquivo": "js/telas/roteiros.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "MAX_TUBES",
+      "MODULOS",
+      "VER_SECTIONS",
+      "atividades",
+      "benches",
+      "criarBancada",
+      "escape",
+      "experimentos",
+      "format",
+      "identificacaoHTML",
+      "indicators",
+      "instrumentos",
+      "irPara",
+      "montagens",
+      "montarExperimento",
+      "montarMontagem",
+      "newTube",
+      "notice",
+      "render",
+      "solutions",
+      "state",
+      "telas",
+      "usarBancada"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "experiencia",
+      "montagem",
+      "reportViews",
+      "temperatura",
+      "view"
+    ],
+    "events": [],
+    "dom_ids_literals": [
+      "montagens-lista",
+      "roteiro-conteudo",
+      "roteiros-lista"
+    ],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "identificacaoHTML"
+      ],
+      [
+        "",
+        "montarExperimento"
+      ],
+      [
+        "",
+        "montarMontagem"
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/abertura.js",
+    "classe": "B",
+    "globals": [
+      "TUBE_DEFAULTS",
+      "abertura",
+      "chem",
+      "escape",
+      "format"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [
+      "keydown",
+      "pointerdown"
+    ],
+    "dom_ids_literals": [
+      "abertura"
+    ],
+    "selectors_literals": [
+      ".ab-formula",
+      ".ab-gota",
+      ".ab-liquido",
+      ".ab-ph",
+      ".ab-tubo",
+      ".abertura-tubos"
+    ],
+    "functions_named": [
+      [
+        "",
+        "abertura"
+      ],
+      [
+        "definir",
+        ""
+      ],
+      [
+        "desenhar",
+        ""
+      ],
+      [
+        "encerrar",
+        ""
+      ],
+      [
+        "etapa",
+        ""
+      ],
+      [
+        "iniciar",
+        ""
+      ],
+      [
+        "leitura",
+        ""
+      ]
+    ],
+    "storage_literals": [
+      "siab_abertura"
+    ]
+  },
+  {
+    "arquivo": "js/ui/activity-ui.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "MODULOS",
+      "VIDRARIAS",
+      "activityUI",
+      "ajuda",
+      "atividades",
+      "current",
+      "escape",
+      "format",
+      "gaveta",
+      "irPara",
+      "nomeIndicador",
+      "solutionSummary",
+      "state",
+      "verDisponivel"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "verTab",
+      "vidraria"
+    ],
+    "events": [
+      "click"
+    ],
+    "dom_ids_literals": [
+      "activity-exit",
+      "activity-help-content",
+      "activity-help-dialog",
+      "activity-help-title",
+      "activity-menu",
+      "activity-montagem",
+      "ajustes",
+      "app-drawer",
+      "controls-title",
+      "drawer-title",
+      "modulos",
+      "painel-laboratorio",
+      "prepare-btn",
+      "secao-frascos",
+      "vidraria-grupo"
+    ],
+    "selectors_literals": [
+      "#a11y-toggle",
+      ".ajuda-link,[data-activity-help]",
+      ".drawer-section",
+      ".field",
+      ".header-brand",
+      ".header-btn-texto",
+      ".painel-secao",
+      "[data-activity-report],[data-activity-finish]",
+      "[data-ir-ver]",
+      "[data-secao=",
+      "[data-startup-settings],#drawer-tour,#drawer-guia,#guide-btn,#missao-refazer",
+      "[data-unrestricted-menu]",
+      "button,a,input",
+      "input,select"
+    ],
+    "functions_named": [
+      [
+        "",
+        "activityUI"
+      ],
+      [
+        "bind",
+        ""
+      ],
+      [
+        "dialog",
+        ""
+      ],
+      [
+        "render",
+        ""
+      ],
+      [
+        "visibility",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/condutimetro.js",
+    "classe": "C",
+    "globals": [
+      "capacidade",
+      "chem",
+      "cientifico",
+      "condutimetro",
+      "condutividade",
+      "escape",
+      "format",
+      "lupa"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "condutimetro"
+      ],
+      [
+        "barra",
+        ""
+      ],
+      [
+        "curva",
+        ""
+      ],
+      [
+        "formatar",
+        ""
+      ],
+      [
+        "html",
+        ""
+      ],
+      [
+        "lampada",
+        ""
+      ],
+      [
+        "tabela",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/conta-gotas.js",
+    "classe": "C",
+    "globals": [
+      "contaGotas"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [
+      "blur",
+      "click",
+      "contextmenu",
+      "keydown",
+      "keyup",
+      "pointerdown"
+    ],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "parar",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/equacao.js",
+    "classe": "C",
+    "globals": [
+      "acidFamilies",
+      "acidos",
+      "bases",
+      "chem",
+      "cientifico",
+      "equacao",
+      "escape",
+      "familySpecies",
+      "format",
+      "funcoes",
+      "lupa",
+      "phFormat",
+      "solutionSummary",
+      "solutions",
+      "state"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "showPH",
+      "vidraria"
+    ],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [
+      ".eq-formula.com-seta",
+      ".eq-seta",
+      "[data-papel="
+    ],
+    "functions_named": [
+      [
+        "",
+        "equacao"
+      ],
+      [
+        "formulaHTML",
+        ""
+      ],
+      [
+        "html",
+        ""
+      ],
+      [
+        "linha",
+        ""
+      ],
+      [
+        "partes",
+        ""
+      ],
+      [
+        "reacaoCompleta",
+        ""
+      ],
+      [
+        "reacaoIonica",
+        ""
+      ],
+      [
+        "reacaoPorEtapas",
+        ""
+      ],
+      [
+        "setas",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/gaveta.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "MODULOS",
+      "experimentos",
+      "gaveta",
+      "manualRegistry",
+      "manualTela",
+      "persistencia",
+      "rota",
+      "state",
+      "telas",
+      "tour",
+      "version",
+      "workspace"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "experiencia",
+      "level",
+      "montagem"
+    ],
+    "events": [
+      "click",
+      "close"
+    ],
+    "dom_ids_literals": [
+      "a11y-toggle",
+      "about-btn",
+      "about-dialog",
+      "access-btn",
+      "app-drawer",
+      "drawer-activity-context",
+      "drawer-continue",
+      "drawer-guia",
+      "drawer-now-detail",
+      "drawer-now-title",
+      "drawer-projector",
+      "drawer-title",
+      "drawer-tour",
+      "drawer-versao",
+      "guide-dialog",
+      "menu-btn",
+      "projetor-check"
+    ],
+    "selectors_literals": [
+      ".drawer-cat-expand, #a11y-toggle",
+      ".drawer-close",
+      "[aria-controls=",
+      "[data-montar]",
+      "a[href]"
+    ],
+    "functions_named": [
+      [
+        "",
+        "gaveta"
+      ],
+      [
+        "abrir",
+        ""
+      ],
+      [
+        "contexto",
+        ""
+      ],
+      [
+        "expandir",
+        ""
+      ],
+      [
+        "fechar",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "projetor",
+        ""
+      ]
+    ],
+    "storage_literals": [
+      "siab_projetor"
+    ]
+  },
+  {
+    "arquivo": "js/ui/grafico.js",
+    "classe": "C",
+    "globals": [
+      "capacidade",
+      "chem",
+      "escape",
+      "format",
+      "grafico",
+      "indicators",
+      "lupa"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "grafico"
+      ],
+      [
+        "curvaTeorica",
+        ""
+      ],
+      [
+        "derivada",
+        ""
+      ],
+      [
+        "distribuicao",
+        ""
+      ],
+      [
+        "eixoVolume",
+        ""
+      ],
+      [
+        "passoRedondo",
+        ""
+      ],
+      [
+        "serie",
+        ""
+      ],
+      [
+        "svg",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/icons.js",
+    "classe": "B",
+    "globals": [
+      "icons"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [
+      "DOMContentLoaded"
+    ],
+    "dom_ids_literals": [],
+    "selectors_literals": [
+      "[data-app-icon]"
+    ],
+    "functions_named": [
+      [
+        "",
+        "icons"
+      ],
+      [
+        "hydrate",
+        ""
+      ],
+      [
+        "svg",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/impressao.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "escape",
+      "impressao",
+      "irPara",
+      "relatorios",
+      "rota",
+      "version"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [
+      "afterprint",
+      "beforeprint",
+      "click"
+    ],
+    "dom_ids_literals": [
+      "folha-impressao",
+      "imprimir-relatorio"
+    ],
+    "selectors_literals": [
+      "h1",
+      "main [data-tela]:not([hidden])"
+    ],
+    "functions_named": [
+      [
+        "",
+        "impressao"
+      ],
+      [
+        "cabecalho",
+        ""
+      ],
+      [
+        "imprimir",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "limpar",
+        ""
+      ],
+      [
+        "preparar",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/layout-bancada.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "layoutBancada"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [
+      "resize"
+    ],
+    "dom_ids_literals": [
+      "overview-grid",
+      "overview-view",
+      "workspace"
+    ],
+    "selectors_literals": [
+      ".experiment",
+      ".overview-details",
+      ".overview-tube",
+      "svg"
+    ],
+    "functions_named": [
+      [
+        "",
+        "layoutBancada"
+      ],
+      [
+        "atualizar",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "organizar",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/lupa.js",
+    "classe": "C",
+    "globals": [
+      "bancada",
+      "chem",
+      "cientifico",
+      "escape",
+      "familySpecies",
+      "format",
+      "lupa",
+      "solutions",
+      "state"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "destaque",
+      "lupaLog",
+      "modo",
+      "showPH",
+      "ver"
+    ],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [
+      ".lupa-evento",
+      ".lupa-eventos",
+      ".lupa-svg",
+      ".lupa-svg[data-par]",
+      "circle, rect"
+    ],
+    "functions_named": [
+      [
+        "",
+        "lupa"
+      ],
+      [
+        "celulas",
+        ""
+      ],
+      [
+        "corDa",
+        ""
+      ],
+      [
+        "dados",
+        ""
+      ],
+      [
+        "equilibrio",
+        ""
+      ],
+      [
+        "html",
+        ""
+      ],
+      [
+        "paresConjugados",
+        ""
+      ],
+      [
+        "particulaSolta",
+        ""
+      ],
+      [
+        "reagir",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/mobile-study.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "loja",
+      "workspace"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [
+      "click",
+      "resize"
+    ],
+    "dom_ids_literals": [
+      "activity-banner",
+      "dose-area",
+      "focus-tab",
+      "focus-view",
+      "overview-grid",
+      "workspace",
+      "workspace-launchers",
+      "workspace-toolbar"
+    ],
+    "selectors_literals": [
+      "#dose-area .dose-actions",
+      ".activity-banner",
+      ".app-header",
+      ".focus-heading",
+      ".overview-heading-actions",
+      ".stage-stats",
+      ".tube-stage",
+      ".tube-strip",
+      ".volume-readout"
+    ],
+    "functions_named": [
+      [
+        "button",
+        ""
+      ],
+      [
+        "schedule",
+        ""
+      ],
+      [
+        "update",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/modulos.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "MODULOS",
+      "NIVEIS",
+      "announce",
+      "modulos",
+      "notice",
+      "render",
+      "state"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "level"
+    ],
+    "events": [
+      "click"
+    ],
+    "dom_ids_literals": [
+      "modulos"
+    ],
+    "selectors_literals": [
+      "#modulos .modulo",
+      ".modulo",
+      ".modulo-ativar",
+      ".modulo-ativar-texto",
+      ".modulo-ativo",
+      ".modulo-cab",
+      ".modulo-corpo"
+    ],
+    "functions_named": [
+      [
+        "",
+        "modulos"
+      ],
+      [
+        "alternar",
+        ""
+      ],
+      [
+        "ativar",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "montar",
+        ""
+      ],
+      [
+        "render",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/prateleira.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "chem",
+      "current",
+      "escape",
+      "format",
+      "indicators",
+      "normalizar",
+      "prateleira",
+      "solutionGroups",
+      "solutions",
+      "state"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "destination"
+    ],
+    "events": [
+      "click",
+      "input",
+      "keydown",
+      "toggle"
+    ],
+    "dom_ids_literals": [
+      "indicator-chips",
+      "menu-frasco-corpo",
+      "secao-frascos",
+      "shelf",
+      "shelf-search"
+    ],
+    "selectors_literals": [
+      ".indicadores-extra",
+      ".menu-frasco",
+      ".menu-frasco-atual",
+      ".menu-frasco-cor",
+      "details[data-grupo][open]"
+    ],
+    "functions_named": [
+      [
+        "",
+        "prateleira"
+      ],
+      [
+        "abrir",
+        ""
+      ],
+      [
+        "alternar",
+        ""
+      ],
+      [
+        "corDoFrasco",
+        ""
+      ],
+      [
+        "emUso",
+        ""
+      ],
+      [
+        "fechar",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "render",
+        ""
+      ],
+      [
+        "renderIndicadores",
+        ""
+      ],
+      [
+        "renderLista",
+        ""
+      ],
+      [
+        "renderMenus",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/regua-ph.js",
+    "classe": "C",
+    "globals": [
+      "chem",
+      "format",
+      "regua"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "regua"
+      ],
+      [
+        "svg",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/render.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "ESCALAS",
+      "MAX_TUBES",
+      "VIDRARIAS",
+      "activityUI",
+      "bancada",
+      "capacidade",
+      "capacidadeDaBancada",
+      "chem",
+      "current",
+      "escala",
+      "escape",
+      "format",
+      "indicators",
+      "instrumentos",
+      "isEveryday",
+      "layoutBancada",
+      "modulos",
+      "nomeGrupo",
+      "nomeIndicador",
+      "pontoFinal",
+      "prateleira",
+      "refreshSelects",
+      "render",
+      "renderVazia",
+      "renderVer",
+      "renderVidraria",
+      "resumoConteudo",
+      "selecaoTubos",
+      "solutionSummary",
+      "solutions",
+      "state",
+      "syncForm",
+      "targets",
+      "textoCompartilhado",
+      "tubeSVG",
+      "vidro",
+      "volumeTexto",
+      "workspace"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "js",
+      "modo"
+    ],
+    "events": [],
+    "dom_ids_literals": [
+      "add-tube-btn",
+      "ajustes",
+      "bancada-vazia",
+      "bench-mode",
+      "capacidade-grupo",
+      "capacidade-opcoes",
+      "capacity-value",
+      "color-name",
+      "color-swatch",
+      "compare-btn",
+      "concentration",
+      "concentration-field",
+      "dilution-field",
+      "dilution-select",
+      "dose-area",
+      "dose-shortcuts",
+      "dose-summary",
+      "drop-btn",
+      "drop-volume",
+      "drop1ml-btn",
+      "drop5-btn",
+      "drop5ml-btn",
+      "equivalence-note",
+      "focus-tab",
+      "focus-view",
+      "group-notice",
+      "indicator-name",
+      "indicator-only",
+      "indicator-range",
+      "initial-volume",
+      "large-tube",
+      "meia-gota-btn",
+      "ordenar-ph-btn",
+      "overview-count",
+      "overview-grid",
+      "overview-group-summary",
+      "overview-tab",
+      "overview-view",
+      "ph-phase",
+      "ph-toggle",
+      "ph-value",
+      "poe-btn",
+      "prepare-btn",
+      "rename-btn",
+      "restart-btn",
+      "sample-model-note",
+      "sample-summary",
+      "temperature-value",
+      "titrant-concentration",
+      "titrant-concentration-field",
+      "titrant-dilution-field",
+      "titrant-dilution-select",
+      "titrant-label",
+      "tube-count",
+      "tube-index",
+      "tube-list",
+      "tube-name",
+      "undo-btn",
+      "unlink-btn",
+      "vazia-desfazer",
+      "vidraria-dica",
+      "vidro-nota",
+      "volume-value",
+      "workspace"
+    ],
+    "selectors_literals": [
+      ".header-btn-texto",
+      "input[name="
+    ],
+    "functions_named": [
+      [
+        "",
+        "nomeIndicador"
+      ],
+      [
+        "",
+        "pontoFinal"
+      ],
+      [
+        "",
+        "render"
+      ],
+      [
+        "",
+        "renderVazia"
+      ],
+      [
+        "",
+        "renderVidraria"
+      ],
+      [
+        "",
+        "resumoConteudo"
+      ],
+      [
+        "",
+        "solutionSummary"
+      ],
+      [
+        "",
+        "syncForm"
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/segredo.js",
+    "classe": "B",
+    "globals": [
+      "montagens",
+      "montarMontagem",
+      "segredo"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/selecao-tubos.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "alterar",
+      "bancada",
+      "capacidade",
+      "chem",
+      "confirmar",
+      "escape",
+      "format",
+      "instrumentos",
+      "limparGrupos",
+      "misturarTubos",
+      "nomeIndicador",
+      "notice",
+      "progresso",
+      "resumoConteudo",
+      "selecaoTubos",
+      "state"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "activeId",
+      "tubes"
+    ],
+    "events": [
+      "click",
+      "keydown"
+    ],
+    "dom_ids_literals": [
+      "comparacao-corpo",
+      "comparacao-dialog",
+      "mistura-destino-dialog",
+      "mistura-destino-form",
+      "mistura-destino-select",
+      "mistura-erro",
+      "overview-grid",
+      "overview-hint",
+      "selecao-cancelar-btn",
+      "selecao-comparar-btn",
+      "selecao-desvincular-btn",
+      "selecao-misturar-btn",
+      "selecao-registrar-btn",
+      "selecao-remover-btn",
+      "selecao-todos-btn",
+      "selecao-tubos",
+      "selecao-tubos-contagem",
+      "selecao-vincular-btn",
+      "selecionar-tubos-btn",
+      "workspace"
+    ],
+    "selectors_literals": [
+      "[data-tube]",
+      "dialog[open]"
+    ],
+    "functions_named": [
+      [
+        "",
+        "selecaoTubos"
+      ],
+      [
+        "atualizar",
+        ""
+      ],
+      [
+        "comparar",
+        ""
+      ],
+      [
+        "estado",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "misturar",
+        ""
+      ],
+      [
+        "registrar",
+        ""
+      ],
+      [
+        "sair",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/seletores.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "enhanceSelect",
+      "escape",
+      "initSelects",
+      "normalizar",
+      "refreshSelects"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [],
+    "events": [
+      "change",
+      "click",
+      "close",
+      "input",
+      "keydown"
+    ],
+    "dom_ids_literals": [
+      "choice-count",
+      "choice-dialog",
+      "choice-empty",
+      "choice-options",
+      "choice-search",
+      "choice-search-field",
+      "choice-title"
+    ],
+    "selectors_literals": [
+      "[data-choice-index]",
+      "[role=",
+      "label",
+      "select",
+      "span"
+    ],
+    "functions_named": [
+      [
+        "",
+        "enhanceSelect"
+      ],
+      [
+        "",
+        "initSelects"
+      ],
+      [
+        "",
+        "refreshSelects"
+      ],
+      [
+        "choose",
+        ""
+      ],
+      [
+        "focusOption",
+        ""
+      ],
+      [
+        "paint",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/som.js",
+    "classe": "B",
+    "globals": [
+      "armazenamento",
+      "som"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "som",
+      "vibrar"
+    ],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [
+      [
+        "",
+        "som"
+      ],
+      [
+        "definir",
+        ""
+      ],
+      [
+        "tocar",
+        ""
+      ],
+      [
+        "vibrar",
+        ""
+      ]
+    ],
+    "storage_literals": [
+      "siab_som_v1"
+    ]
+  },
+  {
+    "arquivo": "js/ui/tour.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ajuda",
+      "atividades",
+      "bancada",
+      "current",
+      "irPara",
+      "notice",
+      "rota",
+      "state",
+      "tour",
+      "trilho",
+      "workspace"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "experiencia"
+    ],
+    "events": [
+      "click",
+      "close",
+      "hashchange",
+      "resize",
+      "scroll"
+    ],
+    "dom_ids_literals": [
+      "boas-vindas",
+      "boas-vindas-tour",
+      "tour",
+      "tour-passo",
+      "tour-pontos",
+      "tour-proximo",
+      "tour-pular",
+      "tour-texto",
+      "tour-titulo",
+      "tour-voltar"
+    ],
+    "selectors_literals": [
+      ".tour-anel",
+      ".tour-cartao"
+    ],
+    "functions_named": [
+      [
+        "",
+        "tour"
+      ],
+      [
+        "alvoDe",
+        ""
+      ],
+      [
+        "comecar",
+        ""
+      ],
+      [
+        "encerrar",
+        ""
+      ],
+      [
+        "iniciar",
+        ""
+      ],
+      [
+        "ligar",
+        ""
+      ],
+      [
+        "mostrar",
+        ""
+      ],
+      [
+        "posicionar",
+        ""
+      ],
+      [
+        "visivel",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/trilho.js",
+    "classe": "B",
+    "globals": [
+      "trilho",
+      "workspace"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "left",
+      "right"
+    ],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/tubo.js",
+    "classe": "C",
+    "globals": [
+      "MEDIDAS_VIDRO",
+      "VIDRARIAS",
+      "activeBench",
+      "capacidade",
+      "chem",
+      "current",
+      "escape",
+      "formaVidro",
+      "format",
+      "marcasDeVolume",
+      "solutions",
+      "state",
+      "tubeSVG",
+      "vidro"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "indicatorOnly",
+      "vidraria"
+    ],
+    "events": [],
+    "dom_ids_literals": [],
+    "selectors_literals": [
+      ".bolhas",
+      ".bu-liquido, .bu-ponta-liquido",
+      ".cg-bulbo",
+      ".cg-liquido",
+      ".efeitos",
+      ".efeitos-dentro",
+      ".efeitos-superficie",
+      ".liquid-body",
+      ".liquido",
+      ".liquido-superficie",
+      ".menisco",
+      ".nuvem-cor",
+      ".sedimento",
+      ".turvacao",
+      ".vidro-corpo",
+      "ellipse",
+      "svg",
+      "svg .liquido",
+      "svg.vidro-foco"
+    ],
+    "functions_named": [
+      [
+        "",
+        "formaVidro"
+      ],
+      [
+        "",
+        "marcasDeVolume"
+      ],
+      [
+        "",
+        "tubeSVG"
+      ],
+      [
+        "",
+        "vidro"
+      ],
+      [
+        "agitar",
+        ""
+      ],
+      [
+        "aplicar",
+        ""
+      ],
+      [
+        "bolhasHTML",
+        ""
+      ],
+      [
+        "buretaSVG",
+        ""
+      ],
+      [
+        "coresDaZona",
+        ""
+      ],
+      [
+        "criar",
+        ""
+      ],
+      [
+        "desenhar",
+        ""
+      ],
+      [
+        "estadoDoVidro",
+        ""
+      ],
+      [
+        "gota",
+        ""
+      ],
+      [
+        "medidas",
+        ""
+      ],
+      [
+        "meniscoD",
+        ""
+      ],
+      [
+        "pingando",
+        ""
+      ],
+      [
+        "suspender",
+        ""
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/ver-investigacao.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "VER_SECTIONS",
+      "alterar",
+      "ambiente",
+      "chem",
+      "cientifico",
+      "condutimetro",
+      "csvCampo",
+      "current",
+      "equacao",
+      "escape",
+      "format",
+      "grafico",
+      "graficoMedido",
+      "historicoHTML",
+      "instrumentos",
+      "ligarVer",
+      "lupa",
+      "medicoes",
+      "renderRegua",
+      "renderVer",
+      "selecionarVer",
+      "solutions",
+      "state",
+      "tabelaCSV",
+      "temperaturaLocal",
+      "verDisponivel",
+      "verFamiliasDisponiveis",
+      "verGrupos",
+      "verRenderers",
+      "workspace"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "destaque",
+      "level",
+      "measurementTable",
+      "reportViews",
+      "verFamily",
+      "verLastTabs",
+      "verTab"
+    ],
+    "events": [
+      "click",
+      "keydown",
+      "submit"
+    ],
+    "dom_ids_literals": [
+      "ver-conteudo",
+      "ver-panel",
+      "ver-regua",
+      "ver-tabs",
+      "workspace"
+    ],
+    "selectors_literals": [
+      "#ver-panel",
+      "[role=",
+      "button"
+    ],
+    "functions_named": [
+      [
+        "",
+        "graficoMedido"
+      ],
+      [
+        "",
+        "ligarVer"
+      ],
+      [
+        "",
+        "renderRegua"
+      ],
+      [
+        "",
+        "renderVer"
+      ],
+      [
+        "",
+        "selecionarVer"
+      ],
+      [
+        "",
+        "tabelaCSV"
+      ],
+      [
+        "",
+        "verDisponivel"
+      ],
+      [
+        "",
+        "verFamiliasDisponiveis"
+      ]
+    ],
+    "storage_literals": []
+  },
+  {
+    "arquivo": "js/ui/workspace.js",
+    "classe": "B",
+    "globals": [
+      "$",
+      "ActivityContext",
+      "MODULOS",
+      "VER_SECTIONS",
+      "VIDRARIAS",
+      "announce",
+      "armazenamento",
+      "atividades",
+      "bancada",
+      "current",
+      "escape",
+      "format",
+      "icons",
+      "instrumentos",
+      "layoutBancada",
+      "loja",
+      "renderVer",
+      "selecionarVer",
+      "solutionSummary",
+      "state",
+      "verDisponivel",
+      "verFamiliasDisponiveis",
+      "workspace"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "activeFamily",
+      "activeTool",
+      "initialView",
+      "left",
+      "leftGroup",
+      "level",
+      "modo",
+      "presentation",
+      "right",
+      "scope",
+      "source",
+      "tool",
+      "verTab",
+      "vidraria",
+      "view"
+    ],
+    "events": [
+      "click",
+      "keydown",
+      "resize",
+      "scroll"
+    ],
+    "dom_ids_literals": [
+      "activity-banner",
+      "agitar-btn",
+      "ajustes",
+      "close-controls",
+      "controls",
+      "controls-title",
+      "dock-close-right",
+      "dock-expand",
+      "dock-left-content",
+      "dock-right-content",
+      "dose-area",
+      "experiment",
+      "sheet-backdrop",
+      "ver-conteudo",
+      "ver-panel",
+      "ver-tabs",
+      "ver-title",
+      "workspace",
+      "workspace-dados",
+      "workspace-quick-measure",
+      "workspace-ver"
+    ],
+    "selectors_literals": [
+      ".app-header",
+      ".bottom-nav",
+      ".chip-ver,.chip-sep",
+      ".dock",
+      ".dock-header",
+      ".painel-conteudo",
+      ".painel-secao",
+      ".sheet-handle",
+      ".trilho",
+      ".tube-strip",
+      ".view-tabs",
+      "[data-dock-group]",
+      "[data-dock-tool]",
+      "[data-recolher],.fechar-flutuante",
+      "[data-secao=",
+      "[data-ver-family][aria-selected=",
+      "[data-ver][aria-selected=",
+      "[inert],[hidden]",
+      "button",
+      "button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea,summary,a[href],[tabindex=",
+      "button:not([hidden])",
+      "dialog[open]",
+      "input,textarea,select"
+    ],
+    "functions_named": [
+      [
+        "",
+        "workspace"
+      ],
+      [
+        "apply",
+        ""
+      ],
+      [
+        "applyLeft",
+        ""
+      ],
+      [
+        "close",
+        ""
+      ],
+      [
+        "editable",
+        ""
+      ],
+      [
+        "geometry",
+        ""
+      ],
+      [
+        "groupAllowed",
+        ""
+      ],
+      [
+        "init",
+        ""
+      ],
+      [
+        "open",
+        ""
+      ],
+      [
+        "refresh",
+        ""
+      ],
+      [
+        "save",
+        ""
+      ],
+      [
+        "selected",
+        ""
+      ],
+      [
+        "summary",
+        ""
+      ],
+      [
+        "sync",
+        ""
+      ]
+    ],
+    "storage_literals": [
+      "siab_workspace_v1"
+    ]
+  },
+  {
+    "arquivo": "sw.js",
+    "classe": "B",
+    "globals": [
+      "version"
+    ],
+    "imports_scripts": [],
+    "state_reads_writes": [
+      "js"
+    ],
+    "events": [
+      "activate",
+      "fetch",
+      "install"
+    ],
+    "dom_ids_literals": [],
+    "selectors_literals": [],
+    "functions_named": [],
+    "storage_literals": []
+  }
+]

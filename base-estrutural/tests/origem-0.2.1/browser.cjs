@@ -1,0 +1,2 @@
+const pw=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+module.exports={...pw,firefox:{launch:options=>pw.firefox.launch({...options,...(process.env.FIREFOX_DISABLE_SANDBOX==='1'?{env:{...process.env,MOZ_DISABLE_CONTENT_SANDBOX:'1'},firefoxUserPrefs:{'security.sandbox.content.level':0}}:{})})},chromium:{launch:options=>pw.chromium.launch({...options,...(process.env.CHROMIUM_EXECUTABLE?{executablePath:process.env.CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage'],env:{...process.env,LD_LIBRARY_PATH:process.env.CHROMIUM_LIBS||'/tmp'}}:{})})}};

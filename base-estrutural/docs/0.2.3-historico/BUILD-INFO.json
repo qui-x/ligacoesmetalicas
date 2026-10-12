@@ -1,0 +1,215 @@
+{
+  "nome": "Base Estrutural",
+  "tipo": "núcleo universal",
+  "base_0_2_0_preservada": {
+    "arquivo": "BASE-ESTRUTURAL.zip",
+    "sha512": "f6ae851e2958c4017f8e726acfec075f864d54ed02b950e2b40b8c8aaa3c4e518088e8e5e556e3a3c34e4f952fe03d7418d2393c0124eb3a1e8da4965e51c780"
+  },
+  "silm_preservado": {
+    "arquivo": "SILM-0.1.0.zip",
+    "sha512": "cf342341ce938d8370d4000907a6b833fef745f4e80f5064963aeea34ba09c740dac1a997ab87f7e798367a9c542d0cd295d5272144da3823ec9cb8a710a021a"
+  },
+  "entrada_vazia": "index.html#/laboratorio",
+  "entrada_demo": "index.html?demo=1#/inicio",
+  "versao": "0.2.3",
+  "origem": "Base Estrutural 0.2.2",
+  "origem_zip": "BASE-ESTRUTURAL-0.2.2.zip",
+  "origem_sha512": "5bf52424a8160477d944e76e803f3423fd0f8ea85803d05af05f26309f02124dfa6b9fb2632cc4721cb24d43dd4b92067c07ef418458aafb9498a516819c9aef",
+  "status": "candidata congelada para homologação; referência fornecida conferida",
+  "referencia_comportamental": "SIAB 1.0.0 fornecido pelo usuário",
+  "referencia_siab": {
+    "arquivo": "SIAB(4).zip",
+    "versao_interna": "1.0.0",
+    "sha512": "ff81556ce175bbc6e527eb922a193599b31d127ee07a0cb43a80639e45570c20a75e5660a876f29fbdb435dc636b0556e527d8d1b394739a3cf9fe1b583983b3",
+    "arquivo_identico": "SIAB(3).zip",
+    "status": "AVAILABLE_VERIFIED",
+    "comparacao": "SOURCE_REVIEW_COMPLETED",
+    "criterio": "Referência já fornecida pelo usuário, confirmada após sua correção em 2026-10-08. SIAB(3) e SIAB(4) são byte a byte idênticos.",
+    "nome_citado_no_prompt": "SIAB(9).zip",
+    "nota_nome": "O nome citado no prompt fica como rastreabilidade. O hash pertence ao arquivo efetivamente inspecionado SIAB(4), sem afirmar identidade com um SIAB(9) não inspecionado."
+  },
+  "regra_de_parada": "Parar na Base 0.2.3 e aguardar homologação. Não iniciar 0.2.4, SILM, rebase ou mecânicas científicas.",
+  "hash_distribuicao": "SHA-512 externo em BASE-ESTRUTURAL-0.2.3-CORRECOES.sha512; sem hash autorreferente no ZIP.",
+  "historico": "docs/0.2.2-historico preserva a proveniência verdadeira da entrega anterior, sem reatribuir hashes.",
+  "data_utc": "2026-10-07T22:10:38.039551Z",
+  "validacao": {
+    "suites": {
+      "shell": {
+        "data_utc": "2026-10-07T22:05:57.887Z",
+        "grupos_aprovados": 16
+      },
+      "operational": {
+        "data_utc": "2026-10-07T22:05:57.871Z",
+        "grupos_aprovados": 10
+      },
+      "regression": {
+        "data_utc": "2026-10-07T22:05:57.929Z",
+        "grupos_aprovados": 16
+      },
+      "visual": {
+        "data_utc": "2026-10-07T22:08:29.728Z",
+        "grupos_aprovados": 1
+      }
+    },
+    "grupos_aprovados": 43,
+    "verificacoes_axe": 32,
+    "violacoes_axe": 0,
+    "contextos_com_diagnosticos": 43,
+    "motores": [
+      {
+        "engine": "chromium",
+        "version": "153.0.8010.0",
+        "status": "AVAILABLE"
+      },
+      {
+        "engine": "firefox",
+        "status": "UNAVAILABLE",
+        "reason": "Error: browserType.launch: Executable doesn't exist at /root/.cache/ms-playwright/firefox-1538/firefox/firefox\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+      },
+      {
+        "engine": "webkit",
+        "status": "UNAVAILABLE",
+        "reason": "Error: browserType.launch: Executable doesn't exist at /root/.cache/ms-playwright/webkit-2336/pw_run.sh\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+      }
+    ],
+    "neutralidade": {
+      "status": "PASS",
+      "versao": "0.2.3",
+      "arquivos_runtime": 51,
+      "referencias_html": 46,
+      "dependencias_cientificas": 0,
+      "ocorrencias_classificadas": [
+        {
+          "arquivo": "manifest.webmanifest",
+          "linha": 1,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "manifest.webmanifest",
+          "linha": 1,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "index.html",
+          "linha": 2,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "index.html",
+          "linha": 32,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "css/components.css",
+          "linha": 2,
+          "termo": "BASE",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "css/components.css",
+          "linha": 3,
+          "termo": "base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "domain/demo/bootstrap.js",
+          "linha": 37,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "domain/demo/bootstrap.js",
+          "linha": 37,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "domain/demo/bootstrap.js",
+          "linha": 38,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "domain/demo/manual.js",
+          "linha": 7,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "domain/demo/manual.js",
+          "linha": 11,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "domain/demo/manual.js",
+          "linha": 13,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "js/storage/migration.js",
+          "linha": 2,
+          "termo": "siab_*",
+          "justificativa": "migração exclusiva de preferências de interface"
+        },
+        {
+          "arquivo": "js/storage/migration.js",
+          "linha": 7,
+          "termo": "siab_a11y_prefs",
+          "justificativa": "migração exclusiva de preferências de interface"
+        },
+        {
+          "arquivo": "js/storage/migration.js",
+          "linha": 13,
+          "termo": "siab_workspace_v1",
+          "justificativa": "migração exclusiva de preferências de interface"
+        },
+        {
+          "arquivo": "js/experience/shell.js",
+          "linha": 105,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "js/experience/teacher.js",
+          "linha": 38,
+          "termo": "KB",
+          "justificativa": "unidade de tamanho de arquivo (kilobytes)"
+        },
+        {
+          "arquivo": "js/core/identity.js",
+          "linha": 3,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "js/core/identity.js",
+          "linha": 3,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        },
+        {
+          "arquivo": "js/core/identity.js",
+          "linha": 3,
+          "termo": "Base",
+          "justificativa": "nome técnico Base / camada CSS"
+        }
+      ],
+      "metodo": "Busca por termos completos e inspeção das referências locais; nenhuma dependência ou catálogo científico no runtime. A palavra Base nomeia a plataforma. A migração herdada lê apenas preferências de interface."
+    },
+    "evidencias": "docs/evidence",
+    "limitacao": "Chromium headless/emulação; Gecko/WebKit ausentes; sem aparelho físico/leitor de tela real. Conferência da referência por leitura direta de HTML/CSS/JS; nenhuma nova execução do SIAB nesta revisão documental."
+  },
+  "revisao_documental": {
+    "rotulo": "0.2.3 — Correções",
+    "data_utc": "2026-10-08T08:12:34.528791Z",
+    "pacote_anterior": "BASE-ESTRUTURAL-0.2.3.zip",
+    "sha512_pacote_anterior": "2b9c5def55362e1bbeb823b9435e3e8ce72f7866c708aed686461ee2c42820ca05f7497d3bf7f4b70f4f3ef1df498b995bdbf525c1ad3a005d107ff7c24cc9d1",
+    "escopo": "Referência, matriz de paridade, relatórios e metadados. Runtime idêntico à candidata 0.2.3 já testada."
+  }
+}
