@@ -1,5 +1,5 @@
 """Fechamento da versão (ordem fixa, para que relatório, auditoria e entrega concordem):
-relatório → auditoria → relatório → entrega (SHA512SUMS + ZIP + SHA-512 externo) → auditoria → conferências.
+relatório ⇄ auditoria (até estabilizar) → entrega (SHA512SUMS + ZIP + SHA-512 externo) → auditoria → conferências.
 Uso: python3 -I scripts/finalize.py  (depois de npm run build e node tests/browser.cjs)"""
 import hashlib,json,pathlib,subprocess,sys,zipfile
 root=pathlib.Path(__file__).resolve().parent.parent
@@ -8,9 +8,13 @@ def run(*cmd,check=True):
     r=subprocess.run(cmd,cwd=root,capture_output=True,text=True)
     if check and r.returncode: sys.exit(f'falhou: {" ".join(cmd)}\n{r.stdout[-2000:]}\n{r.stderr[-2000:]}')
     return r
-run('node','scripts/build-test-report.cjs')
-run('python3','scripts/audit-silm.py',check=False)
-run('node','scripts/build-test-report.cjs')
+# Relatório e auditoria dependem um do outro: repete até a auditoria estabilizar (o relatório precisa existir).
+previous=None
+for _ in range(4):
+    run('node','scripts/build-test-report.cjs');run('python3','scripts/audit-silm.py',check=False)
+    current=(root/'docs/evidence/AUDITORIA-SILM.json').read_text()
+    if current==previous:break
+    previous=current
 run('python3','-I','scripts/release.py')
 run('python3','scripts/audit-silm.py',check=False)
 audit=json.loads((root/'docs/evidence/AUDITORIA-SILM.json').read_text())

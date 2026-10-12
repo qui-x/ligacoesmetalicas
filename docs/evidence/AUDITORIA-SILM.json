@@ -1,6 +1,6 @@
 {
   "product": "SILM",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "checks": [
     {
       "check": "Versão única do produto",
@@ -15,11 +15,13 @@
         "approvedIntegrations": [
           "js/core/domain.js",
           "js/experience/activity.js",
+          "js/manual/manual.js",
           "js/workspace/workspace.js"
         ],
         "changedFiles": [
           "js/core/domain.js",
           "js/experience/activity.js",
+          "js/manual/manual.js",
           "js/workspace/workspace.js"
         ]
       }
@@ -83,7 +85,7 @@
       "detail": null
     },
     {
-      "check": "Montagem (0.4.x), cristalografia (0.5.x), camada eletrônica (0.6.x) e propriedades (0.7.x) presentes e carregadas em ordem",
+      "check": "Montagem (0.4.x), cristalografia (0.5.x), camada eletrônica (0.6.x), propriedades (0.7.x) e Explorar (0.8.x) presentes e carregadas em ordem",
       "status": "PASS",
       "detail": null
     },
@@ -113,6 +115,11 @@
       "detail": null
     },
     {
+      "check": "Explorar: comparação somente leitura, sem laço extra e sem novo schema",
+      "status": "PASS",
+      "detail": null
+    },
+    {
       "check": "Marcadores eletrônicos não são estado científico",
       "status": "PASS",
       "detail": null
@@ -128,6 +135,6 @@
       "detail": null
     }
   ],
-  "passed": 22,
+  "passed": 23,
   "failed": 0
 }

@@ -188,3 +188,31 @@
 @media(forced-colors:active){.silm-unit[data-heat] .silm-unit-core{box-shadow:none;outline:3px double CanvasText}.silm-field-arrow,.silm-force-arrow,.silm-drift-arrow{stroke:CanvasText}.silm-arrow-head,.silm-overlay-label{fill:CanvasText}}
 /* Abas da Montagem (5 desde a 0.7.x): rótulos inteiros; se não couberem, as abas passam para outra linha. */
 #dock-left-tabs button,#dock-right-tabs button{flex:1 1 auto;white-space:nowrap;overflow-wrap:normal}
+/* 0.8.x — Explorar: camadas de apresentação, foco contextual e comparação derivada. */
+#silm-view[data-centers=dim] .silm-unit-core{opacity:.28}
+#silm-view[data-hints=off] .silm-property-overlay{display:none}
+.silm-focus{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.silm-focus button{flex:1 1 auto;padding:6px 10px;font-size:.82rem}
+.silm-focus button[aria-pressed=true],.silm-layer-list button[aria-pressed=true],.silm-compare-list button[aria-pressed=true],.silm-compare .silm-segmented button[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent)}
+.silm-layer-list,.silm-compare-list{display:grid;gap:6px;margin-bottom:10px}
+.silm-layer-list button{text-align:left}
+.silm-layer-list button[aria-pressed=false]{opacity:.85}
+.silm-layer-list button::before{content:"○ ";font-weight:700}
+.silm-layer-list button[aria-pressed=true]::before{content:"● "}
+.silm-compare-panes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:10px}
+.silm-compare[data-layout=ab] .silm-compare-panes{grid-template-columns:minmax(0,1fr)}
+.silm-compare .silm-segmented{display:flex;gap:6px;margin-top:8px}
+.silm-compare .silm-segmented button{flex:1}
+.silm-snapshot{margin:0;display:grid;gap:6px}
+.silm-snapshot[hidden]{display:none}
+.silm-snapshot-label{font-weight:700;font-size:.9rem}
+.silm-snapshot-stage{position:relative;width:100%;aspect-ratio:1;border:1px solid var(--silm-soft-border);border-radius:var(--radius-lg);background:radial-gradient(circle at 50% 46%,var(--panel2),var(--bg) 78%);overflow:hidden}
+.silm-snapshot-svg{position:absolute;inset:0;width:100%;height:100%}
+.silm-snapshot-units{z-index:2}
+.silm-snapshot-unit{fill:#c9a352;stroke:#2a2016;stroke-width:.4}
+.silm-snapshot-lit{fill:#f3e7c2;stroke:var(--silm-light);stroke-width:.9}
+.silm-snapshot-heat{fill:none;stroke:var(--silm-heat);stroke-width:.5}
+.silm-snapshot-symbol{fill:#17181b;font-weight:800}
+.silm-snapshot-edge{stroke:var(--scientific-accent);stroke-width:.25;stroke-dasharray:1 .8;opacity:.7}
+.silm-snapshot-lattice{fill:var(--silm-bronze);opacity:.35}
+@media(forced-colors:active){.silm-snapshot-unit{fill:Canvas;stroke:CanvasText}.silm-snapshot-symbol{fill:CanvasText}}

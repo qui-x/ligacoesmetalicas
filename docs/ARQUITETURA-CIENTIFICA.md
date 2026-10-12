@@ -1,6 +1,6 @@
 # Arquitetura científica do SILM
 
-> Atualizada na 0.7.0. Reconstruída na 0.4.0 a partir do código, porque o arquivo da 0.3.0 não constava do pacote recebido.
+> Atualizada na 0.8.0. Reconstruída na 0.4.0 a partir do código, porque o arquivo da 0.3.0 não constava do pacote recebido.
 
 ## 1. Princípio
 
@@ -19,6 +19,7 @@ SILM CORE
 │                   domain/silm/crystal-view.js — célula, rede e vizinhança pseudo-3D (0.5.x)
 │                   domain/silm/electron-view.js — elétrons deslocalizados, canvas qualitativo (0.6.x)
 │                   domain/silm/property-view.js — sobreposição e controles das experiências (0.7.x)
+│                   domain/silm/exploration.js — Explorar: foco, camadas, comparação derivada (0.8.x)
 │                   domain/silm/periodic-table.js + presentation.js — Tabela (0.2.x)
 ├── measurements    reservado (0.9.x)
 ├── calculations    reservado (0.10.x)
@@ -37,7 +38,7 @@ Tabela Periódica ──(Iniciar investigação)──┐
                                            │ eventos domain:silm:*
               ┌────────────────────────────┼─────────────────────────────┐
               ▼                            ▼                             ▼
-   Viewport (Tabela/cartão/       Montagem (Resumo, Metal,        Ver (Observar) · Dados (Tabela,
+   Viewport (Tabela/cartão/       Montagem (Resumo, Metal,        Ver (Observar, Camadas,     · Dados (Tabela,
    montagem/estrutura)            Estrutura, Propriedades,        Histórico, Relatório)
                                   Módulo)
 ```
@@ -59,6 +60,8 @@ Tabela Periódica ──(Iniciar investigação)──┐
 
 Trocar de módulo altera apenas a perspectiva (`module.active`): não cria investigação, não apaga o metal e não apaga a montagem.
 
+Explorar (0.8.x) é a perspectiva qualitativa integrada: o painel Observar acompanha o objeto em foco, Camadas reúne as camadas de apresentação e Comparar desenha cenas derivadas somente leitura. Foco, camadas de apresentação e modo de comparação ficam em `exploration.view`, fora do `scientificState` (ver `CONTRATO-EXPLORACAO.md`).
+
 ## 5. Roteiros e Missões
 
 ```text
@@ -74,4 +77,4 @@ Toda informação é classificada como dado tabelado (com fonte), calculado pelo
 
 ## 7. Núcleo herdado
 
-A auditoria (`scripts/audit-silm.py`) confere que os arquivos do núcleo permanecem idênticos aos da 0.3.0 recebida (`docs/evidence/NUCLEO-PRESERVADO.json`). Integrações declaradas: `js/experience/activity.js` (0.4.0, opção `session.resumeFree`, correção de origem 0.3.x); `js/workspace/workspace.js` e `js/core/domain.js` (0.5.0, painel direito com fontes Ver/Dados, correção de origem 0.1.x — paridade SIAB 1.0.0).
+A auditoria (`scripts/audit-silm.py`) confere que os arquivos do núcleo permanecem idênticos aos da 0.3.0 recebida (`docs/evidence/NUCLEO-PRESERVADO.json`). Integrações declaradas: `js/experience/activity.js` (0.4.0, opção `session.resumeFree`, correção de origem 0.3.x); `js/workspace/workspace.js` e `js/core/domain.js` (0.5.0, painel direito com fontes Ver/Dados, correção de origem 0.1.x — paridade SIAB 1.0.0); `js/manual/manual.js` (0.8.0, link direto para tópico do Manual, correção de origem 0.1.x).

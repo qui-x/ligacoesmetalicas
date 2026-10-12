@@ -19,7 +19,10 @@ SimCore.manual=(()=>{
   const categories=(data.sections||[]).map(c=>({id:String(c.id),title:String(c.title)}));const ids=new Set();
   const topics=(data.topics||[]).map(t=>{if(!/^[a-z0-9-]+$/.test(t.id)||ids.has(t.id)||!categories.some(c=>c.id===t.category))throw new TypeError('Tópico inválido no Manual');ids.add(t.id);return {...t,title:String(t.title||t.id),summary:t.summary||'',purpose:t.purpose||'',content:t.content||'',keywords:t.keywords||[],steps:t.steps||[],details:t.details||[],actions:t.actions||[],related:t.related||[]};});
   if(new Set(categories.map(c=>c.id)).size!==categories.length)throw new TypeError('Seção duplicada no Manual');
-  registry=S.createManualRegistry({categories,topics,aliases:data.aliases||{}});commands=actionContext||{};if(!topics.length)current='';render(current);
+  registry=S.createManualRegistry({categories,topics,aliases:data.aliases||{}});commands=actionContext||{};if(!topics.length)current='';
+  // Correção de origem 0.1.x (SILM 0.8.0): com o Manual aberto por link direto (#/manual/tópico), o registro do domínio
+  // chega depois da rota; renderiza o tópico pedido pela rota em vez do índice.
+  const route=S.router?.current;render(topics.length&&route?.id==='manual'&&route.param?route.param:current);
  }
  function init(){
   $('manual-open').addEventListener('click',()=>S.router.openManual());$('manual-close').addEventListener('click',()=>S.router.back());

@@ -1,5 +1,15 @@
 # Registro de alterações
 
+## SILM 0.8.0 — Módulo Explorar
+
+- Ver → Observar contextual: foco em Síntese, Centro, Célula/Montagem, Elétrons ou Propriedade, acompanhando a última ação; foco Centro com posição, coordenação e vizinhos (distância calculada a partir dos parâmetros tabelados).
+- Ver → Camadas: centros, célula, rede, vizinhos, elétrons, rótulos e indicações da propriedade, reutilizando os estados existentes.
+- Ver → Comparar: livre × cristalina, célula × rede, elétrons ocultos × visíveis, antes × depois da propriedade; cenas derivadas somente leitura; lado a lado no desktop, A/B no celular.
+- Indicador compacto da propriedade em estudo na linha da cena.
+- Continuidade entre módulos, Manual, Professor, reload e offline; schema científico inalterado (6); representação da exploração fora do estado científico.
+- Documentação: `docs/MODULO-EXPLORAR.md`, `docs/CONTRATO-EXPLORACAO.md`; tópico provisório no Manual.
+- Correção de origem 0.1.x: link direto para um tópico do Manual (`#/manual/<tópico>`) abre o tópico, e não o índice.
+
 ## SILM 0.7.0 — Propriedades Metálicas
 
 - Elegibilidade por propriedade, calculada do banco por metal (experiência qualitativa, dado tabelado ou indisponível com motivo); cobertura por propriedade em `docs/COBERTURA-METAIS.md`.

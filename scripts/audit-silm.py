@@ -12,7 +12,7 @@ core=json.loads((root/'docs/evidence/NUCLEO-PRESERVADO.json').read_text())
 changed=[p for p,h in core['unchanged'].items() if hashlib.sha512((root/p).read_bytes()).hexdigest()!=h]
 # Base de comparação: núcleo da SILM 0.3.0 recebida. Única integração aprovada na 0.4.0: retomada direta (correção de origem 0.3.x).
 # Integrações aprovadas: activity.js (0.4.0, correção de origem 0.3.x); workspace.js e domain.js (0.5.0, paridade SIAB — fontes Ver/Dados).
-expected_integrations={'js/experience/activity.js','js/workspace/workspace.js','js/core/domain.js'}
+expected_integrations={'js/experience/activity.js','js/workspace/workspace.js','js/core/domain.js','js/manual/manual.js'}   # manual.js: link direto para tópico (0.8.0)
 check('Núcleo herdado preservado com integrações declaradas',set(changed)==expected_integrations,{'verifiedFiles':len(core['unchanged']),'approvedIntegrations':sorted(expected_integrations),'changedFiles':changed})
 activity=(root/'js/experience/activity.js').read_text()
 check('Integração opcional por domínio (resumeFree)',"resumeFree==='direct'" in activity and "resumeFree:'direct'" in (root/'domain/silm/bootstrap.js').read_text())
@@ -38,11 +38,11 @@ check('Sintaxe JavaScript',not errors,errors)
 m=json.loads((root/'manifest.webmanifest').read_text());check('Identidade e ícones PWA',m['short_name']=='SILM' and all((root/icon['src']).is_file() for icon in m['icons']))
 sw=(root/'sw.js').read_text();check('Cache independente',f"const VERSION='{version}'" in sw and 'silm@${ROOT.href}' in sw)
 # Documentos históricos 0.1.1–0.3.0 não constavam do pacote recebido (ver docs/SILM-0.4.0.md).
-required=['SILM-0.4.0.md','MONTAGEM-ESTRUTURA-METALICA.md','SCIENTIFIC-STATE.md','ARQUITETURA-CIENTIFICA.md','ROADMAP-SILM.md','CONTRATO-VERSIONAMENTO.md','INVESTIGACAO.md','PARIDADE-SIAB-1.0.0.md','ESTRUTURAS-CRISTALINAS.md','CONTRATO-CRISTALOGRAFICO.md','COBERTURA-METAIS.md','MODELO-ELETRONICO.md','LIMITACOES-MODELO-ELETRONICO.md','PROPRIEDADES-METALICAS.md','CONTRATO-PROPRIEDADES.md','FONTES-E-PROVENIENCIA.md',f'SILM-{version}.md',f'RELATORIO-BUILD-TESTES-{version}.md']
+required=['SILM-0.4.0.md','MONTAGEM-ESTRUTURA-METALICA.md','SCIENTIFIC-STATE.md','ARQUITETURA-CIENTIFICA.md','ROADMAP-SILM.md','CONTRATO-VERSIONAMENTO.md','INVESTIGACAO.md','PARIDADE-SIAB-1.0.0.md','ESTRUTURAS-CRISTALINAS.md','CONTRATO-CRISTALOGRAFICO.md','COBERTURA-METAIS.md','MODELO-ELETRONICO.md','LIMITACOES-MODELO-ELETRONICO.md','PROPRIEDADES-METALICAS.md','CONTRATO-PROPRIEDADES.md','FONTES-E-PROVENIENCIA.md','MODULO-EXPLORAR.md','CONTRATO-EXPLORACAO.md',f'SILM-{version}.md',f'RELATORIO-BUILD-TESTES-{version}.md']
 check('Documentação obrigatória',all((root/'docs'/p).is_file() for p in required))
 roadmap=(root/'docs/ROADMAP-SILM.md').read_text();check('Roadmap integral até 1.0.0',all('SILM 0.'+str(i)+'.x' in roadmap for i in range(1,19)) and '# SILM 1.0.0-rc.x' in roadmap and '# SILM 1.0.0\n' in roadmap)
-assembly=[root/'domain/silm'/n for n in ('assembly.js','assembly-view.js','assembly.css','crystal.js','crystal-view.js','electron-view.js','properties.js','property-view.js')]
-check('Montagem (0.4.x), cristalografia (0.5.x), camada eletrônica (0.6.x) e propriedades (0.7.x) presentes e carregadas em ordem',all(p.is_file() for p in assembly) and html.index('domain/silm/assembly.js')<html.index('domain/silm/crystal.js')<html.index('domain/silm/properties.js')<html.index('domain/silm/state.js')<html.index('domain/silm/assembly-view.js')<html.index('domain/silm/crystal-view.js')<html.index('domain/silm/electron-view.js')<html.index('domain/silm/property-view.js')<html.index('domain/silm/bootstrap.js') and 'domain/silm/assembly.css' in html)
+assembly=[root/'domain/silm'/n for n in ('assembly.js','assembly-view.js','assembly.css','crystal.js','crystal-view.js','electron-view.js','properties.js','property-view.js','exploration.js')]
+check('Montagem (0.4.x), cristalografia (0.5.x), camada eletrônica (0.6.x), propriedades (0.7.x) e Explorar (0.8.x) presentes e carregadas em ordem',all(p.is_file() for p in assembly) and html.index('domain/silm/assembly.js')<html.index('domain/silm/crystal.js')<html.index('domain/silm/properties.js')<html.index('domain/silm/state.js')<html.index('domain/silm/assembly-view.js')<html.index('domain/silm/crystal-view.js')<html.index('domain/silm/electron-view.js')<html.index('domain/silm/property-view.js')<html.index('domain/silm/exploration.js')<html.index('domain/silm/bootstrap.js') and 'domain/silm/assembly.css' in html)
 crystal=re.sub(r'/\*[\s\S]*?\*/','',(root/'domain/silm/crystal-view.js').read_text())
 check('Vista cristalina sem ligações fora do contorno da célula; elétrons só pela camada eletrônica',not re.search(r'bond',crystal,re.I) and crystal.count("svgEl('line'")==1 and not re.search(r'getContext|arc\(',crystal))
 view=re.sub(r'/\*[\s\S]*?\*/','',(root/'domain/silm/assembly-view.js').read_text())
@@ -54,8 +54,10 @@ props=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/properties.js').re
 pview=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/property-view.js').read_text())
 check('Propriedades: sem valores típicos embutidos; dados só do banco com fonte',not re.search(r'\d[\d.,]*\s*(S/m|W/\(m|nΩ|µΩ|MS/m)',props) and 'e.properties' in props and 'PROPERTY_DATA_MISSING' in props)
 check('Propriedades: sem circuito, instrumentos ou setas por elétron; fora da série',not re.search(r'amper[ií]metro|volt[ií]metro|bateria|circuito|particles|magnet|dureza|corros|\bligas?\b',pview+props,re.I))
+explore=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/exploration.js').read_text())
+check('Explorar: comparação somente leitura, sem laço extra e sem novo schema',not re.search(r'startProperty|setPropertyParams|activateElectrons|organize\(|restoreFree|storage\.set|beginAssembly',explore) and 'reducedMotion:()=>true' in explore and 'scientificSchemaVersion=6' in statecode)
 check('Marcadores eletrônicos não são estado científico',not re.search(r"particles|electronCount|countReal",statecode) and "representationType:'qualitative'" in statecode)
-check('Sem estados científicos paralelos',not any(re.search(r'routeStructure|missionStructure|routeScientificState|missionScientificState',f.read_text()) for f in (root/'domain').rglob('*.js')))
+check('Sem estados científicos paralelos',not any(re.search(r'routeStructure|missionStructure|routeScientificState|missionScientificState|exploreScientificState|exploreStructure|exploreElectrons|exploreProperties',f.read_text()) for f in (root/'domain').rglob('*.js')))
 state=subprocess.run(['node',str(root/'scripts/validate-scientific-state.cjs')],capture_output=True,text=True)
 check('Validador do estado científico',state.returncode==0 and '"schemaVersion"' in state.stdout,state.stderr[-500:] or None)
 result={'product':'SILM','version':version,'checks':checks,'passed':sum(c['status']=='PASS' for c in checks),'failed':sum(c['status']=='FAIL' for c in checks)}

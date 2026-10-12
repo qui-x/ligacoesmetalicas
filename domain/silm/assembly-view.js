@@ -84,7 +84,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
   for(const u of list)if(!known.has(u.id)){known.add(u.id);if(drawn&&shownElectrons)electronLayer.incorporate(u.position);}
   for(const id of [...known])if(!list.some(u=>u.id===id))known.delete(id);drawn=true;
   root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;electronControls?.update();
-  const n=list.length;meta.textContent='Montagem metálica · '+n+' '+(n===1?'unidade':'unidades')+' · '+statusLabel[s.status];
+  const n=list.length;meta.textContent='Montagem metálica · '+n+' '+(n===1?'unidade':'unidades')+' · '+statusLabel[s.status]+(pr?.active?' · '+P.catalog[pr.active].title+' em estudo':'');
   empty.hidden=n>0;assist.hidden=!s.assistance.enabled;root.dataset.status=s.status;
   if(!editable)stage.setAttribute('aria-label','Montagem de '+name+' com '+n+' '+(n===1?'unidade':'unidades')+'. Representação didática; a edição está disponível em Explorar.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica.':'')+(fieldOn?' Campo elétrico aplicado: a representação eletrônica apresenta deslocamento coletivo orientado.':''));
   add?.setAttribute('aria-disabled',String(n>=C.maxUnits));undo?.setAttribute('aria-disabled',String(!model.canUndo));if(undo){const last=describeLast();undo.title=last?'Desfazer: '+last:'Nada para desfazer';}
