@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..');
 function load(){const box={window:{},console,Math,Date,Uint8Array,crypto:globalThis.crypto};box.window=box;vm.createContext(box);
- for(const file of ['data/bundle.js','data-api.js','assembly.js','crystal.js','properties.js','state.js'])vm.runInContext(fs.readFileSync(path.join(root,'domain/silm',file),'utf8'),box,{filename:file});return box.SILM;}
+ for(const file of ['data/bundle.js','data-api.js','assembly.js','crystal.js','properties.js','measurements.js','state.js'])vm.runInContext(fs.readFileSync(path.join(root,'domain/silm',file),'utf8'),box,{filename:file});return box.SILM;}
 const plain=value=>JSON.parse(JSON.stringify(value));
 /* Geometria cristalográfica (§115–119): todos os metais suportados, a partir do banco. */
 function validateGeometry(S){
@@ -40,7 +40,7 @@ function validate(){const S=load(),A=S.assembly,C=A.contract,storage=new Map(),e
  const noOverlap=units=>{for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++)if(A.distance(units[i].position,units[j].position)<C.minDistance-1e-9)return false;return true;};
  const geometry=validateGeometry(S);
  const m=fresh(collect);
- assert.equal(S.scientificSchemaVersion,6);assert.equal(S.validateScientificState(m.state).ok,true);
+ assert.equal(S.scientificSchemaVersion,7);assert.equal(S.validateScientificState(m.state).ok,true);
 
  // Regressão 0.3.x: investigação, metal único, módulo, status.
  for(const z of [1,6,104,118,999])assert.equal(m.begin(z),false);
@@ -176,7 +176,29 @@ function validate(){const S=load(),A=S.assembly,C=A.contract,storage=new Map(),e
  const noProvenance={...S.data.get(29),properties:{thermalConductivity:{value:401,unit:'W/(m·K)'}}};assert.equal(P.eligibility(noProvenance).thermal.data,null,'Dado sem condição/fonte é recusado');
  const mnState=fresh();mnState.begin(25);mnState.beginAssembly();mnState.addUnit();mnState.addUnit();assert.equal(mnState.startProperty('electrical').ok,true);assert.equal(mnState.startProperty('malleability').reason,'MODEL_NOT_APPLICABLE');
 
- // Estados inválidos (schema 6).
+ // 0.9.x: medições do modelo — pontos em sítios científicos, valor recalculado das coordenadas em Å.
+ const MS=S.measurement,me=fresh(collect);me.begin(29);me.beginAssembly();me.addUnit();me.addUnit();
+ assert.equal(me.addMeasurement('distance',me.state.structure.units.map(u=>u.id)).reason,'NO_SCALE','Montagem livre: sem medida absoluta');
+ me.organize();const gCu=S.crystal.geometry(S.data.get(29)),K=S.crystal.key,byKey=new Map(me.state.structure.units.map(u=>[K(u.site),u.id]));
+ const corner=gCu.cell.find(c=>c.frac.every(v=>Math.abs(v)<1e-9)),nn=gCu.neighbors(corner).list.find(n=>byKey.has(n.key)),edge=gCu.cell.find(c=>c.basis===corner.basis&&Math.abs(Math.hypot(...c.cart.map((v,i)=>v-corner.cart[i]))-gCu.vectors[0][0])<1e-6);
+ const d=me.addMeasurement('distance',[byKey.get(corner.key),byKey.get(nn.key)]);assert.equal(d.measurement.value,2.556);assert.equal(d.measurement.unit,'Å');assert.equal(d.measurement.source.kind,'MODEL_MEASUREMENT');
+ const lp=me.addMeasurement('latticeParameter',[byKey.get(corner.key),byKey.get(edge.key)]);assert.equal(lp.measurement.value,3.615);assert.equal(lp.measurement.parameter,'a');
+ assert.equal(me.addMeasurement('latticeParameter',[byKey.get(corner.key),byKey.get(nn.key)]).reason,'NOT_LATTICE_VECTOR','Vértice × face não é parâmetro de rede');
+ const co=me.addMeasurement('coordination',[byKey.get(corner.key)]);assert.equal(co.measurement.value,12);
+ const an=me.addMeasurement('angle',[byKey.get(nn.key),byKey.get(corner.key),byKey.get(edge.key)]);assert.ok(an.ok&&an.measurement.unit==='°');
+ assert.equal(me.addMeasurement('distance',[byKey.get(corner.key),byKey.get(corner.key)]).reason,'SAME_POINT');assert.equal(S.validateScientificState(me.state).ok,true);
+ for(const [z,expect] of [[26,{nn:2.482,a:2.865,coord:8}],[12,{nn:3.197,a:3.209,c:5.21,coord:12}]]){const x=fresh();x.begin(z);x.beginAssembly();x.addUnit();x.organize();const g=S.crystal.geometry(S.data.get(z)),map=new Map(x.state.structure.units.map(u=>[K(u.site),u.id]));
+  const c0=g.cell.find(c=>c.frac.every(v=>Math.abs(v)<1e-9)),n0=g.neighbors(c0).list.find(n=>map.has(n.key)),same=g.cell.filter(c=>c.basis===c0.basis&&c.key!==c0.key);
+  assert.equal(x.addMeasurement('distance',[map.get(c0.key),map.get(n0.key)]).measurement.value,expect.nn);assert.equal(x.addMeasurement('coordination',[map.get(c0.key)]).measurement.value,expect.coord);
+  const params=new Set(same.map(c=>x.addMeasurement('latticeParameter',[map.get(c0.key),map.get(c.key)])).filter(r=>r.ok).map(r=>r.measurement.parameter+'='+r.measurement.value));
+  assert.ok(params.has('a='+expect.a),[...params].join());if(expect.c)assert.ok(params.has('c='+expect.c),[...params].join());assert.equal(S.validateScientificState(x.state).ok,true);}
+ const kept=JSON.parse(JSON.stringify(me.state.measurements));me.restoreFree();assert.deepEqual(plain(me.state.measurements),kept);assert.equal(MS.current(me.state.measurements[0],me.state.structure),false);assert.equal(S.validateScientificState(me.state).ok,true);
+ assert.equal(me.removeMeasurement(kept[0].id),true);assert.equal(me.state.measurements.length,kept.length-1);const st0=plain(me.state.structure);assert.equal(me.clearMeasurements(),true);assert.deepEqual(plain(me.state.measurements),[]);assert.deepEqual(plain(me.state.structure),st0,'Limpar medições não limpa a estrutura');
+ const deform=fresh();deform.begin(29);deform.beginAssembly();deform.addUnit();deform.organize();deform.startProperty('malleability');deform.setPropertyParams({compression:1});assert.equal(deform.addMeasurement('coordination',[deform.state.structure.units[0].id]).reason,'DEFORMED');
+ const newInv=fresh();newInv.begin(29);assert.deepEqual(plain(newInv.state.measurements),[],'Nova investigação não herda medições');
+ assert.equal(S.units.format(2.556,'pm'),'255,6 pm');assert.equal(S.units.format(2.556,'nm'),'0,2556 nm');assert.equal(S.units.convert(1,'pm'),100);assert.equal(S.units.convert(1,'nm'),.1);
+
+ // Estados inválidos (schema 7).
  const freeSample=(()=>{const x=fresh();x.begin(29);x.beginAssembly();for(let i=0;i<3;i++)x.addUnit();return x.state;})();
  const crystalSample=(()=>{const x=fresh();x.begin(29);x.beginAssembly();for(let i=0;i<5;i++)x.addUnit();x.organize();return x.state;})();
  assert.equal(S.validateScientificState(freeSample).ok,true);assert.equal(S.validateScientificState(crystalSample).ok,true);
@@ -222,32 +244,45 @@ function validate(){const S=load(),A=S.assembly,C=A.contract,storage=new Map(),e
   [v=>{v.investigation=null;v.metal=null;v.structure=null;},'PROPERTY_CONTEXT_INVALID']
  ];
  for(const [mutate,reason] of invalidProperties){const copy=structuredClone(propertySample);mutate(copy);assert.equal(S.validateScientificState(copy).reason,reason,mutate.toString());}
+ const measureSample=(()=>{const x=fresh();x.begin(29);x.beginAssembly();x.addUnit();x.organize();const ids=x.state.structure.units.map(u=>u.id);x.addMeasurement('distance',[ids[0],ids[1]]);x.addMeasurement('coordination',[ids[0]]);return x.state;})();
+ assert.equal(S.validateScientificState(measureSample).ok,true);
+ const invalidMeasurements=[
+  [v=>v.measurements[0].value=9.9,'MEASUREMENT_VALUE_INVALID'],[v=>v.measurements[0].value=NaN,'MEASUREMENT_VALUE_INVALID'],[v=>v.measurements[0].value=Infinity,'MEASUREMENT_VALUE_INVALID'],
+  [v=>v.measurements[0].unit='nm','MEASUREMENT_UNIT_INVALID'],[v=>v.measurements[0].resolution=1e-6,'MEASUREMENT_UNIT_INVALID'],[v=>v.measurements[0].type='density','MEASUREMENT_TYPE_INVALID'],
+  [v=>v.measurements[0].instrument='multímetro','MEASUREMENT_TYPE_INVALID'],[v=>v.measurements[1].id=v.measurements[0].id,'MEASUREMENT_INVALID'],[v=>v.measurements[0].uncertainty=.01,'MEASUREMENT_INVALID'],
+  [v=>v.measurements[0].metalAtomicNumber=26,'MEASUREMENT_METAL_MISMATCH'],[v=>v.measurements[0].structureContext.mode='free','MEASUREMENT_WITHOUT_SCALE'],[v=>v.measurements[0].structureContext.structureType='BCC','MEASUREMENT_CONTEXT_INVALID'],
+  [v=>v.measurements[0].source.kind='TABULATED','MEASUREMENT_SOURCE_INVALID'],[v=>v.measurements[0].points.pop(),'MEASUREMENT_POINTS_INVALID'],[v=>v.measurements[0].points[0]={x:120,y:44},'MEASUREMENT_POINTS_INVALID'],
+  [v=>v.measurements[0].points[1].site.basis=9,'MEASUREMENT_POINTS_INVALID'],[v=>v.measurements[0].createdAt='ontem','MEASUREMENT_INVALID']
+ ];
+ for(const [mutate,reason] of invalidMeasurements){const copy=structuredClone(measureSample);mutate(copy);assert.equal(S.validateScientificState(copy).reason,reason,mutate.toString());}
  for(const mutate of invalidFree){const copy=structuredClone(freeSample);mutate(copy);assert.equal(S.validateScientificState(copy).ok,false,mutate.toString());}
  for(const mutate of invalidCrystal){const copy=structuredClone(crystalSample);mutate(copy);assert.equal(S.validateScientificState(copy).ok,false,mutate.toString());}
 
- // Migrações para o schema 6: 5 → 6 preserva tudo (inclusive elétrons); 4 → 6; 3 → 6 preserva a montagem livre; 2 → 6; 1 → 6.
+ // Migrações para o schema 7: 6 → 7 (medições vazias); 5 → 7 preserva elétrons; 4 → 7; 3 → 7 preserva a montagem livre; 2 → 7; 1 → 7.
+ const v080=structuredClone(propertySample);v080.schemaVersion=6;const m6=fresh();const r6=m6.restore(v080);assert.deepEqual({ok:r6.ok,from:r6.from},{ok:true,from:6});assert.equal(m6.state.schemaVersion,7);assert.deepEqual(plain(m6.state.properties),plain(v080.properties));
+ assert.equal(fresh().restore({...structuredClone(v080),measurements:[{type:'distance'}]}).ok,false,'Schema 6 com medições não é estado da 0.8.x');
  const v060=structuredClone(electronSample);v060.schemaVersion=5;delete v060.properties;const m5=fresh();const r5=m5.restore(v060);
- assert.deepEqual({ok:r5.ok,from:r5.from},{ok:true,from:5});assert.equal(m5.state.schemaVersion,6);assert.deepEqual(plain(m5.state.electrons),plain(v060.electrons));assert.deepEqual(plain(m5.state.structure),plain(v060.structure));assert.deepEqual(plain(m5.state.properties),plain(P.fresh()));
+ assert.deepEqual({ok:r5.ok,from:r5.from},{ok:true,from:5});assert.equal(m5.state.schemaVersion,7);assert.deepEqual(plain(m5.state.electrons),plain(v060.electrons));assert.deepEqual(plain(m5.state.structure),plain(v060.structure));assert.deepEqual(plain(m5.state.properties),plain(P.fresh()));
  const v050=structuredClone(crystalSample);v050.schemaVersion=4;delete v050.properties;v050.structure.crystallography.representation={...v050.structure.crystallography.representation,view:'lattice',neighbors:true,selectedUnitId:v050.structure.units[0].id};
  const m4=fresh();const r4=m4.restore(v050);assert.deepEqual({ok:r4.ok,migrated:r4.migrated,from:r4.from},{ok:true,migrated:true,from:4});
- assert.equal(m4.state.schemaVersion,6);assert.deepEqual(plain(m4.state.structure),plain(v050.structure));assert.equal(m4.state.electrons,null);assert.equal(m4.state.investigation.id,v050.investigation.id);
+ assert.equal(m4.state.schemaVersion,7);assert.deepEqual(plain(m4.state.structure),plain(v050.structure));assert.equal(m4.state.electrons,null);assert.equal(m4.state.investigation.id,v050.investigation.id);
  assert.equal(fresh().restore({...structuredClone(v050),electrons:{type:'sea'}}).ok,false,'Schema 4 com elétrons não é estado da 0.5.x');
  assert.equal(fresh().restore({...structuredClone(v060),properties:{active:'electrical'}}).ok,false,'Schema 5 com propriedades não é estado da 0.6.x');
  const v040=structuredClone(freeSample);v040.schemaVersion=3;delete v040.properties;v040.structure={...v040.structure,modelVersion:1};delete v040.structure.mode;delete v040.structure.crystallography;
  adapter.set('scientific.state',v040);const migrated=fresh();const migration=migrated.load();
  assert.deepEqual({ok:migration.ok,migrated:migration.migrated,from:migration.from},{ok:true,migrated:true,from:3});
- assert.equal(migrated.state.schemaVersion,6);assert.equal(migrated.state.structure.mode,'free');assert.deepEqual(plain(migrated.state.structure.units),plain(v040.structure.units));assert.equal(migrated.state.structure.status,'assembling');
- const v030={...structuredClone(freeSample),schemaVersion:2,structure:null};delete v030.properties;const m2=fresh();assert.equal(m2.restore(v030).ok,true);assert.equal(m2.state.structure,null);assert.equal(m2.state.schemaVersion,6);
+ assert.equal(migrated.state.schemaVersion,7);assert.equal(migrated.state.structure.mode,'free');assert.deepEqual(plain(migrated.state.structure.units),plain(v040.structure.units));assert.equal(migrated.state.structure.status,'assembling');
+ const v030={...structuredClone(freeSample),schemaVersion:2,structure:null};delete v030.properties;const m2=fresh();assert.equal(m2.restore(v030).ok,true);assert.equal(m2.state.structure,null);assert.equal(m2.state.schemaVersion,7);
  assert.equal(fresh().restore({...v030,structure:{type:'CFC'}}).ok,false);
- const m1=fresh();assert.equal(m1.restore({schemaVersion:1,metal:29}).ok,true);assert.equal(m1.state.schemaVersion,6);
+ const m1=fresh();assert.equal(m1.restore({schemaVersion:1,metal:29}).ok,true);assert.equal(m1.state.schemaVersion,7);
  const badV3=structuredClone(v040);badV3.structure.units[1].position={...badV3.structure.units[0].position};assert.equal(fresh().restore(badV3).ok,false);
 
  // Storage corrompido.
  const corrupted=structuredClone(crystalSample);corrupted.structure.units.pop();adapter.set('scientific.state',corrupted);
  const fallback=fresh();assert.equal(fallback.load().ok,false);assert.equal(fallback.state.structure,null);assert.equal(fallback.state.metal,null);
- for(const name of ['investigation:created','structure:created','structure:unit-added','structure:organized','structure:representation','structure:free','structure:cleared','investigation:reset','electrons:activated','electrons:representation','properties:started','properties:changed','properties:restored','properties:ended'])assert.ok(events.some(e=>e.name===name),name);
+ for(const name of ['investigation:created','structure:created','structure:unit-added','structure:organized','structure:representation','structure:free','structure:cleared','investigation:reset','electrons:activated','electrons:representation','properties:started','properties:changed','properties:restored','properties:ended','measurements:added','measurements:removed','measurements:cleared'])assert.ok(events.some(e=>e.name===name),name);
  assert.ok(!events.some(e=>/bond|electron/i.test(JSON.stringify(e.detail.current?.structure||null))),'Nenhum par M—M; elétrons fora da estrutura');
- return {schemaVersion:6,structureModelVersion:2,electronModelVersion:E.modelVersion,propertiesModelVersion:1,geometry,invalidCases:invalidFree.length+invalidCrystal.length+invalidElectrons.length+invalidProperties.length,migrations:['5 → 6 (elétrons e estrutura preservados)','4 → 6 (estrutura e representação preservadas)','3 → 6 (montagem preservada)','2 → 6','1 → 6'],
+ return {schemaVersion:7,measurementTypes:Object.keys(MS.types),structureModelVersion:2,electronModelVersion:E.modelVersion,propertiesModelVersion:1,geometry,invalidCases:invalidFree.length+invalidCrystal.length+invalidElectrons.length+invalidProperties.length+invalidMeasurements.length,migrations:['6 → 7 (medições vazias)','5 → 6 (elétrons e estrutura preservados)','4 → 6 (estrutura e representação preservadas)','3 → 6 (montagem preservada)','2 → 6','1 → 6'],
   properties:{oneActive:true,noResidualOnSwitch:true,structureUnchanged:true,restoreKeepsInvestigation:true,eligibility:{Cu:'todas qualitativas',Mn:'só elétrica',Hg:'REFERENCE_PHASE_UNSUPPORTED (sem fase sólida de referência)'},tabulatedValues:'PROPERTY_DATA_MISSING (nenhum valor típico)'},
   electrons:{requiresUnits:E.minUnits,visibilityIsRepresentation:true,markersPersisted:false,droppedBelowMinimum:true,clearedWithStructure:true,valenceConvention:'banco (QUALITATIVE)'},organize:{Cu:'FCC',Fe:'BCC',Mg:'HCP',Mn:'CRYSTAL_STRUCTURE_UNSUPPORTED'},authorshipPreserved:true,representationIsNotScience:true,returnToFree:true,undoHistoryPersisted:false};
 }

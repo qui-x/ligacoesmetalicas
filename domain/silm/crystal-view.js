@@ -3,7 +3,7 @@ window.SILM=window.SILM||{};
 /* Representação 2D/pseudo-3D da estrutura cristalina (0.5.x). Lê o estado científico; vista, camadas e
    seleção são gravadas pelas ações do domínio. Unidades são botões acessíveis; a rede extensa é um
    único grupo SVG decorativo. Sem linhas de ligação: o contorno da célula é geométrico e tracejado. */
-SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle='Explorar',note='',animateFrom=null,reducedMotion=()=>false,electrons:electronOptions=null,properties:propertyOptions=null})=>{
+SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle='Explorar',note='',animateFrom=null,reducedMotion=()=>false,electrons:electronOptions=null,properties:propertyOptions=null,measure:measureOptions=null})=>{
  const U=SimCore.ExperienceUI,X=SILM.crystal,m=g.model,name=element.name.toLocaleLowerCase('pt-BR'),NS='http://www.w3.org/2000/svg';
  const structureName='Estrutura cristalina '+m.name+' de '+name;
  const root=U.element('section',null,'silm-assembly silm-crystal');root.dataset.editable='true';root.setAttribute('aria-labelledby','silm-assembly-title');
@@ -42,6 +42,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:units}),propertyHost=U.element('div',null,'silm-property-host');
  footer.insertBefore(propertyHost,electronLegend.nextSibling);const propertyControls=propertyOptions?.controls?.(propertyHost,scope)||null;
  let deform=null,heatTimer=false;const D=c=>deform?deform(c):c;
+ // 0.9.x: medição — pontos escolhidos nas unidades; sobreposição projetada dos sítios científicos.
+ const measureOverlay=measureOptions?SILM.createMeasureOverlay(stage):null;
  function scheduleHeat(){const pr=model.state.properties;if(heatTimer||!propertyOptions?.advanceHeat||pr?.active!=='thermal'||!pr.thermal.heating||pr.thermal.stage>=P.limits.heatStages||reducedMotion())return;
   heatTimer=true;scope.timeout(()=>{heatTimer=false;if(document.hidden){scheduleHeat();return;}propertyOptions.advanceHeat();},900);}
 
@@ -109,12 +111,16 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    if(lit.has(u.id))node.dataset.lit='';else delete node.dataset.lit;});
   overlay.update({field:fieldOn,force:active==='malleability'?'compress':active==='ductility'?'stretch':null,level:active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0,heat:active==='thermal'&&pr.thermal.heating,light});
   root.dataset.property=active||'';propertyControls?.update();scheduleHeat();
+  let measureText='';
+  if(measureOverlay){const marks=measureOptions.marks();root.dataset.measuring=String(!!measureOptions.pickActive());
+   if(marks){const pts=marks.points.map(p=>{const site=p.site||list.find(u=>u.id===p.unitId)?.site;if(!site)return null;const q=layout.project(D(g.site(site).cart));return {x:q.x,y:q.y,label:p.label};}).filter(Boolean);
+    measureOverlay.update(pts.length===marks.points.length?{points:pts,kind:marks.kind,text:marks.text}:{});measureText=marks.spoken||'';}else measureOverlay.update({});}
   const narrative=active?P.narrative(active,pr[active],{reduced:reducedMotion(),electronsVisible:shownElectrons}):null;
   root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;electronControls?.update();
   const inCell=list.filter(u=>g.cellKeys.has(X.key(u.site))).length,added=list.filter(u=>u.placement==='crystallographic').length;
   // Indicador compacto (0.8.x): estrutura e, quando houver, a propriedade em estudo.
   meta.textContent=m.code+' · '+m.name+' · '+list.length+' unidades'+(added?' ('+added+' completadas pelo SILM)':'')+(active?' · '+P.catalog[active].title+' em estudo':'');
-  stage.setAttribute('aria-label',structureName+'. '+(r.view==='lattice'?'Vista da rede extensa':'Vista da célula')+'; célula unitária '+(r.unitCell?'visível':'oculta')+'. '+inCell+' unidades na célula desenhada.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica; '+(moving?'movimento visual ativo.':'representação estática.'):'')+(narrative&&JSON.stringify(pr[active])!==JSON.stringify(P.defaults[active])?' '+P.catalog[active].title+': '+narrative.action+' '+narrative.observation:''));
+  stage.setAttribute('aria-label',structureName+'. '+(r.view==='lattice'?'Vista da rede extensa':'Vista da célula')+'; célula unitária '+(r.unitCell?'visível':'oculta')+'. '+inCell+' unidades na célula desenhada.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica; '+(moving?'movimento visual ativo.':'representação estática.'):'')+(narrative&&JSON.stringify(pr[active])!==JSON.stringify(P.defaults[active])?' '+P.catalog[active].title+': '+narrative.action+' '+narrative.observation:'')+(measureText?' '+measureText:''));
   cellStatus.textContent='Célula unitária '+(r.unitCell?'visível':'oculta');
   cellView.setAttribute('aria-pressed',String(r.view==='cell'));latticeView.setAttribute('aria-pressed',String(r.view==='lattice'));
   neighborsButton.setAttribute('aria-pressed',String(r.neighbors));neighborsButton.textContent=r.neighbors?'Ocultar vizinhos':'Mostrar vizinhos';
@@ -126,7 +132,9 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   frame=requestAnimationFrame(()=>{frame=requestAnimationFrame(()=>{frame=0;root.dataset.organizing='';for(const node of nodes.values()){delete node.dataset.animating;delete node.dataset.appearing;}render();scope.timeout(()=>{delete root.dataset.organizing;},650);});});
  }
  scope.cleanup(()=>{if(frame)cancelAnimationFrame(frame);frame=0;});
- scope.listen(units,'click',event=>{const node=event.target.closest('.silm-unit');if(!node)return;const id=node.dataset.unitId,current=rep().selectedUnitId;actions.select(current===id?null:id);});
+ scope.listen(units,'click',event=>{const node=event.target.closest('.silm-unit');if(!node)return;const id=node.dataset.unitId,current=rep().selectedUnitId;
+  if(measureOptions?.pickActive()){focusId=id;measureOptions.onPick(id);return;}   // com instrumento ativo, o clique (ou Enter) escolhe o ponto
+  actions.select(current===id?null:id);});
  scope.listen(units,'focusin',event=>{const node=event.target.closest('.silm-unit');if(node)focusId=node.dataset.unitId;});
  scope.listen(units,'keydown',event=>{
   const node=event.target.closest('.silm-unit');if(!node||event.altKey||event.ctrlKey||event.metaKey)return;const list=unitsList(),k=list.findIndex(u=>u.id===node.dataset.unitId);

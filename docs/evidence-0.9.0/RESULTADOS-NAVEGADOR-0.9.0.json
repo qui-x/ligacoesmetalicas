@@ -1,0 +1,233 @@
+{
+  "product": "SILM",
+  "version": "0.9.0",
+  "date": "2026-10-12T01:12:49.790Z",
+  "browser": "Chromium (Playwright 1.62.1)",
+  "passed": 22,
+  "failed": 0,
+  "partialRerun": [
+    "0.9-",
+    "0.9-HC",
+    "0.9-CCC",
+    "0.9-ZOOM"
+  ],
+  "results": [
+    {
+      "id": "0.9-MIG",
+      "name": "Migração da 0.8.x (schema 6) sem perda",
+      "status": "PASS",
+      "details": {
+        "from": 6,
+        "to": 7
+      },
+      "durationMs": 2251
+    },
+    {
+      "id": "0.9-FREE",
+      "name": "Montagem livre: sem escala física, sem medida absoluta",
+      "status": "PASS",
+      "details": {
+        "free": "sem medidas absolutas"
+      },
+      "durationMs": 1561
+    },
+    {
+      "id": "0.9-DIST",
+      "name": "CFC (Cu): distância entre vizinhos = medida do modelo, com cota (não ligação)",
+      "status": "PASS",
+      "details": {
+        "value": 2.556,
+        "unit": "Å"
+      },
+      "durationMs": 2684
+    },
+    {
+      "id": "0.9-ZOOM",
+      "name": "Zoom e redimensionamento não alteram a dimensão científica",
+      "status": "PASS",
+      "details": {
+        "screen": [
+          282.9,
+          98.8
+        ],
+        "value": 3.615
+      },
+      "durationMs": 2936
+    },
+    {
+      "id": "0.9-CCC",
+      "name": "CCC (Fe): vizinhos e parâmetro de rede conforme o banco",
+      "status": "PASS",
+      "details": {
+        "nn": 2.482,
+        "a": 2.865
+      },
+      "durationMs": 2320
+    },
+    {
+      "id": "0.9-HC",
+      "name": "HC (Mg): parâmetros a e c como ação de medição; aresta inválida recusada",
+      "status": "PASS",
+      "details": {
+        "a": 3.209,
+        "c": 5.21
+      },
+      "durationMs": 2898
+    },
+    {
+      "id": "0.9-ANGLE",
+      "name": "Ângulo das coordenadas científicas, não da projeção",
+      "status": "PASS",
+      "details": {
+        "value": 60,
+        "screen": 38.7
+      },
+      "durationMs": 2711
+    },
+    {
+      "id": "0.9-COORD",
+      "name": "Vizinhança: contagem visual = número de coordenação do modelo",
+      "status": "PASS",
+      "details": {
+        "Cu": 12,
+        "Fe": 8
+      },
+      "durationMs": 4469
+    },
+    {
+      "id": "0.9-UNITS",
+      "name": "Unidades Å, pm e nm: conversão exata; valor canônico em Å",
+      "status": "PASS",
+      "details": {
+        "A": 2.556,
+        "pm": 255.6,
+        "nm": 0.2556
+      },
+      "durationMs": 2182
+    },
+    {
+      "id": "0.9-HIST",
+      "name": "Painel Medições: rever, remover e limpar (sem limpar a estrutura)",
+      "status": "PASS",
+      "details": {
+        "cleared": true
+      },
+      "durationMs": 3417
+    },
+    {
+      "id": "0.9-CONTEXT",
+      "name": "Medição de estado anterior da estrutura é identificada, não alterada",
+      "status": "PASS",
+      "details": {
+        "flagged": true
+      },
+      "durationMs": 2628
+    },
+    {
+      "id": "0.9-RELOAD",
+      "name": "Reload: medições persistem; medição incompleta é cancelada",
+      "status": "PASS",
+      "details": {
+        "persisted": 1
+      },
+      "durationMs": 2963
+    },
+    {
+      "id": "0.9-MODULE",
+      "name": "Troca de módulo preserva as medições; troca de metal não as herda",
+      "status": "PASS",
+      "details": {
+        "preserved": true,
+        "newMetal": "sem medições herdadas"
+      },
+      "durationMs": 3315
+    },
+    {
+      "id": "0.9-DEFORM",
+      "name": "Com deformação ativa, os instrumentos aguardam a estrutura de referência",
+      "status": "PASS",
+      "details": {
+        "blocked": true
+      },
+      "durationMs": 2086
+    },
+    {
+      "id": "0.9-KBD",
+      "name": "Fluxo completo sem mouse, com anúncios",
+      "status": "PASS",
+      "details": {
+        "keyboard": true
+      },
+      "durationMs": 1795
+    },
+    {
+      "id": "0.9-A11Y",
+      "name": "Acessibilidade: marcadores com letra, resultado legível; axe-core",
+      "status": "PASS",
+      "details": {
+        "violations": 0
+      },
+      "durationMs": 4122
+    },
+    {
+      "id": "0.9-VALID",
+      "name": "Registro adulterado é recusado na restauração",
+      "status": "PASS",
+      "details": {
+        "rejected": "MEASUREMENT_VALUE_INVALID"
+      },
+      "durationMs": 3029
+    },
+    {
+      "id": "0.9-MOB-320",
+      "name": "Mobile/tablet 320: medir com toque e folha de instrumentos",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 237
+      },
+      "durationMs": 2422
+    },
+    {
+      "id": "0.9-MOB-360",
+      "name": "Mobile/tablet 360: medir com toque e folha de instrumentos",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 257
+      },
+      "durationMs": 2343
+    },
+    {
+      "id": "0.9-MOB-390",
+      "name": "Mobile/tablet 390: medir com toque e folha de instrumentos",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 341
+      },
+      "durationMs": 2364
+    },
+    {
+      "id": "0.9-MOB-landscape",
+      "name": "Mobile/tablet landscape: medir com toque e folha de instrumentos",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 381
+      },
+      "durationMs": 2875
+    },
+    {
+      "id": "0.9-MOB-tablet",
+      "name": "Mobile/tablet tablet: medir com toque e folha de instrumentos",
+      "status": "PASS",
+      "details": {
+        "overflow": 0,
+        "stage": 333
+      },
+      "durationMs": 2509
+    }
+  ],
+  "consoleErrors": []
+}
