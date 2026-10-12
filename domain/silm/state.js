@@ -2,14 +2,32 @@
 window.SILM=window.SILM||{};
 /* Contrato formal. Somente este serviço escreve o estado; consumidores recebem cópias.
    Schema 1: seleção provisória (0.2.1). Schema 2: investigação (0.3.0). Schema 3: montagem metálica (0.4.0).
-   Schema 4: modo livre/cristalino da montagem e cristalografia (0.5.0). */
-SILM.scientificSchemaVersion=4;
+   Schema 4: modo livre/cristalino da montagem e cristalografia (0.5.0).
+   Schema 5: modelo eletrônico qualitativo de elétrons de valência deslocalizados (0.6.0). */
+SILM.scientificSchemaVersion=5;
 SILM.scientificModules=Object.freeze(['explorar','medir','calcular']);
 SILM.emptyScientificState=(active='explorar')=>({
- schemaVersion:4,investigation:null,metal:null,module:{active},structure:null,electrons:null,
+ schemaVersion:5,investigation:null,metal:null,module:{active},structure:null,electrons:null,
  conditions:{temperature:null,pressure:null},observations:[],measurements:[],calculations:[],
  representation:{dimension:null,layers:[]},metadata:{}
 });
+/* Modelo eletrônico (0.6.x): distribuição coletiva associada à estrutura inteira, nunca a pares.
+   Os marcadores desenhados não são estado: só o modelo e a configuração da representação são salvos. */
+SILM.electronModel=Object.freeze({modelVersion:1,types:Object.freeze(['delocalized-electron-model']),sourceModel:'valence-electron-contribution',
+ representationType:'qualitative',densityModes:Object.freeze(['qualitative']),minUnits:2,defaults:Object.freeze({visible:true,motion:true,densityMode:'qualitative',representationType:'qualitative'})});
+SILM.validateElectrons=(el,structure,metal,data=SILM.data)=>{
+ const M=SILM.electronModel,fail=reason=>({ok:false,reason}),plain=v=>!!v&&typeof v==='object'&&!Array.isArray(v),keys=(o,list)=>Object.keys(o).sort().join()===[...list].sort().join();
+ if(!plain(el)||!keys(el,['modelVersion','type','status','metalAtomicNumber','source','representation','createdAt']))return fail('ELECTRONS_INVALID');
+ if(el.modelVersion!==M.modelVersion||!M.types.includes(el.type)||el.status!=='active'||!Number.isFinite(Date.parse(el.createdAt)))return fail('ELECTRONS_INVALID');
+ if(!metal||el.metalAtomicNumber!==metal.atomicNumber)return fail('ELECTRONS_METAL_MISMATCH');
+ if(!structure||structure.units.length<M.minUnits)return fail('ELECTRONS_WITHOUT_STRUCTURE');
+ const e=data.get(metal.atomicNumber),src=el.source;
+ if(!plain(src)||!keys(src,['model','valenceSourceId','configurationSourceId'])||src.model!==M.sourceModel)return fail('ELECTRON_SOURCE_INVALID');
+ if(!e?.valenceModel||src.valenceSourceId!==e.valenceModel.sourceId||src.configurationSourceId!==e.electronConfiguration.sourceId)return fail('ELECTRON_SOURCE_MISMATCH');
+ const r=el.representation;
+ if(!plain(r)||!keys(r,['visible','motion','densityMode','representationType'])||typeof r.visible!=='boolean'||typeof r.motion!=='boolean'||!M.densityModes.includes(r.densityMode)||r.representationType!==M.representationType)return fail('ELECTRON_REPRESENTATION_INVALID');
+ return {ok:true};
+};
 SILM.crystalRepresentation=Object.freeze({views:Object.freeze(['cell','lattice']),defaults:Object.freeze({view:'cell',unitCell:true,neighbors:false,labels:false,selectedUnitId:null})});
 SILM.validateStructure=(s,metal,data=SILM.data)=>{
  const A=SILM.assembly,C=A.contract,X=SILM.crystal,fail=reason=>({ok:false,reason}),plain=v=>!!v&&typeof v==='object'&&!Array.isArray(v);
@@ -68,14 +86,13 @@ SILM.validateStructure=(s,metal,data=SILM.data)=>{
 };
 SILM.validateScientificState=(value,data=SILM.data)=>{
  const fail=reason=>({ok:false,reason});
- if(!value||typeof value!=='object'||Array.isArray(value)||value.schemaVersion!==4)return fail('SCHEMA_INCOMPATIBLE');
+ if(!value||typeof value!=='object'||Array.isArray(value)||value.schemaVersion!==5)return fail('SCHEMA_INCOMPATIBLE');
  if(!value.module||!SILM.scientificModules.includes(value.module.active))return fail('MODULE_INVALID');
- if(value.electrons!==null)return fail('FUTURE_DATA_UNSUPPORTED');
  if(!Array.isArray(value.observations)||!Array.isArray(value.measurements)||!Array.isArray(value.calculations)||value.measurements.length||value.calculations.length)return fail('DATA_INVALID');
  if(value.observations.some(x=>typeof x!=='string'||x.length>12000))return fail('OBSERVATIONS_INVALID');
  if(!value.conditions||value.conditions.temperature!==null||value.conditions.pressure!==null||!value.representation||value.representation.dimension!==null||!Array.isArray(value.representation.layers)||value.representation.layers.length)return fail('CONDITIONS_INVALID');
  if(!value.metadata||typeof value.metadata!=='object'||Array.isArray(value.metadata))return fail('METADATA_INVALID');
- if(value.investigation===null){if(value.metal!==null||value.structure!==null)return fail('ORPHAN_METAL');}
+ if(value.investigation===null){if(value.metal!==null||value.structure!==null||value.electrons!==null)return fail('ORPHAN_METAL');}
  else{
   const i=value.investigation,m=value.metal;
   if(!i||typeof i!=='object'||Array.isArray(i)||typeof i.id!=='string'||!/^inv-[a-zA-Z0-9-]{12,80}$/.test(i.id)||!['new','active','paused'].includes(i.status)||!['free','route','mission','teacher'].includes(i.type))return fail('INVESTIGATION_INVALID');
@@ -84,6 +101,7 @@ SILM.validateScientificState=(value,data=SILM.data)=>{
   const element=data.get(m.atomicNumber);
   if(!element||element.silmEligibility.status!=='available'||element.symbol!==m.symbol||m.sourceId!==element.identityProvenance.atomicNumber.sourceId)return fail('METAL_UNAVAILABLE');
   if(value.structure!==null){const structure=SILM.validateStructure(value.structure,m,data);if(!structure.ok)return structure;}
+  if(value.electrons!==null){const electrons=SILM.validateElectrons(value.electrons,value.structure,m,data);if(!electrons.ok)return electrons;}
  }
  return {ok:true,value:JSON.parse(JSON.stringify(value))};
 };
@@ -159,10 +177,10 @@ SILM.createScientificState=()=>{
   const previous=snapshot();history.pop();
   if(entry.type==='add')s.units=s.units.filter(u=>u.id!==entry.unitId);
   else{unit.position={...entry.from.position};unit.placement=entry.from.placement;}
-  s.status=A.statusFor(s.units);touched(now());publish('structure:undone',previous,{action:entry.type,unitId:entry.unitId});return {ok:true,action:entry.type,unitId:entry.unitId};
+  s.status=A.statusFor(s.units);const dropped=dropElectrons();touched(now());publish('structure:undone',previous,{action:entry.type,unitId:entry.unitId,electronsCleared:dropped});return {ok:true,action:entry.type,unitId:entry.unitId,electronsCleared:dropped};
  }
  /* Limpar estrutura: structure → null; investigação, metal e módulo permanecem. */
- function clearStructure(){if(!state.structure)return false;const previous=snapshot();state.structure=null;state.investigation.updatedAt=now();history=[];publish('structure:cleared',previous);return true;}
+ function clearStructure(){if(!state.structure)return false;const previous=snapshot();state.structure=null;state.electrons=null;state.investigation.updatedAt=now();history=[];publish('structure:cleared',previous);return true;}
  function setAssistance(enabled){const s=state.structure;if(!s||!free()||typeof enabled!=='boolean')return false;if(s.assistance.enabled===enabled)return true;
   const previous=snapshot();s.assistance.enabled=enabled;touched(now());publish('structure:assistance',previous);return true;
  }
@@ -188,7 +206,7 @@ SILM.createScientificState=()=>{
  function restoreFree(){
   const s=state.structure;if(!s||free())return false;const previous=snapshot(),date=now();
   state.structure={...s,mode:'free',units:JSON.parse(JSON.stringify(s.crystallography.freeUnits)),referenceStructureId:null,crystallography:null,updatedAt:date};
-  state.investigation.updatedAt=date;history=[];publish('structure:free',previous);return true;
+  const dropped=dropElectrons();state.investigation.updatedAt=date;history=[];publish('structure:free',previous,{electronsCleared:dropped});return true;
  }
  /* Camadas e vista são estado de representação: não alteram a estrutura cristalina nem updatedAt. */
  function setCrystalRepresentation(patch){
@@ -203,10 +221,29 @@ SILM.createScientificState=()=>{
   if(JSON.stringify(next)===JSON.stringify(r))return true;
   const previous=snapshot();s.crystallography.representation=next;publish('structure:representation',previous,{patch});return true;
  }
+ /* Modelo eletrônico (0.6.x). Ativar cria o modelo; ocultar só muda representation.visible. */
+ function dropElectrons(){if(state.electrons&&(!state.structure||state.structure.units.length<SILM.electronModel.minUnits)){state.electrons=null;return true;}return false;}
+ function activateElectrons(){
+  const s=state.structure,M=SILM.electronModel;if(!state.investigation||!s)return {ok:false,reason:'NO_STRUCTURE'};if(s.units.length<M.minUnits)return {ok:false,reason:'TOO_FEW_UNITS'};
+  if(state.electrons){if(state.electrons.representation.visible)return {ok:true,unchanged:true};setElectronRepresentation({visible:true});return {ok:true,shown:true};}
+  const e=SILM.data.get(state.metal.atomicNumber),previous=snapshot(),date=now();
+  state.electrons={modelVersion:M.modelVersion,type:M.types[0],status:'active',metalAtomicNumber:state.metal.atomicNumber,
+   source:{model:M.sourceModel,valenceSourceId:e.valenceModel.sourceId,configurationSourceId:e.electronConfiguration.sourceId},
+   representation:{...M.defaults},createdAt:date};
+  state.investigation.updatedAt=date;publish('electrons:activated',previous);return {ok:true,created:true};
+ }
+ /* Visibilidade e movimento são representação: não alteram o modelo nem updatedAt. */
+ function setElectronRepresentation(patch){
+  const el=state.electrons;if(!el||!patch||typeof patch!=='object')return false;const next={...el.representation};
+  for(const [k,v]of Object.entries(patch)){if(!['visible','motion'].includes(k)||typeof v!=='boolean')return false;next[k]=v;}
+  if(JSON.stringify(next)===JSON.stringify(el.representation))return true;
+  const previous=snapshot();el.representation=next;publish('electrons:representation',previous,{patch});return true;
+ }
  function upgradeStructure(s){return s===null?null:{...s,modelVersion:2,mode:'free',crystallography:null};}
  function migrate(value){
-  if(value?.schemaVersion===3)return {...value,schemaVersion:4,structure:upgradeStructure(value.structure)}; // 0.4.0 → 0.5.0: montagem preservada em modo livre
-  if(value?.schemaVersion===2)return value.structure===null?{...value,schemaVersion:4}:null;     // 0.3.0 → 0.5.0: sem montagem automática
+  if(value?.schemaVersion===4)return value.electrons===null?{...value,schemaVersion:5}:null;   // 0.5.0 → 0.6.0: estrutura e representação preservadas
+  if(value?.schemaVersion===3)return value.electrons===null?{...value,schemaVersion:5,structure:upgradeStructure(value.structure)}:null; // 0.4.0: montagem em modo livre
+  if(value?.schemaVersion===2)return value.structure===null&&value.electrons===null?{...value,schemaVersion:5}:null;     // 0.3.0: sem montagem automática
   if(value?.schemaVersion!==1||!['number','object'].includes(typeof value.metal))return null;
   if(value.metal===null)return SILM.emptyScientificState();
   const z=typeof value.metal==='number'?value.metal:value.metal?.atomicNumber;
@@ -215,14 +252,14 @@ SILM.createScientificState=()=>{
   next.metal={atomicNumber:e.atomicNumber,symbol:e.symbol,sourceId:e.identityProvenance.atomicNumber.sourceId};return next;
  }
  function restore(value,{allowLegacy=true}={}){
-  const legacy=allowLegacy&&[1,2,3].includes(value?.schemaVersion),candidate=legacy?migrate(value):value;
+  const legacy=allowLegacy&&[1,2,3,4].includes(value?.schemaVersion),candidate=legacy?migrate(value):value;
   const result=SILM.validateScientificState(candidate);
   if(!result.ok)return result;
-  const previous=snapshot();history=[];replace(result.value);persist();emit?.('investigation:restored',{previous,current:snapshot(),migrated:legacy,from:legacy?value.schemaVersion:4});return {ok:true,migrated:legacy,from:legacy?value.schemaVersion:4};
+  const previous=snapshot();history=[];replace(result.value);persist();emit?.('investigation:restored',{previous,current:snapshot(),migrated:legacy,from:legacy?value.schemaVersion:5});return {ok:true,migrated:legacy,from:legacy?value.schemaVersion:5};
  }
  function connect(options){storage=options.storage;emit=options.emit;}
  return Object.freeze({get state(){return snapshot();},snapshot,connect,begin,setModule,resetInvestigation,close,setStatus,restore,
-  beginAssembly,addUnit,moveUnit,undo,clearStructure,setAssistance,setAssemblyStatus,organize,restoreFree,setCrystalRepresentation,
+  beginAssembly,addUnit,moveUnit,undo,clearStructure,setAssistance,setAssemblyStatus,organize,restoreFree,setCrystalRepresentation,activateElectrons,setElectronRepresentation,
   get canUndo(){return !!state.structure&&free()&&history.length>0;},get historySize(){return history.length;},
   get lastAction(){const last=history[history.length-1];return state.structure&&last?{type:last.type,unitId:last.unitId}:null;},
   load(){const missing={};const saved=storage?.get('scientific.state',missing);if(saved===missing)return {ok:true,empty:true};const result=restore(saved);if(!result.ok){history=[];replace(SILM.emptyScientificState());persist();return result;}return result;}

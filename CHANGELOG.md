@@ -1,5 +1,20 @@
 # Registro de alterações
 
+## SILM 0.6.0 — Modelo Eletrônico e Elétrons Deslocalizados
+
+- Novo scientificState (schema 5): `electrons` passa a ser um modelo formal (`delocalized-electron-model`, representação qualitativa) ligado ao metal e à estrutura; migração 4 → 5 sem perda de metal, investigação, estrutura e representação.
+- Modelo eletrônico: centros metálicos positivos envolvidos por elétrons de valência deslocalizados pela estrutura inteira; sem pares M—M e sem pares eletrônicos localizados.
+- Valência: origem conceitual na convenção de valência e na configuração do átomo neutro registradas no banco, com fonte; sem contagem por grupo nem contagem visual literal.
+- Transição átomo isolado → estrutura: esquema em Ver e transição curta ao adicionar unidade; não é ionização em fase gasosa.
+- Partículas qualitativas num canvas único (24 a 150 marcadores; até 80 em telas pequenas), sobre montagem livre, célula e rede extensa; o contorno da célula não é parede.
+- Movimento por passeio aleatório isotrópico: sem direção predominante, sem órbitas, sem setas e sem corrente; pausa com a aba oculta.
+- Mostrar/Ocultar elétrons e Movimento eletrônico (alternância); ocultar não apaga o modelo.
+- Movimento reduzido (do sistema ou do SILM): representação estática equivalente.
+- Persistência e reload da configuração; as posições dos marcadores não são estado.
+- Acessibilidade: marcadores fora da ordem de tabulação, estado legível, contorno de contraste, alto contraste e visão de cores verificados.
+- Mobile: densidade reduzida em telas pequenas; em telas largas, as informações da cena ficam numa coluna lateral e a cena ganha altura.
+- Documentação das limitações (`docs/LIMITACOES-MODELO-ELETRONICO.md`) e do modelo (`docs/MODELO-ELETRONICO.md`); tópico "Elétrons deslocalizados" no Manual.
+
 ## SILM 0.5.0 — Estruturas Cristalinas e Rede Metálica
 
 - Evolução do scientificState: schema 4, modelo da estrutura 2 (`mode` livre/cristalino, `crystallography`); migração 3 → 4 preservando a montagem livre.

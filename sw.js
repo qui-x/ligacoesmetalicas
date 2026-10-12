@@ -1,5 +1,5 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.5.0';
+const VERSION='0.6.0';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION,DOMAINS=CACHE+'::domains';
 const FILES=[
   "./",
@@ -96,6 +96,7 @@ const FILES=[
   "domain/silm/data/metadata.json",
   "domain/silm/data/sources.json",
   "domain/silm/data-api.js",
+  "domain/silm/electron-view.js",
   "domain/silm/identidade.css",
   "domain/silm/manual.js",
   "domain/silm/periodic-table.css",

@@ -40,7 +40,7 @@ function validate(){const S=load(),A=S.assembly,C=A.contract,storage=new Map(),e
  const noOverlap=units=>{for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++)if(A.distance(units[i].position,units[j].position)<C.minDistance-1e-9)return false;return true;};
  const geometry=validateGeometry(S);
  const m=fresh(collect);
- assert.equal(S.scientificSchemaVersion,4);assert.equal(S.validateScientificState(m.state).ok,true);
+ assert.equal(S.scientificSchemaVersion,5);assert.equal(S.validateScientificState(m.state).ok,true);
 
  // Regressão 0.3.x: investigação, metal único, módulo, status.
  for(const z of [1,6,104,118,999])assert.equal(m.begin(z),false);
@@ -101,7 +101,40 @@ function validate(){const S=load(),A=S.assembly,C=A.contract,storage=new Map(),e
  const mn=fresh();assert.equal(mn.begin(25),true);mn.beginAssembly();assert.equal(mn.addUnit().ok,true);assert.equal(mn.organize().reason,'CRYSTAL_STRUCTURE_UNSUPPORTED');
  assert.equal(mn.state.structure.mode,'free');assert.equal(mn.addUnit().ok,true);assert.equal(S.validateScientificState(mn.state).ok,true);
 
- // Estados inválidos (schema 4).
+ // 0.6.x: modelo eletrônico qualitativo associado à estrutura inteira.
+ const E=S.electronModel,el=fresh(collect);el.begin(29);
+ assert.equal(el.activateElectrons().reason,'NO_STRUCTURE','Sem estrutura, sem modelo eletrônico');el.beginAssembly();
+ assert.equal(el.activateElectrons().reason,'TOO_FEW_UNITS');el.addUnit();assert.equal(el.activateElectrons().reason,'TOO_FEW_UNITS','Uma unidade isolada não forma distribuição coletiva');
+ el.addUnit();el.addUnit();const act=el.activateElectrons();assert.equal(act.created,true);
+ let ex=plain(el.state.electrons);const eCu=S.data.get(29);
+ assert.deepEqual({v:ex.modelVersion,t:ex.type,st:ex.status,z:ex.metalAtomicNumber,src:ex.source,r:ex.representation},{v:1,t:'delocalized-electron-model',st:'active',z:29,src:{model:'valence-electron-contribution',valenceSourceId:eCu.valenceModel.sourceId,configurationSourceId:eCu.electronConfiguration.sourceId},r:{visible:true,motion:true,densityMode:'qualitative',representationType:'qualitative'}});
+ assert.ok(!('particles' in ex)&&!('electronCountReal' in ex),'Marcadores não são estado científico');assert.equal(S.validateScientificState(el.state).ok,true);
+ // Ocultar e mostrar repetidamente: o modelo permanece; só representation.visible muda; updatedAt não muda.
+ const stamp=el.state.investigation.updatedAt,model0={...ex,representation:null};
+ for(let i=0;i<8;i++){assert.equal(el.setElectronRepresentation({visible:i%2===1}),true);assert.equal(el.state.electrons.representation.visible,i%2===1);}
+ assert.equal(el.setElectronRepresentation({motion:false}),true);assert.equal(el.state.electrons.representation.motion,false);
+ assert.deepEqual({...plain(el.state.electrons),representation:null},model0);assert.equal(el.state.investigation.updatedAt,stamp);
+ for(const bad of [{visible:'sim'},{speed:2},{densityMode:'count'},{representationType:'quantitative'},null])assert.equal(el.setElectronRepresentation(bad),false,JSON.stringify(bad));
+ el.setElectronRepresentation({visible:false});assert.equal(el.activateElectrons().shown,true,'Mostrar elétrons sobre modelo oculto apenas o torna visível');el.setElectronRepresentation({motion:true});
+ // Reload restaura modelo e representação.
+ const elReload=fresh();assert.equal(elReload.load().ok,true);assert.deepEqual(plain(elReload.state.electrons),plain(el.state.electrons));
+ // Organizar preserva o modelo; desfazer abaixo de duas unidades o remove.
+ assert.equal(el.organize().ok,true);assert.deepEqual(plain(el.state.electrons),plain(elReload.state.electrons));assert.equal(S.validateScientificState(el.state).ok,true);
+ assert.equal(el.restoreFree(),true);assert.notEqual(el.state.electrons,null,'Três unidades livres mantêm o modelo');
+ el.addUnit();assert.equal(el.undo().electronsCleared,false);
+ el.moveUnit(el.state.structure.units[0].id,{x:.2,y:.2});el.undo();
+ while(el.state.structure.units.length>1&&el.undo().ok);assert.equal(el.state.electrons===null,el.state.structure.units.length<2,'Modelo existe somente com duas ou mais unidades');
+ const minimal=fresh();minimal.begin(29);minimal.beginAssembly();minimal.addUnit();minimal.addUnit();minimal.activateElectrons();assert.equal(minimal.undo().electronsCleared,true);assert.equal(minimal.state.electrons,null);assert.equal(S.validateScientificState(minimal.state).ok,true);
+ // Uma unidade organizada vira célula completa; voltar ao livre com uma unidade remove o modelo.
+ const one=fresh();one.begin(26);one.beginAssembly();one.addUnit();one.organize();assert.equal(one.activateElectrons().created,true);assert.equal(one.restoreFree(),true);assert.equal(one.state.electrons,null);assert.equal(S.validateScientificState(one.state).ok,true);
+ // Limpar, resetar e trocar de metal: nenhum modelo eletrônico residual.
+ const life=fresh();life.begin(29);life.beginAssembly();life.addUnit();life.addUnit();life.activateElectrons();assert.equal(life.clearStructure(),true);assert.equal(life.state.electrons,null);assert.equal(life.state.metal.symbol,'Cu');
+ life.beginAssembly();life.addUnit();life.addUnit();life.activateElectrons();life.resetInvestigation();assert.equal(life.state.electrons,null);
+ life.beginAssembly();life.addUnit();life.addUnit();life.activateElectrons();life.begin(13);assert.equal(life.state.electrons,null);assert.equal(life.state.metal.symbol,'Al');
+ // Metais de transição e de grupo principal usam a mesma convenção do banco: nenhuma contagem por grupo.
+ for(const z of [11,13,26,29,79]){const x=fresh();x.begin(z);x.beginAssembly();x.addUnit();x.addUnit();x.activateElectrons();const src=x.state.electrons.source,e=S.data.get(z);assert.equal(src.valenceSourceId,e.valenceModel.sourceId);assert.equal(e.valenceModel.kind,'QUALITATIVE');assert.ok(!JSON.stringify(x.state.electrons).match(/count|group|charge/i));}
+
+ // Estados inválidos (schema 5).
  const freeSample=(()=>{const x=fresh();x.begin(29);x.beginAssembly();for(let i=0;i<3;i++)x.addUnit();return x.state;})();
  const crystalSample=(()=>{const x=fresh();x.begin(29);x.beginAssembly();for(let i=0;i<5;i++)x.addUnit();x.organize();return x.state;})();
  assert.equal(S.validateScientificState(freeSample).ok,true);assert.equal(S.validateScientificState(crystalSample).ok,true);
@@ -124,25 +157,42 @@ function validate(){const S=load(),A=S.assembly,C=A.contract,storage=new Map(),e
   v=>v.structure.crystallography.organizedAt='ontem',v=>v.structure.crystallography.lattice=[],v=>v.structure.units[2].symbol='Fe',v=>v.electrons={type:'sea'},
   v=>{v.metal={...v.metal,atomicNumber:25,symbol:'Mn'};v.structure.metalAtomicNumber=25;}
  ];
+ const electronSample=(()=>{const x=fresh();x.begin(29);x.beginAssembly();for(let i=0;i<3;i++)x.addUnit();x.activateElectrons();return x.state;})();
+ assert.equal(S.validateScientificState(electronSample).ok,true);
+ const invalidElectrons=[
+  [v=>v.electrons.particles=[{x:.1,y:.1}],'ELECTRONS_INVALID'],[v=>v.electrons.electronCountReal=12,'ELECTRONS_INVALID'],[v=>v.electrons.type='electron-sea','ELECTRONS_INVALID'],
+  [v=>v.electrons.modelVersion=2,'ELECTRONS_INVALID'],[v=>v.electrons.status='inactive','ELECTRONS_INVALID'],[v=>v.electrons.createdAt='ontem','ELECTRONS_INVALID'],
+  [v=>v.electrons.metalAtomicNumber=26,'ELECTRONS_METAL_MISMATCH'],[v=>v.structure=null,'ELECTRONS_WITHOUT_STRUCTURE'],[v=>{v.structure.units.splice(1);v.structure.status='assembling';},'ELECTRONS_WITHOUT_STRUCTURE'],
+  [v=>v.electrons.source.model='group-number','ELECTRON_SOURCE_INVALID'],[v=>v.electrons.source.count=3,'ELECTRON_SOURCE_INVALID'],[v=>v.electrons.source.valenceSourceId='src-inexistente','ELECTRON_SOURCE_MISMATCH'],
+  [v=>v.electrons.representation.representationType='quantitative','ELECTRON_REPRESENTATION_INVALID'],[v=>v.electrons.representation.densityMode='count','ELECTRON_REPRESENTATION_INVALID'],
+  [v=>v.electrons.representation.visible='sim','ELECTRON_REPRESENTATION_INVALID'],[v=>v.electrons.representation.current=true,'ELECTRON_REPRESENTATION_INVALID'],[v=>v.electrons.representation.speed=3,'ELECTRON_REPRESENTATION_INVALID'],
+  [v=>{v.investigation=null;v.metal=null;v.structure=null;},'ORPHAN_METAL']
+ ];
+ for(const [mutate,reason] of invalidElectrons){const copy=structuredClone(electronSample);mutate(copy);assert.equal(S.validateScientificState(copy).reason,reason,mutate.toString());}
  for(const mutate of invalidFree){const copy=structuredClone(freeSample);mutate(copy);assert.equal(S.validateScientificState(copy).ok,false,mutate.toString());}
  for(const mutate of invalidCrystal){const copy=structuredClone(crystalSample);mutate(copy);assert.equal(S.validateScientificState(copy).ok,false,mutate.toString());}
 
- // Migrações: 3 → 4 preserva a montagem livre; 2 → 4 sem montagem automática; 1 → 4.
+ // Migrações para o schema 5: 4 → 5 preserva estrutura cristalina e representação; 3 → 5 preserva a montagem livre; 2 → 5; 1 → 5.
+ const v050=structuredClone(crystalSample);v050.schemaVersion=4;v050.structure.crystallography.representation={...v050.structure.crystallography.representation,view:'lattice',neighbors:true,selectedUnitId:v050.structure.units[0].id};
+ const m4=fresh();const r4=m4.restore(v050);assert.deepEqual({ok:r4.ok,migrated:r4.migrated,from:r4.from},{ok:true,migrated:true,from:4});
+ assert.equal(m4.state.schemaVersion,5);assert.deepEqual(plain(m4.state.structure),plain(v050.structure));assert.equal(m4.state.electrons,null);assert.equal(m4.state.investigation.id,v050.investigation.id);
+ assert.equal(fresh().restore({...structuredClone(v050),electrons:{type:'sea'}}).ok,false,'Schema 4 com elétrons não é estado da 0.5.x');
  const v040=structuredClone(freeSample);v040.schemaVersion=3;v040.structure={...v040.structure,modelVersion:1};delete v040.structure.mode;delete v040.structure.crystallography;
  adapter.set('scientific.state',v040);const migrated=fresh();const migration=migrated.load();
  assert.deepEqual({ok:migration.ok,migrated:migration.migrated,from:migration.from},{ok:true,migrated:true,from:3});
- assert.equal(migrated.state.schemaVersion,4);assert.equal(migrated.state.structure.mode,'free');assert.deepEqual(plain(migrated.state.structure.units),plain(v040.structure.units));assert.equal(migrated.state.structure.status,'assembling');
- const v030={...structuredClone(freeSample),schemaVersion:2,structure:null};const m2=fresh();assert.equal(m2.restore(v030).ok,true);assert.equal(m2.state.structure,null);assert.equal(m2.state.schemaVersion,4);
+ assert.equal(migrated.state.schemaVersion,5);assert.equal(migrated.state.structure.mode,'free');assert.deepEqual(plain(migrated.state.structure.units),plain(v040.structure.units));assert.equal(migrated.state.structure.status,'assembling');
+ const v030={...structuredClone(freeSample),schemaVersion:2,structure:null};const m2=fresh();assert.equal(m2.restore(v030).ok,true);assert.equal(m2.state.structure,null);assert.equal(m2.state.schemaVersion,5);
  assert.equal(fresh().restore({...v030,structure:{type:'CFC'}}).ok,false);
- const m1=fresh();assert.equal(m1.restore({schemaVersion:1,metal:29}).ok,true);assert.equal(m1.state.schemaVersion,4);
+ const m1=fresh();assert.equal(m1.restore({schemaVersion:1,metal:29}).ok,true);assert.equal(m1.state.schemaVersion,5);
  const badV3=structuredClone(v040);badV3.structure.units[1].position={...badV3.structure.units[0].position};assert.equal(fresh().restore(badV3).ok,false);
 
  // Storage corrompido.
  const corrupted=structuredClone(crystalSample);corrupted.structure.units.pop();adapter.set('scientific.state',corrupted);
  const fallback=fresh();assert.equal(fallback.load().ok,false);assert.equal(fallback.state.structure,null);assert.equal(fallback.state.metal,null);
- for(const name of ['investigation:created','structure:created','structure:unit-added','structure:organized','structure:representation','structure:free','structure:cleared','investigation:reset'])assert.ok(events.some(e=>e.name===name),name);
- assert.ok(!events.some(e=>/bond|electron/i.test(JSON.stringify(e.detail.current?.structure||null))),'Nenhum par M—M nem elétron');
- return {schemaVersion:4,structureModelVersion:2,geometry,invalidCases:invalidFree.length+invalidCrystal.length,migrations:['3 → 4 (montagem preservada)','2 → 4','1 → 4'],organize:{Cu:'FCC',Fe:'BCC',Mg:'HCP',Mn:'CRYSTAL_STRUCTURE_UNSUPPORTED'},authorshipPreserved:true,representationIsNotScience:true,returnToFree:true,undoHistoryPersisted:false};
+ for(const name of ['investigation:created','structure:created','structure:unit-added','structure:organized','structure:representation','structure:free','structure:cleared','investigation:reset','electrons:activated','electrons:representation'])assert.ok(events.some(e=>e.name===name),name);
+ assert.ok(!events.some(e=>/bond|electron/i.test(JSON.stringify(e.detail.current?.structure||null))),'Nenhum par M—M; elétrons fora da estrutura');
+ return {schemaVersion:5,structureModelVersion:2,electronModelVersion:E.modelVersion,geometry,invalidCases:invalidFree.length+invalidCrystal.length+invalidElectrons.length,migrations:['4 → 5 (estrutura e representação preservadas)','3 → 5 (montagem preservada)','2 → 5','1 → 5'],
+  electrons:{requiresUnits:E.minUnits,visibilityIsRepresentation:true,markersPersisted:false,droppedBelowMinimum:true,clearedWithStructure:true,valenceConvention:'banco (QUALITATIVE)'},organize:{Cu:'FCC',Fe:'BCC',Mg:'HCP',Mn:'CRYSTAL_STRUCTURE_UNSUPPORTED'},authorshipPreserved:true,representationIsNotScience:true,returnToFree:true,undoHistoryPersisted:false};
 }
 if(require.main===module){try{console.log(JSON.stringify(validate(),null,2));}catch(error){console.error(error);process.exitCode=1;}}
 module.exports={validate,load};

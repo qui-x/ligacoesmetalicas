@@ -38,15 +38,19 @@ check('Sintaxe JavaScript',not errors,errors)
 m=json.loads((root/'manifest.webmanifest').read_text());check('Identidade e ícones PWA',m['short_name']=='SILM' and all((root/icon['src']).is_file() for icon in m['icons']))
 sw=(root/'sw.js').read_text();check('Cache independente',f"const VERSION='{version}'" in sw and 'silm@${ROOT.href}' in sw)
 # Documentos históricos 0.1.1–0.3.0 não constavam do pacote recebido (ver docs/SILM-0.4.0.md).
-required=['SILM-0.4.0.md','MONTAGEM-ESTRUTURA-METALICA.md','SCIENTIFIC-STATE.md','ARQUITETURA-CIENTIFICA.md','ROADMAP-SILM.md','CONTRATO-VERSIONAMENTO.md','INVESTIGACAO.md','PARIDADE-SIAB-1.0.0.md','ESTRUTURAS-CRISTALINAS.md','CONTRATO-CRISTALOGRAFICO.md','COBERTURA-METAIS.md',f'SILM-{version}.md',f'RELATORIO-BUILD-TESTES-{version}.md']
+required=['SILM-0.4.0.md','MONTAGEM-ESTRUTURA-METALICA.md','SCIENTIFIC-STATE.md','ARQUITETURA-CIENTIFICA.md','ROADMAP-SILM.md','CONTRATO-VERSIONAMENTO.md','INVESTIGACAO.md','PARIDADE-SIAB-1.0.0.md','ESTRUTURAS-CRISTALINAS.md','CONTRATO-CRISTALOGRAFICO.md','COBERTURA-METAIS.md','MODELO-ELETRONICO.md','LIMITACOES-MODELO-ELETRONICO.md',f'SILM-{version}.md',f'RELATORIO-BUILD-TESTES-{version}.md']
 check('Documentação obrigatória',all((root/'docs'/p).is_file() for p in required))
 roadmap=(root/'docs/ROADMAP-SILM.md').read_text();check('Roadmap integral até 1.0.0',all('SILM 0.'+str(i)+'.x' in roadmap for i in range(1,19)) and '# SILM 1.0.0-rc.x' in roadmap and '# SILM 1.0.0\n' in roadmap)
-assembly=[root/'domain/silm'/n for n in ('assembly.js','assembly-view.js','assembly.css','crystal.js','crystal-view.js')]
-check('Montagem (0.4.x) e cristalografia (0.5.x) presentes e carregadas em ordem',all(p.is_file() for p in assembly) and html.index('domain/silm/assembly.js')<html.index('domain/silm/crystal.js')<html.index('domain/silm/state.js')<html.index('domain/silm/assembly-view.js')<html.index('domain/silm/crystal-view.js')<html.index('domain/silm/bootstrap.js') and 'domain/silm/assembly.css' in html)
+assembly=[root/'domain/silm'/n for n in ('assembly.js','assembly-view.js','assembly.css','crystal.js','crystal-view.js','electron-view.js')]
+check('Montagem (0.4.x), cristalografia (0.5.x) e camada eletrônica (0.6.x) presentes e carregadas em ordem',all(p.is_file() for p in assembly) and html.index('domain/silm/assembly.js')<html.index('domain/silm/crystal.js')<html.index('domain/silm/state.js')<html.index('domain/silm/assembly-view.js')<html.index('domain/silm/crystal-view.js')<html.index('domain/silm/electron-view.js')<html.index('domain/silm/bootstrap.js') and 'domain/silm/assembly.css' in html)
 crystal=re.sub(r'/\*[\s\S]*?\*/','',(root/'domain/silm/crystal-view.js').read_text())
-check('Vista cristalina sem elétrons e sem ligações fora do contorno da célula',not re.search(r'electron|bond',crystal,re.I) and crystal.count("svgEl('line'")==1)
+check('Vista cristalina sem ligações fora do contorno da célula; elétrons só pela camada eletrônica',not re.search(r'bond',crystal,re.I) and crystal.count("svgEl('line'")==1 and not re.search(r'getContext|arc\(',crystal))
 view=re.sub(r'/\*[\s\S]*?\*/','',(root/'domain/silm/assembly-view.js').read_text())
-check('Sem linhas M—M nem elétrons na representação',not re.search(r"createElementNS\([^)]*,'(line|path|polyline)'\)|electron",view))
+check('Montagem livre sem linhas M—M; elétrons só pela camada eletrônica',not re.search(r"createElementNS\([^)]*,'(line|path|polyline)'\)|getContext|arc\(",view))
+electron=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/electron-view.js').read_text())
+check('Camada eletrônica: um canvas decorativo, sem trajetórias, setas, pares ou corrente',electron.count("document.createElement('canvas')")==1 and "setAttribute('aria-hidden','true')" in electron and not re.search(r'lineTo|moveTo|createElementNS|bond|current|voltage|corrente|tens[aã]o',electron,re.I))
+statecode=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/state.js').read_text())
+check('Marcadores eletrônicos não são estado científico',not re.search(r"particles|electronCount|countReal",statecode) and "representationType:'qualitative'" in statecode)
 check('Sem estados científicos paralelos',not any(re.search(r'routeStructure|missionStructure|routeScientificState|missionScientificState',f.read_text()) for f in (root/'domain').rglob('*.js')))
 state=subprocess.run(['node',str(root/'scripts/validate-scientific-state.cjs')],capture_output=True,text=True)
 check('Validador do estado científico',state.returncode==0 and '"schemaVersion"' in state.stdout,state.stderr[-500:] or None)

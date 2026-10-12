@@ -1,6 +1,6 @@
 {
   "product": "SILM",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "checks": [
     {
       "check": "Versão única do produto",
@@ -83,17 +83,27 @@
       "detail": null
     },
     {
-      "check": "Montagem (0.4.x) e cristalografia (0.5.x) presentes e carregadas em ordem",
+      "check": "Montagem (0.4.x), cristalografia (0.5.x) e camada eletrônica (0.6.x) presentes e carregadas em ordem",
       "status": "PASS",
       "detail": null
     },
     {
-      "check": "Vista cristalina sem elétrons e sem ligações fora do contorno da célula",
+      "check": "Vista cristalina sem ligações fora do contorno da célula; elétrons só pela camada eletrônica",
       "status": "PASS",
       "detail": null
     },
     {
-      "check": "Sem linhas M—M nem elétrons na representação",
+      "check": "Montagem livre sem linhas M—M; elétrons só pela camada eletrônica",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Camada eletrônica: um canvas decorativo, sem trajetórias, setas, pares ou corrente",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Marcadores eletrônicos não são estado científico",
       "status": "PASS",
       "detail": null
     },
@@ -108,6 +118,6 @@
       "detail": null
     }
   ],
-  "passed": 18,
+  "passed": 20,
   "failed": 0
 }

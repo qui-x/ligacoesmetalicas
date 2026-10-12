@@ -33,7 +33,8 @@ module.exports={series:'0.4',async run(kit,{screenshots=false}={}){
   assert.equal((await state(page)).structure.status,'assembling');
   const svg=await page.evaluate(()=>({lines:document.querySelectorAll('#silm-assembly-stage line, #silm-assembly-stage path, #silm-assembly-stage polyline').length,shapes:[...document.querySelectorAll('.silm-assembly-collective g > *')].map(e=>e.tagName)}));
   assert.equal(svg.lines,0,'Nenhuma linha M—M');assert.ok(svg.shapes.every(t=>t==='circle'));
-  assert.equal(await page.locator('[class*=electron]').count(),0,'Nenhum elétron');
+  // Desde a 0.6.x os elétrons existem como modelo opcional: sem ativação pelo usuário, nenhum é exibido.
+  assert.equal((await state(page)).electrons,null,'Modelo eletrônico não é criado automaticamente');assert.equal(await page.locator('.silm-electron-canvas:visible').count(),0,'Nenhum elétron exibido');
   await page.click('#silm-assembly-add');await page.click('#silm-assembly-undo');
   await shot(page,'03-desktop-montagem-varias-unidades');return {counts,uniqueIds:true,noLines:true,noElectrons:true};
  });

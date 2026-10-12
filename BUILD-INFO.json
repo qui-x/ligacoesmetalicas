@@ -1,11 +1,17 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.5.0",
+  "versao": "0.6.0",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.2.4",
-  "scientificSchemaVersion": 4,
+  "scientificSchemaVersion": 5,
   "origens": [
+    {
+      "arquivo": "SILM-0.5.0.zip",
+      "papel": "origem executável da série 0.6.x",
+      "sha512": "e55d962314bd39be18b0ae4f76d6ee8a57a07739015076332a99ee8738d4fcf6b59ffebbb0cdbdc52c9b85c52019959f8f85654eeaf0923fca11ec0cf5cedc10",
+      "verificado": true
+    },
     {
       "arquivo": "SILM-0.4.0.zip",
       "papel": "origem executável da série 0.5.x (0.4.0 homologada pelo autor)",
@@ -37,9 +43,10 @@
       "verificado": true
     }
   ],
-  "observacaoOrigem": "Origem: entregas/SILM-0.4.0.zip deste repositório, verificado pelo SHA-512 externo. Histórico de origens anteriores em versões anteriores do BUILD-INFO.",
-  "status": "SILM 0.5.0: estruturas cristalinas CCC/CFC/HC, célula, rede e vizinhança; schema 4; paridade de workspace com o SIAB 1.0.0. Relatório em docs/RELATORIO-BUILD-TESTES-0.5.0.md.",
+  "observacaoOrigem": "Origem: entregas/SILM-0.5.0.zip deste repositório, verificado pelo SHA-512 externo.",
+  "status": "SILM 0.6.0: modelo eletrônico qualitativo de elétrons de valência deslocalizados; schema 5. Relatório em docs/RELATORIO-BUILD-TESTES-0.6.0.md.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
   "dataBuild": "2026-10-11",
-  "structureModelVersion": 2
+  "structureModelVersion": 2,
+  "electronModelVersion": 1
 }
