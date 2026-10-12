@@ -1,10 +1,10 @@
 {
   "product": "SILM",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "checks": [
     {
       "check": "Versão única do produto",
-      "status": "PASS",
+      "status": "FAIL",
       "detail": null
     },
     {
@@ -14,14 +14,20 @@
         "verifiedFiles": 42,
         "approvedIntegrations": [
           "js/core/domain.js",
+          "js/core/identity.js",
           "js/experience/activity.js",
+          "js/init/app.js",
           "js/manual/manual.js",
+          "js/navigation/router.js",
           "js/workspace/workspace.js"
         ],
         "changedFiles": [
           "js/core/domain.js",
+          "js/core/identity.js",
           "js/experience/activity.js",
+          "js/init/app.js",
           "js/manual/manual.js",
+          "js/navigation/router.js",
           "js/workspace/workspace.js"
         ]
       }
@@ -76,7 +82,7 @@
     },
     {
       "check": "Documentação obrigatória",
-      "status": "PASS",
+      "status": "FAIL",
       "detail": null
     },
     {
@@ -116,7 +122,7 @@
     },
     {
       "check": "Explorar: comparação somente leitura, sem laço extra e sem novo schema",
-      "status": "PASS",
+      "status": "FAIL",
       "detail": null
     },
     {
@@ -133,8 +139,15 @@
       "check": "Validador do estado científico",
       "status": "PASS",
       "detail": null
+    },
+    {
+      "check": "Identidade oficial íntegra e abertura no início do <body>",
+      "status": "PASS",
+      "detail": {
+        "mismatch": []
+      }
     }
   ],
-  "passed": 23,
-  "failed": 0
+  "passed": 21,
+  "failed": 3
 }

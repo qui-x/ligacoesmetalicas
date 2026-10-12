@@ -1,6 +1,6 @@
 'use strict';
 SimCore.identity=(()=>{
- const defaults={nome:'SILM',nomeCurto:'SILM',titulo:'SILM — A Arquitetura dos Metais',subtitulo:'Simulador Interativo de Ligações Metálicas',icone:'assets/silm-icone.svg'};
+ const defaults={nome:'SILM',nomeCurto:'SILM',titulo:'SILM — A Arquitetura dos Metais',subtitulo:'Simulador Interativo de Ligações Metálicas',icone:'assets/silm-simbolo.svg'};
  const safeIcon=value=>{const url=new URL(value,location.href);if(url.origin!==location.origin||!['http:','https:','file:'].includes(url.protocol))throw new TypeError('Ícone deve ser um recurso local');return url.href;};
  return {defaults,apply(manifest){const m=manifest||defaults;SimCore.$('brand-name').textContent=m.nomeCurto||m.nome;SimCore.$('brand-subtitle').textContent=m.subtitulo;SimCore.$('brand-icon').src=safeIcon(m.icone||defaults.icone);document.title=m.titulo||m.nome;const icon=document.querySelector('link[rel=icon]');if(manifest?.icone){icon.dataset.domainIcon='true';icon.href=safeIcon(manifest.icone);}else{delete icon.dataset.domainIcon;A11Y.atualizarFavicon(A11Y.estado.theme);}}};
 })();

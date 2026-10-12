@@ -13,8 +13,9 @@
 | 0.5.x | Estruturas cristalinas | 0.5.0 entregue |
 | 0.6.x | Elétrons deslocalizados | 0.6.0 entregue |
 | 0.7.x | Propriedades metálicas | 0.7.0 entregue |
-| **0.8.x** | **Módulo Explorar** | **0.8.0 entregue** |
-| 0.9.x – 0.18.x, 1.0.0-rc.x, 1.0.0 | ver abaixo | planejadas |
+| 0.8.x | Módulo Explorar | 0.8.0 entregue |
+| **0.9.x** | **Módulo Medir** | **0.9.0 entregue** |
+| 0.10.x – 0.18.x, 1.0.0-rc.x, 1.0.0 | ver abaixo | planejadas |
 
 ---
 

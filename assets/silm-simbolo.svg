@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 240" role="img" aria-labelledby="title desc">
+<title id="title">Símbolo oficial SILM</title>
+<desc id="desc">Estrutura cúbica metálica dourada com oito vértices, um centro metálico interno e fluxo eletrônico azul deslocalizado.</desc>
+<defs>
+  <radialGradient id="gold" cx="30%" cy="24%" r="78%">
+    <stop offset="0" stop-color="#fff5cf"/>
+    <stop offset=".14" stop-color="#efcb70"/>
+    <stop offset=".42" stop-color="#db9f31"/>
+    <stop offset=".72" stop-color="#b2770d"/>
+    <stop offset="1" stop-color="#6f4704"/>
+  </radialGradient>
+  <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#9fe9ff"/>
+    <stop offset=".52" stop-color="#4fc3f7"/>
+    <stop offset="1" stop-color="#86e3ff"/>
+  </linearGradient>
+  <filter id="goldShadow" x="-70%" y="-70%" width="240%" height="240%">
+    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#7f560a" flood-opacity=".22"/>
+  </filter>
+  <filter id="blueGlow" x="-80%" y="-80%" width="260%" height="260%">
+    <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#4fc3f7" flood-opacity=".72"/>
+  </filter>
+  <filter id="dotGlow" x="-140%" y="-140%" width="380%" height="380%">
+    <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#4fc3f7" flood-opacity=".9"/>
+  </filter>
+</defs>
+
+<!-- Cubo: duas faces quadradas + quatro conexões de profundidade -->
+<g fill="none" stroke="#8b5d0b" stroke-opacity=".22" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="68" y="86" width="92" height="92"/>
+  <rect x="108" y="50" width="92" height="92"/>
+  <path d="M68 86 L108 50 M160 86 L200 50 M160 178 L200 142 M68 178 L108 142"/>
+</g>
+<g fill="none" stroke="#d8ab4c" stroke-width="2.45" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M68 86 H160 V178 H68 Z"/>
+  <path d="M108 50 H200 V142 H108 Z" opacity=".74"/>
+  <path d="M68 86 L108 50 M160 86 L200 50 M160 178 L200 142 M68 178 L108 142" opacity=".9"/>
+</g>
+
+<!-- Fluxo eletrônico -->
+<path d="M82 133 C98 132 109 112 126 110 C143 108 151 127 167 127 C181 127 190 118 202 109"
+      fill="none" stroke="#4fc3f7" stroke-opacity=".20" stroke-width="18" stroke-linecap="round"/>
+<path d="M82 133 C98 132 109 112 126 110 C143 108 151 127 167 127 C181 127 190 118 202 109"
+      fill="none" stroke="url(#cyan)" stroke-width="5.2" stroke-linecap="round" filter="url(#blueGlow)"/>
+<circle cx="100" cy="125" r="4.5" fill="#9eeafd" filter="url(#dotGlow)"/>
+<circle cx="148" cy="118" r="4.5" fill="#9eeafd" filter="url(#dotGlow)"/>
+<circle cx="182" cy="123" r="4.5" fill="#9eeafd" filter="url(#dotGlow)"/>
+
+<!-- Centros metálicos: 8 vértices + 1 centro interno -->
+<g fill="url(#gold)" filter="url(#goldShadow)">
+  <circle cx="68" cy="86" r="12.8"/>
+  <circle cx="160" cy="86" r="12.8"/>
+  <circle cx="160" cy="178" r="12.8"/>
+  <circle cx="68" cy="178" r="12.8"/>
+  <circle cx="108" cy="50" r="11"/>
+  <circle cx="200" cy="50" r="11"/>
+  <circle cx="200" cy="142" r="10.2"/>
+  <circle cx="108" cy="142" r="10.2"/>
+  <circle cx="130" cy="110" r="13.2"/>
+</g>
+</svg>

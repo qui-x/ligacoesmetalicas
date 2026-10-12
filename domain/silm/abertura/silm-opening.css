@@ -1,0 +1,276 @@
+:root{
+  --silm-paper:#f5f3ee;
+  --silm-ink:#20252c;
+  --silm-muted:#666d75;
+}
+.silm-opening{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:grid;
+  grid-template-rows:1fr auto;
+  background:
+    radial-gradient(circle at 50% 34%,rgba(255,255,255,.96),transparent 39%),
+    var(--silm-paper);
+  color:var(--silm-ink);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  opacity:1;
+  visibility:visible;
+  transition:opacity .34s ease,visibility .34s ease;
+}
+.silm-opening.is-hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+.silm-opening__center{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:0;
+  padding:28px 16px 58px;
+}
+.silm-opening__stage{
+  width:min(760px,94vw);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  transform:translateY(-1.2vh);
+}
+.silm-opening__visual{
+  position:relative;
+  width:min(392px,76vw);
+  aspect-ratio:256/240;
+  display:grid;
+  place-items:center;
+}
+.silm-opening__visual svg{
+  width:100%;
+  height:100%;
+  overflow:visible;
+  filter:drop-shadow(0 18px 22px rgba(75,61,24,.08));
+}
+.silm-opening__sheen{
+  position:absolute;
+  inset:7% 6%;
+  overflow:hidden;
+  pointer-events:none;
+  opacity:0;
+}
+.silm-opening__sheen::before{
+  content:"";
+  position:absolute;
+  top:-20%;
+  bottom:-20%;
+  left:-90px;
+  width:54px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.82),transparent);
+  transform:skewX(-18deg);
+  filter:blur(1px);
+}
+.silm-opening__brand{
+  display:grid;
+  justify-items:center;
+  gap:8px;
+  margin-top:8px;
+  opacity:0;
+  transform:translateY(10px);
+}
+.silm-opening__brand-mark{
+  font-size:clamp(2.8rem,7vw,4.8rem);
+  font-weight:560;
+  letter-spacing:.20em;
+  padding-left:.20em;
+  color:#8e650e;
+  line-height:1;
+}
+.silm-opening__brand-name{
+  font-size:clamp(.94rem,2vw,1.22rem);
+  font-weight:440;
+  text-align:center;
+}
+.silm-opening__brand-theme{
+  font-style:normal;
+  font-size:clamp(.82rem,1.6vw,1.02rem);
+  color:var(--silm-muted);
+}
+.silm-opening__hint{
+  text-align:center;
+  font-size:.78rem;
+  color:var(--silm-muted);
+  padding:0 16px calc(18px + env(safe-area-inset-bottom));
+}
+.silm-opening__skip{
+  margin-top:12px;
+  border:1px solid rgba(32,37,44,.14);
+  background:rgba(255,255,255,.62);
+  color:#27313a;
+  border-radius:10px;
+  padding:8px 12px;
+  cursor:pointer;
+}
+
+/* Estado base */
+.silm-opening .back,
+.silm-opening .front,
+.silm-opening .connectors{
+  transform-box:fill-box;
+  transform-origin:center;
+}
+.silm-opening .edge-shadow{opacity:0}
+.silm-opening .edge{stroke-dasharray:240;stroke-dashoffset:240;opacity:0}
+.silm-opening .node{
+  opacity:0;
+  transform-box:fill-box;
+  transform-origin:center;
+  transform:translate(var(--dx),var(--dy)) scale(.62);
+}
+.silm-opening .electron-field{opacity:0}
+.silm-opening .ribbon,
+.silm-opening .ribbon-glow,
+.silm-opening .electron-dot{opacity:0}
+.silm-opening .thermal-ring,
+.silm-opening .thermal-aura{opacity:0}
+
+/* Execução */
+.silm-opening.is-running .edge-shadow{animation:silm-edgeShadow 5.9s ease both}
+.silm-opening.is-running .edge{animation:silm-edgeBuild 5.9s ease both}
+.silm-opening.is-running .node{animation:silm-nodeBuild 5.9s cubic-bezier(.22,.76,.18,1) both}
+.silm-opening.is-running .electron-field{animation:silm-electronField 5.9s ease both}
+.silm-opening.is-running .ribbon{animation:silm-ribbonReveal 5.9s ease both,silm-ribbonFlow 1.12s linear 1.55s infinite}
+.silm-opening.is-running .ribbon-glow{animation:silm-ribbonGlow 5.9s ease both}
+.silm-opening.is-running .electron-dot.d1{animation:silm-electronDot 5.9s ease both,silm-electronPulse 1.45s ease-in-out 1.9s infinite alternate}
+.silm-opening.is-running .electron-dot.d2{animation:silm-electronDot 5.9s ease both,silm-electronPulse 1.45s ease-in-out 2.12s infinite alternate}
+.silm-opening.is-running .electron-dot.d3{animation:silm-electronDot 5.9s ease both,silm-electronPulse 1.45s ease-in-out 2.34s infinite alternate}
+
+.silm-opening.is-running .thermal-aura.ta1{animation:silm-thermalWave 5.9s ease both}
+.silm-opening.is-running .thermal-aura.ta2{animation:silm-thermalWave 5.9s ease .12s both}
+.silm-opening.is-running .thermal-aura.ta3{animation:silm-thermalWave 5.9s ease .24s both}
+.silm-opening.is-running .thermal-aura.ta4{animation:silm-thermalWave 5.9s ease .36s both}
+.silm-opening.is-running .thermal-aura.ta5{animation:silm-thermalWave 5.9s ease .48s both}
+.silm-opening.is-running .thermal-aura.ta6{animation:silm-thermalWave 5.9s ease .60s both}
+.silm-opening.is-running .thermal-aura.ta7{animation:silm-thermalWave 5.9s ease .72s both}
+.silm-opening.is-running .thermal-aura.ta8{animation:silm-thermalWave 5.9s ease .84s both}
+.silm-opening.is-running .thermal-aura.ta9{animation:silm-thermalWave 5.9s ease .96s both}
+
+.silm-opening.is-running .thermal-ring.tr1{animation:silm-thermalRing 5.9s ease both}
+.silm-opening.is-running .thermal-ring.tr2{animation:silm-thermalRing 5.9s ease .12s both}
+.silm-opening.is-running .thermal-ring.tr3{animation:silm-thermalRing 5.9s ease .24s both}
+.silm-opening.is-running .thermal-ring.tr4{animation:silm-thermalRing 5.9s ease .36s both}
+.silm-opening.is-running .thermal-ring.tr5{animation:silm-thermalRing 5.9s ease .48s both}
+.silm-opening.is-running .thermal-ring.tr6{animation:silm-thermalRing 5.9s ease .60s both}
+.silm-opening.is-running .thermal-ring.tr7{animation:silm-thermalRing 5.9s ease .72s both}
+.silm-opening.is-running .thermal-ring.tr8{animation:silm-thermalRing 5.9s ease .84s both}
+.silm-opening.is-running .thermal-ring.tr9{animation:silm-thermalRing 5.9s ease .96s both}
+
+.silm-opening.is-running .front{animation:silm-layerSlideFront 5.9s cubic-bezier(.22,.72,.18,1) both}
+.silm-opening.is-running .connectors{animation:silm-layerSlideConnectors 5.9s cubic-bezier(.22,.72,.18,1) both}
+.silm-opening.is-running .silm-opening__sheen{animation:silm-sheenField 5.9s ease both}
+.silm-opening.is-running .silm-opening__sheen::before{animation:silm-sheenSweep .92s cubic-bezier(.22,.72,.2,1) 4.42s both}
+.silm-opening.is-running .silm-opening__brand{animation:silm-brandIn .58s cubic-bezier(.2,.75,.2,1) 4.18s both}
+
+/* Frame final estático */
+.silm-opening.is-static .edge-shadow,
+.silm-opening.is-static .edge,
+.silm-opening.is-static .node,
+.silm-opening.is-static .electron-field,
+.silm-opening.is-static .ribbon,
+.silm-opening.is-static .ribbon-glow,
+.silm-opening.is-static .electron-dot,
+.silm-opening.is-static .silm-opening__brand{
+  opacity:1;
+  transform:none;
+  stroke-dashoffset:0;
+  animation:none;
+}
+.silm-opening.is-static .thermal-ring,
+.silm-opening.is-static .thermal-aura{
+  opacity:0;
+  animation:none;
+}
+.silm-opening.is-static .front,
+.silm-opening.is-static .connectors{
+  transform:none;
+  animation:none;
+}
+
+@keyframes silm-nodeBuild{
+  0%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.62);filter:blur(2.5px)}
+  15%{opacity:.65;filter:blur(0)}
+  28%{opacity:1;transform:translate(0,0) scale(1.07)}
+  36%,100%{opacity:1;transform:translate(0,0) scale(1)}
+}
+@keyframes silm-edgeBuild{
+  0%,14%{opacity:0;stroke-dashoffset:240}
+  28%{opacity:1;stroke-dashoffset:0}
+  100%{opacity:1;stroke-dashoffset:0}
+}
+@keyframes silm-edgeShadow{0%,16%{opacity:0}31%,100%{opacity:1}}
+@keyframes silm-electronField{0%,24%{opacity:0}34%,100%{opacity:1}}
+@keyframes silm-ribbonReveal{0%,24%{opacity:0}34%,100%{opacity:1}}
+@keyframes silm-ribbonGlow{0%,24%{opacity:0}34%,100%{opacity:1}}
+@keyframes silm-ribbonFlow{to{stroke-dashoffset:-27}}
+@keyframes silm-electronDot{0%,28%{opacity:0}38%,100%{opacity:1}}
+@keyframes silm-electronPulse{from{transform:scale(.84)}to{transform:scale(1.18)}}
+@keyframes silm-thermalWave{
+  0%,44%{opacity:0}
+  49%{opacity:.85}
+  54%{opacity:0}
+  100%{opacity:0}
+}
+@keyframes silm-thermalRing{
+  0%,44%{opacity:0;transform:scale(.78)}
+  49%{opacity:.88;transform:scale(1)}
+  54%{opacity:0;transform:scale(1.18)}
+  100%{opacity:0}
+}
+@keyframes silm-layerSlideFront{
+  0%,56%{transform:translateX(0)}
+  63%{transform:translateX(7px)}
+  69%{transform:translateX(10px)}
+  75%{transform:translateX(3px)}
+  81%,100%{transform:translateX(0)}
+}
+@keyframes silm-layerSlideConnectors{
+  0%,56%{transform:translateX(0)}
+  63%{transform:translateX(4px)}
+  69%{transform:translateX(6px)}
+  75%{transform:translateX(2px)}
+  81%,100%{transform:translateX(0)}
+}
+@keyframes silm-sheenField{0%,74%{opacity:0}79%,86%{opacity:1}90%,100%{opacity:0}}
+@keyframes silm-sheenSweep{0%{left:-90px;opacity:0}8%{opacity:1}75%{opacity:1}100%{left:360px;opacity:0}}
+@keyframes silm-brandIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+@media(max-width:600px){
+  .silm-opening__center{padding:18px 12px 86px}
+  .silm-opening__visual{width:min(300px,80vw)}
+  .silm-opening__brand-mark{font-size:clamp(2.2rem,11vw,3.25rem)}
+  .silm-opening__brand-name{font-size:.88rem;max-width:92vw}
+  .silm-opening__brand-theme{font-size:.79rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .silm-opening .edge-shadow,
+  .silm-opening .edge,
+  .silm-opening .node,
+  .silm-opening .electron-field,
+  .silm-opening .ribbon,
+  .silm-opening .ribbon-glow,
+  .silm-opening .electron-dot,
+  .silm-opening .silm-opening__brand{
+    animation:none!important;
+    opacity:1!important;
+    transform:none!important;
+    stroke-dashoffset:0!important;
+  }
+  .silm-opening .thermal-ring,
+  .silm-opening .thermal-aura{
+    animation:none!important;
+    opacity:0!important;
+  }
+  .silm-opening .front,
+  .silm-opening .connectors{
+    animation:none!important;
+    transform:none!important;
+  }
+}

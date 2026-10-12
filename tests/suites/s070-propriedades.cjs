@@ -15,10 +15,10 @@ module.exports={series:'0.7',async run(kit,{screenshots=false}={}){
 
  await test('0.7-MIG','Migração da 0.6.x (schema 5) sem perda: investigação, metal, estrutura, cristalografia e elétrons',async use=>{
   const page=await use();await crystal(page,'Cu',4);await page.click('#silm-electrons-toggle');await page.waitForFunction(()=>!!SILM.scientificState.electrons);await page.click('#silm-crystal-view-lattice');
-  const s6=await state(page),v060=JSON.parse(JSON.stringify(s6));v060.schemaVersion=5;delete v060.properties;
+  const s6=await state(page),v060=JSON.parse(JSON.stringify(s6));v060.schemaVersion=5;delete v060.properties;   // estado real da 0.6.x: sem propriedades; medições vazias desde o schema 2
   const migrated=await use({seed:v060});await go(migrated);await migrated.waitForSelector('.silm-crystal');const s=await state(migrated);
-  assert.equal(s.schemaVersion,6);assert.deepEqual(s.structure,s6.structure);assert.deepEqual(s.electrons,s6.electrons);assert.equal(s.investigation.id,s6.investigation.id);assert.equal(s.properties.active,null);
-  assert.equal(await migrated.getAttribute('.silm-crystal','data-view'),'lattice');return {from:5,to:6};
+  assert.equal(s.schemaVersion,s6.schemaVersion,'migra até o schema atual');assert.deepEqual(s.structure,s6.structure);assert.deepEqual(s.electrons,s6.electrons);assert.equal(s.investigation.id,s6.investigation.id);assert.equal(s.properties.active,null);
+  assert.equal(await migrated.getAttribute('.silm-crystal','data-view'),'lattice');return {from:5,to:s.schemaVersion};
  });
 
  await test('0.7-ELIG','Elegibilidade por propriedade e contexto: livre só elétrica; cristalina todas; uma por vez',async use=>{

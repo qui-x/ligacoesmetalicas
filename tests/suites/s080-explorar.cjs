@@ -107,7 +107,7 @@ module.exports={series:'0.8',async run(kit,{screenshots=false}={}){
   const before=science(await state(page));await reload(page);await page.waitForSelector('.silm-crystal');
   assert.deepEqual(science(await state(page)),before);assert.deepEqual(await view(page),{focus:'synthesis',layers:{centers:false,propertyHints:true},compare:'cell-lattice'});
   assert.equal(await page.getAttribute('#silm-view','data-centers'),'dim');await openRight(page,'ver','Observar');assert.equal(await focus(page),'synthesis');await closeRight(page);
-  const schema=await page.evaluate(()=>SILM.scientificSchemaVersion);assert.equal(schema,6,'Reorganização de interface não incrementa o schema científico');
+  const schema=await page.evaluate(()=>SILM.scientificSchemaVersion),restored=await state(page);assert.equal(restored.schemaVersion,schema,'Estado restaurado no schema atual');assert.ok(!('exploration' in restored)&&!('view' in restored),'Foco, camadas e comparação não entram no estado científico');
   return {restored:true,schema};
  });
 

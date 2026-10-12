@@ -1,11 +1,23 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.8.0",
+  "versao": "0.9.0",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.2.4",
-  "scientificSchemaVersion": 6,
+  "scientificSchemaVersion": 7,
   "origens": [
+    {
+      "arquivo": "SILM-0.8.0.zip",
+      "papel": "origem executável da série 0.9.x",
+      "sha512": "29f762209ab42d0e9a9adf7bcfdcaf8887fa44cd60128ef3a1031618570f0dd5df305c719104e478c03b681e4f963fb7c59af4480014ac3ff1516bf028719ed9",
+      "verificado": true
+    },
+    {
+      "arquivo": "SILM_LOGO_E_ANIMACAO_OFICIAL_CORRIGIDO.zip",
+      "papel": "identidade oficial do SILM (logo e abertura), fornecida pelo autor; arquivos copiados íntegros (SHA-256 em docs/IDENTIDADE-VISUAL.md)",
+      "sha512": null,
+      "verificado": true
+    },
     {
       "arquivo": "SILM-0.7.0.zip",
       "papel": "origem executável da série 0.8.x",
@@ -49,17 +61,18 @@
       "verificado": true
     },
     {
-      "arquivo": "qui-x/acidobase@f07047a",
-      "papel": "SIAB 1.0.0 congelada: referência comportamental da família, somente leitura",
+      "arquivo": "qui-x/acidobase@9931b45",
+      "papel": "SIAB 1.0.0 (package.json, lockfile e standalone em 1.0.0): referência comportamental da família, somente leitura",
       "sha512": null,
       "verificado": true
     }
   ],
-  "observacaoOrigem": "Origem: entregas/SILM-0.7.0.zip deste repositório, verificado pelo SHA-512 externo.",
-  "status": "SILM 0.8.0: módulo Explorar integrado (observação contextual, camadas, comparação derivada); schema 6 inalterado. Relatório em docs/RELATORIO-BUILD-TESTES-0.8.0.md.",
+  "observacaoOrigem": "Origem: entregas/SILM-0.8.0.zip deste repositório, verificado pelo SHA-512 externo.",
+  "status": "SILM 0.9.0: módulo Medir (medidas do modelo: distância, ângulo, parâmetro de rede, coordenação; Å/pm/nm; registro em Dados → Medições); schema 7; identidade oficial (logo e abertura) e correção de origem da rota inicial. Relatório em docs/RELATORIO-BUILD-TESTES-0.9.0.md.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
-  "dataBuild": "2026-10-11",
+  "dataBuild": "2026-10-12",
   "structureModelVersion": 2,
   "electronModelVersion": 1,
-  "propertiesModelVersion": 1
+  "propertiesModelVersion": 1,
+  "measurementModelVersion": 1
 }
