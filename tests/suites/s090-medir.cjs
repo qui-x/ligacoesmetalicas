@@ -21,7 +21,9 @@ module.exports={series:'0.9',async run(kit,{screenshots=false}={}){
  await test('0.9-MIG','Migração da 0.8.x (schema 6) sem perda',async use=>{
   const page=await use();await crystal(page,'Cu',4);await page.click('#silm-electrons-toggle');const s=await state(page),v=JSON.parse(JSON.stringify(s));v.schemaVersion=6;
   const m=await use({seed:v});await go(m);await m.waitForSelector('.silm-crystal');const t=await state(m);
-  assert.equal(t.schemaVersion,7);assert.deepEqual(t.structure,s.structure);assert.deepEqual(t.electrons,s.electrons);assert.deepEqual(t.measurements,[]);return {from:6,to:7};
+  // Migra até o schema atual (7 na 0.9.x; 8 desde a 0.10.0), sem perder estrutura nem elétrons e sem inventar medições.
+  const current=await m.evaluate(()=>SILM.scientificSchemaVersion);assert.ok(current>=7);
+  assert.equal(t.schemaVersion,current);assert.deepEqual(t.structure,s.structure);assert.deepEqual(t.electrons,s.electrons);assert.deepEqual(t.measurements,[]);return {from:6,to:current};
  });
 
  await test('0.9-FREE','Montagem livre: sem escala física, sem medida absoluta',async use=>{

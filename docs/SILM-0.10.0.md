@@ -33,6 +33,7 @@
 6. **Mesmas pré-condições das medidas:** sem estrutura, montagem livre ou deformação aplicada, não há cálculo absoluto, e o motivo fica à vista.
 7. **Uma definição para cada número:** o (c/a)ideal vem do modelo cristalográfico (`SILM.crystal`) e o serviço de constantes o reexporta. A auditoria recusa constantes repetidas fora do serviço.
 8. **A fonte da constante de Avogadro** (`src-bipm-si-2019`) foi conferida pelo IUPAC Gold Book, porque o PDF da BIPM estava bloqueado na rede do ambiente. Isso está registrado nas notas da fonte.
+9. **Invariante de série anterior atualizada sem perder a intenção:** 0.9-MIG passa a verificar a migração da 0.8.x até o schema atual (como a 0.7-MIG desde a 0.9.0), em vez de fixar o número 7.
 
 ## Paridade de família
 
