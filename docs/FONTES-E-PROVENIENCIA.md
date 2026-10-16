@@ -1,6 +1,6 @@
 # Fontes e proveniência no SILM
 
-> Reconstruído na 0.7.0. O arquivo original da série 0.2.x não constava do pacote 0.3.0 recebido. O conteúdo descreve o banco vigente (`domain/silm/data/sources.json`, `elements.json`, `metadata.json`) e as regras de proveniência acumuladas até a 0.7.x.
+> Reconstruído na 0.7.0. O arquivo original da série 0.2.x não constava do pacote 0.3.0 recebido. O conteúdo descreve o banco vigente (`domain/silm/data/sources.json`, `elements.json`, `metadata.json`) e as regras de proveniência acumuladas até a 0.10.x.
 
 ## 1. Princípio
 
@@ -11,6 +11,9 @@ Toda informação científica exibida pelo SILM é de um destes tipos:
 | **Dado tabelado** (`TABULATED`) | valor ou registro de uma fonte identificada, com condição | parâmetros de rede, estrutura de referência, configuração eletrônica |
 | **Calculado pelo SILM** (`CALCULATED`) | derivado de dados tabelados por uma relação explícita | razão c/a (HC); σ = 1/ρ quando houver resistividade |
 | **Representação qualitativa** (`QUALITATIVE`) | modelo didático; não é medida | montagem, elétrons deslocalizados, experiências de propriedades |
+| **Medida do modelo** (`MODEL_MEASUREMENT`, 0.9.x) | resultado de uma ação de medição sobre sítios do modelo cristalográfico | distância entre vizinhos, ângulo, parâmetro de rede medido |
+| **Valor informado** (`USER`, 0.10.x) | número digitado pelo estudante, com unidade | raio usado num cálculo |
+| **Constante definida** (`CONSTANT`, 0.10.x) | constante do serviço central, com fonte ou definição | N_A (SI 2019); 1 Å³ = 10⁻²⁴ cm³ |
 
 O validador do banco percorre todos os campos `…sourceId` e recusa fontes inexistentes. Também recusa naturezas de evidência inválidas e estruturas sem condição de temperatura, pressão e fase.
 
@@ -23,6 +26,7 @@ O validador do banco percorre todos os campos `…sourceId` e recusa fontes inex
 - **Configurações eletrônicas:** NIST Atomic Spectra Database (estados fundamentais de átomos neutros).
 - **Valência:** IUPAC Gold Book (*valence*). É convenção **qualitativa**, sem contagem universal de elétrons livres.
 - **Estruturas cristalinas:** registros do Crystallography Open Database (COD) e circulares NBS, com evidência local verificada por hash.
+- **Constantes do SI:** BIPM, SI Brochure 9.ª edição (2019), para a constante de Avogadro exata (`src-bipm-si-2019`; valor conferido no IUPAC Gold Book porque o PDF da BIPM estava bloqueado na rede do ambiente).
 - **Convenções do SILM:** decisões do projeto (condição ambiente adotada, políticas de elegibilidade).
 - **Fronteiras pedagógicas:** Royal Society of Chemistry (classificação; não é usada para valores numéricos).
 
@@ -33,7 +37,9 @@ O validador do banco percorre todos os campos `…sourceId` e recusa fontes inex
 | 0.2.x | 118 elementos; metal investigável só com estrutura de referência experimental, sólida e com condição registrada |
 | 0.5.x | sítios cristalográficos expandidos pelas operações de simetria do banco e conferidos com o modelo; divergência → `DATA_CONFLICT` |
 | 0.6.x | o modelo eletrônico registra as fontes da convenção de valência e da configuração eletrônica do metal (`electrons.source`) |
-| **0.7.x** | valores de propriedades só com **valor, unidade, condições e fonte**; lacunas ficam indisponíveis (`PROPERTY_DATA_MISSING`) e **nunca** são preenchidas com "valor típico". Resistividade → σ = 1/ρ classificado como calculado. Fase sem estrutura (`phaseAtReference`) só com fonte |
+| 0.7.x | valores de propriedades só com **valor, unidade, condições e fonte**; lacunas ficam indisponíveis (`PROPERTY_DATA_MISSING`) e **nunca** são preenchidas com "valor típico". Resistividade → σ = 1/ρ classificado como calculado. Fase sem estrutura (`phaseAtReference`) só com fonte |
+| 0.9.x | medidas do modelo identificadas como `MODEL_MEASUREMENT`, com a fonte dos parâmetros de rede usados pela geometria |
+| **0.10.x** | cada entrada de cálculo grava a origem e a referência (fonte, medição ou cálculo de origem); a proveniência do resultado reúne as fontes das entradas e da fórmula; constantes vêm do serviço central com fonte; dado tabelado divergente do banco é recusado (`CALCULATION_TABULATED_MISMATCH`) |
 
 ## 4. Situação dos dados de propriedades (0.7.0)
 
@@ -44,4 +50,5 @@ O banco não contém, nesta versão, valores homologados de condutividade elétr
 - **Tabela Periódica e Fontes dos dados:** campo a campo (identidade, peso, configuração, valência, estrutura, condições).
 - **Ver → Observar:** cada dado com a sua natureza (Dado tabelado, Calculado pelo SILM, Representação qualitativa).
 - **Dados → Tabela:** dados tabelados do metal e a situação dos dados de propriedades.
-- **Relatório:** fonte da estrutura de referência e as ressalvas dos modelos.
+- **Dados → Medições e Dados → Cálculos:** cada registro com a etiqueta da origem, as entradas e as fontes.
+- **Relatório:** fonte da estrutura de referência, medições, cálculos e as ressalvas dos modelos.

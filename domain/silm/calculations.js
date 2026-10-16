@@ -13,10 +13,14 @@ SILM.constants=Object.freeze({
  avogadro:Object.freeze({key:'NA',symbol:'N_A',name:'constante de Avogadro',value:6.02214076e23,unit:'mol⁻¹',exact:true,sourceId:'src-bipm-si-2019',display:'6,02214076 × 10²³ mol⁻¹'}),
  /* Definição da unidade (1 Å = 10⁻¹⁰ m): relação exata, não é dado medido. */
  angstrom3ToCm3:Object.freeze({key:'A3cm3',symbol:'1 Å³',name:'1 ångström cúbico em centímetros cúbicos',value:1e-24,unit:'cm³',exact:true,sourceId:null,display:'10⁻²⁴ cm³ (definição: 1 Å = 10⁻¹⁰ m)'}),
- idealHcpRatio:Object.freeze({key:'caIdeal',symbol:'(c/a)ideal',name:'razão c/a do empilhamento ideal de esferas rígidas',value:Math.sqrt(8/3),unit:'1',exact:true,sourceId:null,display:'√(8/3) ≈ 1,633 (geometria do empilhamento ideal)'})
+ idealHcpRatio:Object.freeze({key:'caIdeal',symbol:'(c/a)ideal',name:'razão c/a do empilhamento ideal de esferas rígidas',value:SILM.crystal.models.HCP.idealRatio,unit:'1',exact:true,sourceId:null,display:'√(8/3) ≈ 1,633 (geometria do empilhamento ideal)'})
 });
 (()=>{
  const C=SILM.constants,PI=Math.PI,SQ2=Math.SQRT2,SQ3=Math.sqrt(3);
+ /* Conversões do Calcular (§15), centralizadas. Comprimento reutiliza SILM.units (0.9.x): 1 Å = 100 pm = 0,1 nm.
+    Volume: 1 Å³ = 10⁻³ nm³ = 10⁻²⁴ cm³ = 10⁻³⁰ m³. Densidade: 1 g/cm³ = 1000 kg/m³. O valor canônico é sempre o da fórmula. */
+ const CONVERT=Object.freeze({volume:Object.freeze({'Å³':1,'nm³':1e-3,'cm³':C.angstrom3ToCm3.value,'m³':1e-30}),density:Object.freeze({'g/cm³':1,'kg/m³':1e3})});
+ function convert(kind,value,unit){if(kind==='length')return SILM.units.convert(value,unit);const t=CONVERT[kind];if(!t||!(unit in t))throw new Error('Unidade desconhecida: '+unit);return value*t[unit];}
  const ORIGINS=Object.freeze({TABULATED:'Dado tabelado',MODEL_MEASUREMENT:'Medida do modelo',USER:'Valor informado pelo usuário',CALCULATED:'Calculado pelo SILM',CONSTANT:'Constante definida'});
  const IN={
   a:{key:'a',symbol:'a',name:'parâmetro de rede a',unit:'Å',origins:['TABULATED','MODEL_MEASUREMENT','USER','CALCULATED'],quantity:'latticeParameter'},
@@ -74,6 +78,10 @@ SILM.constants=Object.freeze({
    expression:'c/a',spoken:'c dividido por a.',model:'razão dos parâmetros do metal',notes:'A razão do empilhamento ideal de esferas rígidas, √(8/3) ≈ 1,633, é um valor geométrico de referência. Não é dado do metal, e a diferença não é erro experimental.',
    compute:i=>({value:i.c/i.a,intermediates:[step('(c/a)ideal = √(8/3)','razão do empilhamento ideal (geometria)',C.idealHcpRatio.value,'1')]})}
  ];
+ /* Referências de cada fórmula (§5). A densidade usa N_A exato do SI (BIPM 2019). As demais relações são derivações geométricas
+    da célula adotada, documentadas em docs/FORMULAS-CRISTALOGRAFICAS.md e conferidas pelos testes; os dados de entrada trazem a própria fonte. */
+ const REFERENCES={'theoretical-density':['src-bipm-si-2019']};
+ for(const f of list)f.references=Object.freeze(REFERENCES[f.id]||[]);
  const FORMULAS=Object.freeze(Object.fromEntries(list.map(f=>[f.id,Object.freeze(f)])));
  const QUANTITY=Object.freeze({effectiveAtoms:'Número efetivo',cellVolume:'Volume da célula',radius:'Raio metálico',latticeParameter:'Parâmetro de rede',packingFactor:'Fator de empacotamento',density:'Densidade teórica',caRatio:'Razão c/a'});
  const LIMIT=200;
@@ -149,5 +157,5 @@ SILM.constants=Object.freeze({
   return {ok:true};
  }
  SILM.formulas=FORMULAS;
- SILM.calculation=Object.freeze({origins:ORIGINS,quantities:QUANTITY,inputs:IN,counting,limit:LIMIT,applicable,effective,tabulated,compute,validate,format,percent,sig,context,current});
+ SILM.calculation=Object.freeze({origins:ORIGINS,quantities:QUANTITY,inputs:IN,counting,limit:LIMIT,conversions:CONVERT,convert,applicable,effective,tabulated,compute,validate,format,percent,sig,context,current});
 })();

@@ -35,7 +35,10 @@ module.exports={series:'0.10',async run(kit,{screenshots=false}={}){
   const rho=await run(page,'theoretical-density');assert.equal(num((await page.locator('#silm-calc-result dd').first().innerText()).split('= ')[1]),8.935);
   assert.ok(rho.inputs.some(x=>x.key==='NA'&&x.origin==='CONSTANT'&&x.value===6.02214076e23));assert.ok(rho.inputs.some(x=>x.key==='M'&&x.origin==='TABULATED'&&x.value===63.546));
   assert.ok(rho.provenance.dependsOn.includes(V.id));assert.match(await page.locator('#silm-calc-result').innerText(),/8935 kg\/m³[\s\S]*massa da célula/);await shot(page,'k02-densidade');
-  return {n:4,V:'47,24 Å³',r:'1,278 Å',FE:'0,7405',rho:'8,935 g/cm³'};
+  // r → a com o r calculado volta ao a tabelado; a referência aparece lado a lado (§12), sem 'erro experimental'.
+  const a=await run(page,'a-from-radius-fcc');assert.equal(a.inputs[0].origin,'CALCULATED');assert.ok(Math.abs(a.result.value-3.615)<1e-12);
+  const txt=await page.locator('#silm-calc-result').innerText();assert.match(txt,/Referência[\s\S]*3,6150 Å[\s\S]*Dado tabelado/);assert.match(txt,/não é erro experimental/);assert.match(txt,/361,5 pm · 0,3615 nm/);
+  return {n:4,V:'47,24 Å³',r:'1,278 Å',FE:'0,7405',rho:'8,935 g/cm³',a:'3,615 Å (referência 3,6150 Å)'};
  });
 
  await test('0.10-CCC','CCC (Fe): n = 2, r = √3·a/4 e FE = π√3/8',async use=>{
@@ -49,10 +52,10 @@ module.exports={series:'0.10',async run(kit,{screenshots=false}={}){
 
  await test('0.10-HC','HC (Mg): prisma hexagonal (n = 6), V = (3√3/2)a²c, c/a ≠ ideal e densidade com peso atômico em intervalo',async use=>{
   const page=await use();await toCalc(page,'Mg',3);
-  const list=await page.locator('.silm-layer-list button[id^="silm-calc-"]').allTextContents();assert.ok(list.includes('Razão c/a')&&!list.includes('Parâmetro (r → a)'),'sem fórmula cúbica nem r → a no HC: '+list);
+  const list=await page.locator('.silm-layer-list button[id^="silm-calc-"]').allTextContents();assert.ok(list.includes('Razão c/a')&&list.includes('Raio (a, c → r)')&&!list.includes('Parâmetro (r → a)'),'sem fórmula cúbica nem r → a no HC: '+list);
   assert.equal((await run(page,'effective-atoms-hcp')).result.value,6);const V=await run(page,'cell-volume-hcp');assert.ok(Math.abs(V.result.value-3*Math.sqrt(3)/2*3.2093**2*5.2103)<1e-9);
   const r=await run(page,'radius-from-ac-hcp');assert.ok(Math.abs(r.result.value-Math.sqrt(3.2093**2/3+5.2103**2/4)/2)<1e-12,'contato entre camadas (c/a < ideal)');
-  const ca=await run(page,'ca-ratio-hcp');assert.ok(Math.abs(ca.result.value-5.2103/3.2093)<1e-12);assert.match(await page.locator('#silm-calc-result').innerText(),/√\(8\/3\) ≈ 1,633[\s\S]*não dado do metal/);
+  const ca=await run(page,'ca-ratio-hcp');assert.ok(Math.abs(ca.result.value-5.2103/3.2093)<1e-12);assert.match(await page.locator('#silm-calc-result').innerText(),/√\(8\/3\) ≈ 1,633[\s\S]*não é dado do metal/);
   const rho=await run(page,'theoretical-density');assert.ok(Array.isArray(rho.result.interval)&&rho.result.value===null,'peso atômico em intervalo → densidade em intervalo');
   await shot(page,'k03-hc-razao');return {ca:ca.result.value,rho:rho.result.interval};
  });

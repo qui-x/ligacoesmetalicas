@@ -326,7 +326,7 @@ SILM.createScientificState=()=>{
   const clean=inputs.map(x=>({key:x.key,symbol:x.symbol,name:x.name,value:Array.isArray(x.value)?[...x.value]:x.value,unit:x.unit,origin:x.origin,ref:x.ref?{...x.ref}:null}));
   const all=[...clean,...constants],r=CA.compute(formulaId,all);if(!r.ok)return r;
   const previous=snapshot(),date=now(),e=SILM.data.get(state.metal.atomicNumber),g=SILM.crystal.geometry(e);
-  const references=[...new Set(all.map(x=>x.ref?.sourceId).filter(Boolean))],dependsOn=all.map(x=>x.ref?.calculationId||x.ref?.measurementId).filter(Boolean);
+  const references=[...new Set([...all.map(x=>x.ref?.sourceId).filter(Boolean),...(f.references||[])])],dependsOn=all.map(x=>x.ref?.calculationId||x.ref?.measurementId).filter(Boolean);
   const c={id:random('calc-'),type:f.quantity,formulaId,structureType:type,inputs:all,result:r.result,unit:f.outputUnit,
    provenance:{kind:'CALCULATED',model:f.model,references,dependsOn},structureContext:SILM.measurement.context(s),metalAtomicNumber:state.metal.atomicNumber,createdAt:date};
   if(c.structureContext.sourceId!==g.eligibility.sourceId)return {ok:false,reason:'CALCULATION_CONTEXT_INVALID'};

@@ -1,6 +1,6 @@
-# Estado científico do SILM — schema 7
+# Estado científico do SILM — schema 8
 
-> Documento reconstruído na 0.4.0 e atualizado na 0.5.0, na 0.6.0, na 0.7.0 e na 0.9.0. O arquivo original da 0.3.0 não constava do pacote recebido. O conteúdo descreve o código vigente (`domain/silm/state.js`) e o histórico dos schemas.
+> Documento reconstruído na 0.4.0 e atualizado na 0.5.0, na 0.6.0, na 0.7.0, na 0.9.0 e na 0.10.0. O arquivo original da 0.3.0 não constava do pacote recebido. O conteúdo descreve o código vigente (`domain/silm/state.js`) e o histórico dos schemas.
 
 O SILM possui **uma única fonte de verdade** para a ciência: o `scientificState`. Laboratório Livre, Explorar, Medir, Calcular e os futuros Roteiros e Missões observam e modificam o mesmo estado. Não existem estados paralelos (`routeScientificState`, `missionStructure` etc.).
 
@@ -21,15 +21,16 @@ metal selecionado → INVESTIGAÇÃO → scientificState → Explorar / Medir / 
 | 4 | 0.5.0 | `structure.mode` livre/cristalino e `structure.crystallography` (CCC, CFC, HC) |
 | 5 | 0.6.0 | `electrons`: modelo eletrônico qualitativo de elétrons de valência deslocalizados |
 | 6 | 0.7.0 | `properties`: experiência de propriedade ativa e seus parâmetros |
-| **7** | **0.9.0** | `measurements`: medidas do modelo (distância, ângulo, parâmetro de rede, coordenação) |
+| 7 | 0.9.0 | `measurements`: medidas do modelo (distância, ângulo, parâmetro de rede, coordenação) |
+| **8** | **0.10.0** | `calculations`: cálculos científicos do catálogo de fórmulas, com entradas, origens e proveniência |
 
 `schemaVersion` é a versão do contrato do estado, não a versão do produto.
 
-## 2. Estrutura do schema 7
+## 2. Estrutura do schema 8
 
 ```js
 {
-  schemaVersion: 7,
+  schemaVersion: 8,
   investigation: null | { id: 'inv-…', status: 'new'|'active'|'paused', type: 'free'|'route'|'mission'|'teacher', createdAt, updatedAt },
   metal: null | { atomicNumber: 29, symbol: 'Cu', sourceId: '…' },
   module: { active: 'explorar'|'medir'|'calcular' },
@@ -39,7 +40,7 @@ metal selecionado → INVESTIGAÇÃO → scientificState → Explorar / Medir / 
   conditions: { temperature: null, pressure: null },
   observations: [],                        // textos, até 12 000 caracteres cada
   measurements: [ MeasurementRecord ],      // schema 7 (0.9.x); ver CONTRATO-MEDICOES.md
-  calculations: [],                        // vazio até a 0.10.x
+  calculations: [ CalculationRecord ],      // schema 8 (0.10.x); ver CONTRATO-CALCULOS.md
   representation: { dimension: null, layers: [] },
   metadata: {}
 }
@@ -89,13 +90,13 @@ Bloqueante no build (`scripts/validate-scientific-state.cjs`) e aplicada a todo 
 
 | Regra | Código de recusa |
 |---|---|
-| `schemaVersion === 7` | `SCHEMA_INCOMPATIBLE` |
+| `schemaVersion === 8` | `SCHEMA_INCOMPATIBLE` |
 | `measurements`: até 200 registros; tipo, instrumento, unidade e resolução do tipo; valor finito recalculado a partir dos sítios; contexto cristalino (sem medida sem escala); metal e fonte coerentes | `MEASUREMENTS_INVALID`, `MEASUREMENT_INVALID`, `MEASUREMENT_TYPE_INVALID`, `MEASUREMENT_UNIT_INVALID`, `MEASUREMENT_VALUE_INVALID`, `MEASUREMENT_METAL_MISMATCH`, `MEASUREMENT_WITHOUT_SCALE`, `MEASUREMENT_CONTEXT_INVALID`, `MEASUREMENT_SOURCE_INVALID`, `MEASUREMENT_POINTS_INVALID` (ver `CONTRATO-MEDICOES.md`) |
 | `properties`: chaves, parâmetros, uma ativa, sem resíduo, contexto e elegibilidade | `PROPERTIES_INVALID`, `PROPERTY_PARAMS_INVALID`, `PROPERTY_UNKNOWN`, `PROPERTY_STATE_RESIDUAL`, `PROPERTY_CONTEXT_INVALID`, `PROPERTY_UNAVAILABLE` |
 | modo cristalino: tipo, referência, fonte, coordenação, sítios, autoria, célula completa, representação | ver `CONTRATO-CRISTALOGRAFICO.md` |
 | módulo registrado | `MODULE_INVALID` |
 | `electrons`: contrato, metal, estrutura com 2 ou mais unidades, fontes do banco, representação qualitativa | `ELECTRONS_INVALID`, `ELECTRONS_METAL_MISMATCH`, `ELECTRONS_WITHOUT_STRUCTURE`, `ELECTRON_SOURCE_INVALID`, `ELECTRON_SOURCE_MISMATCH`, `ELECTRON_REPRESENTATION_INVALID` |
-| `calculations` vazio | `DATA_INVALID` |
+| `calculations`: até 200 registros; fórmula do catálogo aplicável à estrutura; unidade da fórmula; entradas completas com origem permitida; dado tabelado idêntico ao do banco; constante igual à do serviço; resultado recalculado; proveniência `CALCULATED`; metal e contexto coerentes | `CALCULATIONS_INVALID`, `CALCULATION_INVALID`, `FORMULA_UNKNOWN`, `FORMULA_NOT_APPLICABLE`, `CALCULATION_UNIT_INVALID`, `CALCULATION_METAL_MISMATCH`, `CALCULATION_CONTEXT_INVALID`, `CALCULATION_WITHOUT_STRUCTURE`, `CALCULATION_INPUTS_INVALID`, `CALCULATION_CONSTANT_INVALID`, `CALCULATION_ORIGIN_INVALID`, `CALCULATION_VALUE_INVALID`, `CALCULATION_TABULATED_MISMATCH`, `CALCULATION_RESULT_INVALID`, `CALCULATION_PROVENANCE_INVALID` (ver `CONTRATO-CALCULOS.md`) |
 | condições e representação ainda nulas | `CONDITIONS_INVALID` |
 | sem investigação → sem metal, sem estrutura e sem elétrons | `ORPHAN_METAL` |
 | investigação com ID, status, tipo e datas válidos | `INVESTIGATION_INVALID`, `TIMESTAMP_INVALID` |
@@ -136,6 +137,8 @@ Somente `SILM.createScientificState()` escreve no estado. Consumidores recebem c
 | `startProperty(id)` / `setPropertyParams(patch)` / `restoreProperty()` / `endProperty()` | experiência de propriedade (não altera a estrutura) |
 | `measurementAvailability()` | `NO_STRUCTURE`, `NO_SCALE` (montagem livre) ou `DEFORMED`; senão disponível |
 | `addMeasurement(type, unitIds)` / `removeMeasurement(id)` / `clearMeasurements()` | registra, remove ou limpa medições; limpar não toca na estrutura |
+| `calculationAvailability()` | mesmas pré-condições das medidas: `NO_STRUCTURE`, `NO_SCALE` ou `DEFORMED` |
+| `addCalculation(formulaId, inputs)` / `removeCalculation(id)` / `clearCalculations()` | registra um cálculo concluído (acrescenta as constantes, recalcula e grava a proveniência), remove ou limpa; limpar não toca na estrutura nem nas medições |
 | `setAssistance(bool)` / `setAssemblyStatus(s)` | assistência; marcação `assembled`/`assembling` |
 | `restore(value)` / `load()` | valida, migra e restaura; em falha, recupera para o estado vazio |
 
@@ -145,7 +148,7 @@ Na interface, o domínio respeita `init`, `mount`, `activate`, `resize`, `reset`
 
 Cada escrita persiste o estado e emite o evento específico seguido de `investigation:updated` (prefixo `domain:silm:` no barramento da Base):
 
-`investigation:created`, `investigation:reset`, `investigation:closed`, `investigation:status`, `investigation:restored`, `metal:changed`, `scientific:module-changed`, `structure:created`, `structure:unit-added`, `structure:unit-moved`, `structure:undone`, `structure:cleared`, `structure:assistance`, `structure:status`, `structure:organized`, `structure:free`, `structure:representation`, `electrons:activated`, `electrons:representation`, `properties:started`, `properties:changed`, `properties:restored`, `properties:ended`, `measurements:added`, `measurements:removed`, `measurements:cleared`.
+`investigation:created`, `investigation:reset`, `investigation:closed`, `investigation:status`, `investigation:restored`, `metal:changed`, `scientific:module-changed`, `structure:created`, `structure:unit-added`, `structure:unit-moved`, `structure:undone`, `structure:cleared`, `structure:assistance`, `structure:status`, `structure:organized`, `structure:free`, `structure:representation`, `electrons:activated`, `electrons:representation`, `properties:started`, `properties:changed`, `properties:restored`, `properties:ended`, `measurements:added`, `measurements:removed`, `measurements:cleared`, `calculations:added`, `calculations:removed`, `calculations:cleared`.
 
 ## 6. Persistência
 
@@ -158,12 +161,13 @@ Cada escrita persiste o estado e emite o evento específico seguido de `investig
 
 | De → para | Regra |
 |---|---|
-| 1 → 7 | seleção provisória vira investigação `free` com o metal, se ele estiver disponível |
-| 2 → 7 | mesmo conteúdo, com `schemaVersion: 7`. Só é aceita se `structure` e `electrons` forem `null`. Nenhuma montagem é criada automaticamente. |
-| 3 → 7 | a montagem livre da 0.4.x é preservada: `modelVersion: 2`, `mode: 'free'`, `crystallography: null`; unidades, posições e status inalterados. |
-| 4 → 7 | estrutura (livre ou cristalina), representação, metal e investigação preservados; `electrons` continua `null`. |
-| 5 → 7 | tudo preservado (inclusive `electrons`); `properties` entra no estado-base, sem experiência ativa. |
-| **6 → 7** | tudo preservado; aceita só com `measurements` vazio (a 0.8.x não tinha medições). |
+| 1 → 8 | seleção provisória vira investigação `free` com o metal, se ele estiver disponível |
+| 2 → 8 | mesmo conteúdo, com `schemaVersion: 8`. Só é aceita se `structure` e `electrons` forem `null`. Nenhuma montagem é criada automaticamente. |
+| 3 → 8 | a montagem livre da 0.4.x é preservada: `modelVersion: 2`, `mode: 'free'`, `crystallography: null`; unidades, posições e status inalterados. |
+| 4 → 8 | estrutura (livre ou cristalina), representação, metal e investigação preservados; `electrons` continua `null`. |
+| 5 → 8 | tudo preservado (inclusive `electrons`); `properties` entra no estado-base, sem experiência ativa. |
+| 6 → 8 | tudo preservado; aceita só com `measurements` vazio (a 0.8.x não tinha medições). |
+| **7 → 8** | tudo preservado (inclusive as medições); aceita só com `calculations` vazio (a 0.9.x não tinha cálculos). |
 
 Exemplo da migração 3 → 4:
 
@@ -172,8 +176,8 @@ schema 3: metal = Cu, structure = { modelVersion: 1, units: 5 }, module = explor
 schema 4: metal = Cu, structure = { modelVersion: 2, mode: 'free', units: 5, crystallography: null }, module = explorar
 ```
 
-A migração roda na restauração (`restore`) e o resultado é gravado logo em seguida no schema 7. O evento `investigation:restored` informa `migrated: true` e `from` (1 a 6).
+A migração roda na restauração (`restore`) e o resultado é gravado logo em seguida no schema 8. O evento `investigation:restored` informa `migrated: true` e `from` (1 a 7).
 
-## 8. Preparação para a 0.10.x
+## 8. Preparação para a 0.11.x
 
-A 0.8.x organizou o módulo Explorar sobre estes objetos sem criar estado paralelo, e a 0.9.x acrescentou as medidas do modelo. Os cálculos (0.10.x, Calcular) continuam vazios.
+A 0.8.x organizou o módulo Explorar sobre estes objetos sem criar estado paralelo, a 0.9.x acrescentou as medidas do modelo e a 0.10.x, os cálculos. As representações 2D e 3D definitivas (0.11.x e 0.12.x) vão desenhar este mesmo estado; dimensão e camadas continuam em `representation`, fora da ciência.

@@ -1,6 +1,6 @@
 # Arquitetura científica do SILM
 
-> Atualizada na 0.9.0. Reconstruída na 0.4.0 a partir do código, porque o arquivo da 0.3.0 não constava do pacote recebido.
+> Atualizada na 0.10.0. Reconstruída na 0.4.0 a partir do código, porque o arquivo da 0.3.0 não constava do pacote recebido.
 
 ## 1. Princípio
 
@@ -11,7 +11,7 @@ O SILM e o SIAB são instrumentos científicos diferentes da mesma família: **m
 ```text
 SILM CORE
 ├── data            domain/silm/data/ (JSON canônicos, bundle.js, evidências CIF) + data-api.js
-├── state           domain/silm/state.js — scientificState único, schema 7
+├── state           domain/silm/state.js — scientificState único, schema 8
 ├── mechanics       domain/silm/assembly.js — contrato da cena e assistência (0.4.x)
 │                   domain/silm/crystal.js — modelo cristalográfico CCC/CFC/HC, elegibilidade, vizinhança (0.5.x)
 │                   domain/silm/properties.js — propriedades: elegibilidade, dados, transformações (0.7.x)
@@ -23,7 +23,8 @@ SILM CORE
 │                   domain/silm/periodic-table.js + presentation.js — Tabela (0.2.x)
 ├── measurements    domain/silm/measurements.js — medidas do modelo, unidades e validação (0.9.x)
 │                   domain/silm/measure-view.js — cota, arco do ângulo e marcadores A/B/C (0.9.x)
-├── calculations    reservado (0.10.x)
+├── calculations    domain/silm/calculations.js — constantes, catálogo de fórmulas, conversões e validação (0.10.x)
+│                   bootstrap.js → Ver → Calcular e Dados → Cálculos; destaque geométrico em crystal-view.js
 └── pedagogy        domain/silm/manual.js; Aprender, Roteiros e Missões configurados em bootstrap.js
 ```
 
@@ -74,7 +75,7 @@ Uma atividade muda o contexto (módulo permitido, restrições), mas usa o mesmo
 
 ## 6. Proveniência
 
-Toda informação é classificada como dado tabelado (com fonte), calculado pelo SILM ou representação qualitativa ou didática. Até a 0.7.0 não há medidas nem cálculos interativos; o único valor calculado previsto nas propriedades é σ = 1/ρ, quando houver resistividade homologada. O modelo eletrônico é representação qualitativa; sua origem conceitual (convenção de valência e configuração do átomo neutro) vem do banco, com fonte. A montagem livre é representação didática, e suas posições não são medidas. Na estrutura cristalina, sítios, coordenação e distâncias vêm do banco (dado tabelado com fonte); a projeção na tela é representação.
+Toda informação é classificada como dado tabelado (com fonte), calculado pelo SILM ou representação qualitativa ou didática. Desde a 0.9.0 há **medidas do modelo** (Medir), e desde a 0.10.0, **cálculos** (Calcular) com a origem de cada entrada: dado tabelado, medida do modelo, valor informado ou calculado pelo SILM, mais constantes com fonte. Nas propriedades, o único valor calculado previsto é σ = 1/ρ, quando houver resistividade homologada. O modelo eletrônico é representação qualitativa; sua origem conceitual (convenção de valência e configuração do átomo neutro) vem do banco, com fonte. A montagem livre é representação didática, e suas posições não são medidas. Na estrutura cristalina, sítios, coordenação e distâncias vêm do banco (dado tabelado com fonte); a projeção na tela é representação.
 
 ## 7. Núcleo herdado
 

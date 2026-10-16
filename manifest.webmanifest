@@ -2,7 +2,7 @@
   "id": "./",
   "name": "SILM — Simulador Interativo de Ligações Metálicas",
   "short_name": "SILM",
-  "description": "A Arquitetura dos Metais — módulo Medir 0.9.1.",
+  "description": "A Arquitetura dos Metais — módulo Calcular 0.10.0.",
   "start_url": "./index.html#/inicio",
   "scope": "./",
   "display": "standalone",

@@ -3,7 +3,7 @@ window.SILM = window.SILM || {};
 SILM.create = () => {
   const U = SimCore.ExperienceUI, model = SILM.createScientificState(), X = SILM.crystal;
   let ctx = null, host = null, stopOpening = null;
-  const icon = 'assets/silm-simbolo.svg', VERSION = '0.9.1';
+  const icon = 'assets/silm-simbolo.svg', VERSION = '0.10.0';
   const modules = [
     {id:'explorar',title:'Explorar',description:'Investigação qualitativa integrada: monte, organize, observe célula, rede, elétrons e propriedades, use camadas e compare representações.',icon:'grid'},
     {id:'medir',title:'Medir',description:'Meça distâncias, ângulos, parâmetros de rede e coordenação no modelo cristalográfico (medidas do modelo).',icon:'lab'},
@@ -475,16 +475,18 @@ SILM.create = () => {
   function calcRecord(c,{detailed=true}={}){
     const f=SILM.formulas[c.formulaId],dl=U.element('dl',null,'silm-facts'),add=(k,v,kind)=>{const dd=U.element('dd',v);if(kind)dd.append(U.element('br'),kind);dl.append(U.element('dt',k),dd);};
     add(f.name,f.outputSymbol+' = '+CA.format(c.result,c.unit)+(c.type==='packingFactor'?' ('+CA.percent(c.result.value)+')':''),tag('Calculado pelo SILM'));
-    if(c.type==='cellVolume'&&c.result.value)add('Conversões',CA.sig(c.result.value/1000)+' nm³ · '+sci(c.result.value*SILM.constants.angstrom3ToCm3.value)+' cm³');
-    if(c.type==='density'){const vals=c.result.interval||[c.result.value];add('Conversões',vals.map(v=>CA.sig(v*1000)).filter((v,i,a)=>a.indexOf(v)===i).join(' a ')+' kg/m³');}
-    if(['radius','latticeParameter'].includes(c.type))add('Conversões',CA.sig(c.result.value*100)+' pm');
+    if(c.type==='cellVolume'&&c.result.value){const v=c.result.value;add('Conversões',CA.sig(CA.convert('volume',v,'nm³'))+' nm³ · '+sci(CA.convert('volume',v,'cm³'))+' cm³ · '+sci(CA.convert('volume',v,'m³'))+' m³');}
+    if(c.type==='density'){const vals=c.result.interval||[c.result.value];add('Conversões',vals.map(v=>CA.sig(CA.convert('density',v,'kg/m³'))).filter((v,i,a)=>a.indexOf(v)===i).join(' a ')+' kg/m³');}
+    if(['radius','latticeParameter'].includes(c.type))add('Conversões',CA.sig(CA.convert('length',c.result.value,'pm'))+' pm · '+CA.sig(CA.convert('length',c.result.value,'nm'))+' nm');
     const formula=U.element('dd',null,'silm-formula-dd'),fx=U.element('span',f.expression,'silm-formula');fx.setAttribute('aria-hidden','true');formula.append(fx,U.element('span',f.spoken,'sr-only'));dl.append(U.element('dt','Fórmula'),formula);
     if(detailed){
      add('Entradas',c.inputs.map(x=>x.symbol+' = '+inputValue(x)+' · '+(CA.origins[x.origin]||x.origin)).join('; '));
      const r=CA.compute(c.formulaId,c.inputs);   // intermediários: mesma fórmula e mesmas entradas do registro (não é recálculo com dados novos)
      if(r.ok&&r.intermediates.length)add('Intermediários',r.intermediates.map(x=>x.symbol+' = '+(x.interval?x.interval.map(v=>sci(v)).join(' a '):x.unit==='g'||x.unit==='cm³'?sci(x.value):CA.sig(x.value))+(x.unit==='1'?'':' '+x.unit)+' ('+x.name+')').join('; '));
      add('Modelo',f.model);add('Nota',f.notes);
-     if(c.type==='caRatio')add('Referência geométrica','(c/a)ideal = √(8/3) ≈ 1,633 · valor do empilhamento ideal de esferas rígidas, não dado do metal');
+     /* §12: referência lado a lado quando há dado tabelado válido; a diferença não é chamada de erro experimental. */
+     if(c.type==='latticeParameter'){const t=CA.tabulated(D.get(c.metalAtomicNumber),'a');if(t)add('Referência',t.display.startsWith('a')?t.display:'a = '+t.display,tag('Dado tabelado'));if(t)add('Comparação','O valor calculado e o tabelado aparecem lado a lado. A diferença vem do modelo de esferas rígidas, do arredondamento e das condições de referência; não é erro experimental.');}
+     if(c.type==='caRatio'){const k=SILM.constants.idealHcpRatio;add('Referência geométrica',k.symbol+' = '+k.display+' · não é dado do metal');}
      const sources=c.provenance.references.map(id=>D.source(id)).filter(Boolean).map(x=>x.institution+' · '+x.title);if(sources.length)add('Fontes',sources.join('; '));
      if(!CA.current(c,model.state.structure))add('Contexto','Cálculo realizado em estado anterior da estrutura.');
     }
@@ -502,7 +504,7 @@ SILM.create = () => {
     box.append(status,goCalc,list,form,result,limits);
     let rendered='';
     const renderList=()=>{const fs=calcFormulas(),key=fs.map(f=>f.id).join();if(list.dataset.key===key)return;list.dataset.key=key;
-      list.replaceChildren(...fs.map(f=>SILM.actionButton(CALC_LABEL[f.quantity],()=>chooseCalc(f.id),local.scope,{id:'silm-calc-'+f.id,label:f.name})));};
+      list.replaceChildren(...fs.map(f=>SILM.actionButton(f.requiredInputs.some(x=>x.key==='c')&&f.quantity==='radius'?'Raio (a, c → r)':CALC_LABEL[f.quantity],()=>chooseCalc(f.id),local.scope,{id:'silm-calc-'+f.id,label:f.name})));};
     const renderForm=()=>{
       const f=calc.formula&&SILM.formulas[calc.formula],sig=f?f.id+'|'+model.state.calculations.length+'|'+model.state.measurements.length+'|'+(model.state.structure?.crystallography?.organizedAt||''):'';
       if(sig===rendered){for(const spec of f?.requiredInputs||[]){const err=form.querySelector('#silm-calc-error-'+spec.key);if(err)err.textContent=calc.errors[spec.key]||'';const field=form.querySelector('#silm-calc-'+spec.key+'-value');if(field)field.setAttribute('aria-invalid',String(!!calc.errors[spec.key]));}return;}

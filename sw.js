@@ -1,5 +1,5 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.9.1';
+const VERSION='0.10.0';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION,DOMAINS=CACHE+'::domains';
 const FILES=[
   "./",
@@ -24,6 +24,7 @@ const FILES=[
   "domain/silm/assembly.css",
   "domain/silm/assembly.js",
   "domain/silm/bootstrap.js",
+  "domain/silm/calculations.js",
   "domain/silm/crystal-view.js",
   "domain/silm/crystal.js",
   "domain/silm/data/bundle.js",
