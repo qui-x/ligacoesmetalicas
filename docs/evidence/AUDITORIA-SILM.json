@@ -1,6 +1,6 @@
 {
   "product": "SILM",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "checks": [
     {
       "check": "Versão única do produto",
@@ -131,7 +131,7 @@
       "detail": null
     },
     {
-      "check": "Medir: schema 7, validador recalcula cada registro e só há medida com escala cristalina",
+      "check": "Medir: schema ≥ 7, validador recalcula cada registro e só há medida com escala cristalina",
       "status": "PASS",
       "detail": null
     },
@@ -156,6 +156,31 @@
       "detail": null
     },
     {
+      "check": "Calcular: script presente e carregado em ordem (cristalografia → medições → cálculos → estado)",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Calcular: schema 8; o validador recalcula cada cálculo e recusa fórmula fora da estrutura",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Calcular: constantes centralizadas, sem números mágicos fora do serviço",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Calcular: fórmulas só no catálogo; expressões legíveis, sem sintaxe de programação",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Calcular: cálculos só no scientificState",
+      "status": "PASS",
+      "detail": null
+    },
+    {
       "check": "Validador do estado científico",
       "status": "PASS",
       "detail": null
@@ -168,6 +193,6 @@
       }
     }
   ],
-  "passed": 28,
+  "passed": 33,
   "failed": 0
 }

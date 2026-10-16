@@ -1,11 +1,17 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.9.1",
+  "versao": "0.10.0",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.2.4",
-  "scientificSchemaVersion": 7,
+  "scientificSchemaVersion": 8,
   "origens": [
+    {
+      "arquivo": "SILM-0.9.1.zip",
+      "papel": "origem executável da série 0.10.x",
+      "sha512": "c0ebba7d3e60b05062781a5bff882610c56fde3789eacf843926e2df6bdae314e91fd2838fc7b12cc4962f93a54d5051696205a3718329b87d42635a7bb27546",
+      "verificado": true
+    },
     {
       "arquivo": "SILM-0.9.0.zip",
       "papel": "origem executável da 0.9.1 (correção de homologação)",
@@ -73,12 +79,13 @@
       "verificado": true
     }
   ],
-  "observacaoOrigem": "Origem: entregas/SILM-0.9.0.zip deste repositório, verificado pelo SHA-512 externo.",
-  "status": "SILM 0.9.1: correção de homologação da 0.9.0 — cena prioritária no celular e no tablet (explicações em \"Como ler esta cena\", sem a linha de título repetida) e esferas sempre redondas. Schema 7 inalterado. Relatório em docs/RELATORIO-BUILD-TESTES-0.9.1.md.",
+  "observacaoOrigem": "Origem: entregas/SILM-0.9.1.zip deste repositório, verificado pelo SHA-512 externo.",
+  "status": "SILM 0.10.0: módulo Calcular — catálogo central de fórmulas cristalográficas (número efetivo, volume da célula, raio ↔ parâmetro, fator de empacotamento, densidade teórica e c/a), constantes centralizadas com fonte, origem de cada entrada (tabelado, medida do modelo, informado, calculado) e lista Cálculos. Schema 8. Relatório em docs/RELATORIO-BUILD-TESTES-0.10.0.md.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
-  "dataBuild": "2026-10-12",
+  "dataBuild": "2026-10-16",
   "structureModelVersion": 2,
   "electronModelVersion": 1,
   "propertiesModelVersion": 1,
-  "measurementModelVersion": 1
+  "measurementModelVersion": 1,
+  "calculationModelVersion": 1
 }

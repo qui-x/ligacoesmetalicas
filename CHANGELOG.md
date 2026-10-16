@@ -1,5 +1,17 @@
 # Registro de alterações
 
+## SILM 0.10.0 — Módulo Calcular
+
+- Ver → Calcular com o catálogo central de fórmulas: número efetivo de átomos (com decomposição geométrica), volume da célula, raio ↔ parâmetro (CCC e CFC; HC pela menor distância entre vizinhos), fator de empacotamento (esferas rígidas), densidade teórica e razão c/a no HC (com o valor ideal √(8/3) como referência geométrica).
+- Só aparecem os cálculos compatíveis com a estrutura; uma operação por vez; a cena destaca frações, contato ou arestas da célula.
+- Origem explícita de cada entrada: dado tabelado, medida do modelo, valor informado ou calculado pelo SILM; constantes com valor e fonte (N_A exato do SI).
+- Modo assistido com origem à vista; escolha entre medida e referência; valor informado com vírgula decimal e teclado numérico; erros associados ao campo.
+- Conversões centralizadas (pm, nm, nm³, cm³, m³, kg/m³); 4 algarismos significativos; peso atômico em intervalo gera densidade em intervalo.
+- Dados → Cálculos: reabrir com fórmula, entradas, origens, intermediários e fontes; remover e limpar; cálculo de estado anterior identificado e nunca recalculado; um cálculo pode alimentar outro sem planilha reativa.
+- Referência tabelada lado a lado no parâmetro calculado, sem chamar a diferença de erro experimental.
+- Schema científico 8 (`calculations[]`), com migração 7 → 8 e validação que recalcula cada registro.
+- Documentação: `docs/MODULO-CALCULAR.md`, `docs/CONTRATO-CALCULOS.md`, `docs/FORMULAS-CRISTALOGRAFICAS.md`, `docs/CONSTANTES-CIENTIFICAS.md`.
+
 ## SILM 0.9.1 — Correção de homologação: cena prioritária no celular e no tablet
 
 - Explicações, legendas e instruções da cena em "Como ler esta cena" (recolhível; fechado até 900 px, aberto no desktop; escolha lembrada).

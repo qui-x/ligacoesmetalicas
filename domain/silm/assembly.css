@@ -253,3 +253,14 @@
    continua disponível para leitores de tela e no painel Montagem → Propriedades. Metadados em até duas linhas. */
 @media(max-width:900px){.silm-property-compact .silm-property-status{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}}
 @media(max-width:600px){.silm-assembly-meta{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}}
+/* Calcular (0.10.x): destaque da geometria do cálculo em curso. */
+.silm-crystal[data-calc=fractions] .silm-site-label:not(:empty){display:block;background:var(--accent);color:var(--on-primary);border-color:var(--accent)}
+.silm-crystal[data-calc=edges] .silm-cell-edges line{stroke:var(--accent);stroke-width:.8;stroke-dasharray:none;opacity:1}
+.silm-formula{font-family:'Cambria Math','STIX Two Math','Times New Roman',serif;font-size:1.15em;letter-spacing:.01em}
+.silm-formula-line{margin:.25rem 0;padding:.4rem .6rem;border:1px solid var(--silm-soft-border);border-radius:var(--radius);background:var(--panel2)}
+.silm-calc-input{border:1px solid var(--silm-soft-border);border-radius:var(--radius);padding:.4rem .6rem;margin:.4rem 0;display:grid;gap:4px}
+.silm-calc-input legend{font-weight:700;padding:0 .25rem}
+.silm-calc-option small{display:block;color:var(--secondary)}
+.silm-calc-user{display:flex;align-items:center;gap:6px}.silm-calc-user input{min-height:44px;max-width:12rem}.silm-calc-user input:disabled{opacity:.55}
+.silm-field-error{color:var(--erro,#c62828);font-weight:600;margin:0}.silm-field-error:empty{display:none}
+@media(forced-colors:active){.silm-crystal[data-calc=fractions] .silm-site-label{background:Canvas;color:CanvasText;border-color:CanvasText}.silm-crystal[data-calc=edges] .silm-cell-edges line{stroke:Highlight}}

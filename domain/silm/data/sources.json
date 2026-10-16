@@ -1491,5 +1491,18 @@
       "path": "domain/silm/data/evidence/cif/9017521.cif",
       "sha256": "29423a57b9b9f65a63b6d589207aac03608f5359c4bc7c6e0acacfccfd61ef8a"
     }
+  },
+  {
+    "id": "src-bipm-si-2019",
+    "institution": "Bureau International des Poids et Mesures (BIPM)",
+    "authors": [],
+    "title": "The International System of Units (SI) · 9.ª edição da SI Brochure (2019) · constante de Avogadro",
+    "year": 2019,
+    "url": "https://www.bipm.org/en/publications/si-brochure",
+    "doi": null,
+    "accessedAt": "2026-10-12",
+    "license": "Direitos da publicação original; constante transcrita com atribuição.",
+    "notes": "Na revisão do SI de 2019, a constante de Avogadro é uma das sete constantes definidoras, com valor exato N_A = 6,02214076 × 10²³ mol⁻¹. O valor foi conferido nesta data no verbete A00543 do IUPAC Gold Book, que cita a SI Brochure, por meio de busca. O PDF da BIPM não pôde ser aberto diretamente neste ambiente, porque a rede bloqueou o acesso. Usado pelo Calcular (0.10.x) na densidade teórica.",
+    "type": "dados"
   }
 ]
