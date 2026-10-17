@@ -1,6 +1,6 @@
 {
   "descricao": "Hashes SHA-512 do núcleo herdado: Base Estrutural 0.3.1 (gramática da família), adotada sem alteração na SILM 0.10.1 (correção de origem 0.1.x). A auditoria exige que estes arquivos permaneçam idênticos; mudanças de núcleo entram pela Base.",
-  "origem": "Base Estrutural 0.3.1 (BASE-ESTRUTURAL-0.3.1.zip, SHA-512 23959bfc4deae42baa9510ff61c6dc2027d57915e4a011adf9d6aa471b50622f06b31b8fa104960c8bbdf2313567ce4d50683ef404628f1d25ef70289ead3544, entregue ao autor fora do repositório)",
+  "origem": "Base Estrutural 0.3.1 (BASE-ESTRUTURAL-0.3.1.zip, SHA-512 ac23100187858f7b029ca9002cd283231173487faafea42a15cbf7c7f90846d1edeb190c0243af2df3ddb90a865a6bb16278dfad5d5067e5d49a71a47819c0c3, entregue ao autor fora do repositório)",
   "unchanged": {
     "a11y.js": "3e17d282318cb1f8041abcecc880640111891d051725d19cd44c6be0d5bf7f90aae3d0a11fc4225cfb52bd7592bc2c6d1c2ee8ef3fb8270f3085c4f5161496e2",
     "css/a11y.css": "2ee95d24956a088e39dd421867d62b80fc2b56111bd538fa21fcd89b0d8f62a1f92e505238874b70f55f96eb43c30eedfd6483d507d1193719fd2dc37a7fe4d8",
