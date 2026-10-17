@@ -21,14 +21,15 @@
 - **Aprender** em lista; "Investigar no Laboratório" seleciona o metal do tema.
 - **R06**: a Tabela Periódica cabe na cena em qualquer tela a partir de 768 px. No celular, rola com uma dica.
 - **Revisão adversarial** (15 achados confirmados, todos corrigidos):
-  - durante roteiros e missões, a Montagem mantém os grupos do SILM; a atividade fica no Menu, e o cartão "Agora" mostra o título dela;
+  - durante roteiros e missões, a Montagem mantém os grupos do SILM (em atividade restrita, sem Metal, e os painéis dizem que a atividade não usa metal); a atividade fica no Menu; no roteiro de navegação livre, o cartão "Agora" mostra o título dela;
   - a ajuda e o Manual citam "Concluir missão" (Menu da atividade), o rótulo que existe;
   - "Dados do metal" abre a ferramenta, não o menu de Dados;
   - o tema do metal da investigação redesenha a cena;
-  - a montagem pronta pede a confirmação do SILM ("Iniciar uma nova investigação?"), sem prometer Desfazer, e descarta a fórmula escolhida no Calcular;
+  - a montagem pronta só pergunta quando há investigação a encerrar ("Iniciar uma nova investigação?"), sem prometer Desfazer;
+  - trocar, encerrar ou resetar a investigação descarta a fórmula escolhida e os valores digitados no Calcular;
   - o som toca só na coordenação (8 grave, 12 agudo); as outras medidas só vibram;
   - caminhos do painel Ver (Observar → Camadas, Medir → Instrumentos, Analisar → Comparar/Calcular) e rótulos de Acessibilidade (Reduzir animações, Leitura simples, Espaçamento de letras) atualizados no Manual;
-  - "Sobre o SILM" descreve Medir e Calcular.
+  - "Sobre o SILM" e o tópico do Relatório descrevem Medir e Calcular; o Manual não cita mais o painel "Informações".
 - Nenhum dado científico mudou (schema 8).
 
 ## SILM 0.10.0 — Módulo Calcular

@@ -18,6 +18,8 @@
 | Regressões 0.4.x a 0.10.0 | ✅ | suítes s040 a s100 completas |
 | Nenhum dado científico alterado (schema 8) | ✅ | `validate-scientific-state.cjs`; `validate-scientific-data.cjs` |
 | Revisão adversarial: 15 achados confirmados corrigidos (grupos do SILM nas atividades, Agora com a atividade, Concluir missão, Dados do metal, tema que redesenha, confirmação verdadeira da montagem pronta, Calcular limpo, som 8–12, caminhos e rótulos do Manual, Sobre o SILM, M6) | ✅ | itens 0.10.1-REV e 0.10.1-SOM |
-| Núcleo corrigido pela Base, não pelo produto: Base 0.3.1 (confirmação declarada, segurança da abertura, `opening.stop()`) | ✅ | Base 0.3.1: 92/92 testes; `docs/evidence/NUCLEO-PRESERVADO.json` |
+| Núcleo corrigido pela Base, não pelo produto: Base 0.3.1 (confirmação declarada, também conforme o estado; segurança da abertura; `opening.stop()`, também no aviso de falha) | ✅ | Base 0.3.1: 92/92 testes; `docs/evidence/NUCLEO-PRESERVADO.json` |
+| Segunda verificação independente (Manual, resetCalc, montagem pronta sem investigação, atividade restrita sem metal, documentos) | ✅ | item 0.10.1-REV |
+| Objetivos ao vivo de missões com passos, com `activityPanel:false` | ⏳ R19 | antes das missões M1–M6: outra superfície para os objetivos ou o painel da atividade de volta |
 | R19 missões temáticas | ⏳ rascunho | `docs/MISSOES-TEMATICAS-RASCUNHO.md` (aguarda validação do autor) |
 | R23 som de cada metal pela física | ⏳ pesquisa | precisa de fonte verificável (velocidade do som em barra fina, CRC); a rede do ambiente bloqueia as fontes |

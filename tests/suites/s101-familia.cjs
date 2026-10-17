@@ -117,7 +117,16 @@ module.exports={series:'0.10',async run(kit,{screenshots=false}={}){
   const d=kit.dialog(page);await d.waitFor();const msg=await d.textContent();
   assert.match(msg,/Iniciar uma nova investigação\?/);assert.match(msg,/estrutura, medições e cálculos/);assert.doesNotMatch(msg,/Desfazer/);
   await d.locator('.dialog-actions button.primary-btn').click();await page.waitForFunction(()=>SILM.scientificState.metal?.atomicNumber===26&&SILM.scientificState.structure?.mode==='crystalline');
-  await kit.switchModule(page,'calcular');await openRight(page,'ver','Calcular');assert.equal(await page.locator('#silm-calc-run').count(),0,'nenhuma fórmula da estrutura anterior');await kit.closeRight(page);
+  await kit.switchModule(page,'calcular');await openRight(page,'ver','Calcular');assert.equal(await page.locator('#silm-calc-run').count(),0,'nenhuma fórmula da estrutura anterior');
+  /* Resetar a investigação (com outra ferramenta aberta em Dados) também descarta a fórmula escolhida. */
+  await page.click('#silm-calc-packing-factor');await page.waitForSelector('#silm-calc-run');await openRight(page,'dados','Cálculos');await kit.closeRight(page);
+  await kit.openLeft(page,'Metal');await page.click('#silm-panel-reset');await kit.answer(page,'Resetar investigação');await kit.closeLeft(page);
+  await kit.switchModule(page,'explorar');await kit.assemble(page,4);await kit.organize(page);await kit.switchModule(page,'calcular');await openRight(page,'ver','Calcular');
+  assert.equal(await page.locator('#silm-calc-run').count(),0,'reset limpa o Calcular');await kit.closeRight(page);
+  /* Sem investigação aberta (há dados de sessão), a montagem pronta não pergunta. */
+  const q=await use();await kit.investigate(q,'Cu');await q.click('#silm-close');await kit.answer(q,'Encerrar investigação');
+  await q.evaluate(()=>SimCore.router.navigate('montagens'));await q.waitForSelector('#preset-apply-cobre-cfc');await q.click('#preset-apply-cobre-cfc');
+  await q.waitForFunction(()=>SILM.scientificState.metal?.atomicNumber===29&&SimCore.router.current.id==='laboratorio');assert.equal(await q.locator('dialog.app-dialog[open]').count(),0,'nada a perder, nenhuma pergunta');
   /* Roteiro: a Montagem continua com os grupos do SILM e o cartão Agora diz qual atividade está aberta. */
   const r=await use();await go(r,'roteiros/percurso-interface');await r.click('#activity-start');await r.waitForFunction(()=>SimCore.experience.current.activity.current?.type==='route');
   assert.ok((await r.evaluate(()=>SimCore.experience.current.activity.getDefinition().procedure.join(' '))).includes('Em Montagem → Módulo'));
@@ -127,10 +136,18 @@ module.exports={series:'0.10',async run(kit,{screenshots=false}={}){
   /* Missão: a ajuda cita um rótulo que existe no Menu da atividade, que leva aos dois campos. */
   const m=await use();await go(m,'missoes/revisar-registro');await m.click('#activity-start');await m.waitForFunction(()=>SimCore.experience.current.activity.current?.type==='mission');
   assert.match(await m.evaluate(()=>SimCore.experience.current.activity.getDefinition().help.instructions),/Concluir missão no Menu da atividade/);
-  await m.evaluate(()=>SimCore.router.navigate('laboratorio'));await m.waitForFunction(()=>SimCore.router.current.id==='laboratorio');await m.click('#core-menu');
+  await m.evaluate(()=>SimCore.router.navigate('laboratorio'));await m.waitForFunction(()=>SimCore.router.current.id==='laboratorio');
+  /* Atividade restrita sem metal: Montagem sem Metal, e os painéis não pedem para escolher um metal. */
+  await m.click('#workspace-left');assert.deepEqual(await m.locator('#dock-left-tabs button').allTextContents(),['Resumo','Estrutura','Propriedades','Módulo']);
+  await kit.openLeft(m,'Estrutura');assert.match(await text(m,'#controls'),/Esta atividade não usa um metal/);assert.doesNotMatch(await text(m,'#controls'),/Selecione um metal/);await kit.closeLeft(m);
+  assert.match(await text(m,'#silm-view'),/sem um metal/);assert.doesNotMatch(await text(m,'#silm-view'),/definido pelo professor/);
+  await m.click('#core-menu');
   await m.waitForSelector('#shell-activity-finish');assert.equal(await text(m,'#shell-activity-finish'),'Concluir missão');await m.click('#shell-activity-finish');
   await m.waitForSelector('#mission-evidence');await m.fill('#mission-evidence','Abri Montagem, Ver e Dados.');await m.fill('#mission-conclusion','Concluir guarda a atividade; Encerrar volta ao Laboratório Livre.');
   await m.click('#mission-finish');await m.waitForFunction(()=>SimCore.experience.current.activity.current?.status==='completed');
+  /* Manual: o tópico do Relatório descreve medições e cálculos e o caminho real. */
+  const relatorio=await m.evaluate(()=>{const t=SimCore.manual.resolve('relatorio');return [t.content,...t.steps].join(' ');});
+  assert.doesNotMatch(relatorio,/sem medidas ou cálculos|Informações/);assert.match(relatorio,/Dados → Relatório/);
   return {};
  });
 }};

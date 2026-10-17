@@ -37,17 +37,17 @@ Os PNG são gerados pelo Chromium a partir dos SVG oficiais, sem redesenho.
 | `domain/silm/abertura.js` | Adaptador ao contrato da família SIAB |
 | `domain/silm/abertura.css` | Regras de integração e a correção descrita abaixo |
 
-**Contrato de família**, o mesmo do SIAB (`js/ui/abertura.js`):
+**Contrato de família**, o mesmo do SIAB (`js/ui/abertura.js`), implementado desde a 0.10.1 pela camada de abertura da Base Estrutural (`SimCore.opening`, `js/a11y/opening.js`):
 
 | Situação | Comportamento |
 |---|---|
-| Ao abrir ou recarregar | Toca uma vez, antes do primeiro desenho. A decisão é tomada no `<head>` (`domain/silm/prelude.js`) |
+| Ao abrir ou recarregar | Toca uma vez, antes do primeiro desenho. A decisão é tomada no `<head>` pelo portão da Base (`js/a11y/opening-gate.js`); `domain/silm/prelude.js` só migra, uma vez, a preferência antiga do SILM |
 | Pular | Toque, clique, qualquer tecla ou o botão **Pular abertura** |
 | Pular pelo teclado | O foco vai ao conteúdo da tela atual |
-| Reduzir movimento (sistema ou preferência) | Não aparece |
-| Preferência desligada | Não aparece. Fica em Menu → Animação de abertura e é salva no armazenamento do domínio |
+| Reduzir animações (sistema ou preferência) | Não aparece |
+| Preferência desligada | Não aparece. Fica em Acessibilidade → Aparência → Animação de abertura e é salva no armazenamento do núcleo (`opening`) |
 | Leitores de tela | A camada é decorativa (`aria-hidden`) e o botão fica fora da ordem de Tab, porque qualquer tecla a encerra |
-| Proteção | Uma regra CSS independente torna a camada inerte e invisível em 7 s, mesmo sem o controlador |
+| Proteção | Uma regra CSS independente torna a camada inerte e invisível em 7 s, contados do início do ciclo, mesmo sem o controlador |
 
 A duração oficial é de **6,1 s**, definida no pacote. O SIAB usa cerca de 3,6 s, com o mesmo contrato de pular.
 

@@ -36,20 +36,35 @@ O autor pediu que o SILM fosse "exatamente igual ao SIAB em forma de mexer nele"
 Depois da adoção, uma revisão adversarial do SILM 0.10.1 confirmou 15 achados, e todos foram corrigidos:
 
 - **Atividades**:
-  - durante roteiros e missões, a Montagem continua com Metal, Estrutura, Propriedades e Módulo (`activityPanel:false`). A atividade fica no Menu;
-  - o cartão "Agora" mostra o título da atividade;
+  - durante roteiros e missões, a Montagem continua com os grupos do SILM (`activityPanel:false`). Em atividade restrita, como a missão demonstrativa, o grupo Metal fica oculto e os painéis dizem que a atividade não usa metal. A atividade fica no Menu;
+  - nas atividades de navegação livre (o roteiro), o cartão "Agora" mostra o título da atividade. Em atividade restrita, o Menu mostra só o Menu da atividade;
   - a ajuda e o Manual citam "Concluir missão", o rótulo que existe no Menu da atividade.
 - **Laboratório**:
   - "Dados do metal" abre a ferramenta;
   - o tema do metal da investigação redesenha a cena;
   - a montagem pronta descarta a fórmula escolhida no Calcular e pede a confirmação do próprio SILM, que diz o que acontece com a investigação e não promete Desfazer.
+- **Calcular**: a fórmula escolhida e os valores digitados são descartados quando a investigação é trocada, encerrada ou resetada.
 - **Som**: só a coordenação tem tom (8 grave, 12 agudo, os dois valores que o modelo produz); as outras medidas só vibram.
 - **Textos**:
   - caminhos do painel Ver e rótulos de Acessibilidade atualizados no Manual;
   - "Sobre o SILM" descreve Medir e Calcular;
   - no rascunho M6, as origens usam os rótulos do SILM.
 
-Três correções eram do núcleo e entraram pela **Base 0.3.1**, nunca no produto: o texto da confirmação declarado pela montagem pronta, a segurança da abertura contada do início do ciclo e `SimCore.opening.stop()`, que o SILM usa quando falha ao montar.
+Três correções eram do núcleo e entraram pela **Base 0.3.1**, nunca no produto:
+
+- a confirmação declarada pela montagem pronta. O SILM só pergunta quando há uma investigação a encerrar;
+- a segurança da abertura contada do início do ciclo;
+- `SimCore.opening.stop()`, que o SILM usa quando falha ao montar e que a Base usa no aviso de falha de carregamento.
+
+Uma segunda verificação independente conferiu as correções antes do fechamento. Ela encontrou e corrigiu:
+
+- textos velhos do Manual: o relatório "sem medidas ou cálculos", o painel "Informações", "Concluído" no lugar de "Revisado" e a lista dos grupos e de Dados;
+- `resetCalc` também no reset da investigação;
+- a confirmação da montagem pronta sem investigação aberta;
+- os documentos de arquitetura e identidade visual;
+- o parâmetro de rede a partir do raio, que faltava nas listas de cálculos.
+
+**Fica para as missões temáticas (R19)**: com `activityPanel:false`, os objetivos ao vivo de uma missão com passos não aparecem na Montagem. Antes de as missões M1–M6 entrarem, elas precisam de outra superfície para os objetivos, ou o painel da atividade precisa voltar.
 
 ## Decisões registradas
 
