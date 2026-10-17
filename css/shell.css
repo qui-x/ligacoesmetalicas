@@ -1,6 +1,5 @@
 /* Shell 0.2.3 utiliza os tokens, painéis e breakpoints da família. */
 :root{--activity-h:0px;--bottom-h:0px;--launchers-h:0px}
-.app-header{display:grid;grid-template-columns:auto minmax(160px,250px) minmax(0,1fr) auto;align-items:center;gap:12px;flex-wrap:nowrap}
 .brand{min-width:0}.brand span{min-width:0}.brand strong,.brand small{overflow-wrap:anywhere}
 .shell-menu-button{min-width:44px;padding:8px}.hamburger-icon{display:grid;gap:4px;width:20px}.hamburger-icon i{height:2px;border-radius:2px;background:currentColor}
 .main-nav{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:4px;min-width:0}
@@ -19,13 +18,105 @@
 .home-section-title{margin:20px 0 10px;font-size:1rem}.home-section-title:first-of-type{margin-top:0}.home-primary .path-card:first-child{grid-column:auto;background:var(--panel)}.home-primary .path-laboratory{grid-column:span 2!important;background:var(--panel2)!important}.home-support{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.home-support .path-card,.home-support .path-card:first-child{grid-column:auto;padding:16px;background:transparent;gap:6px}.home-support .path-card h2{font-size:1rem;margin:0}.home-support .path-top .eyebrow{display:none}.home-support .path-card p{font-size:.88rem}.home-support .path-action{padding-top:4px;font-size:.86rem}
 .theme-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}.theme-card{display:flex;flex-direction:column;gap:10px;padding:24px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--panel);color:var(--text);text-decoration:none;min-height:210px}.theme-card:hover{border-color:var(--accent);background:var(--hover)}.theme-card-top{display:flex;align-items:center;justify-content:space-between;color:var(--accent)}.theme-card h2{margin:0}.theme-card p{color:var(--secondary)}.theme-card .path-action{margin-top:auto}.theme-subtitle{font-weight:600}.theme-detail{padding:24px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--panel)}.theme-related{margin-top:20px}.theme-related h2{margin-bottom:10px}
 .projector .brand small{display:none}.projector .page-heading{padding-top:24px}.projector .scientific-viewport{border-width:2px}.projector .path-card{padding:28px}.projector .home-support .path-card{padding:14px}
-@media(max-width:1100px){.app-header{grid-template-columns:auto minmax(0,1fr) auto}.main-nav{grid-column:1/-1;grid-row:2;justify-content:center}.brand{grid-column:2}.header-actions{grid-column:3;grid-row:1}}
 @media(max-width:/*bp:mobile*/900px){body{padding-bottom:var(--bottom-h)}.app-header{grid-template-columns:auto minmax(0,1fr) auto;gap:8px;padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}.brand img{width:32px;height:32px}.brand strong{font-size:.9rem}.brand small{font-size:.72rem}.main-nav{display:none}.header-actions #access-btn{display:inline-flex}.bottom-nav{position:fixed;z-index:45;display:flex;align-items:stretch;justify-content:space-around;inset:auto 0 0;padding:4px max(6px,env(safe-area-inset-left)) calc(4px + env(safe-area-inset-bottom));background:var(--panel);border-top:1px solid var(--border);min-height:60px}.shell-bottom-link{flex:1;min-width:0;flex-direction:column;justify-content:center;gap:3px;padding:4px 3px;font-size:.75rem;text-align:center}.shell-bottom-link span{overflow-wrap:anywhere}.shell-bottom-link .experience-icon{width:20px;height:20px}.sheet-open .bottom-nav{visibility:hidden}.activity-banner{padding:8px max(10px,env(safe-area-inset-right)) 8px max(10px,env(safe-area-inset-left))}.drawer{width:min(360px,88vw)}.theme-grid{grid-template-columns:1fr}.theme-card,.theme-detail{padding:18px}.home-primary .path-laboratory{grid-column:span 2!important}}
 @media(max-width:/*bp:compactHeader*/600px){.home-primary .path-laboratory{grid-column:auto!important}.home-support{grid-template-columns:1fr}.activity-banner{flex-wrap:wrap}.activity-banner .action-row{width:100%;justify-content:flex-end}.brand{gap:8px;min-width:0}.brand small{max-width:none}}
 @media(forced-colors:active){.drawer{border-right:1px solid CanvasText}.shell-nav-link[aria-current=page],.shell-bottom-link[aria-current=page],.drawer-link[aria-current=page]{border:2px solid Highlight}}
 @media print{.app-header,#activity-banner,.bottom-nav,.drawer{display:none!important}body{padding:0!important}}
 
-.activity-restricted .app-header{grid-template-columns:auto minmax(0,1fr) auto}.activity-restricted .brand{grid-column:2}.activity-restricted .header-actions{grid-column:3;grid-row:1}
-.drawer-disclosure{font-weight:600}.disclosure-arrow{margin-left:auto;font-size:1.4em;line-height:1}.drawer-disclosure[aria-expanded=true] .disclosure-arrow{transform:rotate(90deg)}.drawer-a11y-controls{padding:4px 8px 12px;min-width:0}.drawer-a11y-controls .field{margin:12px 0}.drawer-a11y-controls .check-row{flex-wrap:nowrap;overflow-wrap:anywhere}.drawer-a11y-controls input[type=checkbox]{flex:none}.drawer-a11y-controls .preference-font{flex-wrap:wrap;gap:8px}.drawer-a11y-controls select{width:100%;min-width:0}.home-preferences{margin-top:20px;padding:16px 0;border-top:1px solid var(--border)}
+.drawer-disclosure{font-weight:600}.disclosure-arrow{margin-left:auto;font-size:1.4em;line-height:1}.drawer-disclosure[aria-expanded=true] .disclosure-arrow{transform:rotate(90deg)}.drawer-a11y-controls{min-width:0}.home-preferences{margin-top:20px;padding:16px 0;border-top:1px solid var(--border)}
 @keyframes drawer-enter{from{transform:translateX(-100%)}to{transform:translateX(0)}}
 :root[data-motion=on] .drawer[open]{animation:none}@media(prefers-reduced-motion:reduce){.drawer[open]{animation:none}}
+
+/* Cabeçalho da família (0.3.0): fixo no topo, marca com o nome curto em destaque, abas só com texto, botões com rótulo.
+   Sem espaço (fonte ampliada, muitas abas): primeiro os botões ficam só com ícone (.is-compact); se ainda faltar,
+   as abas descem para uma segunda linha rolável (.is-two-row). A altura real vai para --header-h. */
+.app-header{position:sticky;top:0;z-index:900;min-height:56px;display:flex;align-items:center;flex-wrap:nowrap;gap:12px;padding:calc(6px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 6px max(16px,env(safe-area-inset-left));background:var(--panel);border-bottom:1px solid var(--border)}
+.shell-menu-button{display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0;background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text)}
+.shell-menu-button:hover,.shell-menu-button[aria-expanded=true]{border-color:var(--accent);background:var(--hover)}
+.brand{display:flex;gap:9px;align-items:center;min-width:0;flex:0 1 auto;text-decoration:none;color:var(--text)}
+.brand img{width:30px;height:30px;flex-shrink:0}.brand>span{min-width:0}
+.brand strong{display:block;font-size:1rem;line-height:1.2;letter-spacing:.07em;color:var(--accent);overflow-wrap:normal}
+.brand small{display:block;font-size:.72rem;line-height:1.3;color:var(--secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:none}
+@media(max-width:1200px){.brand small{white-space:normal;max-width:21ch;font-size:.66rem;line-height:1.2}}
+.main-nav{display:flex;flex-wrap:nowrap;justify-content:flex-start;gap:4px;margin-left:8px;min-width:0}
+.main-nav .shell-nav-link{color:var(--secondary);padding:8px 12px;font-size:.875rem;font-weight:600;border:1px solid transparent;border-radius:6px;gap:0}
+.main-nav .shell-nav-link .experience-icon{display:none}
+.main-nav .shell-nav-link:hover{color:var(--text);background:var(--hover);border-color:transparent}
+.main-nav .shell-nav-link[aria-current=page]{color:var(--accent);border-color:var(--border);background:var(--panel2)}
+.header-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.header-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;min-width:40px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text);font:inherit;font-size:.8rem;font-weight:600}
+.header-btn:hover,.header-btn[aria-expanded=true]{border-color:var(--accent);background:var(--hover)}
+.header-btn svg{width:20px;height:20px;flex:none}
+.header-actions #access-btn{min-width:40px;padding:6px 12px}
+.app-header.is-compact .header-btn-text{display:none}
+.app-header.is-compact .header-btn,.app-header.is-compact .header-actions #access-btn{width:44px;padding:0}
+.app-header.is-two-row{flex-wrap:wrap;row-gap:4px}
+.app-header.is-two-row .main-nav{order:3;flex:1 0 100%;margin:0;overflow-x:auto;scrollbar-width:thin}
+.app-header.is-two-row .main-nav .shell-nav-link{flex:none}
+@media(max-width:1000px){.main-nav .shell-nav-link{padding:8px 9px;font-size:.8rem}.main-nav{margin-left:0}}
+@media(max-width:/*bp:mobile*/900px){.app-header{gap:10px;padding:calc(6px + env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 6px max(12px,env(safe-area-inset-left))}.header-btn{min-height:44px}.header-actions #access-btn{width:44px;padding:0}.header-actions #access-btn .header-btn-text{display:none}.main-nav{display:none}.app-header.is-two-row{flex-wrap:nowrap}}
+
+/* Menu lateral da família (0.3.0): entrada com mola curta, fundo desfocado, cartão "Agora", lista com chevron e
+   "Apresentação · Modo projetor" com a caixa à direita. */
+.drawer{border-radius:0 14px 14px 0;box-shadow:8px 0 32px #0008}
+.drawer[open]{animation:drawer-enter .26s cubic-bezier(.3,1.1,.4,1) both}
+.drawer::backdrop{background:#000a;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.drawer-section{padding:4px 0 8px}
+.drawer-section-title{margin:0;padding:12px 10px 6px;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.drawer-now-card{padding:16px;border:1px solid var(--border);border-radius:10px;background:var(--panel2)}
+.drawer-now-title{display:block;font-size:1.05rem}
+.drawer-now-detail{margin:6px 0 12px;color:var(--secondary);font-size:.875rem}
+.drawer-lista{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.drawer-lista .drawer-link{width:100%}
+.drawer-link>svg{width:20px;height:20px;flex-shrink:0;color:var(--muted)}
+.drawer-link[aria-current=page]>svg{color:var(--accent)}
+.drawer-chevron{width:18px;height:18px;margin-left:auto;color:var(--muted);transition:transform .15s}
+.drawer-disclosure[aria-expanded=true] .drawer-chevron{transform:rotate(90deg)}
+label.drawer-link.drawer-check{display:flex;width:100%;cursor:pointer}
+label.drawer-link.drawer-check>span{flex:1;min-width:0}
+label.drawer-link.drawer-check input{flex:none;width:20px;height:20px;min-height:0;margin:0;accent-color:var(--accent)}
+.drawer-version{padding:10px 10px 0;font-size:.75rem;color:var(--muted)}
+:root[data-motion=on] .drawer-chevron{transition:none}
+/* Avisos no topo, logo abaixo do cabeçalho e da faixa de atividade, com ação opcional. */
+.toast{top:calc(var(--header-h,56px) + var(--activity-h,0px) + 12px);bottom:auto}
+.toast-action{flex:none;min-height:36px;padding:4px 10px;font-weight:700;color:var(--accent);background:transparent;border:1px solid var(--accent);border-radius:var(--radius)}
+.toast-action[hidden]{display:none}
+
+/* "Como deseja iniciar?" da família: marca à esquerda, painel com destinos em cartões à direita. */
+.startup-dialog{width:min(940px,calc(100vw - 40px));max-height:calc(100dvh - 40px);padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--text);overflow:auto}
+.startup-dialog[open]{display:grid;grid-template-columns:.85fr 1.15fr;align-items:center;gap:52px}
+.startup-dialog::backdrop,.startup-dialog+.backdrop{background:#050a14bd;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.startup-brand{display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px}
+.startup-brand img{width:208px;height:208px;filter:drop-shadow(0 8px 40px #0006)}
+.startup-brand strong{display:block;margin-top:6px;padding-left:.16em;color:#f3f6fb;font-size:3.3rem;letter-spacing:.16em;line-height:1.3}
+.startup-brand span{display:block;margin-top:8px;color:#d4dbe6;font-size:.95rem}
+.startup-panel{position:relative;overflow:hidden;padding:28px;border:1px solid var(--border);border-radius:22px;background:var(--panel);box-shadow:0 24px 65px #0005}
+.startup-panel::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--accent)}
+.startup-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+.startup-top .eyebrow{margin:0}
+.startup-close{display:grid;place-items:center;min-width:40px;min-height:40px;border:0;border-radius:50%;background:transparent;color:var(--secondary)}
+.startup-close svg{width:20px;height:20px}
+#startup-title{margin:0;font-size:1.6rem;letter-spacing:-.025em}
+#startup-description{margin:10px 0 0;line-height:1.6;color:var(--secondary)}
+.startup-options{display:grid;gap:12px;margin:24px 0 20px}
+.startup-option{display:grid;grid-template-columns:42px minmax(0,1fr) 16px;align-items:center;gap:14px;min-height:88px;padding:17px 14px;border:1px solid var(--border);border-radius:12px;background:var(--panel2);color:var(--text);text-align:left;transition:border-color 180ms ease,background 180ms ease}
+.startup-option:hover,.startup-option:focus-visible{border-color:var(--accent);background:var(--hover)}
+.startup-option[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 3px 0 var(--accent)}
+.startup-option-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:10px;background:var(--panel);color:var(--accent)}
+.startup-option-icon svg{width:24px;height:24px}
+.startup-option strong{display:block;font-size:.95rem}
+.startup-option small{display:block;margin-top:4px;font-size:.78rem;line-height:1.45;color:var(--secondary)}
+.startup-arrow{width:16px;height:16px;color:var(--muted)}
+.startup-help{margin:0;font-size:.77rem;line-height:1.6;color:var(--muted)}
+.startup-footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;margin-top:18px;padding-top:10px;border-top:1px solid var(--border)}
+.startup-footer .quiet-btn{min-height:44px}
+:root[data-contrast=on] .startup-brand strong,:root[data-contrast=on] .startup-brand span{color:#fff}
+:root[data-motion=on] .startup-option{transition:none}
+@media(max-width:960px){.startup-dialog{width:calc(100vw - 28px);max-height:calc(100dvh - 28px)}.startup-dialog[open]{grid-template-columns:1fr;gap:20px}.startup-brand{flex-direction:row;justify-content:center;gap:12px;padding:0;text-align:left}.startup-brand img{width:76px;height:76px}.startup-brand strong{margin:0;padding:0;font-size:2rem}.startup-brand span{margin-top:2px;font-size:.8rem}.startup-panel{padding:20px;border-radius:18px}.startup-top{margin-bottom:10px}#startup-title{font-size:1.4rem}.startup-options{margin:20px 0 16px}.startup-option{gap:10px;padding:14px 12px}}
+
+/* Faixa da atividade da família: legenda fina e as ações Finalizar e Encerrar atividade. */
+.activity-banner{min-height:0;padding:6px 18px;font-size:.78rem;border-bottom:1px solid var(--accent);background:var(--panel2)}
+.activity-banner-caption{font-weight:700;letter-spacing:.06em;overflow-wrap:anywhere}
+.activity-banner .action-row{gap:6px}
+.activity-banner .quiet-btn{min-height:36px;padding:4px 12px}
+@media(max-width:600px){.activity-banner{flex-wrap:wrap}.activity-banner-copy{flex:1 1 100%}.activity-banner .quiet-btn{min-height:44px}}

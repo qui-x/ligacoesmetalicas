@@ -896,3 +896,24 @@ body[data-route="manual"] #manual-print{
   }}.tela-manual{margin:auto;min-height:calc(100vh - var(--header-h));width:100%}.manual-topic-link{min-width:0;overflow-wrap:anywhere}.manual-topic-link>span>span{display:block;margin-top:6px;color:var(--secondary)}.manual-hero{display:block}.manual-category-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}.manual-article>p{margin:20px 0}.manual-topbar{flex-wrap:wrap}.manual-topbar #manual-search-form{min-width:160px}.manual-index strong{display:block;padding:12px 8px}.manual-empty{padding:40px 0}.manual-empty p{margin-top:16px;color:var(--secondary)}#manual-print{display:none}@media print{.app-header,.workspace,.toast,#manual-screen>.manual-topbar,#manual-screen>.manual-tools,#manual-status,.manual-shell{display:none!important}#manual-print{display:block!important;color:#000;background:#fff}#manual-print article{break-after:page}.manual-breadcrumb{display:none}.tela-manual{padding:0;max-width:none}}
 
 .manual-search-field{flex-wrap:wrap}.manual-search-field input{flex:1 1 100px;width:auto}.manual-search-field button{flex:0 0 auto;overflow-wrap:normal;white-space:nowrap}
+
+/* Início do Manual da família (0.3.0): ações do herói, ilustração, "Quero saber" e cartões por grupo. */
+.manual-hero{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.manual-hero>div{min-width:0}
+.manual-hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.manual-hero-actions .primary-btn{display:inline-flex;align-items:center;gap:8px}
+.manual-hero-actions svg,.manual-shortcuts svg,.manual-category-action svg{width:18px;height:18px}
+.manual-hero .manual-diagram{flex:0 1 360px;margin:0}
+.manual-shortcuts{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;margin:20px 0;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.manual-shortcuts>span{font-size:.7rem;font-weight:700;letter-spacing:.1em;color:var(--muted)}
+.manual-shortcuts a{display:inline-flex;align-items:center;gap:6px;min-height:44px;color:var(--secondary);text-decoration:none}
+.manual-shortcuts a:hover{color:var(--accent)}
+.manual-category-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.manual-category{display:flex;flex-direction:column;gap:6px;padding:18px;border:1px solid var(--border);border-radius:14px;background:var(--panel);color:var(--text);text-decoration:none}
+.manual-category:hover{border-color:var(--accent)}
+.manual-category h3{margin:4px 0 0;font-size:1rem}
+.manual-category p{margin:0;color:var(--secondary);font-size:.85rem}
+.manual-symbol{display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--border);border-radius:10px;background:var(--panel2);color:var(--accent)}
+.manual-symbol svg{width:22px;height:22px}
+.manual-category-action{display:inline-flex;align-items:center;gap:6px;margin-top:auto;padding-top:6px;color:var(--accent);font-size:.8rem;font-weight:600}
+@media(max-width:760px){.manual-hero{flex-direction:column;align-items:stretch}.manual-hero .manual-diagram{flex:none}}

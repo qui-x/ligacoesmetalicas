@@ -3,13 +3,13 @@
    rota inicial. Série 0.9: as verificações valem como regressão nas séries seguintes. */
 module.exports={series:'0.9',async run(kit,{screenshots=false}={}){
  const {assert,go}=kit;const shot=screenshots?kit.shot:async()=>{},test=kit.test;
- const opening=page=>page.evaluate(()=>{const n=document.getElementById('silm-opening');return {node:!!n,state:document.documentElement.dataset.silmOpening,aria:n?.getAttribute('aria-hidden')||null};});
+ const opening=page=>page.evaluate(()=>{const n=document.getElementById('silm-opening');return {node:!!n,state:document.documentElement.dataset.opening,aria:n?.getAttribute('aria-hidden')||null};});
  const visibleToasts=page=>page.evaluate(()=>[...document.querySelectorAll('.toast:not([hidden])')].map(t=>t.innerText.split('\n')[0]));
 
  await test('0.9-ID1','Abertura oficial: monta antes do primeiro desenho, decorativa e sem artefatos',async use=>{
   const page=await use({opening:true});await page.goto(kit.base+'#/inicio');await page.waitForSelector('#silm-opening.is-running');
   const info=await page.evaluate(()=>{const n=document.getElementById('silm-opening'),skip=n.querySelector('[data-silm-skip]');
-   return {first:document.body.firstElementChild===n||document.body.querySelector(':scope > #silm-opening')===n,aria:n.getAttribute('aria-hidden'),mark:n.querySelector('.silm-opening__brand-mark').textContent,
+   /* 0.10.1: o desenho oficial roda no palco da camada de abertura da família (#app-opening), logo no início do <body>. */return {first:n.closest('#app-opening')===document.body.querySelector(':scope > #app-opening'),aria:n.getAttribute('aria-hidden'),mark:n.querySelector('.silm-opening__brand-mark').textContent,
     name:n.querySelector('.silm-opening__brand-name').textContent,theme:n.querySelector('.silm-opening__brand-theme').textContent,skip:skip.textContent,skipTab:skip.tabIndex,
     nodes:n.querySelectorAll('.node').length,thermalGroupFilter:getComputedStyle(n.querySelector('g[filter*=silmThermalGlow]')).filter,auraFilter:getComputedStyle(n.querySelector('.thermal-aura')).filter};});
   assert.equal(info.aria,'true');assert.equal(info.mark,'SILM');assert.equal(info.name,'Simulador Interativo de Ligações Metálicas');assert.equal(info.theme,'A Arquitetura dos Metais');
@@ -21,7 +21,7 @@ module.exports={series:'0.9',async run(kit,{screenshots=false}={}){
  await test('0.9-ID2','Abertura: pula com tecla (foco no conteúdo), botão e toque; termina sozinha',async use=>{
   const page=await use({opening:true});await page.goto(kit.base+'#/laboratorio');await page.waitForSelector('#silm-opening.is-running');await kit.ready(page);
   await page.keyboard.press('Enter');await page.waitForFunction(()=>!document.getElementById('silm-opening'));
-  const key=await page.evaluate(()=>({state:document.documentElement.dataset.silmOpening,focus:document.activeElement?.id}));assert.deepEqual(key,{state:'done',focus:'scientific-viewport'});
+  const key=await page.evaluate(()=>({state:document.documentElement.dataset.opening,focus:document.activeElement?.id}));assert.deepEqual(key,{state:'done',focus:'scientific-viewport'});
   const b=await use({opening:true});await b.goto(kit.base+'#/inicio');await b.waitForSelector('#silm-opening.is-running');await kit.ready(b);await b.click('[data-silm-skip]');await b.waitForFunction(()=>!document.getElementById('silm-opening'));
   const m=await use({opening:true,mobile:true,width:390,height:844});await m.goto(kit.base+'#/inicio');await m.waitForSelector('#silm-opening.is-running');await kit.ready(m);await m.locator('#silm-opening').tap();await m.waitForFunction(()=>!document.getElementById('silm-opening'));
   const t=await use({opening:true});const start=Date.now();await t.goto(kit.base+'#/inicio');await t.waitForSelector('#silm-opening.is-running');await t.waitForFunction(()=>!document.getElementById('silm-opening'),null,{timeout:9000});
@@ -30,8 +30,8 @@ module.exports={series:'0.9',async run(kit,{screenshots=false}={}){
  });
 
  await test('0.9-ID3','Abertura omitida com movimento reduzido ou preferência desligada',async use=>{
-  const r=await use({opening:true,reducedMotion:'reduce'});await go(r,'inicio');assert.deepEqual(await opening(r),{node:false,state:'done',aria:null});
-  const o=await use();await go(o,'inicio');assert.deepEqual(await opening(o),{node:false,state:'done',aria:null});
+  /* 0.10.1: o portão da família marca data-opening="off" antes do primeiro desenho. */const r=await use({opening:true,reducedMotion:'reduce'});await go(r,'inicio');assert.deepEqual(await opening(r),{node:false,state:'off',aria:null});
+  const o=await use();await go(o,'inicio');assert.deepEqual(await opening(o),{node:false,state:'off',aria:null});
   const a=await use({opening:true,storage:{simcore_a11y_v1:{motion:true}}});await go(a,'inicio');const s=await opening(a);assert.equal(s.node,false);return {reduced:'omitida',off:'omitida'};
  });
 

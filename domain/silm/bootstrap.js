@@ -2,7 +2,7 @@
 window.SILM = window.SILM || {};
 SILM.create = () => {
   const U = SimCore.ExperienceUI, model = SILM.createScientificState(), X = SILM.crystal;
-  let ctx = null, host = null, stopOpening = null;
+  let ctx = null, host = null;
   const icon = 'assets/silm-simbolo.svg', VERSION = '0.10.0';
   const modules = [
     {id:'explorar',title:'Explorar',description:'Investigação qualitativa integrada: monte, organize, observe célula, rede, elétrons e propriedades, use camadas e compare representações.',icon:'grid'},
@@ -689,15 +689,6 @@ SILM.create = () => {
   }
   function reportPanel(el,local){const box=U.element('section',null,'silm-panel');box.append(U.element('p','RELATÓRIO','eyebrow'),U.element('p','O relatório reúne o estado da investigação, os dados tabelados e seus textos.'),U.button('Abrir relatório',()=>ctx.screens.navigate('relatorios'),local.scope,{id:'silm-report',primary:true}));el.append(box);}
   function teacherResources(el,local){const box=U.element('section',null,'silm-teacher-resource');box.id='teacher-periodic-resource';const text=U.element('div');text.append(U.element('p','RECURSO PEDAGÓGICO','eyebrow'),U.element('h2','Tabela Periódica'),U.element('p','Visualize e explore os 118 elementos em formato ampliado para apresentação à turma.'));const open=U.button('Abrir Tabela Periódica',()=>presentation.open({opener:open}),local.scope,{id:'teacher-periodic-open',primary:true});box.append(text,open);el.append(box);}
-  function openingSettings() {
-    const box=U.element('div',null,'silm-opening-setting');
-    const label=U.element('label',null,'check-row'),input=U.element('input');input.type='checkbox';input.id='silm-opening-check';input.checked=ctx.storage.get('abertura',true)!==false;
-    label.append(input,U.element('span','Animação de abertura'));box.append(label,U.element('p','Exibir ao abrir ou recarregar. A redução de movimento sempre prevalece.'));
-    return ctx.modal.open({title:'Animação de abertura',content:box,actions:[{id:'cancel',label:'Cancelar'},{id:'save',label:'Salvar',primary:true,run:()=>{
-      const saved=ctx.storage.set('abertura',input.checked);if(!input.checked)stopOpening?.();
-      ctx.notify(saved?'Preferência da abertura salva.':'Preferência aplicada nesta visita. O navegador não permitiu salvá-la.',{type:saved?'success':'warning'});
-    }}]});
-  }
   function reportText(){
     const state=model.snapshot(),e=selected(),i=state.investigation;if(!(e&&i))return 'SILM '+VERSION+' · Nenhuma investigação científica ativa; não há medidas ou cálculos científicos.';
     const s=state.structure;let structure='Estrutura ainda não montada.';
@@ -744,7 +735,7 @@ SILM.create = () => {
         ]},
         notebook:{enabled:false},modulePanel:false,
         navigation:{desktop:[{id:'inicio',label:'Início',icon:'home'},{id:'aprender',label:'Aprender',icon:'learn'},{id:'missoes',label:'Missões',icon:'mission'},{id:'roteiros',label:'Roteiros Experimentais',icon:'routes'},{id:'laboratorio',label:'Laboratório',icon:'lab'},{id:'manual',label:'Manual',icon:'manual'}],mobile:[{id:'inicio',label:'Início',icon:'home'},{id:'aprender',label:'Aprender',icon:'learn'},{id:'laboratorio',label:'Laboratório',icon:'lab'},{id:'missoes',label:'Missões',icon:'mission'}]},
-        shell:{startup:{destinations:[{id:'inicio',label:'Início'},{id:'aprender',label:'Aprender'},{id:'laboratorio',label:'Laboratório'}]},resources:[{id:'abertura',title:'Animação de abertura',icon:'tour',action:openingSettings}]},
+        shell:{startup:{destinations:[{id:'inicio',label:'Início'},{id:'aprender',label:'Aprender'},{id:'laboratorio',label:'Laboratório'}]}},
         themes:[['ligacao-metalica','Ligação metálica'],['estrutura','Estrutura'],['eletrons','Elétrons'],['propriedades','Propriedades']].map(([id,title])=>({id,title,subtitle:'Conteúdo inicial',description:'Este tema apresenta um ponto de entrada. O conteúdo científico será incorporado nas etapas próprias do SILM.',icon:'learn',related:{content:[{title:'Sobre o SILM',destination:'manual',parameter:'sobre-silm'}],investigations:[{title:'Conhecer o Laboratório',destination:'laboratorio'}],routes:['percurso-interface'],missions:[]}})),
         modules:modules.map(m=>({...m,controls(el){el.append(U.element('p',moduleMessage(m.id),'panel-empty'));}})),
         resources:[],
@@ -760,8 +751,6 @@ SILM.create = () => {
       });
       ctx.scope.on('module:changed',event=>{const id=event.detail?.id;if(restoringModule&&id==='explorar')return;restoringModule=false;const before=model.state.module.active;model.setModule(id);if(id!=='medir'){measure.tool=null;measure.picks=[];}if(before!==id&&model.state.investigation)logEvent('Módulo: '+(ctx.modules.get(id)?.title||id)+'.');contextChanged();});
       ctx.scope.on('activity:changed',()=>{if(restoringModule){const target=model.state.module.active;restoringModule=false;ctx.modules.select(target).catch(error=>console.error('Falha ao retomar módulo',error));}contextChanged();});
-      const themeColor=()=>{document.querySelector('meta[name="theme-color"]').content=ctx.accessibility.state.contrast?'#000000':ctx.accessibility.state.theme==='light'?'#fffefa':'#1f2329';};
-      ctx.scope.on('theme:changed',themeColor);themeColor();
       // Preferência interna de movimento: controles e camada eletrônica refletem a mudança sem recarregar.
       ctx.scope.on('a11y:changed',()=>{view?.update();for(const fn of [...watchers])fn();});
       contextChanged();
@@ -769,12 +758,11 @@ SILM.create = () => {
     mount(){host=U.element('section',null,'silm-laboratory');host.id='silm-view';applyLayers();ctx.viewport.host.append(host);ctx.scope.cleanup(()=>{host?.remove();host=null;});draw();},
     activate() {
       const favicon=document.querySelector('link[rel=icon]');delete favicon.dataset.domainIcon;A11Y.atualizarFavicon(ctx.accessibility.state.theme);
-      try{stopOpening=SILM.startOpening?.(ctx);}catch(error){console.warn('Abertura visual omitida; espaço disponível.',error);document.getElementById('silm-opening')?.remove();}
       draw();
     },
     resize(size){if(host)host.dataset.viewportWidth=String(Math.round(size.width));},
     async reset(){if(model.resetInvestigation()){logEvent('Investigação resetada; metal mantido.');await ctx.activity.touch();contextChanged();ctx.notify('Investigação resetada. Metal e preferências preservados.',{type:'info'});}else ctx.notify('Não há investigação científica para resetar.',{type:'info'});},
-    deactivate(){stopOpening?.();stopOpening=null;},
+    deactivate(){},
     destroy(){host=null;ctx=null;}
   };
 };

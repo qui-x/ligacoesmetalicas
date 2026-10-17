@@ -1,11 +1,7 @@
-/* Adaptação da abertura oficial à família. O visual está em abertura/silm-opening.css (pacote oficial, intacto).
-   Segurança independente do controlador JS: a camada fica inerte e invisível em sete segundos. */
-#silm-opening{animation:silm-safety .01s linear 7s forwards}
-@keyframes silm-safety{0%,100%{opacity:0;visibility:hidden;pointer-events:none}}
-:root[data-silm-opening=off] #silm-opening,:root[data-motion=on] #silm-opening{display:none!important}
-@media(prefers-reduced-motion:reduce){#silm-opening{display:none!important}}
+/* Adaptação da abertura oficial à camada da família (#app-opening). O visual está em abertura/silm-opening.css
+   (pacote oficial, intacto). A Base esconde a camada sozinha em sete segundos se o ciclo não terminar. */
+#app-opening .app-opening-brand,#app-opening .app-opening-skip{visibility:hidden}
 @media(forced-colors:active){#silm-opening{background:Canvas;color:CanvasText;border:2px solid CanvasText}#silm-opening .silm-opening__brand-mark,#silm-opening .silm-opening__brand-theme,#silm-opening .silm-opening__hint{color:CanvasText}}
-@media print{#silm-opening{display:none!important}}
 /* Correção do pacote oficial (sem editar os arquivos do pacote): no Chromium, um filtro aplicado a um grupo cujos
    filhos estão todos transparentes desenha um quadrado preto na origem do SVG. O brilho térmico passa do grupo para
    cada círculo; o resultado visual da onda de calor é o mesmo. */

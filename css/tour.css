@@ -1,0 +1,24 @@
+/* Tour do laboratório e nota de boas-vindas (gramática da família). */
+dialog.tour{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;box-shadow:none;overflow:hidden;color:var(--text)}
+dialog.tour::backdrop{background:transparent;backdrop-filter:none}
+dialog.tour+.backdrop{background:transparent}
+.tour-anel{position:fixed;border-radius:10px;box-shadow:0 0 0 3px var(--accent),0 0 0 9999px #000000a8;pointer-events:none;transition:all .22s ease}
+.tour-cartao{position:fixed;width:min(340px,calc(100vw - 24px));padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--panel);box-shadow:0 16px 48px #000a}
+.tour-cartao h2{font-size:1.05rem;margin:2px 0 6px}
+.tour-cartao p:not(.eyebrow){font-size:.86rem;color:var(--secondary);margin:0}
+.tour-passo{margin:0;color:var(--accent)}
+.tour-pontos{display:flex;gap:5px;margin:12px 0 4px}
+.tour-pontos span{width:7px;height:7px;border-radius:50%;background:var(--border)}
+.tour-pontos span.atual{background:var(--accent);width:18px;border-radius:4px}
+.tour-acoes{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin-top:8px}
+.tour-acoes .quiet-btn{margin-right:auto}
+.tour-acoes .primary-btn,.tour-acoes .secondary-btn{min-height:44px;padding:8px 14px;display:inline-flex;align-items:center;gap:6px}
+.tour-acoes svg{width:16px;height:16px}
+.welcome-note{flex:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 14px;margin:0;padding:6px 10px;border:1px solid var(--accent);border-radius:var(--radius);background:var(--panel2);font-size:.82rem}
+.welcome-note[hidden]{display:none}
+.welcome-note p{flex:1 1 260px;margin:0}
+.welcome-note>div{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.welcome-note .secondary-btn,.welcome-note .primary-btn,.welcome-note .quiet-btn{min-height:44px;padding:6px 12px}
+@media(prefers-reduced-motion:reduce){.tour-anel{transition:none}}
+@media(forced-colors:active){.tour-anel{box-shadow:none;outline:3px solid Highlight}.tour-cartao{border:2px solid CanvasText}}
+@media print{dialog.tour,.welcome-note{display:none!important}}

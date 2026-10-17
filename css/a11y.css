@@ -1,0 +1,34 @@
+/* Painel de Acessibilidade da família: ícone, texto e interruptor; toda a linha é clicável. */
+.a11y-panel{display:flex;flex-direction:column;gap:2px;padding:2px 0 8px 32px}
+.a11y-panel[hidden]{display:none}
+.dialog-body .a11y-panel{padding:0}
+.a11y-panel-title{margin:10px 0 2px;padding:0 10px;font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.a11y-panel-title:first-child{margin-top:4px}
+.a11y-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;margin:0;padding:6px 10px;border-radius:6px;cursor:pointer}
+.a11y-row:hover{background:var(--hover)}
+.a11y-row-select,.a11y-row-font{cursor:default}
+.a11y-row-label{display:flex;align-items:center;gap:10px;min-width:0;font-size:.85rem;color:var(--text)}
+.a11y-row-label>span{display:flex;flex-direction:column;min-width:0}
+.a11y-row-icon{width:18px;height:18px;flex-shrink:0;color:var(--muted)}
+.a11y-row-dica{font-size:.72rem;color:var(--secondary)}
+.a11y-row select{max-width:150px;min-height:36px;padding:4px 8px;font-size:.78rem;border:1px solid var(--border);border-radius:6px;background:var(--panel2);color:var(--text)}
+.a11y-dica{margin:0;padding:0 10px 4px;font-size:.72rem;line-height:1.45;color:var(--secondary)}
+.switch{position:relative;width:42px;height:24px;flex-shrink:0}
+.switch input{position:absolute;inset:0;width:100%;height:100%;min-height:0;margin:0;opacity:0;cursor:pointer}
+.switch .track{position:absolute;inset:0;border-radius:999px;background:var(--hover);box-shadow:inset 0 0 0 1px var(--muted);transition:background .15s;pointer-events:none}
+.switch .thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--text);transition:transform .15s}
+.switch input:checked+.track{background:var(--accent);box-shadow:none}
+.switch input:checked+.track .thumb{transform:translateX(18px);background:var(--bg)}
+.switch input:focus-visible+.track{outline:var(--focus-width) solid var(--focus);outline-offset:2px}
+:root[data-contrast=on] .switch .track{background:#000;box-shadow:inset 0 0 0 2px #fff}
+:root[data-contrast=on] .switch input:checked+.track{background:#ff0;box-shadow:inset 0 0 0 2px #ff0}
+:root[data-contrast=on] .switch input:checked+.track .thumb{background:#000}
+.fontstep{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.fontstep-btn{min-width:40px;min-height:36px;padding:0 6px;border:1px solid var(--border);border-radius:6px;background:var(--panel2);color:var(--text);font-size:.8rem;font-weight:700}
+.fontstep-btn:hover:not(:disabled){border-color:var(--accent)}
+.fontstep-btn:disabled{opacity:.5;cursor:not-allowed}
+.fontstep output{min-width:3.4em;text-align:center;font:.78rem Consolas,monospace;color:var(--secondary)}
+.a11y-restaurar{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;margin:8px 0 0 4px}
+.a11y-restaurar svg{width:16px;height:16px}
+@media(forced-colors:active){.switch .track{border:1px solid CanvasText}.switch input:checked+.track{background:Highlight}}
+@media print{.a11y-panel{display:none!important}}
