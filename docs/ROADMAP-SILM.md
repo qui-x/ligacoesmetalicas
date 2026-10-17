@@ -15,7 +15,7 @@
 | 0.7.x | Propriedades metálicas | 0.7.0 entregue |
 | 0.8.x | Módulo Explorar | 0.8.0 entregue |
 | 0.9.x | Módulo Medir | 0.9.0 e 0.9.1 (homologação) entregues |
-| **0.10.x** | **Módulo Calcular** | **0.10.0 entregue** |
+| **0.10.x** | **Módulo Calcular** | **0.10.0 entregue; 0.10.1 (correção de origem: gramática da família, Base Estrutural 0.3.0)** |
 | 0.11.x – 0.18.x, 1.0.0-rc.x, 1.0.0 | ver abaixo | planejadas |
 
 ---

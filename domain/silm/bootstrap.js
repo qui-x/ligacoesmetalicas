@@ -2,12 +2,15 @@
 window.SILM = window.SILM || {};
 SILM.create = () => {
   const U = SimCore.ExperienceUI, model = SILM.createScientificState(), X = SILM.crystal;
-  let ctx = null, host = null, stopOpening = null;
-  const icon = 'assets/silm-simbolo.svg', VERSION = '0.10.0';
+  let ctx = null, host = null;
+  const icon = 'assets/silm-simbolo.svg', VERSION = '0.10.1';
   const modules = [
-    {id:'explorar',title:'Explorar',description:'Investigação qualitativa integrada: monte, organize, observe célula, rede, elétrons e propriedades, use camadas e compare representações.',icon:'grid'},
-    {id:'medir',title:'Medir',description:'Meça distâncias, ângulos, parâmetros de rede e coordenação no modelo cristalográfico (medidas do modelo).',icon:'lab'},
-    {id:'calcular',title:'Calcular',description:'Relacione estrutura e dados: número efetivo, volume da célula, raio, fator de empacotamento, densidade teórica e c/a, com fórmula, entradas e origem de cada valor.',icon:'report'}
+    {id:'explorar',number:1,title:'Explorar',description:'Investigação qualitativa integrada: monte, organize, observe célula, rede, elétrons e propriedades, use camadas e compare representações.',icon:'explore',
+     facts:[['Você ajusta','Metal, unidades e organização cristalina'],['Você observa','Célula, rede, elétrons e propriedades'],['Bom para','Construir e comparar representações']],note:'Representação didática: a organização cristalina não é uma simulação de cristalização.'},
+    {id:'medir',number:2,title:'Medir',description:'Meça distâncias, ângulos, parâmetros de rede e coordenação no modelo cristalográfico (medidas do modelo).',icon:'ruler',
+     facts:[['Você ajusta','Instrumento e pontos da estrutura'],['Você observa','Distância, ângulo, parâmetro de rede e coordenação'],['Bom para','Relacionar geometria e estrutura']],note:'Medidas do modelo, calculadas das coordenadas científicas, nunca da tela nem de uma amostra real.'},
+    {id:'calcular',number:3,title:'Calcular',description:'Relacione estrutura e dados: número efetivo, volume da célula, raio, fator de empacotamento, densidade teórica e c/a, com fórmula, entradas e origem de cada valor.',icon:'calculator',
+     facts:[['Você ajusta','A grandeza a calcular'],['Você observa','Fórmula, entradas e origem de cada valor'],['Bom para','Ligar a estrutura aos dados tabelados']],note:'Cada resultado mostra a fórmula, as entradas e a fonte; comparações com valores tabelados não são erro experimental.'}
   ];
   const C=SILM.assembly.contract;
   const crystalline=()=>model.state.structure?.mode==='crystalline';
@@ -39,6 +42,16 @@ SILM.create = () => {
   }
   function openSources(e){const body=U.element('div');renderSources(e,body);return ctx.modal.open({title:'Fontes dos dados · '+e.name,content:body,size:'wide'});}
   function confirmDestructive(title,description,label){const handle=ctx.modal.open({title,content:description,actions:[{id:'cancel',label:'Cancelar'},{id:'confirm',label,intent:'danger'}]});return handle?.result.then(answer=>answer==='confirm')||Promise.resolve(false);}
+  /* Montagem pronta: inicia a investigação do metal, monta e organiza segundo a estrutura de referência do banco. */
+  async function preset(z){
+    const e=D.get(z);if(!e||e.silmEligibility.status!=='available'||!canInvestigate())return false;
+    if(!model.begin(e.atomicNumber,ctx.activity.current?.type||'free'))return false;
+    exploration=EX.sanitize(null);ctx.storage.set('exploration.view',exploration);applyLayers();resetMeasure();showTable=false;tableState.selection=e.atomicNumber;
+    if(!model.beginAssembly()||!model.addUnit().ok)return false;const r=model.organize();if(!r.ok)return false;
+    const m=X.models[crystalOf(e).structureType];logEvent('Montagem pronta: '+e.name+' · '+m.code+' ('+m.international+').');follow('structure');await ctx.activity.touch();contextChanged();return true;
+  }
+  /* Tema → laboratório: seleciona o metal representativo na Tabela Periódica (a investigação começa pelo gesto da pessoa). */
+  async function themeInvestigate(z){tableState.selection=z;showTable=!model.state.investigation||selected()?.atomicNumber!==z;if(!showTable)return true;contextChanged();return true;}
   async function investigate(e){
     if(!canInvestigate()||e.silmEligibility.status!=='available')return false;
     const units=model.state.structure?.units.length||0,assembly=model.state.structure?' A '+(crystalline()?'estrutura cristalina atual':'montagem atual')+(units?' com '+units+' '+(units===1?'unidade':'unidades'):'')+' será removida; as unidades não são convertidas para o novo metal.':'';
@@ -689,15 +702,6 @@ SILM.create = () => {
   }
   function reportPanel(el,local){const box=U.element('section',null,'silm-panel');box.append(U.element('p','RELATÓRIO','eyebrow'),U.element('p','O relatório reúne o estado da investigação, os dados tabelados e seus textos.'),U.button('Abrir relatório',()=>ctx.screens.navigate('relatorios'),local.scope,{id:'silm-report',primary:true}));el.append(box);}
   function teacherResources(el,local){const box=U.element('section',null,'silm-teacher-resource');box.id='teacher-periodic-resource';const text=U.element('div');text.append(U.element('p','RECURSO PEDAGÓGICO','eyebrow'),U.element('h2','Tabela Periódica'),U.element('p','Visualize e explore os 118 elementos em formato ampliado para apresentação à turma.'));const open=U.button('Abrir Tabela Periódica',()=>presentation.open({opener:open}),local.scope,{id:'teacher-periodic-open',primary:true});box.append(text,open);el.append(box);}
-  function openingSettings() {
-    const box=U.element('div',null,'silm-opening-setting');
-    const label=U.element('label',null,'check-row'),input=U.element('input');input.type='checkbox';input.id='silm-opening-check';input.checked=ctx.storage.get('abertura',true)!==false;
-    label.append(input,U.element('span','Animação de abertura'));box.append(label,U.element('p','Exibir ao abrir ou recarregar. A redução de movimento sempre prevalece.'));
-    return ctx.modal.open({title:'Animação de abertura',content:box,actions:[{id:'cancel',label:'Cancelar'},{id:'save',label:'Salvar',primary:true,run:()=>{
-      const saved=ctx.storage.set('abertura',input.checked);if(!input.checked)stopOpening?.();
-      ctx.notify(saved?'Preferência da abertura salva.':'Preferência aplicada nesta visita. O navegador não permitiu salvá-la.',{type:saved?'success':'warning'});
-    }}]});
-  }
   function reportText(){
     const state=model.snapshot(),e=selected(),i=state.investigation;if(!(e&&i))return 'SILM '+VERSION+' · Nenhuma investigação científica ativa; não há medidas ou cálculos científicos.';
     const s=state.structure;let structure='Estrutura ainda não montada.';
@@ -717,8 +721,15 @@ SILM.create = () => {
       },
       manual:SILM.manual,viewport:{label:'Área de investigação da estrutura metálica'},
       // Paridade com o SIAB 1.0.0 (correção de origem 0.1.x): Montagem / Ver / Dados.
-      painelEsquerdo:{title:'Montagem',sections:[{id:'resumo',title:'Resumo',render:summaryPanel},{id:'metal',title:'Metal',visible:context=>!context?.restricted,render:metalPanel},{id:'estrutura',title:'Estrutura',render:structurePanel},{id:'propriedades',title:'Propriedades',render:propertiesPanel},{id:'modulo',title:'Módulo',render:(el,local)=>local.modules.render(el,local)}]},
-      painelDireito:{title:'Ver',sources:[{id:'ver',title:'Ver',sections:[{id:'observar',title:'Observar',render:observePanel},{id:'camadas',title:'Camadas',render:layersPanel},{id:'comparar',title:'Comparar',render:comparePanel},{id:'medir',title:'Medir',render:measurePanel},{id:'calcular',title:'Calcular',render:calcPanel}]},{id:'dados',title:'Dados',sections:[{id:'tabela',title:'Tabela',render:tablePanel},{id:'medicoes',title:'Medições',render:measurementsPanel},{id:'calculos',title:'Cálculos',render:calculationsPanel},{id:'historico',title:'Histórico',render:historyPanel},{id:'relatorio',title:'Relatório',render:reportPanel}]}]},
+      painelEsquerdo:{title:'Montagem',icon:'setup',tabsLabel:'Preparação da investigação',help:{topic:'interface',label:'Ajuda: Montagem'},
+        summary:{title:'Resumo',render:summaryPanel},
+        groups:[{id:'metal',title:'Metal',heading:'Escolha do metal',icon:'grid',visible:context=>!context?.restricted,render:metalPanel},{id:'estrutura',title:'Estrutura',heading:'Montagem da estrutura',icon:'objects',editable:true,render:structurePanel},{id:'propriedades',title:'Propriedades',heading:'Experiências de propriedades',icon:'meter',render:propertiesPanel},{id:'modulo',title:'Módulo',heading:'Módulos de investigação',icon:'module',render:(el,local)=>local.modules.render(el,local)}],defaultGroup:'estrutura'},
+      painelDireito:{title:'Ver',heading:'Investigar',icon:'view',help:{topic:'interface',label:'Ajuda: painel Ver'},families:[
+        {id:'observar',title:'Observar',icon:'observe',items:[{id:'observar',title:'Síntese',presentation:'standard',render:observePanel},{id:'camadas',title:'Camadas',presentation:'compact',render:layersPanel}]},
+        {id:'medir',title:'Medir',icon:'measure',items:[{id:'medir',title:'Instrumentos',presentation:'standard',render:measurePanel}]},
+        {id:'analisar',title:'Analisar',icon:'analyze',items:[{id:'comparar',title:'Comparar',presentation:'wide',render:comparePanel},{id:'calcular',title:'Calcular',presentation:'standard',render:calcPanel}]}],
+        data:{title:'Dados',heading:'Dados da investigação',icon:'data',intro:'Consulte medições, cálculos, o histórico e os dados de referência do metal.',tools:[{id:'medicoes',title:'Medições',presentation:'wide',render:measurementsPanel},{id:'calculos',title:'Cálculos',presentation:'wide',render:calculationsPanel},{id:'historico',title:'Histórico',presentation:'wide',render:historyPanel},{id:'tabela',title:'Dados do metal',presentation:'wide',render:tablePanel}],
+          report:{title:'Relatório',text:'Estado da investigação, dados tabelados e seus textos.',action:{label:'Abrir relatório',run:()=>ctx.screens.navigate('relatorios')}}}},
       recursos:['domain/entry.js','domain/silm/prelude.js','domain/silm/data/bundle.js','domain/silm/data-api.js','domain/silm/periodic-table.js','domain/silm/presentation.js','domain/silm/periodic-table.css','domain/silm/assembly.js','domain/silm/crystal.js','domain/silm/state.js','domain/silm/assembly-view.js','domain/silm/crystal-view.js','domain/silm/electron-view.js','domain/silm/properties.js','domain/silm/property-view.js','domain/silm/exploration.js','domain/silm/measurements.js','domain/silm/calculations.js','domain/silm/measure-view.js','domain/silm/assembly.css','domain/silm/bootstrap.js','domain/silm/manual.js','domain/silm/styles.css','domain/silm/identidade.css','domain/silm/abertura.js','domain/silm/abertura.css','domain/silm/abertura/silm-opening.js','domain/silm/abertura/silm-opening.css','assets/silm-icone.svg','assets/silm-logo-vertical.svg',icon]
     },
     init(context) {
@@ -733,19 +744,19 @@ SILM.create = () => {
       Object.defineProperty(SILM,'scientificState',{configurable:true,get:()=>model.snapshot()});
       ctx.scope.cleanup(()=>{delete SILM.scientificState;});
       ctx.experience.configure({
-        home:{title:'A Arquitetura dos Metais',description:'Explore o SILM e selecione um metal com dados de referência para começar uma investigação.',primary:[
-          {id:'laboratorio',title:'Laboratório',description:'Monte a estrutura metálica e observe sua organização cristalina em Explorar, Medir e Calcular.',icon:'lab',destination:'laboratorio',order:'01'},
-          {id:'aprender',title:'Aprender',description:'Conheça os temas iniciais e encontre orientações relacionadas.',icon:'learn',destination:'aprender',order:'02'},
-          {id:'missoes',title:'Missões',description:'Experimente o fluxo de evidências e conclusão em uma demonstração.',icon:'mission',destination:'missoes',order:'03'},
-          {id:'roteiros',title:'Roteiros Experimentais',description:'Percorra a interface com um roteiro demonstrativo.',icon:'routes',destination:'roteiros',order:'04'}
-        ],support:[
-          {id:'manual',title:'Manual',description:'Consulte as orientações de uso e os limites desta versão.',icon:'manual',destination:'manual',order:'01'},
-          {id:'professor',title:'Área do Professor',description:'Prepare instruções e experimente uma atividade livre ou restrita.',icon:'teacher',destination:'professor',order:'02'}
-        ]},
+        home:{title:'A Arquitetura',titleAccent:'dos Metais',motto:'Observe. Monte. Meça. Interprete.',featured:'laboratorio',primary:[
+          {id:'laboratorio',title:'Laboratório',tag:'Investigação livre',invite:'Explore na prática',cta:'Entrar no laboratório',description:'Monte a estrutura metálica e observe sua organização cristalina em Explorar, Medir e Calcular.',icon:'lab',destination:'laboratorio',decoration:node=>{for(const c of ['#b87333','#c7a54a','#a8a9ad','#8c7853','#dcc074'])node.append(Object.assign(document.createElement('i'),{style:'background:'+c}));}},
+          {id:'aprender',title:'Aprender',description:'Conheça os temas da ligação metálica e investigue cada um no laboratório.',icon:'learn',destination:'aprender'},
+          {id:'missoes',title:'Missões',description:'Experimente o fluxo de evidências e conclusão em uma demonstração.',icon:'mission',destination:'missoes'},
+          {id:'roteiros',title:'Roteiros Experimentais',description:'Percorra a interface com um roteiro demonstrativo.',icon:'routes',destination:'roteiros'}
+        ],support:[{id:'manual',title:'Manual de uso',destination:'manual'},{id:'professor',title:'Área do Professor',destination:'professor'}]},
+        accessibility:{colorNote:'Camadas, estados e medidas também são descritos em texto.'},
+        presets:[['cobre-cfc','Cobre · CFC',29,'Comece pela estrutura cúbica de face centrada do cobre.',['Observe a célula unitária e a vizinhança de um centro.','Meça a distância entre vizinhos mais próximos.']],['ferro-ccc','Ferro · CCC',26,'Comece pela estrutura cúbica de corpo centrado do ferro α.',['Compare a coordenação com a do cobre.','Calcule o fator de empacotamento.']],['magnesio-hc','Magnésio · HC',12,'Comece pela estrutura hexagonal compacta do magnésio.',['Meça os parâmetros a e c.','Calcule a razão c/a e compare com o valor ideal.']]].map(([id,title,z,objective,steps])=>({id,title,objective,module:'explorar',meta:'Estrutura cristalina',facts:['Dados de referência do banco do SILM','Célula unitária completa'],steps,apply:()=>preset(z),notice:'Montagem pronta: '+title+'.'})),
         notebook:{enabled:false},modulePanel:false,
         navigation:{desktop:[{id:'inicio',label:'Início',icon:'home'},{id:'aprender',label:'Aprender',icon:'learn'},{id:'missoes',label:'Missões',icon:'mission'},{id:'roteiros',label:'Roteiros Experimentais',icon:'routes'},{id:'laboratorio',label:'Laboratório',icon:'lab'},{id:'manual',label:'Manual',icon:'manual'}],mobile:[{id:'inicio',label:'Início',icon:'home'},{id:'aprender',label:'Aprender',icon:'learn'},{id:'laboratorio',label:'Laboratório',icon:'lab'},{id:'missoes',label:'Missões',icon:'mission'}]},
-        shell:{startup:{destinations:[{id:'inicio',label:'Início'},{id:'aprender',label:'Aprender'},{id:'laboratorio',label:'Laboratório'}]},resources:[{id:'abertura',title:'Animação de abertura',icon:'tour',action:openingSettings}]},
-        themes:[['ligacao-metalica','Ligação metálica'],['estrutura','Estrutura'],['eletrons','Elétrons'],['propriedades','Propriedades']].map(([id,title])=>({id,title,subtitle:'Conteúdo inicial',description:'Este tema apresenta um ponto de entrada. O conteúdo científico será incorporado nas etapas próprias do SILM.',icon:'learn',related:{content:[{title:'Sobre o SILM',destination:'manual',parameter:'sobre-silm'}],investigations:[{title:'Conhecer o Laboratório',destination:'laboratorio'}],routes:['percurso-interface'],missions:[]}})),
+        shell:{startup:{tagline:'A Arquitetura dos Metais',destinations:[{id:'inicio',label:'Página inicial',description:'Explore temas, missões e roteiros.',icon:'home'},{id:'aprender',label:'Aprender',description:'Comece pelos temas da ligação metálica.',icon:'learn'},{id:'laboratorio',label:'Laboratório',description:'Vá direto para a investigação livre.',icon:'lab'}]},
+          now:route=>route.id==='laboratorio'?{detail:(selected()?selected().name:'Investigação livre')+' · '+moduleName()}:null},
+        themes:{items:[['ligacao-metalica','Ligação metálica',29,'investiga o cobre'],['estrutura','Estrutura',26,'investiga o ferro (CCC)'],['eletrons','Elétrons',11,'investiga o sódio'],['propriedades','Propriedades',29,'investiga o cobre']].map(([id,title,z,hint])=>({id,title,subtitle:'Ponto de entrada · '+hint,description:'Este tema apresenta um ponto de entrada. O conteúdo científico será incorporado nas etapas próprias do SILM.',icon:'learn',investigate:{label:'Investigar no Laboratório',run:()=>themeInvestigate(z)},related:{content:[{title:'Sobre o SILM',destination:'manual',parameter:'sobre-silm'}],investigations:[],routes:['percurso-interface'],missions:[]}}))},
         modules:modules.map(m=>({...m,controls(el){el.append(U.element('p',moduleMessage(m.id),'panel-empty'));}})),
         resources:[],
         routes:[{id:'percurso-interface',title:'Um percurso pelo SILM',subtitle:'Demonstração interna de interface · sem experimento científico',module:'explorar',description:'Conheça a navegação e os painéis.',objective:'Reconhecer os controles do Laboratório e o acesso ao relatório.',procedure:['Abra Montagem e consulte o Resumo.','Na aba Módulo, consulte Explorar.','Abra Ver e depois Dados → Relatório.','Retorne ao Laboratório pelo botão Voltar.'],requirements:['Mouse, toque ou teclado.'],help:{instructions:'Este roteiro demonstra somente o funcionamento da interface.',tips:['Use Fechar ou Escape para recolher os painéis.'],explanations:'Nenhum metal, instrumento ou resultado científico está ativo.',manualTopic:'interface'},navigation:'free',initialState:{schemaVersion:1}}],
@@ -760,8 +771,6 @@ SILM.create = () => {
       });
       ctx.scope.on('module:changed',event=>{const id=event.detail?.id;if(restoringModule&&id==='explorar')return;restoringModule=false;const before=model.state.module.active;model.setModule(id);if(id!=='medir'){measure.tool=null;measure.picks=[];}if(before!==id&&model.state.investigation)logEvent('Módulo: '+(ctx.modules.get(id)?.title||id)+'.');contextChanged();});
       ctx.scope.on('activity:changed',()=>{if(restoringModule){const target=model.state.module.active;restoringModule=false;ctx.modules.select(target).catch(error=>console.error('Falha ao retomar módulo',error));}contextChanged();});
-      const themeColor=()=>{document.querySelector('meta[name="theme-color"]').content=ctx.accessibility.state.contrast?'#000000':ctx.accessibility.state.theme==='light'?'#fffefa':'#1f2329';};
-      ctx.scope.on('theme:changed',themeColor);themeColor();
       // Preferência interna de movimento: controles e camada eletrônica refletem a mudança sem recarregar.
       ctx.scope.on('a11y:changed',()=>{view?.update();for(const fn of [...watchers])fn();});
       contextChanged();
@@ -769,12 +778,11 @@ SILM.create = () => {
     mount(){host=U.element('section',null,'silm-laboratory');host.id='silm-view';applyLayers();ctx.viewport.host.append(host);ctx.scope.cleanup(()=>{host?.remove();host=null;});draw();},
     activate() {
       const favicon=document.querySelector('link[rel=icon]');delete favicon.dataset.domainIcon;A11Y.atualizarFavicon(ctx.accessibility.state.theme);
-      try{stopOpening=SILM.startOpening?.(ctx);}catch(error){console.warn('Abertura visual omitida; espaço disponível.',error);document.getElementById('silm-opening')?.remove();}
       draw();
     },
     resize(size){if(host)host.dataset.viewportWidth=String(Math.round(size.width));},
     async reset(){if(model.resetInvestigation()){logEvent('Investigação resetada; metal mantido.');await ctx.activity.touch();contextChanged();ctx.notify('Investigação resetada. Metal e preferências preservados.',{type:'info'});}else ctx.notify('Não há investigação científica para resetar.',{type:'info'});},
-    deactivate(){stopOpening?.();stopOpening=null;},
+    deactivate(){},
     destroy(){host=null;ctx=null;}
   };
 };

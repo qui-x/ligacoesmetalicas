@@ -1,5 +1,27 @@
 # Registro de alterações
 
+## SILM 0.10.1 — Correção de origem: gramática da família
+
+- Núcleo da **Base Estrutural 0.3.0**, adotado sem nenhuma alteração local. A Base é neutra e foi entregue ao autor fora deste repositório.
+- **Entrada**:
+  - abertura oficial sobre a camada da família;
+  - "Animação de abertura" em Acessibilidade, com migração da preferência antiga;
+  - "Como deseja iniciar?" com cartões e convite na primeira visita;
+  - página inicial editorial ("A Arquitetura **dos Metais**", lema, Laboratório em destaque, metas vivas).
+- **Menu**: "Agora · <metal> · <módulo>"; Montagens prontas em Recursos.
+- **Acessibilidade**: painel em grupos, "Restaurar padrões", som e vibração das medições (desligados por padrão), VLibras sob demanda.
+- **Laboratório**:
+  - Montagem por grupos (Resumo, Metal, Estrutura, Propriedades, Módulo);
+  - Ver em famílias (Observar, Medir, Analisar);
+  - Dados como ponto de partida, com "Dados do metal";
+  - cartões de módulo numerados e com fatos;
+  - tour do laboratório;
+  - cena com sobretítulo "MONTAGEM LIVRE" ou "ESTRUTURA CRISTALINA".
+- **Montagens prontas**: Cobre · CFC, Ferro · CCC e Magnésio · HC, com os dados de referência do banco.
+- **Aprender** em lista; "Investigar no Laboratório" seleciona o metal do tema.
+- **R06**: a Tabela Periódica cabe na cena em qualquer tela a partir de 768 px. No celular, rola com uma dica.
+- Nenhum dado científico mudou (schema 8).
+
 ## SILM 0.10.0 — Módulo Calcular
 
 - Ver → Calcular com o catálogo central de fórmulas: número efetivo de átomos (com decomposição geométrica), volume da célula, raio ↔ parâmetro (CCC e CFC; HC pela menor distância entre vizinhos), fator de empacotamento (esferas rígidas), densidade teórica e razão c/a no HC (com o valor ideal √(8/3) como referência geométrica).

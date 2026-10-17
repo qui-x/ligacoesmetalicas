@@ -1,0 +1,22 @@
+/* Animação de abertura da família: camada sobre o aplicativo, marca revelada e dica para pular.
+   Só aparece com o portão ligado (data-opening="on") e com a camada ligada pelo produto (sem "hidden").
+   A animação de segurança a esconde sozinha se o JavaScript não terminar o ciclo. */
+.app-opening{display:none}
+:root[data-opening=on] .app-opening:not([hidden]){position:fixed;inset:0;z-index:5000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:24px;background:radial-gradient(circle at 50% 42%,var(--panel2),var(--bg) 72%);color:var(--text);cursor:pointer;animation:app-opening-safety .01s linear var(--opening-safety,6000ms) forwards}
+:root[data-contrast=on] .app-opening{background:#000}
+.app-opening-stage{width:min(420px,86vw);flex:none}
+.app-opening-stage:empty{display:none}
+.app-opening-brand{display:flex;align-items:center;gap:14px;opacity:0;transform:scale(.96);animation:app-opening-brand .6s ease-out var(--opening-brand-at,300ms) forwards}
+.app-opening-brand img{width:46px;height:46px;flex:none}
+.app-opening-brand strong{display:block;font-size:1.6rem;line-height:1.2;letter-spacing:.07em;color:var(--accent)}
+.app-opening-brand span{display:block;margin-top:2px;font-size:.9rem;color:var(--secondary)}
+.app-opening-brand em{display:block;margin-top:2px;font-size:.85rem;color:var(--muted)}
+.app-opening-brand em:empty{display:none}
+.app-opening-skip{position:absolute;left:0;right:0;bottom:calc(20px + env(safe-area-inset-bottom));margin:0;padding:0 16px;text-align:center;font-size:.78rem;color:var(--muted)}
+.app-opening.is-leaving{opacity:0;transition:opacity .35s ease}
+@keyframes app-opening-brand{to{opacity:1;transform:none}}
+@keyframes app-opening-safety{to{opacity:0;visibility:hidden;pointer-events:none}}
+:root[data-motion=on] .app-opening{display:none!important}
+@media(prefers-reduced-motion:reduce){.app-opening{display:none!important}}
+@media(forced-colors:active){.app-opening{background:Canvas;color:CanvasText}}
+@media print{.app-opening{display:none!important}}

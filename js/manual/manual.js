@@ -1,7 +1,8 @@
 'use strict';
 /* Navegação, cards, pesquisa e acordeões parametrizados da baseline. */
 SimCore.manual=(()=>{
- const S=SimCore,$=S.$,esc=S.escape;let registry=S.createManualRegistry({categories:[],topics:[],aliases:{}}),current='',commands={},origin=null;
+ const S=SimCore,$=S.$,esc=S.escape;let registry=S.createManualRegistry({categories:[],topics:[],aliases:{}}),current='',commands={},origin=null,homeSpec=null;
+ const svg=name=>S.icons.element(name,'manual-icon').outerHTML;
  const href=id=>'#/manual/'+encodeURIComponent(id);
  function setIndex(open){$('manual-index-toggle').setAttribute('aria-expanded',String(open));$('manual-index-toggle').textContent=open?'Fechar índice':'Índice do Manual';$('manual-screen').classList.toggle('manual-index-open',open);}
  function rich(text){return String(text||'').split(/(\[\[[^\]]+\]\])/g).map(s=>{const m=s.match(/^\[\[([a-z0-9-]+)(?:\|([^\]]+))?\]\]$/);if(!m)return esc(s);const t=registry.resolve(m[1]);return t?`<a href="${href(t.id)}">${esc(m[2]||t.title)}</a>`:esc(m[2]||m[1]);}).join('');}
@@ -11,26 +12,41 @@ SimCore.manual=(()=>{
  function render(id='',keepSearch=false){current=id;if(!keepSearch)$('manual-busca').value='';$('manual-clear').hidden=!$('manual-busca').value;setIndex(false);index(id);$('manual-screen').dataset.manualView=id?'topic':'home';$('manual-status').textContent='';const t=registry.resolve(id);let html;
   if(!registry.topics.length)html='<div class="manual-empty"><h1 id="manual-titulo" tabindex="-1">Manual ainda não disponível</h1><p>O conteúdo será apresentado quando um módulo o disponibilizar.</p></div>';
   else if(id)html=t?article(t):'<div class="manual-empty"><h1 id="manual-titulo" tabindex="-1">Tópico não encontrado</h1><a class="secondary-btn" href="#/manual">Voltar ao índice</a></div>';
-  else html='<header class="manual-hero"><div><p class="eyebrow">MANUAL DO USUÁRIO</p><h1 id="manual-titulo" tabindex="-1">Encontre seu próximo passo.</h1><p>Consulte um assunto ou utilize a busca.</p></div></header>'+registry.categories.map(c=>`<section class="manual-category-section"><h2>${esc(c.title)}</h2><div class="manual-category-grid">${registry.topics.filter(t=>t.category===c.id).map(link).join('')}</div></section>`).join('');
-  $('manual-conteudo').innerHTML=html;$('manual-imprimir').disabled=!registry.topics.length;
+  else html=home();
+  $('manual-conteudo').innerHTML=html;if(!id&&typeof homeSpec?.figure==='function'){const f=$('manual-conteudo').querySelector('[data-manual-figure]');if(f){try{homeSpec.figure(f);f.hidden=!f.childNodes.length;}catch(error){console.error('Falha na ilustração do Manual',error);}}}$('manual-imprimir').disabled=!registry.topics.length;
+ }
+ /* Início do Manual da família: "MANUAL DO USUÁRIO · Encontre seu próximo passo.", ação "Começar a usar", tour do
+    laboratório, ilustração opcional, "Quero saber" e categorias em grupos com cartões. Configuração: manual.home={lead,
+    start, startLabel, tour:true|false, tourLabel, figure(node), shortcuts:[[tópico, rótulo]]}; seções com {icon, summary, group}. */
+ function home(){
+  const h=homeSpec||{},start=h.start&&registry.resolve(h.start),tour=h.tour!==false&&S.experience?.current?.tour?.configured;
+  const actions=(start?`<a class="primary-btn" href="${href(start.id)}">${esc(h.startLabel||'Começar a usar')} ${svg('arrow')}</a>`:'')+(tour?`<button class="quiet-btn" type="button" data-manual-command="tour">${esc(h.tourLabel||'Iniciar tour do laboratório')}</button>`:'');
+  let out=`<header class="manual-hero"><div><p class="eyebrow">MANUAL DO USUÁRIO</p><h1 id="manual-titulo" tabindex="-1">Encontre seu próximo passo.</h1><p>${esc(h.lead||'Consulte um assunto ou utilize a busca.')}</p>${actions?`<div class="manual-hero-actions">${actions}</div>`:''}</div>${typeof h.figure==='function'?'<figure class="manual-diagram" data-manual-figure hidden></figure>':''}</header>`;
+  const shortcuts=(h.shortcuts||[]).map(([id,label])=>[registry.resolve(id),label]).filter(([t])=>t);
+  if(shortcuts.length)out+=`<nav class="manual-shortcuts" aria-label="Consultas rápidas"><span>QUERO SABER</span>${shortcuts.map(([t,label])=>`<a href="${href(t.id)}">${esc(label||t.title)} ${svg('arrow')}</a>`).join('')}</nav>`;
+  const groups=[...new Set(registry.categories.map(c=>c.group).filter(Boolean))];
+  if(!groups.length)return out+registry.categories.map(c=>`<section class="manual-category-section"><h2>${esc(c.title)}</h2><div class="manual-category-grid">${registry.topics.filter(t=>t.category===c.id).map(link).join('')}</div></section>`).join('');
+  const card=c=>{const first=registry.topics.find(t=>t.id===c.id)||registry.topics.find(t=>t.category===c.id);return first?`<a class="manual-category" href="${href(first.id)}"><span class="manual-symbol">${svg(c.icon||'manual')}</span><h3>${esc(c.title)}</h3><p>${esc(c.summary||first.summary)}</p><span class="manual-category-action">Consultar ${svg('arrow')}</span></a>`:'';};
+  const loose=registry.categories.filter(c=>!c.group);
+  return out+[...groups.map(g=>[g,registry.categories.filter(c=>c.group===g)]),...(loose.length?[['Mais tópicos',loose]]:[])].map(([g,list])=>`<section class="manual-category-section"><h2>${esc(g)}</h2><div class="manual-category-grid manual-category-cards">${list.map(card).join('')}</div></section>`).join('');
  }
  function search(){const query=$('manual-busca').value.trim();$('manual-clear').hidden=!query;if(!query){render(current,true);return;}const items=registry.search(query);$('manual-screen').dataset.manualView='search';setIndex(false);$('manual-status').textContent=items.length+' tópico(s) encontrado(s).';$('manual-conteudo').innerHTML=`<section class="manual-search-results"><h1 id="manual-titulo" tabindex="-1">${items.length?'Resultados da busca':'Nenhum tópico encontrado'}</h1><p>${esc(query)}</p><div class="manual-topic-list">${items.map(link).join('')}</div></section>`;}
  function register(data={},actionContext){
-  const categories=(data.sections||[]).map(c=>({id:String(c.id),title:String(c.title)}));const ids=new Set();
+  const categories=(data.sections||[]).map(c=>({id:String(c.id),title:String(c.title),icon:c.icon?String(c.icon):'',summary:c.summary?String(c.summary):'',group:c.group?String(c.group):''}));homeSpec=data.home||null;const ids=new Set();
   const topics=(data.topics||[]).map(t=>{if(!/^[a-z0-9-]+$/.test(t.id)||ids.has(t.id)||!categories.some(c=>c.id===t.category))throw new TypeError('Tópico inválido no Manual');ids.add(t.id);return {...t,title:String(t.title||t.id),summary:t.summary||'',purpose:t.purpose||'',content:t.content||'',keywords:t.keywords||[],steps:t.steps||[],details:t.details||[],actions:t.actions||[],related:t.related||[]};});
   if(new Set(categories.map(c=>c.id)).size!==categories.length)throw new TypeError('Seção duplicada no Manual');
   registry=S.createManualRegistry({categories,topics,aliases:data.aliases||{}});commands=actionContext||{};if(!topics.length)current='';
-  // Correção de origem 0.1.x (SILM 0.8.0): com o Manual aberto por link direto (#/manual/tópico), o registro do domínio
+  // Correção de família: com o Manual aberto por link direto (#/manual/tópico), o registro do domínio
   // chega depois da rota; renderiza o tópico pedido pela rota em vez do índice.
   const route=S.router?.current;render(topics.length&&route?.id==='manual'&&route.param?route.param:current);
  }
  function init(){
   $('manual-open').addEventListener('click',()=>S.router.openManual());$('manual-close').addEventListener('click',()=>S.router.back());
   $('manual-busca').addEventListener('input',search);$('manual-search-form').addEventListener('submit',e=>{e.preventDefault();search();$('manual-titulo')?.focus();});$('manual-clear').addEventListener('click',()=>{$('manual-busca').value='';search();$('manual-busca').focus();});$('manual-index-toggle').addEventListener('click',()=>setIndex($('manual-index-toggle').getAttribute('aria-expanded')!=='true'));
-  $('manual-screen').addEventListener('click',e=>{const exp=e.target.closest('[data-manual-expand]');if(exp){const open=exp.getAttribute('aria-expanded')!=='true';exp.setAttribute('aria-expanded',String(open));$(exp.getAttribute('aria-controls')).hidden=!open;}const action=e.target.closest('[data-manual-action]');if(action){const a=registry.resolve(current)?.actions[Number(action.dataset.manualAction)];try{Promise.resolve(a?.run?.(commands)).catch(error=>{console.error('Falha na ação do Manual',error);S.notifications.show('Não foi possível concluir esta ação.',{type:'error'});});}catch(error){console.error('Falha na ação do Manual',error);S.notifications.show('Não foi possível concluir esta ação.',{type:'error'});}}});
+  $('manual-screen').addEventListener('click',e=>{const exp=e.target.closest('[data-manual-expand]');if(exp){const open=exp.getAttribute('aria-expanded')!=='true';exp.setAttribute('aria-expanded',String(open));$(exp.getAttribute('aria-controls')).hidden=!open;}const command=e.target.closest('[data-manual-command=tour]');if(command){S.experience?.current?.tour?.start(command);return;}const action=e.target.closest('[data-manual-action]');if(action){const a=registry.resolve(current)?.actions[Number(action.dataset.manualAction)];try{Promise.resolve(a?.run?.(commands)).catch(error=>{console.error('Falha na ação do Manual',error);S.notifications.show('Não foi possível concluir esta ação.',{type:'error'});});}catch(error){console.error('Falha na ação do Manual',error);S.notifications.show('Não foi possível concluir esta ação.',{type:'error'});}}});
   $('manual-screen').addEventListener('keydown',e=>{if(e.key==='Escape'&&$('manual-screen').classList.contains('manual-index-open')){setIndex(false);$('manual-index-toggle').focus();}});
   const preparePrint=()=>{if(!$('manual-screen').hidden){const t=registry.resolve(current);$('manual-print').innerHTML=t?article(t,true).replace(/id="manual-titulo"/g,''):registry.topics.map(t=>article(t,true).replace(/id="manual-titulo"/g,'')).join('');}};
   $('manual-imprimir').addEventListener('click',()=>{preparePrint();window.print();});window.addEventListener('beforeprint',preparePrint);window.addEventListener('afterprint',()=>{$('manual-print').replaceChildren();});
  }
- return {init,register,render,href,clear:()=>register(),get topics(){return registry.topics;}};
+ return {init,register,render,href,clear:()=>register(),resolve:id=>registry.resolve(id),category:id=>registry.category(id),get topics(){return registry.topics;}};
 })();

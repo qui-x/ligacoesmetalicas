@@ -10,9 +10,11 @@ function createKit({version,only=null}){
  const kit={assert,KEY,version,results,consoleErrors,get base(){return base;},evidence,shots};
  kit.start=async()=>{server=await serve();base=server.url;browser=await launch();};
  kit.stop=async()=>{await browser?.close();server?.server.close();};
- kit.open=async({width=1366,height=800,mobile=false,reducedMotion='no-preference',seed=null,serviceWorkers='block',storage=null,opening=false}={})=>{
+ kit.open=async({width=1366,height=800,mobile=false,reducedMotion='no-preference',seed=null,serviceWorkers='block',storage=null,opening=false,invite=false}={})=>{
   const context=await browser.newContext({viewport:{width,height},isMobile:mobile,hasTouch:mobile,deviceScaleFactor:1,reducedMotion,serviceWorkers,locale:'pt-BR'});
-  await context.addInitScript(([seed,key,extra,opening])=>{try{if(!opening)localStorage.setItem('simcore_domain_silm_v1_abertura','false');if(!sessionStorage.getItem('silm-seeded')){if(seed)localStorage.setItem(key,JSON.stringify(seed));for(const [k,v]of Object.entries(extra||{}))localStorage.setItem(k,JSON.stringify(v));sessionStorage.setItem('silm-seeded','1');}}catch(_){}},[seed,KEY,storage,opening]);
+  /* 0.10.1 (família): sem o convite "Como deseja iniciar?", a não ser que o teste peça (invite:true). */
+  if(!invite)await context.addInitScript(()=>{try{if(localStorage.getItem('simcore_core_v1_startup')===null)localStorage.setItem('simcore_core_v1_startup',JSON.stringify('inicio'));}catch{}});
+  await context.addInitScript(([seed,key,extra,opening])=>{try{if(!opening)localStorage.setItem('simcore_core_v1_opening','false');if(!sessionStorage.getItem('silm-seeded')){if(seed)localStorage.setItem(key,JSON.stringify(seed));for(const [k,v]of Object.entries(extra||{}))localStorage.setItem(k,JSON.stringify(v));sessionStorage.setItem('silm-seeded','1');}}catch(_){}},[seed,KEY,storage,opening]);
   const page=await context.newPage();
   page.on('console',m=>{if(m.type()==='error')consoleErrors.push({test:current,text:m.text()});});page.on('pageerror',e=>consoleErrors.push({test:current,text:e.message}));
   return {context,page};
@@ -43,11 +45,14 @@ function createKit({version,only=null}){
   const t=page.locator('#dock-left-tabs button',{hasText:tab});if(await t.count()&&await t.getAttribute('aria-pressed')!=='true')await t.click();
  };
  h.closeLeft=async page=>{if(await page.locator('#controls').getAttribute('aria-hidden')!=='true')await page.click('#close-left');};
+ /* 0.10.1 (família): Ver em famílias → ferramentas e Dados como ponto de partida; o rótulo antigo da aba vira a ferramenta. */
+ const TOOL={'Observar':'observar','Síntese':'observar','Camadas':'camadas','Comparar':'comparar','Medir':'medir','Instrumentos':'medir','Calcular':'calcular','Tabela':'tabela','Dados do metal':'tabela','Medições':'medicoes','Cálculos':'calculos','Histórico':'historico'};
  h.openRight=async(page,source='ver',tab=null)=>{
-  const launcher=source==='dados'?'#workspace-right-alt':'#workspace-right';
-  const open=await page.locator('#context-panel').getAttribute('aria-hidden')!=='true',current=await page.evaluate(()=>SimCore.workspace.source);
-  if(!open||current!==source)await page.click(launcher);
-  if(tab){const t=page.locator('#dock-right-tabs button',{hasText:tab});if(await t.count()&&await t.getAttribute('aria-pressed')!=='true')await t.click();}
+  if(source==='dados'&&tab==='Relatório'){await page.click('#workspace-right-alt');return;}
+  const id=tab?TOOL[tab]||tab:null;
+  if(source==='dados'){if(await page.locator('#workspace-right-alt').getAttribute('aria-expanded')!=='true')await page.click('#workspace-right-alt');if(id)await page.evaluate(id=>SimCore.workspace.selectTool(id),id);return;}
+  if(await page.locator('#workspace-right').getAttribute('aria-expanded')!=='true')await page.click('#workspace-right');
+  if(id)await page.evaluate(id=>SimCore.workspace.selectTool(id),id);
  };
  h.closeRight=async page=>{if(await page.locator('#context-panel').getAttribute('aria-hidden')!=='true')await page.click('#close-right');};
  h.switchModule=async(page,id)=>{

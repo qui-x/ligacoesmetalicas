@@ -103,7 +103,9 @@ module.exports={series:'0.7',async run(kit,{screenshots=false}={}){
  });
 
  await test('0.7-149','Maleabilidade: elétrons continuam associados à estrutura coletiva',async use=>{
-  const page=await use();await crystal(page,'Cu',4);await start(page,'malleability');await page.click('#silm-electrons-toggle');for(let i=0;i<3;i++)await act(page,'compress');await page.waitForTimeout(200);
+  const page=await use();await crystal(page,'Cu',4);await start(page,'malleability');await page.click('#silm-electrons-toggle');for(let i=0;i<3;i++)await act(page,'compress');
+  /* 0.10.1: espera o fim das transições finitas em vez de um tempo fixo (o tempo fixo falhava com a máquina carregada). */
+  await page.evaluate(()=>Promise.all(document.getAnimations().filter(a=>Number.isFinite(a.effect?.getTiming?.().iterations)&&a.effect.getTiming().iterations<Infinity).map(a=>a.finished.catch(()=>{}))));await page.waitForTimeout(200);
   const s=await snap(page),units=await page.evaluate(()=>{const st=document.getElementById('silm-assembly-stage').getBoundingClientRect();return [...document.querySelectorAll('.silm-crystal-unit')].map(n=>{const r=n.getBoundingClientRect();return {x:(r.left+r.width/2-st.left)/st.width,y:(r.top+r.height/2-st.top)/st.height};});});
   assert.ok(units.every((u,i)=>Math.hypot(u.x-s.centerList[i].x,u.y-s.centerList[i].y)<.01),'Região eletrônica acompanha os centros deformados');
   const near=s.particles.filter(p=>s.centerList.some(c=>Math.hypot(p.x-c.x,p.y-c.y)<=s.radius*1.05)).length/s.count;assert.ok(near>.7,'Distribuição sobre o conjunto: '+near);
@@ -240,7 +242,7 @@ module.exports={series:'0.7',async run(kit,{screenshots=false}={}){
   for(const part of ['O que você alterou','O que aconteceu','Como interpretar','Qualitativa','Não homologado no banco do SILM','não corresponde diretamente à velocidade real dos portadores'])assert.ok(t.includes(part),part);
   assert.ok(!/condutividade alta|conduz mais|CFC conduz/i.test(t),'Sem ranking arbitrário');await shot(page,'p09-ver-propriedade');
   await openRight(page,'dados','Tabela');assert.match(await page.locator('#context-panel').textContent(),/Propriedades \(dados tabelados\)/);
-  await openRight(page,'dados','Relatório');await page.click('#silm-report');await page.waitForSelector('#report-document');assert.match(await page.locator('#report-document').textContent(),/Experiência de propriedade em estudo: Condutividade elétrica/);
+  await openRight(page,'dados','Relatório');/* 0.10.1: Relatório no ponto de partida de Dados */await page.click('#dock-data-report-open');await page.waitForSelector('#report-document');assert.match(await page.locator('#report-document').textContent(),/Experiência de propriedade em estudo: Condutividade elétrica/);
   await page.goto(kit.base+'#/manual/propriedades-metalicas');await page.waitForTimeout(400);const manual=await page.locator('main').textContent();
   for(const part of ['Condutividade elétrica','Condutividade térmica','Maleabilidade','Ductilidade','Brilho metálico','Limitações'])assert.ok(manual.includes(part),part);
   return {ver:true,dados:true,report:true,manual:true};

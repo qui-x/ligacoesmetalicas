@@ -228,7 +228,7 @@ module.exports={series:'0.6',async run(kit,{screenshots=false}={}){
   await page.click('#silm-electron-summary details summary');await shot(page,'e10-ver-modelo-eletronico');
   await page.click('#silm-electron-manual');await page.waitForFunction(()=>location.hash.includes('eletrons-deslocalizados'));
   const manual=await page.locator('main').textContent();for(const part of ['Ideia principal','Observe','O que significa','Limites da representação'])assert.ok(manual.includes(part),part);
-  await page.goto(kit.base+'#/laboratorio');await page.waitForSelector('.silm-crystal');await openRight(page,'dados','Relatório');await page.click('#silm-report');await page.waitForSelector('#report-document');assert.match(await page.locator('#report-document').textContent(),/Modelo eletrônico ativo \(representação qualitativa\)/);
+  await page.goto(kit.base+'#/laboratorio');await page.waitForSelector('.silm-crystal');await openRight(page,'dados','Relatório');/* 0.10.1: Relatório no ponto de partida de Dados */await page.click('#dock-data-report-open');await page.waitForSelector('#report-document');assert.match(await page.locator('#report-document').textContent(),/Modelo eletrônico ativo \(representação qualitativa\)/);
   return {section:true,manual:true,report:true};
  });
 

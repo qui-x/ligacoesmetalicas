@@ -10,7 +10,7 @@
 .periodic-group,.periodic-period{font-size:.7rem;color:var(--secondary);display:grid;place-items:center;font-weight:600}
 .periodic-series-mark{display:grid;place-items:center;font-size:.65rem;border:1px dotted var(--border);border-radius:4px;color:var(--secondary)}
 .periodic-series-label{font-size:.73rem;text-align:right;align-self:center;padding-right:10px;color:var(--secondary)}
-.periodic-element{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0;min-height:44px;max-width:100%;padding:3px 2px;border:1px solid var(--border);border-radius:5px;background:var(--panel);color:var(--text);cursor:pointer;line-height:1.1;box-shadow:none}
+.periodic-element{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0;min-height:0;max-width:100%;padding:3px 2px;border:1px solid var(--border);border-radius:5px;background:var(--panel);color:var(--text);cursor:pointer;line-height:1.1;box-shadow:none}
 .periodic-element[data-availability=available]{border:2px solid var(--accent);background:color-mix(in srgb,var(--accent) 9%,var(--panel))}
 .periodic-element[data-availability=unavailable]{border:1px dashed var(--secondary)}
 .periodic-element[data-availability=outside]{background:var(--bg);border-color:var(--border)}
@@ -52,3 +52,11 @@
 /* 0.9.1: rótulos dos botões quebram só entre palavras (a Base aplica overflow-wrap:anywhere); a ação principal ganha a linha inteira quando falta espaço. */
 .periodic-actions button{overflow-wrap:normal;word-break:normal;hyphens:manual;flex:1 1 auto}
 @media(max-width:420px){.periodic-actions [id$="-investigate"]{order:-1;flex-basis:100%}}
+
+/* 0.10.1 · R06: a Tabela cabe na cena em qualquer dimensão; com células pequenas ficam só o símbolo e o número. */
+.element-symbol{font-size:clamp(.78rem,calc(var(--periodic-cell)*.40),2.25rem)}
+.silm-periodic[data-density=compact] .element-name{display:none}
+.silm-periodic[data-density=tiny] .element-name,.silm-periodic[data-density=tiny] .element-badge{display:none}
+.silm-periodic[data-density=tiny] .element-z{font-size:.5rem;margin-left:1px}
+.silm-periodic[data-density=tiny] .periodic-element{padding:1px;border-radius:4px}
+.periodic-scroll-hint{margin:0;font-size:.74rem;color:var(--secondary);text-align:center}.periodic-scroll-hint[hidden]{display:none}

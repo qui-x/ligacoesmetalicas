@@ -16,20 +16,34 @@ SimCore.createModules=(ctx,experience)=>{
   const controls=U.element('div',null,'module-controls');host.append(box,controls);
   const cleanup=()=>{if(releaseControl){const release=releaseControl;releaseControl=null;release();}controlScope=null;};
   local.scope.cleanup(()=>{controlScope?.destroy();controlScope=null;});
+  /* Cartões da família: cabeçalho com ícone, nome, número e selo "Ativo"; um só cartão aberto; corpo com o botão
+     "Ativar módulo X" / "Módulo X em uso", a definição, um quadro de fatos e uma nota (todos opcionais, vindos do domínio). */
   for(const m of records.values()){
-   const card=U.element('section',null,'module-card');card.dataset.module=m.id;
+   const card=U.element('section',null,'module-card');card.dataset.module=m.id;if(m.accent)card.style.setProperty('--mod',m.accent);
    const head=U.element('button',null,'module-head');head.type='button';head.id='module-head-'+m.id;head.setAttribute('aria-controls','module-body-'+m.id);head.title=m.tooltip||m.description||m.title;
-   head.append(U.icon(m.icon),U.element('strong',m.title));const badge=U.element('span','Ativo','status-badge');badge.dataset.moduleBadge='';head.append(badge);
+   const mark=U.element('span',null,'module-icon');mark.append(U.icon(m.icon||'module'));head.append(mark,U.element('strong',m.title,'module-name'));
+   if(m.number!=null){const n=U.element('span',null,'module-number');n.append(U.element('span',', módulo ','sr-only'),document.createTextNode(String(m.number)));head.append(n);}
+   const badge=U.element('span',null,'status-badge module-active');badge.dataset.moduleBadge='';badge.append(U.element('span',', ','sr-only'),document.createTextNode('Ativo'));head.append(badge,S.icons.element('dropdown','module-chevron'));
    const body=U.element('div',null,'module-body');body.id='module-body-'+m.id;body.setAttribute('role','region');body.setAttribute('aria-labelledby',head.id);
-   body.append(U.element('p',m.description||''));if(m.badge)body.append(U.element('p',m.badge,'eyebrow'));
-   const activate=U.button('Ativar '+m.title,()=>select(m.id),local.scope,{id:'module-select-'+m.id});activate.dataset.moduleSelect=m.id;body.append(activate);
+   const activate=U.button('Ativar módulo '+m.title,()=>choose(m.id),local.scope,{id:'module-select-'+m.id});activate.dataset.moduleSelect=m.id;activate.classList.add('module-activate');
+   activate.replaceChildren(U.element('span',null,'module-dot'),U.element('span','Ativar módulo '+m.title,'module-activate-text'));activate.querySelector('.module-dot').setAttribute('aria-hidden','true');
+   if(m.description)activate.setAttribute('aria-describedby','module-def-'+m.id);body.append(activate);
+   if(m.description){const def=U.element('p',m.description,'module-def');def.id='module-def-'+m.id;body.append(def);}
+   if(m.badge)body.append(U.element('p',m.badge,'eyebrow'));
+   if(Array.isArray(m.facts)&&m.facts.length){const dl=U.element('dl',null,'fact-grid');for(const [label,value]of m.facts){const cell=U.element('div',null,'fact-cell');cell.append(U.element('dt',String(label),'fact-label'),U.element('dd',String(value),'fact-value'));dl.append(cell);}body.append(dl);}
+   if(m.note)body.append(U.element('p',m.note,'module-note'));
    const reason=U.element('p','Indisponível neste contexto.','module-reason');body.append(reason);
    local.scope.listen(head,'click',()=>{expanded=expanded===m.id?null:m.id;update(false);});card.append(head,body);box.append(card);
+  }
+  async function choose(id){
+   const m=records.get(id);if(!m)return;
+   if(selected===id){S.notifications.announce('O módulo '+m.title+' já está em uso.');return;}
+   if(await select(id)){ctx.history?.log({action:'Módulo: '+m.title+'.'});S.notifications.announce('Módulo '+m.title+' ativado.'+(m.description?' '+m.description:''));ctx.notify('Módulo '+m.title+' ativado.',{type:'success',duration:3600});}
   }
   function update(refreshControls=true){
    for(const m of records.values()){const card=box.querySelector('[data-module="'+m.id+'"]'),active=selected===m.id,open=expanded===m.id;
     card.classList.toggle('is-active',active);card.querySelector('.module-head').setAttribute('aria-expanded',String(open));card.querySelector('.module-body').hidden=!open;card.querySelector('[data-module-badge]').hidden=!active;
-    const b=card.querySelector('[data-module-select]');b.disabled=!allowed(m.id);b.setAttribute('aria-pressed',String(active));b.textContent=active?m.title+' em uso':'Ativar '+m.title;card.querySelector('.module-reason').hidden=allowed(m.id);
+    const b=card.querySelector('[data-module-select]');const can=allowed(m.id);if(can)b.removeAttribute('aria-disabled');else b.setAttribute('aria-disabled','true');b.setAttribute('aria-pressed',String(active));b.querySelector('.module-activate-text').textContent=active?'Módulo '+m.title+' em uso':'Ativar módulo '+m.title;card.querySelector('.module-reason').hidden=can;
    }
    if(!refreshControls)return;cleanup();controls.replaceChildren();const m=records.get(selected);if(m?.controls){controlScope=S.createScope();releaseControl=local.scope.cleanup(()=>controlScope?.destroy());const result=m.controls(controls,{...local,scope:controlScope});if(typeof result==='function')controlScope.cleanup(result);}
   }

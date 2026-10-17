@@ -72,8 +72,11 @@
   var falhou = false;
   function mostrarFalha() {
     if (!document.body || document.getElementById("falha-abertura")) return;
-    var abertura = document.getElementById("abertura");
-    if (abertura) abertura.parentNode.removeChild(abertura);
+    var camadas = ["abertura", "app-opening"];
+    for (var c = 0; c < camadas.length; c++) {
+      var abertura = document.getElementById(camadas[c]);
+      if (abertura) abertura.parentNode.removeChild(abertura);
+    }
     var aviso = document.createElement("section");
     aviso.id = "falha-abertura";
     aviso.className = "falha-abertura";
