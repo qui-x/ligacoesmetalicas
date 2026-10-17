@@ -72,6 +72,8 @@
   var falhou = false;
   function mostrarFalha() {
     if (!document.body || document.getElementById("falha-abertura")) return;
+    // 0.3.1: a abertura em andamento termina pelo próprio ciclo (sem ouvintes que engulam a primeira tecla).
+    if (window.SimCore && SimCore.opening && typeof SimCore.opening.stop === "function") SimCore.opening.stop();
     var camadas = ["abertura", "app-opening"];
     for (var c = 0; c < camadas.length; c++) {
       var abertura = document.getElementById(camadas[c]);

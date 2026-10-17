@@ -64,6 +64,10 @@
 - **Conclusão pedida**: identifique de onde vem cada valor, com os rótulos de origem do SILM (Dado tabelado, Calculado pelo SILM — origem de n e de V —, Medida do modelo quando ela alimenta o volume, Valor informado pelo usuário ou Constante definida), e o que a densidade calculada representa.
 - **Limite**: ainda não há densidade experimental com fonte no banco para comparar. Ela só entra quando houver uma fonte verificável.
 
+## Antes de entrar no programa
+
+Desde a 0.10.1, a Montagem mantém os grupos do SILM durante as atividades (`activityPanel:false`), e o cartão da atividade da família, onde os objetivos passam a "Concluído" ao vivo, não aparece. Antes de M1–M6 entrarem, os objetivos precisam de outra superfície visível, ou o painel da atividade precisa voltar com os controles de Estrutura levados para a cena.
+
 ## O que preciso de você
 
 1. Aprovar, cortar ou reescrever os enunciados. O texto final é seu.

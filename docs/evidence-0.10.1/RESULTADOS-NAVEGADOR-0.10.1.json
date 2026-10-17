@@ -1,17 +1,10 @@
 {
   "product": "SILM",
   "version": "0.10.1",
-  "date": "2026-10-17T10:00:29.240Z",
+  "date": "2026-10-17T20:37:31.825Z",
   "browser": "Chromium (Playwright 1.62.1)",
-  "passed": 202,
+  "passed": 203,
   "failed": 0,
-  "partialRerun": [
-    "0.6-VER",
-    "0.7-149",
-    "0.7-VER",
-    "0.10.1",
-    "0.10.1-SOM"
-  ],
   "results": [
     {
       "id": "0.4-122",
@@ -23,7 +16,7 @@
         "structure": null,
         "investigationPreserved": true
       },
-      "durationMs": 789
+      "durationMs": 1427
     },
     {
       "id": "0.4-123",
@@ -33,7 +26,7 @@
         "status": "empty",
         "focus": "silm-assembly-add"
       },
-      "durationMs": 618
+      "durationMs": 918
     },
     {
       "id": "0.4-124",
@@ -50,7 +43,7 @@
         "noLines": true,
         "noElectrons": true
       },
-      "durationMs": 1196
+      "durationMs": 1836
     },
     {
       "id": "0.4-125",
@@ -66,7 +59,7 @@
           "y": 0.8
         }
       },
-      "durationMs": 1679
+      "durationMs": 2155
     },
     {
       "id": "0.4-126",
@@ -79,7 +72,7 @@
         },
         "touchTarget": "35px"
       },
-      "durationMs": 817
+      "durationMs": 1201
     },
     {
       "id": "0.4-127",
@@ -91,7 +84,7 @@
         "undoMergesKeyboardGesture": true,
         "globalArrowsIntercepted": false
       },
-      "durationMs": 1065
+      "durationMs": 1713
     },
     {
       "id": "0.4-128",
@@ -101,7 +94,7 @@
         "assisted": "ajuste discreto",
         "free": "recusa com feedback"
       },
-      "durationMs": 1719
+      "durationMs": 2128
     },
     {
       "id": "0.4-129",
@@ -110,7 +103,7 @@
       "details": {
         "after": 3
       },
-      "durationMs": 853
+      "durationMs": 1371
     },
     {
       "id": "0.4-130",
@@ -122,7 +115,7 @@
           "y": 0.5
         }
       },
-      "durationMs": 1145
+      "durationMs": 1504
     },
     {
       "id": "0.4-131",
@@ -132,7 +125,7 @@
         "structure": null,
         "metal": "Cu"
       },
-      "durationMs": 1643
+      "durationMs": 1879
     },
     {
       "id": "0.4-132",
@@ -141,7 +134,7 @@
       "details": {
         "units": 4
       },
-      "durationMs": 989
+      "durationMs": 1443
     },
     {
       "id": "0.4-133",
@@ -151,7 +144,7 @@
         "structure": null,
         "metal": "Cu"
       },
-      "durationMs": 1101
+      "durationMs": 1456
     },
     {
       "id": "0.4-134",
@@ -160,7 +153,7 @@
       "details": {
         "returnedTo": "Tabela Periódica"
       },
-      "durationMs": 974
+      "durationMs": 1387
     },
     {
       "id": "0.4-135",
@@ -170,7 +163,7 @@
         "units": 5,
         "identical": true
       },
-      "durationMs": 1756
+      "durationMs": 2182
     },
     {
       "id": "0.4-135b",
@@ -180,7 +173,7 @@
         "dialog": false,
         "route": "inicio"
       },
-      "durationMs": 1950
+      "durationMs": 2768
     },
     {
       "id": "0.4-136",
@@ -194,7 +187,7 @@
           "inicio"
         ]
       },
-      "durationMs": 3413
+      "durationMs": 4955
     },
     {
       "id": "0.4-137",
@@ -203,7 +196,7 @@
       "details": {
         "sequence": "Explorar → Medir → Calcular → Explorar"
       },
-      "durationMs": 2225
+      "durationMs": 2957
     },
     {
       "id": "0.4-138",
@@ -213,7 +206,7 @@
         "cancel": "Cu preservado",
         "confirm": "Fe, structure = null"
       },
-      "durationMs": 1282
+      "durationMs": 1941
     },
     {
       "id": "0.4-139",
@@ -224,7 +217,7 @@
         "units": 4,
         "offline": true
       },
-      "durationMs": 3015
+      "durationMs": 4464
     },
     {
       "id": "0.4-140-320",
@@ -237,7 +230,7 @@
         "addVisible": true,
         "unitsInside": true
       },
-      "durationMs": 952
+      "durationMs": 1227
     },
     {
       "id": "0.4-140-360",
@@ -250,7 +243,7 @@
         "addVisible": true,
         "unitsInside": true
       },
-      "durationMs": 913
+      "durationMs": 1076
     },
     {
       "id": "0.4-140-390",
@@ -263,17 +256,17 @@
         "addVisible": true,
         "unitsInside": true
       },
-      "durationMs": 1066
+      "durationMs": 1301
     },
     {
       "id": "0.4-141",
       "name": "Landscape mobile",
       "status": "PASS",
       "details": {
-        "stage": 334,
+        "stage": 342,
         "overflow": 0
       },
-      "durationMs": 934
+      "durationMs": 1156
     },
     {
       "id": "0.4-142",
@@ -284,7 +277,7 @@
         "addHeight": 54,
         "barInside": true
       },
-      "durationMs": 1031
+      "durationMs": 1563
     },
     {
       "id": "0.4-143",
@@ -296,7 +289,7 @@
         "ring": "dashed",
         "border": "rgb(255, 255, 255)"
       },
-      "durationMs": 932
+      "durationMs": 1270
     },
     {
       "id": "0.4-144",
@@ -304,9 +297,9 @@
       "status": "PASS",
       "details": {
         "transition": "0s",
-        "resources": 77
+        "resources": 82
       },
-      "durationMs": 1124
+      "durationMs": 1448
     },
     {
       "id": "0.4-147",
@@ -317,7 +310,7 @@
         "available": 43,
         "teacher": "presentationSelection independente"
       },
-      "durationMs": 31353
+      "durationMs": 32141
     },
     {
       "id": "0.4-148",
@@ -329,7 +322,7 @@
           "simcore_domain_silm_v1_scientific.state"
         ]
       },
-      "durationMs": 1192
+      "durationMs": 1893
     },
     {
       "id": "0.4-A11Y",
@@ -346,7 +339,7 @@
           "Unidade de cobre 5 de 5"
         ]
       },
-      "durationMs": 2123
+      "durationMs": 2574
     },
     {
       "id": "0.5-121",
@@ -357,7 +350,7 @@
         "mode": "free",
         "units": 4
       },
-      "durationMs": 1262
+      "durationMs": 1901
     },
     {
       "id": "0.5-122",
@@ -369,7 +362,7 @@
         "reused": 5,
         "completed": 9
       },
-      "durationMs": 1112
+      "durationMs": 1726
     },
     {
       "id": "0.5-123",
@@ -379,7 +372,7 @@
         "structure": "CCC",
         "condition": "298.0 K"
       },
-      "durationMs": 926
+      "durationMs": 1399
     },
     {
       "id": "0.5-124",
@@ -392,7 +385,7 @@
           "A": 14
         }
       },
-      "durationMs": 1104
+      "durationMs": 1752
     },
     {
       "id": "0.5-125",
@@ -402,7 +395,7 @@
         "metal": "Mn",
         "reason": "CRYSTAL_STRUCTURE_UNSUPPORTED"
       },
-      "durationMs": 966
+      "durationMs": 1443
     },
     {
       "id": "0.5-126",
@@ -412,7 +405,7 @@
         "toggles": 5,
         "scienceChanged": false
       },
-      "durationMs": 1400
+      "durationMs": 2174
     },
     {
       "id": "0.5-127",
@@ -422,7 +415,7 @@
         "lattice": 136,
         "dom": 210
       },
-      "durationMs": 1548
+      "durationMs": 2448
     },
     {
       "id": "0.5-128",
@@ -433,7 +426,7 @@
         "CCC": 8,
         "HC": 12
       },
-      "durationMs": 4137
+      "durationMs": 5101
     },
     {
       "id": "0.5-129",
@@ -443,7 +436,7 @@
         "mode": "free",
         "units": 5
       },
-      "durationMs": 1245
+      "durationMs": 1421
     },
     {
       "id": "0.5-130",
@@ -452,7 +445,7 @@
       "details": {
         "deterministic": true
       },
-      "durationMs": 1445
+      "durationMs": 1737
     },
     {
       "id": "0.5-131",
@@ -461,7 +454,7 @@
       "details": {
         "restored": true
       },
-      "durationMs": 1900
+      "durationMs": 2257
     },
     {
       "id": "0.5-132",
@@ -470,7 +463,7 @@
       "details": {
         "structure": null
       },
-      "durationMs": 1221
+      "durationMs": 1482
     },
     {
       "id": "0.5-133",
@@ -480,7 +473,7 @@
         "metal": "Fe",
         "structure": null
       },
-      "durationMs": 1369
+      "durationMs": 1639
     },
     {
       "id": "0.5-134",
@@ -491,7 +484,7 @@
         "structure": "CFC",
         "offline": true
       },
-      "durationMs": 3403
+      "durationMs": 3844
     },
     {
       "id": "0.5-135-320",
@@ -502,7 +495,7 @@
         "stage": 280,
         "visible": true
       },
-      "durationMs": 1284
+      "durationMs": 1438
     },
     {
       "id": "0.5-135-360",
@@ -513,7 +506,7 @@
         "stage": 315,
         "visible": true
       },
-      "durationMs": 1250
+      "durationMs": 1485
     },
     {
       "id": "0.5-135-390",
@@ -524,7 +517,7 @@
         "stage": 350,
         "visible": true
       },
-      "durationMs": 1400
+      "durationMs": 1581
     },
     {
       "id": "0.5-135-landscape",
@@ -532,10 +525,10 @@
       "status": "PASS",
       "details": {
         "overflow": 0,
-        "stage": 314,
+        "stage": 316,
         "visible": true
       },
-      "durationMs": 1278
+      "durationMs": 1493
     },
     {
       "id": "0.5-135-tablet",
@@ -546,7 +539,7 @@
         "stage": 553,
         "visible": true
       },
-      "durationMs": 1312
+      "durationMs": 1455
     },
     {
       "id": "0.5-136",
@@ -557,7 +550,7 @@
         "overlap": false,
         "overflow": 0
       },
-      "durationMs": 1422
+      "durationMs": 1530
     },
     {
       "id": "0.5-137",
@@ -568,7 +561,7 @@
         "neighbor": "dotted",
         "core": "2px"
       },
-      "durationMs": 982
+      "durationMs": 1140
     },
     {
       "id": "0.5-138",
@@ -579,7 +572,7 @@
         "animating": 0,
         "transition": "0s"
       },
-      "durationMs": 925
+      "durationMs": 1172
     },
     {
       "id": "0.5-PAR",
@@ -593,7 +586,7 @@
         ],
         "history": 6
       },
-      "durationMs": 1345
+      "durationMs": 1525
     },
     {
       "id": "0.5-KBD",
@@ -602,7 +595,7 @@
       "details": {
         "ok": true
       },
-      "durationMs": 927
+      "durationMs": 1223
     },
     {
       "id": "0.5-A11Y",
@@ -611,7 +604,7 @@
       "details": {
         "violations": 0
       },
-      "durationMs": 1946
+      "durationMs": 2288
     },
     {
       "id": "0.6-109",
@@ -622,7 +615,7 @@
         "to": 5,
         "representation": "lattice + vizinhos preservados"
       },
-      "durationMs": 1731
+      "durationMs": 1853
     },
     {
       "id": "0.6-110",
@@ -633,7 +626,7 @@
         "target": 24,
         "type": "delocalized-electron-model"
       },
-      "durationMs": 1034
+      "durationMs": 1207
     },
     {
       "id": "0.6-111",
@@ -644,19 +637,19 @@
         "particles": 84,
         "recreated": false
       },
-      "durationMs": 1566
+      "durationMs": 1822
     },
     {
       "id": "0.6-112",
       "name": "Movimento: percorre a estrutura, sem órbita e sem direção predominante",
       "status": "PASS",
       "details": {
-        "meanCentersVisited": 2.41,
+        "meanCentersVisited": 2.52,
         "moved": 1,
-        "meanDrift": 0.102,
+        "meanDrift": 0.111,
         "particles": 54
       },
-      "durationMs": 5160
+      "durationMs": 5339
     },
     {
       "id": "0.6-113",
@@ -667,7 +660,7 @@
         "oneUnit": "indisponível",
         "undoBelowTwo": "modelo removido"
       },
-      "durationMs": 1087
+      "durationMs": 1372
     },
     {
       "id": "0.6-114",
@@ -680,7 +673,7 @@
         "inside": 0.86,
         "bridges": 0
       },
-      "durationMs": 1173
+      "durationMs": 1277
     },
     {
       "id": "0.6-115",
@@ -691,7 +684,7 @@
         "maxShare": 0.2,
         "count": 54
       },
-      "durationMs": 1225
+      "durationMs": 1349
     },
     {
       "id": "0.6-116",
@@ -702,7 +695,7 @@
         "maxShare": 0.12,
         "count": 84
       },
-      "durationMs": 1284
+      "durationMs": 1406
     },
     {
       "id": "0.6-117",
@@ -713,16 +706,16 @@
         "maxShare": 0.11,
         "count": 102
       },
-      "durationMs": 1278
+      "durationMs": 1412
     },
     {
       "id": "0.6-118",
       "name": "Célula unitária: elétrons não ficam presos às bordas da célula",
       "status": "PASS",
       "details": {
-        "outsideCellBox": 30
+        "outsideCellBox": 31
       },
-      "durationMs": 2596
+      "durationMs": 2686
     },
     {
       "id": "0.6-119",
@@ -732,9 +725,9 @@
         "centers": 166,
         "particles": 150,
         "spanX": 0.97,
-        "spanY": 0.98
+        "spanY": 0.96
       },
-      "durationMs": 1467
+      "durationMs": 1997
     },
     {
       "id": "0.6-120",
@@ -744,7 +737,7 @@
         "system": "estático",
         "internal": "estático e retomado ao desligar"
       },
-      "durationMs": 3721
+      "durationMs": 3907
     },
     {
       "id": "0.6-121",
@@ -753,7 +746,7 @@
       "details": {
         "restored": true
       },
-      "durationMs": 2697
+      "durationMs": 3093
     },
     {
       "id": "0.6-122",
@@ -764,7 +757,7 @@
         "electrons": null,
         "metal": "Cu"
       },
-      "durationMs": 1390
+      "durationMs": 1538
     },
     {
       "id": "0.6-123",
@@ -774,9 +767,9 @@
         "electrons": null,
         "canvas": 0,
         "metal": "Cu",
-        "rafProbe": 21
+        "rafProbe": 20
       },
-      "durationMs": 1486
+      "durationMs": 1715
     },
     {
       "id": "0.6-124",
@@ -786,7 +779,7 @@
         "metal": "Fe",
         "electrons": null
       },
-      "durationMs": 1484
+      "durationMs": 1635
     },
     {
       "id": "0.6-125",
@@ -796,7 +789,7 @@
         "paused": true,
         "resumed": true
       },
-      "durationMs": 2313
+      "durationMs": 2472
     },
     {
       "id": "0.6-126-320",
@@ -808,7 +801,7 @@
         "toggle": true,
         "particles": 80
       },
-      "durationMs": 1184
+      "durationMs": 1240
     },
     {
       "id": "0.6-126-360",
@@ -820,7 +813,7 @@
         "toggle": true,
         "particles": 80
       },
-      "durationMs": 1198
+      "durationMs": 1343
     },
     {
       "id": "0.6-126-390",
@@ -832,7 +825,7 @@
         "toggle": true,
         "particles": 80
       },
-      "durationMs": 1180
+      "durationMs": 1344
     },
     {
       "id": "0.6-126-landscape",
@@ -840,11 +833,11 @@
       "status": "PASS",
       "details": {
         "overflow": 0,
-        "stage": 330,
+        "stage": 340,
         "toggle": true,
         "particles": 80
       },
-      "durationMs": 1292
+      "durationMs": 1453
     },
     {
       "id": "0.6-126-tablet",
@@ -856,7 +849,7 @@
         "toggle": true,
         "particles": 84
       },
-      "durationMs": 1158
+      "durationMs": 1414
     },
     {
       "id": "0.6-127",
@@ -865,11 +858,11 @@
       "details": {
         "units": 48,
         "particles": 150,
-        "costMs": 0.34,
-        "framesPerSecond": 61,
+        "costMs": 0.44,
+        "framesPerSecond": 60,
         "stageDomNodes": 161
       },
-      "durationMs": 5764
+      "durationMs": 6037
     },
     {
       "id": "0.6-128",
@@ -882,7 +875,7 @@
           255
         ]
       },
-      "durationMs": 1439
+      "durationMs": 1557
     },
     {
       "id": "0.6-129",
@@ -892,7 +885,7 @@
         "modes": 4,
         "edge": "#06202a"
       },
-      "durationMs": 1809
+      "durationMs": 2055
     },
     {
       "id": "0.6-130",
@@ -902,7 +895,7 @@
         "stage": 490,
         "overflow": 0
       },
-      "durationMs": 1421
+      "durationMs": 1548
     },
     {
       "id": "0.6-131",
@@ -911,7 +904,7 @@
       "details": {
         "keyboard": true
       },
-      "durationMs": 1273
+      "durationMs": 1465
     },
     {
       "id": "0.6-MOD",
@@ -921,7 +914,7 @@
         "medir": "ativação indisponível",
         "calcular": "visibilidade alterável"
       },
-      "durationMs": 2226
+      "durationMs": 2535
     },
     {
       "id": "0.6-TRANS",
@@ -930,10 +923,10 @@
       "details": {
         "before": 24,
         "afterAdd": 27,
-        "nearNewUnit": 6,
+        "nearNewUnit": 7,
         "settled": 24
       },
-      "durationMs": 4509
+      "durationMs": 4873
     },
     {
       "id": "0.6-VER",
@@ -944,7 +937,7 @@
         "manual": true,
         "report": true
       },
-      "durationMs": 2039
+      "durationMs": 2304
     },
     {
       "id": "0.6-A11Y",
@@ -954,7 +947,7 @@
         "violations": 0,
         "serious": 0
       },
-      "durationMs": 2185
+      "durationMs": 2738
     },
     {
       "id": "0.7-MIG",
@@ -964,7 +957,7 @@
         "from": 5,
         "to": 8
       },
-      "durationMs": 1720
+      "durationMs": 2065
     },
     {
       "id": "0.7-ELIG",
@@ -975,38 +968,38 @@
         "crystalline": "cinco propriedades",
         "controls": "somente a ativa"
       },
-      "durationMs": 1365
+      "durationMs": 1621
     },
     {
       "id": "0.7-140",
       "name": "Condutividade elétrica sem campo: movimento não direcionado",
       "status": "PASS",
       "details": {
-        "meanVx": 0.016,
-        "againstField": 0.51
+        "meanVx": 0.007,
+        "againstField": 0.518
       },
-      "durationMs": 2198
+      "durationMs": 2393
     },
     {
       "id": "0.7-141",
       "name": "Aplicar campo: resposta coletiva direcional (não uniforme)",
       "status": "PASS",
       "details": {
-        "meanVx": -0.559,
+        "meanVx": -0.558,
         "againstField": 0.258,
-        "wraps": 41
+        "wraps": 39
       },
-      "durationMs": 2907
+      "durationMs": 3158
     },
     {
       "id": "0.7-142",
       "name": "Remover campo: retorno ao comportamento não direcionado",
       "status": "PASS",
       "details": {
-        "meanVx": 0.053,
-        "againstField": 0.546
+        "meanVx": -0.013,
+        "againstField": 0.488
       },
-      "durationMs": 3396
+      "durationMs": 3534
     },
     {
       "id": "0.7-143",
@@ -1015,7 +1008,7 @@
       "details": {
         "static": true
       },
-      "durationMs": 1374
+      "durationMs": 1501
     },
     {
       "id": "0.7-144",
@@ -1024,7 +1017,7 @@
       "details": {
         "structure": "inalterada em cinco experiências"
       },
-      "durationMs": 3249
+      "durationMs": 3525
     },
     {
       "id": "0.7-145",
@@ -1034,7 +1027,7 @@
         "before": "00004044440000",
         "after": "44434444443333"
       },
-      "durationMs": 4936
+      "durationMs": 5065
     },
     {
       "id": "0.7-146",
@@ -1043,7 +1036,7 @@
       "details": {
         "restored": true
       },
-      "durationMs": 1610
+      "durationMs": 1784
     },
     {
       "id": "0.7-147",
@@ -1053,7 +1046,7 @@
         "stage": 4,
         "melting": false
       },
-      "durationMs": 1428
+      "durationMs": 1785
     },
     {
       "id": "0.7-148",
@@ -1064,16 +1057,16 @@
         "ratioAfter": 0.64,
         "moved": 14
       },
-      "durationMs": 2105
+      "durationMs": 2238
     },
     {
       "id": "0.7-149",
       "name": "Maleabilidade: elétrons continuam associados à estrutura coletiva",
       "status": "PASS",
       "details": {
-        "coverage": 0.87
+        "coverage": 0.95
       },
-      "durationMs": 2023
+      "durationMs": 2244
     },
     {
       "id": "0.7-150",
@@ -1082,7 +1075,7 @@
       "details": {
         "restored": true
       },
-      "durationMs": 2120
+      "durationMs": 2197
     },
     {
       "id": "0.7-151",
@@ -1095,7 +1088,7 @@
           "ductility": 1.67
         }
       },
-      "durationMs": 3385
+      "durationMs": 3428
     },
     {
       "id": "0.7-152",
@@ -1104,7 +1097,7 @@
       "details": {
         "restored": true
       },
-      "durationMs": 2000
+      "durationMs": 2055
     },
     {
       "id": "0.7-153",
@@ -1113,7 +1106,7 @@
       "details": {
         "lit": 5
       },
-      "durationMs": 1507
+      "durationMs": 1591
     },
     {
       "id": "0.7-154",
@@ -1122,7 +1115,7 @@
       "details": {
         "static": true
       },
-      "durationMs": 1479
+      "durationMs": 1509
     },
     {
       "id": "0.7-155",
@@ -1132,7 +1125,7 @@
         "metal": "Mn",
         "reason": "MODEL_NOT_APPLICABLE"
       },
-      "durationMs": 1025
+      "durationMs": 1180
     },
     {
       "id": "0.7-156",
@@ -1146,7 +1139,7 @@
         "t": "REFERENCE_PHASE_UNSUPPORTED",
         "liquidRule": "LIQUID_AT_REFERENCE_CONDITION"
       },
-      "durationMs": 368
+      "durationMs": 481
     },
     {
       "id": "0.7-157",
@@ -1155,7 +1148,7 @@
       "details": {
         "residual": false
       },
-      "durationMs": 1747
+      "durationMs": 2078
     },
     {
       "id": "0.7-158",
@@ -1165,7 +1158,7 @@
         "metal": "Al",
         "active": null
       },
-      "durationMs": 1494
+      "durationMs": 1721
     },
     {
       "id": "0.7-159",
@@ -1174,7 +1167,7 @@
       "details": {
         "cleared": true
       },
-      "durationMs": 1658
+      "durationMs": 1900
     },
     {
       "id": "0.7-160",
@@ -1183,7 +1176,7 @@
       "details": {
         "reset": true
       },
-      "durationMs": 1592
+      "durationMs": 1909
     },
     {
       "id": "0.7-161",
@@ -1192,7 +1185,7 @@
       "details": {
         "closed": true
       },
-      "durationMs": 1823
+      "durationMs": 1883
     },
     {
       "id": "0.7-162",
@@ -1201,7 +1194,7 @@
       "details": {
         "resumed": "malleability 2/3"
       },
-      "durationMs": 3077
+      "durationMs": 3092
     },
     {
       "id": "0.7-163",
@@ -1211,7 +1204,7 @@
         "offline": true,
         "experiences": 5
       },
-      "durationMs": 4339
+      "durationMs": 5073
     },
     {
       "id": "0.7-164-320",
@@ -1222,7 +1215,7 @@
         "stage": 280,
         "units": true
       },
-      "durationMs": 1408
+      "durationMs": 1620
     },
     {
       "id": "0.7-164-360",
@@ -1233,7 +1226,7 @@
         "stage": 315,
         "units": true
       },
-      "durationMs": 1366
+      "durationMs": 1557
     },
     {
       "id": "0.7-164-390",
@@ -1244,7 +1237,7 @@
         "stage": 350,
         "units": true
       },
-      "durationMs": 1364
+      "durationMs": 1556
     },
     {
       "id": "0.7-164-landscape",
@@ -1252,10 +1245,10 @@
       "status": "PASS",
       "details": {
         "overflow": 0,
-        "stage": 372,
+        "stage": 380,
         "units": true
       },
-      "durationMs": 1517
+      "durationMs": 1808
     },
     {
       "id": "0.7-164-tablet",
@@ -1266,7 +1259,7 @@
         "stage": 456,
         "units": true
       },
-      "durationMs": 1411
+      "durationMs": 1563
     },
     {
       "id": "0.7-165",
@@ -1280,18 +1273,18 @@
         ],
         "stage": 429
       },
-      "durationMs": 1598
+      "durationMs": 1754
     },
     {
       "id": "0.7-166",
       "name": "Desempenho: propriedade + estrutura + elétrons simultâneos",
       "status": "PASS",
       "details": {
-        "costMs": 0.62,
+        "costMs": 0.82,
         "fps": 62,
         "particles": 150
       },
-      "durationMs": 3990
+      "durationMs": 4279
     },
     {
       "id": "0.7-MOD",
@@ -1300,7 +1293,7 @@
       "details": {
         "medir": "somente acompanhamento"
       },
-      "durationMs": 1826
+      "durationMs": 2178
     },
     {
       "id": "0.7-VER",
@@ -1312,7 +1305,7 @@
         "report": true,
         "manual": true
       },
-      "durationMs": 2481
+      "durationMs": 3055
     },
     {
       "id": "0.7-A11Y",
@@ -1322,7 +1315,7 @@
         "violations": 0,
         "serious": 0
       },
-      "durationMs": 2474
+      "durationMs": 2853
     },
     {
       "id": "0.8-01",
@@ -1331,7 +1324,7 @@
       "details": {
         "flow": "livre → CFC → célula/rede → vizinhos → elétrons → campo → restaurar"
       },
-      "durationMs": 2186
+      "durationMs": 2742
     },
     {
       "id": "0.8-02",
@@ -1340,7 +1333,7 @@
       "details": {
         "nonLinear": true
       },
-      "durationMs": 1052
+      "durationMs": 1248
     },
     {
       "id": "0.8-03",
@@ -1350,7 +1343,7 @@
         "structure": "HC",
         "condition": "298.15 K"
       },
-      "durationMs": 1204
+      "durationMs": 1224
     },
     {
       "id": "0.8-04",
@@ -1360,7 +1353,7 @@
         "structure": "CCC",
         "condition": "298.0 K"
       },
-      "durationMs": 1348
+      "durationMs": 1366
     },
     {
       "id": "0.8-05",
@@ -1369,7 +1362,7 @@
       "details": {
         "metal": "Mn"
       },
-      "durationMs": 1295
+      "durationMs": 1464
     },
     {
       "id": "0.8-06",
@@ -1378,7 +1371,7 @@
       "details": {
         "metal": "Sn"
       },
-      "durationMs": 1011
+      "durationMs": 1086
     },
     {
       "id": "0.8-07",
@@ -1387,7 +1380,7 @@
       "details": {
         "layers": 7
       },
-      "durationMs": 2089
+      "durationMs": 2502
     },
     {
       "id": "0.8-08",
@@ -1396,7 +1389,7 @@
       "details": {
         "modes": 4
       },
-      "durationMs": 6072
+      "durationMs": 6607
     },
     {
       "id": "0.8-08m",
@@ -1405,7 +1398,7 @@
       "details": {
         "mobile": "A/B"
       },
-      "durationMs": 1496
+      "durationMs": 1698
     },
     {
       "id": "0.8-09",
@@ -1414,7 +1407,7 @@
       "details": {
         "preserved": true
       },
-      "durationMs": 2629
+      "durationMs": 2636
     },
     {
       "id": "0.8-10",
@@ -1423,7 +1416,7 @@
       "details": {
         "preserved": true
       },
-      "durationMs": 2612
+      "durationMs": 2991
     },
     {
       "id": "0.8-11",
@@ -1433,7 +1426,7 @@
         "restored": true,
         "schema": 8
       },
-      "durationMs": 2348
+      "durationMs": 2757
     },
     {
       "id": "0.8-11b",
@@ -1442,7 +1435,7 @@
       "details": {
         "sanitized": true
       },
-      "durationMs": 949
+      "durationMs": 1110
     },
     {
       "id": "0.8-12",
@@ -1451,7 +1444,7 @@
       "details": {
         "offline": true
       },
-      "durationMs": 3046
+      "durationMs": 3394
     },
     {
       "id": "0.8-13-320",
@@ -1461,7 +1454,7 @@
         "overflow": 0,
         "stage": 280
       },
-      "durationMs": 1237
+      "durationMs": 1404
     },
     {
       "id": "0.8-13-360",
@@ -1471,7 +1464,7 @@
         "overflow": 0,
         "stage": 315
       },
-      "durationMs": 1199
+      "durationMs": 1509
     },
     {
       "id": "0.8-13-390",
@@ -1481,7 +1474,7 @@
         "overflow": 0,
         "stage": 350
       },
-      "durationMs": 1322
+      "durationMs": 1474
     },
     {
       "id": "0.8-13-landscape",
@@ -1489,9 +1482,9 @@
       "status": "PASS",
       "details": {
         "overflow": 0,
-        "stage": 358
+        "stage": 366
       },
-      "durationMs": 1619
+      "durationMs": 1717
     },
     {
       "id": "0.8-13-tablet",
@@ -1501,7 +1494,7 @@
         "overflow": 0,
         "stage": 553
       },
-      "durationMs": 1276
+      "durationMs": 1486
     },
     {
       "id": "0.8-14",
@@ -1510,7 +1503,7 @@
       "details": {
         "keyboard": true
       },
-      "durationMs": 1245
+      "durationMs": 1511
     },
     {
       "id": "0.8-15",
@@ -1520,7 +1513,7 @@
         "violations": 0,
         "dialog": 0
       },
-      "durationMs": 3081
+      "durationMs": 3631
     },
     {
       "id": "0.8-17",
@@ -1529,7 +1522,7 @@
       "details": {
         "deepLink": true
       },
-      "durationMs": 1406
+      "durationMs": 1485
     },
     {
       "id": "0.8-16",
@@ -1538,7 +1531,7 @@
       "details": {
         "indicator": true
       },
-      "durationMs": 1626
+      "durationMs": 1922
     },
     {
       "id": "0.9-MIG",
@@ -1548,7 +1541,7 @@
         "from": 6,
         "to": 8
       },
-      "durationMs": 1505
+      "durationMs": 1856
     },
     {
       "id": "0.9-FREE",
@@ -1557,7 +1550,7 @@
       "details": {
         "free": "sem medidas absolutas"
       },
-      "durationMs": 1207
+      "durationMs": 1347
     },
     {
       "id": "0.9-DIST",
@@ -1567,7 +1560,7 @@
         "value": 2.556,
         "unit": "Å"
       },
-      "durationMs": 1663
+      "durationMs": 2047
     },
     {
       "id": "0.9-ZOOM",
@@ -1580,7 +1573,7 @@
         ],
         "value": 3.615
       },
-      "durationMs": 2364
+      "durationMs": 2566
     },
     {
       "id": "0.9-CCC",
@@ -1590,7 +1583,7 @@
         "nn": 2.482,
         "a": 2.865
       },
-      "durationMs": 1928
+      "durationMs": 2122
     },
     {
       "id": "0.9-HC",
@@ -1600,7 +1593,7 @@
         "a": 3.209,
         "c": 5.21
       },
-      "durationMs": 1859
+      "durationMs": 1923
     },
     {
       "id": "0.9-ANGLE",
@@ -1610,7 +1603,7 @@
         "value": 60,
         "screen": 38.7
       },
-      "durationMs": 1647
+      "durationMs": 1898
     },
     {
       "id": "0.9-COORD",
@@ -1620,7 +1613,7 @@
         "Cu": 12,
         "Fe": 8
       },
-      "durationMs": 2997
+      "durationMs": 3399
     },
     {
       "id": "0.9-UNITS",
@@ -1631,7 +1624,7 @@
         "pm": 255.6,
         "nm": 0.2556
       },
-      "durationMs": 1784
+      "durationMs": 1982
     },
     {
       "id": "0.9-HIST",
@@ -1640,7 +1633,7 @@
       "details": {
         "cleared": true
       },
-      "durationMs": 2486
+      "durationMs": 2731
     },
     {
       "id": "0.9-CONTEXT",
@@ -1649,7 +1642,7 @@
       "details": {
         "flagged": true
       },
-      "durationMs": 2506
+      "durationMs": 2659
     },
     {
       "id": "0.9-RELOAD",
@@ -1658,7 +1651,7 @@
       "details": {
         "persisted": 1
       },
-      "durationMs": 2629
+      "durationMs": 2792
     },
     {
       "id": "0.9-MODULE",
@@ -1668,7 +1661,7 @@
         "preserved": true,
         "newMetal": "sem medições herdadas"
       },
-      "durationMs": 2950
+      "durationMs": 3161
     },
     {
       "id": "0.9-DEFORM",
@@ -1677,7 +1670,7 @@
       "details": {
         "blocked": true
       },
-      "durationMs": 1825
+      "durationMs": 1811
     },
     {
       "id": "0.9-KBD",
@@ -1686,7 +1679,7 @@
       "details": {
         "keyboard": true
       },
-      "durationMs": 1605
+      "durationMs": 1618
     },
     {
       "id": "0.9-A11Y",
@@ -1695,7 +1688,7 @@
       "details": {
         "violations": 0
       },
-      "durationMs": 2712
+      "durationMs": 2977
     },
     {
       "id": "0.9-VALID",
@@ -1704,7 +1697,7 @@
       "details": {
         "rejected": "MEASUREMENT_VALUE_INVALID"
       },
-      "durationMs": 2338
+      "durationMs": 2554
     },
     {
       "id": "0.9-MOB-320",
@@ -1714,7 +1707,7 @@
         "overflow": 0,
         "stage": 280
       },
-      "durationMs": 5527
+      "durationMs": 5729
     },
     {
       "id": "0.9-MOB-360",
@@ -1724,7 +1717,7 @@
         "overflow": 0,
         "stage": 315
       },
-      "durationMs": 5644
+      "durationMs": 5679
     },
     {
       "id": "0.9-MOB-390",
@@ -1734,7 +1727,7 @@
         "overflow": 0,
         "stage": 350
       },
-      "durationMs": 5532
+      "durationMs": 5797
     },
     {
       "id": "0.9-MOB-landscape",
@@ -1742,9 +1735,9 @@
       "status": "PASS",
       "details": {
         "overflow": 0,
-        "stage": 368
+        "stage": 374
       },
-      "durationMs": 1822
+      "durationMs": 2196
     },
     {
       "id": "0.9-MOB-tablet",
@@ -1754,7 +1747,7 @@
         "overflow": 0,
         "stage": 553
       },
-      "durationMs": 1676
+      "durationMs": 1904
     },
     {
       "id": "0.9-ID1",
@@ -1772,7 +1765,7 @@
         "thermalGroupFilter": "none",
         "auraFilter": "url(\"#silmThermalGlow\")"
       },
-      "durationMs": 5053
+      "durationMs": 5203
     },
     {
       "id": "0.9-ID2",
@@ -1783,9 +1776,9 @@
           "state": "done",
           "focus": "scientific-viewport"
         },
-        "elapsedMs": 6702
+        "elapsedMs": 6744
       },
-      "durationMs": 9626
+      "durationMs": 9944
     },
     {
       "id": "0.9-ID3",
@@ -1795,7 +1788,7 @@
         "reduced": "omitida",
         "off": "omitida"
       },
-      "durationMs": 1298
+      "durationMs": 1601
     },
     {
       "id": "0.9-ID4",
@@ -1803,14 +1796,14 @@
       "status": "PASS",
       "details": {
         "brand": {
-          "src": "http://localhost:38959/assets/silm-simbolo.svg",
+          "src": "http://localhost:43049/assets/silm-simbolo.svg",
           "fit": "contain",
           "favicon": "favicon-dark.svg"
         },
         "about": "assets/silm-simbolo.svg",
         "icons": 4
       },
-      "durationMs": 991
+      "durationMs": 1106
     },
     {
       "id": "0.9-ID5",
@@ -1834,7 +1827,7 @@
           "toasts": []
         }
       },
-      "durationMs": 4034
+      "durationMs": 4435
     },
     {
       "id": "0.9.1-01",
@@ -1846,7 +1839,7 @@
           "silm-assembly-feedback"
         ]
       },
-      "durationMs": 2242
+      "durationMs": 2580
     },
     {
       "id": "0.9.1-02",
@@ -1857,7 +1850,7 @@
         "title": "CFC · cúbica de faces centradas · 14 unidades (10 completadas pelo SILM)",
         "text": "CFC · cúbica de faces centradas · 14 unidades (10 completadas pelo SILM)"
       },
-      "durationMs": 1196
+      "durationMs": 1253
     },
     {
       "id": "0.9.1-05",
@@ -1899,7 +1892,7 @@
           }
         ]
       },
-      "durationMs": 946
+      "durationMs": 1423
     },
     {
       "id": "0.9.1-03",
@@ -1910,7 +1903,7 @@
         "latticeDiameter": 16,
         "symbols": "shown"
       },
-      "durationMs": 3159
+      "durationMs": 3174
     },
     {
       "id": "0.9.1-04",
@@ -1920,7 +1913,7 @@
         "desktop": "aberto",
         "mobile": "fechado"
       },
-      "durationMs": 1776
+      "durationMs": 2316
     },
     {
       "id": "0.10-MIG",
@@ -1930,7 +1923,7 @@
         "from": 7,
         "to": 8
       },
-      "durationMs": 1663
+      "durationMs": 2042
     },
     {
       "id": "0.10-FREE",
@@ -1939,7 +1932,7 @@
       "details": {
         "free": "sem cálculo absoluto"
       },
-      "durationMs": 1255
+      "durationMs": 1452
     },
     {
       "id": "0.10-CFC",
@@ -1953,7 +1946,7 @@
         "rho": "8,935 g/cm³",
         "a": "3,615 Å (referência 3,6150 Å)"
       },
-      "durationMs": 3042
+      "durationMs": 3540
     },
     {
       "id": "0.10-CCC",
@@ -1962,7 +1955,7 @@
       "details": {
         "FE": 0.6801747615878316
       },
-      "durationMs": 1688
+      "durationMs": 2129
     },
     {
       "id": "0.10-HC",
@@ -1975,7 +1968,7 @@
           1.7369865692458906
         ]
       },
-      "durationMs": 2292
+      "durationMs": 2805
     },
     {
       "id": "0.10-ORIGIN",
@@ -1985,7 +1978,7 @@
         "measured": 47.241633375000006,
         "tabulated": 47.241633375000006
       },
-      "durationMs": 1992
+      "durationMs": 2596
     },
     {
       "id": "0.10-INPUT",
@@ -1994,7 +1987,7 @@
       "details": {
         "user": 3.6
       },
-      "durationMs": 1946
+      "durationMs": 2489
     },
     {
       "id": "0.10-HIST",
@@ -2003,7 +1996,7 @@
       "details": {
         "cleared": true
       },
-      "durationMs": 2325
+      "durationMs": 2777
     },
     {
       "id": "0.10-RELOAD",
@@ -2013,7 +2006,7 @@
         "persisted": 1,
         "flagged": true
       },
-      "durationMs": 3011
+      "durationMs": 3368
     },
     {
       "id": "0.10-METAL",
@@ -2023,7 +2016,7 @@
         "preserved": true,
         "newMetal": "sem cálculos herdados"
       },
-      "durationMs": 2658
+      "durationMs": 2862
     },
     {
       "id": "0.10-KBD",
@@ -2032,7 +2025,7 @@
       "details": {
         "keyboard": true
       },
-      "durationMs": 1528
+      "durationMs": 1653
     },
     {
       "id": "0.10-A11Y",
@@ -2041,7 +2034,7 @@
       "details": {
         "violations": 0
       },
-      "durationMs": 2252
+      "durationMs": 2590
     },
     {
       "id": "0.10-MOB-360",
@@ -2050,7 +2043,7 @@
       "details": {
         "overflow": 0
       },
-      "durationMs": 5734
+      "durationMs": 5944
     },
     {
       "id": "0.10-MOB-390",
@@ -2059,7 +2052,7 @@
       "details": {
         "overflow": 0
       },
-      "durationMs": 5669
+      "durationMs": 5885
     },
     {
       "id": "0.10-MOB-landscape",
@@ -2068,28 +2061,28 @@
       "details": {
         "overflow": 0
       },
-      "durationMs": 1835
+      "durationMs": 2133
     },
     {
       "id": "0.10.1-HOME",
       "name": "Página inicial editorial: \"A Arquitetura dos Metais\", lema, Laboratório em destaque e metas vivas",
       "status": "PASS",
       "details": {},
-      "durationMs": 870
+      "durationMs": 937
     },
     {
       "id": "0.10.1-START",
       "name": "Como deseja iniciar?: convite na primeira visita com cartões; um toque salva e leva ao destino",
       "status": "PASS",
       "details": {},
-      "durationMs": 1292
+      "durationMs": 1228
     },
     {
       "id": "0.10.1-MENU",
       "name": "Menu: Agora com metal e módulo; Montagens prontas; abertura em Acessibilidade, não em Recursos",
       "status": "PASS",
       "details": {},
-      "durationMs": 1507
+      "durationMs": 1645
     },
     {
       "id": "0.10.1-MONT",
@@ -2102,14 +2095,14 @@
           "Calcular, módulo 3, Ativo"
         ]
       },
-      "durationMs": 1035
+      "durationMs": 1211
     },
     {
       "id": "0.10.1-VER",
       "name": "Ver em famílias (Observar, Medir, Analisar) e Dados como ponto de partida, com \"Dados do metal\"",
       "status": "PASS",
       "details": {},
-      "durationMs": 1620
+      "durationMs": 1777
     },
     {
       "id": "0.10.1-PRESET",
@@ -2129,14 +2122,14 @@
           "units": 17
         }
       },
-      "durationMs": 1876
+      "durationMs": 2163
     },
     {
       "id": "0.10.1-APRENDER",
       "name": "Aprender em lista; Investigar no Laboratório seleciona o metal do tema (Estrutura → Fe)",
       "status": "PASS",
       "details": {},
-      "durationMs": 529
+      "durationMs": 632
     },
     {
       "id": "0.10.1-R06",
@@ -2179,23 +2172,14 @@
           "page": 0
         }
       },
-      "durationMs": 6116
-    },
-    {
-      "id": "CONSOLE",
-      "name": "Console sem erros críticos (todas as suítes)",
-      "status": "PASS",
-      "details": {
-        "errors": 0
-      },
-      "durationMs": 0
+      "durationMs": 7034
     },
     {
       "id": "0.10.1-TOUR",
       "name": "Tour do laboratório com nota de boas-vindas; cena diz MONTAGEM LIVRE / ESTRUTURA CRISTALINA",
       "status": "PASS",
       "details": {},
-      "durationMs": 1514
+      "durationMs": 1875
     },
     {
       "id": "0.10.1-SOM",
@@ -2206,7 +2190,23 @@
           880
         ]
       },
-      "durationMs": 2529
+      "durationMs": 3018
+    },
+    {
+      "id": "0.10.1-REV",
+      "name": "Revisão: Dados do metal, tema que redesenha, montagem pronta com confirmação verdadeira e Calcular limpo; roteiro com os grupos do SILM e Agora com a atividade; missão por Concluir missão",
+      "status": "PASS",
+      "details": {},
+      "durationMs": 7536
+    },
+    {
+      "id": "CONSOLE",
+      "name": "Console sem erros críticos (todas as suítes)",
+      "status": "PASS",
+      "details": {
+        "errors": 0
+      },
+      "durationMs": 0
     }
   ],
   "consoleErrors": []

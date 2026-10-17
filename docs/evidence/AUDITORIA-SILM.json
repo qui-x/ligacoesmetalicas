@@ -4,7 +4,7 @@
   "checks": [
     {
       "check": "Versão única do produto",
-      "status": "FAIL",
+      "status": "PASS",
       "detail": null
     },
     {
@@ -66,7 +66,7 @@
     },
     {
       "check": "Documentação obrigatória",
-      "status": "FAIL",
+      "status": "PASS",
       "detail": null
     },
     {
@@ -177,6 +177,6 @@
       }
     }
   ],
-  "passed": 31,
-  "failed": 2
+  "passed": 33,
+  "failed": 0
 }
