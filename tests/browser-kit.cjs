@@ -10,8 +10,10 @@ function createKit({version,only=null}){
  const kit={assert,KEY,version,results,consoleErrors,get base(){return base;},evidence,shots};
  kit.start=async()=>{server=await serve();base=server.url;browser=await launch();};
  kit.stop=async()=>{await browser?.close();server?.server.close();};
- kit.open=async({width=1366,height=800,mobile=false,reducedMotion='no-preference',seed=null,serviceWorkers='block',storage=null,opening=false}={})=>{
+ kit.open=async({width=1366,height=800,mobile=false,reducedMotion='no-preference',seed=null,serviceWorkers='block',storage=null,opening=false,invite=false}={})=>{
   const context=await browser.newContext({viewport:{width,height},isMobile:mobile,hasTouch:mobile,deviceScaleFactor:1,reducedMotion,serviceWorkers,locale:'pt-BR'});
+  /* 0.10.1 (família): sem o convite "Como deseja iniciar?", a não ser que o teste peça (invite:true). */
+  if(!invite)await context.addInitScript(()=>{try{if(localStorage.getItem('simcore_core_v1_startup')===null)localStorage.setItem('simcore_core_v1_startup',JSON.stringify('inicio'));}catch{}});
   await context.addInitScript(([seed,key,extra,opening])=>{try{if(!opening)localStorage.setItem('simcore_core_v1_opening','false');if(!sessionStorage.getItem('silm-seeded')){if(seed)localStorage.setItem(key,JSON.stringify(seed));for(const [k,v]of Object.entries(extra||{}))localStorage.setItem(k,JSON.stringify(v));sessionStorage.setItem('silm-seeded','1');}}catch(_){}},[seed,KEY,storage,opening]);
   const page=await context.newPage();
   page.on('console',m=>{if(m.type()==='error')consoleErrors.push({test:current,text:m.text()});});page.on('pageerror',e=>consoleErrors.push({test:current,text:e.message}));

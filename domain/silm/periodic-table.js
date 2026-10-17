@@ -13,6 +13,8 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
  const status=U.element('p','','periodic-status');status.id=prefix+'-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');input.setAttribute('aria-describedby',status.id);root.append(status);
  const scroll=U.element('div',null,'periodic-scroll');scroll.setAttribute('aria-label','Tabela completa. Role dentro desta região para ver todos os grupos.');
  const grid=U.element('div',null,'periodic-grid');scroll.append(grid);root.append(scroll);
+ /* R06: em telas estreitas a Tabela completa não cabe com células tocáveis; a dica mostra que há mais grupos ao lado. */
+ const scrollHint=U.element('p','Deslize a tabela para os lados para ver os grupos 1 a 18.','periodic-scroll-hint');scrollHint.hidden=true;root.append(scrollHint);
  const place=(node,row,column,span=1)=>{node.style.gridRow=String(row);node.style.gridColumn=String(column)+(span>1?' / span '+span:'');grid.append(node);};
  for(let g=1;g<=18;g++)place(U.element('span',String(g),'periodic-group'),1,g+1);
  for(let p=1;p<=7;p++)place(U.element('span',String(p),'periodic-period'),p+1,1);
@@ -57,10 +59,10 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
   }else if(event.key==='Home')target=D.elements[0];else if(event.key==='End')target=D.elements[117];else return;
   event.preventDefault();if(target){buttons.get(target.atomicNumber).focus();buttons.get(target.atomicNumber).scrollIntoView({block:'nearest',inline:'nearest'});}
  });
- const resize=()=>{if(!root.isConnected)return;const em=parseFloat(getComputedStyle(document.documentElement).fontSize),min=Math.max(44,2.8*em),gap=4;
-  const width=scroll.clientWidth-24,wide=(width-18*gap)/18;let cell=Math.max(min,wide);
+ const resize=()=>{if(!root.isConnected)return;const min=26,gap=4;
+  const width=scroll.clientWidth-30,wide=(width-20-18*gap)/18;let cell=Math.max(min,wide);
   if(root.closest('.silm-presentation.is-expanded,.silm-laboratory')){const tall=(scroll.clientHeight-46-9*gap)/9/1.13;cell=Math.max(min,Math.min(wide,tall));}
-  root.style.setProperty('--periodic-cell',Math.max(min,Math.min(96,cell))+'px');
+  const size=Math.max(min,Math.min(96,cell));root.style.setProperty('--periodic-cell',size+'px');root.dataset.density=size<34?'tiny':size<46?'compact':'full';requestAnimationFrame(()=>{scrollHint.hidden=scroll.scrollWidth<=scroll.clientWidth+1;});
  };
  if(window.ResizeObserver){const observer=new ResizeObserver(resize);scope.observe(observer,scroll);}scope.listen(window,'resize',resize);scope.on('theme:changed',resize);
  update();if(state.query)updateSearch(false);else status.textContent='118 elementos · grupos 1–18 · use as setas para navegar entre elementos.';resize();
