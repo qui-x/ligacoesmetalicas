@@ -1,5 +1,5 @@
 'use strict';
-/* Série 0.10.1 — correção de origem: o SILM adota a gramática da família (Base Estrutural 0.3.0) e o pedido R06 do autor
+/* Série 0.10.1 — correção de origem: o SILM adota a gramática da família (Base Estrutural 0.3.1) e o pedido R06 do autor
    (Tabela Periódica cabendo na tela em qualquer dimensão). Nenhum dado ou cálculo científico muda. */
 module.exports={series:'0.10',async run(kit,{screenshots=false}={}){
  const {assert,go,state,openLeft,closeLeft,openRight}=kit;const shot=screenshots?kit.shot:async()=>{},test=kit.test;
@@ -89,12 +89,48 @@ module.exports={series:'0.10',async run(kit,{screenshots=false}={}){
 
  await test('0.10.1-SOM','Som e toque: linhas em Acessibilidade, desligadas por padrão; medição com a preferência ligada toca e vibra',async use=>{
   const page=await use();await page.addInitScript(()=>{window.__tones=[];const P=AudioContext.prototype,c=P.createOscillator;P.createOscillator=function(){const o=c.call(this),s=o.start.bind(o);o.start=(...a)=>{window.__tones.push(Math.round(o.frequency.value));return s(...a);};return o;};window.__vib=[];Object.defineProperty(navigator,'vibrate',{configurable:true,value:p=>{window.__vib.push(p);return true;}});});
-  await page.reload();await kit.ready(page);await page.click('#access-btn');await page.waitForSelector('#drawer-sound-check');
+  await go(page);await page.click('#access-btn');await page.waitForSelector('#drawer-sound-check');
   assert.equal(await page.evaluate(()=>document.getElementById('drawer-sound-check-label').textContent),'Som das medições');assert.equal(await page.isChecked('#drawer-sound-check'),false);
-  await page.check('#drawer-sound-check');await page.check('#drawer-vibrate-check');await page.keyboard.press('Escape');
+  assert.match(await page.evaluate(()=>document.getElementById('drawer-sound-check').closest('.a11y-row').textContent),/tom grave para 8 \(CCC\), agudo para 12 \(CFC e HC\)/);
+  await page.check('#drawer-sound-check');await page.check('#drawer-vibrate-check');assert.deepEqual(await page.evaluate(()=>window.__tones),[440],'amostra ao ligar');await page.keyboard.press('Escape');
   await kit.crystal(page,'Cu',4);await kit.switchModule(page,'medir');await openRight(page,'ver','Medir');await page.click('#silm-tool-coordination');await kit.closeRight(page);
   const id=await page.evaluate(()=>SILM.scientificState.structure.units[0].id);await page.click(`.silm-crystal-unit[data-unit-id="${id}"]`);
   await page.waitForFunction(()=>SILM.scientificState.measurements.length===1);const tones=await page.evaluate(()=>window.__tones),vib=await page.evaluate(()=>window.__vib);
-  assert.ok(tones.length>=2,'amostra + medição: '+tones);assert.deepEqual(vib.at(-1),[40]);return {tones};
+  /* Cobre (CFC): coordenação 12 → tom agudo da faixa 8–12, 880 Hz. */assert.equal(tones.at(-1),880,'tom da coordenação: '+tones);assert.deepEqual(vib.at(-1),[40]);
+  /* As outras medidas só vibram: a distância não toca tom. */
+  await openRight(page,'ver','Medir');await page.click('#silm-tool-distance');await kit.closeRight(page);const ids=await page.evaluate(()=>SILM.scientificState.structure.units.slice(0,2).map(u=>u.id));
+  for(const u of ids)await page.click(`.silm-crystal-unit[data-unit-id="${u}"]`);await page.waitForFunction(()=>SILM.scientificState.measurements.length===2);
+  assert.equal((await page.evaluate(()=>window.__tones)).length,tones.length,'distância sem tom');assert.equal((await page.evaluate(()=>window.__vib)).length,vib.length+1,'distância vibra');return {tones};
+ });
+
+ await test('0.10.1-REV','Revisão: Dados do metal, tema que redesenha, montagem pronta com confirmação verdadeira e Calcular limpo; roteiro com os grupos do SILM e Agora com a atividade; missão por Concluir missão',async use=>{
+  const page=await use();
+  await kit.investigate(page,'Cu');await page.click('#silm-info');await page.waitForFunction(()=>SimCore.workspace.tool==='tabela');await kit.closeRight(page);
+  /* Tema de outro metal mostra a Tabela; tema do metal da investigação volta à cena da investigação. */
+  const theme=async id=>{await page.evaluate(()=>SimCore.router.navigate('aprender'));await page.click('#theme-'+id);await page.click('#theme-investigate');await page.waitForFunction(()=>SimCore.router.current.id==='laboratorio');};
+  await theme('estrutura');await page.waitForSelector('.periodic-element.is-selected[data-symbol="Fe"]');
+  await theme('ligacao-metalica');await page.waitForSelector('#silm-start-assembly');assert.equal(await page.locator('.periodic-grid').count(),0,'a Tabela não fica velha na cena');
+  /* Montagem pronta sobre uma investigação: confirmação do SILM; a fórmula escolhida antes não sobrevive. */
+  await kit.assemble(page,4);await kit.organize(page);await kit.switchModule(page,'calcular');await openRight(page,'ver','Calcular');
+  await page.click('#silm-calc-packing-factor');await page.waitForSelector('#silm-calc-run');await kit.closeRight(page);
+  await page.evaluate(()=>SimCore.router.navigate('montagens'));await page.waitForSelector('#preset-apply-ferro-ccc');await page.click('#preset-apply-ferro-ccc');
+  const d=kit.dialog(page);await d.waitFor();const msg=await d.textContent();
+  assert.match(msg,/Iniciar uma nova investigação\?/);assert.match(msg,/estrutura, medições e cálculos/);assert.doesNotMatch(msg,/Desfazer/);
+  await d.locator('.dialog-actions button.primary-btn').click();await page.waitForFunction(()=>SILM.scientificState.metal?.atomicNumber===26&&SILM.scientificState.structure?.mode==='crystalline');
+  await kit.switchModule(page,'calcular');await openRight(page,'ver','Calcular');assert.equal(await page.locator('#silm-calc-run').count(),0,'nenhuma fórmula da estrutura anterior');await kit.closeRight(page);
+  /* Roteiro: a Montagem continua com os grupos do SILM e o cartão Agora diz qual atividade está aberta. */
+  const r=await use();await go(r,'roteiros/percurso-interface');await r.click('#activity-start');await r.waitForFunction(()=>SimCore.experience.current.activity.current?.type==='route');
+  assert.ok((await r.evaluate(()=>SimCore.experience.current.activity.getDefinition().procedure.join(' '))).includes('Em Montagem → Módulo'));
+  await r.evaluate(()=>SimCore.router.navigate('laboratorio'));await r.waitForFunction(()=>SimCore.router.current.id==='laboratorio');await r.click('#workspace-left');
+  assert.deepEqual(await r.locator('#dock-left-tabs button').allTextContents(),['Resumo','Metal','Estrutura','Propriedades','Módulo']);await kit.closeLeft(r);
+  await r.click('#core-menu');assert.equal(await text(r,'.drawer-now-detail'),'Um percurso pelo SILM · Explorar');await r.keyboard.press('Escape');
+  /* Missão: a ajuda cita um rótulo que existe no Menu da atividade, que leva aos dois campos. */
+  const m=await use();await go(m,'missoes/revisar-registro');await m.click('#activity-start');await m.waitForFunction(()=>SimCore.experience.current.activity.current?.type==='mission');
+  assert.match(await m.evaluate(()=>SimCore.experience.current.activity.getDefinition().help.instructions),/Concluir missão no Menu da atividade/);
+  await m.evaluate(()=>SimCore.router.navigate('laboratorio'));await m.waitForFunction(()=>SimCore.router.current.id==='laboratorio');await m.click('#core-menu');
+  await m.waitForSelector('#shell-activity-finish');assert.equal(await text(m,'#shell-activity-finish'),'Concluir missão');await m.click('#shell-activity-finish');
+  await m.waitForSelector('#mission-evidence');await m.fill('#mission-evidence','Abri Montagem, Ver e Dados.');await m.fill('#mission-conclusion','Concluir guarda a atividade; Encerrar volta ao Laboratório Livre.');
+  await m.click('#mission-finish');await m.waitForFunction(()=>SimCore.experience.current.activity.current?.status==='completed');
+  return {};
  });
 }};

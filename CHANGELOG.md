@@ -2,7 +2,7 @@
 
 ## SILM 0.10.1 — Correção de origem: gramática da família
 
-- Núcleo da **Base Estrutural 0.3.0**, adotado sem nenhuma alteração local. A Base é neutra e foi entregue ao autor fora deste repositório.
+- Núcleo da **Base Estrutural 0.3.1**, adotado sem nenhuma alteração local. A Base é neutra e foi entregue ao autor fora deste repositório. A 0.3.1 corrige a 0.3.0 em três pontos pedidos pela revisão do SILM: texto da confirmação declarado pela montagem pronta, segurança da abertura contada do início do ciclo e `SimCore.opening.stop()`.
 - **Entrada**:
   - abertura oficial sobre a camada da família;
   - "Animação de abertura" em Acessibilidade, com migração da preferência antiga;
@@ -20,6 +20,15 @@
 - **Montagens prontas**: Cobre · CFC, Ferro · CCC e Magnésio · HC, com os dados de referência do banco.
 - **Aprender** em lista; "Investigar no Laboratório" seleciona o metal do tema.
 - **R06**: a Tabela Periódica cabe na cena em qualquer tela a partir de 768 px. No celular, rola com uma dica.
+- **Revisão adversarial** (15 achados confirmados, todos corrigidos):
+  - durante roteiros e missões, a Montagem mantém os grupos do SILM; a atividade fica no Menu, e o cartão "Agora" mostra o título dela;
+  - a ajuda e o Manual citam "Concluir missão" (Menu da atividade), o rótulo que existe;
+  - "Dados do metal" abre a ferramenta, não o menu de Dados;
+  - o tema do metal da investigação redesenha a cena;
+  - a montagem pronta pede a confirmação do SILM ("Iniciar uma nova investigação?"), sem prometer Desfazer, e descarta a fórmula escolhida no Calcular;
+  - o som toca só na coordenação (8 grave, 12 agudo); as outras medidas só vibram;
+  - caminhos do painel Ver (Observar → Camadas, Medir → Instrumentos, Analisar → Comparar/Calcular) e rótulos de Acessibilidade (Reduzir animações, Leitura simples, Espaçamento de letras) atualizados no Manual;
+  - "Sobre o SILM" descreve Medir e Calcular.
 - Nenhum dado científico mudou (schema 8).
 
 ## SILM 0.10.0 — Módulo Calcular

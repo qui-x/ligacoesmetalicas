@@ -2,7 +2,7 @@
 
 **Simulador Interativo de Ligações Metálicas.** Esta versão mantém o banco científico (0.2.x) e a investigação persistente de um metal (0.3.x), a montagem manual da estrutura metálica (0.4.x), as estruturas cristalinas (0.5.x), o modelo eletrônico com elétrons deslocalizados (0.6.x), as propriedades metálicas (0.7.x), o módulo **Explorar** (0.8.x), o módulo **Medir** (0.9.x) e acrescenta o módulo **Calcular**: em **Ver → Calcular**, obtenha o número efetivo de átomos, o volume da célula, o raio a partir do parâmetro (e o inverso), o fator de empacotamento, a densidade teórica e, no HC, a razão c/a. Cada entrada mostra a origem (dado tabelado, medida do modelo, valor informado ou calculado pelo SILM) e os registros ficam em **Dados → Cálculos**. Monte com **+ Adicionar unidade** e use **Organizar estrutura**: o SILM reorganiza a montagem segundo a estrutura de referência do banco (CCC, CFC ou HC), com célula unitária, rede extensa e vizinhança. O Laboratório usa os painéis **Montagem, Ver e Dados**, da mesma família do SIAB.
 
-Desde a 0.10.1, o SILM usa a gramática de interação da família de simuladores: a mesma forma de usar, com o núcleo da Base Estrutural 0.3.0 adotado sem alteração. Veja `docs/SILM-0.10.1.md`.
+Desde a 0.10.1, o SILM usa a gramática de interação da família de simuladores: a mesma forma de usar, com o núcleo da Base Estrutural 0.3.1 adotado sem alteração. Veja `docs/SILM-0.10.1.md`.
 
 ## Usar
 

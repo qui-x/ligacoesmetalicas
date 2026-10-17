@@ -6,6 +6,8 @@
       sua marca nela). Sem desenho próprio, a Base revela a marca com um esmaecer curto.
    3. Desenho próprio: SimCore.opening.define({duration, brandAt, safety, tagline, mount(stage) → {hide, destroy}}),
       chamado por um script do produto logo depois da camada ou antes de app.js.
+   A animação de segurança recomeça quando o ciclo começa (0.3.1): um carregamento lento não corta o desenho.
+   SimCore.opening.stop() encerra a abertura na hora (por exemplo, quando o produto falha ao montar).
    Toque, clique ou tecla pulam; pulada pelo teclado, o foco vai ao conteúdo da tela. "Reduzir animações", o sistema
    pedindo menos movimento ou a preferência desligada impedem a abertura. Ao terminar, emite 'opening:finished'. */
 SimCore.opening=(()=>{
@@ -54,10 +56,11 @@ SimCore.opening=(()=>{
   auto=auto||declare();paint(layer);
   if(root.dataset.opening!=='on'||!enabled()||reduced()){layer.remove();finish(false);return;}
   const c=custom||{};let parts=null;
+  layer.style.animationName='none';void layer.offsetWidth;layer.style.animationName='';
   if(c.mount){try{parts=c.mount(S.$('app-opening-stage'),{reducedMotion:false})||null;}catch(error){console.warn('Desenho da abertura omitido',error);parts=null;}}
   run(layer,{duration:c.duration??2600,exit:400,
    hide:()=>{layer.classList.add('is-leaving');try{parts?.hide?.();}catch(error){console.warn('Falha na saída do desenho',error);}},
    destroy:()=>{if(typeof parts==='function')parts();else parts?.destroy?.();}});
  }
- return {set,declare,define,run,init,get enabled(){return enabled();},get allowed(){return enabled()&&!reduced();},get declared(){return spec?{...spec}:null;},get playing(){return !!active;},get finished(){return finished;}};
+ return {set,declare,define,run,init,stop(){active?.stop();},get enabled(){return enabled();},get allowed(){return enabled()&&!reduced();},get declared(){return spec?{...spec}:null;},get playing(){return !!active;},get finished(){return finished;}};
 })();

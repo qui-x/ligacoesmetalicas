@@ -1,11 +1,21 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.10.0",
+  "versao": "0.10.1",
   "tema": "A Arquitetura dos Metais",
-  "versaoBase": "0.2.4",
+  "versaoBase": "0.3.1",
   "scientificSchemaVersion": 8,
   "origens": [
+    {
+      "arquivo": "SILM-0.10.0.zip",
+      "papel": "origem executável da correção 0.10.1",
+      "sha512": "e84a0043727bcca93120bede748f3e7aab55ad41e418733bb18272256c914b68ad22885e0a19addcddfb488cd6eee5764667daa2bdf924b6526b3931ecaec084"
+    },
+    {
+      "arquivo": "BASE-ESTRUTURAL-0.3.1.zip",
+      "papel": "núcleo adotado sem alteração (entregue ao autor fora do repositório)",
+      "sha512": "23959bfc4deae42baa9510ff61c6dc2027d57915e4a011adf9d6aa471b50622f06b31b8fa104960c8bbdf2313567ce4d50683ef404628f1d25ef70289ead3544"
+    },
     {
       "arquivo": "SILM-0.9.1.zip",
       "papel": "origem executável da série 0.10.x",
@@ -79,10 +89,10 @@
       "verificado": true
     }
   ],
-  "observacaoOrigem": "Origem: entregas/SILM-0.9.1.zip deste repositório, verificado pelo SHA-512 externo.",
-  "status": "SILM 0.10.0: módulo Calcular — catálogo central de fórmulas cristalográficas (número efetivo, volume da célula, raio ↔ parâmetro, fator de empacotamento, densidade teórica e c/a), constantes centralizadas com fonte, origem de cada entrada (tabelado, medida do modelo, informado, calculado) e lista Cálculos. Schema 8. Relatório em docs/RELATORIO-BUILD-TESTES-0.10.0.md.",
+  "observacaoOrigem": "Origem: entregas/SILM-0.10.0.zip deste repositório, verificado pelo SHA-512 externo; núcleo da Base Estrutural 0.3.1.",
+  "status": "SILM 0.10.1: correção de origem — gramática de interação da família (Base Estrutural 0.3.1): entrada, menu, acessibilidade, laboratório por grupos e famílias, Dados como ponto de partida, Montagens prontas, Aprender em lista, tour, som e toque; R06 Tabela Periódica cabendo na tela. Nenhum dado científico alterado.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
-  "dataBuild": "2026-10-16",
+  "dataBuild": "2026-10-17",
   "structureModelVersion": 2,
   "electronModelVersion": 1,
   "propertiesModelVersion": 1,

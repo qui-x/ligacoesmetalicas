@@ -10,11 +10,8 @@ lock=json.loads((root/'package-lock.json').read_text())
 check('Versão única do produto',json.loads((root/'package.json').read_text())['version']==version and lock['version']==version and lock['packages']['']['version']==version and json.loads((root/'BUILD-INFO.json').read_text())['versao']==version and f'data-app-version="{version}"' in (root/'index.html').read_text())
 core=json.loads((root/'docs/evidence/NUCLEO-PRESERVADO.json').read_text())
 changed=[p for p,h in core['unchanged'].items() if hashlib.sha512((root/p).read_bytes()).hexdigest()!=h]
-# Base de comparação: núcleo da SILM 0.3.0 recebida. Única integração aprovada na 0.4.0: retomada direta (correção de origem 0.3.x).
-# Integrações aprovadas: activity.js (0.4.0, correção de origem 0.3.x); workspace.js e domain.js (0.5.0, paridade SIAB — fontes Ver/Dados).
-expected_integrations={'js/experience/activity.js','js/workspace/workspace.js','js/core/domain.js','js/manual/manual.js'}   # manual.js: link direto para tópico (0.8.0)
-# 0.9.0: identity.js (símbolo oficial do SILM como ícone padrão); router.js + app.js (correção de origem: rota inicial direta sem aviso falso).
-expected_integrations|={'js/core/identity.js','js/navigation/router.js','js/init/app.js'}
+# Base de comparação desde a 0.10.1: núcleo da Base Estrutural 0.3.x (hoje 0.3.1), adotado sem nenhuma integração local.
+expected_integrations=set()
 check('Núcleo herdado preservado com integrações declaradas',set(changed)==expected_integrations,{'verifiedFiles':len(core['unchanged']),'approvedIntegrations':sorted(expected_integrations),'changedFiles':changed})
 activity=(root/'js/experience/activity.js').read_text()
 check('Integração opcional por domínio (resumeFree)',"resumeFree==='direct'" in activity and "resumeFree:'direct'" in (root/'domain/silm/bootstrap.js').read_text())
