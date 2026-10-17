@@ -2,7 +2,7 @@
 
 | Item | Situação | Evidência |
 |---|---|---|
-| Núcleo = Base Estrutural 0.3.0, sem alteração local | ✅ | auditoria "Núcleo herdado preservado" (`docs/evidence/NUCLEO-PRESERVADO.json`, 52 arquivos) |
+| Núcleo = Base Estrutural 0.3.1, sem alteração local | ✅ | auditoria "Núcleo herdado preservado" (`docs/evidence/NUCLEO-PRESERVADO.json`, 52 arquivos) |
 | Abertura oficial sobre a camada da família; preferência em Acessibilidade; migração única | ✅ | itens 0.9-ID1, 0.9-ID2, 0.9-ID3 e 0.10.1-MENU |
 | Página inicial editorial (R01) | ✅ | item 0.10.1-HOME |
 | Como deseja iniciar? com cartões e convite (R02) | ✅ | item 0.10.1-START |
@@ -17,5 +17,7 @@
 | Som e vibração das medições, desligados por padrão (R23, parte da família) | ✅ | item 0.10.1-SOM |
 | Regressões 0.4.x a 0.10.0 | ✅ | suítes s040 a s100 completas |
 | Nenhum dado científico alterado (schema 8) | ✅ | `validate-scientific-state.cjs`; `validate-scientific-data.cjs` |
+| Revisão adversarial: 15 achados confirmados corrigidos (grupos do SILM nas atividades, Agora com a atividade, Concluir missão, Dados do metal, tema que redesenha, confirmação verdadeira da montagem pronta, Calcular limpo, som 8–12, caminhos e rótulos do Manual, Sobre o SILM, M6) | ✅ | itens 0.10.1-REV e 0.10.1-SOM |
+| Núcleo corrigido pela Base, não pelo produto: Base 0.3.1 (confirmação declarada, segurança da abertura, `opening.stop()`) | ✅ | Base 0.3.1: 92/92 testes; `docs/evidence/NUCLEO-PRESERVADO.json` |
 | R19 missões temáticas | ⏳ rascunho | `docs/MISSOES-TEMATICAS-RASCUNHO.md` (aguarda validação do autor) |
 | R23 som de cada metal pela física | ⏳ pesquisa | precisa de fonte verificável (velocidade do som em barra fina, CRC); a rede do ambiente bloqueia as fontes |

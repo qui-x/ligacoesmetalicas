@@ -10,7 +10,7 @@ lock=json.loads((root/'package-lock.json').read_text())
 check('Versão única do produto',json.loads((root/'package.json').read_text())['version']==version and lock['version']==version and lock['packages']['']['version']==version and json.loads((root/'BUILD-INFO.json').read_text())['versao']==version and f'data-app-version="{version}"' in (root/'index.html').read_text())
 core=json.loads((root/'docs/evidence/NUCLEO-PRESERVADO.json').read_text())
 changed=[p for p,h in core['unchanged'].items() if hashlib.sha512((root/p).read_bytes()).hexdigest()!=h]
-# Base de comparação desde a 0.10.1: núcleo da Base Estrutural 0.3.0, adotado sem nenhuma integração local.
+# Base de comparação desde a 0.10.1: núcleo da Base Estrutural 0.3.x (hoje 0.3.1), adotado sem nenhuma integração local.
 expected_integrations=set()
 check('Núcleo herdado preservado com integrações declaradas',set(changed)==expected_integrations,{'verifiedFiles':len(core['unchanged']),'approvedIntegrations':sorted(expected_integrations),'changedFiles':changed})
 activity=(root/'js/experience/activity.js').read_text()

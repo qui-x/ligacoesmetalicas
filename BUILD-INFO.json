@@ -3,7 +3,7 @@
   "nome": "Simulador Interativo de Ligações Metálicas",
   "versao": "0.10.1",
   "tema": "A Arquitetura dos Metais",
-  "versaoBase": "0.3.0",
+  "versaoBase": "0.3.1",
   "scientificSchemaVersion": 8,
   "origens": [
     {
@@ -12,9 +12,9 @@
       "sha512": "e84a0043727bcca93120bede748f3e7aab55ad41e418733bb18272256c914b68ad22885e0a19addcddfb488cd6eee5764667daa2bdf924b6526b3931ecaec084"
     },
     {
-      "arquivo": "BASE-ESTRUTURAL-0.3.0.zip",
+      "arquivo": "BASE-ESTRUTURAL-0.3.1.zip",
       "papel": "núcleo adotado sem alteração (entregue ao autor fora do repositório)",
-      "sha512": "6f3fbcda30d7aaa0fe69735f8befb64bf3210df0215cc36ea5185994ba2251269631e304b578a3aa61d1bc123df8871f515022a9a13388118c63747843583ff3"
+      "sha512": "23959bfc4deae42baa9510ff61c6dc2027d57915e4a011adf9d6aa471b50622f06b31b8fa104960c8bbdf2313567ce4d50683ef404628f1d25ef70289ead3544"
     },
     {
       "arquivo": "SILM-0.9.1.zip",
@@ -89,8 +89,8 @@
       "verificado": true
     }
   ],
-  "observacaoOrigem": "Origem: entregas/SILM-0.10.0.zip deste repositório, verificado pelo SHA-512 externo; núcleo da Base Estrutural 0.3.0.",
-  "status": "SILM 0.10.1: correção de origem — gramática de interação da família (Base Estrutural 0.3.0): entrada, menu, acessibilidade, laboratório por grupos e famílias, Dados como ponto de partida, Montagens prontas, Aprender em lista, tour, som e toque; R06 Tabela Periódica cabendo na tela. Nenhum dado científico alterado.",
+  "observacaoOrigem": "Origem: entregas/SILM-0.10.0.zip deste repositório, verificado pelo SHA-512 externo; núcleo da Base Estrutural 0.3.1.",
+  "status": "SILM 0.10.1: correção de origem — gramática de interação da família (Base Estrutural 0.3.1): entrada, menu, acessibilidade, laboratório por grupos e famílias, Dados como ponto de partida, Montagens prontas, Aprender em lista, tour, som e toque; R06 Tabela Periódica cabendo na tela. Nenhum dado científico alterado.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
   "dataBuild": "2026-10-17",
   "structureModelVersion": 2,

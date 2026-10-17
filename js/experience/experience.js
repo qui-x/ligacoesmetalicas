@@ -119,7 +119,9 @@ SimCore.createExperience=ctx=>{
  function syncActivityPanel(){const a=experience.activity.current;if(experience.options.activityPanel===false||!a||!['mission','route','teacher'].includes(a.type)){S.workspace.setActivityGroup(null);return;}
   S.workspace.setActivityGroup({id:'atividade',title:{mission:'Missão',route:'Roteiro',teacher:'Atividade'}[a.type],heading:a.title,icon:'mission',render:host=>activityCard(host)});}
  /* Montagens prontas: configurações rápidas do laboratório (presets:[{id, title, objective, module, meta, facts, steps,
-    recommended, apply(ctx), notice}]). Cada cartão mostra objetivo e passos e "Preparar no Laboratório". */
+    recommended, apply(ctx), notice, confirm}]). Cada cartão mostra objetivo e passos e "Preparar no Laboratório".
+    confirm:{title, text, label} troca o texto da confirmação pedida quando já há dados (0.3.1): o produto diz o que
+    de fato acontece com o trabalho atual. */
  function presetsScreen(host,local){
   U.heading(host,'Montagens prontas','Configurações rápidas do Laboratório.');const grid=U.element('div',null,'setup-grid');
   for(const p of experience.options.presets||[]){const card=U.element('article',null,'setup-card');card.id='preset-'+p.id;const mod=experience.modules.get(p.module)?.title;card.append(U.element('p',[mod,p.meta].filter(Boolean).join(' · '),'eyebrow'),U.element('h2',p.title));if(p.objective)card.append(U.element('p',p.objective));
@@ -127,7 +129,7 @@ SimCore.createExperience=ctx=>{
    if(p.steps?.length){card.append(U.element('h3','Investigue'));const ol=U.element('ol');p.steps.forEach(s=>ol.append(U.element('li',s)));card.append(ol);}
    if(p.recommended?.length)card.append(U.element('p','Recursos recomendados: '+p.recommended.join(', ')+'.','field-hint'));
    const go=U.button('Preparar no Laboratório',async()=>{if(experience.restricted){ctx.notify('Configuração definida pela atividade.',{type:'info'});return;}
-     const a=experience.activity.current;if(a&&await experience.activity.hasData()&&!await U.confirm(ctx,'Substituir a montagem?','A configuração atual do laboratório será trocada por esta montagem. Use Desfazer ou o relatório para rever o que foi feito.','Preparar'))return;
+     const a=experience.activity.current,ask=p.confirm||{};if(a&&await experience.activity.hasData()&&!await U.confirm(ctx,ask.title||'Substituir a montagem?',ask.text||'A configuração atual do laboratório será trocada por esta montagem. Use Desfazer ou o relatório para rever o que foi feito.',ask.label||'Preparar'))return;
      if(p.module)await experience.modules.select(p.module);const ok=await p.apply(ctx);if(ok===false)return;await S.router.navigate('laboratorio');ctx.notify(p.notice||'Montagem pronta.',{type:'success'});},local.scope,{id:'preset-apply-'+p.id,primary:true});card.append(go);grid.append(card);}
   host.append(grid);
  }

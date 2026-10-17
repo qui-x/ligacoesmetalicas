@@ -1,5 +1,5 @@
 'use strict';
-window.SimCore = { version:'0.3.0', ready:false, events:new EventTarget() };
+window.SimCore = { version:'0.3.1', ready:false, events:new EventTarget() };
 SimCore.emit=(type,detail)=>SimCore.events.dispatchEvent(new CustomEvent(type,{detail}));
 SimCore.$=id=>document.getElementById(id);
 SimCore.escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

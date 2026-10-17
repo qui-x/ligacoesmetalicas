@@ -61,7 +61,7 @@
 - **Objetivos verificáveis**:
   1. Organize a estrutura do cobre.
   2. Calcule a densidade teórica (`calculations` com `formula = 'theoretical-density'`), com origem explícita de cada entrada.
-- **Conclusão pedida**: identifique de onde vem cada valor (dado tabelado, medida do modelo, constante) e o que a densidade calculada representa.
+- **Conclusão pedida**: identifique de onde vem cada valor, com os rótulos de origem do SILM (Dado tabelado, Calculado pelo SILM — origem de n e de V —, Medida do modelo quando ela alimenta o volume, Valor informado pelo usuário ou Constante definida), e o que a densidade calculada representa.
 - **Limite**: ainda não há densidade experimental com fonte no banco para comparar. Ela só entra quando houver uma fonte verificável.
 
 ## O que preciso de você
