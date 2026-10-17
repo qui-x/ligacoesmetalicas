@@ -9,7 +9,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const root=U.element('section',null,'silm-assembly silm-crystal');root.dataset.editable='true';root.setAttribute('aria-labelledby','silm-assembly-title');
  const bar=U.element('header',null,'silm-assembly-bar'),identity=U.element('div',null,'silm-assembly-identity'),titles=U.element('div');
  const badge=U.element('span',element.symbol,'silm-assembly-symbol');badge.setAttribute('aria-hidden','true');
- const eyebrow=U.element('p','MÓDULO · '+moduleTitle.toLocaleUpperCase('pt-BR'),'eyebrow silm-assembly-eyebrow');
+ const eyebrow=U.element('p','ESTRUTURA CRISTALINA','eyebrow silm-assembly-eyebrow');
  const title=U.element('h1',element.name);title.id='silm-assembly-title';title.tabIndex=-1;
  const help=U.element('a','?','ajuda-link');help.href='#/manual/estruturas-cristalinas';help.setAttribute('aria-label','Ajuda: estruturas cristalinas');help.title='Ajuda: estruturas cristalinas';
  const heading=U.element('div',null,'silm-assembly-heading');heading.append(title,help);

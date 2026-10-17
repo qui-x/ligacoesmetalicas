@@ -373,6 +373,7 @@ SILM.create = () => {
     const picks=measure.picks;measure.picks=[];const r=model.addMeasurement(type,picks);
     if(!r.ok){structureChanged();say(MEASURE_FAIL[r.reason]||'Não foi possível medir: '+r.reason+'.');return;}
     measure.review=r.measurement.id;if(type==='coordination')represent({neighbors:true,selectedUnitId:picks[0]},{announce:false});
+    ctx.feedback.tone(type==='coordination'?Number(r.measurement.value):8,{min:4,max:12});ctx.feedback.vibrate([40]);
     logEvent('Medição registrada (medida do modelo): '+TOOL_LABEL[type]+(r.measurement.parameter?' '+r.measurement.parameter:'')+' = '+displayValue(r.measurement,'Å')+'.');
     structureChanged();say(resultText(r.measurement)+' Medida do modelo.');
   }
@@ -700,7 +701,6 @@ SILM.create = () => {
     const update=()=>{const entries=model.state.investigation?historyRecord().entries:[];list.replaceChildren(...entries.map(x=>{const li=U.element('li'),t=U.element('time',new Date(x.at).toLocaleTimeString('pt-BR'));t.dateTime=x.at;li.append(t,document.createTextNode(x.text));return li;}));empty.textContent=entries.length?'':'Nenhuma ação registrada nesta investigação.';empty.hidden=!!entries.length;};
     watch(local.scope,update);update();el.append(box);
   }
-  function reportPanel(el,local){const box=U.element('section',null,'silm-panel');box.append(U.element('p','RELATÓRIO','eyebrow'),U.element('p','O relatório reúne o estado da investigação, os dados tabelados e seus textos.'),U.button('Abrir relatório',()=>ctx.screens.navigate('relatorios'),local.scope,{id:'silm-report',primary:true}));el.append(box);}
   function teacherResources(el,local){const box=U.element('section',null,'silm-teacher-resource');box.id='teacher-periodic-resource';const text=U.element('div');text.append(U.element('p','RECURSO PEDAGÓGICO','eyebrow'),U.element('h2','Tabela Periódica'),U.element('p','Visualize e explore os 118 elementos em formato ampliado para apresentação à turma.'));const open=U.button('Abrir Tabela Periódica',()=>presentation.open({opener:open}),local.scope,{id:'teacher-periodic-open',primary:true});box.append(text,open);el.append(box);}
   function reportText(){
     const state=model.snapshot(),e=selected(),i=state.investigation;if(!(e&&i))return 'SILM '+VERSION+' · Nenhuma investigação científica ativa; não há medidas ou cálculos científicos.';
@@ -751,6 +751,13 @@ SILM.create = () => {
           {id:'roteiros',title:'Roteiros Experimentais',description:'Percorra a interface com um roteiro demonstrativo.',icon:'routes',destination:'roteiros'}
         ],support:[{id:'manual',title:'Manual de uso',destination:'manual'},{id:'professor',title:'Área do Professor',destination:'professor'}]},
         accessibility:{colorNote:'Camadas, estados e medidas também são descritos em texto.'},
+        feedback:{sound:{label:'Som das medições',hint:'Tom mais agudo para coordenações maiores (4 a 12)',preview:.5},haptics:{label:'Vibrar ao registrar medição',hint:'Em celulares compatíveis'}},
+        tour:{title:'Tour do laboratório',welcome:{title:'Primeira vez no laboratório?',text:'O tour mostra a Tabela Periódica, a Montagem, o painel Ver e os Dados. Consulte também o Manual.',manualTopic:'interface'},steps:[
+          {target:'#scientific-viewport',title:'Escolha um metal',text:'Na Tabela Periódica, toque num metal disponível (borda dourada) e use Iniciar investigação.'},
+          {target:'#controls',mobileTarget:'#workspace-left',open:{side:'left',option:'estrutura'},title:'Monte a estrutura',text:'Em Montagem → Estrutura, inicie a montagem, adicione unidades e organize a estrutura cristalina de referência.'},
+          {target:'#controls',mobileTarget:'#workspace-left',open:{side:'left',option:'modulo'},title:'Escolha um módulo',text:'Explorar, Medir e Calcular: cada módulo é uma forma de investigar a mesma estrutura.'},
+          {target:'#context-panel',mobileTarget:'#workspace-right',open:{side:'right'},title:'Observe, meça e analise',text:'Em Ver, use Observar, Medir e Analisar. As medidas são do modelo, não de uma amostra real.'},
+          {target:'#workspace-right-alt',title:'Consulte os dados',text:'Em Dados ficam Medições, Cálculos, Histórico, Dados do metal e o Relatório.'}]},
         presets:[['cobre-cfc','Cobre · CFC',29,'Comece pela estrutura cúbica de face centrada do cobre.',['Observe a célula unitária e a vizinhança de um centro.','Meça a distância entre vizinhos mais próximos.']],['ferro-ccc','Ferro · CCC',26,'Comece pela estrutura cúbica de corpo centrado do ferro α.',['Compare a coordenação com a do cobre.','Calcule o fator de empacotamento.']],['magnesio-hc','Magnésio · HC',12,'Comece pela estrutura hexagonal compacta do magnésio.',['Meça os parâmetros a e c.','Calcule a razão c/a e compare com o valor ideal.']]].map(([id,title,z,objective,steps])=>({id,title,objective,module:'explorar',meta:'Estrutura cristalina',facts:['Dados de referência do banco do SILM','Célula unitária completa'],steps,apply:()=>preset(z),notice:'Montagem pronta: '+title+'.'})),
         notebook:{enabled:false},modulePanel:false,
         navigation:{desktop:[{id:'inicio',label:'Início',icon:'home'},{id:'aprender',label:'Aprender',icon:'learn'},{id:'missoes',label:'Missões',icon:'mission'},{id:'roteiros',label:'Roteiros Experimentais',icon:'routes'},{id:'laboratorio',label:'Laboratório',icon:'lab'},{id:'manual',label:'Manual',icon:'manual'}],mobile:[{id:'inicio',label:'Início',icon:'home'},{id:'aprender',label:'Aprender',icon:'learn'},{id:'laboratorio',label:'Laboratório',icon:'lab'},{id:'missoes',label:'Missões',icon:'mission'}]},

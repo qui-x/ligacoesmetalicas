@@ -89,12 +89,12 @@ module.exports={series:'0.10',async run(kit,{screenshots=false}={}){
 
  await test('0.10.1-SOM','Som e toque: linhas em Acessibilidade, desligadas por padrão; medição com a preferência ligada toca e vibra',async use=>{
   const page=await use();await page.addInitScript(()=>{window.__tones=[];const P=AudioContext.prototype,c=P.createOscillator;P.createOscillator=function(){const o=c.call(this),s=o.start.bind(o);o.start=(...a)=>{window.__tones.push(Math.round(o.frequency.value));return s(...a);};return o;};window.__vib=[];Object.defineProperty(navigator,'vibrate',{configurable:true,value:p=>{window.__vib.push(p);return true;}});});
-  await page.reload();await kit.ready(page);await page.click('#access-btn');await page.waitForSelector('#drawer-sound-check');
+  await go(page);await page.click('#access-btn');await page.waitForSelector('#drawer-sound-check');
   assert.equal(await page.evaluate(()=>document.getElementById('drawer-sound-check-label').textContent),'Som das medições');assert.equal(await page.isChecked('#drawer-sound-check'),false);
-  await page.check('#drawer-sound-check');await page.check('#drawer-vibrate-check');await page.keyboard.press('Escape');
+  await page.check('#drawer-sound-check');await page.check('#drawer-vibrate-check');assert.deepEqual(await page.evaluate(()=>window.__tones),[440],'amostra ao ligar');await page.keyboard.press('Escape');
   await kit.crystal(page,'Cu',4);await kit.switchModule(page,'medir');await openRight(page,'ver','Medir');await page.click('#silm-tool-coordination');await kit.closeRight(page);
   const id=await page.evaluate(()=>SILM.scientificState.structure.units[0].id);await page.click(`.silm-crystal-unit[data-unit-id="${id}"]`);
   await page.waitForFunction(()=>SILM.scientificState.measurements.length===1);const tones=await page.evaluate(()=>window.__tones),vib=await page.evaluate(()=>window.__vib);
-  assert.ok(tones.length>=2,'amostra + medição: '+tones);assert.deepEqual(vib.at(-1),[40]);return {tones};
+  /* Cobre (CFC): coordenação 12 → tom máximo da faixa 4–12, 880 Hz. */assert.equal(tones.at(-1),880,'tom da coordenação: '+tones);assert.deepEqual(vib.at(-1),[40]);return {tones};
  });
 }};
