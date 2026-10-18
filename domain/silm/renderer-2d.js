@@ -42,7 +42,8 @@ SILM.renderer2d=(()=>{
  const svgEl=(parent,tag,attrs,text=null)=>{const n=document.createElementNS(NS,tag);for(const [k,v]of Object.entries(attrs))n.setAttribute(k,String(v));if(text!==null)n.textContent=text;parent.append(n);return n;};
 
  function createStage(stage,{scope,area=null,readOnly=false,idPrefix='silm',camera:initial=null,reducedMotion=()=>false,announce=()=>{},describe=null,
-  onCamera=null,onBackgroundTap=null,onUnitTap=null,onUnitPress=null,items=()=>[],focusPoint=null,canArrowPan=()=>true,onReset=null,toolbar=!readOnly}={}){
+  onCamera=null,onBackgroundTap=null,onUnitTap=null,onUnitPress=null,items=()=>[],focusPoint=null,canArrowPan=()=>true,onReset=null,toolbar=!readOnly,
+  ownsUnitDrag=false,onGestureStart=null,toggleHost=null}={}){
   const U=SimCore.ExperienceUI;
   let cam=R.sanitizeCamera(initial||R.camera()),interest={x0:0,y0:0,x1:1,y1:1},margin=0,size=0;
   stage.classList.add('silm-stage');stage.dataset.renderer='2d';if(readOnly)stage.dataset.readonly='';
@@ -63,7 +64,7 @@ SILM.renderer2d=(()=>{
   const cameraText=()=>'Vista: zoom '+zoomText()+(cam.mode==='fit'?', enquadrada':'')+'. O zoom muda só a apresentação; as medidas e o estado científico não mudam (escala visual não é escala física).';
   function describeNow(){if(description)description.textContent=[describe?.(),cameraText()].filter(Boolean).join(' ');}
   /* ---------- barra de câmera (fora do palco, sobre o canto da cena; gramática de controles da família) ---------- */
-  let bar=null,output=null,inButton=null,outButton=null,dock=null;
+  let bar=null,zoomLabel=null,inButton=null,outButton=null,dock=null;
   if(toolbar&&area){
    /* No celular e na paisagem curta, a barra fica recolhida atrás de "Vista" (como "Doses" no SIAB): a cena não fica coberta. */
    dock=U.element('div',null,'silm-camera');const toggle=U.element('button',null,'secondary-btn silm-camera-toggle');toggle.type='button';toggle.id=idPrefix+'-camera-toggle';
@@ -71,13 +72,15 @@ SILM.renderer2d=(()=>{
    bar=U.element('div',null,'silm-camera-bar');bar.id=idPrefix+'-camera-bar';bar.setAttribute('role','toolbar');bar.setAttribute('aria-label','Controles da vista');
    scope.listen(toggle,'click',()=>{const open=dock.dataset.open===undefined;if(open)dock.dataset.open='';else delete dock.dataset.open;toggle.setAttribute('aria-expanded',String(open));if(open)(bar.querySelector('button[tabindex="0"]')||bar.querySelector('button'))?.focus();});
    scope.listen(dock,'keydown',e=>{if(e.key==='Escape'&&dock.dataset.open!==undefined&&getComputedStyle(toggle).display!=='none'){e.preventDefault();e.stopPropagation();delete dock.dataset.open;toggle.setAttribute('aria-expanded','false');toggle.focus();}});
-   dock.append(toggle,bar);
+   // toggleHost: o botão "Vista" fica nas ferramentas do cabeçalho da cena (não cobre unidades em 320 px).
+   if(toggleHost){toggleHost.append(toggle);dock.append(bar);}else dock.append(toggle,bar);
    const button=(id,glyph,label,key,run)=>{const b=U.element('button',null,'secondary-btn silm-camera-btn');b.type='button';b.id=idPrefix+'-camera-'+id;b.setAttribute('aria-label',label);b.title=label+' (tecla '+key+')';b.tabIndex=-1;
     const g=U.element('span',glyph,'silm-camera-glyph');g.setAttribute('aria-hidden','true');b.append(g);scope.listen(b,'click',()=>{if(b.getAttribute('aria-disabled')!=='true')run();});return b;};
    inButton=button('in','+','Aproximar','+',()=>zoomStep(Z.step));outButton=button('out','−','Afastar','−',()=>zoomStep(1/Z.step));
    const fitButton=button('fit','⤢','Enquadrar a estrutura','F',()=>fitNow()),centerButton=button('center','⌖','Centralizar','C',()=>centerNow()),resetButton=button('reset','↺','Restaurar vista','0',()=>resetNow());
-   output=U.element('output',zoomText(),'silm-camera-zoom');output.id=idPrefix+'-camera-zoom';output.setAttribute('aria-label','Zoom da vista');
-   bar.append(inButton,output,outButton,fitButton,centerButton,resetButton);inButton.tabIndex=0;area.append(dock);
+   // Valor do zoom só visual: <output> seria região viva e falaria a cada quadro do gesto; o anúncio é um por gesto.
+   zoomLabel=U.element('span',zoomText(),'silm-camera-zoom');zoomLabel.id=idPrefix+'-camera-zoom';zoomLabel.setAttribute('aria-hidden','true');
+   bar.append(inButton,zoomLabel,outButton,fitButton,centerButton,resetButton);inButton.tabIndex=0;area.append(dock);
    const buttons=[inButton,outButton,fitButton,centerButton,resetButton];
    scope.listen(bar,'keydown',e=>{const k=buttons.indexOf(document.activeElement);if(k<0)return;const next={ArrowDown:k+1,ArrowRight:k+1,ArrowUp:k-1,ArrowLeft:k-1,Home:0,End:buttons.length-1}[e.key];
     if(next==null||e.shiftKey)return;e.preventDefault();e.stopPropagation();const t=buttons[(next+buttons.length)%buttons.length];for(const b of buttons)b.tabIndex=b===t?0:-1;t.focus();});
@@ -85,7 +88,7 @@ SILM.renderer2d=(()=>{
   function apply(){
    const t=transform();for(const el of stage.querySelectorAll(':scope>[data-camera]'))el.style.transform=t;
    stage.style.setProperty('--camera-zoom',cam.zoom.toFixed(4));stage.dataset.cameraMode=cam.mode;
-   if(output)output.textContent=zoomText();inButton?.setAttribute('aria-disabled',String(cam.zoom>=Z.max-1e-6));outButton?.setAttribute('aria-disabled',String(cam.zoom<=Z.min+1e-6));
+   if(zoomLabel)zoomLabel.textContent=zoomText();inButton?.setAttribute('aria-disabled',String(cam.zoom>=Z.max-1e-6));outButton?.setAttribute('aria-disabled',String(cam.zoom<=Z.min+1e-6));
    for(const fn of listeners.camera)fn(cam);
   }
   let settleTimer=0;
@@ -104,6 +107,14 @@ SILM.renderer2d=(()=>{
   function fitNow(){setCamera(fit(interest,margin),{animate:true,say:'Vista enquadrada: zoom '+Math.round(fit(interest,margin).zoom*100)+' %.'});}
   function centerNow(){const p=focusPoint?.()||{x:(interest.x0+interest.x1)/2,y:(interest.y0+interest.y1)/2};setCamera({mode:'free',zoom:cam.zoom,x:p.x,y:p.y},{animate:true,say:'Vista centralizada.'});}
   function resetNow(){onReset?.();setCamera(fit(interest,margin),{animate:true,say:'Vista restaurada.'});}
+  /* Foco fora da vista (Tab, setas, leitor de tela): a câmera desloca o mínimo para mostrar o item; o palco nunca rola. */
+  function ensureVisible(p){
+   if(!p)return false;const v=toView(cam,p),m=Math.min(.4,.06+(p.r||0)*cam.zoom);let dx=0,dy=0;
+   if(v.x<m)dx=m-v.x;else if(v.x>1-m)dx=1-m-v.x;if(v.y<m)dy=m-v.y;else if(v.y>1-m)dy=1-m-v.y;
+   return dx||dy?setCamera(panBy(cam,dx,dy),{animate:true}):false;
+  }
+  // Foco por Tab ou leitor de tela rola o palco (overflow hidden): volta a zero, porque a inversa da câmera não conta rolagem.
+  scope.listen(stage,'scroll',()=>{if(stage.scrollLeft||stage.scrollTop){stage.scrollLeft=0;stage.scrollTop=0;}});
   /* ---------- palco quadrado: posições normalizadas independem do tamanho da tela ---------- */
   let frame=0;
   function measure(){frame=0;const host=area||stage.parentElement;if(!host)return;const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;   // oculto (outra rota, tela cheia): ignora 0×0
@@ -116,27 +127,37 @@ SILM.renderer2d=(()=>{
   const clientToScene=e=>toScene(cam,viewPoint(e));
   function sceneToClient(p){const r=stage.getBoundingClientRect(),w=stage.clientWidth||r.width,h=stage.clientHeight||r.height,v=toView(cam,p);return {x:r.left+stage.clientLeft+v.x*w,y:r.top+stage.clientTop+v.y*h};}
   const tolerance=type=>{const px=type==='mouse'?4:22;return size?px/size:.05;};
-  function viewItems(){return items().map(it=>{const v=toView(cam,it);return {id:it.id,x:v.x,y:v.y,r:(it.r||0)*cam.zoom,depth:it.depth,priority:it.priority};});}
+  function viewItems(){return items().filter(it=>it.hit!==false).map(it=>{const v=toView(cam,it);return {id:it.id,x:v.x,y:v.y,r:(it.r||0)*cam.zoom,depth:it.depth,priority:it.priority};});}
+  const gesture={pinching:()=>false};
   if(!readOnly){
-   const pointers=new Map();let pan=null,pinch=null,press=null;
+   const pointers=new Map();let pan=null,pinch=null,press=null,swallowUntil=0,pointerAt=0;
    const ignore=e=>e.target.closest?.('.silm-camera')||e.button>0;
+   const capture=id=>{try{stage.setPointerCapture(id);}catch(_){}};
    scope.listen(stage,'pointerdown',e=>{
+    pointerAt=performance.now();swallowUntil=0;   // um novo toque nunca é engolido
     if(ignore(e))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,type:e.pointerType});
-    if(pointers.size===2){const [a,b]=[...pointers.values()];pan=null;press=null;pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,cam:{...cam},mid:viewPoint({clientX:(a.x+b.x)/2,clientY:(a.y+b.y)/2})};try{stage.setPointerCapture(e.pointerId);}catch(_){}return;}
+    // Segundo dedo: pinça. A vista cancela o arrasto da unidade que o primeiro dedo tenha começado (nada se move).
+    if(pointers.size===2){const [a,b]=[...pointers.values()];pan=null;press=null;pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,cam:{...cam},mid:viewPoint({clientX:(a.x+b.x)/2,clientY:(a.y+b.y)/2})};onGestureStart?.('pinch');for(const id of pointers.keys())capture(id);return;}
     if(pointers.size>1)return;
-    if(e.target.closest('.silm-unit[data-unit-id]'))return;   // a própria vista trata o clique/arrasto da unidade
-    const id=hit(viewItems(),viewPoint(e),tolerance(e.pointerType));
+    const unit=e.target.closest('.silm-unit[data-unit-id]');
+    if(unit&&ownsUnitDrag)return;   // montagem livre editável: arrastar a unidade a move (a própria vista trata)
+    const id=unit?null:hit(viewItems(),viewPoint(e),tolerance(e.pointerType));
     if(id&&onUnitPress){onUnitPress(id,e);return;}
     if(id&&onUnitTap){press={id,pointerId:e.pointerId,x:e.clientX,y:e.clientY,threshold:e.pointerType==='mouse'?4:8};}
-    pan={pointerId:e.pointerId,x:e.clientX,y:e.clientY,cam:{...cam},moved:false,threshold:e.pointerType==='mouse'?4:8};
-    try{stage.setPointerCapture(e.pointerId);}catch(_){}
+    // Sobre uma unidade, o deslocamento só captura o ponteiro depois do limiar: um toque continua sendo o clique dela.
+    pan={pointerId:e.pointerId,x:e.clientX,y:e.clientY,cam:{...cam},moved:false,captured:!unit,threshold:e.pointerType==='mouse'?4:8};
+    if(!unit)capture(e.pointerId);
    });
+   // O clique que o navegador gera ao fim de um deslocamento não seleciona nada (Enter e Espaço têm detail 0 e passam).
+   scope.listen(stage,'click',e=>{if(e.detail>0&&performance.now()<swallowUntil){swallowUntil=0;e.stopPropagation();e.preventDefault();}},{capture:true});
+   scope.listen(stage,'focusin',e=>{const node=e.target.closest?.('[data-unit-id]');if(!node||performance.now()-pointerAt<800)return;const it=items().find(i=>i.id===node.dataset.unitId);if(it)ensureVisible(it);});
    scope.listen(stage,'pointermove',e=>{
     const p=pointers.get(e.pointerId);if(p){p.x=e.clientX;p.y=e.clientY;}
     if(pinch&&pointers.size>=2){const [a,b]=[...pointers.values()],d=Math.hypot(a.x-b.x,a.y-b.y)||1,mid=viewPoint({clientX:(a.x+b.x)/2,clientY:(a.y+b.y)/2});
      let next=zoomAt(pinch.cam,d/pinch.d,pinch.mid);next=panBy(next,mid.x-pinch.mid.x,mid.y-pinch.mid.y);setCamera(next,{settled:false});return;}
     if(!pan||e.pointerId!==pan.pointerId)return;
     if(!pan.moved&&Math.hypot(e.clientX-pan.x,e.clientY-pan.y)<pan.threshold)return;
+    if(!pan.captured){pan.captured=true;capture(pan.pointerId);}
     pan.moved=true;press=null;stage.dataset.panning='';const w=stage.clientWidth||1;setCamera(panBy(pan.cam,(e.clientX-pan.x)/w,(e.clientY-pan.y)/w),{settled:false});
    });
    const end=(e,commit)=>{
@@ -144,11 +165,12 @@ SILM.renderer2d=(()=>{
     if(pinch){if(pointers.size<2){pinch=null;pan=null;press=null;settle('Vista: zoom '+zoomText()+'.');}return;}
     const wasPress=press&&press.pointerId===e.pointerId?press:null;press=null;
     if(pan&&e.pointerId===pan.pointerId){const moved=pan.moved;pan=null;delete stage.dataset.panning;try{stage.releasePointerCapture(e.pointerId);}catch(_){}
-     if(moved){settle('Vista deslocada.');return;}
+     if(moved){swallowUntil=performance.now()+400;settle('Vista deslocada.');return;}
      if(!commit)return;
      if(wasPress){onUnitTap?.(wasPress.id);return;}
      onBackgroundTap?.(clientToScene(e),e);}
    };
+   gesture.pinching=()=>!!pinch;
    scope.listen(stage,'pointerup',e=>end(e,true));scope.listen(stage,'pointercancel',e=>end(e,false));scope.listen(stage,'lostpointercapture',e=>{if(pan&&e.pointerId===pan.pointerId)end(e,false);});
    scope.listen(stage,'contextmenu',e=>{if(pan||pinch)e.preventDefault();});
    scope.listen(stage,'wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();setCamera(zoomAt(cam,Math.exp(-clamp(e.deltaY,-60,60)*.006),viewPoint(e)),{settled:false});scheduleSettle(()=>'Vista: zoom '+zoomText()+'.');},{passive:false});
@@ -181,7 +203,8 @@ SILM.renderer2d=(()=>{
   Object.defineProperty(stage,'silmRenderer',{configurable:true,value:Object.freeze({snapshot:()=>({camera:{...cam},interest:{...interest},margin,size,layers:[...stage.children].map(el=>el.dataset?.layer).filter(Boolean)}),
    toClient:p=>sceneToClient(p),toScene:v=>toScene(cam,v),toView:p=>toView(cam,p),setCamera:c=>setCamera({...cam,mode:'free',...c})})});
   measure();apply();describeNow();
-  return Object.freeze({stage,layer,selectionLayer,labelsLayer,get camera(){return {...cam};},setCamera,setInterest,fit:fitNow,zoomBy:zoomStep,center:centerNow,reset:resetNow,
+  return Object.freeze({stage,layer,selectionLayer,labelsLayer,get camera(){return {...cam};},setCamera,setInterest,fit:fitNow,zoomBy:zoomStep,center:centerNow,reset:resetNow,ensureVisible,
+   get pinching(){return gesture.pinching();},descriptionId:description?.id||null,
    toView:p=>toView(cam,p),toScene:v=>toScene(cam,v),clientToScene,sceneToClient,get size(){return size;},describe:describeNow,
    visible:()=>{const a=toScene(cam,{x:0,y:0}),b=toScene(cam,{x:1,y:1});return {x0:a.x,y0:a.y,x1:b.x,y1:b.y};},
    onCamera:fn=>{listeners.camera.add(fn);return()=>listeners.camera.delete(fn);},onResize:fn=>{listeners.resize.add(fn);return()=>listeners.resize.delete(fn);}});

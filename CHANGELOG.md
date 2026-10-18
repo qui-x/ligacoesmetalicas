@@ -21,6 +21,19 @@
 - **Correções:**
   - a medida em revisão não aparece mais no Calcular;
   - a conversão do toque para a cena desconta a borda do palco.
+- **Revisão adversarial** (15 achados confirmados, todos corrigidos, testes 0.11-15 a 0.11-22):
+  - o palco não rola mais ao focar uma unidade fora da vista; a câmera vai até ela;
+  - a pinça que começa numa unidade não a move;
+  - arrastar a partir de uma unidade desloca a vista no cristal e na montagem somente leitura, sem virar clique; Enter e Espaço nunca são ignorados;
+  - os elétrons estáticos da rede não se refazem ao aproximar ou deslocar;
+  - as fontes de calor ficam marcadas em toda projeção, e a faixa "calor" só aparece junto delas;
+  - o valor do zoom saiu da região viva;
+  - tocar perto da unidade selecionada escolhe o destino; o clique perto de uma unidade seleciona uma vez só;
+  - o Organizar anima a partir das posições livres;
+  - vista e vizinhos não entram mais no Histórico da investigação;
+  - a vista é gravada mesmo recarregando logo depois do gesto;
+  - o botão "Vista" foi para o cabeçalho da cena (em 320 px cobria uma unidade), e a barra fica presa ao palco no tablet em retrato;
+  - a descrição da cena também vale para a montagem livre editável.
 - **Documentação:** `docs/SILM-0.11.0.md`, `docs/RENDERER-2D.md`, `docs/CONTRATO-REPRESENTACAO-2D.md` e o tópico do Manual "Mover a vista".
 - Nenhum dado científico mudou (schema 8). O núcleo continua o da Base Estrutural 0.3.1, sem alteração.
 

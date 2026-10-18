@@ -11,7 +11,8 @@
   - Aproximar (+) e Afastar (−), com o valor do zoom;
   - Enquadrar a estrutura (F), Centralizar (C) e Restaurar vista (0).
   - Arraste o fundo para deslocar; no celular, use dois dedos para aproximar; no computador, Ctrl ou ⌘ + roda aproxima no cursor; Shift + setas também deslocam.
-  - No celular e com a tela deitada, a barra fica recolhida atrás do botão "Vista", como "Doses" no SIAB, para não cobrir a cena.
+  - No celular e com a tela deitada, a barra fica recolhida atrás do botão "Vista", como "Doses" no SIAB, para não cobrir a cena. O botão fica nas ferramentas do cabeçalho da cena.
+  - Ao focar pelo teclado uma unidade fora da vista, a câmera vai até ela; o palco nunca rola.
 - **Projeções** na estrutura cristalina: Isométrica, Frontal, Superior e Lateral. Ficam no cabeçalho da cena e em Ver → Observar → Camadas.
   - Na projeção Superior, o HC aparece como hexágono, com a camada B entre os centros da camada A; ele deixa de parecer um cubo deformado.
 - **A vista nunca muda a ciência:**
@@ -42,6 +43,28 @@ Tudo ficou no domínio: o núcleo da Base não foi alterado.
 
 - Na 0.10.1, depois de medir e trocar para Calcular, a cota antiga aparecia no lugar de "d = 2r". Agora a medida em revisão fica só em Medir.
 - A conversão do toque para a cena descontava a borda do palco errado (cerca de 1 px). Agora passa pela inversa exata da câmera.
+
+## Revisão adversarial
+
+Uma revisão independente da 0.11.0 confirmou 15 achados. Todos foram corrigidos antes da entrega, com os testes 0.11-15 a 0.11-22:
+
+| Achado | Correção |
+|---|---|
+| Focar uma unidade fora da vista rolava o palco, e a inversa do toque passava a errar | A rolagem do palco volta a zero na hora e a câmera desloca até a unidade focada |
+| A pinça que começava numa unidade a arrastava | A pinça desfaz o arrasto em curso, sem gravar nada |
+| No cristal, arrastar a partir de uma unidade não deslocava (e com mouse virava clique) | O ponteiro só é capturado depois do limiar; o clique do fim do deslocamento é ignorado |
+| Elétrons estáticos se refaziam ao aproximar ou deslocar a rede | Os centros eletrônicos vêm da janela da vista enquadrada, não da câmera |
+| Na projeção Lateral, a faixa "calor" ficava à esquerda e as unidades quentes à direita | Fontes marcadas com contorno tracejado em toda projeção; a faixa só aparece junto delas |
+| O valor do zoom era região viva e falava a cada quadro | Valor só visual; o anúncio é um por gesto |
+| Tocar perto da selecionada a soltava em vez de levá-la ao destino | A selecionada fica fora do toque por proximidade |
+| Clique de mouse perto de uma unidade alternava duas vezes | O clique gerado depois do toque perto é ignorado |
+| Um clique ignorado podia "sobrar" e engolir o próximo Enter | O descarte vale só para o clique do mesmo gesto; teclado nunca é descartado |
+| O Organizar não animava a partir das posições livres | O ponto de partida é aplicado sem transição antes da animação |
+| Trocar a vista e os vizinhos entrava no Histórico | Só anúncio; o contrato registra a herança do schema 8 |
+| Recarregar logo depois do gesto perdia a vista | Gravação pendente sai no `pagehide` e ao ocultar a aba |
+| Em 320 px, o botão "Vista" cobria uma unidade | O botão foi para o cabeçalho da cena |
+| No tablet em retrato, a barra ficava 200 px acima do palco | A barra fica presa ao topo do palco |
+| A descrição da cena não era anunciada na montagem livre editável | O grupo das unidades aponta para a descrição (`aria-describedby`) |
 
 ## Decisões registradas
 

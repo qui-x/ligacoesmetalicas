@@ -119,7 +119,8 @@ SILM.create = () => {
     if(!crystalline())return false;const before=model.state.structure.crystallography.representation;
     if(!model.setCrystalRepresentation(patch))return false;structureChanged();if(!announce)return true;
     const r=model.state.structure.crystallography.representation;
-    if('view' in patch&&patch.view!==before.view){logEvent('Vista: '+(r.view==='lattice'?'rede extensa.':'célula unitária.'));say(r.view==='lattice'?'Vista da rede extensa: a estrutura se repete além da célula.':'Vista da célula unitária.');}
+    // Vista, célula, rótulos e vizinhos são representação (herdada no schema 8): anunciados, mas fora do Histórico da investigação.
+    if('view' in patch&&patch.view!==before.view){say(r.view==='lattice'?'Vista da rede extensa: a estrutura se repete além da célula.':'Vista da célula unitária.');}
     if('unitCell' in patch&&patch.unitCell!==before.unitCell)say('Célula unitária '+(r.unitCell?'visível.':'oculta. A estrutura cristalina não muda.'));
     if('labels' in patch&&patch.labels!==before.labels)say('Rótulos das posições '+(r.labels?'visíveis.':'ocultos.'));
     if('neighbors' in patch||'selectedUnitId' in patch)announceNeighbors();
@@ -140,7 +141,7 @@ SILM.create = () => {
     const r=model.state.structure?.crystallography?.representation;if(!r)return;
     if(!r.neighbors&&!r.selectedUnitId){const g=geometry(),central=model.state.structure.units.find(u=>X.key(u.site)===g.cell[0].key)||model.state.structure.units[0];represent({neighbors:true,selectedUnitId:central.id});follow('unit');}
     else represent({neighbors:!r.neighbors});
-    if(model.state.structure.crystallography.representation.neighbors)logEvent('Vizinhos imediatos destacados.');else say('Destaque de vizinhos desligado.');
+    if(!model.state.structure.crystallography.representation.neighbors)say('Destaque de vizinhos desligado.');
   }
   /* ---------- Modelo eletrônico (0.6.x): elétrons de valência deslocalizados, representação qualitativa ---------- */
   const ELECTRONS_DROPPED='Modelo eletrônico desativado: a distribuição coletiva precisa de ao menos duas unidades.';
@@ -581,6 +582,8 @@ SILM.create = () => {
   /* ---------- Representação 2D (0.11.x): projeção e câmera — fora do estado científico, do Desfazer e do Histórico ---------- */
   const RP=SILM.representation;let representation=RP.defaults(null),representationTimer=0;
   function saveRepresentation(){if(representationTimer)clearTimeout(representationTimer);representationTimer=setTimeout(()=>{representationTimer=0;if(ctx&&model.state.investigation)ctx.storage.set('representation.view',representation);},250);}
+  // Gravação pendente sai já ao trocar de aba, fechar ou recarregar (pagehide): a vista volta como foi deixada.
+  function flushRepresentation(){if(!representationTimer)return;clearTimeout(representationTimer);representationTimer=0;if(ctx&&model.state.investigation)ctx.storage.set('representation.view',representation);}
   function resetRepresentation(){representation=RP.defaults(model.state.investigation?.id||null);if(model.state.investigation)ctx.storage.set('representation.view',representation);else ctx.storage.remove('representation.view');}
   const representationApi=Object.freeze({
     projection:()=>representation.projection,
@@ -773,7 +776,8 @@ SILM.create = () => {
       showTable=!selected();restoringModule=!!selected()&&model.state.module.active!=='explorar';
       presentation=SILM.createPresentation(ctx,{onInvestigate:investigate,onSources:renderSources,canInvestigate:canTeacherInvestigate});SILM.presentationSelection=presentation.state;ctx.scope.cleanup(()=>{viewScope?.destroy();viewScope=null;delete SILM.presentationSelection;});
       Object.defineProperty(SILM,'scientificState',{configurable:true,get:()=>model.snapshot()});
-      Object.defineProperty(SILM,'representationState',{configurable:true,get:()=>representationState()});ctx.scope.cleanup(()=>{delete SILM.representationState;if(representationTimer){clearTimeout(representationTimer);representationTimer=0;if(model.state.investigation)ctx.storage.set('representation.view',representation);}});
+      Object.defineProperty(SILM,'representationState',{configurable:true,get:()=>representationState()});ctx.scope.cleanup(()=>{delete SILM.representationState;flushRepresentation();});
+      ctx.scope.listen(window,'pagehide',flushRepresentation);ctx.scope.listen(document,'visibilitychange',()=>{if(document.hidden)flushRepresentation();});
       ctx.scope.cleanup(()=>{delete SILM.scientificState;});
       ctx.experience.configure({
         home:{title:'A Arquitetura',titleAccent:'dos Metais',motto:'Observe. Monte. Meça. Interprete.',featured:'laboratorio',primary:[

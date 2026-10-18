@@ -13,7 +13,8 @@ projection ≠ new scientific state
 
 1. **Estado científico ≠ estado de representação.**
    - São representação: zoom, deslocamento (pan), projeção, modo de enquadramento, camadas visuais, seleção visual e sobreposições.
-   - Mudar a representação nunca escreve no `scientificState`, não entra no Desfazer nem no Histórico da investigação e não muda o schema (continua 8).
+   - Mudar a representação (zoom, pan, projeção) nunca escreve no `scientificState`, não entra no Desfazer nem no Histórico da investigação e não muda o schema (continua 8).
+   - Exceção herdada: vista Célula/Rede, célula, rótulos, vizinhos e unidade selecionada ainda ficam no estado do schema 8 (ver "Herança do schema 8" abaixo). Mesmo assim, desde a revisão da 0.11.0 eles não entram no Desfazer nem no Histórico; só são anunciados.
 2. **A escala da tela não é escala física.**
    - Aproximar ou afastar muda só a apresentação.
    - Medir e Calcular usam apenas as coordenadas científicas: Å na estrutura cristalina; posição normalizada na montagem livre, que não tem escala física e por isso não admite medida nem cálculo absolutos.
@@ -57,11 +58,15 @@ coordenadas da tela (px)
   - redimensionar a tela ou abrir o teclado virtual não move nada, porque a câmera está em unidades da cena.
 - O pan é limitado: o centro da vista fica dentro da caixa de interesse, alargada pela vista.
 - **Controles da vista:**
-  - barra `role=toolbar` com os botões Aproximar, Afastar, Enquadrar a estrutura, Centralizar e Restaurar vista, e a saída do zoom;
-  - botões de 44 px; a barra fica fora do palco no DOM, sobre o canto superior direito da cena;
+  - barra `role=toolbar` com os botões Aproximar, Afastar, Enquadrar a estrutura, Centralizar e Restaurar vista, e o valor do zoom;
+  - o valor do zoom é só visual (`span aria-hidden`): um `<output>` seria região viva e falaria a cada quadro do gesto;
+  - botões de 44 px; a barra fica fora do palco no DOM, presa ao canto superior direito do palco (também no tablet em retrato, quando a área é mais alta que o palco);
   - no celular e na paisagem curta, a barra fica recolhida atrás do botão "Vista" (`aria-expanded`), como "Doses" no SIAB; Esc fecha;
+  - o botão "Vista" fica nas ferramentas do cabeçalho da cena, e não sobre a cena: em 320 px ele não cobre nenhuma unidade;
   - teclas na área da cena: + − F C 0 e Shift + setas;
   - gestos: arrastar o fundo, pinça e Ctrl/⌘ + roda.
+- **O palco não rola.** Focar uma unidade fora da vista (Tab, setas, leitor de tela) leva a câmera até ela, pelo mínimo necessário. Se o navegador rolar o palco ao focar, o renderizador zera a rolagem na hora, porque a inversa da câmera não conta rolagem.
+- **Gravação:** a câmera é gravada 250 ms depois do gesto. Ao trocar de aba, fechar ou recarregar (`pagehide`, `visibilitychange`), a gravação pendente sai na hora.
 - **Anúncios:** um por gesto ou botão ("Vista: zoom 125 %.", "Vista enquadrada…", "Vista restaurada.", "Vista deslocada."), nunca um por quadro.
 
 ## Estado de representação (`representationState`)
@@ -108,16 +113,19 @@ measurementOverlay → calculationOverlay → labels → selection
 - **Gestos:**
   - toque seleciona;
   - arrastar uma unidade a move (só na montagem livre, em Explorar);
-  - arrastar o fundo desloca;
-  - um toque no fundo, com uma unidade selecionada na montagem livre, leva a unidade até lá.
+  - arrastar o fundo desloca. No cristal e na montagem somente leitura, arrastar a partir de uma unidade também desloca. O ponteiro só é capturado depois do limiar, para que um toque continue sendo o clique da unidade, e o clique gerado ao fim do deslocamento é ignorado. Enter e Espaço nunca são ignorados;
+  - a pinça cancela o arrasto que o primeiro dedo tenha começado numa unidade: nada se move e nada é gravado;
+  - um toque no fundo, com uma unidade selecionada na montagem livre, leva a unidade até lá. A própria selecionada fica fora do toque por proximidade, então tocar perto dela também escolhe o destino. Tocar nela mesma ainda a solta.
 
 ## Rede extensa, elétrons e propriedades
 
 - **Rede:** é uma janela em torno da área visível, com esmaecimento a partir do centro da vista e no máximo 260 sítios. É refeita ao fim de cada gesto, não a cada quadro.
-- **Elétrons:** os centros e os marcadores ficam em coordenadas da cena, e a câmera entra só no desenho. Aproximar ou deslocar não refaz a distribuição. Os limites acompanham a estrutura, incluindo a rede além da cena.
+- **Elétrons:** os centros e os marcadores ficam em coordenadas da cena, e a câmera entra só no desenho. Na rede, os centros vêm da janela da vista enquadrada, e não da câmera atual. Por isso aproximar ou deslocar não refaz a distribuição estática (teste 0.11-18). Os limites acompanham a estrutura, incluindo a rede além da cena.
 - **Propriedades:**
   - as setas de campo e de força ficam presas ao palco;
   - a faixa de calor e o alvo do feixe de luz acompanham a estrutura;
+  - as fontes de calor são as mesmas unidades em toda projeção, escolhidas na projeção de referência. Elas recebem contorno tracejado (`data-heat-source`) e "na região aquecida" no nome acessível;
+  - a faixa "calor" só aparece quando as fontes estão à esquerda na projeção atual. Na Lateral, por exemplo, elas podem ficar à direita: a faixa some e a descrição da cena explica;
   - não há motor paralelo: os contratos da 0.7.x valem como antes.
 
 ## Acessibilidade

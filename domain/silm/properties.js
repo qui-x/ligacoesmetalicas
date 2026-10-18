@@ -77,12 +77,13 @@ window.SILM=window.SILM||{};
   if(pr.active==='ductility'&&pr.ductility.elongation)return p=>elongate(p,c,pr.ductility.elongation);
   return null;
  }
+ /* Fontes: as unidades da faixa esquerda (18 % da largura) na projeção de referência; a vista as marca onde estiverem. */
+ function heatSources(points){const xs=points.map(p=>p.x),min=Math.min(...xs),max=Math.max(...xs),span=Math.max(1e-9,max-min);return points.map(p=>(p.x-min)/span<=.18);}
  /* Condução térmica: propagação qualitativa por vizinhança, a partir da região aquecida (lado esquerdo).
     Etapas discretas e determinísticas; valores limitados a 1 (sem fusão nem mudança de fase). */
  function heat(points,spacing,stage){
   const n=points.length;if(!n)return [];
-  const xs=points.map(p=>p.x),min=Math.min(...xs),max=Math.max(...xs),span=Math.max(1e-9,max-min);
-  const source=points.map(p=>(p.x-min)/span<=.18),links=points.map((p,i)=>points.map((q,j)=>j!==i&&Math.hypot(p.x-q.x,p.y-q.y)<=spacing*1.25?j:-1).filter(j=>j>=0));
+  const source=heatSources(points),links=points.map((p,i)=>points.map((q,j)=>j!==i&&Math.hypot(p.x-q.x,p.y-q.y)<=spacing*1.25?j:-1).filter(j=>j>=0));
   let e=points.map((_,i)=>source[i]?1:0);
   for(let s=0;s<stage*2;s++){const next=e.map((v,i)=>source[i]?1:Math.min(1,v+.14*links[i].reduce((a,j)=>a+(e[j]-v),0)));e=next;}
   return e.map(v=>Math.round(Math.max(0,Math.min(1,v))*4));   // níveis 0–4 (padrão de anéis + texto, não só cor)
@@ -103,6 +104,6 @@ window.SILM=window.SILM||{};
    return {action:'Luz incidente sobre a superfície.',observation:'A superfície reflete a maior parte da luz visível incidente: brilho metálico.',interpretation:'Os elétrons deslocalizados próximos da superfície respondem à luz incidente e a reemitem, o que produz alta reflexão. A cor própria de cada metal não é representada.'};}
   return off;
  }
- SILM.properties=Object.freeze({ids:IDS,defaults,limits,catalog,reasons,phase,data,eligibility,deformer,compress,elongate,heat,heatWord,narrative,
+ SILM.properties=Object.freeze({ids:IDS,defaults,limits,catalog,reasons,phase,data,eligibility,deformer,compress,elongate,heat,heatSources,heatWord,narrative,
   fresh:()=>({modelVersion:1,active:null,startedAt:null,...JSON.parse(JSON.stringify(defaults))})});
 })();

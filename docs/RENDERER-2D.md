@@ -28,6 +28,8 @@ As três desenham sobre o mesmo palco, com a mesma ordem de camadas e a mesma c�
 | `setInterest(caixa, {margin})` | Caixa de interesse (enquadrar acompanha em modo `fit`) |
 | `setCamera`, `fit`, `zoomBy`, `center`, `reset` | Câmera (mesmo caminho dos botões) |
 | `toView`, `toScene`, `clientToScene`, `sceneToClient`, `visible()` | Transformações e janela visível em coordenadas da cena |
+| `ensureVisible(ponto)` | Desloca a câmera o mínimo para mostrar o ponto (foco por teclado, passo de teclado na montagem) |
+| `pinching`, `descriptionId` | Pinça em curso (a vista ignora arrastos) e id da descrição da cena (para `aria-describedby`) |
 | `selectionLayer()`, `labelsLayer()` | Anel de seleção e rótulos com tamanho de tela constante e sem colisão |
 | `onCamera(fn)`, `onResize(fn)`, `describe()` | Repintar sobreposições, ajustar ao tamanho, atualizar a descrição |
 
@@ -41,7 +43,12 @@ As três desenham sobre o mesmo palco, com a mesma ordem de camadas e a mesma c�
 - `focusPoint`: Centralizar;
 - `onReset`: Restaurar vista volta à projeção isométrica;
 - `describe`: texto da cena para a camada semântica;
-- `readOnly`: comparação.
+- `readOnly`: comparação;
+- `ownsUnitDrag`: a vista arrasta as próprias unidades (só a montagem livre editável). Sem ele, arrastar a partir de uma unidade desloca a vista;
+- `onGestureStart`: aviso de início de pinça, para a vista desfazer o arrasto em curso;
+- `toggleHost`: onde fica o botão "Vista" (as ferramentas do cabeçalho da cena).
+
+Os itens de `items` podem ter `hit: false`: continuam valendo para o foco, mas ficam fora do toque por proximidade. A montagem livre usa isso para a unidade selecionada.
 
 **Diagnóstico para os testes:** `stage.silmRenderer`. Expõe `snapshot()`, `toClient`, `toScene`, `toView` e `setCamera`. O `setCamera` mexe só na representação, pelo mesmo caminho e com os mesmos limites dos botões.
 
