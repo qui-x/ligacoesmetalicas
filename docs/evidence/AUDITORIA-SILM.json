@@ -1,6 +1,6 @@
 {
   "product": "SILM",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "checks": [
     {
       "check": "Versão única do produto",
@@ -66,7 +66,7 @@
     },
     {
       "check": "Documentação obrigatória",
-      "status": "PASS",
+      "status": "FAIL",
       "detail": null
     },
     {
@@ -175,8 +175,23 @@
       "detail": {
         "mismatch": []
       }
+    },
+    {
+      "check": "Representação 2D: renderizador comum nas três cenas, sem ligações e com a ordem central de camadas",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Representação 2D: representationState separado e versionado; câmera fora do estado científico, do Desfazer e do Histórico",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Representação 2D: projeção isométrica congelada para o Organizar e o calor (vistas não mudam o estado nem a experiência)",
+      "status": "PASS",
+      "detail": null
     }
   ],
-  "passed": 33,
-  "failed": 0
+  "passed": 35,
+  "failed": 1
 }
