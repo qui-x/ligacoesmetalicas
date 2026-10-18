@@ -3,7 +3,7 @@ window.SILM = window.SILM || {};
 SILM.create = () => {
   const U = SimCore.ExperienceUI, model = SILM.createScientificState(), X = SILM.crystal;
   let ctx = null, host = null;
-  const icon = 'assets/silm-simbolo.svg', VERSION = '0.10.1';
+  const icon = 'assets/silm-simbolo.svg', VERSION = '0.11.0';
   const modules = [
     {id:'explorar',number:1,title:'Explorar',description:'Investigação qualitativa integrada: monte, organize, observe célula, rede, elétrons e propriedades, use camadas e compare representações.',icon:'explore',
      facts:[['Você ajusta','Metal, unidades e organização cristalina'],['Você observa','Célula, rede, elétrons e propriedades'],['Bom para','Construir e comparar representações']],note:'Representação didática: a organização cristalina não é uma simulação de cristalização.'},
@@ -29,7 +29,8 @@ SILM.create = () => {
   /* Sem metal: na navegação livre, o pedido de escolher um; em atividade restrita, que ela não usa metal. */
   const noMetal=text=>canInvestigate()?text:'Esta atividade não usa um metal. Para investigar um metal, use Encerrar atividade no Menu da atividade.';
   const canTeacherInvestigate=()=>!ctx.activity.current||ctx.activity.current.type==='free';
-  const reducedMotion=()=>!!(ctx?.accessibility.reducedMotion||document.documentElement.dataset.motion==='on'||matchMedia('(prefers-reduced-motion: reduce)').matches);
+  // 0.11.x: como no SIAB (semMovimento), Leitura simples também reduz movimento.
+  const reducedMotion=()=>!!(ctx?.accessibility.reducedMotion||ctx?.accessibility.state?.reading==='on'||document.documentElement.dataset.motion==='on'||document.documentElement.dataset.reading==='on'||matchMedia('(prefers-reduced-motion: reduce)').matches);
   const tag=(text,cls='silm-kind-tag')=>U.element('span',text,cls);
   /* ---------- Histórico da investigação (paridade SIAB: sequência cronológica, não é Caderno nem relatório) ---------- */
   const HISTORY_LIMIT=300;
@@ -48,7 +49,7 @@ SILM.create = () => {
   async function preset(z){
     const e=D.get(z);if(!e||e.silmEligibility.status!=='available'||!canInvestigate())return false;
     if(!model.begin(e.atomicNumber,ctx.activity.current?.type||'free'))return false;
-    exploration=EX.sanitize(null);ctx.storage.set('exploration.view',exploration);applyLayers();resetMeasure();resetCalc();showTable=false;tableState.selection=e.atomicNumber;
+    exploration=EX.sanitize(null);ctx.storage.set('exploration.view',exploration);applyLayers();resetMeasure();resetCalc();resetRepresentation();showTable=false;tableState.selection=e.atomicNumber;
     if(!model.beginAssembly()||!model.addUnit().ok)return false;const r=model.organize();if(!r.ok)return false;
     const m=X.models[crystalOf(e).structureType];logEvent('Montagem pronta: '+e.name+' · '+m.code+' ('+m.international+').');follow('structure');await ctx.activity.touch();contextChanged();return true;
   }
@@ -59,7 +60,7 @@ SILM.create = () => {
     const units=model.state.structure?.units.length||0,assembly=model.state.structure?' A '+(crystalline()?'estrutura cristalina atual':'montagem atual')+(units?' com '+units+' '+(units===1?'unidade':'unidades'):'')+' será removida; as unidades não são convertidas para o novo metal.':'';
     if(model.state.investigation&&!await U.confirm(ctx,'Iniciar uma nova investigação?','A investigação atual será encerrada. Seus dados científicos serão substituídos; os textos de relatório permanecem salvos.'+assembly,'Iniciar nova investigação'))return false;
     if(!model.begin(e.atomicNumber,ctx.activity.current?.type||'free'))return false;
-    exploration=EX.sanitize(null);ctx.storage.set('exploration.view',exploration);applyLayers();resetMeasure();resetCalc();
+    exploration=EX.sanitize(null);ctx.storage.set('exploration.view',exploration);applyLayers();resetMeasure();resetCalc();resetRepresentation();
     logEvent('Investigação iniciada com '+e.name+' ('+e.symbol+').');
     showTable=false;tableState.selection=e.atomicNumber;await ctx.activity.touch();contextChanged();await ctx.screens.navigate('laboratorio');
     ctx.viewport.host.scrollTop=0;host?.querySelector('h1')?.focus();SimCore.notifications.announce('Investigação iniciada com '+e.name+'.');return true;
@@ -70,7 +71,7 @@ SILM.create = () => {
   }
   async function closeInvestigation(){if(!model.state.investigation)return false;
     if(!await confirmDestructive('Encerrar investigação?','O metal e a estrutura serão removidos e o Laboratório voltará à seleção. Os textos de relatório permanecem salvos.','Encerrar investigação'))return false;
-    model.close();ctx.storage.remove('investigation.history');ctx.storage.remove('exploration.view');exploration=EX.sanitize(null);applyLayers();resetMeasure();resetCalc();showTable=true;tableState.selection=null;tableState.query='';await ctx.activity.touch();contextChanged();ctx.viewport.host.scrollTop=0;ctx.notify('Investigação encerrada.',{type:'info'});SimCore.notifications.announce('Investigação encerrada. Selecione um metal.');return true;
+    model.close();ctx.storage.remove('investigation.history');ctx.storage.remove('exploration.view');ctx.storage.remove('representation.view');representation=RP.defaults(null);exploration=EX.sanitize(null);applyLayers();resetMeasure();resetCalc();showTable=true;tableState.selection=null;tableState.query='';await ctx.activity.touch();contextChanged();ctx.viewport.host.scrollTop=0;ctx.notify('Investigação encerrada.',{type:'info'});SimCore.notifications.announce('Investigação encerrada. Selecione um metal.');return true;
   }
   /* ---------- Montagem livre (0.4.x) ---------- */
   function structureChanged(){view?.update();for(const fn of [...watchers])fn();}
@@ -104,7 +105,8 @@ SILM.create = () => {
     const body=U.element('div');body.append(U.element('p','As unidades serão organizadas segundo a estrutura cristalina de referência deste metal.'),U.element('p',e.name+': '+m.code+' ('+m.international+') · '+m.name+'. Condição de referência: '+ref.conditions.temperature.display+'; '+lower(ref.conditions.pressure.display)+'.'),U.element('p','Suas '+n+' '+(n===1?'unidade será reposicionada':'unidades serão reposicionadas')+(complete?'; o SILM completará '+complete+' '+(complete===1?'unidade':'unidades')+' para representar a célula unitária ('+m.cellSites+' posições).':'.')),U.element('p','A montagem livre fica guardada e pode ser restaurada com Voltar à montagem livre. Esta é uma reorganização didática, não uma simulação de cristalização.'));
     const handle=ctx.modal.open({title:'Organizar estrutura?',content:body,actions:[{id:'cancel',label:'Cancelar'},{id:'organize',label:'Organizar estrutura',primary:true}]});
     if((await handle?.result)!=='organize')return false;
-    const from=Object.fromEntries(model.state.structure.units.map(u=>[u.id,u.position]));
+    const freeCam=view?.renderer?.camera||representation.cameras.free,from=Object.fromEntries(model.state.structure.units.map(u=>[u.id,SILM.renderer2d.toView(freeCam,u.position)]));
+    representation.cameras.crystal=RP.camera();saveRepresentation();
     const r=model.organize();if(!r.ok){say('Não foi possível organizar a estrutura.');return false;}
     pendingAnimation=from;follow('structure');logEvent('Estrutura organizada como '+m.code+' ('+m.international+'): '+r.reused+' unidades reaproveitadas'+(r.added?', '+r.added+' completadas pelo SILM.':'.'));
     await ctx.activity.touch();contextChanged();view?.title?.focus();
@@ -204,8 +206,8 @@ SILM.create = () => {
     view=null;viewKey=key;viewScope?.destroy();viewScope=SimCore.createScope();host.replaceChildren();
     if(table){SILM.createPeriodicTable(host,{scope:viewScope,state:tableState,onInvestigate:investigate,onSources:openSources,canInvestigate});return;}
     const e=selected();
-    if(key&&structure.mode==='crystalline'){const animateFrom=pendingAnimation;pendingAnimation=null;view=SILM.createCrystalView(host,{scope:viewScope,model,element:e,geometry:geometry(),moduleTitle:moduleName(),note:editable()?'':moduleMessage(model.state.module.active),animateFrom,reducedMotion,electrons:electronOptions(),properties:propertyOptions(),measure:measureOptions(),calc:calcOptions(),actions:{represent,select:selectCrystal,toggleNeighbors}});return;}
-    if(key){view=SILM.createAssemblyView(host,{scope:viewScope,model,element:e,editable:editable(),note:moduleMessage(model.state.module.active),reference:referenceName(e),moduleTitle:moduleName(),describeLast,actions:{add:addUnit,undo:undoAction,move:moveUnit},canExplore:()=>ctx.modules.available('explorar'),onExplore:explore,organize:{run:organizeStructure,state:organizeState},reducedMotion,electrons:electronOptions(),properties:propertyOptions()});return;}
+    if(key&&structure.mode==='crystalline'){const animateFrom=pendingAnimation;pendingAnimation=null;view=SILM.createCrystalView(host,{scope:viewScope,model,element:e,geometry:geometry(),moduleTitle:moduleName(),note:editable()?'':moduleMessage(model.state.module.active),animateFrom,reducedMotion,electrons:electronOptions(),properties:propertyOptions(),measure:measureOptions(),calc:calcOptions(),representation:representationApi,actions:{represent,select:selectCrystal,toggleNeighbors}});return;}
+    if(key){view=SILM.createAssemblyView(host,{scope:viewScope,model,element:e,editable:editable(),note:moduleMessage(model.state.module.active),reference:referenceName(e),moduleTitle:moduleName(),describeLast,actions:{add:addUnit,undo:undoAction,move:moveUnit},canExplore:()=>ctx.modules.available('explorar'),onExplore:explore,organize:{run:organizeStructure,state:organizeState},reducedMotion,electrons:electronOptions(),properties:propertyOptions(),representation:representationApi});return;}
     const card=U.element('section',null,'silm-metal-card');
     card.append(U.element('p','LABORATÓRIO · '+moduleName().toUpperCase(),'eyebrow'));
     if(e)card.append(U.element('div',e.symbol,'metal-symbol'));
@@ -576,6 +578,24 @@ SILM.create = () => {
   function applyLayers(){if(!host)return;host.dataset.centers=exploration.layers.centers?'on':'dim';host.dataset.hints=exploration.layers.propertyHints?'on':'off';}
   function setExploration(patch){exploration=EX.sanitize({...exploration,...patch,layers:{...exploration.layers,...(patch.layers||{})}});if(ctx&&model.state.investigation)ctx.storage.set('exploration.view',exploration);applyLayers();for(const fn of [...watchers])fn();}
   const follow=focus=>setExploration({focus});   // o painel acompanha o último objeto com que o estudante interagiu
+  /* ---------- Representação 2D (0.11.x): projeção e câmera — fora do estado científico, do Desfazer e do Histórico ---------- */
+  const RP=SILM.representation;let representation=RP.defaults(null),representationTimer=0;
+  function saveRepresentation(){if(representationTimer)clearTimeout(representationTimer);representationTimer=setTimeout(()=>{representationTimer=0;if(ctx&&model.state.investigation)ctx.storage.set('representation.view',representation);},250);}
+  function resetRepresentation(){representation=RP.defaults(model.state.investigation?.id||null);if(model.state.investigation)ctx.storage.set('representation.view',representation);else ctx.storage.remove('representation.view');}
+  const representationApi=Object.freeze({
+    projection:()=>representation.projection,
+    camera:mode=>({...representation.cameras[mode]}),
+    saveCamera(mode,cam){representation.cameras[mode]=RP.sanitizeCamera(cam);saveRepresentation();},
+    setProjection(p){if(!RP.PROJECTIONS.includes(p)||p===representation.projection)return;representation.projection=p;saveRepresentation();view?.update();for(const fn of [...watchers])fn();
+      say('Projeção '+RP.LABELS[p].toLocaleLowerCase('pt-BR')+'. Muda só a apresentação: a estrutura e as medidas não mudam.');}
+  });
+  /* Fachada de leitura (testes e depuração): compõe a representação herdada do schema 8 com a da 0.11.x. */
+  function representationState(){
+    const s=model.state,st=s.structure,cr=st?.mode==='crystalline'?st.crystallography.representation:null,mode=cr?'crystal':'free',cam=view?.renderer?.camera||representation.cameras[mode],marks=calcOptions().marks();
+    return Object.freeze({version:RP.VERSION,view:st?(cr?cr.view:'free'):null,zoom:cam.zoom,pan:{x:cam.x,y:cam.y},camera:cam.mode,projection:cr?representation.projection:null,
+      layers:{unitCell:cr?.unitCell??null,neighbors:cr?.neighbors??null,labels:cr?.labels??null,centers:exploration.layers.centers,propertyHints:exploration.layers.propertyHints,electrons:!!s.electrons?.representation.visible},
+      selection:cr?cr.selectedUnitId:(view?.selected??null),overlays:{measure:measure.tool||(measure.review?'review':null),calculation:marks?.mode||null}});
+  }
   function structureBlock(container,scope,e){
     const body=U.element('div'),limits=U.element('details'),list=U.element('ul');limits.append(U.element('summary','Limitações do modelo'),list);for(const t of LIMITS)list.append(U.element('li',t));
     const sources=U.button('Fontes destes dados',()=>openSources(e),scope,{id:'silm-observe-sources'});container.append(body,sources,limits);
@@ -657,7 +677,12 @@ SILM.create = () => {
       {id:'hints',label:'Indicações da propriedade',when:()=>!!model.state.properties.active,on:()=>exploration.layers.propertyHints,run:()=>{setExploration({layers:{propertyHints:!exploration.layers.propertyHints}});say(exploration.layers.propertyHints?'Indicações da propriedade visíveis.':'Indicações da propriedade ocultas; o estado da experiência continua no texto.');}}
     ];
     const buttons=defs.map(d=>{const b=SILM.actionButton(d.label,d.run,local.scope,{id:'silm-layer-'+d.id});list.append(b);return [d,b];});
-    const update=()=>{const visible=[];for(const [d,b]of buttons){const show=!d.when||d.when();b.hidden=!show;if(!show)continue;const on=!!d.on(),able=d.able?d.able():{ok:true};b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-disabled',String(!on&&!able.ok));b.title=!on&&!able.ok?able.reason:'';if(on)visible.push(d.label.toLocaleLowerCase('pt-BR'));}
+    // 0.11.x: projeção da estrutura cristalina (representação; a mesma escolha do seletor da cena).
+    const projLabel=U.element('p','Projeção','silm-measure-label'),projList=U.element('div',null,'silm-segmented silm-projection-list');projList.setAttribute('role','group');projList.setAttribute('aria-label','Projeção da estrutura');
+    const projNote=U.element('p','Muda só a apresentação: a estrutura, as medidas e os cálculos não mudam.','silm-panel-note');
+    const projButtons=RP.PROJECTIONS.map(id=>{const b=SILM.actionButton(RP.LABELS[id],()=>representationApi.setProjection(id),local.scope,{id:'silm-projection-'+id});projList.append(b);return [id,b];});
+    box.append(projLabel,projList,projNote);
+    const update=()=>{const visible=[];const cr=crystalline();projLabel.hidden=projList.hidden=projNote.hidden=!cr;for(const [id,b]of projButtons)b.setAttribute('aria-pressed',String(representation.projection===id));for(const [d,b]of buttons){const show=!d.when||d.when();b.hidden=!show;if(!show)continue;const on=!!d.on(),able=d.able?d.able():{ok:true};b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-disabled',String(!on&&!able.ok));b.title=!on&&!able.ok?able.reason:'';if(on)visible.push(d.label.toLocaleLowerCase('pt-BR'));}
       status.textContent='Camadas visíveis: '+(visible.length?visible.join(', '):'nenhuma')+'.';};
     watch(local.scope,update);update();el.append(box);
   }
@@ -669,7 +694,7 @@ SILM.create = () => {
     const panes=U.element('div',null,'silm-compare-panes');
     let toggle=null;if(narrow){toggle=U.element('div',null,'silm-segmented');toggle.setAttribute('role','group');toggle.setAttribute('aria-label','Mostrar cena');content.append(toggle);}
     content.append(panes);
-    const A=SILM.renderSnapshot(panes,{scope,state:a,element:e,label:'A: '+mode.a}).root,B=SILM.renderSnapshot(panes,{scope,state:b,element:e,label:'B: '+mode.b}).root;
+    const projection=representation.projection,A=SILM.renderSnapshot(panes,{scope,state:a,element:e,label:'A: '+mode.a,projection}).root,B=SILM.renderSnapshot(panes,{scope,state:b,element:e,label:'B: '+mode.b,projection}).root;
     if(narrow){const show=side=>{A.hidden=side!=='a';B.hidden=side!=='b';ba.setAttribute('aria-pressed',String(side==='a'));bb.setAttribute('aria-pressed',String(side==='b'));};
       const ba=SILM.actionButton('A: '+mode.a,()=>show('a'),scope,{id:'silm-compare-show-a'}),bb=SILM.actionButton('B: '+mode.b,()=>show('b'),scope,{id:'silm-compare-show-b'});toggle.append(ba,bb);show('a');}
     const handle=ctx.modal.open({title:'Comparar: '+mode.label,content,size:'wide',actions:[{id:'close',label:'Fechar'}]});
@@ -735,7 +760,7 @@ SILM.create = () => {
         {id:'analisar',title:'Analisar',icon:'analyze',items:[{id:'comparar',title:'Comparar',presentation:'wide',render:comparePanel},{id:'calcular',title:'Calcular',presentation:'standard',render:calcPanel}]}],
         data:{title:'Dados',heading:'Dados da investigação',icon:'data',intro:'Consulte medições, cálculos, o histórico e os dados de referência do metal.',tools:[{id:'medicoes',title:'Medições',presentation:'wide',render:measurementsPanel},{id:'calculos',title:'Cálculos',presentation:'wide',render:calculationsPanel},{id:'historico',title:'Histórico',presentation:'wide',render:historyPanel},{id:'tabela',title:'Dados do metal',presentation:'wide',render:tablePanel}],
           report:{title:'Relatório',text:'Estado da investigação, dados tabelados e seus textos.',action:{label:'Abrir relatório',run:()=>ctx.screens.navigate('relatorios')}}}},
-      recursos:['domain/entry.js','domain/silm/prelude.js','domain/silm/data/bundle.js','domain/silm/data-api.js','domain/silm/periodic-table.js','domain/silm/presentation.js','domain/silm/periodic-table.css','domain/silm/assembly.js','domain/silm/crystal.js','domain/silm/state.js','domain/silm/assembly-view.js','domain/silm/crystal-view.js','domain/silm/electron-view.js','domain/silm/properties.js','domain/silm/property-view.js','domain/silm/exploration.js','domain/silm/measurements.js','domain/silm/calculations.js','domain/silm/measure-view.js','domain/silm/assembly.css','domain/silm/bootstrap.js','domain/silm/manual.js','domain/silm/styles.css','domain/silm/identidade.css','domain/silm/abertura.js','domain/silm/abertura.css','domain/silm/abertura/silm-opening.js','domain/silm/abertura/silm-opening.css','assets/silm-icone.svg','assets/silm-logo-vertical.svg',icon]
+      recursos:['domain/entry.js','domain/silm/prelude.js','domain/silm/data/bundle.js','domain/silm/data-api.js','domain/silm/periodic-table.js','domain/silm/presentation.js','domain/silm/periodic-table.css','domain/silm/assembly.js','domain/silm/crystal.js','domain/silm/state.js','domain/silm/representation.js','domain/silm/renderer-2d.js','domain/silm/assembly-view.js','domain/silm/crystal-view.js','domain/silm/electron-view.js','domain/silm/properties.js','domain/silm/property-view.js','domain/silm/exploration.js','domain/silm/measurements.js','domain/silm/calculations.js','domain/silm/measure-view.js','domain/silm/assembly.css','domain/silm/bootstrap.js','domain/silm/manual.js','domain/silm/styles.css','domain/silm/identidade.css','domain/silm/abertura.js','domain/silm/abertura.css','domain/silm/abertura/silm-opening.js','domain/silm/abertura/silm-opening.css','assets/silm-icone.svg','assets/silm-logo-vertical.svg',icon]
     },
     init(context) {
       ctx=context;model.connect({storage:ctx.storage,emit:(name,detail)=>ctx.events.emit(name,detail)});
@@ -743,10 +768,12 @@ SILM.create = () => {
       if(restoration.empty){const session=ctx.storage.get('experience.session',null),legacy=session?.sessionId&&ctx.storage.get('scientific.session.'+session.sessionId,null);if(legacy)restoration=model.restore(legacy);}
       if(!restoration.ok)ctx.notify('A investigação anterior não pôde ser restaurada. Selecione um metal para iniciar outra.',{type:'warning'});
       exploration=EX.sanitize(model.state.investigation?ctx.storage.get('exploration.view',null):null);
+      representation=RP.sanitize(model.state.investigation?ctx.storage.get('representation.view',null):null,model.state.investigation?.id||null);
       {const u=ctx.storage.get('measure.view',null)?.unit;measureView={unit:UN.length[u]?u:'Å'};}
       showTable=!selected();restoringModule=!!selected()&&model.state.module.active!=='explorar';
       presentation=SILM.createPresentation(ctx,{onInvestigate:investigate,onSources:renderSources,canInvestigate:canTeacherInvestigate});SILM.presentationSelection=presentation.state;ctx.scope.cleanup(()=>{viewScope?.destroy();viewScope=null;delete SILM.presentationSelection;});
       Object.defineProperty(SILM,'scientificState',{configurable:true,get:()=>model.snapshot()});
+      Object.defineProperty(SILM,'representationState',{configurable:true,get:()=>representationState()});ctx.scope.cleanup(()=>{delete SILM.representationState;if(representationTimer){clearTimeout(representationTimer);representationTimer=0;if(model.state.investigation)ctx.storage.set('representation.view',representation);}});
       ctx.scope.cleanup(()=>{delete SILM.scientificState;});
       ctx.experience.configure({
         home:{title:'A Arquitetura',titleAccent:'dos Metais',motto:'Observe. Monte. Meça. Interprete.',featured:'laboratorio',primary:[
@@ -783,7 +810,7 @@ SILM.create = () => {
         session:{resumeFree:'direct',hasChanges(){return !!model.state.investigation;},capture(){/* scientific.state é persistido pelo serviço único no namespace SILM */},restore(){showTable=!selected();contextChanged();}},
         onStart(){/* Atividade pedagógica muda o contexto, não cria outro estado científico. */contextChanged();}
       });
-      ctx.scope.on('module:changed',event=>{const id=event.detail?.id;if(restoringModule&&id==='explorar')return;restoringModule=false;const before=model.state.module.active;model.setModule(id);if(id!=='medir'){measure.tool=null;measure.picks=[];}if(before!==id&&model.state.investigation)logEvent('Módulo: '+(ctx.modules.get(id)?.title||id)+'.');contextChanged();});
+      ctx.scope.on('module:changed',event=>{const id=event.detail?.id;if(restoringModule&&id==='explorar')return;restoringModule=false;const before=model.state.module.active;model.setModule(id);if(id!=='medir'){measure.tool=null;measure.picks=[];measure.review=null;}if(before!==id&&model.state.investigation)logEvent('Módulo: '+(ctx.modules.get(id)?.title||id)+'.');contextChanged();});
       ctx.scope.on('activity:changed',()=>{if(restoringModule){const target=model.state.module.active;restoringModule=false;ctx.modules.select(target).catch(error=>console.error('Falha ao retomar módulo',error));}contextChanged();});
       // Preferência interna de movimento: controles e camada eletrônica refletem a mudança sem recarregar.
       ctx.scope.on('a11y:changed',()=>{view?.update();for(const fn of [...watchers])fn();});

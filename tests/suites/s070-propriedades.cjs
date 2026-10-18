@@ -107,7 +107,9 @@ module.exports={series:'0.7',async run(kit,{screenshots=false}={}){
   /* 0.10.1: espera o fim das transições finitas em vez de um tempo fixo (o tempo fixo falhava com a máquina carregada). */
   await page.evaluate(()=>Promise.all(document.getAnimations().filter(a=>Number.isFinite(a.effect?.getTiming?.().iterations)&&a.effect.getTiming().iterations<Infinity).map(a=>a.finished.catch(()=>{}))));await page.waitForTimeout(200);
   const s=await snap(page),units=await page.evaluate(()=>{const st=document.getElementById('silm-assembly-stage').getBoundingClientRect();return [...document.querySelectorAll('.silm-crystal-unit')].map(n=>{const r=n.getBoundingClientRect();return {x:(r.left+r.width/2-st.left)/st.width,y:(r.top+r.height/2-st.top)/st.height};});});
-  assert.ok(units.every((u,i)=>Math.hypot(u.x-s.centerList[i].x,u.y-s.centerList[i].y)<.01),'Região eletrônica acompanha os centros deformados');
+  /* 0.11.x: centros dos elétrons ficam na cena; a câmera (que reenquadra a estrutura deformada) leva ao palco. */
+  const cam=s.camera||{zoom:1,x:.5,y:.5},view=c=>({x:(c.x-cam.x)*cam.zoom+.5,y:(c.y-cam.y)*cam.zoom+.5});
+  assert.ok(units.every((u,i)=>{const v=view(s.centerList[i]);return Math.hypot(u.x-v.x,u.y-v.y)<.01;}),'Região eletrônica acompanha os centros deformados');
   const near=s.particles.filter(p=>s.centerList.some(c=>Math.hypot(p.x-c.x,p.y-c.y)<=s.radius*1.05)).length/s.count;assert.ok(near>.7,'Distribuição sobre o conjunto: '+near);
   return {coverage:+near.toFixed(2)};
  });

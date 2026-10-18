@@ -11,7 +11,9 @@ window.SILM=window.SILM||{};
      trajetórias fechadas. Não representa velocidade física nem temperatura.
    - Campo elétrico (0.7.x, condutividade): só então se soma um viés coletivo no sentido oposto ao do campo
      (portadores negativos); o passeio aleatório continua, e os marcadores que saem a jusante reentram a montante.
-   - Sem laço contínuo quando oculto, estático, com movimento reduzido ou com a aba oculta. */
+   - Sem laço contínuo quando oculto, estático, com movimento reduzido ou com a aba oculta.
+   - 0.11.x: marcadores e centros ficam em coordenadas da cena; a câmera (setCamera) entra só no desenho. Aproximar,
+     afastar ou deslocar não refaz a distribuição. Os limites seguem a estrutura (rede além da cena incluída). */
 SILM.electronLayerLimits=Object.freeze({min:24,max:150,maxSmall:80,perCenter:6,smallStage:360});
 SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
  const L=SILM.electronLayerLimits;
@@ -19,7 +21,7 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
  stage.insertBefore(canvas,before);
  const g2=canvas.getContext('2d');
  let particles=[],centers=[],bridges=[],radius=.1,visible=false,motion=false,field=false,wraps=0,frame=0,last=0,frames=0,cost=0,seed=1,colors=null,signature='',box=null;
- let width=0,height=0,dpr=1;
+ let width=0,height=0,dpr=1,cam={zoom:1,x:.5,y:.5},lim={x0:.01,y0:.01,x1:.99,y1:.99};
  /* Gerador determinístico: a distribuição estática é a mesma para a mesma estrutura. */
  const rng=()=>{seed=(seed+0x6D2B79F5)|0;let t=Math.imul(seed^(seed>>>15),1|seed);t=(t+Math.imul(t^(t>>>7),61|t))^t;return ((t^(t>>>14))>>>0)/4294967296;};
  const gauss=()=>{const u=Math.max(1e-9,rng()),v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
@@ -35,7 +37,7 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
  }
  function spawn(){
   if(!centers.length)return null;
-  const xs=centers.map(c=>c.x),ys=centers.map(c=>c.y),x0=Math.max(0,Math.min(...xs)-radius),x1=Math.min(1,Math.max(...xs)+radius),y0=Math.max(0,Math.min(...ys)-radius),y1=Math.min(1,Math.max(...ys)+radius);
+  const xs=centers.map(c=>c.x),ys=centers.map(c=>c.y),x0=Math.max(lim.x0,Math.min(...xs)-radius),x1=Math.min(lim.x1,Math.max(...xs)+radius),y0=Math.max(lim.y0,Math.min(...ys)-radius),y1=Math.min(lim.y1,Math.max(...ys)+radius);
   for(let i=0;i<400;i++){const p={x:x0+rng()*(x1-x0),y:y0+rng()*(y1-y0)};if(nearest(p).d<=1)return make(p);}
   const c=centers[Math.floor(rng()*centers.length)];return make({x:c.x+(rng()-.5)*radius,y:c.y+(rng()-.5)*radius});
  }
@@ -63,7 +65,8 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
   g2.setTransform(1,0,0,1,0,0);g2.clearRect(0,0,canvas.width,canvas.height);if(!visible||!width)return;
   if(!colors)readColors();const r=Math.max(2.2,Math.min(3.6,width*.0085))*dpr;
   g2.fillStyle=colors.fill;g2.strokeStyle=colors.edge;g2.lineWidth=1.3*dpr;
-  for(const p of particles){g2.beginPath();g2.arc(p.x*width*dpr,p.y*height*dpr,r,0,Math.PI*2);g2.fill();g2.stroke();}
+  const sx=width*dpr*cam.zoom,sy=height*dpr*cam.zoom,ox=(.5-cam.x*cam.zoom)*width*dpr,oy=(.5-cam.y*cam.zoom)*height*dpr;
+  for(const p of particles){g2.beginPath();g2.arc(ox+p.x*sx,oy+p.y*sy,r,0,Math.PI*2);g2.fill();g2.stroke();}
  }
  function step(dt){
   const speed=radius*2.2,diffusion=.6,n=target();
@@ -79,7 +82,7 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
    if(d>1.6&&!(field&&box&&p.x<box.x0)){const q=spawn();if(q){p.x=q.x;p.y=q.y;}continue;}
    // Fora da região: vira suavemente de volta (sem reflexão em parede, sem órbita).
    if(d>1&&ref&&!(field&&box&&p.x<box.x0)){const back=Math.atan2(ref.y-p.y,ref.x-p.x);let delta=back-p.a;delta=Math.atan2(Math.sin(delta),Math.cos(delta));p.a+=delta*Math.min(1,dt*5);}
-   if(p.x<.01||p.x>.99)p.a=Math.PI-p.a;if(p.y<.01||p.y>.99)p.a=-p.a;p.x=Math.min(.99,Math.max(.01,p.x));p.y=Math.min(.99,Math.max(.01,p.y));
+   if(p.x<lim.x0||p.x>lim.x1)p.a=Math.PI-p.a;if(p.y<lim.y0||p.y>lim.y1)p.a=-p.a;p.x=Math.min(lim.x1,Math.max(lim.x0,p.x));p.y=Math.min(lim.y1,Math.max(lim.y0,p.y));
   }
  }
  function tick(now){
@@ -96,6 +99,8 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
  function update({visible:show=false,motion:move=false,field:applied=false,centers:list=[],spacing=.1,connect=false}={}){
   const sig=list.map(c=>c.x.toFixed(3)+','+c.y.toFixed(3)).join(';')+'|'+spacing.toFixed(4)+'|'+connect;
   if(sig!==signature){signature=sig;centers=list.map(c=>({x:c.x,y:c.y}));radius=Math.max(.05,Math.min(.16,spacing*.75));bridges=connect?spanningBridges(centers):[];
+   // Limites: nunca menores que a cena (0,01–0,99); com a rede além da cena, acompanham os centros.
+   if(centers.length){const xs=centers.map(c=>c.x),ys=centers.map(c=>c.y);lim={x0:Math.min(.01,Math.min(...xs)-2*radius),x1:Math.max(.99,Math.max(...xs)+2*radius),y0:Math.min(.01,Math.min(...ys)-2*radius),y1:Math.max(.99,Math.max(...ys)+2*radius)};}else lim={x0:.01,y0:.01,x1:.99,y1:.99};
    // Estrutura mudou: sem movimento, a distribuição estática é refeita (uniforme e determinística para esta
    // estrutura); com movimento, os marcadores na região continuam e o conjunto se completa.
    if(!(visible&&motion&&!reducedMotion())){particles=[];seed=[...sig].reduce((h,c)=>Math.imul(h^c.charCodeAt(0),16777619),2166136261)|0;}reconcile();}
@@ -116,9 +121,11 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
  scope.cleanup(()=>{watcher.disconnect();if(frame)cancelAnimationFrame(frame);frame=0;particles=[];});
  // Diagnóstico somente leitura (testes): não expõe nem aceita estado científico.
  Object.defineProperty(canvas,'silmElectrons',{value:Object.freeze({snapshot:()=>({visible,running:!!frame,motion:effectiveMotion(),field,wraps,count:visible?particles.length:0,target:target(),frames,cost,radius,centers:centers.length,bridges:bridges.length,
-  particles:visible?particles.map(p=>({x:p.x,y:p.y,dx:Math.cos(p.a),dy:Math.sin(p.a),vx:Math.cos(p.a)*(field?.75:1)-(field?.6:0),vy:Math.sin(p.a)*(field?.75:1)})):[],centerList:centers.map(c=>({...c}))})})});
+  particles:visible?particles.map(p=>({x:p.x,y:p.y,dx:Math.cos(p.a),dy:Math.sin(p.a),vx:Math.cos(p.a)*(field?.75:1)-(field?.6:0),vy:Math.sin(p.a)*(field?.75:1)})):[],centerList:centers.map(c=>({...c})),camera:{...cam}})})});
  requestAnimationFrame(()=>resize());
- return Object.freeze({canvas,update,incorporate,resize,get running(){return !!frame;}});
+ /* Câmera da representação: só o desenho muda (marcadores e centros continuam na cena). */
+ function setCamera(c){if(!c)return;const next={zoom:c.zoom,x:c.x,y:c.y};if(next.zoom===cam.zoom&&next.x===cam.x&&next.y===cam.y)return;cam=next;if(!effectiveMotion()||document.hidden)draw();}
+ return Object.freeze({canvas,update,incorporate,resize,setCamera,get running(){return !!frame;}});
 };
 /* Controles compartilhados pela montagem livre e pela estrutura cristalina: Mostrar/Ocultar elétrons,
    Movimento eletrônico e estado legível por leitor de tela. */

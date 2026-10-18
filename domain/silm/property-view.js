@@ -3,6 +3,8 @@ window.SILM=window.SILM||{};
 /* Representação das experiências de propriedades (0.7.x).
    - Sobreposição SVG decorativa (aria-hidden): indicação do campo, setas de força, fonte de calor e feixe de luz,
      sempre nas bordas da cena, fora da estrutura. Sem diagrama de circuito e sem setas por elétron.
+     0.11.x: coordenadas em frações do palco (câmera já aplicada); setas e rótulos ficam presos ao palco, e a fonte de
+     calor e o alvo do feixe acompanham a estrutura (heatX e light chegam convertidos pela câmera).
    - O estado legível (texto) vem das narrativas de SILM.properties; a animação nunca é a única informação.
    - Controles: somente os da propriedade ativa (mais Restaurar e Encerrar). */
 SILM.createPropertyOverlay=(stage,{before=null}={})=>{
@@ -16,13 +18,13 @@ SILM.createPropertyOverlay=(stage,{before=null}={})=>{
  const fieldG=group('silm-field-indicator'),forceG=group('silm-force-indicator'),heatG=group('silm-heat-source'),lightG=group('silm-light-beam');
  const arrow=(g,x1,y1,x2,y2,cls)=>el('line',{x1,y1,x2,y2,class:cls,'marker-end':'url(#'+uid+'-head)'},g);
  stage.insertBefore(svg,before);
- function update({field=false,force=null,level=0,heat=false,light=null}={}){
+ function update({field=false,force=null,level=0,heat=false,light=null,heatX=0}={}){
   for(const g of [fieldG,forceG,heatG,lightG])g.replaceChildren();
   if(field){arrow(fieldG,32,4.5,68,4.5,'silm-field-arrow');el('text',{x:73,y:6,class:'silm-overlay-label'},fieldG,'E');
    arrow(fieldG,64,96,40,96,'silm-drift-arrow');el('text',{x:66,y:97.4,class:'silm-overlay-label silm-overlay-small'},fieldG,'elétrons (média)');}
   if(force==='compress'&&level){for(const x of [38,50,62]){arrow(forceG,x,1,x,7,'silm-force-arrow');arrow(forceG,x,99,x,93,'silm-force-arrow');}el('text',{x:66,y:5.5,class:'silm-overlay-label silm-overlay-small'},forceG,'compressão');}
   if(force==='stretch'&&level){for(const x of [44,56]){arrow(forceG,x,8,x,1,'silm-force-arrow');arrow(forceG,x,92,x,99,'silm-force-arrow');}el('text',{x:60,y:5.5,class:'silm-overlay-label silm-overlay-small'},forceG,'tração');}
-  if(heat){el('rect',{x:0,y:8,width:5,height:84,fill:'url(#'+uid+'-hatch)',class:'silm-heat-band'},heatG);el('text',{x:6.5,y:12,class:'silm-overlay-label silm-overlay-small'},heatG,'calor');}
+  if(heat){el('rect',{x:heatX,y:8,width:5,height:84,fill:'url(#'+uid+'-hatch)',class:'silm-heat-band'},heatG);el('text',{x:heatX+6.5,y:12,class:'silm-overlay-label silm-overlay-small'},heatG,'calor');}
   if(light){const {x,y}=light;el('polygon',{points:`0,2 12,2 ${x+3},${y} ${x-3},${y}`,class:'silm-light-in',fill:'url(#'+uid+'-rays)'},lightG);
    el('polygon',{points:`${x-3},${y} ${x+3},${y} 100,2 88,2`,class:'silm-light-out'},lightG);el('text',{x:2,y:9,class:'silm-overlay-label silm-overlay-small'},lightG,'luz incidente');el('text',{x:98,y:9,'text-anchor':'end',class:'silm-overlay-label silm-overlay-small'},lightG,'luz refletida');}
  }

@@ -233,8 +233,10 @@ module.exports={series:'0.4',async run(kit,{screenshots=false}={}){
   const page=await use();await investigate(page);await assemble(page,5);await page.evaluate(()=>SimCore.accessibility.set('contrast',true));
   const id=(await units(page))[1].id;await page.click(`.silm-unit[data-unit-id="${id}"]`);
   const css=await page.evaluate(id=>{const sel=document.querySelector(`.silm-unit[data-unit-id="${id}"]`),other=document.querySelector(`.silm-unit:not([data-unit-id="${id}"])`);const core=n=>getComputedStyle(n.querySelector('.silm-unit-core'));
-   return {selectedOutline:core(sel).outlineWidth,otherOutline:core(other).outlineStyle,ring:getComputedStyle(sel,'::after').borderStyle,border:core(other).borderTopColor};},id);
-  assert.notEqual(css.selectedOutline,'0px');assert.equal(css.ring,'dashed');assert.equal(css.otherOutline,'none');
+   /* 0.11.x: o anel tracejado vive na camada de seleção do renderizador (acima da estrutura), não no ::after do botão. */
+   const ring=document.querySelector('#silm-assembly-stage [data-layer=selection] .silm-selection-ring');
+   return {selectedOutline:core(sel).outlineWidth,otherOutline:core(other).outlineStyle,ring:ring?getComputedStyle(ring).strokeDasharray:'none',border:core(other).borderTopColor};},id);
+  assert.notEqual(css.selectedOutline,'0px');assert.notEqual(css.ring,'none','anel tracejado na camada de seleção');assert.equal(css.otherOutline,'none');
   await shot(page,'11-desktop-alto-contraste');await page.evaluate(()=>{SimCore.accessibility.set('contrast',false);SimCore.accessibility.set('theme','light');});await shot(page,'12-desktop-tema-claro');
   return css;
  });
