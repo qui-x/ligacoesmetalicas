@@ -1,5 +1,29 @@
 # Registro de alterações
 
+## SILM 0.11.0 — Representação 2D científica
+
+- **Renderizador 2D comum** (`domain/silm/renderer-2d.js`): montagem livre, estrutura cristalina e comparação usam o mesmo palco, com camadas numa ordem central e sem z-index espalhado.
+- **Câmera**:
+  - "Controles da vista" com Aproximar, Afastar, Enquadrar a estrutura, Centralizar e Restaurar vista;
+  - arrastar o fundo desloca; pinça e Ctrl/⌘ + roda aproximam no ponto;
+  - teclas + − F C 0 e Shift + setas;
+  - um anúncio por gesto; fora do Desfazer.
+- **Projeções** Isométrica, Frontal, Superior e Lateral na estrutura cristalina. No HC visto de cima, a camada B aparece entre os centros da A.
+- **representationState** separado e versionado (`representation.view`): `scientificState ≠ representationState`. A fachada de leitura é `SILM.representationState`.
+- **Invariância:**
+  - medições idênticas com 50 %, 100 % e 200 % de zoom e em qualquer projeção;
+  - Organizar e calor idênticos à 0.10.1, porque a isométrica de referência fica congelada.
+- **Toque central:** um toque até cerca de 22 px da borda de uma unidade a seleciona. O anel de seleção ganhou camada própria e nunca fica atrás de outra esfera.
+- **Rótulos e cotas com tamanho de tela constante**, e o valor da medição sai de cima dos marcadores.
+- **Rede extensa em janela**, com até 260 sítios.
+- **Comparação** com o mesmo renderizador, na mesma projeção, com os planos do HC e cópias só do necessário.
+- **Leitura simples reduz o movimento**, como no SIAB.
+- **Correções:**
+  - a medida em revisão não aparece mais no Calcular;
+  - a conversão do toque para a cena desconta a borda do palco.
+- **Documentação:** `docs/SILM-0.11.0.md`, `docs/RENDERER-2D.md`, `docs/CONTRATO-REPRESENTACAO-2D.md` e o tópico do Manual "Mover a vista".
+- Nenhum dado científico mudou (schema 8). O núcleo continua o da Base Estrutural 0.3.1, sem alteração.
+
 ## SILM 0.10.1 — Correção de origem: gramática da família
 
 - Núcleo da **Base Estrutural 0.3.1**, adotado sem nenhuma alteração local. A Base é neutra e foi entregue ao autor fora deste repositório. A 0.3.1 corrige a 0.3.0 em três pontos pedidos pela revisão do SILM: texto da confirmação declarado pela montagem pronta, segurança da abertura contada do início do ciclo e `SimCore.opening.stop()`.

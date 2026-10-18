@@ -1,11 +1,17 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.10.1",
+  "versao": "0.11.0",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.3.1",
   "scientificSchemaVersion": 8,
   "origens": [
+    {
+      "arquivo": "SILM-0.10.1.zip",
+      "papel": "origem executável da série 0.11.x",
+      "sha512": "203a49c7bcb9eb486923626352eef6005ef0820e299754d4868796d947b55ea76d49e33506e00f9f1591e96206ed38e02bca53e5c8e8eac3a35e978a7f56e453",
+      "verificado": true
+    },
     {
       "arquivo": "SILM-0.10.0.zip",
       "papel": "origem executável da correção 0.10.1",
@@ -89,13 +95,14 @@
       "verificado": true
     }
   ],
-  "observacaoOrigem": "Origem: entregas/SILM-0.10.0.zip deste repositório, verificado pelo SHA-512 externo; núcleo da Base Estrutural 0.3.1.",
-  "status": "SILM 0.10.1: correção de origem — gramática de interação da família (Base Estrutural 0.3.1): entrada, menu, acessibilidade, laboratório por grupos e famílias, Dados como ponto de partida, Montagens prontas, Aprender em lista, tour, som e toque; R06 Tabela Periódica cabendo na tela. Nenhum dado científico alterado.",
+  "observacaoOrigem": "Origem: entregas/SILM-0.10.1.zip deste repositório, verificado pelo SHA-512 externo; núcleo da Base Estrutural 0.3.1 sem alteração local.",
+  "status": "SILM 0.11.0: representação 2D científica — renderizador comum (montagem livre, estrutura cristalina e comparação), câmera com pan, zoom, enquadrar, centralizar e restaurar vista, projeções isométrica, frontal, superior e lateral, camadas numa ordem central, toque central, rede extensa em janela, representationState separado e versionado; medições idênticas com qualquer zoom e projeção. Nenhum dado científico alterado.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
-  "dataBuild": "2026-10-17",
+  "dataBuild": "2026-10-18",
   "structureModelVersion": 2,
   "electronModelVersion": 1,
   "propertiesModelVersion": 1,
   "measurementModelVersion": 1,
-  "calculationModelVersion": 1
+  "calculationModelVersion": 1,
+  "representationModelVersion": 1
 }

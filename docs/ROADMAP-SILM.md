@@ -16,7 +16,8 @@
 | 0.8.x | Módulo Explorar | 0.8.0 entregue |
 | 0.9.x | Módulo Medir | 0.9.0 e 0.9.1 (homologação) entregues |
 | **0.10.x** | **Módulo Calcular** | **0.10.0 entregue; 0.10.1 (correção de origem: gramática da família, Base Estrutural 0.3.1)** |
-| 0.11.x – 0.18.x, 1.0.0-rc.x, 1.0.0 | ver abaixo | planejadas |
+| **0.11.x** | **Representação 2D** | **0.11.0 entregue (renderizador comum, câmera, projeções, representationState)** |
+| 0.12.x – 0.18.x, 1.0.0-rc.x, 1.0.0 | ver abaixo | planejadas |
 
 ---
 

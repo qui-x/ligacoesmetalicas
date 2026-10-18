@@ -137,6 +137,31 @@ SILM.crystal=(()=>{
   const depths=pts.map(p=>p.depth),dmin=Math.min(...depths),dmax=Math.max(...depths);
   return {scale,project(p){const q=P(p);return {x:.5+(q.x-cx)*scale,y:.5+(q.y-cyy)*scale,depth:dmax>dmin?(q.depth-dmin)/(dmax-dmin):.5};},centre:c};
  }
+ /* 0.11.x — projeções da representação 2D. A isométrica é o projector acima, congelado: o Organizar e o calor
+    usam sempre ela, para que trocar de vista nunca mude o estado científico nem a experiência. As outras são vistas
+    quase ortogonais, ao longo de [010] (frontal), [100] (lateral) e [001] (superior), com a menor inclinação que
+    mantém todos os centros da célula separados (≥ 0,34 da distância entre vizinhos; busca numérica sobre Fe, Cu e Mg).
+    Projeção é representação: não cria estado científico novo. */
+ const VIEWS=Object.freeze({
+  front:Object.freeze({BCC:[10,14],FCC:[13,5],HCP:[8,8]}),
+  side:Object.freeze({BCC:[80,14],FCC:[103,5],HCP:[109,6]}),
+  top:Object.freeze({BCC:[0,72],FCC:[0,76],HCP:[0,77]})
+ });
+ const PROJECTIONS=Object.freeze(['isometric','front','top','side']);
+ function projectorFor(m,projection='isometric'){
+  const view=VIEWS[projection]?.[m.id];if(!view)return projector(m);
+  const yaw=view[0]*deg,pitch=view[1]*deg,cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  return p=>{const x1=p[0]*cy-p[1]*sy,y1=p[0]*sy+p[1]*cy,z=p[2];const y2=y1*cp-z*sp,z2=y1*sp+z*cp;return {x:x1,y:-z2,depth:y2};};
+ }
+ /* Mesmo ajuste de layout(), para qualquer projeção (a cena da 0.11.x: estável, sem depender da câmera). */
+ function layoutFor(g,fit,{margin=.12,projection='isometric'}={}){
+  if(!VIEWS[projection])return layout(g,fit,{margin});
+  const P=projectorFor(g.model,projection),pts=fit.map(p=>P(p));
+  const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y),w=Math.max(...xs)-Math.min(...xs),h=Math.max(...ys)-Math.min(...ys);
+  const scale=(1-2*margin)/Math.max(w,h,1e-9),cx=(Math.max(...xs)+Math.min(...xs))/2,cyy=(Math.max(...ys)+Math.min(...ys))/2;
+  const depths=pts.map(p=>p.depth),dmin=Math.min(...depths),dmax=Math.max(...depths);
+  return {scale,project(p){const q=P(p);return {x:.5+(q.x-cx)*scale,y:.5+(q.y-cyy)*scale,depth:dmax>dmin?(q.depth-dmin)/(dmax-dmin):.5};},centre:P(g.center)};
+ }
  /* Organização: reaproveita as unidades livres (pareamento guloso pela proximidade na cena) e completa a célula. */
  function organize(g,freeUnits){
   const need=Math.max(freeUnits.length,g.model.cellSites),targets=[...g.cell,...g.extra].slice(0,need);
@@ -149,5 +174,5 @@ SILM.crystal=(()=>{
  }
  const label=id=>{const m=MODELS[id];return m?m.code+' ('+m.international+') · '+m.name:id;};
  return Object.freeze({models:MODELS,typeByDatabase:TYPE_BY_DB,reasons:REASONS,structureTypes:Object.freeze(Object.keys(MODELS)),
-  eligibility,geometry,projector,layout,organize,expandSites,matchesBasis,parseOperation,key,label});
+  eligibility,geometry,projector,layout,organize,expandSites,matchesBasis,parseOperation,key,label,projections:PROJECTIONS,views:VIEWS,projectorFor,layoutFor});
 })();
