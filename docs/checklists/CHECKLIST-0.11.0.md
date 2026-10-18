@@ -30,3 +30,4 @@
 | Nenhum dado científico alterado (schema 8); Organizar e calor idênticos à 0.10.1 | ✅ | item 0.11-07; validadores científicos |
 | Núcleo = Base Estrutural 0.3.1, sem alteração local | ✅ | auditoria "Núcleo herdado preservado" |
 | §29 Regra de parada: não iniciar a 0.12.0 | ✅ | nenhum renderizador 3D |
+| Revisão adversarial da 0.11.0: 15 achados confirmados, todos corrigidos | ✅ | itens 0.11-15 a 0.11-22 (foco sem rolagem, pinça sobre unidade, deslocar a partir da unidade, elétrons estáveis na rede, fontes de calor em toda projeção, toque e clique perto, animação do Organizar, Histórico, gravação no `pagehide`, botão Vista em 320 px, barra no tablet, descrição da montagem livre); item 0.11-01 (zoom fora da região viva) |

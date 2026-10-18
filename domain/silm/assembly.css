@@ -61,7 +61,7 @@
 :root[data-contrast=on] .silm-unit-core{background:#000;border:2px solid #fff;color:#fff;box-shadow:none}
 :root[data-contrast=on] .silm-assembly-collective g{fill:#fff;opacity:.22}
 :root[data-contrast=on] .silm-unit[aria-pressed=true] .silm-unit-core{outline-width:4px}
-@media(forced-colors:active){.silm-unit-core{background:Canvas;border:2px solid CanvasText;color:CanvasText;forced-color-adjust:none}.silm-unit[aria-pressed=true] .silm-unit-core{outline:4px solid Highlight}.silm-unit[aria-pressed=true]::after{border-color:Highlight}.silm-assembly-collective g{fill:CanvasText;opacity:.15}}
+@media(forced-colors:active){.silm-unit-core{background:Canvas;border:2px solid CanvasText;color:CanvasText;forced-color-adjust:none}.silm-unit[aria-pressed=true] .silm-unit-core{outline:4px solid Highlight}.silm-crystal-unit[data-heat-source]::after{border-color:Highlight}.silm-assembly-collective g{fill:CanvasText;opacity:.15}}
 /* Estrutura cristalina (0.5.x): esferas reduzidas, profundidade por escala e ordem; contorno geométrico tracejado. */
 .silm-crystal-stage{--unit-size:10%}
 .silm-crystal-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
@@ -77,6 +77,8 @@
 .silm-crystal-unit[data-layer=B] .silm-unit-core::after{content:'';position:absolute;inset:16%;border:1.5px dashed #2a2016;border-radius:50%}
 .silm-crystal-unit[data-placement=crystallographic] .silm-unit-core{filter:saturate(.7) brightness(.96)}
 /* Vizinho imediato: anel pontilhado externo + contorno, sem depender só de cor. */
+/* Região aquecida (fontes de calor): contorno tracejado em qualquer projeção; não depende só de cor. */
+.silm-crystal-unit[data-heat-source]::after{content:'';position:absolute;inset:-24%;border:1.5px dashed var(--silm-heat);border-radius:50%;pointer-events:none}
 .silm-crystal-unit[data-neighbor]::before{content:'';position:absolute;inset:-14%;border:2px dotted var(--scientific-accent);border-radius:50%;pointer-events:none}
 .silm-crystal-unit[data-neighbor] .silm-unit-core{outline:2px solid var(--scientific-accent);outline-offset:1px}
 .silm-site-label{display:none;position:absolute;right:-6%;bottom:-6%;min-width:1.4em;padding:0 .25em;border-radius:6px;background:var(--panel);border:1px solid var(--border);color:var(--text);font-size:calc(max(9px,calc(var(--stage)*.022))/var(--camera-zoom,1));font-weight:800;line-height:1.35;text-align:center}
@@ -277,7 +279,9 @@
 .silm-stage-layer[data-layer=calculationOverlay]{z-index:9}
 .silm-stage-layer[data-layer=labels]{z-index:10}
 .silm-stage-layer[data-layer=selection]{z-index:11}
-.silm-assembly-stage{overflow:hidden}
+/* Palco: overflow hidden (não clip) para que a rolagem do foco pare nele e não role a área nem a página; o
+   renderizador zera essa rolagem no mesmo instante e leva a câmera até a unidade focada. */
+.silm-stage{overflow:hidden}
 .silm-stage:not([data-readonly]){touch-action:none;-webkit-touch-callout:none}
 .silm-stage[data-panning]{cursor:grabbing}
 .silm-stage[data-camera-animate]>[data-camera]{transition:transform 200ms ease-out}
@@ -291,7 +295,7 @@
 .silm-edge-label{background:var(--accent);border-color:var(--accent);color:var(--on-primary)}
 .silm-crystal[data-labels-fit=no]:not([data-calc=fractions]) .silm-site-label{display:none!important}
 /* Controles da vista: fora do palco no DOM, sobre o canto superior direito da cena (como a barra da lupa do SIAB). */
-.silm-camera{position:absolute;z-index:20;top:6px;right:max(6px,calc((100% - var(--stage,300px))/2 - 60px));display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.silm-camera{position:absolute;z-index:20;top:max(6px,calc((100% - var(--stage,300px))/2 + 6px));right:max(6px,calc((100% - var(--stage,300px))/2 - 60px));display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .silm-camera-toggle{display:none;min-width:60px;min-height:44px;padding:0 10px;font-weight:700}
 .silm-camera-bar{display:flex;flex-direction:column;flex-wrap:wrap;align-content:flex-end;gap:4px;max-height:calc(var(--stage,300px) - 12px);padding:4px;border:1px solid var(--silm-soft-border);border-radius:var(--radius);background:var(--panel);box-shadow:0 2px 8px #0003}
 .silm-camera-btn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;display:grid;place-items:center}
@@ -307,7 +311,8 @@
  .silm-camera[data-open] .silm-camera-bar{flex-direction:row;justify-content:flex-end;max-height:none;max-width:min(300px,calc(100vw - 40px))}
  .silm-camera-zoom{width:auto;align-self:center;padding:0 4px}
 }
-@media(max-width:600px){.silm-crystal-tools{grid-auto-flow:row}.silm-crystal-tools .silm-projection{grid-column:1/-1}.silm-projection select{flex:1}}
+/* Celular: projeção e "Vista" dividem a mesma linha (o rótulo "Projeção" continua como nome acessível do seletor). */
+@media(max-width:600px){.silm-crystal-tools{grid-auto-flow:row}.silm-crystal-tools .silm-projection{min-width:0}.silm-projection-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.silm-projection select{flex:1;min-width:0}}
 @media(forced-colors:active){.silm-selection-ring{stroke:Highlight}.silm-camera-bar{border-color:CanvasText}}
 @media print{.silm-camera{display:none}}
 @media print{.silm-camera-bar{display:none}}

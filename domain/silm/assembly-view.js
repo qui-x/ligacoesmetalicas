@@ -55,15 +55,18 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  const feedback=U.element('p','','silm-assembly-feedback');feedback.id='silm-assembly-feedback';
  const crystalReason=U.element('p','','silm-assembly-reason');crystalReason.id='silm-assembly-crystal-reason';
  footer.append(crystalReason,feedback);root.append(bar,area,footer);host.append(root);
- const nodes=new Map();let selected=null,focusId=null,serial=0,drag=null,keyMove=null,suppressClick=false,lastRegion=new Map();
+ const nodes=new Map();let selected=null,focusId=null,serial=0,drag=null,keyMove=null,suppressUntil=0,lastRegion=new Map();
  const units=()=>model.state.structure?.units||[];
  /* ---------- renderizador comum ---------- */
  const R=SILM.renderer2d.createStage(stage,{scope,area,idPrefix:'silm',camera:rep2.camera('free'),reducedMotion,announce:text=>SimCore.notifications.announce(text),
   describe:()=>{const n=units().length,k=selected?indexOf(selected)+1:0;return 'Montagem livre de '+name+' com '+n+' '+(n===1?'unidade':'unidades')+'.'+(k?' Unidade '+k+' selecionada, na '+region(units().find(u=>u.id===selected).position)+'.':'');},
-  onCamera:c=>rep2.saveCamera('free',c),items:()=>units().map(u=>({id:u.id,x:u.position.x,y:u.position.y,r:C.minDistance/2,priority:u.id===selected?1:0})),
+  onCamera:c=>rep2.saveCamera('free',c),
+  // A selecionada fica fora do toque por proximidade: tocar o fundo perto dela é escolher o destino (tocá-la mesma ainda a solta).
+  items:()=>units().map(u=>({id:u.id,x:u.position.x,y:u.position.y,r:C.minDistance/2,priority:u.id===selected?1:0,hit:u.id!==selected})),
   focusPoint:()=>{const list=units(),s=list.find(u=>u.id===selected);if(s)return s.position;if(!list.length)return null;return {x:list.reduce((a,u)=>a+u.position.x,0)/list.length,y:list.reduce((a,u)=>a+u.position.y,0)/list.length};},
-  canArrowPan:()=>true,onBackgroundTap:editable?point=>backgroundTap(point):null,onUnitPress:editable?(id,event)=>{const node=nodes.get(id);if(node)beginDrag(node,event);}:null});
- R.layer('background',svg,{camera:true});R.layer('structure',layer,{camera:true});R.setInterest({x0:0,y0:0,x1:1,y1:1},{margin:0});
+  canArrowPan:()=>true,onBackgroundTap:editable?point=>backgroundTap(point):null,onUnitPress:editable?(id,event)=>{const node=nodes.get(id);if(node)beginDrag(node,event);}:null,
+  ownsUnitDrag:editable,onGestureStart:()=>cancelDrag(),toggleHost:tools});
+ R.layer('background',svg,{camera:true});R.layer('structure',layer,{camera:true});if(editable&&R.descriptionId)layer.setAttribute('aria-describedby',R.descriptionId);R.setInterest({x0:0,y0:0,x1:1,y1:1},{margin:0});
  const selectionRing=R.selectionLayer();
  // 0.6.x: elétrons de valência deslocalizados — distribuição preliminar sobre a montagem livre.
  const electronLayer=SILM.createElectronLayer(stage,{scope,before:layer,reducedMotion});R.layer('electrons',electronLayer.canvas);
@@ -99,7 +102,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
    node.dataset.placement=u.placement;
   }
   const roving=selected||(focusId&&nodes.has(focusId)?focusId:list[0]?.id);if(editable)for(const [id,node]of nodes)node.tabIndex=id===roving?0:-1;
-  if(lostFocus)(nodes.get(roving)||title).focus();
+  if(lostFocus)(nodes.get(roving)||title).focus({preventScroll:true});
   collective.replaceChildren(...list.map(u=>{const c=document.createElementNS(svg.namespaceURI,'circle');c.setAttribute('cx',String(u.position.x*100));c.setAttribute('cy',String(u.position.y*100));c.setAttribute('r',String(C.minDistance*78));return c;}));
   const el=model.state.electrons,shownElectrons=!!el?.representation.visible&&list.length>=2;
   const pr=model.state.properties,fieldOn=pr?.active==='electrical'&&pr.electrical.field;
@@ -120,7 +123,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  function select(id,{announce=true,focus=false}={}){
   if(!editable)return;flushKeys();if(id&&!nodes.has(id))return;
   const previous=selected;selected=id;serial++;if(id)focusId=id;render();
-  if(focus&&id)nodes.get(id).focus();
+  if(focus&&id)nodes.get(id).focus({preventScroll:true});
   if(announce){if(id)say('Unidade de '+name+' '+(indexOf(id)+1)+' selecionada.');else if(previous&&nodes.has(previous))say('Unidade de '+name+' '+(indexOf(previous)+1)+' solta.');}
  }
  function moveTo(id,target){
@@ -135,7 +138,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
   const u=units().find(x=>x.id===id),current=keyMove?.id===id?keyMove.position:u.position,target=A.clamp({x:current.x+dx,y:current.y+dy});
   if(target.x===current.x&&target.y===current.y){say('Limite da área de montagem.');return;}
   if(!A.isFree(units(),target,id)){say('Movimento bloqueado: espaço ocupado.');return;}
-  keyMove={id,position:target,gesture:'teclado-'+serial};place(nodes.get(id),target);paintSelection();
+  keyMove={id,position:target,gesture:'teclado-'+serial};place(nodes.get(id),target);if(!R.ensureVisible({...target,r:C.minDistance/2}))paintSelection();
  }
  function flushKeys(){
   if(!keyMove)return;const pending=keyMove;keyMove=null;const r=actions.move(pending.id,pending.position,{gesture:pending.gesture});
@@ -144,13 +147,19 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  }
  /* Arrasto: começa na unidade tocada (ou na mais próxima dentro da tolerância de toque, pelo renderizador). */
  function beginDrag(node,event){
-  suppressClick=false;if(event.button>0||drag)return;flushKeys();
+  suppressUntil=0;if(event.button>0||drag||R.pinching)return;flushKeys();
   const u=units().find(x=>x.id===node.dataset.unitId);if(!u)return;
   const p=toScene(event);drag={id:u.id,node,pointerId:event.pointerId,x:event.clientX,y:event.clientY,offset:{x:p.x-u.position.x,y:p.y-u.position.y},moved:false,position:u.position,threshold:event.pointerType==='mouse'?4:8,nearHit:!event.target.closest('.silm-unit')};
   try{node.setPointerCapture(event.pointerId);}catch(_){}
  }
+ /* Pinça começou: o arrasto em curso é desfeito sem escrever nada (a unidade volta ao lugar). */
+ function cancelDrag(){
+  if(!drag)return;const current=drag;drag=null;delete current.node.dataset.dragging;delete current.node.dataset.conflict;
+  try{current.node.releasePointerCapture(current.pointerId);}catch(_){}
+  const u=units().find(x=>x.id===current.id);if(u)place(current.node,u.position);paintSelection();
+ }
  /* Alternativa sem arrasto: unidade selecionada → toque ou clique no destino. */
- function backgroundTap(point){suppressClick=false;if(!selected){if(units().length)say('Selecione uma unidade para posicioná-la.');return;}moveTo(selected,point);}
+ function backgroundTap(point){if(!selected){if(units().length)say('Selecione uma unidade para posicioná-la.');return;}moveTo(selected,point);}
  if(editable){
   scope.listen(layer,'pointerdown',event=>{const node=event.target.closest('.silm-unit');if(node)beginDrag(node,event);});
   scope.listen(layer,'pointermove',event=>{
@@ -163,14 +172,15 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
   const endDrag=(event,commit)=>{
    if(!drag||event.pointerId!==drag.pointerId)return;const current=drag;drag=null;delete current.node.dataset.dragging;delete current.node.dataset.conflict;
    try{current.node.releasePointerCapture(current.pointerId);}catch(_){}
-   if(current.moved){suppressClick=true;if(commit)moveTo(current.id,current.position);render();}
-   else if(current.nearHit&&commit){const id=current.id;select(selected===id?null:id);}   // toque perto da unidade: seleciona como o clique
+   // O clique que o navegador gera depois do arrasto (ou do toque perto, já tratado aqui) é ignorado; Enter e Espaço (detail 0) não.
+   if(current.moved){suppressUntil=performance.now()+500;if(commit)moveTo(current.id,current.position);render();}
+   else if(current.nearHit&&commit){suppressUntil=performance.now()+500;const id=current.id;select(selected===id?null:id);}   // toque perto da unidade: seleciona como o clique
   };
   scope.listen(layer,'pointerup',event=>endDrag(event,true));
   scope.listen(layer,'pointercancel',event=>endDrag(event,false));
   scope.listen(layer,'lostpointercapture',event=>endDrag(event,false));
   scope.cleanup(()=>{if(drag){try{drag.node.releasePointerCapture(drag.pointerId);}catch(_){}drag=null;}});
-  scope.listen(layer,'click',event=>{const node=event.target.closest('.silm-unit');if(!node)return;event.stopPropagation();if(suppressClick){suppressClick=false;return;}const id=node.dataset.unitId;select(selected===id?null:id);});
+  scope.listen(layer,'click',event=>{const node=event.target.closest('.silm-unit');if(!node)return;event.stopPropagation();if(event.detail>0&&performance.now()<suppressUntil){suppressUntil=0;return;}const id=node.dataset.unitId;select(selected===id?null:id);});
   scope.listen(layer,'focusin',event=>{const node=event.target.closest('.silm-unit');if(node)focusId=node.dataset.unitId;});
   scope.listen(layer,'focusout',()=>flushKeys());
   scope.listen(layer,'keydown',event=>{
@@ -180,7 +190,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
    if(arrows[event.key]&&selected===id){event.preventDefault();const step=event.shiftKey?C.fineStep:C.keyboardStep,[dx,dy]=arrows[event.key];keyStep(id,dx*step,dy*step);return;}
    // Sem unidade selecionada, as setas apenas percorrem as unidades; nada é movido.
    const k=indexOf(id),next={ArrowRight:k+1,ArrowDown:k+1,ArrowLeft:k-1,ArrowUp:k-1,Home:0,End:list.length-1}[event.key];
-   if(next!=null&&!selected&&!event.shiftKey){event.preventDefault();const target=list[Math.max(0,Math.min(list.length-1,next))];focusId=target.id;render();nodes.get(target.id).focus();}
+   if(next!=null&&!selected&&!event.shiftKey){event.preventDefault();const target=list[Math.max(0,Math.min(list.length-1,next))];focusId=target.id;render();nodes.get(target.id).focus({preventScroll:true});}
   });
   scope.listen(layer,'keyup',event=>{if(event.key.startsWith('Arrow'))flushKeys();});
   scope.cleanup(()=>flushKeys());
@@ -188,5 +198,5 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  // Cena quadrada (renderizador): posições normalizadas são independentes do tamanho da tela.
  render();
  return Object.freeze({root,title,update:render,select:(id,options)=>select(id,options),say,renderer:R,get selected(){return selected;},focusAdd:()=>add?.focus(),
-  focusUnit:id=>{if(nodes.has(id)){focusId=id;render();nodes.get(id).focus();}}});
+  focusUnit:id=>{if(nodes.has(id)){focusId=id;render();nodes.get(id).focus({preventScroll:true});}}});
 };
