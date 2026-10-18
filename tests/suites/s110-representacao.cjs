@@ -142,7 +142,11 @@ module.exports={series:'0.11',async run(kit,{screenshots=false}={}){
   const out={};
   for(const [w,h] of [[390,844],[320,740]]){
    const page=await use({width:w,height:h,mobile:true});await crystal(page,'Cu',4);
-   const bar=await page.evaluate(()=>{const b=document.querySelector('.silm-camera-bar').getBoundingClientRect(),btn=[...document.querySelectorAll('.silm-camera-btn')].map(x=>x.getBoundingClientRect());return {right:b.right,bottom:b.bottom,min:Math.min(...btn.map(r=>Math.min(r.width,r.height))),page:document.documentElement.scrollWidth-innerWidth};});
+   // Celular: a barra começa recolhida atrás de "Vista" (a cena não fica coberta); o botão abre e fecha.
+   assert.equal(await page.isVisible('#silm-camera-in'),false);assert.equal(await page.getAttribute('#silm-camera-toggle','aria-expanded'),'false');
+   await page.tap('#silm-camera-toggle');assert.equal(await page.getAttribute('#silm-camera-toggle','aria-expanded'),'true');await page.waitForSelector('#silm-camera-in',{state:'visible'});
+   const bar=await page.evaluate(()=>{const b=document.querySelector('.silm-camera-bar').getBoundingClientRect(),btn=[...document.querySelectorAll('.silm-camera-btn,.silm-camera-toggle')].map(x=>x.getBoundingClientRect());return {right:b.right,bottom:b.bottom,min:Math.min(...btn.map(r=>Math.min(r.width,r.height))),page:document.documentElement.scrollWidth-innerWidth};});
+   await page.tap('#silm-camera-toggle');
    assert.ok(bar.min>=44,'alvo ≥ 44 px');assert.ok(bar.right<=w,'barra na tela');assert.ok(bar.page<=1,'sem rolagem lateral');
    // Unidade mais alta da metade esquerda (longe da barra); toque 10 px acima da borda da esfera.
    const t=await page.evaluate(()=>{const st=document.getElementById('silm-assembly-stage').getBoundingClientRect();const c=[...document.querySelectorAll('.silm-crystal-unit')].map(n=>({id:n.dataset.unitId,r:n.getBoundingClientRect()})).filter(o=>o.r.x+o.r.width/2<st.x+st.width*.6).sort((a,b)=>a.r.y-b.r.y)[0];return {id:c.id,x:c.r.x+c.r.width/2,y:c.r.y-10};});

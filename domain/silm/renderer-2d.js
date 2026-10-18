@@ -63,15 +63,21 @@ SILM.renderer2d=(()=>{
   const cameraText=()=>'Vista: zoom '+zoomText()+(cam.mode==='fit'?', enquadrada':'')+'. O zoom muda só a apresentação; as medidas e o estado científico não mudam (escala visual não é escala física).';
   function describeNow(){if(description)description.textContent=[describe?.(),cameraText()].filter(Boolean).join(' ');}
   /* ---------- barra de câmera (fora do palco, sobre o canto da cena; gramática de controles da família) ---------- */
-  let bar=null,output=null,inButton=null,outButton=null;
+  let bar=null,output=null,inButton=null,outButton=null,dock=null;
   if(toolbar&&area){
-   bar=U.element('div',null,'silm-camera-bar');bar.setAttribute('role','toolbar');bar.setAttribute('aria-label','Controles da vista');bar.setAttribute('aria-orientation','vertical');
+   /* No celular e na paisagem curta, a barra fica recolhida atrás de "Vista" (como "Doses" no SIAB): a cena não fica coberta. */
+   dock=U.element('div',null,'silm-camera');const toggle=U.element('button',null,'secondary-btn silm-camera-toggle');toggle.type='button';toggle.id=idPrefix+'-camera-toggle';
+   toggle.append(U.element('span','Vista'));toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-controls',idPrefix+'-camera-bar');toggle.title='Mostrar ou ocultar os controles da vista';
+   bar=U.element('div',null,'silm-camera-bar');bar.id=idPrefix+'-camera-bar';bar.setAttribute('role','toolbar');bar.setAttribute('aria-label','Controles da vista');
+   scope.listen(toggle,'click',()=>{const open=dock.dataset.open===undefined;if(open)dock.dataset.open='';else delete dock.dataset.open;toggle.setAttribute('aria-expanded',String(open));if(open)(bar.querySelector('button[tabindex="0"]')||bar.querySelector('button'))?.focus();});
+   scope.listen(dock,'keydown',e=>{if(e.key==='Escape'&&dock.dataset.open!==undefined&&getComputedStyle(toggle).display!=='none'){e.preventDefault();e.stopPropagation();delete dock.dataset.open;toggle.setAttribute('aria-expanded','false');toggle.focus();}});
+   dock.append(toggle,bar);
    const button=(id,glyph,label,key,run)=>{const b=U.element('button',null,'secondary-btn silm-camera-btn');b.type='button';b.id=idPrefix+'-camera-'+id;b.setAttribute('aria-label',label);b.title=label+' (tecla '+key+')';b.tabIndex=-1;
     const g=U.element('span',glyph,'silm-camera-glyph');g.setAttribute('aria-hidden','true');b.append(g);scope.listen(b,'click',()=>{if(b.getAttribute('aria-disabled')!=='true')run();});return b;};
    inButton=button('in','+','Aproximar','+',()=>zoomStep(Z.step));outButton=button('out','−','Afastar','−',()=>zoomStep(1/Z.step));
    const fitButton=button('fit','⤢','Enquadrar a estrutura','F',()=>fitNow()),centerButton=button('center','⌖','Centralizar','C',()=>centerNow()),resetButton=button('reset','↺','Restaurar vista','0',()=>resetNow());
    output=U.element('output',zoomText(),'silm-camera-zoom');output.id=idPrefix+'-camera-zoom';output.setAttribute('aria-label','Zoom da vista');
-   bar.append(inButton,output,outButton,fitButton,centerButton,resetButton);inButton.tabIndex=0;area.append(bar);
+   bar.append(inButton,output,outButton,fitButton,centerButton,resetButton);inButton.tabIndex=0;area.append(dock);
    const buttons=[inButton,outButton,fitButton,centerButton,resetButton];
    scope.listen(bar,'keydown',e=>{const k=buttons.indexOf(document.activeElement);if(k<0)return;const next={ArrowDown:k+1,ArrowRight:k+1,ArrowUp:k-1,ArrowLeft:k-1,Home:0,End:buttons.length-1}[e.key];
     if(next==null||e.shiftKey)return;e.preventDefault();e.stopPropagation();const t=buttons[(next+buttons.length)%buttons.length];for(const b of buttons)b.tabIndex=b===t?0:-1;t.focus();});
@@ -113,7 +119,7 @@ SILM.renderer2d=(()=>{
   function viewItems(){return items().map(it=>{const v=toView(cam,it);return {id:it.id,x:v.x,y:v.y,r:(it.r||0)*cam.zoom,depth:it.depth,priority:it.priority};});}
   if(!readOnly){
    const pointers=new Map();let pan=null,pinch=null,press=null;
-   const ignore=e=>e.target.closest?.('.silm-camera-bar')||e.button>0;
+   const ignore=e=>e.target.closest?.('.silm-camera')||e.button>0;
    scope.listen(stage,'pointerdown',e=>{
     if(ignore(e))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,type:e.pointerType});
     if(pointers.size===2){const [a,b]=[...pointers.values()];pan=null;press=null;pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,cam:{...cam},mid:viewPoint({clientX:(a.x+b.x)/2,clientY:(a.y+b.y)/2})};try{stage.setPointerCapture(e.pointerId);}catch(_){}return;}

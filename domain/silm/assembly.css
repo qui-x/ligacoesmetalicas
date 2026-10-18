@@ -291,7 +291,9 @@
 .silm-edge-label{background:var(--accent);border-color:var(--accent);color:var(--on-primary)}
 .silm-crystal[data-labels-fit=no]:not([data-calc=fractions]) .silm-site-label{display:none!important}
 /* Controles da vista: fora do palco no DOM, sobre o canto superior direito da cena (como a barra da lupa do SIAB). */
-.silm-camera-bar{position:absolute;z-index:20;top:6px;right:max(6px,calc((100% - var(--stage,300px))/2 - 60px));display:flex;flex-direction:column;flex-wrap:wrap;align-content:flex-end;gap:4px;max-height:calc(var(--stage,300px) - 12px);padding:4px;border:1px solid var(--silm-soft-border);border-radius:var(--radius);background:var(--panel);box-shadow:0 2px 8px #0003}
+.silm-camera{position:absolute;z-index:20;top:6px;right:max(6px,calc((100% - var(--stage,300px))/2 - 60px));display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.silm-camera-toggle{display:none;min-width:60px;min-height:44px;padding:0 10px;font-weight:700}
+.silm-camera-bar{display:flex;flex-direction:column;flex-wrap:wrap;align-content:flex-end;gap:4px;max-height:calc(var(--stage,300px) - 12px);padding:4px;border:1px solid var(--silm-soft-border);border-radius:var(--radius);background:var(--panel);box-shadow:0 2px 8px #0003}
 .silm-camera-btn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;display:grid;place-items:center}
 .silm-camera-glyph{font-size:1.25rem;font-weight:800;line-height:1}
 .silm-camera-zoom{display:block;width:44px;font-size:.72rem;text-align:center;font-variant-numeric:tabular-nums;color:var(--secondary)}
@@ -299,6 +301,13 @@
 .silm-projection select{min-height:var(--control-min);padding:0 8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--panel);color:var(--text);font:inherit}
 .silm-projection-list{display:flex;flex-wrap:wrap;margin-bottom:6px}
 .silm-projection-list button{flex:1 1 auto}
-@media(max-width:600px){.silm-camera-zoom{display:none}.silm-crystal-tools .silm-projection{grid-column:1/-1}.silm-projection select{flex:1}}
+@media(max-width:600px),(max-height:500px) and (orientation:landscape){
+ .silm-camera-toggle{display:inline-flex;align-items:center;justify-content:center}
+ .silm-camera:not([data-open]) .silm-camera-bar{display:none}
+ .silm-camera[data-open] .silm-camera-bar{flex-direction:row;justify-content:flex-end;max-height:none;max-width:min(300px,calc(100vw - 40px))}
+ .silm-camera-zoom{width:auto;align-self:center;padding:0 4px}
+}
+@media(max-width:600px){.silm-crystal-tools{grid-auto-flow:row}.silm-crystal-tools .silm-projection{grid-column:1/-1}.silm-projection select{flex:1}}
 @media(forced-colors:active){.silm-selection-ring{stroke:Highlight}.silm-camera-bar{border-color:CanvasText}}
+@media print{.silm-camera{display:none}}
 @media print{.silm-camera-bar{display:none}}

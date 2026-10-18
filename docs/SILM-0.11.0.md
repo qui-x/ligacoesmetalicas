@@ -11,6 +11,7 @@
   - Aproximar (+) e Afastar (−), com o valor do zoom;
   - Enquadrar a estrutura (F), Centralizar (C) e Restaurar vista (0).
   - Arraste o fundo para deslocar; no celular, use dois dedos para aproximar; no computador, Ctrl ou ⌘ + roda aproxima no cursor; Shift + setas também deslocam.
+  - No celular e com a tela deitada, a barra fica recolhida atrás do botão "Vista", como "Doses" no SIAB, para não cobrir a cena.
 - **Projeções** na estrutura cristalina: Isométrica, Frontal, Superior e Lateral. Ficam no cabeçalho da cena e em Ver → Observar → Camadas.
   - Na projeção Superior, o HC aparece como hexágono, com a camada B entre os centros da camada A; ele deixa de parecer um cubo deformado.
 - **A vista nunca muda a ciência:**

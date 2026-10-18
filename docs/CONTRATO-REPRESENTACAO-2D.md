@@ -59,6 +59,7 @@ coordenadas da tela (px)
 - **Controles da vista:**
   - barra `role=toolbar` com os botões Aproximar, Afastar, Enquadrar a estrutura, Centralizar e Restaurar vista, e a saída do zoom;
   - botões de 44 px; a barra fica fora do palco no DOM, sobre o canto superior direito da cena;
+  - no celular e na paisagem curta, a barra fica recolhida atrás do botão "Vista" (`aria-expanded`), como "Doses" no SIAB; Esc fecha;
   - teclas na área da cena: + − F C 0 e Shift + setas;
   - gestos: arrastar o fundo, pinça e Ctrl/⌘ + roda.
 - **Anúncios:** um por gesto ou botão ("Vista: zoom 125 %.", "Vista enquadrada…", "Vista restaurada.", "Vista deslocada."), nunca um por quadro.
