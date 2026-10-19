@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "none",
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "strict": true,
+    "outFile": "app.js",
+    "noEmitOnError": true,
+    "skipLibCheck": true,
+    "removeComments": false
+  },
+  "files": [
+    "src/contracts.ts",
+    "src/scene-contracts.ts",
+    "src/config.ts",
+    "src/storage.ts",
+    "src/navigation.ts",
+    "src/menu-review.ts",
+    "src/router.ts",
+    "src/preferences.ts",
+    "src/modules.ts",
+    "src/extension-contracts.ts",
+    "src/extensions.ts",
+    "src/extensions-demo.ts",
+    "src/records-contracts.ts",
+    "src/education-contracts.ts",
+    "src/education.ts",
+    "src/records.ts",
+    "src/scene.ts",
+    "src/scene-interaction.ts",
+    "src/workspace.ts",
+    "src/workspace-ui.ts",
+    "src/components.ts",
+    "src/extensions-ui.ts",
+    "src/viewers.ts",
+    "src/education-ui.ts",
+    "src/records-ui.ts",
+    "src/manual.ts",
+    "src/sharing.ts",
+    "src/distribution.ts",
+    "src/scene-ui.ts",
+    "src/home.ts",
+    "src/app.ts"
+  ]
+}

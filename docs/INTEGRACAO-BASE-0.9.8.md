@@ -6,7 +6,7 @@
 - Base de destino: 0.9.8, repositório https://github.com/quimicaifbacampusvca/baseparasimuladores, commit `cce03dfe9fbe06f47d1e012d702e1f8bf1490caa`.
 - Base em execução no SILM: 0.3.1, conforme BUILD-INFO.json.
 - O autor autorizou usar a base atual enquanto continua removendo o motor químico antigo. A limpeza não é pré-requisito para iniciar a integração.
-- Estado deste checkpoint: levantamento e referência de migração. O runtime ainda NÃO foi migrado. Não alterar versaoBase nem declarar paridade nesta etapa.
+- Estado atual: primeira entrada funcional em `integracao/index.html`, com shell da Base 0.9.8 e domínio científico do SILM 0.11.0. A distribuição principal ainda usa a base anterior. Não alterar versaoBase da distribuição nem declarar paridade completa nesta etapa.
 
 ## Compatibilidade observada no código
 
@@ -37,3 +37,13 @@ A base de referência deve permanecer sem alterações de domínio. Resíduos do
 
 - `npm run test:scientific` no SILM 0.11.0: PASS — 118 elementos, 43 metais, 78 fontes e 101 casos inválidos no validador de estado; cálculos de Fe/Cu/Mg e migrações aprovados.
 - Os testes desta etapa não demonstram integração funcional nem homologação de navegador.
+
+## Primeira entrada funcional
+
+A branch acrescenta `integracao/index.html` para testar a adoção da base atual sem substituir a distribuição principal. O código upstream fica íntegro em `integracao/upstream`, com revisão e hashes em `integracao/base-lock.json`.
+
+O produto inicializa navegação, menu, preferências, workspace e componentes da base. O estado e os renderizadores continuam sendo os do domínio SILM. A demonstração genérica não é inicializada. A porta `compat.js` fornece somente serviços mínimos de apresentação para o renderer herdado.
+
+A integração funcional contempla seleção de metal, montagem livre, movimentação, Desfazer, organização cristalina, retorno à montagem, célula/rede, vizinhos, câmera, projeções, elétrons e importação/exportação de investigação. Dados científicos têm persistência própria, sem serialização no estado de 8 KB das extensões genéricas. A sessão da distribuição completa permanece independente.
+
+Limitações e instruções de reprodução: `integracao/README.md`. A próxima etapa será conectar os fluxos Medir e Calcular às docas e registros da base; estes recursos continuam disponíveis na distribuição principal.

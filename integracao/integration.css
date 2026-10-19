@@ -1,0 +1,22 @@
+:root{--silm-bronze:#b88c45;--silm-soft-border:var(--line,#c7d0d7);--radius:12px;--radius-lg:18px;--panel:var(--card,#fff);--panel2:var(--surface,#f1f4f6);--bg:var(--page,#edf1f4);--text:var(--ink,#172533);--secondary:var(--muted,#536371);--border:var(--line,#c7d0d7);--accent:#79571f;--scientific-accent:#76521b;--focus:#126b94;--hover:#eee5d4;--danger:#a52c35;--control-min:44px}
+html[data-theme=escuro]{--panel:#182733;--panel2:#223644;--bg:#10202b;--text:#edf2f5;--secondary:#b9c6cf;--accent:#ead09a;--scientific-accent:#ead09a;--hover:#354338}
+.silm-home{max-width:740px;margin:auto;padding:clamp(24px,6vw,70px)}
+.silm-home h1{font-size:clamp(3rem,9vw,6rem);letter-spacing:-.05em;margin:0}
+.silm-home p{line-height:1.65}.silm-home a{margin:12px 12px 12px 0}
+#silm-integration-scene{width:100%;height:100%;min-height:0;color:var(--text)}
+.silm-laboratory>.silm-assembly{display:flex;flex-direction:column}
+#workspace-focus{padding:8px;min-width:0;min-height:0;overflow:auto}
+.silm-assembly-bar{flex:none}.silm-assembly-area{overflow:hidden;min-height:120px}
+.silm-assembly-footer{flex:none;max-height:100px;overflow:auto}
+.silm-laboratory .silm-assembly-footer{flex-direction:row;align-self:stretch;align-items:center;max-height:100px}
+.silm-scene-notes{max-height:75px;overflow:auto}
+.silm-assembly-tools{gap:4px}.silm-assembly-tools button{font-size:.8rem}
+.secondary-btn,.primary-btn,.danger-btn{min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);cursor:pointer;font:inherit}
+.primary-btn{background:var(--accent);color:#fff}.danger-btn{color:var(--danger)}
+button[aria-disabled=true]{opacity:.55;cursor:default}
+.si-dock-scroll label,.si-dock-scroll select,.si-dock-scroll input,.si-dock-scroll>.button{display:block;max-width:100%;margin:10px 0}
+.si-dock-scroll button{margin:6px 0}.si-dock-scroll select{width:100%;min-height:44px}
+#silm-data dl{display:grid;grid-template-columns:1fr 1fr;gap:8px}#silm-data dt{font-weight:700}#silm-data dd{margin:0;overflow-wrap:anywhere}
+.silm-provenance{font-size:.8rem;overflow-wrap:anywhere}.silm-status{color:var(--secondary)}
+.silm-assembly-area canvas{pointer-events:none}
+@media(max-width:600px){.silm-assembly-bar{padding:6px;gap:4px}.silm-assembly-identity h1{font-size:1rem}.silm-assembly-symbol{width:32px;height:32px}.silm-assembly-identity{gap:6px}.silm-assembly-meta{font-size:.72rem}.silm-assembly-tools button{padding:5px 8px}.silm-assembly-footer{max-height:64px}.silm-assembly-eyebrow{display:none}}
