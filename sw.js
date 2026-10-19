@@ -1,5 +1,5 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.12.1';
+const VERSION='0.12.2';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION,DOMAINS=CACHE+'::domains';
 const FILES=[
   "./",
@@ -12,6 +12,7 @@ const FILES=[
   "integracao/index.html",
   "integracao/integration.css",
   "integracao/pwa.js",
+  "integracao/scientific-tools.js",
   "integracao/upstream/LICENSE",
   "integracao/upstream/app.css",
   "integracao/upstream/app.js",

@@ -2,7 +2,7 @@
 /* Produto SILM sobre a Base 0.9.8. A ciência continua no serviço original schema 8. */
 (() => {
  const B=BaseDemoSI,S=SILM,$=id=>document.getElementById(id);
- B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.12.1 · desenvolvimento',
+ B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.12.2 · desenvolvimento',
   routes:B.manifest.routes.map(route=>({...route,subtitle:route.id==='ambiente'?'A Arquitetura dos Metais':route.title}))});
  const model=S.createScientificState();let view=null,scope=null,viewKey='',pending=false,ready=false,selected=null,focusAfterRender=null;
  let representation=S.representation.defaults(null),storageOK=true,unavailable3D=false;
@@ -34,24 +34,25 @@
   saveCamera(mode,value){representation.cameras[mode]=S.representation.sanitizeCamera(value);saveView();}
  };
  function saveView(){storage.set('representation.view',representation);}
+ const tools=S.createIntegrationTools({model,host:$('silm-tools'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m)});
  const run={
   add(){if(!model.state.structure)model.beginAssembly();return report(model.addUnit());},
   move:(id,target,options)=>report(model.moveUnit(id,target,options)),
-  undo:()=>report(model.undo()),
+  undo:()=>model.state.module.active==='explorar'&&report(model.undo()),
   organize:()=>report(model.organize()),
   represent:value=>model.setCrystalRepresentation(value),
   select:id=>model.setCrystalRepresentation({selectedUnitId:id}),
   toggleNeighbors(){const r=model.state.structure?.crystallography?.representation;if(r)model.setCrystalRepresentation({neighbors:!r.neighbors});}
  };
  function renderScene(){
-  const state=model.state,e=element(),key=e?state.investigation.id+':'+e.atomicNumber+':'+(state.structure?.mode||'empty')+':'+(state.structure?.mode==='crystalline'?representation.viewMode:'2d'):'none';
+  const state=model.state,e=element(),key=e?state.investigation.id+':'+e.atomicNumber+':'+state.module.active+':'+(state.structure?.mode||'empty')+':'+(state.structure?.mode==='crystalline'?representation.viewMode:'2d'):'none';
   if(viewKey!==key){scope?.destroy();scope=null;view=null;viewKey=key;$('silm-integration-scene').replaceChildren();
    if(!e){const p=document.createElement('p');p.textContent='Abra Montagem e escolha um metal para iniciar a investigação.';$('silm-integration-scene').append(p);}
    else if(!state.structure){const p=document.createElement('p');p.textContent='Use Adicionar unidade em Montagem para começar a estrutura de '+e.name+'.';$('silm-integration-scene').append(p);}
    else if(state.structure){
-    scope=SimCore.createScope();const common={scope,model,element:e,actions:run,reducedMotion:reduced,representation:rep};
+    scope=SimCore.createScope();const common={scope,model,element:e,actions:run,reducedMotion:reduced,representation:rep,moduleTitle:{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active],measure:tools.measure,calc:tools.calc};
     if(state.structure.mode==='crystalline')view=S.createCrystalView($('silm-integration-scene'),{...common,geometry:S.crystal.geometry(e)});
-    else view=S.createAssemblyView($('silm-integration-scene'),{...common,editable:true,organize:{run:run.organize,state:()=>{
+    else view=S.createAssemblyView($('silm-integration-scene'),{...common,editable:state.module.active==='explorar',organize:{run:run.organize,state:()=>{
      const eligibility=S.crystal.eligibility(e);return {disabled:!model.state.structure?.units.length||eligibility.status!=='available',reason:eligibility.status!=='available'?eligibility.message:''};
     }}});
     // Contextual help uses the Base route, whose router deliberately has no nested routes.
@@ -63,13 +64,13 @@
  function render(){
   const state=model.state,e=element(),s=state.structure,n=s?.units.length||0;
   if(representation.investigationId!==(state.investigation?.id??null))representation=S.representation.defaults(state.investigation?.id??null);
-  renderScene();if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
+  tools.render();renderScene();if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
   text('silm-summary',e?e.name+' · '+n+' unidades · '+(s?.mode==='crystalline'?'estrutura cristalina':'montagem livre'):'Nenhuma investigação iniciada.');
   text('scene-count',n+' unidades');text('silm-metal-information',selected?S.data.get(Number(selected)).name:'');
-  $('scene-undo').disabled=!model.canUndo;$('scene-clear').disabled=!n;
-  $('si-compact-clear').disabled=!n;$('scene-count').dataset.compactCount=n+' unidades';
-  $('silm-add').disabled=!e||s?.mode==='crystalline';$('silm-organize').disabled=!n||s?.mode==='crystalline'||S.crystal.eligibility(e).status!=='available';
-  $('silm-free').hidden=s?.mode!=='crystalline';$('silm-export').disabled=!e;
+  $('scene-undo').disabled=state.module.active!=='explorar'||!model.canUndo;$('scene-clear').disabled=state.module.active!=='explorar'||!n;
+  $('si-compact-clear').disabled=state.module.active!=='explorar'||!n;$('scene-count').dataset.compactCount=n+' unidades';
+  $('silm-add').disabled=state.module.active!=='explorar'||!e||s?.mode==='crystalline';$('silm-organize').disabled=state.module.active!=='explorar'||!n||s?.mode==='crystalline'||S.crystal.eligibility(e).status!=='available';
+  $('silm-free').hidden=s?.mode!=='crystalline';$('silm-free').disabled=state.module.active!=='explorar';$('silm-export').disabled=!e;
   $('silm-electrons').disabled=n<2;
   const visible=!!state.electrons?.representation.visible;
   text('silm-electrons',visible?'Ocultar elétrons':'Mostrar elétrons');$('silm-electrons').setAttribute('aria-pressed',String(visible));
@@ -77,7 +78,7 @@
   if(e){
    const dl=document.createElement('dl');
    const structure=S.data.structure(e);
-   const rows=[['Metal',e.name+' ('+e.symbol+')'],['Estrutura de referência',structure?.type||'Não disponível'],['Unidades',String(n)],['Massa molar',e.atomicWeight.value+' '+(e.atomicWeight.unit||'g/mol')],['Medições preservadas',String(state.measurements.length)],['Cálculos preservados',String(state.calculations.length)]];
+   const rows=[['Metal',e.name+' ('+e.symbol+')'],['Estrutura de referência',structure?.type||'Não disponível'],['Unidades',String(n)],['Massa molar',S.calculation.tabulated(e,'M').display],['Medições preservadas',String(state.measurements.length)],['Cálculos preservados',String(state.calculations.length)]];
    for(const [label,value]of rows){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;dl.append(dt,dd);}data.append(dl);
    const sources=document.createElement('p');sources.className='silm-provenance';sources.textContent='Dados tabelados. Fontes do elemento: '+S.data.sourceIds(e).join(', ')+'.';data.append(sources);
   }else data.textContent='Inicie uma investigação para consultar os dados do metal.';
@@ -140,7 +141,7 @@
   window.addEventListener('si-route-changed',()=>{view?.update();});
   const appearance=new MutationObserver(()=>view?.update());appearance.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   document.addEventListener('keydown',event=>{if(!(event.ctrlKey||event.metaKey)||event.altKey||event.shiftKey||event.key.toLowerCase()!=='z'||B.isPlatformDialogOpen()||B.currentRoute(location.hash)!=='ambiente'||event.target.closest('input,select,textarea,[contenteditable]'))return;event.preventDefault();run.undo();});
-  ready=true;render();
+  B.selectModule(model.state.module.active);ready=true;render();
   // Read-only inspection facade: tests and debugging cannot mutate the authoritative state directly.
   window.SILMIntegration=Object.freeze({snapshot:()=>model.snapshot(),baseVersion:'0.9.8'});
  }
