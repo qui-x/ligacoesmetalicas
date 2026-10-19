@@ -1,5 +1,5 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.12.2';
+const VERSION='0.12.3';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION,DOMAINS=CACHE+'::domains';
 const FILES=[
   "./",
@@ -11,8 +11,10 @@ const FILES=[
   "integracao/compat.js",
   "integracao/index.html",
   "integracao/integration.css",
+  "integracao/metallic-experience.js",
   "integracao/pwa.js",
   "integracao/scientific-tools.js",
+  "integracao/silm-theme.css",
   "integracao/upstream/LICENSE",
   "integracao/upstream/app.css",
   "integracao/upstream/app.js",
@@ -45,6 +47,7 @@ const FILES=[
   "integracao/upstream/education.css",
   "integracao/upstream/environment-organization.css",
   "integracao/upstream/extensions.css",
+  "integracao/upstream/home-context.css",
   "integracao/upstream/home-fidelity.css",
   "integracao/upstream/index.html",
   "integracao/upstream/inspection.css",

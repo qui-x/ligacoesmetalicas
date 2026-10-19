@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict');
 module.exports=async(browser,url)=>{
- const context=await browser.newContext({viewport:{width:1440,height:1000}}),p=await context.newPage();p.setDefaultTimeout(8000);const errors=[];p.on('pageerror',e=>errors.push(e.message));
+ const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'}),p=await context.newPage();p.setDefaultTimeout(15000);const errors=[];p.on('pageerror',e=>errors.push(e.message));
  try{
  await p.goto(url);await p.waitForFunction(()=>window.SILMIntegration);
  const state=()=>p.evaluate(()=>SILMIntegration.snapshot());
@@ -29,6 +29,34 @@ module.exports=async(browser,url)=>{
   await p.locator('[data-open-dock="dados"]').click();assert.equal(await p.locator('#silm-history details').count(),5);await p.locator('[data-close-dock="right"]').click();
   await p.locator('[data-open-dock="ver"]').click();await p.locator('#silm-module').selectOption('explorar');await p.locator('[data-close-dock="right"]').click();
  }
+ assert.equal(await p.evaluate(()=>{for(const e of SILM.data.elements.filter(e=>e.silmEligibility.status==='available')){const host=document.createElement('div');SILM.renderIntegrationMetalData(host,e,SILMIntegration.snapshot());if(/undefined|NaN|g\/mol g\/mol/.test(host.textContent))return e.symbol;}return true;}),true,'Dados renderizados para os 43 metais sem valores inválidos');
+ const originalUnits=(await state()).structure.units;
+ await p.locator('[data-open-dock="ver"]').click();
+ for(const [id,action,key,value]of [['electrical','field','field',true],['thermal','heat','heating',true],['malleability','compress','compression',1],['ductility','stretch','elongation',1],['luster','light','light',true]]){
+  await p.locator('#silm-panel-property-start-'+id).click();await p.locator('#silm-panel-property-'+action).click();
+  assert.equal((await state()).properties[id][key],value);if(id==='thermal'){await p.locator('#silm-panel-property-advance').click();assert.equal((await state()).properties.thermal.stage,1);}assert.deepEqual((await state()).structure.units,originalUnits,'Propriedade preserva sítios científicos');
+  await p.locator('#silm-panel-property-restore').click();await p.locator('#silm-panel-property-end').click();
+ }
+ await p.locator('[data-close-dock="right"]').click();
+ const science=await state();
+ const palette=await p.evaluate(()=>{const css=()=>getComputedStyle(document.documentElement).getPropertyValue('--silm-electron').trim();BaseDemoSI.applyTheme('claro');const light=css();BaseDemoSI.applyTheme('escuro');return {light,dark:css()};});assert.notEqual(palette.light,palette.dark);
+ await p.evaluate(()=>document.getElementById('si-contrast').click());assert.equal(await p.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--surface').trim()),'#050505');
+ await p.evaluate(()=>document.getElementById('si-contrast').click());assert.deepEqual(await state(),science,'Tema e contraste não alteram ciência');
+ await p.locator('[data-open-dock="montagem"]').click();await p.locator('#silm-open-periodic').click();
+ assert.equal(await p.locator('#silm-periodic-dialog .periodic-element').count(),118);
+ await p.locator('#silm-periodic-dialog [data-z="8"]').click();assert.equal(await p.locator('#silm-periodic-dialog [id$="-investigate"]').isVisible(),false);
+ await p.locator('#silm-close-periodic').click();assert.deepEqual(await state(),science,'Cancelar tabela preserva investigação');
+ await p.locator('[data-close-dock="left"]').click();
+ await p.setViewportSize({width:390,height:844});await p.locator('[data-open-dock="ver"]').click();
+ assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Painel científico sem overflow móvel');
+ console.log('PASS: cinco propriedades, cores científicas claro/escuro, alto contraste, tabela de 118 elementos e invariância do motor.');
+ const migration=await browser.newContext();
+ try{
+  await migration.addInitScript(value=>localStorage.setItem('simcore_domain_silm_v1_scientific.state',JSON.stringify(value)),science);
+  const restored=await migration.newPage();await restored.goto(url);await restored.waitForFunction(()=>window.SILMIntegration);
+  assert.deepEqual(await restored.evaluate(()=>SILMIntegration.snapshot()),science,'Sessão antiga válida copiada para interface vazia');
+  assert.deepEqual(await restored.evaluate(()=>JSON.parse(localStorage.getItem('simcore_domain_silm_v1_scientific.state'))),science,'Sessão antiga original preservada');
+ }finally{await migration.close();}
  assert.deepEqual(errors,[]);console.log('PASS: Medir/Calcular na nova base — FCC/BCC/HCP, teclado, fontes, unidades, entradas com vírgula, rejeição negativa, densidade derivada e persistência.');
  }finally{await context.close();}
 };

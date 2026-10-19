@@ -105,7 +105,7 @@ async function main(){
   if(evidence){fs.mkdirSync(evidence,{recursive:true});await page.setViewportSize({width:1440,height:1000});await page.screenshot({path:path.join(evidence,'desktop.png')});await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(evidence,'mobile.png')});}
   await require('./integration-tools.cjs')(browser,url);
   assert.deepEqual(errors,[],'Console sem exceções');assert.deepEqual(failed,[],'Recursos locais disponíveis');
-  console.log('PASS: base 0.9.8 + SILM — montagem, Desfazer, cristal FCC/HCP, projeção, elétrons, reload, exportação, importação >8 KB, rejeição inválida, isolamento, cancelamento, menu e docas em 320/390/768/1440 px.');
+  console.log('PASS: base 0.9.12 + SILM — montagem, Desfazer, cristal FCC/HCP, projeção, elétrons, reload, exportação, importação >8 KB, rejeição inválida, isolamento, cancelamento, menu e docas em 320/390/768/1440 px.');
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

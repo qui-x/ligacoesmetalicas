@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.8",
+        version: "0.9.12",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -171,18 +171,78 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
+    let soundEnabled = false;
+    let vibrationEnabled = false;
+    let audio = null;
+    function findAudioCtor() {
+        const browser = window;
+        if (typeof browser.AudioContext === "function")
+            return browser.AudioContext;
+        return typeof browser.webkitAudioContext === "function" ? browser.webkitAudioContext : null;
+    }
+    function feedbackCapabilities() {
+        return { sound: !!findAudioCtor(), vibration: typeof navigator.vibrate === "function" };
+    }
+    BaseDemoSI.feedbackCapabilities = feedbackCapabilities;
+    function configureFeedback(sound, vibration) {
+        soundEnabled = sound === true;
+        vibrationEnabled = vibration === true;
+    }
+    BaseDemoSI.configureFeedback = configureFeedback;
+    function currentFeedback() {
+        return { sound: soundEnabled, vibration: vibrationEnabled };
+    }
+    BaseDemoSI.currentFeedback = currentFeedback;
+    /** Não emite sinais até que a pessoa habilite a preferência explicitamente. */
+    function signalFeedback(event) {
+        const support = feedbackCapabilities();
+        if (soundEnabled && support.sound) {
+            try {
+                const ctor = findAudioCtor();
+                if (ctor) {
+                    audio = audio || new ctor();
+                    if (audio.state === "suspended")
+                        void audio.resume().catch(() => { });
+                    const oscillator = audio.createOscillator();
+                    const gain = audio.createGain();
+                    oscillator.type = "sine";
+                    oscillator.frequency.value = event === "success" ? 580 : event === "warning" ? 295 : 440;
+                    const now = audio.currentTime;
+                    gain.gain.setValueAtTime(0.0001, now);
+                    gain.gain.exponentialRampToValueAtTime(0.06, now + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+                    oscillator.connect(gain).connect(audio.destination);
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.2);
+                }
+            }
+            catch { /* A preferência continua ativa; o dispositivo pode bloquear áudio. */ }
+        }
+        if (vibrationEnabled && support.vibration) {
+            try {
+                navigator.vibrate(event === "warning" ? [65, 35, 65] : 55);
+            }
+            catch { /* Nem todo sistema operacional autoriza vibração. */ }
+        }
+    }
+    BaseDemoSI.signalFeedback = signalFeedback;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
     // Contrato de menu: preferência local e acesso contextual; nenhum motor científico.
     const menuGet = (id) => document.getElementById(id);
-    const prefDefault = { dark: true, contrast: false, font: 1, spacing: false, motion: false, intro: true, simple: false, vision: "none", projector: false, startup: "inicio" };
+    const prefDefault = { dark: true, contrast: false, font: 1, spacing: false, motion: false, intro: true, simple: false, vision: "none", projector: false, startup: "inicio", sound: false, vibrate: false };
     const prefKey = "family-menu-v1";
     const validVision = ["none", "protanopia", "deuteranopia", "tritanopia", "acromatopsia"];
     let pref = { ...prefDefault };
     let activityLink = "";
+    let activeActivity = null;
     const checkbox = (id, checked) => { const node = menuGet(id); if (node)
         node.checked = checked; };
     function menuPreferences(value) {
         pref = value;
         const root = document.documentElement;
+        BaseDemoSI.configureFeedback(pref.sound, pref.vibrate);
         const theme = pref.dark ? "escuro" : "claro";
         BaseDemoSI.applyTheme(theme);
         menuGet("theme-choice")?.setAttribute("data-from-menu", theme);
@@ -195,6 +255,8 @@ var BaseDemoSI;
         root.classList.toggle("si-no-motion", pref.motion);
         root.classList.toggle("si-simple-reading", pref.simple);
         root.classList.toggle("si-font-mod", pref.font !== 1);
+        // Rem afeta a aplicação inteira, não apenas os rótulos da gaveta.
+        root.style.fontSize = pref.font === 1 ? "" : `${16 * pref.font}px`;
         root.style.setProperty("--si-font-factor", String(pref.font));
         document.body.classList.toggle("si-projector-mode", pref.projector);
         for (const [id, v] of [["si-dark", pref.dark], ["si-contrast", pref.contrast], ["si-letter-spacing", pref.spacing], ["si-motion", pref.motion], ["si-intro", pref.intro], ["si-simple", pref.simple], ["si-projector", pref.projector]])
@@ -208,6 +270,21 @@ var BaseDemoSI;
             minus.disabled = pref.font <= .8;
         if (plus)
             plus.disabled = pref.font >= 2;
+        const capabilities = BaseDemoSI.feedbackCapabilities();
+        for (const [id, enabled, supported, noteId] of [
+            ["si-sound", pref.sound, capabilities.sound, "si-sound-support"],
+            ["si-vibrate", pref.vibrate, capabilities.vibration, "si-vibrate-support"]
+        ]) {
+            const control = menuGet(id);
+            if (control) {
+                control.disabled = !supported;
+                control.checked = supported && enabled;
+                control.setAttribute("aria-disabled", String(!supported));
+            }
+            const note = menuGet(noteId);
+            if (note)
+                note.textContent = supported ? `${id === "si-sound" ? "Som" : "Vibração"} ${enabled ? "ativado" : "desativado"}; controle local` : (id === "si-sound" ? "Áudio indisponível neste navegador" : "Vibração indisponível neste dispositivo");
+        }
         const vision = menuGet("si-vision-select");
         if (vision)
             vision.value = pref.vision;
@@ -216,7 +293,9 @@ var BaseDemoSI;
             startup.value = pref.startup;
         // Acromatopsia é representável por escala cinza. Os demais perfis
         // demandam transformações de cor validadas e permanecem informativos.
-        root.classList.toggle("si-achromatopsia", pref.vision === "acromatopsia");
+        for (const filter of ["protanopia", "deuteranopia", "tritanopia", "acromatopsia"])
+            root.classList.toggle(`si-color-${filter}`, pref.vision === filter);
+        root.dataset.siIntro = pref.intro ? "on" : "off";
     }
     function updatePref(key, value) {
         menuPreferences({ ...pref, [key]: value });
@@ -225,30 +304,35 @@ var BaseDemoSI;
     }
     function getActivityContext() {
         const route = BaseDemoSI.currentRoute(window.location.hash);
-        const item = new URLSearchParams((window.location.hash.split("?")[1] ?? "")).get("item");
-        if (item && (route === "missoes" || route === "roteiros")) {
-            const candidates = [...BaseDemoSI.officialActivities];
-            const match = candidates.find(a => a.id === item);
-            if (match)
-                return { title: match.title, url: `#/${route}?item=${encodeURIComponent(item)}` };
+        let destination = window.location.hash;
+        if (route === "ambiente") {
+            const returnControl = menuGet("si-return-activity");
+            if (!returnControl || returnControl.hidden)
+                return null;
+            destination = returnControl.getAttribute("href") ?? "";
         }
-        const returnControl = menuGet("si-return-activity");
-        if (route === "ambiente" && returnControl && !returnControl.hidden && returnControl.href) {
-            const path = returnControl.getAttribute("href") ?? "";
-            if (path.startsWith("#/"))
-                return { title: "Atividade orientada", url: path };
-        }
-        return null;
+        const activityRoute = BaseDemoSI.currentRoute(destination);
+        if (activityRoute !== "missoes" && activityRoute !== "roteiros")
+            return null;
+        const id = new URLSearchParams(destination.split("?")[1] ?? "").get("item");
+        if (!id)
+            return null;
+        const kind = activityRoute === "missoes" ? "mission" : "script";
+        const activity = BaseDemoSI.menuActivity(kind, id);
+        return activity ? { id, kind, title: activity.title, url: `#/${activityRoute}?item=${encodeURIComponent(id)}`, steps: activity.steps } : null;
     }
     function syncMenuReview() {
         const ctx = getActivityContext();
+        activeActivity = ctx;
         activityLink = ctx?.url ?? "";
         const activity = menuGet("si-activity-menu");
         if (activity)
             activity.hidden = !ctx;
         const context = menuGet("si-activity-context");
-        if (context)
-            context.textContent = ctx ? `${ctx.title} · execução local` : "";
+        if (context) {
+            const done = ctx ? BaseDemoSI.menuActivityProgress(ctx.id) : 0;
+            context.textContent = ctx ? `${ctx.title} · ${Math.min(done, ctx.steps.length)}/${ctx.steps.length} etapas` : "";
+        }
         const title = menuGet("si-menu-title");
         if (title)
             title.textContent = ctx ? "Menu da atividade" : "Menu";
@@ -282,64 +366,138 @@ var BaseDemoSI;
         panel.hidden = !panel.hidden;
         trigger.setAttribute("aria-expanded", String(!panel.hidden));
     }
-    function tour() {
-        window.location.hash = "#/ambiente";
-        BaseDemoSI.closeNavigationDrawer(false);
-        const targets = ["#si-stage", "#si-dock-left", "#si-dock-right", ".si-actionbar"];
-        const captions = ["Esta é a cena principal, que recebe os objetos.", "Montagem reúne objetos e ferramentas.", "Ver e Dados apresentam visualizações e registros.", "A barra de ações reúne operações de edição e histórico."];
-        let index = 0;
-        const root = document.createElement("div");
-        root.className = "si-tour-overlay";
-        root.setAttribute("role", "dialog");
-        root.setAttribute("aria-modal", "true");
-        root.setAttribute("aria-label", "Tour do ambiente");
-        const card = document.createElement("section");
-        card.className = "si-tour-card";
-        const title = document.createElement("h2");
-        const detail = document.createElement("p");
-        const buttons = document.createElement("div");
-        const back = document.createElement("button"), next = document.createElement("button"), exit = document.createElement("button");
-        back.type = next.type = exit.type = "button";
-        back.textContent = "Anterior";
-        exit.textContent = "Encerrar";
-        function done() { document.removeEventListener("keydown", key); root.remove(); }
-        function key(ev) { if (ev.key === "Escape") {
-            ev.preventDefault();
-            done();
-        } }
-        function render() {
-            title.textContent = `Tour do ambiente · ${index + 1}/${captions.length}`;
-            detail.textContent = captions[index];
-            back.disabled = index === 0;
-            next.textContent = index === captions.length - 1 ? "Concluir" : "Próximo";
-            const item = document.querySelector(targets[index]);
-            if (item) {
-                item.scrollIntoView({ block: "center", behavior: "instant" });
-            }
+    // Tour em coachmarks: não altera objetos, não interfere com missões e não
+    // ocupa a cena com uma folha inferior que desloque o experimento.
+    function startWorkspaceTour() {
+        if (getActivityContext()) {
+            BaseDemoSI.notify("O tour está disponível apenas no ambiente livre. Encerre a atividade orientada primeiro.", "warning");
+            return;
         }
-        back.addEventListener("click", () => { index = Math.max(index - 1, 0); render(); });
-        next.addEventListener("click", () => { if (index === captions.length - 1)
-            done();
-        else {
-            index++;
-            render();
-        } });
-        exit.addEventListener("click", done);
-        buttons.append(back, next, exit);
-        card.append(title, detail, buttons);
-        root.append(card);
-        document.body.append(root);
-        render();
-        next.focus();
-        document.addEventListener("keydown", key);
+        const steps = [
+            { target: "#si-stage", title: "Conheça o ambiente", content: "Esta é a cena central, onde você seleciona e movimenta objetos." },
+            { target: '[data-open-dock="montagem"]', title: "Prepare a montagem", content: "Abra Montagem para preparar a cena, selecionar objetos e escolher o módulo de trabalho." },
+            { target: '[data-scene-view="overview"]', title: "Foco e visão geral", content: "Alterne entre examinar um objeto selecionado e acompanhar todos os objetos da montagem." },
+            { target: '[data-open-dock="ver"]', title: "Observe e meça", content: "Abra Ver para escolher recursos de Observar, Medir e Analisar compatíveis com o módulo." },
+            { target: '[data-open-dock="dados"]', title: "Consulte seus registros", content: "Em Dados, você encontra o histórico e os atalhos para Caderno e Relatórios." }
+        ];
+        const launch = () => {
+            // Evitar sobreposição de diálogos ou de folhas inferiores.
+            const previousFocus = document.activeElement;
+            const dialog = document.createElement("dialog");
+            dialog.className = "si-coach-dialog";
+            dialog.setAttribute("aria-label", "Tour guiado do ambiente");
+            const ring = document.createElement("div");
+            ring.className = "si-coach-ring";
+            ring.setAttribute("aria-hidden", "true");
+            const card = document.createElement("section");
+            card.className = "si-coach-card";
+            const step = document.createElement("p");
+            step.className = "si-coach-step";
+            const title = document.createElement("h2");
+            title.id = "si-coach-title";
+            const content = document.createElement("p");
+            content.className = "si-coach-text";
+            const actions = document.createElement("div");
+            actions.className = "si-coach-actions";
+            const back = document.createElement("button"), next = document.createElement("button"), skip = document.createElement("button");
+            for (const button of [back, next, skip])
+                button.type = "button";
+            back.textContent = "Voltar";
+            skip.textContent = "Pular tour";
+            actions.append(skip, back, next);
+            card.append(step, title, content, actions);
+            dialog.append(ring, card);
+            dialog.setAttribute("aria-labelledby", title.id);
+            document.body.append(dialog);
+            let current = 0;
+            const position = () => {
+                const target = document.querySelector(steps[current].target);
+                const box = target?.getBoundingClientRect();
+                const vw = window.innerWidth, vh = window.innerHeight;
+                ring.hidden = !box || box.width <= 0 || box.height <= 0;
+                if (box && !ring.hidden) {
+                    const x = Math.max(4, box.left - 5), y = Math.max(4, box.top - 5);
+                    ring.style.left = `${x}px`;
+                    ring.style.top = `${y}px`;
+                    ring.style.width = `${Math.min(vw - 4, box.right + 5) - x}px`;
+                    ring.style.height = `${Math.min(vh - 4, box.bottom + 5) - y}px`;
+                }
+                const cw = Math.min(430, Math.max(260, vw - 24));
+                const ch = card.getBoundingClientRect().height;
+                const freeBottom = box ? vh - box.bottom : 0;
+                const freeTop = box ? box.top : 0;
+                let cy = (box && freeBottom >= ch + 22) ? box.bottom + 12 : (box && freeTop >= ch + 22) ? box.top - ch - 12 : vh - ch - 12;
+                cy = Math.max(8, Math.min(cy, vh - ch - 8));
+                let cx = box ? box.left + box.width / 2 - cw / 2 : (vw - cw) / 2;
+                cx = Math.max(10, Math.min(cx, vw - cw - 10));
+                card.style.left = `${cx}px`;
+                card.style.top = `${cy}px`;
+            };
+            const show = (index) => {
+                current = index;
+                step.textContent = `PASSO ${current + 1} DE ${steps.length}`;
+                title.textContent = steps[current].title;
+                content.textContent = steps[current].content;
+                back.disabled = index === 0;
+                next.textContent = index === steps.length - 1 ? "Concluir" : "Próximo";
+                position();
+                next.focus({ preventScroll: true });
+            };
+            let cleaned = false;
+            const cleanup = () => {
+                if (cleaned)
+                    return;
+                cleaned = true;
+                window.removeEventListener("resize", position);
+                document.removeEventListener("scroll", position, true);
+                dialog.remove();
+                const returnTarget = previousFocus?.isConnected && !previousFocus.closest("#sidebar") ? previousFocus : menuGet("nav-toggle");
+                returnTarget?.focus({ preventScroll: true });
+            };
+            dialog.addEventListener("close", cleanup, { once: true });
+            dialog.addEventListener("cancel", event => { event.preventDefault(); dialog.close(); });
+            dialog.addEventListener("click", event => { if (event.target === dialog)
+                dialog.close(); });
+            skip.addEventListener("click", () => dialog.close());
+            back.addEventListener("click", () => show(Math.max(0, current - 1)));
+            next.addEventListener("click", () => { if (current >= steps.length - 1)
+                dialog.close();
+            else
+                show(current + 1); });
+            dialog.addEventListener("keydown", event => {
+                if (event.key !== "Tab")
+                    return;
+                const buttons = [skip, back, next].filter(button => !button.disabled);
+                if (event.shiftKey && document.activeElement === buttons[0]) {
+                    event.preventDefault();
+                    buttons[buttons.length - 1].focus();
+                }
+                else if (!event.shiftKey && document.activeElement === buttons[buttons.length - 1]) {
+                    event.preventDefault();
+                    buttons[0].focus();
+                }
+            });
+            window.addEventListener("resize", position);
+            document.addEventListener("scroll", position, true);
+            dialog.showModal();
+            show(0);
+        };
+        BaseDemoSI.closeNavigationDrawer(false);
+        if (BaseDemoSI.currentRoute(window.location.hash) !== "ambiente") {
+            window.location.hash = "#/ambiente";
+            window.requestAnimationFrame(() => window.requestAnimationFrame(launch));
+        }
+        else
+            window.requestAnimationFrame(launch);
     }
+    BaseDemoSI.startWorkspaceTour = startWorkspaceTour;
     function setupMenuReview() {
         try {
             const value = BaseDemoSI.storage.read(prefKey);
             if (value) {
                 const obj = JSON.parse(value);
                 if (obj && typeof obj === "object")
-                    pref = { ...prefDefault, ...obj, font: Math.min(2, Math.max(.8, Number(obj.font) || 1)), vision: validVision.includes(obj.vision ?? "") ? obj.vision : "none", startup: ["inicio", "ambiente", "aprender"].includes(obj.startup ?? "") ? obj.startup : "inicio" };
+                    pref = { ...prefDefault, ...obj, font: Math.min(2, Math.max(.8, Number(obj.font) || 1)), vision: validVision.includes(obj.vision ?? "") ? obj.vision : "none", startup: ["inicio", "ambiente", "aprender"].includes(obj.startup ?? "") ? obj.startup : "inicio", sound: obj.sound === true, vibrate: obj.vibrate === true };
             }
         }
         catch {
@@ -362,31 +520,75 @@ var BaseDemoSI;
         menuGet("nav-toggle")?.addEventListener("click", () => requestAnimationFrame(syncMenuReview));
         window.addEventListener("si-route-changed", syncMenuReview);
         menuGet("si-startup-select")?.addEventListener("change", event => updatePref("startup", event.target.value));
+        menuGet("si-projector")?.addEventListener("click", event => {
+            if (getActivityContext()) {
+                event.preventDefault();
+                BaseDemoSI.notify("O modo projetor não pode ser alterado durante uma atividade orientada.", "warning");
+            }
+        });
         for (const [id, key] of [["si-dark", "dark"], ["si-contrast", "contrast"], ["si-letter-spacing", "spacing"], ["si-motion", "motion"], ["si-intro", "intro"], ["si-simple", "simple"], ["si-projector", "projector"]]) {
             menuGet(id)?.addEventListener("change", event => updatePref(key, event.target.checked));
+        }
+        for (const [id, key, capability] of [["si-sound", "sound", "sound"], ["si-vibrate", "vibrate", "vibration"]]) {
+            menuGet(id)?.addEventListener("change", event => {
+                const choice = event.target.checked;
+                if (choice && !BaseDemoSI.feedbackCapabilities()[capability]) {
+                    BaseDemoSI.notify("Este dispositivo não oferece o recurso solicitado.", "warning");
+                    menuPreferences(pref);
+                    return;
+                }
+                updatePref(key, choice);
+                if (choice)
+                    BaseDemoSI.signalFeedback("info");
+            });
         }
         for (const [id, delta] of [["si-font-minus", -.1], ["si-font-plus", .1]]) {
             menuGet(id)?.addEventListener("click", () => updatePref("font", Math.round(Math.max(.8, Math.min(2, pref.font + delta)) * 10) / 10));
         }
-        menuGet("si-vision-select")?.addEventListener("change", event => { const v = event.target.value; updatePref("vision", v); if (v !== "none" && v !== "acromatopsia")
-            BaseDemoSI.notify("Perfil registrado. A simulação visual dessa alteração ainda requer validação específica.", "info"); });
+        menuGet("si-vision-select")?.addEventListener("change", event => {
+            const v = event.target.value;
+            updatePref("vision", v);
+            if (v !== "none")
+                BaseDemoSI.notify("Simulação aproximada de visão de cores ativada. Consulte também os rótulos textuais.", "info");
+        });
         menuGet("si-a11y-reset")?.addEventListener("click", () => { menuPreferences({ ...prefDefault }); BaseDemoSI.storage.write(prefKey, JSON.stringify(pref)); BaseDemoSI.notify("Preferências de acessibilidade restauradas.", "success"); });
         menuGet("si-drawer-install")?.addEventListener("click", () => { BaseDemoSI.closeNavigationDrawer(false); menuGet("distribution-install")?.click(); });
-        menuGet("si-drawer-tour")?.addEventListener("click", tour);
+        menuGet("si-drawer-tour")?.addEventListener("click", startWorkspaceTour);
         menuGet("si-guide-open")?.addEventListener("click", () => { BaseDemoSI.closeNavigationDrawer(false); window.location.hash = "#/manual"; BaseDemoSI.notify("Consulte as orientações de acessibilidade e os recursos para mediação em sala.", "info"); });
         menuGet("si-activity-about")?.addEventListener("click", () => { if (activityLink) {
             BaseDemoSI.closeNavigationDrawer(false);
             window.location.hash = activityLink;
         } });
-        menuGet("si-activity-finish")?.addEventListener("click", () => { if (activityLink) {
+        menuGet("si-activity-finish")?.addEventListener("click", () => {
+            const ctx = activeActivity;
+            if (!ctx)
+                return;
             BaseDemoSI.closeNavigationDrawer(false);
-            window.location.hash = activityLink;
-            BaseDemoSI.notify("Confira os critérios e registre a etapa na própria atividade.", "info");
-        } });
-        menuGet("si-activity-exit")?.addEventListener("click", async () => { const decision = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "Você retornará ao catálogo. O progresso local já registrado será preservado.", confirmText: "Encerrar" }); if (decision) {
+            const progress = BaseDemoSI.menuActivityProgress(ctx.id);
+            if (progress >= ctx.steps.length) {
+                BaseDemoSI.notify("Esta atividade já está concluída.", "info");
+                window.location.hash = ctx.url;
+                return;
+            }
+            const result = BaseDemoSI.advanceActivityFromMenu(ctx.id);
+            BaseDemoSI.notify(result.message, result.ok ? "success" : "warning");
+            if (result.ok) {
+                window.location.hash = ctx.url;
+                syncMenuReview();
+            }
+        });
+        menuGet("si-activity-exit")?.addEventListener("click", async () => {
+            const ctx = activeActivity;
+            if (!ctx)
+                return;
+            const decision = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "Você retornará ao catálogo. O progresso local já registrado será preservado.", confirmText: "Encerrar" });
+            if (!decision)
+                return;
+            BaseDemoSI.clearGuidedReturn();
             BaseDemoSI.closeNavigationDrawer(false);
-            window.location.hash = "#/roteiros";
-        } });
+            window.location.hash = ctx.kind === "mission" ? "#/missoes" : "#/roteiros";
+            syncMenuReview();
+        });
         syncMenuReview();
     }
     BaseDemoSI.setupMenuReview = setupMenuReview;
@@ -1254,6 +1456,12 @@ var BaseDemoSI;
                             selectedId = null;
                         break;
                     }
+                    case "replace": {
+                        const replacement = parseScene(command.snapshot);
+                        if (!replacement)
+                            return false;
+                        return commit(replacement);
+                    }
                     case "clear":
                         if (!entities.length)
                             return false;
@@ -1305,6 +1513,196 @@ var BaseDemoSI;
             x: 30 + spread, y: 30 + spread / 2, width, height, tone: "teal" };
     }
     BaseDemoSI.makeEntity = makeEntity;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    const key = "si-scene-presets-v1";
+    const builtins = [
+        { id: "modelo-basico", name: "Objeto central", builtin: true, snapshot: { schemaVersion: 1, selectedId: null, entities: [{ id: "preset-1", kind: "block", label: "Objeto central", x: 50, y: 50, width: 20, height: 20, tone: "teal" }] } },
+        { id: "modelo-comparacao", name: "Comparação lado a lado", builtin: true, snapshot: { schemaVersion: 1, selectedId: null, entities: [
+                    { id: "preset-1", kind: "circle", label: "Objeto A", x: 32, y: 49, width: 18, height: 18, tone: "blue" },
+                    { id: "preset-2", kind: "circle", label: "Objeto B", x: 68, y: 49, width: 18, height: 18, tone: "amber" }
+                ] } },
+        { id: "modelo-analise", name: "Composição com legenda", builtin: true, snapshot: { schemaVersion: 1, selectedId: null, entities: [
+                    { id: "preset-1", kind: "block", label: "Estrutura", x: 49, y: 39, width: 23, height: 20, tone: "teal" },
+                    { id: "preset-2", kind: "label", label: "Observação", x: 49, y: 72, width: 29, height: 10, tone: "blue" }
+                ] } }
+    ];
+    const validPresetName = (value) => typeof value === "string" && value.trim().length >= 2 && value.trim().length <= 64;
+    function parseCustomPresets(input) {
+        if (!Array.isArray(input) || input.length > 8)
+            return [];
+        const seen = new Set();
+        const result = [];
+        for (const item of input) {
+            if (!item || typeof item !== "object" || Array.isArray(item))
+                return [];
+            const raw = item;
+            if (typeof raw.id !== "string" || !/^user-[a-z0-9-]{1,55}$/.test(raw.id) || seen.has(raw.id) || !validPresetName(raw.name) || raw.builtin !== false)
+                return [];
+            const snapshot = BaseDemoSI.parseScene(raw.snapshot);
+            if (!snapshot || snapshot.entities.length === 0)
+                return [];
+            seen.add(raw.id);
+            result.push({ id: raw.id, name: raw.name.trim(), snapshot, builtin: false });
+        }
+        return result;
+    }
+    BaseDemoSI.parseCustomPresets = parseCustomPresets;
+    let saved = [];
+    let opened = false;
+    const byId = (id) => document.getElementById(id);
+    function setupPresets(sceneStore) {
+        let dirty = false;
+        try {
+            const value = BaseDemoSI.storage.read(key);
+            if (value !== null) {
+                saved = parseCustomPresets(JSON.parse(value));
+                dirty = JSON.parse(value).length !== saved.length;
+            }
+        }
+        catch {
+            saved = [];
+            dirty = true;
+        }
+        const trigger = byId("si-drawer-presets");
+        if (!trigger)
+            return;
+        const dialog = document.createElement("dialog");
+        dialog.className = "si-preset-dialog";
+        dialog.setAttribute("aria-labelledby", "si-preset-title");
+        const container = document.createElement("div");
+        container.className = "si-preset-layout";
+        const heading = document.createElement("h2");
+        heading.id = "si-preset-title";
+        heading.textContent = "Montagens prontas";
+        const description = document.createElement("p");
+        description.textContent = "Escolha uma montagem neutra ou guarde a organização atual para reutilizar nesta instalação.";
+        const list = document.createElement("div");
+        list.className = "si-preset-list";
+        list.setAttribute("role", "group");
+        list.setAttribute("aria-label", "Montagens disponíveis");
+        const label = document.createElement("label");
+        label.textContent = "Nome da montagem atual";
+        label.htmlFor = "si-preset-name";
+        const input = document.createElement("input");
+        input.id = "si-preset-name";
+        input.maxLength = 64;
+        input.placeholder = "Ex.: Investigação 1";
+        const actions = document.createElement("div");
+        actions.className = "si-preset-actions";
+        const save = document.createElement("button");
+        save.type = "button";
+        save.textContent = "Guardar montagem";
+        const close = document.createElement("button");
+        close.type = "button";
+        close.textContent = "Fechar";
+        actions.append(save, close);
+        container.append(heading, description, list, label, input, actions);
+        dialog.append(container);
+        document.body.append(dialog);
+        const closeDialog = () => { if (dialog.open)
+            dialog.close(); };
+        function persist() { return BaseDemoSI.storage.write(key, JSON.stringify(saved)); }
+        function rebuild() {
+            list.replaceChildren();
+            for (const preset of [...builtins, ...saved]) {
+                const row = document.createElement("div");
+                row.className = "si-preset-entry";
+                const info = document.createElement("span");
+                info.textContent = `${preset.name} · ${preset.snapshot.entities.length} objeto(s)`;
+                const load = document.createElement("button");
+                load.type = "button";
+                load.textContent = "Montar";
+                load.disabled = !BaseDemoSI.sceneManipulationAllowed();
+                load.addEventListener("click", async () => {
+                    if (!BaseDemoSI.sceneManipulationAllowed()) {
+                        BaseDemoSI.notify("Este módulo não permite manipular a montagem.", "warning");
+                        return;
+                    }
+                    const current = sceneStore.getSnapshot();
+                    closeDialog();
+                    if (current.entities.length) {
+                        const accepted = await BaseDemoSI.confirmDialog({ title: "Substituir montagem atual?", description: "A montagem atual será substituída. Você poderá usar Desfazer para recuperar todos os objetos de uma vez.", confirmText: "Montar", destructive: true });
+                        if (!accepted)
+                            return;
+                    }
+                    if (sceneStore.dispatch({ type: "replace", snapshot: preset.snapshot })) {
+                        BaseDemoSI.closeNavigationDrawer(false);
+                        window.location.hash = "#/ambiente";
+                        BaseDemoSI.notify(`Montagem “${preset.name}” aplicada. Use Desfazer para recuperar a anterior.`, "success");
+                    }
+                    else
+                        BaseDemoSI.notify("A montagem escolhida já está na cena.", "info");
+                });
+                row.append(info, load);
+                if (!preset.builtin) {
+                    const remove = document.createElement("button");
+                    remove.type = "button";
+                    remove.textContent = "Excluir";
+                    remove.setAttribute("aria-label", `Excluir montagem ${preset.name}`);
+                    remove.addEventListener("click", async () => {
+                        closeDialog();
+                        const accepted = await BaseDemoSI.confirmDialog({ title: "Excluir montagem guardada?", description: `A montagem “${preset.name}” será excluída do catálogo local.`, confirmText: "Excluir", destructive: true });
+                        if (!accepted)
+                            return;
+                        saved = saved.filter(x => x.id !== preset.id);
+                        if (!persist())
+                            BaseDemoSI.notify("Montagem excluída nesta sessão, mas o armazenamento está bloqueado.", "warning");
+                        rebuild();
+                        dialog.showModal();
+                    });
+                    row.append(remove);
+                }
+                list.append(row);
+            }
+        }
+        trigger.addEventListener("click", () => {
+            if (opened || dialog.open)
+                return;
+            BaseDemoSI.closeNavigationDrawer(false);
+            rebuild();
+            dialog.showModal();
+            input.focus();
+            if (dirty)
+                BaseDemoSI.notify("Algumas montagens locais eram inválidas e não foram carregadas.", "warning");
+            dirty = false;
+        });
+        save.addEventListener("click", () => {
+            const snapshot = sceneStore.getSnapshot();
+            const name = input.value.trim();
+            if (!BaseDemoSI.sceneManipulationAllowed()) {
+                BaseDemoSI.notify("A montagem não pode ser editada neste módulo.", "warning");
+                return;
+            }
+            if (!validPresetName(name)) {
+                BaseDemoSI.notify("Informe um nome entre 2 e 64 caracteres.", "warning");
+                input.focus();
+                return;
+            }
+            if (!snapshot.entities.length) {
+                BaseDemoSI.notify("Adicione um objeto antes de guardar uma montagem.", "warning");
+                return;
+            }
+            if (saved.length >= 8) {
+                BaseDemoSI.notify("Limite de 8 montagens locais atingido.", "warning");
+                return;
+            }
+            const id = `user-${Date.now().toString(36)}-${saved.length}`;
+            saved = [...saved, { id, name, snapshot, builtin: false }];
+            if (!persist())
+                BaseDemoSI.notify("Montagem guardada nesta sessão, mas o armazenamento local está indisponível.", "warning");
+            else
+                BaseDemoSI.notify("Montagem guardada no dispositivo.", "success");
+            input.value = "";
+            rebuild();
+        });
+        close.addEventListener("click", closeDialog);
+        dialog.addEventListener("close", () => { trigger.focus({ preventScroll: true }); });
+        window.addEventListener("si-module-change", () => { if (dialog.open)
+            rebuild(); });
+    }
+    BaseDemoSI.setupPresets = setupPresets;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -1980,6 +2378,7 @@ var BaseDemoSI;
         if (status)
             status.textContent = result.message;
         BaseDemoSI.notify(result.message, result.ok ? "success" : "warning");
+        BaseDemoSI.signalFeedback(result.ok ? "success" : "warning");
     }
     function renderExtensions(snapshot) {
         if (!extensionsReady)
@@ -2307,6 +2706,29 @@ var BaseDemoSI;
     function countReadings() { return BaseDemoSI.extensionRecordCount(); }
     /** Catálogo e leitura têm espaços próprios; nunca substituímos a bancada. */
     let returnToActivity = "";
+    const guidedKey = "guided-return-v1";
+    /** Vínculo validado sempre contra o catálogo carregado: sem atividade fantasma. */
+    function validatedGuidedLink(value) {
+        const match = /^#\/(missoes|roteiros)\?item=([a-z0-9-]{1,80})$/.exec(value);
+        if (!match || !education)
+            return null;
+        const kind = match[1] === "missoes" ? "mission" : "script";
+        const activity = education.list(kind).find(a => a.id === match[2]);
+        if (!activity)
+            return null;
+        return { url: `#/${match[1]}?item=${encodeURIComponent(activity.id)}`, activity, progress: education.snapshot().progress[activity.id] ?? 0 };
+    }
+    function saveGuidedReturn(value) {
+        returnToActivity = value;
+        BaseDemoSI.storage.write(guidedKey, value);
+        mountReturnLink();
+        window.dispatchEvent(new Event("si-guided-context-changed"));
+    }
+    function guidedActivityContext() {
+        const result = validatedGuidedLink(returnToActivity);
+        return result ? { url: result.url, title: result.activity.title, kind: result.activity.kind, progress: result.progress, total: result.activity.steps.length } : null;
+    }
+    BaseDemoSI.guidedActivityContext = guidedActivityContext;
     const selectedParam = (key) => {
         const search = window.location.hash.split("?")[1] ?? "";
         return new URLSearchParams(search).get(key) ?? "";
@@ -2322,13 +2744,26 @@ var BaseDemoSI;
             document.querySelector(`[data-catalog-id="${id}"]`)?.focus({ preventScroll: true });
         }, 0);
     }
+    function menuActivity(kind, id) { return education?.list(kind).find(a => a.id === id); }
+    BaseDemoSI.menuActivity = menuActivity;
+    function menuActivityProgress(id) { return education?.snapshot().progress[id] ?? 0; }
+    BaseDemoSI.menuActivityProgress = menuActivityProgress;
+    function advanceActivityFromMenu(id) {
+        if (!education || !educationScene)
+            return { ok: false, message: "Nenhuma atividade disponível." };
+        return education.advance(id, educationScene.getSnapshot(), BaseDemoSI.extensionRecordCount());
+    }
+    BaseDemoSI.advanceActivityFromMenu = advanceActivityFromMenu;
+    function clearGuidedReturn() { saveGuidedReturn(""); }
+    BaseDemoSI.clearGuidedReturn = clearGuidedReturn;
     function mountReturnLink() {
         const control = el("si-return-activity");
         if (!control)
             return;
-        control.hidden = !returnToActivity || BaseDemoSI.currentRoute(window.location.hash) !== "ambiente";
-        if (returnToActivity)
-            control.href = returnToActivity;
+        const guided = guidedActivityContext();
+        control.hidden = !guided || BaseDemoSI.currentRoute(window.location.hash) !== "ambiente";
+        if (guided)
+            control.href = guided.url;
     }
     function showDetail(catalogId, detailId, open) {
         const catalog = el(catalogId), detail = el(detailId);
@@ -2406,7 +2841,9 @@ var BaseDemoSI;
         if (!active || !detail)
             return;
         const position = snapshot.progress[active.id] ?? 0, finished = position >= active.steps.length;
-        returnToActivity = `#/${route}?item=${encodeURIComponent(active.id)}`;
+        const nextReturn = `#/${route}?item=${encodeURIComponent(active.id)}`;
+        if (returnToActivity !== nextReturn)
+            saveGuidedReturn(nextReturn);
         const back = button(`← Todas as ${kind === "mission" ? "missões" : "investigações"}`, () => returnToCatalog(route, active.id));
         back.classList.add("si-detail-back");
         const heading = text("h2", active.title);
@@ -2593,8 +3030,17 @@ var BaseDemoSI;
     function setupEducation(scene) {
         educationScene = scene;
         education = BaseDemoSI.createEducationStore(BaseDemoSI.storage);
+        const previous = BaseDemoSI.storage.read(guidedKey) ?? "";
+        returnToActivity = validatedGuidedLink(previous)?.url ?? "";
+        if (previous && !returnToActivity)
+            BaseDemoSI.storage.write(guidedKey, "");
         BaseDemoSI.bindEducationForSharing(education);
-        education.subscribe(renderAll);
+        education.subscribe(() => {
+            if (returnToActivity && !validatedGuidedLink(returnToActivity))
+                saveGuidedReturn("");
+            renderAll();
+            window.dispatchEvent(new Event("si-guided-context-changed"));
+        });
         scene.subscribe(() => { if (BaseDemoSI.currentRoute(window.location.hash) !== "ambiente")
             renderAll(); });
         window.addEventListener("si-education-observation", () => renderAll());
@@ -3125,9 +3571,9 @@ var BaseDemoSI;
 (function (BaseDemoSI) {
     const precacheFiles = [
         "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
-        "./components.css", "./extensions.css", "./education.css", "./records.css",
-        "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./manifest.webmanifest", "./assets/icon.svg",
-        "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
+        "./components.css", "./mobile-contract.css", "./extensions.css", "./education.css", "./records.css",
+        "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./home-context.css", "./manifest.webmanifest", "./assets/icon.svg",
+        "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png", "./assets/menu-icons/mount.svg", "./assets/menu-icons/eye.svg", "./assets/menu-icons/report.svg"
     ];
     let installPrompt = null;
     let changingController = false;
@@ -3457,6 +3903,7 @@ var BaseDemoSI;
         BaseDemoSI.setupViewers(() => store.getSnapshot());
         BaseDemoSI.setupEducation(store);
         BaseDemoSI.setupJournal(store);
+        BaseDemoSI.setupPresets(store);
         for (const button of document.querySelectorAll("[data-add-kind]")) {
             button.addEventListener("click", () => {
                 const kind = button.dataset.addKind;
@@ -3605,12 +4052,69 @@ var BaseDemoSI;
         setText("si-home-missions-meta", `${officialMissions + extraMissions} desafios para investigar`);
         setText("si-home-scripts-meta", `${officialScripts + extraScripts} investigações orientadas`);
         setText("si-home-notebook-meta", notes ? `${notes} registro${notes === 1 ? "" : "s"} salvo${notes === 1 ? "" : "s"}` : "Pronto para seus registros");
+        const active = BaseDemoSI.guidedActivityContext();
+        const resume = document.getElementById("si-home-resume");
+        const resumeLink = document.getElementById("si-home-resume-link");
+        const benchLink = document.getElementById("si-home-resume-bench");
+        if (resume)
+            resume.hidden = !active;
+        if (active) {
+            setText("si-home-resume-title", active.title);
+            setText("si-home-resume-meta", `${active.kind === "mission" ? "Missão" : "Roteiro"} · ${Math.min(active.progress, active.total)}/${active.total} etapa(s) ${active.progress >= active.total ? "concluídas" : "registradas"}`);
+            if (resumeLink) {
+                resumeLink.href = active.url;
+                resumeLink.textContent = active.progress >= active.total ? "Rever atividade" : "Retomar atividade";
+            }
+            if (benchLink)
+                benchLink.href = "#/ambiente";
+        }
+        let scene = null;
+        try {
+            const raw = BaseDemoSI.storage.read("scene-project-v1");
+            if (raw)
+                scene = BaseDemoSI.parseScene(JSON.parse(raw));
+        }
+        catch { /* Projeto não válido: nenhuma retomada é exibida. */ }
+        const count = scene?.entities.length ?? 0;
+        const sceneInfo = document.getElementById("si-home-scene-summary");
+        if (sceneInfo) {
+            sceneInfo.hidden = count === 0;
+            sceneInfo.textContent = count === 1 ? "1 objeto salvo na bancada" : `${count} objetos salvos na bancada`;
+        }
     }
     BaseDemoSI.updateHomeIndicators = updateHomeIndicators;
     function setupHome() {
+        let pendingFromHome = null;
         window.addEventListener("si-route-changed", () => {
+            const current = BaseDemoSI.currentRoute(window.location.hash);
+            if (current === "inicio")
+                updateHomeIndicators();
+            if (current !== pendingFromHome)
+                return;
+            pendingFromHome = null;
+            // Atualizar a rota antes de mover o foco: cabeçalhos ocultos não recebem foco.
+            window.requestAnimationFrame(() => {
+                const view = document.querySelector(`[data-view="${current}"]`);
+                const heading = view?.querySelector("h1,h2");
+                if (heading) {
+                    heading.tabIndex = -1;
+                    heading.focus({ preventScroll: true });
+                }
+                else
+                    document.getElementById("conteudo")?.focus({ preventScroll: true });
+            });
+        });
+        window.addEventListener("si-guided-context-changed", () => {
             if (BaseDemoSI.currentRoute(window.location.hash) === "inicio")
                 updateHomeIndicators();
+        });
+        // O clique apenas marca o destino; a restauração de foco aguarda a rota realmente visível.
+        document.querySelectorAll(".si-home-family a[href^='#/']").forEach(link => {
+            link.addEventListener("click", () => {
+                const next = BaseDemoSI.currentRoute(link.getAttribute("href") ?? "");
+                if (next !== "inicio")
+                    pendingFromHome = next;
+            });
         });
         updateHomeIndicators();
     }

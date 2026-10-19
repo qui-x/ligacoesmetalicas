@@ -1,9 +1,9 @@
 'use strict';
-/* Produto SILM sobre a Base 0.9.8. A ciência continua no serviço original schema 8. */
+/* Produto SILM sobre a Base 0.9.12. A ciência continua no serviço original schema 8. */
 (() => {
  const B=BaseDemoSI,S=SILM,$=id=>document.getElementById(id);
- B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.12.2 · desenvolvimento',
-  routes:B.manifest.routes.map(route=>({...route,subtitle:route.id==='ambiente'?'A Arquitetura dos Metais':route.title}))});
+ B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.12.3 · desenvolvimento',
+  routes:B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'A Arquitetura dos Metais':route.title}))});
  const model=S.createScientificState();let view=null,scope=null,viewKey='',pending=false,ready=false,selected=null,focusAfterRender=null;
  let representation=S.representation.defaults(null),storageOK=true,unavailable3D=false;
  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.classList.contains('si-no-motion')||document.documentElement.classList.contains('si-simple-reading')||B.currentRoute(location.hash)!=='ambiente';
@@ -12,7 +12,7 @@
   get(key,fallback){try{const raw=B.storage.read(key);return raw===null?fallback:JSON.parse(raw);}catch{return fallback;}},
   set(key,value){storageOK=B.storage.write(key,JSON.stringify(value));if(ready)storageStatus();return storageOK;}
  };
- function storageStatus(){if($('silm-storage-status'))$('silm-storage-status').textContent=storageOK?'Investigação salva neste navegador, separada do SILM completo.':'Não foi possível salvar. Exporte a investigação antes de fechar.';}
+ function storageStatus(){if($('silm-storage-status'))$('silm-storage-status').textContent=storageOK?'Investigação salva neste navegador. Exporte em JSON para guardar uma cópia.':'Não foi possível salvar. Exporte a investigação antes de fechar.';}
  function schedule(){if(!ready||pending)return;pending=true;queueMicrotask(()=>{pending=false;render();});}
  model.connect({storage,emit(name){if(name==='investigation:updated')schedule();}});
  const report=r=>{if(r?.ok===false)say(S.crystal.reasons[r.reason]||'Esta operação não está disponível no contexto atual.','warning');schedule();return r;};
@@ -35,6 +35,7 @@
  };
  function saveView(){storage.set('representation.view',representation);}
  const tools=S.createIntegrationTools({model,host:$('silm-tools'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m)});
+ const experience=S.createMetallicExperience({model,say,schedule,reduced,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);await start();}});
  const run={
   add(){if(!model.state.structure)model.beginAssembly();return report(model.addUnit());},
   move:(id,target,options)=>report(model.moveUnit(id,target,options)),
@@ -50,7 +51,7 @@
    if(!e){const p=document.createElement('p');p.textContent='Abra Montagem e escolha um metal para iniciar a investigação.';$('silm-integration-scene').append(p);}
    else if(!state.structure){const p=document.createElement('p');p.textContent='Use Adicionar unidade em Montagem para começar a estrutura de '+e.name+'.';$('silm-integration-scene').append(p);}
    else if(state.structure){
-    scope=SimCore.createScope();const common={scope,model,element:e,actions:run,reducedMotion:reduced,representation:rep,moduleTitle:{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active],measure:tools.measure,calc:tools.calc};
+    scope=SimCore.createScope();const common={scope,model,element:e,actions:run,reducedMotion:reduced,representation:rep,moduleTitle:{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active],measure:tools.measure,calc:tools.calc,properties:experience.scene};
     if(state.structure.mode==='crystalline')view=S.createCrystalView($('silm-integration-scene'),{...common,geometry:S.crystal.geometry(e)});
     else view=S.createAssemblyView($('silm-integration-scene'),{...common,editable:state.module.active==='explorar',organize:{run:run.organize,state:()=>{
      const eligibility=S.crystal.eligibility(e);return {disabled:!model.state.structure?.units.length||eligibility.status!=='available',reason:eligibility.status!=='available'?eligibility.message:''};
@@ -64,7 +65,7 @@
  function render(){
   const state=model.state,e=element(),s=state.structure,n=s?.units.length||0;
   if(representation.investigationId!==(state.investigation?.id??null))representation=S.representation.defaults(state.investigation?.id??null);
-  tools.render();renderScene();if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
+  tools.render();experience.update();renderScene();if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
   text('silm-summary',e?e.name+' · '+n+' unidades · '+(s?.mode==='crystalline'?'estrutura cristalina':'montagem livre'):'Nenhuma investigação iniciada.');
   text('scene-count',n+' unidades');text('silm-metal-information',selected?S.data.get(Number(selected)).name:'');
   $('scene-undo').disabled=state.module.active!=='explorar'||!model.canUndo;$('scene-clear').disabled=state.module.active!=='explorar'||!n;
@@ -73,14 +74,11 @@
   $('silm-free').hidden=s?.mode!=='crystalline';$('silm-free').disabled=state.module.active!=='explorar';$('silm-export').disabled=!e;
   $('silm-electrons').disabled=n<2;
   const visible=!!state.electrons?.representation.visible;
+  $('silm-motion').disabled=!visible||reduced();$('silm-motion').setAttribute('aria-pressed',String(visible&&!!state.electrons?.representation.motion&&!reduced()));
   text('silm-electrons',visible?'Ocultar elétrons':'Mostrar elétrons');$('silm-electrons').setAttribute('aria-pressed',String(visible));
   const data=$('silm-data');data.replaceChildren();
   if(e){
-   const dl=document.createElement('dl');
-   const structure=S.data.structure(e);
-   const rows=[['Metal',e.name+' ('+e.symbol+')'],['Estrutura de referência',structure?.type||'Não disponível'],['Unidades',String(n)],['Massa molar',S.calculation.tabulated(e,'M').display],['Medições preservadas',String(state.measurements.length)],['Cálculos preservados',String(state.calculations.length)]];
-   for(const [label,value]of rows){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;dl.append(dt,dd);}data.append(dl);
-   const sources=document.createElement('p');sources.className='silm-provenance';sources.textContent='Dados tabelados. Fontes do elemento: '+S.data.sourceIds(e).join(', ')+'.';data.append(sources);
+   S.renderIntegrationMetalData(data,e,state);
   }else data.textContent='Inicie uma investigação para consultar os dados do metal.';
   const list=$('scene-overview-items');list.replaceChildren();
   for(const [index,u]of (s?.units||[]).entries()){
@@ -127,7 +125,12 @@
   const selector=$('silm-metal');
   for(const e of S.data.elements.filter(e=>e.silmEligibility.status==='available')){const o=document.createElement('option');o.value=e.atomicNumber;o.textContent=e.symbol+' — '+e.name;selector.append(o);}
   selected='29';selector.value=selected;selector.addEventListener('change',()=>{selected=selector.value;render();});
-  const raw=B.storage.read('scientific.state');
+  let raw=B.storage.read('scientific.state');
+  // Copia somente uma sessão antiga válida quando a nova interface ainda está vazia.
+  if(raw===null){try{const legacy=localStorage.getItem('simcore_domain_silm_v1_scientific.state');
+   if(legacy){const checked=S.validateScientificState(JSON.parse(legacy));if(checked.ok&&checked.value.investigation){raw=JSON.stringify(checked.value);B.storage.write('scientific.state',raw);}}
+  }catch{/* O original permanece intacto; exportação/importação continua disponível. */}}
+
   if(raw!==null){try{const value=JSON.parse(raw),check=S.validateScientificState(value);if(!check.ok)throw new Error();model.restore(check.value,{allowLegacy:false});if(model.state.metal){selected=String(model.state.metal.atomicNumber);selector.value=selected;}}catch{storageOK=false;say('A investigação salva é inválida. O arquivo original foi preservado; nenhuma restauração foi aplicada.','warning');}}
   representation=S.representation.sanitize(storage.get('representation.view',null),model.state.investigation?.id??null);
   $('silm-start').addEventListener('click',start);$('silm-add').addEventListener('click',run.add);$('silm-organize').addEventListener('click',run.organize);
@@ -137,13 +140,14 @@
   $('silm-electrons').addEventListener('click',()=>{
    if(model.state.electrons)model.setElectronRepresentation({visible:!model.state.electrons.representation.visible});else report(model.activateElectrons());
   });
+  $('silm-motion').addEventListener('click',()=>{if(model.state.electrons)model.setElectronRepresentation({motion:!model.state.electrons.representation.motion});});
   $('silm-export').addEventListener('click',exportState);$('silm-import').addEventListener('change',importState);
   window.addEventListener('si-route-changed',()=>{view?.update();});
-  const appearance=new MutationObserver(()=>view?.update());appearance.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+  const appearance=new MutationObserver(()=>{document.documentElement.dataset.contrast=document.documentElement.classList.contains('si-highcontrast')?'on':'off';view?.update();window.dispatchEvent(new CustomEvent('silm:theme:changed'));});appearance.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   document.addEventListener('keydown',event=>{if(!(event.ctrlKey||event.metaKey)||event.altKey||event.shiftKey||event.key.toLowerCase()!=='z'||B.isPlatformDialogOpen()||B.currentRoute(location.hash)!=='ambiente'||event.target.closest('input,select,textarea,[contenteditable]'))return;event.preventDefault();run.undo();});
   B.selectModule(model.state.module.active);ready=true;render();
   // Read-only inspection facade: tests and debugging cannot mutate the authoritative state directly.
-  window.SILMIntegration=Object.freeze({snapshot:()=>model.snapshot(),baseVersion:'0.9.8'});
+  window.SILMIntegration=Object.freeze({snapshot:()=>model.snapshot(),baseVersion:'0.9.12'});
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

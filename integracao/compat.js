@@ -16,9 +16,12 @@ window.SimCore={
   return {
    get active(){return active;},cleanup,
    listen(target,type,handler,options){target.addEventListener(type,handler,options);return cleanup(()=>target.removeEventListener(type,handler,options));},
+   on(name,handler){return this.listen(window,'silm:'+name,event=>handler(event.detail));},
    timeout(fn,ms){let release;const id=setTimeout(()=>{release();if(active)fn();},ms);release=cleanup(()=>clearTimeout(id));return release;},
    observe(observer,target,options){observer.observe(target,options);return cleanup(()=>observer.disconnect());},
    destroy(){if(!active)return;active=false;for(const release of [...cleanups].reverse())release();}
   };
  }
 };
+
+SimCore.ExperienceUI.button=(text,run,scope,options={})=>SILM.actionButton(text,run,scope,options);

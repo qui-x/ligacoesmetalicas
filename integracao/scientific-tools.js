@@ -64,7 +64,7 @@ SILM.createIntegrationTools=({model,host,history,onChange,say,onModule})=>{
   field(host,'Módulo',select('silm-module',[['explorar','Explorar'],['medir','Medir'],['calcular','Calcular']],state.module.active,v=>{reset();model.setModule(v);onModule(v);change();}));
   if(state.module.active!=='explorar'){
    host.append(node('p','Medições e cálculos usam o modelo cristalográfico em escala física. Zoom e projeção não alteram os valores.'));
-   if(!available())host.append(node('p','Organize uma estrutura cristalina em Explorar para usar este módulo. A montagem livre não tem escala física.'));
+   if(!available())host.append(node('p',model.measurementAvailability().reason==='DEFORMED'?'Restaure a experiência de deformação em Explorar para medir ou calcular a estrutura de referência.':'Organize uma estrutura cristalina em Explorar para usar este módulo. A montagem livre não tem escala física.'));
    else if(state.module.active==='medir'){
     field(host,'Instrumento',select('silm-instrument',[['','Escolha um instrumento'],...Object.entries(MS.types).map(([k,t])=>[k,t.label])],tool||'',v=>{tool=v||null;picks=[];review=null;change();say(v?'Selecione '+MS.types[v].points+' ponto(s) na cena.':'Instrumento desligado.');}));
     field(host,'Unidade de comprimento',select('silm-measure-unit',Object.keys(U.length).map(k=>[k,k]),unit,v=>{unit=v;change();}));

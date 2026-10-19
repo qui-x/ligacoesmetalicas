@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.9.8
+# Base Demo Oficial - SI · 0.9.12
 
-Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.8 — Bloco 05: manipulação e estabilidade mobile.**
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.12 — Continuidade da Home e navegação contextual de atividades.**
 
 ## Executar
 
@@ -62,3 +62,22 @@ A doca de Montagem apresenta Resumo, Preparo, Objetos e Módulo; Missão é exib
 A cena permanece geometricamente estável ao abrir/trocar Montagem, Ver e Dados; as folhas inferiores usam rolagem própria e seus controles têm alvos mínimos de 44 px. Em telas estreitas, a ação de limpar fica no menu Mais e conserva confirmação, Desfazer e recuperação. A altura visível e o teclado virtual são considerados no posicionamento das folhas, sem redesenhar o estado científico. Novos estilos de geometria compacta ficam concentrados em `mobile-contract.css`. Consulte `docs/ACEITE-BLOCO-05-0.9.8.md`.
 
 **Escopo dos testes:** Chromium por carregamento isolado do HTML em nove tamanhos; abrir `file://`, HTTPS/localhost, PWA instalada e outros navegadores requer validação adicional.
+
+## Auditoria funcional do menu · 0.9.9
+
+A gaveta mantém os SVGs locais e a navegação existente. O menu contextual reconhece missões, roteiros e atividades do professor, apresenta o progresso real, valida critérios ao registrar etapas e retorna ao catálogo correspondente ao encerrar com confirmação. As preferências de leitura, espaçamento e tamanho da fonte passam a atingir a aplicação e não somente a gaveta. Montagens prontas neutras e Tour guiado foram incorporados na 0.9.10; Libras offline e o feedback de extensões ainda aguardam implementação compatível. Consulte `docs/AUDITORIA-MENU-0.9.9.md`.
+
+## Revisão de menu · 0.9.10
+
+- Montagens prontas neutras, incluindo criação e exclusão de modelos locais (até 8) com validação; substituição da cena com confirmação e uma única operação Desfazer.
+- Tour guiado de cinco etapas com destaque dos controles reais, botões Voltar, Próximo e Pular, ESC e foco devolvido ao comando.
+- Perfis de visão de cores: filtros de simulação aproximada com matrizes locais, não critérios clínicos nem substitutos dos rótulos textuais.
+- Modo projetor e preferência de tela inicial preservados e sem interferir em atividades orientadas.
+- Sonorização, vibração e Libras permanecem indisponíveis sem extensões locais homologadas; a aplicação não importa bibliotecas por CDN.
+- Homologação real de WebKit/Safari, Firefox, PWA instalada e dispositivos físicos continua pendente.
+
+Consulte `docs/AUDITORIA-MENU-0.9.10.md`.
+
+## Auditoria da Home · 0.9.12
+
+A Home mantém a identidade visual e os cinco caminhos aprovados. Quando existe uma atividade orientada válida, oferece ações para rever ou retomar essa atividade e para voltar à bancada, sempre consultando o catálogo oficial ou local e o progresso registrado. O vínculo é preservado no armazenamento local, validado a cada abertura e apagado ao encerrar a atividade; referências a atividades excluídas são ignoradas. O resumo de objetos é calculado a partir do projeto válido salvo, sem criar um segundo estado da cena. A navegação pelo teclado transfere o foco ao destino, e o layout adapta as ações contextualizadas a telefones estreitos. Ver `docs/AUDITORIA-HOME-0.9.12.md`.

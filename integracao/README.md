@@ -1,5 +1,9 @@
-# Nova interface SILM — 0.12.2
+# SILM — Base SI 0.9.12 integrada
 
-A página principal utiliza esta interface. Em Ver, selecione Explorar, Medir ou Calcular; Dados reúne os registros com proveniência. A interface anterior está preservada em ../completo.html para propriedades, relatórios e atividades ainda não migrados.
+A entrada principal utiliza os serviços científicos originais do SILM para montagem, cristais 2D/3D, elétrons, cinco propriedades, Medir e Calcular. A tabela periódica original conserva os 118 elementos e a elegibilidade dos 43 metais. Dados apresenta referências e fontes.
 
-Consulte ../docs/SILM-0.12.2.md e ../docs/CONSOLIDACAO-INTERFACE-SILM.md. O snapshot upstream permanece fixado e validado por base-lock.json.
+A paleta e os tokens científicos são adaptados em silm-theme.css, com temas claro/escuro e alto contraste. O upstream permanece íntegro e fixado em base-lock.json; o gerador remove apenas o boot da demonstração.
+
+Uma sessão válida da interface anterior é copiada apenas quando a nova não possui sessão salva. O original é preservado. Exportação e importação JSON permanecem disponíveis. Relatórios e atividades anteriores ainda não migrados estão em ../completo.html.
+
+Versão 0.12.3. Consulte ../docs/SILM-0.12.3.md.
