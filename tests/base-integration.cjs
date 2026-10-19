@@ -75,6 +75,20 @@ async function main(){
    const before=await page.locator('#silm-assembly-stage').boundingBox();
    await page.locator('[data-open-dock="dados"]').click();
    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+   if(width<=768){
+    const covered=await page.locator('#silm-assembly-stage').evaluate(stage=>{
+     const r=stage.getBoundingClientRect(),dock=document.querySelector('.si-dock-right');
+     const d=dock.getBoundingClientRect();let checked=0;
+     for(const atom of stage.querySelectorAll('.silm-unit')){
+      const a=atom.getBoundingClientRect(),x=a.x+a.width/2,y=a.y+a.height/2;
+      if(x>d.left&&x<d.right&&y>d.top&&y<d.bottom){
+       checked++;if(!dock.contains(document.elementFromPoint(x,y)))return false;
+      }
+     }
+     return checked>0;
+    });
+    assert.ok(covered,'Painel Dados cobre os átomos e recebe o toque em '+width);
+   }
    const after=await page.locator('#silm-assembly-stage').boundingBox();
    assert.ok(Math.abs(before.width-after.width)<=2,'Cena estável ao abrir doca em '+width+': '+before.width+' → '+after.width);
    await page.locator('[data-close-dock="right"]').click();
