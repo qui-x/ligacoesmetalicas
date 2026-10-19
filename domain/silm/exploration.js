@@ -67,8 +67,9 @@ window.SILM=window.SILM||{};
 })();
 /* Comparação (0.8.x; renderizador comum desde a 0.11.x): a mesma cena da vista principal, em modo somente leitura —
    mesma projeção, mesmas camadas (rede em janela, célula com planos do HC, propriedades, elétrons estáticos),
-   enquadrada pela câmera. Sem ids, sem foco, sem gestos e sem escrita no estado; a cena é descrita por texto (role=img). */
-SILM.renderSnapshot=(host,{scope,state,element,label,projection='isometric'})=>{
+   enquadrada pela câmera. Sem ids, sem foco, sem gestos e sem escrita no estado; a cena é descrita por texto (role=img).
+   0.12.x: com camera3D, as duas cenas usam a mesma orientação e projeção 3D da vista principal. */
+SILM.renderSnapshot=(host,{scope,state,element,label,projection='isometric',camera3D=null})=>{
  const U=SimCore.ExperienceUI,X=SILM.crystal,P=SILM.properties,RD=SILM.renderer2d,NS='http://www.w3.org/2000/svg';
  const figure=U.element('figure',null,'silm-snapshot'),stage=U.element('div',null,'silm-snapshot-stage'),caption=U.element('figcaption',label,'silm-snapshot-label');
  stage.setAttribute('role','img');stage.setAttribute('aria-label',label+'. '+SILM.exploration.describe(state,element));
@@ -82,11 +83,14 @@ SILM.renderSnapshot=(host,{scope,state,element,label,projection='isometric'})=>{
  let points=[],spacing=.12,radius=.05,lattice=[],refPoints=[],refSpacing=.12;const pr=state.properties,active=pr?.active;
  if(s.mode==='crystalline'){
   const g=X.geometry(SILM.data.get(state.metal.atomicNumber)),r=s.crystallography.representation,def=P.deformer(state,g),D=c=>def?def(c):c;
-  const carts=[...g.cell.map(c=>c.cart),...s.units.map(u=>g.site(u.site).cart)],L=X.layoutFor(g,carts,{margin:.12,projection});
+  const carts=[...g.cell.map(c=>c.cart),...s.units.map(u=>g.site(u.site).cart)];let L=null;
+  if(camera3D){try{L=X.layout3D(g,carts,camera3D);}catch(_){L=null;}}   // sem 3D: a comparação continua em 2D
+  if(!L)L=X.layoutFor(g,carts,{margin:.12,projection});
   points=s.units.map(u=>{const q=L.project(D(g.site(u.site).cart));return {x:q.x,y:q.y,depth:q.depth,z:g.site(u.site).cart[2]};});
   const d=g.neighbors(g.cell[0]).distances[0];spacing=d*L.scale;radius=Math.min(.11,Math.max(.045,spacing*.3));
   const ref=X.layout(g,carts.map(D),{margin:.12});refPoints=s.units.map(u=>ref.project(D(g.site(u.site).cart)));refSpacing=d*ref.scale;   // calor: projeção de referência
-  R.setInterest(RD.boundsOf([...g.cell.map(c=>L.project(D(c.cart))),...points]),{margin:r.view==='lattice'?.3:.12});
+  if(L.radius)R.setInterest({x0:.08,y0:.08,x1:.92,y1:.92},{margin:.08});   // 3D: escala estável, como na vista principal
+  else R.setInterest(RD.boundsOf([...g.cell.map(c=>L.project(D(c.cart))),...points]),{margin:r.view==='lattice'?.3:.12});
   if(r.unitCell){for(const [a,b]of g.edges()){const p=L.project(D(a)),q=L.project(D(b));el(cellSvg,'line',{x1:p.x*100,y1:p.y*100,x2:q.x*100,y2:q.y*100,class:'silm-snapshot-edge'});}
    if(g.model.id==='HCP'){const h=g.vectors[2][2],a=g.vectors[0][0];for(const z of [0,h])el(cellSvg,'polygon',{points:[0,1,2,3,4,5].map(k=>{const q=L.project(D([a*Math.cos(k*Math.PI/3),a*Math.sin(k*Math.PI/3),z]));return q.x*100+','+q.y*100;}).join(' '),class:'silm-snapshot-plane'});}}
   if(r.view==='lattice'){const w=R.visible(),cv=R.toScene({x:.5,y:.5}),reach=.62/R.camera.zoom,occupied=new Set(s.units.map(u=>X.key(u.site)));

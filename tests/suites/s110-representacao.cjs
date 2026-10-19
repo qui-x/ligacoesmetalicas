@@ -35,9 +35,9 @@ module.exports={series:'0.11',async run(kit,{screenshots=false}={}){
   await page.keyboard.press('Tab');await page.selectOption('#silm-crystal-projection','top');await page.selectOption('#silm-crystal-projection','side');
   const box=await page.locator('#silm-assembly-stage').boundingBox();await page.mouse.move(box.x+20,box.y+box.height-20);await page.mouse.down();await page.mouse.move(box.x+90,box.y+box.height-60,{steps:5});await page.mouse.up();
   const after=JSON.stringify(await state(page));assert.equal(after,before,'scientificState idêntico');
-  const r=await rep(page);assert.equal(r.projection,'side');assert.equal(r.camera,'free');assert.equal(r.version,1);await page.waitForTimeout(400);   // gravação adiada (250 ms)
+  const r=await rep(page);assert.equal(r.projection,'side');assert.equal(r.camera,'free');assert.equal(r.version,await page.evaluate(()=>SILM.representation.VERSION));await page.waitForTimeout(400);   // versão: 1 na 0.11.x, 2 desde a 0.12.x; espera a gravação adiada (250 ms)
   const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('simcore_domain_silm_v1_representation.view')));
-  assert.equal(stored.version,1);assert.equal(stored.investigationId,(await state(page)).investigation.id);assert.equal(stored.projection,'side');
+  assert.equal(stored.version,r.version);assert.equal(stored.investigationId,(await state(page)).investigation.id);assert.equal(stored.projection,'side');
   assert.equal((await state(page)).schemaVersion,8,'schema científico inalterado');return {representation:r};
  });
 

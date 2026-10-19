@@ -314,5 +314,16 @@
 /* Celular: projeção e "Vista" dividem a mesma linha (o rótulo "Projeção" continua como nome acessível do seletor). */
 @media(max-width:600px){.silm-crystal-tools{grid-auto-flow:row}.silm-crystal-tools .silm-projection{min-width:0}.silm-projection-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.silm-projection select{flex:1;min-width:0}}
 @media(forced-colors:active){.silm-selection-ring{stroke:Highlight}.silm-camera-bar{border-color:CanvasText}}
+/* 0.12.x — vista 3D: a órbita redesenha a cada quadro, então as unidades não têm transição (exceto ao organizar).
+   Arrastar gira (cursor de agarrar); os eixos no canto são referência visual, fora do palco e sem eventos. */
+.silm-crystal[data-view-mode="3d"]:not([data-organizing]) .silm-crystal-unit{transition:none}
+.silm-stage[data-drag-mode=orbit]{cursor:grab}
+.silm-stage[data-orbiting]{cursor:grabbing}
+.silm-camera-btn[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 -3px var(--accent)}
+.silm-axes{position:absolute;z-index:15;left:max(6px,calc((100% - var(--stage,300px))/2 + 6px));bottom:max(6px,calc((100% - var(--stage,300px))/2 + 6px));width:56px;height:56px;pointer-events:none;overflow:visible}
+.silm-axis{fill:none;stroke:var(--secondary);stroke-width:1.8;stroke-linecap:round}
+.silm-axis-label{fill:var(--text);font-size:10px;font-weight:800;font-family:inherit}
+:root[data-contrast=on] .silm-axis{stroke:#fff}
+@media(forced-colors:active){.silm-axis{stroke:CanvasText}.silm-axis-label{fill:CanvasText}}
 @media print{.silm-camera{display:none}}
 @media print{.silm-camera-bar{display:none}}

@@ -11,7 +11,9 @@ window.SILM=window.SILM||{};
    - Toque central: item mais próximo dentro do raio mais uma tolerância (maior no toque), à frente vence o empate.
    - Gestos: toque seleciona; arrastar o fundo desloca; pinça (ou Ctrl/⌘ + roda) aproxima em torno do ponto.
      Teclado na área da cena: + − 0 F C e Shift + setas (deslocar). Câmera fora do Desfazer; um anúncio por gesto.
-   - Medida de medição ≠ ligação química; escala visual ≠ escala física (texto da camada semântica). */
+   - Medida de medição ≠ ligação química; escala visual ≠ escala física (texto da camada semântica).
+   - 0.12.x (3D): no modo 'orbit', arrastar com um dedo (ou o mouse) gira a câmera 3D da vista (onOrbit); Shift +
+     arrastar e dois dedos deslocam e aproximam como no 2D. Teclas J L I K e botões de girar na mesma barra. */
 SILM.renderer2d=(()=>{
  const R=SILM.representation,Z=R.ZOOM,NS='http://www.w3.org/2000/svg';
  const LAYERS=Object.freeze(['background','lattice','unitCell','neighbors','electrons','properties','structure','measurementOverlay','calculationOverlay','labels','selection']);
@@ -43,9 +45,9 @@ SILM.renderer2d=(()=>{
 
  function createStage(stage,{scope,area=null,readOnly=false,idPrefix='silm',camera:initial=null,reducedMotion=()=>false,announce=()=>{},describe=null,
   onCamera=null,onBackgroundTap=null,onUnitTap=null,onUnitPress=null,items=()=>[],focusPoint=null,canArrowPan=()=>true,onReset=null,toolbar=!readOnly,
-  ownsUnitDrag=false,onGestureStart=null,toggleHost=null}={}){
+  ownsUnitDrag=false,onGestureStart=null,toggleHost=null,onOrbit=null,extraButtons=null}={}){
   const U=SimCore.ExperienceUI;
-  let cam=R.sanitizeCamera(initial||R.camera()),interest={x0:0,y0:0,x1:1,y1:1},margin=0,size=0;
+  let cam=R.sanitizeCamera(initial||R.camera()),interest={x0:0,y0:0,x1:1,y1:1},margin=0,size=0,dragMode='pan';
   stage.classList.add('silm-stage');stage.dataset.renderer='2d';if(readOnly)stage.dataset.readonly='';
   const order=[],listeners={camera:new Set(),resize:new Set()};
   const zoomText=()=>Math.round(cam.zoom*100)+' %';
@@ -61,10 +63,10 @@ SILM.renderer2d=(()=>{
   let description=null;
   if(!readOnly){description=U.element('p','','sr-only silm-scene-description');description.id=idPrefix+'-scene-description';stage.append(description);
    const ids=(stage.getAttribute('aria-describedby')||'').split(' ').filter(Boolean);if(!ids.includes(description.id))stage.setAttribute('aria-describedby',[...ids,description.id].join(' '));}
-  const cameraText=()=>'Vista: zoom '+zoomText()+(cam.mode==='fit'?', enquadrada':'')+'. O zoom muda só a apresentação; as medidas e o estado científico não mudam (escala visual não é escala física).';
+  const cameraText=()=>'Vista: zoom '+zoomText()+(cam.mode==='fit'?', enquadrada':'')+'. O zoom'+(dragMode==='orbit'?' e a órbita mudam':' muda')+' só a apresentação; as medidas e o estado científico não mudam (escala visual não é escala física).';
   function describeNow(){if(description)description.textContent=[describe?.(),cameraText()].filter(Boolean).join(' ');}
   /* ---------- barra de câmera (fora do palco, sobre o canto da cena; gramática de controles da família) ---------- */
-  let bar=null,zoomLabel=null,inButton=null,outButton=null,dock=null;
+  let bar=null,zoomLabel=null,inButton=null,outButton=null,dock=null,buttons=[],orbitButtons=[];
   if(toolbar&&area){
    /* No celular e na paisagem curta, a barra fica recolhida atrás de "Vista" (como "Doses" no SIAB): a cena não fica coberta. */
    dock=U.element('div',null,'silm-camera');const toggle=U.element('button',null,'secondary-btn silm-camera-toggle');toggle.type='button';toggle.id=idPrefix+'-camera-toggle';
@@ -81,9 +83,15 @@ SILM.renderer2d=(()=>{
    // Valor do zoom só visual: <output> seria região viva e falaria a cada quadro do gesto; o anúncio é um por gesto.
    zoomLabel=U.element('span',zoomText(),'silm-camera-zoom');zoomLabel.id=idPrefix+'-camera-zoom';zoomLabel.setAttribute('aria-hidden','true');
    bar.append(inButton,zoomLabel,outButton,fitButton,centerButton,resetButton);inButton.tabIndex=0;area.append(dock);
-   const buttons=[inButton,outButton,fitButton,centerButton,resetButton];
-   scope.listen(bar,'keydown',e=>{const k=buttons.indexOf(document.activeElement);if(k<0)return;const next={ArrowDown:k+1,ArrowRight:k+1,ArrowUp:k-1,ArrowLeft:k-1,Home:0,End:buttons.length-1}[e.key];
-    if(next==null||e.shiftKey)return;e.preventDefault();e.stopPropagation();const t=buttons[(next+buttons.length)%buttons.length];for(const b of buttons)b.tabIndex=b===t?0:-1;t.focus();});
+   buttons=[inButton,outButton,fitButton,centerButton,resetButton];
+   // 0.12.x: girar a vista 3D (só aparecem no modo 'orbit') e botões extras da vista (perspectiva/ortográfica).
+   if(onOrbit){orbitButtons=[button('yaw-left','⟲','Girar para a esquerda','J',()=>orbitKey(-1,0)),button('yaw-right','⟳','Girar para a direita','L',()=>orbitKey(1,0)),
+     button('pitch-up','⇡','Inclinar para cima','I',()=>orbitKey(0,-1)),button('pitch-down','⇣','Inclinar para baixo','K',()=>orbitKey(0,1))];
+    for(const b of orbitButtons){b.classList.add('silm-camera-orbit');b.hidden=true;bar.append(b);}buttons.push(...orbitButtons);}
+   for(const b of extraButtons?.(button)||[]){bar.append(b);buttons.push(b);}
+   const shown=()=>buttons.filter(b=>!b.hidden);
+   scope.listen(bar,'keydown',e=>{const list=shown(),k=list.indexOf(document.activeElement);if(k<0)return;const next={ArrowDown:k+1,ArrowRight:k+1,ArrowUp:k-1,ArrowLeft:k-1,Home:0,End:list.length-1}[e.key];
+    if(next==null||e.shiftKey)return;e.preventDefault();e.stopPropagation();const t=list[(next+list.length)%list.length];for(const b of buttons)b.tabIndex=b===t?0:-1;t.focus();});
   }
   function apply(){
    const t=transform();for(const el of stage.querySelectorAll(':scope>[data-camera]'))el.style.transform=t;
@@ -107,6 +115,14 @@ SILM.renderer2d=(()=>{
   function fitNow(){setCamera(fit(interest,margin),{animate:true,say:'Vista enquadrada: zoom '+Math.round(fit(interest,margin).zoom*100)+' %.'});}
   function centerNow(){const p=focusPoint?.()||{x:(interest.x0+interest.x1)/2,y:(interest.y0+interest.y1)/2};setCamera({mode:'free',zoom:cam.zoom,x:p.x,y:p.y},{animate:true,say:'Vista centralizada.'});}
   function resetNow(){onReset?.();setCamera(fit(interest,margin),{animate:true,say:'Vista restaurada.'});}
+  /* Órbita (3D): passo de teclado ou botão = 24 px de arrasto; a vista converte em graus e anuncia. */
+  const ORBIT_STEP=24;
+  function orbitKey(dx,dy){if(dragMode==='orbit')onOrbit?.(dx*ORBIT_STEP,dy*ORBIT_STEP,'key');}
+  function setDragMode(m){
+   dragMode=m==='orbit'&&onOrbit?'orbit':'pan';stage.dataset.dragMode=dragMode;
+   for(const b of orbitButtons){b.hidden=dragMode!=='orbit';if(b.hidden&&b.tabIndex===0){b.tabIndex=-1;if(inButton)inButton.tabIndex=0;}}
+   describeNow();
+  }
   /* Foco fora da vista (Tab, setas, leitor de tela): a câmera desloca o mínimo para mostrar o item; o palco nunca rola. */
   function ensureVisible(p){
    if(!p)return false;const v=toView(cam,p),m=Math.min(.4,.06+(p.r||0)*cam.zoom);let dx=0,dy=0;
@@ -137,7 +153,7 @@ SILM.renderer2d=(()=>{
     pointerAt=performance.now();swallowUntil=0;   // um novo toque nunca é engolido
     if(ignore(e))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,type:e.pointerType});
     // Segundo dedo: pinça. A vista cancela o arrasto da unidade que o primeiro dedo tenha começado (nada se move).
-    if(pointers.size===2){const [a,b]=[...pointers.values()];pan=null;press=null;pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,cam:{...cam},mid:viewPoint({clientX:(a.x+b.x)/2,clientY:(a.y+b.y)/2})};onGestureStart?.('pinch');for(const id of pointers.keys())capture(id);return;}
+    if(pointers.size===2){const [a,b]=[...pointers.values()];if(pan?.orbit&&pan.moved){onOrbit?.(0,0,'end');delete stage.dataset.orbiting;}pan=null;press=null;pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,cam:{...cam},mid:viewPoint({clientX:(a.x+b.x)/2,clientY:(a.y+b.y)/2})};onGestureStart?.('pinch');for(const id of pointers.keys())capture(id);return;}
     if(pointers.size>1)return;
     const unit=e.target.closest('.silm-unit[data-unit-id]');
     if(unit&&ownsUnitDrag)return;   // montagem livre editável: arrastar a unidade a move (a própria vista trata)
@@ -145,7 +161,8 @@ SILM.renderer2d=(()=>{
     if(id&&onUnitPress){onUnitPress(id,e);return;}
     if(id&&onUnitTap){press={id,pointerId:e.pointerId,x:e.clientX,y:e.clientY,threshold:e.pointerType==='mouse'?4:8};}
     // Sobre uma unidade, o deslocamento só captura o ponteiro depois do limiar: um toque continua sendo o clique dela.
-    pan={pointerId:e.pointerId,x:e.clientX,y:e.clientY,cam:{...cam},moved:false,captured:!unit,threshold:e.pointerType==='mouse'?4:8};
+    // Modo 'orbit' (3D): o arrasto gira; Shift + arrastar desloca como no 2D.
+    pan={pointerId:e.pointerId,x:e.clientX,y:e.clientY,lx:e.clientX,ly:e.clientY,cam:{...cam},moved:false,captured:!unit,orbit:dragMode==='orbit'&&!e.shiftKey,threshold:e.pointerType==='mouse'?4:8};
     if(!unit)capture(e.pointerId);
    });
    // O clique que o navegador gera ao fim de um deslocamento não seleciona nada (Enter e Espaço têm detail 0 e passam).
@@ -158,13 +175,16 @@ SILM.renderer2d=(()=>{
     if(!pan||e.pointerId!==pan.pointerId)return;
     if(!pan.moved&&Math.hypot(e.clientX-pan.x,e.clientY-pan.y)<pan.threshold)return;
     if(!pan.captured){pan.captured=true;capture(pan.pointerId);}
-    pan.moved=true;press=null;stage.dataset.panning='';const w=stage.clientWidth||1;setCamera(panBy(pan.cam,(e.clientX-pan.x)/w,(e.clientY-pan.y)/w),{settled:false});
+    pan.moved=true;press=null;
+    if(pan.orbit){stage.dataset.orbiting='';onOrbit?.(e.clientX-pan.lx,e.clientY-pan.ly,'move');pan.lx=e.clientX;pan.ly=e.clientY;return;}
+    stage.dataset.panning='';const w=stage.clientWidth||1;setCamera(panBy(pan.cam,(e.clientX-pan.x)/w,(e.clientY-pan.y)/w),{settled:false});
    });
    const end=(e,commit)=>{
     if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);
-    if(pinch){if(pointers.size<2){pinch=null;pan=null;press=null;settle('Vista: zoom '+zoomText()+'.');}return;}
+    if(pinch){if(pointers.size<2){pinch=null;if(pan?.orbit&&pan.moved)onOrbit?.(0,0,'end');pan=null;press=null;settle('Vista: zoom '+zoomText()+'.');}return;}
     const wasPress=press&&press.pointerId===e.pointerId?press:null;press=null;
-    if(pan&&e.pointerId===pan.pointerId){const moved=pan.moved;pan=null;delete stage.dataset.panning;try{stage.releasePointerCapture(e.pointerId);}catch(_){}
+    if(pan&&e.pointerId===pan.pointerId){const moved=pan.moved,orbit=pan.orbit;pan=null;delete stage.dataset.panning;delete stage.dataset.orbiting;try{stage.releasePointerCapture(e.pointerId);}catch(_){}
+     if(moved&&orbit){swallowUntil=performance.now()+400;onOrbit?.(0,0,'end');return;}
      if(moved){swallowUntil=performance.now()+400;settle('Vista deslocada.');return;}
      if(!commit)return;
      if(wasPress){onUnitTap?.(wasPress.id);return;}
@@ -179,6 +199,7 @@ SILM.renderer2d=(()=>{
     if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey||/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName))return;const k=e.key;let done=true;
     if(k==='+'||k==='='||k==='Add')zoomStep(Z.step);else if(k==='-'||k==='−'||k==='_'||k==='Subtract')zoomStep(1/Z.step);else if(k==='0')resetNow();
     else if(k==='f'||k==='F')fitNow();else if(k==='c'||k==='C')centerNow();
+    else if(dragMode==='orbit'&&/^[jlikJLIK]$/.test(k))orbitKey(...{j:[-1,0],l:[1,0],i:[0,-1],k:[0,1]}[k.toLowerCase()]);
     else if(e.shiftKey&&k.startsWith('Arrow')&&canArrowPan(e)){const d=.08,[dx,dy]={ArrowLeft:[d,0],ArrowRight:[-d,0],ArrowUp:[0,d],ArrowDown:[0,-d]}[k]||[0,0];setCamera(panBy(cam,dx,dy),{settled:false});scheduleSettle(()=>'Vista deslocada.');}
     else done=false;
     if(done){e.preventDefault();e.stopPropagation();}
@@ -203,7 +224,7 @@ SILM.renderer2d=(()=>{
   Object.defineProperty(stage,'silmRenderer',{configurable:true,value:Object.freeze({snapshot:()=>({camera:{...cam},interest:{...interest},margin,size,layers:[...stage.children].map(el=>el.dataset?.layer).filter(Boolean)}),
    toClient:p=>sceneToClient(p),toScene:v=>toScene(cam,v),toView:p=>toView(cam,p),setCamera:c=>setCamera({...cam,mode:'free',...c})})});
   measure();apply();describeNow();
-  return Object.freeze({stage,layer,selectionLayer,labelsLayer,get camera(){return {...cam};},setCamera,setInterest,fit:fitNow,zoomBy:zoomStep,center:centerNow,reset:resetNow,ensureVisible,
+  return Object.freeze({stage,layer,selectionLayer,labelsLayer,get camera(){return {...cam};},setCamera,setInterest,fit:fitNow,zoomBy:zoomStep,center:centerNow,reset:resetNow,ensureVisible,setDragMode,get dragMode(){return dragMode;},
    get pinching(){return gesture.pinching();},descriptionId:description?.id||null,
    toView:p=>toView(cam,p),toScene:v=>toScene(cam,v),clientToScene,sceneToClient,get size(){return size;},describe:describeNow,
    visible:()=>{const a=toScene(cam,{x:0,y:0}),b=toScene(cam,{x:1,y:1});return {x0:a.x,y0:a.y,x1:b.x,y1:b.y};},
