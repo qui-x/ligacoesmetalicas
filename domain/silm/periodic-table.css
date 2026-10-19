@@ -1,5 +1,5 @@
 .silm-laboratory{width:100%;min-width:0;padding:12px;align-self:stretch}
-.silm-periodic{--periodic-cell:52px;display:flex;flex-direction:column;min-width:0;max-width:100%;gap:10px;color:var(--text)}
+.silm-periodic{--periodic-cell:52px;display:flex;flex-direction:column;min-width:0;max-width:100%;gap:8px;color:var(--text)}
 .periodic-heading{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
 .periodic-heading h1{font-size:1.35rem;margin:0}.periodic-heading .eyebrow{margin:0 0 4px;color:var(--accent);font-size:.7rem;letter-spacing:.12em}
 .periodic-search{display:grid;grid-template-columns:minmax(100px,1fr) auto;align-items:center;gap:6px;max-width:100%;min-width:0;width:310px}

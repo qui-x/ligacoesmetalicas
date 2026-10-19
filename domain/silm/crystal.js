@@ -162,6 +162,27 @@ SILM.crystal=(()=>{
   const depths=pts.map(p=>p.depth),dmin=Math.min(...depths),dmax=Math.max(...depths);
   return {scale,project(p){const q=P(p);return {x:.5+(q.x-cx)*scale,y:.5+(q.y-cyy)*scale,depth:dmax>dmin?(q.depth-dmin)/(dmax-dmin):.5};},centre:P(g.center)};
  }
+ /* 0.12.x — representação 3D: a mesma geometria (Å), vista por uma câmera de órbita (guinada e inclinação) com
+    projeção perspectiva ou ortográfica. Vistas padrão ao longo dos eixos: XY (de cima, ao longo de z), XZ (de frente,
+    ao longo de y) e YZ (de lado, ao longo de x); "3D" parte da vista de referência da estrutura. A normalização usa a
+    esfera que envolve a célula e as unidades: girar não muda a escala (a estrutura não "respira").
+    Câmera é representação: nunca cria estado científico, e medidas e cálculos não passam por aqui. */
+ const PRESETS3D=Object.freeze({'3d':null,xy:Object.freeze([0,90]),xz:Object.freeze([0,0]),yz:Object.freeze([-90,0])});
+ const PERSPECTIVE_DISTANCE=3.2;   // distância da câmera ao centro, em raios da esfera envolvente
+ function orientation3D(m,cam={}){
+  if(typeof cam.yaw==='number'&&typeof cam.pitch==='number')return [cam.yaw,Math.max(-90,Math.min(90,cam.pitch))];
+  const preset=PRESETS3D[cam.preset];if(preset)return [...preset];
+  return {BCC:[-20,16],FCC:[-11,17],HCP:[-10,16]}[m.id].slice();   // a mesma vista da isométrica de referência
+ }
+ function layout3D(g,fit,cam={}){
+  if(SILM.debug?.fail3D)throw new Error('3D indisponível (diagnóstico)');
+  const [yawDeg,pitchDeg]=orientation3D(g.model,cam),yaw=yawDeg*deg,pitch=pitchDeg*deg,cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  const c=g.center,R=Math.max(1e-9,...fit.map(p=>Math.hypot(p[0]-c[0],p[1]-c[1],p[2]-c[2]))),perspective=cam.projection!=='orthographic';
+  const D=PERSPECTIVE_DISTANCE*R,reach=perspective?R*D/(D-R):R,margin=.05,scale=(1-2*margin)/(2*reach);
+  const rot=p=>{const x=p[0]-c[0],y=p[1]-c[1],z=p[2]-c[2],x1=x*cy-y*sy,y1=x*sy+y*cy;return {x:x1,y:-(y1*sp+z*cp),depth:y1*cp-z*sp};};
+  return {scale,radius:R,perspective,orientation:[yawDeg,pitchDeg],
+   project(p){const q=rot(p),f=perspective?D/Math.max(D*.2,D+q.depth):1;return {x:.5+q.x*f*scale,y:.5+q.y*f*scale,depth:Math.max(0,Math.min(1,(q.depth+R)/(2*R))),size:f};}};
+ }
  /* Organização: reaproveita as unidades livres (pareamento guloso pela proximidade na cena) e completa a célula. */
  function organize(g,freeUnits){
   const need=Math.max(freeUnits.length,g.model.cellSites),targets=[...g.cell,...g.extra].slice(0,need);
@@ -174,5 +195,5 @@ SILM.crystal=(()=>{
  }
  const label=id=>{const m=MODELS[id];return m?m.code+' ('+m.international+') · '+m.name:id;};
  return Object.freeze({models:MODELS,typeByDatabase:TYPE_BY_DB,reasons:REASONS,structureTypes:Object.freeze(Object.keys(MODELS)),
-  eligibility,geometry,projector,layout,organize,expandSites,matchesBasis,parseOperation,key,label,projections:PROJECTIONS,views:VIEWS,projectorFor,layoutFor});
+  eligibility,geometry,projector,layout,organize,expandSites,matchesBasis,parseOperation,key,label,projections:PROJECTIONS,views:VIEWS,projectorFor,layoutFor,presets3D:PRESETS3D,orientation3D,layout3D});
 })();

@@ -1,5 +1,26 @@
 # Registro de alterações
 
+## SILM 0.12.0 — Representação 3D científica
+
+- Consolidação da branch `claude/optimistic-cerf-167d72` com a integração da Base Demo SI 0.9.8.
+- Entrada `integracao/index.html`: navegação, docas, investigação e renderer comum 2D/3D, com armazenamento separado.
+- Correção: reenquadrar uma vista 3D grava a câmera `crystal3d`, preservando a câmera 2D `crystal`.
+- A distribuição principal mantém Medir, Calcular e demais recursos completos; a nova base permanece em integração.
+
+
+- **Vista 3D da estrutura cristalina:** a mesma estrutura, em ångström, girada por uma câmera de órbita no renderizador comum. Não há motor 3D paralelo nem WebGL.
+  - Vistas: 3D livre, Plano XY (de cima), Plano XZ (de frente) e Plano YZ (de lado), no seletor Projeção e em Ver → Observar → Camadas.
+  - Perspectiva ou ortográfica, pelo botão da barra ou pela tecla P.
+  - Girar: arrastar (no celular, um dedo), teclas J L I K e botões. Deslocar e aproximar como no 2D (Shift + arrastar, dois dedos, Ctrl/⌘ + roda, + −). F enquadra; 0 restaura.
+  - Eixos x, y e z no canto, como referência visual.
+- **A mesma ciência:** seleção, vizinhos, medições e cálculos são os mesmos objetos do 2D. Distância e ângulo dão o mesmo valor no 2D e no 3D, e o calor continua na isométrica de referência.
+- **Elétrons** ocultos durante a órbita e redistribuídos ao soltar, sem elétrons "3D" à parte.
+- **Comparação** na mesma orientação 3D da vista principal.
+- **Volta ao 2D** com aviso se a vista 3D falhar.
+- **representationState v2** (`viewMode`, `camera3D`, câmera `crystal3d`), com migração da v1 sem perda.
+- **Documentação:** `docs/SILM-0.12.0.md`, `docs/RENDERER-3D.md`, `docs/CONTRATO-REPRESENTACAO-3D.md` e o tópico do Manual "Ver a estrutura em 3D".
+- Nenhum dado científico mudou (schema 8). O núcleo continua o da Base Estrutural 0.3.1, sem alteração.
+
 ## SILM 0.11.0 — Representação 2D científica
 
 - **Renderizador 2D comum** (`domain/silm/renderer-2d.js`): montagem livre, estrutura cristalina e comparação usam o mesmo palco, com camadas numa ordem central e sem z-index espalhado.

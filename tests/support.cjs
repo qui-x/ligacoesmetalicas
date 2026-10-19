@@ -10,14 +10,18 @@ function serve(){
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);res.end('not found');return;}
   res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','Cache-Control':'no-store'});fs.createReadStream(file).pipe(res);
  });
- return new Promise(resolve=>server.listen(0,'127.0.0.1',()=>resolve({server,url:'http://localhost:'+server.address().port+'/'})));
+ return new Promise(resolve=>server.listen(0,'127.0.0.1',()=>resolve({server,url:'http://127.0.0.1:'+server.address().port+'/'})));
 }
 async function launch(){
  const {chromium}=require('playwright');
  try{return await chromium.launch();}
  catch(error){
   const candidates=['/opt/pw-browsers/chromium-1194/chrome-linux/chrome',process.env.SILM_CHROMIUM].filter(Boolean);
-  for(const executablePath of candidates)if(fs.existsSync(executablePath))return chromium.launch({executablePath});
+  for(const executablePath of candidates)if(fs.existsSync(executablePath)){
+   const args=process.env.SILM_CHROMIUM_ARGS?JSON.parse(process.env.SILM_CHROMIUM_ARGS):undefined;
+   if(args!==undefined&&(!Array.isArray(args)||!args.every(value=>typeof value==='string')))throw new Error('SILM_CHROMIUM_ARGS deve ser uma lista JSON de argumentos.');
+   return chromium.launch({executablePath,args});
+  }
   throw error;
  }
 }

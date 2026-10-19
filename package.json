@@ -1,6 +1,6 @@
 {
   "name": "silm",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "private": true,
   "description": "SILM — Estruturas cristalinas e rede metálica.",
   "license": "GPL-3.0",
@@ -13,7 +13,9 @@
     "audit": "python3 scripts/audit-silm.py",
     "test:scientific": "node tests/scientific-data.cjs && node scripts/validate-scientific-state.cjs",
     "coverage": "node scripts/build-coverage.cjs",
-    "test:browser": "node tests/browser.cjs"
+    "test:browser": "node tests/browser.cjs",
+    "build:integration": "node scripts/build-base-integration.cjs",
+    "test:integration": "npm run build:integration && node tests/base-integration.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1",

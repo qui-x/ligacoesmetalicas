@@ -61,7 +61,12 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
  });
  const resize=()=>{if(!root.isConnected)return;const min=26,gap=4;
   const width=scroll.clientWidth-30,wide=(width-20-18*gap)/18;let cell=Math.max(min,wide);
-  if(root.closest('.silm-presentation.is-expanded,.silm-laboratory')){const tall=(scroll.clientHeight-46-9*gap)/9/1.13;cell=Math.max(min,Math.min(wide,tall));}
+  if(root.closest('.silm-presentation.is-expanded,.silm-laboratory')){
+   // Onze linhas: cabeçalho de 20 px, separador de 8 px e nove linhas de elementos.
+   // Descontar os dez intervalos e o padding real evita overflow por poucos pixels no tablet.
+   const style=getComputedStyle(scroll),padding=(parseFloat(style.paddingTop)||0)+(parseFloat(style.paddingBottom)||0);
+   const tall=(scroll.clientHeight-padding-20-8-10*gap-2)/9/1.13;cell=Math.max(min,Math.min(wide,tall));
+  }
   const size=Math.max(min,Math.min(96,cell));root.style.setProperty('--periodic-cell',size+'px');root.dataset.density=size<34?'tiny':size<46?'compact':'full';requestAnimationFrame(()=>{scrollHint.hidden=scroll.scrollWidth<=scroll.clientWidth+1;});
  };
  if(window.ResizeObserver){const observer=new ResizeObserver(resize);scope.observe(observer,scroll);}scope.listen(window,'resize',resize);scope.on('theme:changed',resize);

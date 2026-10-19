@@ -1,10 +1,16 @@
-# SILM 0.11.0 — A Arquitetura dos Metais
+# SILM 0.12.0 — A Arquitetura dos Metais
 
 **Simulador Interativo de Ligações Metálicas.** Esta versão mantém o banco científico (0.2.x) e a investigação persistente de um metal (0.3.x), a montagem manual da estrutura metálica (0.4.x), as estruturas cristalinas (0.5.x), o modelo eletrônico com elétrons deslocalizados (0.6.x), as propriedades metálicas (0.7.x), o módulo **Explorar** (0.8.x), o módulo **Medir** (0.9.x) e acrescenta o módulo **Calcular**: em **Ver → Analisar → Calcular**, obtenha o número efetivo de átomos, o volume da célula, o raio a partir do parâmetro (e o inverso), o fator de empacotamento, a densidade teórica e, no HC, a razão c/a. Cada entrada mostra a origem (dado tabelado, medida do modelo, valor informado ou calculado pelo SILM) e os registros ficam em **Dados → Cálculos**. Monte com **+ Adicionar unidade** e use **Organizar estrutura**: o SILM reorganiza a montagem segundo a estrutura de referência do banco (CCC, CFC ou HC), com célula unitária, rede extensa e vizinhança. O Laboratório usa os painéis **Montagem, Ver e Dados**, da mesma família do SIAB.
 
 Desde a 0.10.1, o SILM usa a gramática de interação da família de simuladores: a mesma forma de usar, com o núcleo da Base Estrutural 0.3.1 adotado sem alteração. Veja `docs/SILM-0.10.1.md`.
 
 Na 0.11.0, a cena ganhou um renderizador 2D comum. Há controles da vista (aproximar, afastar, enquadrar, centralizar, restaurar), projeções Isométrica, Frontal, Superior e Lateral, e a garantia de que a vista nunca muda a ciência: as medidas são as mesmas com qualquer zoom. Veja `docs/SILM-0.11.0.md`.
+
+Na 0.12.0, a estrutura cristalina também pode ser vista em 3D: a mesma estrutura, em ångström, girada por uma câmera de órbita, com perspectiva ou ortográfica e os planos XY, XZ e YZ. Medições e cálculos dão os mesmos valores no 2D e no 3D. Veja `docs/SILM-0.12.0.md`.
+
+## Integração com a base atual
+
+A entrada [SILM sobre a Base Demo SI 0.9.8](integracao/index.html) conecta a exploração científica e a representação 2D/3D à navegação e às docas da base atual. A sessão é separada da distribuição completa. Medir, Calcular, propriedades e relatórios continuam nesta distribuição principal enquanto a migração avança. Consulte [as instruções e os limites da integração](integracao/README.md).
 
 ## Usar
 

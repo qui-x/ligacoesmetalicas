@@ -3,7 +3,7 @@ window.SILM = window.SILM || {};
 SILM.create = () => {
   const U = SimCore.ExperienceUI, model = SILM.createScientificState(), X = SILM.crystal;
   let ctx = null, host = null;
-  const icon = 'assets/silm-simbolo.svg', VERSION = '0.11.0';
+  const icon = 'assets/silm-simbolo.svg', VERSION = '0.12.0';
   const modules = [
     {id:'explorar',number:1,title:'Explorar',description:'Investigação qualitativa integrada: monte, organize, observe célula, rede, elétrons e propriedades, use camadas e compare representações.',icon:'explore',
      facts:[['Você ajusta','Metal, unidades e organização cristalina'],['Você observa','Célula, rede, elétrons e propriedades'],['Bom para','Construir e comparar representações']],note:'Representação didática: a organização cristalina não é uma simulação de cristalização.'},
@@ -202,7 +202,7 @@ SILM.create = () => {
   function draw(){
     if(!ctx||!host)return;
     const table=(showTable||!selected())&&!ctx.experience.restricted,structure=model.state.structure;
-    const key=!table&&selected()&&structure?'assembly:'+model.state.investigation.id+':'+model.state.module.active+':'+structure.mode:null;
+    const key=!table&&selected()&&structure?'assembly:'+model.state.investigation.id+':'+model.state.module.active+':'+structure.mode+(structure.mode==='crystalline'?':'+representation.viewMode:''):null;
     if(key&&key===viewKey&&view){view.update();return;}
     view=null;viewKey=key;viewScope?.destroy();viewScope=SimCore.createScope();host.replaceChildren();
     if(table){SILM.createPeriodicTable(host,{scope:viewScope,state:tableState,onInvestigate:investigate,onSources:openSources,canInvestigate});return;}
@@ -585,17 +585,51 @@ SILM.create = () => {
   // Gravação pendente sai já ao trocar de aba, fechar ou recarregar (pagehide): a vista volta como foi deixada.
   function flushRepresentation(){if(!representationTimer)return;clearTimeout(representationTimer);representationTimer=0;if(ctx&&model.state.investigation)ctx.storage.set('representation.view',representation);}
   function resetRepresentation(){representation=RP.defaults(model.state.investigation?.id||null);if(model.state.investigation)ctx.storage.set('representation.view',representation);else ctx.storage.remove('representation.view');}
+  let unavailable3D=false;   // falhou nesta sessão: o 3D fica indisponível e a vista 2D científica continua
+  /* Troca 2D ↔ 3D: refaz a vista cristalina (outra câmera e outros gestos); estado científico, seleção, medições e
+     cálculos não mudam. O foco volta para o seletor de vista. */
+  function setViewMode(mode,{projection=null,silent=false}={}){
+    if(!RP.VIEW_MODES.includes(mode)||(mode==='3d'&&unavailable3D))return false;
+    const changed=mode!==representation.viewMode||(projection&&projection!==representation.projection);
+    if(projection&&RP.PROJECTIONS.includes(projection))representation.projection=projection;
+    if(!changed)return false;representation.viewMode=mode;saveRepresentation();
+    const hadFocus=document.activeElement?.id;draw();for(const fn of [...watchers])fn();
+    if(hadFocus)document.getElementById(hadFocus)?.focus({preventScroll:true});
+    if(!silent)say(mode==='3d'?'Vista 3D: arraste para girar, Shift + arrastar desloca. A estrutura, a seleção e as medidas são as mesmas do 2D.':'Vista 2D, projeção '+RP.LABELS[representation.projection].toLocaleLowerCase('pt-BR')+'. A estrutura, a seleção e as medidas não mudam.');
+    return true;
+  }
   const representationApi=Object.freeze({
     projection:()=>representation.projection,
+    viewMode:()=>representation.viewMode,
+    available3D:()=>!unavailable3D,
+    camera3D:()=>({...representation.camera3D}),
     camera:mode=>({...representation.cameras[mode]}),
     saveCamera(mode,cam){representation.cameras[mode]=RP.sanitizeCamera(cam);saveRepresentation();},
+    setViewMode,
+    /* Câmera 3D: preset, órbita ou projeção. silent = a própria vista já desenhou (fim da órbita). */
+    setCamera3D(patch,{silent=false}={}){
+      const before=representation.camera3D;representation.camera3D=RP.sanitizeCamera3D({...before,...patch});saveRepresentation();
+      if(!silent){view?.update();for(const fn of [...watchers])fn();}
+      if(patch.preset&&patch.preset!==before.preset&&!silent)say(RP.PRESET_LABELS[patch.preset]+'. Muda só a apresentação.');
+      if(patch.projection&&patch.projection!==before.projection)say(patch.projection==='perspective'?'Projeção em perspectiva: o que está mais perto parece maior.':'Projeção ortográfica: arestas paralelas continuam paralelas, sem efeito de distância.');
+    },
+    /* Falha do 3D (exceção ao projetar): volta para o 2D científico, sem perder nada. */
+    fail3D(error){
+      if(unavailable3D)return;unavailable3D=true;console.warn('SILM: vista 3D indisponível —',error?.message||error);
+      representation.viewMode='2d';saveRepresentation();scope3DRetry();
+      ctx.notify('A vista 3D não está disponível. A vista 2D científica continua, com a mesma estrutura e as mesmas medidas.',{type:'warning'});
+    },
     setProjection(p){if(!RP.PROJECTIONS.includes(p)||p===representation.projection)return;representation.projection=p;saveRepresentation();view?.update();for(const fn of [...watchers])fn();
       say('Projeção '+RP.LABELS[p].toLocaleLowerCase('pt-BR')+'. Muda só a apresentação: a estrutura e as medidas não mudam.');}
   });
-  /* Fachada de leitura (testes e depuração): compõe a representação herdada do schema 8 com a da 0.11.x. */
+  // A vista é refeita fora do ciclo que falhou (a falha acontece dentro do desenho).
+  function scope3DRetry(){setTimeout(()=>{if(ctx){viewKey=null;draw();for(const fn of [...watchers])fn();}},0);}
+  /* Fachada de leitura (testes e depuração): compõe a representação herdada do schema 8 com a da 0.11.x e a 3D da 0.12.x. */
   function representationState(){
-    const s=model.state,st=s.structure,cr=st?.mode==='crystalline'?st.crystallography.representation:null,mode=cr?'crystal':'free',cam=view?.renderer?.camera||representation.cameras[mode],marks=calcOptions().marks();
-    return Object.freeze({version:RP.VERSION,view:st?(cr?cr.view:'free'):null,zoom:cam.zoom,pan:{x:cam.x,y:cam.y},camera:cam.mode,projection:cr?representation.projection:null,
+    const s=model.state,st=s.structure,cr=st?.mode==='crystalline'?st.crystallography.representation:null,three=!!cr&&representation.viewMode==='3d',mode=cr?(three?'crystal3d':'crystal'):'free',cam=view?.renderer?.camera||representation.cameras[mode],marks=calcOptions().marks();
+    const c3=representation.camera3D,orientation=three?(view?.orientation?.()||null):null;
+    return Object.freeze({version:RP.VERSION,view:st?(cr?cr.view:'free'):null,viewMode:cr?representation.viewMode:'2d',zoom:cam.zoom,pan:{x:cam.x,y:cam.y},camera:cam.mode,projection:cr?representation.projection:null,
+      camera3D:three?{preset:c3.preset,projection:c3.projection,yaw:orientation?orientation[0]:c3.yaw,pitch:orientation?orientation[1]:c3.pitch,target:'centro da célula'}:null,
       layers:{unitCell:cr?.unitCell??null,neighbors:cr?.neighbors??null,labels:cr?.labels??null,centers:exploration.layers.centers,propertyHints:exploration.layers.propertyHints,electrons:!!s.electrons?.representation.visible},
       selection:cr?cr.selectedUnitId:(view?.selected??null),overlays:{measure:measure.tool||(measure.review?'review':null),calculation:marks?.mode||null}});
   }
@@ -683,9 +717,16 @@ SILM.create = () => {
     // 0.11.x: projeção da estrutura cristalina (representação; a mesma escolha do seletor da cena).
     const projLabel=U.element('p','Projeção','silm-measure-label'),projList=U.element('div',null,'silm-segmented silm-projection-list');projList.setAttribute('role','group');projList.setAttribute('aria-label','Projeção da estrutura');
     const projNote=U.element('p','Muda só a apresentação: a estrutura, as medidas e os cálculos não mudam.','silm-panel-note');
-    const projButtons=RP.PROJECTIONS.map(id=>{const b=SILM.actionButton(RP.LABELS[id],()=>representationApi.setProjection(id),local.scope,{id:'silm-projection-'+id});projList.append(b);return [id,b];});
-    box.append(projLabel,projList,projNote);
-    const update=()=>{const visible=[];const cr=crystalline();projLabel.hidden=projList.hidden=projNote.hidden=!cr;for(const [id,b]of projButtons)b.setAttribute('aria-pressed',String(representation.projection===id));for(const [d,b]of buttons){const show=!d.when||d.when();b.hidden=!show;if(!show)continue;const on=!!d.on(),able=d.able?d.able():{ok:true};b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-disabled',String(!on&&!able.ok));b.title=!on&&!able.ok?able.reason:'';if(on)visible.push(d.label.toLocaleLowerCase('pt-BR'));}
+    // 0.12.x: as projeções 2D e as vistas 3D (órbita livre e planos XY, XZ, YZ) — as mesmas opções do seletor da cena.
+    const choose2D=id=>{if(representation.viewMode==='3d')setViewMode('2d',{projection:id});else representationApi.setProjection(id);};
+    const choose3D=preset=>{representationApi.setCamera3D({preset,yaw:null,pitch:null},{silent:representation.viewMode!=='3d'});setViewMode('3d');};
+    const projButtons=RP.PROJECTIONS.map(id=>{const b=SILM.actionButton(RP.LABELS[id],()=>choose2D(id),local.scope,{id:'silm-projection-'+id});projList.append(b);return [id,b];});
+    const label3D=U.element('p','Vista 3D','silm-measure-label'),list3D=U.element('div',null,'silm-segmented silm-projection-list');list3D.setAttribute('role','group');list3D.setAttribute('aria-label','Vista 3D da estrutura');
+    const buttons3D=RP.PRESETS.map(id=>{const b=SILM.actionButton(RP.PRESET_LABELS[id],()=>choose3D(id),local.scope,{id:'silm-projection-'+(id==='3d'?'3d':'3d-'+id)});list3D.append(b);return [id,b];});
+    box.append(projLabel,projList,label3D,list3D,projNote);
+    const update=()=>{const visible=[];const cr=crystalline(),three=representation.viewMode==='3d';projLabel.hidden=projList.hidden=projNote.hidden=label3D.hidden=list3D.hidden=!cr;
+      for(const [id,b]of projButtons)b.setAttribute('aria-pressed',String(!three&&representation.projection===id));
+      for(const [id,b]of buttons3D){b.setAttribute('aria-pressed',String(three&&(representation.camera3D.preset||'3d')===id));b.setAttribute('aria-disabled',String(unavailable3D));b.title=unavailable3D?'A vista 3D não está disponível nesta sessão.':'';}for(const [d,b]of buttons){const show=!d.when||d.when();b.hidden=!show;if(!show)continue;const on=!!d.on(),able=d.able?d.able():{ok:true};b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-disabled',String(!on&&!able.ok));b.title=!on&&!able.ok?able.reason:'';if(on)visible.push(d.label.toLocaleLowerCase('pt-BR'));}
       status.textContent='Camadas visíveis: '+(visible.length?visible.join(', '):'nenhuma')+'.';};
     watch(local.scope,update);update();el.append(box);
   }
@@ -697,7 +738,9 @@ SILM.create = () => {
     const panes=U.element('div',null,'silm-compare-panes');
     let toggle=null;if(narrow){toggle=U.element('div',null,'silm-segmented');toggle.setAttribute('role','group');toggle.setAttribute('aria-label','Mostrar cena');content.append(toggle);}
     content.append(panes);
-    const projection=representation.projection,A=SILM.renderSnapshot(panes,{scope,state:a,element:e,label:'A: '+mode.a,projection}).root,B=SILM.renderSnapshot(panes,{scope,state:b,element:e,label:'B: '+mode.b,projection}).root;
+    // 0.12.x: no 3D, as duas cenas usam a orientação e a projeção 3D da vista principal (girada como estiver).
+    const projection=representation.projection,o=representation.viewMode==='3d'&&!unavailable3D?view?.orientation?.():null,camera3D=o?{yaw:o[0],pitch:o[1],projection:representation.camera3D.projection}:null;
+    const A=SILM.renderSnapshot(panes,{scope,state:a,element:e,label:'A: '+mode.a,projection,camera3D}).root,B=SILM.renderSnapshot(panes,{scope,state:b,element:e,label:'B: '+mode.b,projection,camera3D}).root;
     if(narrow){const show=side=>{A.hidden=side!=='a';B.hidden=side!=='b';ba.setAttribute('aria-pressed',String(side==='a'));bb.setAttribute('aria-pressed',String(side==='b'));};
       const ba=SILM.actionButton('A: '+mode.a,()=>show('a'),scope,{id:'silm-compare-show-a'}),bb=SILM.actionButton('B: '+mode.b,()=>show('b'),scope,{id:'silm-compare-show-b'});toggle.append(ba,bb);show('a');}
     const handle=ctx.modal.open({title:'Comparar: '+mode.label,content,size:'wide',actions:[{id:'close',label:'Fechar'}]});

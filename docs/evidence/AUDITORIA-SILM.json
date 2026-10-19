@@ -1,6 +1,6 @@
 {
   "product": "SILM",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "checks": [
     {
       "check": "Versão única do produto",
@@ -190,8 +190,18 @@
       "check": "Representação 2D: projeção isométrica congelada para o Organizar e o calor (vistas não mudam o estado nem a experiência)",
       "status": "PASS",
       "detail": null
+    },
+    {
+      "check": "Representação 3D: câmera de órbita sobre as coordenadas científicas (Å), no mesmo renderizador e com volta ao 2D científico",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Representação 3D: eixos são referência visual fora do palco, sem linhas de ligação; Organizar e calor seguem a isométrica",
+      "status": "PASS",
+      "detail": null
     }
   ],
-  "passed": 36,
+  "passed": 38,
   "failed": 0
 }
