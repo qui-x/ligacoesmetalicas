@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-BR" data-app-version="0.12.0"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1f2329"><link rel="manifest" href="manifest.webmanifest"><title>SILM — A Arquitetura dos Metais</title><meta name="description" content="SILM — Simulador Interativo de Ligações Metálicas. A Arquitetura dos Metais."><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><link rel="icon" type="image/svg+xml" href="favicon-dark.svg"><link rel="stylesheet" href="vendor/dialog-polyfill/dialog-polyfill.css"><link rel="stylesheet" href="css/tokens-structure.css"><link rel="stylesheet" href="css/theme.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/workspace.css"><link rel="stylesheet" href="css/tour.css"><link rel="stylesheet" href="css/manual.css"><link rel="stylesheet" href="css/experience.css"><link rel="stylesheet" href="css/shell.css"><link rel="stylesheet" href="css/a11y.css"><link rel="stylesheet" href="css/opening.css"><link rel="stylesheet" href="domain/silm/identidade.css"><link rel="stylesheet" href="domain/silm/styles.css"><link rel="stylesheet" href="domain/silm/abertura/silm-opening.css"><link rel="stylesheet" href="domain/silm/abertura.css"><link rel="stylesheet" href="domain/silm/periodic-table.css"><link rel="stylesheet" href="domain/silm/assembly.css"><script src="js/core/compatibilidade.js"></script><script src="js/storage/migration.js"></script><script src="a11y.js"></script><script src="js/core/namespace.js"></script><script src="js/storage/storage.js"></script><script src="js/a11y/opening-gate.js"></script><script src="js/a11y/opening.js"></script><script src="domain/silm/prelude.js"></script></head>
+<body><noscript>Ative o JavaScript para utilizar a aplicação.</noscript><!-- Animação de abertura da família: o produto a liga tirando "hidden" e pode desenhar no palco (SimCore.opening.define). --><div id="app-opening" class="app-opening" aria-hidden="true"><div id="app-opening-stage" class="app-opening-stage"></div><div class="app-opening-brand"><img id="app-opening-icon" src="assets/silm-simbolo.svg" alt="" width="46" height="46"><div><strong id="app-opening-name">SILM</strong><span id="app-opening-subtitle">Simulador Interativo de Ligações Metálicas</span><em id="app-opening-tagline"></em></div></div><p class="app-opening-skip">Toque ou aperte uma tecla para pular</p></div><script src="domain/silm/abertura/silm-opening.js"></script><script src="domain/silm/abertura.js"></script><svg width="0" height="0" class="svg-defs" aria-hidden="true">
+      <defs>
+        <filter id="f-protanopia">
+          <feColorMatrix
+            type="matrix"
+            values="0.567 0.433 0 0 0 0.558 0.442 0 0 0 0 0.242 0.758 0 0 0 0 0 1 0"
+          />
+        </filter>
+        <filter id="f-deuteranopia">
+          <feColorMatrix
+            type="matrix"
+            values="0.625 0.375 0 0 0 0.7 0.3 0 0 0 0 0.3 0.7 0 0 0 0 0 1 0"
+          />
+        </filter>
+        <filter id="f-tritanopia">
+          <feColorMatrix
+            type="matrix"
+            values="0.95 0.05 0 0 0 0 0.433 0.567 0 0 0 0.475 0.525 0 0 0 0 0 1 0"
+          />
+        </filter>
+        <filter id="f-acromatopsia">
+          <feColorMatrix
+            type="matrix"
+            values="0.299 0.587 0.114 0 0 0.299 0.587 0.114 0 0 0.299 0.587 0.114 0 0 0 0 0 1 0"
+          />
+        </filter>
+      </defs>
+    </svg>
+<div id="colorblindOverlay" aria-hidden="true"></div><a class="skip-link" href="#scientific-viewport">Ir para o conteúdo</a>
+<header class="app-header"><button class="icon-btn shell-menu-button" type="button" id="core-menu" title="Abrir menu" aria-label="Abrir menu" aria-haspopup="dialog" aria-controls="app-drawer" aria-expanded="false"><span class="hamburger-icon" aria-hidden="true"><i></i><i></i><i></i></span></button><a class="brand" href="#/inicio"><img id="brand-icon" src="assets/silm-simbolo.svg" alt="" width="38" height="36"><span><strong id="brand-name">SILM</strong><small id="brand-subtitle">Simulador Interativo de Ligações Metálicas</small></span></a><nav id="main-nav" class="main-nav" aria-label="Navegação principal"></nav><div class="header-actions"><nav id="domain-actions" aria-label="Ações do módulo"></nav><button class="quiet-btn" type="button" id="manual-open">Manual</button><button class="header-btn" type="button" id="access-btn" title="Acessibilidade" aria-label="Acessibilidade" aria-haspopup="dialog" aria-controls="app-drawer"><span data-app-icon="accessibility"></span><span class="header-btn-text">Acessibilidade</span></button></div></header>
+<div id="activity-banner" class="activity-banner" role="region" aria-label="Atividade em andamento" hidden><div class="activity-banner-copy"><span id="activity-banner-caption" class="activity-banner-caption"></span><small id="activity-banner-type" hidden></small><strong id="activity-banner-title" hidden></strong></div><div class="action-row"><button type="button" class="secondary-btn" id="activity-banner-details" hidden>Atividade</button><button type="button" class="quiet-btn" id="activity-banner-finish">Finalizar</button><button type="button" class="quiet-btn" id="activity-banner-exit">Encerrar atividade</button></div></div>
+<main><section id="screens-host" class="screen" aria-label="Conteúdo" hidden></section><section id="workspace" class="workspace" aria-label="Área de trabalho"><div id="workspace-toolbar" class="workspace-toolbar"><div class="workspace-toolbar-start"><nav id="workspace-views" class="view-tabs" aria-label="Visualização da área de trabalho" hidden></nav><p class="domain-status view-tabs-mode" id="module-status">Área de trabalho</p></div><nav id="workspace-launchers" class="workspace-launchers" aria-label="Painéis"><button type="button" class="secondary-btn dock-button" id="workspace-left" aria-controls="controls" aria-expanded="false">Ferramentas</button><button type="button" class="secondary-btn dock-button" id="workspace-right" aria-controls="context-panel" aria-expanded="false">Informações</button><button type="button" class="secondary-btn dock-button" id="workspace-right-alt" aria-controls="context-panel" aria-expanded="false" hidden>Dados</button></nav></div>
+<div id="scientific-stage" class="workspace-stage"><div id="workspace-welcome" class="welcome-note" role="note" hidden></div><section id="scientific-viewport" class="scientific-viewport" tabindex="0" aria-label="Área central"><div id="viewport-empty" class="empty-state"><img class="empty-symbol" src="assets/silm-simbolo.svg" alt=""><h1>Preparando o SILM</h1><p>Aguarde a preparação do espaço de investigação.</p></div><div id="viewport-content" class="viewport-content" hidden></div></section><div id="workspace-chip" class="workspace-chip" aria-hidden="true" hidden></div></div>
+<p id="workspace-status" class="workspace-status-line" hidden></p>
+<div id="workspace-actions" class="workspace-actions context-action-bar" role="group" aria-label="Ações da investigação" hidden></div>
+<div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
+<div id="controls" class="dock dock-left dock-collapsed" aria-labelledby="title-left" aria-hidden="true"><header class="dock-header"><h2 id="title-left">Ferramentas</h2><span id="help-left" class="dock-help" hidden></span><button type="button" id="close-left" class="secondary-btn dock-close" aria-label="Fechar Ferramentas" aria-controls="controls">Fechar</button></header><nav id="dock-left-tabs" class="dock-tabs" aria-label="Seções de Ferramentas" hidden></nav><div id="dock-left-content" class="dock-scroll"></div></div><div id="context-panel" class="dock dock-right dock-collapsed" aria-labelledby="title-right" aria-hidden="true"><header class="dock-header"><button type="button" id="dock-back" class="quiet-btn dock-button dock-back" hidden>Voltar</button><h2 id="title-right">Informações</h2><span id="help-right" class="dock-help" hidden></span><button type="button" id="dock-expand" class="secondary-btn dock-button dock-expand" aria-controls="context-panel" aria-expanded="false">Expandir</button><button type="button" id="close-right" class="secondary-btn dock-close" aria-label="Fechar Informações" aria-controls="context-panel">Fechar</button></header><nav id="dock-right-tabs" class="dock-tabs" aria-label="Seções de Informações" hidden></nav><div id="dock-right-content" class="dock-scroll"></div></div></section><section id="manual-screen" class="screen tela-manual" aria-label="Manual" hidden><div class="manual-topbar"><a href="#/manual" class="manual-home-link">Manual</a><form id="manual-search-form" role="search"><label for="manual-busca">Buscar no Manual</label><div class="manual-search-field"><input id="manual-busca" type="search" autocomplete="off" placeholder="Digite um assunto"><button class="secondary-btn" type="submit">Buscar</button><button type="button" class="quiet-btn" id="manual-clear" hidden>Limpar</button></div></form><button class="secondary-btn" id="manual-close" type="button">Voltar</button></div><div class="manual-tools"><button type="button" class="secondary-btn" id="manual-index-toggle" aria-expanded="false" aria-controls="manual-indice">Índice do Manual</button><button type="button" class="quiet-btn" id="manual-imprimir">Imprimir</button></div><p id="manual-status" role="status"></p><div class="manual-shell"><nav id="manual-indice" class="manual-index" aria-label="Índice do Manual"></nav><div id="manual-conteudo"></div></div><div id="manual-print"></div></section></main><nav id="bottom-nav" class="bottom-nav" aria-label="Navegação móvel"></nav><dialog id="app-drawer" class="drawer" aria-modal="true" aria-labelledby="drawer-title"><div class="drawer-head"><h2 id="drawer-title">Menu</h2><button type="button" class="icon-btn" id="drawer-close" aria-label="Fechar menu">×</button></div><div id="drawer-sections" class="drawer-body"></div></dialog>
+<div id="toast" class="toast" role="region" aria-label="Notificações" hidden><span id="toast-message"></span><button type="button" class="text-btn toast-action" id="toast-action" hidden></button><button type="button" class="quiet-btn" id="toast-close" aria-label="Fechar notificação">Fechar</button></div><div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<script src="vendor/dialog-polyfill/dialog-polyfill.js"></script>
+
+<script src="js/core/icons.js"></script>
+<script src="js/core/breakpoints.js"></script>
+
+<script src="js/core/scope.js"></script>
+<script src="js/components/notifications.js"></script>
+<script src="js/components/modal.js"></script>
+<script src="js/workspace/workspace.js"></script>
+<script src="js/workspace/viewport.js"></script>
+<script src="js/a11y/feedback.js"></script><script src="js/a11y/libras.js"></script><script src="js/a11y/preferencias.js"></script>
+<script src="js/responsive/layout.js"></script>
+<script src="js/manual/registry.js"></script>
+<script src="js/manual/manual.js"></script>
+<script src="js/core/identity.js"></script>
+<script src="js/core/theme.js"></script>
+<script src="js/core/reset.js"></script>
+<script src="js/navigation/router.js"></script>
+<script src="js/experience/common.js"></script><script src="js/components/data-table.js"></script>
+<script src="js/experience/modules.js"></script>
+<script src="js/experience/undo.js"></script><script src="js/experience/history.js"></script>
+<script src="js/experience/tour.js"></script>
+<script src="js/experience/stage.js"></script>
+<script src="js/experience/activity.js"></script>
+<script src="js/experience/learning.js"></script>
+<script src="js/experience/notebook.js"></script>
+<script src="js/experience/shell.js"></script>
+<script src="js/experience/teacher.js"></script>
+<script src="js/experience/reports.js"></script>
+<script src="js/experience/references.js"></script>
+<script src="js/experience/experience.js"></script>
+<script src="js/core/domain.js"></script>
+<script src="js/init/pwa.js"></script>
+<script src="js/init/app.js"></script>
+<script src="domain/silm/data/bundle.js"></script><script src="domain/silm/data-api.js"></script><script src="domain/silm/periodic-table.js"></script><script src="domain/silm/presentation.js"></script><script src="domain/silm/assembly.js"></script><script src="domain/silm/crystal.js"></script><script src="domain/silm/properties.js"></script><script src="domain/silm/measurements.js"></script><script src="domain/silm/calculations.js"></script><script src="domain/silm/state.js"></script><script src="domain/silm/representation.js"></script><script src="domain/silm/renderer-2d.js"></script><script src="domain/silm/assembly-view.js"></script><script src="domain/silm/crystal-view.js"></script><script src="domain/silm/electron-view.js"></script><script src="domain/silm/property-view.js"></script><script src="domain/silm/exploration.js"></script><script src="domain/silm/measure-view.js"></script><script src="domain/silm/manual.js"></script><script src="domain/silm/bootstrap.js"></script><script src="domain/entry.js"></script>
+</body></html>

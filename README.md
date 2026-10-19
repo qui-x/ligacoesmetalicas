@@ -1,4 +1,4 @@
-# SILM 0.12.0 — A Arquitetura dos Metais
+# SILM 0.12.1 — A Arquitetura dos Metais
 
 **Simulador Interativo de Ligações Metálicas.** Esta versão mantém o banco científico (0.2.x) e a investigação persistente de um metal (0.3.x), a montagem manual da estrutura metálica (0.4.x), as estruturas cristalinas (0.5.x), o modelo eletrônico com elétrons deslocalizados (0.6.x), as propriedades metálicas (0.7.x), o módulo **Explorar** (0.8.x), o módulo **Medir** (0.9.x) e acrescenta o módulo **Calcular**: em **Ver → Analisar → Calcular**, obtenha o número efetivo de átomos, o volume da célula, o raio a partir do parâmetro (e o inverso), o fator de empacotamento, a densidade teórica e, no HC, a razão c/a. Cada entrada mostra a origem (dado tabelado, medida do modelo, valor informado ou calculado pelo SILM) e os registros ficam em **Dados → Cálculos**. Monte com **+ Adicionar unidade** e use **Organizar estrutura**: o SILM reorganiza a montagem segundo a estrutura de referência do banco (CCC, CFC ou HC), com célula unitária, rede extensa e vizinhança. O Laboratório usa os painéis **Montagem, Ver e Dados**, da mesma família do SIAB.
 
@@ -10,7 +10,7 @@ Na 0.12.0, a estrutura cristalina também pode ser vista em 3D: a mesma estrutur
 
 ## Integração com a base atual
 
-A entrada [SILM sobre a Base Demo SI 0.9.8](integracao/index.html) conecta a exploração científica e a representação 2D/3D à navegação e às docas da base atual. A sessão é separada da distribuição completa. Medir, Calcular, propriedades e relatórios continuam nesta distribuição principal enquanto a migração avança. Consulte [as instruções e os limites da integração](integracao/README.md).
+A página principal agora usa a nova Base Demo SI 0.9.8, com a identidade ouro/grafite do SILM, exploração científica e representação 2D/3D. Medir, Calcular, propriedades e relatórios permanecem acessíveis na [interface anterior preservada](completo.html) enquanto sua migração avança. Os armazenamentos continuam separados; use JSON para transportar investigações entre interfaces. Consulte [as instruções e os limites da integração](integracao/README.md).
 
 ## Usar
 

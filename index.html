@@ -1,76 +1,183 @@
 <!doctype html>
-<html lang="pt-BR" data-app-version="0.12.0"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1f2329"><link rel="manifest" href="manifest.webmanifest"><title>SILM — A Arquitetura dos Metais</title><meta name="description" content="SILM — Simulador Interativo de Ligações Metálicas. A Arquitetura dos Metais."><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><link rel="icon" type="image/svg+xml" href="favicon-dark.svg"><link rel="stylesheet" href="vendor/dialog-polyfill/dialog-polyfill.css"><link rel="stylesheet" href="css/tokens-structure.css"><link rel="stylesheet" href="css/theme.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/workspace.css"><link rel="stylesheet" href="css/tour.css"><link rel="stylesheet" href="css/manual.css"><link rel="stylesheet" href="css/experience.css"><link rel="stylesheet" href="css/shell.css"><link rel="stylesheet" href="css/a11y.css"><link rel="stylesheet" href="css/opening.css"><link rel="stylesheet" href="domain/silm/identidade.css"><link rel="stylesheet" href="domain/silm/styles.css"><link rel="stylesheet" href="domain/silm/abertura/silm-opening.css"><link rel="stylesheet" href="domain/silm/abertura.css"><link rel="stylesheet" href="domain/silm/periodic-table.css"><link rel="stylesheet" href="domain/silm/assembly.css"><script src="js/core/compatibilidade.js"></script><script src="js/storage/migration.js"></script><script src="a11y.js"></script><script src="js/core/namespace.js"></script><script src="js/storage/storage.js"></script><script src="js/a11y/opening-gate.js"></script><script src="js/a11y/opening.js"></script><script src="domain/silm/prelude.js"></script></head>
-<body><noscript>Ative o JavaScript para utilizar a aplicação.</noscript><!-- Animação de abertura da família: o produto a liga tirando "hidden" e pode desenhar no palco (SimCore.opening.define). --><div id="app-opening" class="app-opening" aria-hidden="true"><div id="app-opening-stage" class="app-opening-stage"></div><div class="app-opening-brand"><img id="app-opening-icon" src="assets/silm-simbolo.svg" alt="" width="46" height="46"><div><strong id="app-opening-name">SILM</strong><span id="app-opening-subtitle">Simulador Interativo de Ligações Metálicas</span><em id="app-opening-tagline"></em></div></div><p class="app-opening-skip">Toque ou aperte uma tecla para pular</p></div><script src="domain/silm/abertura/silm-opening.js"></script><script src="domain/silm/abertura.js"></script><svg width="0" height="0" class="svg-defs" aria-hidden="true">
-      <defs>
-        <filter id="f-protanopia">
-          <feColorMatrix
-            type="matrix"
-            values="0.567 0.433 0 0 0 0.558 0.442 0 0 0 0 0.242 0.758 0 0 0 0 0 1 0"
-          />
-        </filter>
-        <filter id="f-deuteranopia">
-          <feColorMatrix
-            type="matrix"
-            values="0.625 0.375 0 0 0 0.7 0.3 0 0 0 0 0.3 0.7 0 0 0 0 0 1 0"
-          />
-        </filter>
-        <filter id="f-tritanopia">
-          <feColorMatrix
-            type="matrix"
-            values="0.95 0.05 0 0 0 0 0.433 0.567 0 0 0 0.475 0.525 0 0 0 0 0 1 0"
-          />
-        </filter>
-        <filter id="f-acromatopsia">
-          <feColorMatrix
-            type="matrix"
-            values="0.299 0.587 0.114 0 0 0.299 0.587 0.114 0 0 0.299 0.587 0.114 0 0 0 0 0 1 0"
-          />
-        </filter>
-      </defs>
-    </svg>
-<div id="colorblindOverlay" aria-hidden="true"></div><a class="skip-link" href="#scientific-viewport">Ir para o conteúdo</a>
-<header class="app-header"><button class="icon-btn shell-menu-button" type="button" id="core-menu" title="Abrir menu" aria-label="Abrir menu" aria-haspopup="dialog" aria-controls="app-drawer" aria-expanded="false"><span class="hamburger-icon" aria-hidden="true"><i></i><i></i><i></i></span></button><a class="brand" href="#/inicio"><img id="brand-icon" src="assets/silm-simbolo.svg" alt="" width="38" height="36"><span><strong id="brand-name">SILM</strong><small id="brand-subtitle">Simulador Interativo de Ligações Metálicas</small></span></a><nav id="main-nav" class="main-nav" aria-label="Navegação principal"></nav><div class="header-actions"><nav id="domain-actions" aria-label="Ações do módulo"></nav><button class="quiet-btn" type="button" id="manual-open">Manual</button><button class="header-btn" type="button" id="access-btn" title="Acessibilidade" aria-label="Acessibilidade" aria-haspopup="dialog" aria-controls="app-drawer"><span data-app-icon="accessibility"></span><span class="header-btn-text">Acessibilidade</span></button></div></header>
-<div id="activity-banner" class="activity-banner" role="region" aria-label="Atividade em andamento" hidden><div class="activity-banner-copy"><span id="activity-banner-caption" class="activity-banner-caption"></span><small id="activity-banner-type" hidden></small><strong id="activity-banner-title" hidden></strong></div><div class="action-row"><button type="button" class="secondary-btn" id="activity-banner-details" hidden>Atividade</button><button type="button" class="quiet-btn" id="activity-banner-finish">Finalizar</button><button type="button" class="quiet-btn" id="activity-banner-exit">Encerrar atividade</button></div></div>
-<main><section id="screens-host" class="screen" aria-label="Conteúdo" hidden></section><section id="workspace" class="workspace" aria-label="Área de trabalho"><div id="workspace-toolbar" class="workspace-toolbar"><div class="workspace-toolbar-start"><nav id="workspace-views" class="view-tabs" aria-label="Visualização da área de trabalho" hidden></nav><p class="domain-status view-tabs-mode" id="module-status">Área de trabalho</p></div><nav id="workspace-launchers" class="workspace-launchers" aria-label="Painéis"><button type="button" class="secondary-btn dock-button" id="workspace-left" aria-controls="controls" aria-expanded="false">Ferramentas</button><button type="button" class="secondary-btn dock-button" id="workspace-right" aria-controls="context-panel" aria-expanded="false">Informações</button><button type="button" class="secondary-btn dock-button" id="workspace-right-alt" aria-controls="context-panel" aria-expanded="false" hidden>Dados</button></nav></div>
-<div id="scientific-stage" class="workspace-stage"><div id="workspace-welcome" class="welcome-note" role="note" hidden></div><section id="scientific-viewport" class="scientific-viewport" tabindex="0" aria-label="Área central"><div id="viewport-empty" class="empty-state"><img class="empty-symbol" src="assets/silm-simbolo.svg" alt=""><h1>Preparando o SILM</h1><p>Aguarde a preparação do espaço de investigação.</p></div><div id="viewport-content" class="viewport-content" hidden></div></section><div id="workspace-chip" class="workspace-chip" aria-hidden="true" hidden></div></div>
-<p id="workspace-status" class="workspace-status-line" hidden></p>
-<div id="workspace-actions" class="workspace-actions context-action-bar" role="group" aria-label="Ações da investigação" hidden></div>
-<div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
-<div id="controls" class="dock dock-left dock-collapsed" aria-labelledby="title-left" aria-hidden="true"><header class="dock-header"><h2 id="title-left">Ferramentas</h2><span id="help-left" class="dock-help" hidden></span><button type="button" id="close-left" class="secondary-btn dock-close" aria-label="Fechar Ferramentas" aria-controls="controls">Fechar</button></header><nav id="dock-left-tabs" class="dock-tabs" aria-label="Seções de Ferramentas" hidden></nav><div id="dock-left-content" class="dock-scroll"></div></div><div id="context-panel" class="dock dock-right dock-collapsed" aria-labelledby="title-right" aria-hidden="true"><header class="dock-header"><button type="button" id="dock-back" class="quiet-btn dock-button dock-back" hidden>Voltar</button><h2 id="title-right">Informações</h2><span id="help-right" class="dock-help" hidden></span><button type="button" id="dock-expand" class="secondary-btn dock-button dock-expand" aria-controls="context-panel" aria-expanded="false">Expandir</button><button type="button" id="close-right" class="secondary-btn dock-close" aria-label="Fechar Informações" aria-controls="context-panel">Fechar</button></header><nav id="dock-right-tabs" class="dock-tabs" aria-label="Seções de Informações" hidden></nav><div id="dock-right-content" class="dock-scroll"></div></div></section><section id="manual-screen" class="screen tela-manual" aria-label="Manual" hidden><div class="manual-topbar"><a href="#/manual" class="manual-home-link">Manual</a><form id="manual-search-form" role="search"><label for="manual-busca">Buscar no Manual</label><div class="manual-search-field"><input id="manual-busca" type="search" autocomplete="off" placeholder="Digite um assunto"><button class="secondary-btn" type="submit">Buscar</button><button type="button" class="quiet-btn" id="manual-clear" hidden>Limpar</button></div></form><button class="secondary-btn" id="manual-close" type="button">Voltar</button></div><div class="manual-tools"><button type="button" class="secondary-btn" id="manual-index-toggle" aria-expanded="false" aria-controls="manual-indice">Índice do Manual</button><button type="button" class="quiet-btn" id="manual-imprimir">Imprimir</button></div><p id="manual-status" role="status"></p><div class="manual-shell"><nav id="manual-indice" class="manual-index" aria-label="Índice do Manual"></nav><div id="manual-conteudo"></div></div><div id="manual-print"></div></section></main><nav id="bottom-nav" class="bottom-nav" aria-label="Navegação móvel"></nav><dialog id="app-drawer" class="drawer" aria-modal="true" aria-labelledby="drawer-title"><div class="drawer-head"><h2 id="drawer-title">Menu</h2><button type="button" class="icon-btn" id="drawer-close" aria-label="Fechar menu">×</button></div><div id="drawer-sections" class="drawer-body"></div></dialog>
-<div id="toast" class="toast" role="region" aria-label="Notificações" hidden><span id="toast-message"></span><button type="button" class="text-btn toast-action" id="toast-action" hidden></button><button type="button" class="quiet-btn" id="toast-close" aria-label="Fechar notificação">Fechar</button></div><div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
-<script src="vendor/dialog-polyfill/dialog-polyfill.js"></script>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#13273b">
+  <meta name="description" content="SILM — Simulador Interativo de Ligações Metálicas. A Arquitetura dos Metais.">
+  <link rel="icon" href="assets/silm-simbolo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="integracao/upstream/app.css">
+  <link rel="stylesheet" href="integracao/upstream/workspace.css">
+  <link rel="stylesheet" href="integracao/upstream/components.css">
+  <link rel="stylesheet" href="integracao/upstream/extensions.css">
+  <link rel="stylesheet" href="integracao/upstream/education.css">
+  <link rel="stylesheet" href="integracao/upstream/records.css">
+  <link rel="stylesheet" href="integracao/upstream/distribution.css">
+  <link rel="stylesheet" href="integracao/upstream/inspection.css">
+  <link rel="stylesheet" href="integracao/upstream/completion.css">
+  <link rel="stylesheet" href="integracao/upstream/organization.css">
+  <link rel="stylesheet" href="integracao/upstream/environment-organization.css">
+  <link rel="stylesheet" href="integracao/upstream/menu-fidelity.css">
+  <link rel="stylesheet" href="integracao/upstream/home-fidelity.css">
+  <link rel="stylesheet" href="integracao/upstream/menu-review.css">
+  <link rel="stylesheet" href="integracao/upstream/mobile-contract.css">
+  <title>SILM — A Arquitetura dos Metais</title>
+<link rel="stylesheet" href="domain/silm/assembly.css"><link rel="stylesheet" href="integracao/integration.css"><script src="integracao/base-core.js" defer></script><script src="integracao/compat.js" defer></script><script src="domain/silm/data/bundle.js" defer></script><script src="domain/silm/data-api.js" defer></script><script src="domain/silm/assembly.js" defer></script><script src="domain/silm/crystal.js" defer></script><script src="domain/silm/properties.js" defer></script><script src="domain/silm/measurements.js" defer></script><script src="domain/silm/calculations.js" defer></script><script src="domain/silm/state.js" defer></script><script src="domain/silm/representation.js" defer></script><script src="domain/silm/renderer-2d.js" defer></script><script src="domain/silm/assembly-view.js" defer></script><script src="domain/silm/crystal-view.js" defer></script><script src="domain/silm/electron-view.js" defer></script><script src="domain/silm/property-view.js" defer></script><script src="integracao/adapter.js" defer></script><link rel="manifest" href="manifest.webmanifest"><script src="integracao/pwa.js" defer></script></head>
+<body>
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+  <div class="app-shell">
+    <aside class="side si-menu-drawer" id="sidebar" role="dialog" aria-modal="true" aria-labelledby="si-menu-title" aria-hidden="true">
+<div class="si-drawer-head"><h2 id="si-menu-title">Menu</h2><button type="button" id="si-nav-close" class="si-drawer-close" aria-label="Fechar menu"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="si-drawer-body">
+ <section class="si-drawer-section" id="si-activity-menu" hidden aria-labelledby="si-activity-title">
+   <h3 id="si-activity-title">Atividade em andamento</h3><p id="si-activity-context" class="si-drawer-context"></p>
+   <button type="button" class="si-drawer-item" id="si-activity-about"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"></path></svg><span>Sobre esta atividade</span></button><a class="si-drawer-item" href="#/manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0M9 8a3 3 0 1 1 4 3c-1 1-1 1-1 3M12 17h.01"></path></svg><span>Ajuda</span></a><button type="button" class="si-drawer-item" id="si-activity-finish"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 12h11M11.5 5.5 18 12l-6.5 6.5"></path></svg><span>Finalizar atividade</span></button><button type="button" class="si-drawer-item" id="si-activity-exit"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"></path></svg><span>Encerrar atividade</span></button>
+ </section>
+ <section class="si-drawer-section si-drawer-now" aria-labelledby="si-now-label"><h3 id="si-now-label">Agora</h3><strong id="si-now-title">Início</strong><p id="si-now-description">Seu contexto atual</p><button type="button" id="si-nav-continue" class="si-drawer-continue">Continuar nesta tela</button></section>
+ <section class="si-drawer-section" aria-label="Seções principais">
+   <button type="button" class="si-drawer-nav-toggle" id="si-nav-group-toggle" aria-expanded="true" aria-controls="si-nav-main"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M16 8l-3 5-5 3 3-5Z"></path></svg><span>Navegar</span><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"></path></svg></button>
+   <nav id="si-nav-main" class="si-drawer-links" aria-label="Destinos da plataforma"><a class="si-drawer-item" href="#/inicio" data-route="inicio"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9"></path></svg><span>Início</span></a><a class="si-drawer-item" href="#/ambiente" data-route="ambiente"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 4h8M5 4v14a3 3 0 0 0 6 0V4M5 13h6M18 5c1 2 3 4 3 6a3 3 0 0 1-6 0c0-2 2-4 3-6Z"></path></svg><span>Ambiente</span></a><a class="si-drawer-item" href="#/manual" data-route="manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6"></path></svg><span>Manual</span></a></nav>
+ </section>
+ <section class="si-drawer-section" aria-labelledby="si-teacher-title"><h3 id="si-teacher-title">Professor</h3><div class="si-drawer-links"><a class="si-drawer-item" href="#/manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 5H5v16h14V5h-3M8 3h8v4H8ZM8 11l1 1 2-2M13 11h3M8 16h8"></path></svg><span>Apoio pedagógico</span></a><button type="button" class="si-drawer-item" id="si-guide-open"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"></path></svg><span>Ideias para uma aula acessível</span></button></div></section>
+ <section class="si-drawer-section" aria-labelledby="si-preferences-title"><h3 id="si-preferences-title">Preferências</h3>
+  <button class="si-drawer-nav-toggle" id="si-a11y-toggle" type="button" aria-expanded="false" aria-controls="si-a11y-panel"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"></path></svg><span>Acessibilidade</span><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"></path></svg></button>
+<div aria-labelledby="si-a11y-toggle" class="si-a11y-panel" hidden="" id="si-a11y-panel" role="group">
+<p class="si-panel-title">Aparência</p>
+<label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"></path></svg>Modo escuro</span><span class="si-switch"><input id="si-dark" role="switch" type="checkbox"><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 3v18M12 7h7M12 11h9M12 15h8"></path></svg>Alto contraste</span><span class="si-switch"><input id="si-contrast" role="switch" type="checkbox"><span aria-hidden="true" class="si-track"></span></span></label>
+<div class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><path d="M5 20 11 4h2l6 16M8 14h8"></path></svg>Tamanho do texto</span><div class="si-fontstep"><button aria-label="Diminuir texto" id="si-font-minus" type="button">A−</button><output aria-live="polite" id="si-font-output">100%</output><button aria-label="Aumentar texto" id="si-font-plus" type="button">A+</button></div></div>
+<label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M3 12h18M6 9l-3 3 3 3M18 9l3 3-3 3"></path></svg>Espaçamento de letras</span><span class="si-switch"><input id="si-letter-spacing" role="switch" type="checkbox"><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM10 9v6M14 9v6"></path></svg>Reduzir animações</span><span class="si-switch"><input id="si-motion" role="switch" type="checkbox"><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M4 6h16M4 10h16M4 14h10M4 18h7"></path></svg>Leitura simples<small>Texto maior e cores mais firmes</small></span><span class="si-switch"><input id="si-simple" role="switch" type="checkbox"><span aria-hidden="true" class="si-track"></span></span></label>
+<p class="si-panel-title">Visão de cores</p><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path></svg>Simular daltonismo</span><select id="si-vision-select"><option value="none">Nenhum</option><option value="protanopia">Protanopia</option><option value="deuteranopia">Deuteranopia</option><option value="tritanopia">Tritanopia</option><option value="acromatopsia">Acromatopsia</option></select></label>
+<p class="si-panel-note">Os filtros simulam diferenças de percepção; não substituem descrições textuais.</p>
+<p class="si-panel-title">Som e toque</p>
+<label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M4 9v6h4l5 4V5L8 9H4ZM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"></path></svg>Feedback sonoro<small>Disponível quando uma extensão fornecer eventos</small></span><span class="si-switch"><input disabled id="si-sound" role="switch" type="checkbox"><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M8 4h8a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1ZM3 9v6M21 9v6"></path></svg>Feedback por vibração<small>Em dispositivos compatíveis e com suporte da extensão</small></span><span class="si-switch"><input disabled id="si-vibrate" role="switch" type="checkbox"><span aria-hidden="true" class="si-track"></span></span></label>
+<p class="si-panel-title">Outros recursos</p>
+<div class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11m0-6.5a1.5 1.5 0 0 1 3 0V11m0-4.5a1.5 1.5 0 0 1 3 0V14a7 7 0 0 1-7 7h-1a6 6 0 0 1-5-2.7L3.3 15a1.5 1.5 0 0 1 2.5-1.7L8 16"></path></svg>Tradutor de Libras<small>Requer uma integração local homologada</small></span><span class="si-disabled-marker">Não disponível</span></div>
+<button class="si-drawer-item" id="si-a11y-reset" type="button"><svg aria-hidden="true" class="si-menu-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 8a9 9 0 1 1-1 7M3 3v6h6M12 7v6l4 2"></path></svg><span>Restaurar padrões</span></button>
+</div>
+  <div class="si-drawer-links si-present-settings">
+    <label class="si-drawer-item si-projector-row"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h18v13H3ZM8 22l4-5 4 5M12 17v5"></path></svg><span>Apresentação · Modo projetor</span><input id="si-projector" type="checkbox" role="switch" aria-label="Modo projetor"></label>
+    <a class="si-drawer-item" href="#/manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6"></path></svg><span>Como apresentar à turma</span></a>
+  </div>
+ </section>
+ <section class="si-drawer-section" aria-labelledby="si-app-title"><h3 id="si-app-title">Aplicativo</h3><button type="button" class="si-drawer-item" id="si-drawer-install" hidden><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12M8 11l4 4 4-4M4 17v4h16v-4"></path></svg><span>Instalar aplicativo</span></button><a class="si-drawer-item" href="#/sobre"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"></path></svg><span>Sobre o SILM</span></a><p class="si-drawer-version">Versão <span data-app-version>0.12.1 · desenvolvimento</span></p></section>
+</div></aside>
 
-<script src="js/core/icons.js"></script>
-<script src="js/core/breakpoints.js"></script>
+    <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
 
-<script src="js/core/scope.js"></script>
-<script src="js/components/notifications.js"></script>
-<script src="js/components/modal.js"></script>
-<script src="js/workspace/workspace.js"></script>
-<script src="js/workspace/viewport.js"></script>
-<script src="js/a11y/feedback.js"></script><script src="js/a11y/libras.js"></script><script src="js/a11y/preferencias.js"></script>
-<script src="js/responsive/layout.js"></script>
-<script src="js/manual/registry.js"></script>
-<script src="js/manual/manual.js"></script>
-<script src="js/core/identity.js"></script>
-<script src="js/core/theme.js"></script>
-<script src="js/core/reset.js"></script>
-<script src="js/navigation/router.js"></script>
-<script src="js/experience/common.js"></script><script src="js/components/data-table.js"></script>
-<script src="js/experience/modules.js"></script>
-<script src="js/experience/undo.js"></script><script src="js/experience/history.js"></script>
-<script src="js/experience/tour.js"></script>
-<script src="js/experience/stage.js"></script>
-<script src="js/experience/activity.js"></script>
-<script src="js/experience/learning.js"></script>
-<script src="js/experience/notebook.js"></script>
-<script src="js/experience/shell.js"></script>
-<script src="js/experience/teacher.js"></script>
-<script src="js/experience/reports.js"></script>
-<script src="js/experience/references.js"></script>
-<script src="js/experience/experience.js"></script>
-<script src="js/core/domain.js"></script>
-<script src="js/init/pwa.js"></script>
-<script src="js/init/app.js"></script>
-<script src="domain/silm/data/bundle.js"></script><script src="domain/silm/data-api.js"></script><script src="domain/silm/periodic-table.js"></script><script src="domain/silm/presentation.js"></script><script src="domain/silm/assembly.js"></script><script src="domain/silm/crystal.js"></script><script src="domain/silm/properties.js"></script><script src="domain/silm/measurements.js"></script><script src="domain/silm/calculations.js"></script><script src="domain/silm/state.js"></script><script src="domain/silm/representation.js"></script><script src="domain/silm/renderer-2d.js"></script><script src="domain/silm/assembly-view.js"></script><script src="domain/silm/crystal-view.js"></script><script src="domain/silm/electron-view.js"></script><script src="domain/silm/property-view.js"></script><script src="domain/silm/exploration.js"></script><script src="domain/silm/measure-view.js"></script><script src="domain/silm/manual.js"></script><script src="domain/silm/bootstrap.js"></script><script src="domain/entry.js"></script>
-</body></html>
+    <div class="main-column" id="main-column">
+      <header class="topbar si-global-header">
+        <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu" aria-haspopup="dialog" title="Menu"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+        <a class="si-global-brand" href="#/inicio" aria-label="SILM, início">
+          <img src="assets/silm-simbolo.svg" width="34" height="34" alt="">
+          <span><strong>SILM</strong><small>Ligações Metálicas</small></span>
+        </a>
+        <nav class="si-global-nav" aria-label="Destinos principais">
+          <a data-route="inicio" href="#/inicio">Início</a>
+          <a data-route="ambiente" href="#/ambiente">Ambiente</a>
+          <a data-route="manual" href="#/manual">Manual</a>
+        </nav>
+        <div class="si-global-actions">
+          <button type="button" class="si-header-action" id="si-header-access" aria-label="Abrir acessibilidade no menu" title="Acessibilidade"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"></path></svg> <span>Acessibilidade</span></button>
+          <span class="version-pill">v<span data-app-version>0.12.1 · desenvolvimento</span></span>
+        </div>
+        <span id="current-section" class="sr-only">Início</span>
+      </header>
+      <div id="storage-warning" class="si-storage-warning" role="alert" hidden>
+          <strong>Atenção: armazenamento local indisponível.</strong> Alterações podem desaparecer ao fechar esta página. Exporte os seus registros e confirme se o navegador permite salvar dados locais.
+        </div>
+      <main id="conteudo" tabindex="-1">
+        <section data-view="inicio"><header class="silm-home"><img src="assets/silm-simbolo.svg" width="72" height="72" alt=""><p class="eyebrow">A ARQUITETURA DOS METAIS</p><h1>SILM</h1><p>Investigue a montagem metálica e as estruturas cristalinas.</p><a class="button" href="#/ambiente">Abrir laboratório</a><p>Nova interface em desenvolvimento. Investigações da interface anterior podem ser abertas por arquivo JSON em Dados.</p><a href="completo.html">Recursos da interface anterior</a></header></section><section class="view si-environment" data-view="ambiente" aria-labelledby="environment-title" hidden>
+          <h1 id="environment-title" class="sr-only">Laboratório de ligações metálicas</h1>
+          <div id="si-workspace" class="si-workspace" data-view-mode="focus" data-left-open="false" data-right-open="false">
+            <div class="si-workspace-toolbar">
+              <div class="si-view-tabs" role="group" aria-label="Modo de visualização">
+                <button type="button" class="si-tab" data-scene-view="focus" aria-pressed="true">Foco</button>
+                <button type="button" class="si-tab" data-scene-view="overview" aria-pressed="false">Visão geral</button>
+              </div>
+
+              <div class="si-launchers" role="group" aria-label="Painéis da bancada">
+                <button type="button" data-open-dock="montagem" aria-controls="si-dock-left" aria-expanded="false"><svg aria-hidden="true" class="si-launch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h20M4 18v3M20 18v3M5 3h6M6 3v10a2 2 0 0 0 4 0V3M6 10h4M16 6v4l-3 5h8l-3-5V6M15 6h4"></path></svg> Montagem</button>
+                <button type="button" data-open-dock="ver" aria-controls="si-dock-right" aria-expanded="false"><svg aria-hidden="true" class="si-launch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0"></path></svg> Ver</button>
+                <button type="button" data-open-dock="dados" aria-controls="si-dock-right" aria-expanded="false"><svg aria-hidden="true" class="si-launch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h10l4 4v14H5ZM15 3v5h4M8 12h8M8 16h8"></path></svg> Dados</button>
+              </div>
+            </div>
+            <p id="si-module-description" class="sr-only" aria-live="polite">Modo de trabalho livre.</p><div class="si-scene-region" id="si-stage" aria-label="Cena de demonstração">
+              <section id="workspace-focus" class="si-focus-view"><div id="silm-integration-scene" class="silm-laboratory"></div></section><section id="workspace-overview" class="si-overview-view" aria-label="Visão geral dos objetos" hidden>
+                <h2>Visão geral da cena</h2><p>Selecione um objeto para retornar ao foco.</p>
+                <div id="scene-overview-items" class="si-overview-grid"></div>
+              </section>
+            </div>
+            <div class="si-actionbar" role="group" aria-label="Ações da cena">
+              <button id="scene-clear" type="button" class="button outline" disabled>Limpar estrutura</button><button id="scene-undo" type="button" class="button outline" disabled>↶ Desfazer</button><div class="si-toolmenu-wrap">
+                </div>
+              <span id="scene-count" class="scene-count" aria-live="polite">0 / 60 objetos</span>
+            <div class="si-toolmenu-wrap"><button class="button outline si-more-trigger" id="scene-menu-toggle" type="button" aria-haspopup="menu" aria-controls="scene-tools-menu" aria-expanded="false">Mais ▾</button><div id="scene-tools-menu" class="si-toolmenu" role="menu" aria-label="Mais ações da estrutura" hidden><button role="menuitem" type="button" data-menu-action="clear" id="si-compact-clear">Limpar estrutura</button><button role="menuitem" type="button" data-menu-action="help">Como usar</button></div></div></div>
+            <aside id="si-dock-left" class="si-dock si-dock-left" aria-label="Montagem" role="region" hidden>
+              <header class="si-dock-header"><h2 id="si-left-title">Montagem</h2><button type="button" class="si-dock-close" data-close-dock="left" aria-label="Fechar Montagem">✕</button></header>
+              <nav class="si-dock-tabs" role="group" aria-label="Categorias da montagem">
+                <button type="button" data-left-tab="resumo" aria-pressed="false">Resumo</button>
+                <button type="button" data-left-tab="preparo" aria-pressed="true">Preparo</button>
+                <button type="button" data-left-tab="objetos" aria-pressed="false">Objetos</button>
+                <button type="button" data-left-tab="modulo" aria-pressed="false">Módulo</button>
+                <button type="button" data-left-tab="missao" aria-pressed="false" hidden>Missão</button>
+              </nav>
+              <div class="si-dock-scroll" id="si-left-scroll" tabindex="-1">
+                <div data-left-panel="resumo"><h3>Investigação atual</h3><p id="silm-summary"></p></div><div data-left-panel="preparo"><h3>Metal da investigação</h3><label for="silm-metal">Escolha um metal</label><select id="silm-metal"></select><button id="silm-start" class="button" type="button">Iniciar investigação</button><p id="silm-metal-information"></p><button id="silm-add" class="button outline" type="button">Adicionar unidade</button><button id="silm-organize" class="button outline" type="button">Organizar estrutura</button><button id="silm-free" class="button outline" type="button">Retornar à montagem livre</button></div><div data-left-panel="objetos"><h3>Unidades metálicas</h3><p>Selecione e mova unidades diretamente na montagem livre. Na estrutura cristalina, as posições seguem o modelo do metal.</p></div><div data-left-panel="modulo"><h3>Explorar</h3><p>Montagem, estrutura cristalina, vizinhos e elétrons deslocalizados.</p><a href="completo.html">Medir e calcular no SILM completo</a></div><div data-left-panel="missao" hidden>
+                  <h3>Atividade orientada</h3><p>Consulte a atividade vinculada à sessão atual sem perder a montagem.</p>
+                  <p id="si-dock-activity-status" role="status">Nenhuma atividade orientada em andamento.</p>
+                  </div>
+              </div>
+            </aside>
+            <aside id="si-dock-right" class="si-dock si-dock-right" aria-label="Ver" role="region" hidden data-presentation="standard">
+              <header class="si-dock-header"><h2 id="si-right-title">Ver</h2><button type="button" class="si-dock-close" data-close-dock="right" aria-label="Fechar painel">✕</button></header>
+              <div class="si-dock-scroll" id="si-right-scroll">
+                <div data-right-panel="ver"><h3>Representação</h3><p>Use os controles junto à cena para escolher a projeção, célula, rede e vizinhos.</p><button type="button" id="silm-electrons" class="button outline">Mostrar elétrons</button><p>Modelo qualitativo de elétrons de valência deslocalizados.</p></div><div data-right-panel="dados"><h3>Dados científicos</h3><div id="silm-data"></div><button id="silm-export" class="button outline" type="button">Exportar investigação</button><label for="silm-import">Abrir investigação SILM (JSON)</label><input type="file" id="silm-import" accept="application/json,.json"><p id="silm-storage-status" role="status"></p></div></div>
+            </aside>
+            <div id="si-sheet-backdrop" class="si-sheet-backdrop" hidden></div>
+          </div>
+          <p id="scene-feedback" class="sr-only" role="status" aria-live="polite">Workspace pronto.</p>
+          <p id="offline-status" class="sr-only">Ambiente de integração do SILM. A distribuição completa está disponível na página inicial.</p>
+        </section>
+
+
+        <section data-view="manual"><h1>Montagem e estrutura metálica</h1><p>Abra Montagem, escolha um metal e adicione unidades. Arraste uma unidade ou use o teclado para reposicioná-la. Organizar estrutura usa a referência cristalográfica do banco científico.</p><p>Na estrutura cristalina, selecione unidades, mostre vizinhos e alterne entre célula, rede e projeções. O zoom altera apenas a apresentação.</p><p>Os pontos dos elétrons são qualitativos e não representam a contagem real. A montagem livre não tem escala física.</p><a href="completo.html#/manual">Consultar o manual completo do SILM</a></section><section class="view narrow" data-view="configuracoes" aria-labelledby="settings-title" hidden>
+          <div class="section-heading"><p class="eyebrow">PREFERÊNCIAS</p><h1 id="settings-title">Seu ambiente, suas escolhas</h1><p>As preferências pertencem à plataforma, independentemente do simulador que será instalado.</p></div>
+          <div class="card setting-card"><label for="theme-choice">Aparência</label><p>Escolha o tema da interface.</p><select id="theme-choice"><option value="sistema">Acompanhar sistema</option><option value="claro">Claro</option><option value="escuro">Escuro</option></select><p class="feedback" id="preferences-feedback" role="status" aria-live="polite"></p></div>
+          <section class="card si-distribution-card" aria-labelledby="distribution-title">
+            <h2 id="distribution-title">Instalação e acesso offline</h2>
+            <p>O programa utiliza recursos incorporados. Em HTTPS ou localhost, a PWA pode armazenar os arquivos essenciais; o pacote standalone pode ser aberto diretamente sem conexão.</p>
+            <p id="distribution-status" class="si-distribution-status" role="status" aria-live="polite">Verificando modo de execução...</p>
+            <div class="si-distribution-actions"><button class="button primary" id="distribution-install" type="button" hidden>Instalar aplicativo</button><button class="button outline" id="distribution-check" type="button">Conferir recursos offline</button></div>
+            <p class="si-distribution-note">Caso não apareça a opção de instalação, utilize o menu do navegador quando disponível. O armazenamento local depende das permissões e do espaço do dispositivo; exporte backups regularmente.</p>
+          </section>
+          <div class="card"><h2>Ajuda contextual</h2><p>O Manual apresenta orientações para cada área e pode ser aberto com F1.</p><a class="button outline" href="#/manual">Abrir Manual</a></div>
+          <p class="notice">O contraste e a redução de movimento respeitam as preferências do navegador. Controles de acessibilidade adicionais permanecem sujeitos à homologação.</p>
+        </section>
+
+        <section data-view="sobre"><h1>Sobre o SILM</h1><p>Simulador Interativo de Ligações Metálicas — A Arquitetura dos Metais.</p><p>Este ambiente conecta o domínio científico do SILM 0.12.0 à Base Demo Oficial SI 0.9.8. A integração está em desenvolvimento.</p><p>Medir, Calcular, relatórios e atividades permanecem disponíveis na distribuição completa.</p><a href="completo.html">Recursos da interface anterior</a></section></main>
+      <nav class="si-mobile-bottom-nav" aria-label="Navegação principal para dispositivos móveis">
+        <a data-route="inicio" href="#/inicio"><span aria-hidden="true">⌂</span>Início</a>
+        <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span>Ambiente</a>
+        </nav>
+      <footer class="footer"><span>SILM — A Arquitetura dos Metais</span><span>Construção por camadas · <span data-app-version>0.12.1 · desenvolvimento</span></span></footer>
+    </div>
+  </div>
+  <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>
+  <div id="si-notifications" class="si-notifications" aria-label="Notificações" aria-live="polite" aria-atomic="false"></div>
+  <div id="si-modal" class="si-modal-cover" hidden>
+    <section class="si-modal" role="alertdialog" aria-modal="true" aria-labelledby="si-modal-title" aria-describedby="si-modal-description">
+      <div class="si-modal-mark" aria-hidden="true">◇</div>
+      <h2 id="si-modal-title"></h2>
+      <p id="si-modal-description"></p>
+      <div class="si-modal-actions"><button id="si-modal-cancel" class="button outline" type="button">Cancelar</button><button id="si-modal-confirm" class="button primary" type="button">Confirmar</button></div>
+    </section>
+  </div>
+</body>
+</html>

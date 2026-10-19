@@ -19,7 +19,7 @@ async function main(){
   const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'}),page=await context.newPage();
   page.setDefaultTimeout(8000);
   page.on('pageerror',e=>{errors.push(e.stack);console.error(e.stack);});page.on('response',r=>{if(r.status()>=400)failed.push(r.url()+':'+r.status());});
-  const url='http://127.0.0.1:'+server.address().port+'/integracao/index.html#/ambiente';
+  const url='http://127.0.0.1:'+server.address().port+(process.env.SILM_TEST_MAIN?'/index.html#/ambiente':'/integracao/index.html#/ambiente');
   await page.goto(url);await page.waitForFunction(()=>window.SILMIntegration);
   const state=()=>page.evaluate(()=>SILMIntegration.snapshot());
   await page.evaluate(()=>localStorage.setItem('silm:legacy-sentinel','preservar'));
