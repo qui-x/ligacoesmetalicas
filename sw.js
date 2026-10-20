@@ -1,5 +1,5 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.12.3';
+const VERSION='0.13.0';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION,DOMAINS=CACHE+'::domains';
 const FILES=[
   "./",
@@ -13,6 +13,7 @@ const FILES=[
   "integracao/integration.css",
   "integracao/metallic-experience.js",
   "integracao/pwa.js",
+  "integracao/route-ui.js",
   "integracao/scientific-tools.js",
   "integracao/silm-theme.css",
   "integracao/upstream/LICENSE",
@@ -169,6 +170,8 @@ const FILES=[
   "domain/silm/property-view.js",
   "domain/silm/renderer-2d.js",
   "domain/silm/representation.js",
+  "domain/silm/route-session.js",
+  "domain/silm/routes.js",
   "domain/silm/state.js",
   "domain/silm/styles.css",
   "vendor/dialog-polyfill/dialog-polyfill.css",

@@ -4,7 +4,7 @@ const {chromium}=require('playwright');
 const root=path.resolve(__dirname,'..');
 async function main(){
  const server=http.createServer((req,res)=>{
-  const file=path.resolve(root,'.'+decodeURIComponent(req.url.split('?')[0]));
+  const file=path.resolve(root,'.'+decodeURIComponent(req.url.split('?')[0]).replace(/\/$/,'/index.html'));
   if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}
   const types={'.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json','.png':'image/png','.html':'text/html'};
   try{res.setHeader('Content-Type',types[path.extname(file)]||'text/plain');res.end(fs.readFileSync(file));}catch{res.writeHead(404).end();}
@@ -19,7 +19,7 @@ async function main(){
   const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'}),page=await context.newPage();
   page.setDefaultTimeout(8000);
   page.on('pageerror',e=>{errors.push(e.stack);console.error(e.stack);});page.on('response',r=>{if(r.status()>=400)failed.push(r.url()+':'+r.status());});
-  const url='http://127.0.0.1:'+server.address().port+(process.env.SILM_TEST_MAIN?'/index.html#/ambiente':'/integracao/index.html#/ambiente');
+  const url='http://127.0.0.1:'+server.address().port+(process.env.SILM_TEST_INTEGRATION_ENTRY?'/integracao/index.html#/ambiente':'/index.html#/ambiente');
   await page.goto(url);await page.waitForFunction(()=>window.SILMIntegration);
   const state=()=>page.evaluate(()=>SILMIntegration.snapshot());
   await page.evaluate(()=>localStorage.setItem('silm:legacy-sentinel','preservar'));
@@ -104,8 +104,9 @@ async function main(){
   const evidence=process.env.SILM_INTEGRATION_EVIDENCE;
   if(evidence){fs.mkdirSync(evidence,{recursive:true});await page.setViewportSize({width:1440,height:1000});await page.screenshot({path:path.join(evidence,'desktop.png')});await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(evidence,'mobile.png')});}
   await require('./integration-tools.cjs')(browser,url);
+  await require('./routes-browser.cjs')(browser,url);
   assert.deepEqual(errors,[],'Console sem exceções');assert.deepEqual(failed,[],'Recursos locais disponíveis');
-  console.log('PASS: base 0.9.12 + SILM — montagem, Desfazer, cristal FCC/HCP, projeção, elétrons, reload, exportação, importação >8 KB, rejeição inválida, isolamento, cancelamento, menu e docas em 320/390/768/1440 px.');
+  console.log('PASS: base 0.9.13 + SILM — montagem, Desfazer, cristal FCC/HCP, projeção, elétrons, reload, exportação, importação >8 KB, rejeição inválida, isolamento, cancelamento, menu e docas em 320/390/768/1440 px.');
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

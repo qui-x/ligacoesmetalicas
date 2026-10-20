@@ -1,6 +1,6 @@
 'use strict';
 /* Interface sobre os serviços científicos existentes. Não contém fórmulas próprias. */
-SILM.createIntegrationTools=({model,host,history,onChange,say,onModule})=>{
+SILM.createIntegrationTools=({model,host,history,onChange,say,onModule,activity=()=>null})=>{
  const S=SILM,MS=S.measurement,CA=S.calculation,U=S.units;
  let context='',tool=null,picks=[],review=null,formula=null,choice={},user={},unit='Å';
  const node=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
@@ -11,6 +11,7 @@ SILM.createIntegrationTools=({model,host,history,onChange,say,onModule})=>{
  const type=()=>model.state.structure?.crystallography?.structureType;
  const reset=()=>{tool=null;picks=[];review=null;formula=null;choice={};user={};};
  const change=()=>onChange();
+ const allowed=t=>!activity()||activity().allows(t);
  function value(m){return U.format(m.value,m.unit==='Å'?unit:m.unit);}
  function result(c){return CA.format(c.result,c.unit);}
  function options(spec){
@@ -25,6 +26,7 @@ SILM.createIntegrationTools=({model,host,history,onChange,say,onModule})=>{
   return out;
  }
  function calculate(f){
+  if(!allowed(f.quantity))return;
   const inputs=[];
   for(const spec of f.requiredInputs){
    const opts=options(spec),o=opts.find(o=>o.id===choice[spec.key])||opts[0];
@@ -42,7 +44,7 @@ SILM.createIntegrationTools=({model,host,history,onChange,say,onModule})=>{
   change();
  }
  function pick(id){
-  if(!tool||!available()||model.state.module.active!=='medir')return;
+  if(!tool||!allowed(tool)||!available()||model.state.module.active!=='medir')return;
   picks.push(id);
   if(picks.length===MS.types[tool].points){
    const r=model.addMeasurement(tool,picks);picks=[];
@@ -61,17 +63,18 @@ SILM.createIntegrationTools=({model,host,history,onChange,say,onModule})=>{
   const state=model.state,key=state.investigation?.id+':'+state.structure?.mode;
   if(key!==context){context=key;reset();}
   host.replaceChildren();history.replaceChildren();
-  field(host,'Módulo',select('silm-module',[['explorar','Explorar'],['medir','Medir'],['calcular','Calcular']],state.module.active,v=>{reset();model.setModule(v);onModule(v);change();}));
+  field(host,'Módulo',select('silm-module',[['explorar','Explorar'],['medir','Medir'],['calcular','Calcular']],state.module.active,v=>{if(activity()?.lockedModule())return;reset();model.setModule(v);onModule(v);change();}));
+  document.getElementById('silm-module').disabled=!!activity()?.lockedModule();
   if(state.module.active!=='explorar'){
    host.append(node('p','Medições e cálculos usam o modelo cristalográfico em escala física. Zoom e projeção não alteram os valores.'));
    if(!available())host.append(node('p',model.measurementAvailability().reason==='DEFORMED'?'Restaure a experiência de deformação em Explorar para medir ou calcular a estrutura de referência.':'Organize uma estrutura cristalina em Explorar para usar este módulo. A montagem livre não tem escala física.'));
    else if(state.module.active==='medir'){
-    field(host,'Instrumento',select('silm-instrument',[['','Escolha um instrumento'],...Object.entries(MS.types).map(([k,t])=>[k,t.label])],tool||'',v=>{tool=v||null;picks=[];review=null;change();say(v?'Selecione '+MS.types[v].points+' ponto(s) na cena.':'Instrumento desligado.');}));
+    field(host,'Instrumento',select('silm-instrument',[['','Escolha um instrumento'],...Object.entries(MS.types).filter(([k])=>allowed(k)).map(([k,t])=>[k,t.label])],tool||'',v=>{tool=v||null;picks=[];review=null;change();say(v?'Selecione '+MS.types[v].points+' ponto(s) na cena.':'Instrumento desligado.');}));
     field(host,'Unidade de comprimento',select('silm-measure-unit',Object.keys(U.length).map(k=>[k,k]),unit,v=>{unit=v;change();}));
     host.append(node('p',tool?'Selecionados: '+picks.length+' de '+MS.types[tool].points+'. Para ângulos, B é o vértice.':'Selecione um instrumento para medir na cena.'));
     host.append(button('Cancelar seleção',()=>{tool=null;picks=[];change();}));
    }else{
-    const formulas=CA.applicable(type());if(!formulas.some(f=>f.id===formula))formula=formulas[0]?.id;
+    const formulas=CA.applicable(type()).filter(f=>allowed(f.quantity));if(!formulas.some(f=>f.id===formula))formula=formulas[0]?.id;
     field(host,'Fórmula',select('silm-formula',formulas.map(f=>[f.id,f.name]),formula,id=>{formula=id;choice={};user={};change();}));
     const f=S.formulas[formula];if(f){
      host.append(node('p',f.expression),node('p',f.notes));
@@ -90,7 +93,7 @@ SILM.createIntegrationTools=({model,host,history,onChange,say,onModule})=>{
   for(const m of state.measurements){
    const row=node('details');row.append(node('summary',MS.types[m.type].label+(m.parameter?' '+m.parameter:'')+': '+value(m)+' · Medida do modelo'));
    row.append(node('p','Resolução: '+U.format(m.resolution,m.unit)+' · Fonte: '+m.source.latticeSourceId));
-   if(MS.current(m,state.structure))row.append(button('Rever na cena',()=>{reset();review=m.id;model.setModule('medir');onModule('medir');change();}));
+   if(MS.current(m,state.structure))row.append(button('Rever na cena',()=>{if(activity()?.lockedModule()&&activity().lockedModule()!=='medir')return;reset();review=m.id;model.setModule('medir');onModule('medir');change();}));
    history.append(row);
   }
   for(const c of state.calculations){

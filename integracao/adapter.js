@@ -1,10 +1,22 @@
 'use strict';
-/* Produto SILM sobre a Base 0.9.12. A ciência continua no serviço original schema 8. */
+/* Produto SILM sobre a Base 0.9.13. A ciência continua no serviço original schema 8. */
 (() => {
  const B=BaseDemoSI,S=SILM,$=id=>document.getElementById(id);
- B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.12.3 · desenvolvimento',
-  routes:B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'A Arquitetura dos Metais':route.title}))});
+ B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.13.0 · desenvolvimento',
+  routes:B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'A Arquitetura dos Metais':route.title}))});
+ // A cena cristalina também usa data-view; o roteamento só pode atingir páginas do produto.
+ B.updateRoute=()=>{
+  const selected=B.currentRoute(location.hash);
+  if(!B.manifest.routes.some(r=>r.id===selected)){location.replace('#/inicio');return;}
+  for(const page of document.querySelectorAll('#conteudo > [data-view]'))page.hidden=page.dataset.view!==selected;
+  for(const link of document.querySelectorAll('a[data-route]')){if(link.dataset.route===selected)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');}
+  const route=B.manifest.routes.find(r=>r.id===selected);document.title=route.title+' · SILM';$('current-section').textContent=route.subtitle;
+  document.body.classList.toggle('route-ambiente',selected==='ambiente');window.dispatchEvent(new CustomEvent('si-route-changed',{detail:selected}));B.closeNavigationDrawer(false);
+  requestAnimationFrame(()=>{const page=document.querySelector('#conteudo > [data-view="'+selected+'"]');const heading=page?.querySelector('h1,h2');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}});
+ };
  const model=S.createScientificState();let view=null,scope=null,viewKey='',pending=false,ready=false,selected=null,focusAfterRender=null;
+ let routeUI=null;
+ const allows=tool=>!routeUI||routeUI.session.allows(tool);
  let representation=S.representation.defaults(null),storageOK=true,unavailable3D=false;
  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.classList.contains('si-no-motion')||document.documentElement.classList.contains('si-simple-reading')||B.currentRoute(location.hash)!=='ambiente';
  const say=(text,kind='info')=>{SimCore.notifications.announce(text);B.notify(text,kind);};
@@ -34,16 +46,17 @@
   saveCamera(mode,value){representation.cameras[mode]=S.representation.sanitizeCamera(value);saveView();}
  };
  function saveView(){storage.set('representation.view',representation);}
- const tools=S.createIntegrationTools({model,host:$('silm-tools'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m)});
- const experience=S.createMetallicExperience({model,say,schedule,reduced,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);await start();}});
+ const tools=S.createIntegrationTools({model,host:$('silm-tools'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
+ const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);await start();}});
+ routeUI=S.createRouteUI({model,storage,view:()=>representation,onView:value=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);saveView();},schedule,say,onModule:m=>B.selectModule(m)});
  const run={
-  add(){if(!model.state.structure)model.beginAssembly();return report(model.addUnit());},
-  move:(id,target,options)=>report(model.moveUnit(id,target,options)),
-  undo:()=>model.state.module.active==='explorar'&&report(model.undo()),
-  organize:()=>report(model.organize()),
+  add(){if(routeUI.session.open())return;if(!model.state.structure)model.beginAssembly();return report(model.addUnit());},
+  move:(id,target,options)=>!routeUI.session.open()&&report(model.moveUnit(id,target,options)),
+  undo:()=>!routeUI.session.open()&&model.state.module.active==='explorar'&&report(model.undo()),
+  organize:()=>!routeUI.session.open()&&report(model.organize()),
   represent:value=>model.setCrystalRepresentation(value),
   select:id=>model.setCrystalRepresentation({selectedUnitId:id}),
-  toggleNeighbors(){const r=model.state.structure?.crystallography?.representation;if(r)model.setCrystalRepresentation({neighbors:!r.neighbors});}
+  toggleNeighbors(){if(!allows('neighbors'))return;const r=model.state.structure?.crystallography?.representation;if(r)model.setCrystalRepresentation({neighbors:!r.neighbors});}
  };
  function renderScene(){
   const state=model.state,e=element(),key=e?state.investigation.id+':'+e.atomicNumber+':'+state.module.active+':'+(state.structure?.mode||'empty')+':'+(state.structure?.mode==='crystalline'?representation.viewMode:'2d'):'none';
@@ -53,7 +66,7 @@
    else if(state.structure){
     scope=SimCore.createScope();const common={scope,model,element:e,actions:run,reducedMotion:reduced,representation:rep,moduleTitle:{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active],measure:tools.measure,calc:tools.calc,properties:experience.scene};
     if(state.structure.mode==='crystalline')view=S.createCrystalView($('silm-integration-scene'),{...common,geometry:S.crystal.geometry(e)});
-    else view=S.createAssemblyView($('silm-integration-scene'),{...common,editable:state.module.active==='explorar',organize:{run:run.organize,state:()=>{
+    else view=S.createAssemblyView($('silm-integration-scene'),{...common,editable:state.module.active==='explorar'&&!routeUI.session.open(),organize:{run:run.organize,state:()=>{
      const eligibility=S.crystal.eligibility(e);return {disabled:!model.state.structure?.units.length||eligibility.status!=='available',reason:eligibility.status!=='available'?eligibility.message:''};
     }}});
     // Contextual help uses the Base route, whose router deliberately has no nested routes.
@@ -86,14 +99,16 @@
    b.addEventListener('click',()=>{document.querySelector('[data-scene-view="focus"]').click();if(s.mode==='crystalline')run.select(u.id);view?.focusUnit(u.id);});list.append(b);
   }
   if(!n)list.textContent='Ainda não há unidades nesta investigação.';
-  storageStatus();
+  routeUI.render();storageStatus();
  }
  async function start(){
+  if(routeUI.session.open())return;
   const z=Number($('silm-metal').value);
   if(model.state.investigation){const accepted=await B.confirmDialog({title:'Iniciar outra investigação?',description:'A investigação atual será substituída neste ambiente. Exporte-a em Dados se desejar guardá-la.',confirmText:'Iniciar',cancelText:'Cancelar'});if(!accepted)return;}
   if(model.begin(z)){model.beginAssembly();say('Investigação iniciada com '+S.data.get(z).name+'.','success');}
  }
  async function clear(){
+  if(routeUI.session.open())return;
   if(!model.state.structure?.units.length)return;
   if(await B.confirmDialog({title:'Limpar estrutura?',description:'A estrutura será removida. O metal, as medições e os cálculos registrados serão preservados. Esta limpeza não pode ser desfeita.',confirmText:'Limpar estrutura',destructive:true})){
    model.clearStructure();model.beginAssembly();say('Estrutura limpa. Metal e registros preservados.');
@@ -104,6 +119,7 @@
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='SILM-investigacao-'+model.state.metal.symbol+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
  }
  async function importState(event){
+  if(routeUI.session.open()){event.target.value='';return;}
   const input=event.target,file=input.files[0];if(!file)return;
   try{
    if(file.size>5*1024*1024)throw new Error('O arquivo excede 5 MB.');
@@ -134,7 +150,7 @@
   if(raw!==null){try{const value=JSON.parse(raw),check=S.validateScientificState(value);if(!check.ok)throw new Error();model.restore(check.value,{allowLegacy:false});if(model.state.metal){selected=String(model.state.metal.atomicNumber);selector.value=selected;}}catch{storageOK=false;say('A investigação salva é inválida. O arquivo original foi preservado; nenhuma restauração foi aplicada.','warning');}}
   representation=S.representation.sanitize(storage.get('representation.view',null),model.state.investigation?.id??null);
   $('silm-start').addEventListener('click',start);$('silm-add').addEventListener('click',run.add);$('silm-organize').addEventListener('click',run.organize);
-  $('silm-free').addEventListener('click',()=>report(model.restoreFree()));
+  $('silm-free').addEventListener('click',()=>!routeUI.session.open()&&report(model.restoreFree()));
   $('scene-undo').addEventListener('click',run.undo);$('scene-clear').addEventListener('click',clear);
   B.setupActionMenu('scene-menu-toggle','scene-tools-menu',action=>{if(action==='clear')return clear();if(action==='help')location.hash='#/manual';});
   $('silm-electrons').addEventListener('click',()=>{
@@ -145,9 +161,9 @@
   window.addEventListener('si-route-changed',()=>{view?.update();});
   const appearance=new MutationObserver(()=>{document.documentElement.dataset.contrast=document.documentElement.classList.contains('si-highcontrast')?'on':'off';view?.update();window.dispatchEvent(new CustomEvent('silm:theme:changed'));});appearance.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   document.addEventListener('keydown',event=>{if(!(event.ctrlKey||event.metaKey)||event.altKey||event.shiftKey||event.key.toLowerCase()!=='z'||B.isPlatformDialogOpen()||B.currentRoute(location.hash)!=='ambiente'||event.target.closest('input,select,textarea,[contenteditable]'))return;event.preventDefault();run.undo();});
-  B.selectModule(model.state.module.active);ready=true;render();
+  routeUI.init();B.selectModule(model.state.module.active);ready=true;render();
   // Read-only inspection facade: tests and debugging cannot mutate the authoritative state directly.
-  window.SILMIntegration=Object.freeze({snapshot:()=>model.snapshot(),baseVersion:'0.9.12'});
+  window.SILMIntegration=Object.freeze({snapshot:()=>model.snapshot(),baseVersion:'0.9.13',activity:()=>routeUI.session.snapshot()});
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

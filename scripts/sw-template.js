@@ -1,5 +1,5 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.12.3';
+const VERSION='0.13.0';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION,DOMAINS=CACHE+'::domains';
 const FILES=/*__PRECACHE__*/;
 const local=value=>{const url=new URL(value,ROOT);if(url.origin!==ROOT.origin||!url.pathname.startsWith(ROOT.pathname))throw new TypeError('Recurso fora do escopo');return url;};

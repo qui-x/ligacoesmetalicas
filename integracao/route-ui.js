@@ -1,0 +1,61 @@
+'use strict';
+SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule})=>{
+ const S=SILM,B=BaseDemoSI,$=id=>document.getElementById(id),N=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
+ const button=(label,fn,id)=>{const b=N('button',label);b.type='button';b.className='button outline';if(id)b.id=id;b.addEventListener('click',fn);return b;};
+ const session=S.createRouteSession({model,storage,view,onView,say});
+ const url=id=>'#/roteiros?item='+encodeURIComponent(id);
+ function sync(){const c=session.context(),active=!!c;document.body.classList.toggle('silm-guided',active);const href=active?url(c.id):'#/inicio';document.querySelector('.si-global-brand').href=href;const back=$('si-return-activity');back.hidden=!active;back.href=href;back.textContent='Roteiro em andamento';B.closeNavigationDrawer(false);window.dispatchEvent(new CustomEvent('si-module-change'));schedule();}
+ function complete(){const r=session.complete();say(r.message,r.ok?'success':'warning');sync();return r;}
+ function close(){session.close();onModule(model.state.module.active);location.hash='#/roteiros';say('Atividade encerrada. Sua investigação livre foi restaurada.');sync();}
+ B.guidedActivityContext=()=>{const c=session.context(),r=session.route();return c?{url:url(c.id),title:r.title,kind:'script',progress:c.status==='completed'?1:0,total:1}:null;};
+ B.menuActivity=(kind,id)=>{const c=session.context(),r=session.route();return kind==='script'&&c?.id===id?{id:r.id,kind:'script',title:r.title,module:r.module,steps:[{label:r.guidance.criterion,requirement:'manual',minimum:1}]}:undefined;};
+ B.menuActivityProgress=id=>session.context()?.id===id&&session.context().status==='completed'?1:0;
+ B.advanceActivityFromMenu=()=>complete();B.clearGuidedReturn=()=>close();B.endGuidedActivity=()=>close();
+ function enter(r,z,resume){if(session.open()){location.hash='#/ambiente';return;}if(!session.start(r.id,z,{resume})){say('Não foi possível preparar esta investigação.','warning');return;}onModule(r.module);location.hash='#/ambiente';sync();say('Contexto restrito: '+r.title+'. Módulo '+r.module+' fixo.');}
+ function catalogue(){
+  const host=$('silm-route-catalog');host.replaceChildren();const doc=session.snapshot(),id=new URLSearchParams(location.hash.split('?')[1]||'').get('item'),r=S.routes.get(id);
+  if(!r){for(const item of S.routes.registry){const card=N('article');card.className='edu-card';card.append(N('h2',item.title),N('p',item.subtitle),N('p','Módulo: '+item.module));if(doc.completed[item.id]===item.version)card.append(N('strong','Concluído'));card.append(button('Ver especificações',()=>{location.hash=url(item.id);},'route-card-'+item.id));host.append(card);}return;}
+  const box=N('article');box.className='edu-card';box.append(N('h2',r.title),N('p',r.subtitle),N('p','Módulo: '+r.module),N('p',r.description));
+  for(const [label,items]of [['Objetivos',r.objectives],['Condições e pré-requisitos',r.prerequisites],['Recursos virtuais',r.allowedTools]]){box.append(N('h3',label));const list=N('ul');items.forEach(x=>list.append(N('li',labels[x]||x)));box.append(list);}
+  box.append(N('h3','Orientações'),N('p',r.guidance.action),N('p',r.guidance.hint),N('p','Critério de conclusão: '+r.guidance.criterion));
+  for(const id of r.sources){const s=S.data.source(id);box.append(N('p','Fonte: '+s.institution+' — '+s.title));}
+  const selection=N('select');selection.id='route-metal';for(const z of r.metalSelection.atomicNumbers){const e=S.data.get(z),o=N('option',e.name+' ('+e.symbol+')');o.value=z;selection.append(o);}selection.value=r.metalSelection.atomicNumbers.includes(29)?'29':String(r.metalSelection.atomicNumbers[0]);if(session.context()?.id===r.id){selection.value=String(model.state.metal.atomicNumber);selection.disabled=true;}const label=N('label','Metal da investigação');label.htmlFor=selection.id;box.append(label,selection);
+  if(session.open())box.append(button('Retomar na bancada',()=>{location.hash='#/ambiente';},'route-resume'));
+  else{if(doc.attempts[r.id])box.append(button('Retomar investigação',()=>enter(r,doc.attempts[r.id].checkpoint.metal.atomicNumber,true),'route-resume'));
+   box.append(button(doc.completed[r.id]?'Refazer roteiro':'Montar na bancada',async()=>{if(!await B.confirmDialog({title:'Montar roteiro?',description:'Sua investigação livre será guardada e restaurada ao encerrar a atividade.',confirmText:'Montar'}))return;enter(r,Number(selection.value),false);},'route-mount'));}
+  if(doc.archives[r.id])box.append(button('Abrir relatório',()=>{location.hash='#/relatorios?roteiro='+r.id;}));
+  if(!session.open())box.append(button('Todos os roteiros',()=>{location.hash='#/roteiros';}));host.append(box);
+ }
+ const labels={structure:'Estrutura cristalina',unitCell:'Célula unitária',neighbors:'Vizinhança',electrons:'Elétrons deslocalizados',malleability:'Maleabilidade',distance:'Distância',latticeParameter:'Parâmetro de rede',coordination:'Coordenação',cellVolume:'Volume da célula',effectiveAtoms:'Contagem geométrica de átomos'};
+ function guidance(){const c=session.context(),host=$('silm-route-guidance');host.replaceChildren();if(!c)return;const r=session.route();host.append(N('h3',r.title),N('p','Módulo fixo: '+r.module));for(const [title,text]of [['Objetivo',r.objectives.join(' ')],['O que observar/fazer',r.guidance.action],['Pistas',r.guidance.hint],['Critério de conclusão',r.guidance.criterion]]){host.append(N('h4',title),N('p',text));}
+  if(c.status==='completed'){host.append(N('strong','Concluído'),button('Abrir relatório',()=>{location.hash='#/relatorios?roteiro='+r.id;},'route-report'));}
+  else{const b=button('Concluir roteiro',complete,'route-complete');b.disabled=!session.ready();host.append(b);}
+  host.append(button('Encerrar atividade',async()=>{if(await B.confirmDialog({title:'Encerrar atividade?',description:'A investigação livre será restaurada. Uma tentativa ainda não concluída ficará disponível para retomada.',confirmText:'Encerrar'}))close();},'route-close'));
+ }
+ function report(){const host=$('silm-route-report');host.replaceChildren();const id=new URLSearchParams(location.hash.split('?')[1]||'').get('roteiro')||session.context()?.id,record=session.report(id);if(!record){host.append(N('p','Conclua um roteiro para abrir seu relatório.'));return;}const r=S.routes.get(record.activityContext.id),s=record.checkpoint,e=S.data.get(s.metal.atomicNumber),editable=session.context()?.id===r.id;
+  host.append(N('h1','Relatório — '+r.title),N('p',r.subtitle+' · Módulo '+r.module),N('p','Metal: '+e.name+' ('+e.symbol+') · Estrutura: '+(s.structure.crystallography?.structureType||'montagem livre')+' · Unidades: '+s.structure.units.length));
+  const structure=S.data.structure(e);for(const key of ['temperature','pressure','phase']){const d=structure?.conditions?.[key];if(d)host.append(N('p',d.display||String(d.value)));}
+  for(const [key,label]of [['name','Nome'],['date','Data'],['observations','Observações'],['interpretation','Interpretação'],['conclusion','Conclusão']]){const l=N('label',label);l.htmlFor='report-'+key;const input=N(['name','date'].includes(key)?'input':'textarea');input.id=l.htmlFor;input.value=record.report[key];input.readOnly=!editable;input.maxLength=10000;const print=N('div',input.value);print.className='silm-print-value';input.addEventListener('input',()=>{if(session.edit(key,input.value))print.textContent=input.value;});host.append(l,input,print);}
+  host.append(N('h2','Registros científicos'));
+  const observations=[];if(record.evidence.cell)observations.push('Célula unitária observada');if(record.evidence.lattice)observations.push('Rede observada');if(record.evidence.deformation)observations.push('Compressão representada');if(s.electrons?.representation.visible)observations.push('Distribuição eletrônica visível');if(observations.length)host.append(N('p',observations.join(' · ')));
+  for(const m of s.measurements)host.append(N('p',S.measurement.types[m.type].label+(m.parameter?' '+m.parameter:'')+': '+S.units.format(m.value,m.unit)+' · Medida do modelo · resolução '+S.units.format(m.resolution,m.unit)+' · fonte '+m.source.latticeSourceId));
+  for(const c of s.calculations){host.append(N('p',S.formulas[c.formulaId].name+': '+S.calculation.format(c.result,c.unit)+' · Calculado pelo SILM'),N('p',S.formulas[c.formulaId].expression));for(const x of c.inputs)host.append(N('p',x.symbol+' = '+(Array.isArray(x.value)?x.value.join(' – '):x.value)+' '+x.unit+' · '+S.calculation.origins[x.origin]));}
+  if(!s.measurements.length&&!s.calculations.length)host.append(N('p','Este roteiro registra observações qualitativas; não foram produzidas medições nem cálculos.'));
+  const sources=new Set([...S.data.sourceIds(e),...r.sources,...s.calculations.flatMap(c=>c.provenance.references)]);host.append(N('h2','Fontes'));for(const id of sources){const src=S.data.source(id);if(src)host.append(N('p',src.institution+' — '+src.title+(src.url?' · '+src.url:'')));}
+  const controls=N('div');controls.className='silm-report-actions';controls.append(button('Imprimir / salvar em PDF',()=>window.print(),'route-print'),button(session.open()?'Voltar à bancada':'Voltar aos roteiros',()=>{location.hash=session.open()?'#/ambiente':'#/roteiros';}));host.append(controls);
+ }
+ function render(){
+  session.observe(B.currentRoute(location.hash)==='ambiente');
+  const context=session.context();document.body.classList.toggle('silm-guided',!!context);$('si-return-activity').hidden=!context;
+  if(context){$('si-return-activity').href=url(context.id);document.querySelector('.si-global-brand').href=url(context.id);}
+  if(B.currentRoute(location.hash)==='roteiros')catalogue();if(B.currentRoute(location.hash)==='relatorios')report();guidance();
+  if(context){$('si-dock-activity-status').textContent='Roteiro em andamento · '+session.route().module;if(document.querySelector('[data-left-tab="missao"]').getAttribute('aria-pressed')==='true')$('si-left-title').textContent='Roteiro';}
+  const menu=$('si-activity-context');if(context&&menu)menu.textContent=session.route().title+' · '+(context.status==='completed'?'Concluído':'Em investigação');
+  $('silm-import').disabled=!!context;$('silm-metal').disabled=!!context;for(const id of ['silm-start','silm-open-periodic','silm-add','silm-organize','silm-free','scene-clear','si-compact-clear','scene-undo'])if(context)$(id).disabled=true;
+  for(const [id,tool]of [['silm-electrons','electrons'],['silm-motion','electrons'],['silm-crystal-neighbors','neighbors']])if($(id))$(id).hidden=!session.allows(tool);
+  const finish=$('si-activity-finish');if(finish){finish.querySelector('span').textContent='Concluir roteiro';finish.disabled=!!context&&(context.status==='completed'||!session.ready());}
+ }
+ function guard(){if(!session.open())return;const route=B.currentRoute(location.hash),id=new URLSearchParams(location.hash.split('?')[1]||'').get('item');if(!['ambiente','roteiros','relatorios','manual'].includes(route)||route==='roteiros'&&id!==session.context().id)location.replace(url(session.context().id));}
+ function init(){$('nav-toggle').addEventListener('click',()=>requestAnimationFrame(()=>{if(session.open()){$('si-now-description').textContent='Investigação orientada · '+session.route().module;$('si-activity-context').textContent=session.route().title+' · '+(session.context().status==='completed'?'Concluído':'Em investigação');}}));document.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(session.open()&&a&&a.target!=='_blank'&&!a.getAttribute('href').startsWith('#')&&new URL(a.href).origin===location.origin){event.preventDefault();say('Encerre a atividade para abrir outra interface.','warning');}},true);const restored=session.load();if(restored){onModule(session.lockedModule());location.hash=url(session.context().id);}window.addEventListener('hashchange',guard);window.addEventListener('hashchange',schedule);window.addEventListener('si-route-changed',()=>{guard();schedule();});sync();}
+ return {session,init,render};
+};

@@ -1,11 +1,11 @@
 'use strict';
 /* Liga os componentes científicos SILM à plataforma, sem criar outro estado ou motor. */
-SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal})=>{
+SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,allows=()=>true})=>{
  const S=SILM,P=S.properties,U=SimCore.ExperienceUI,scope=SimCore.createScope();
  const editable=()=>model.state.module.active==='explorar';
  const change=patch=>{if(!editable())return;const ok=model.setPropertyParams(patch);if(ok)schedule();return ok;};
  const actions={
-  start(id){if(!editable())return;const r=model.startProperty(id);if(!r.ok)say(P.reasons[r.reason]||'Organize uma estrutura cristalina para esta experiência.','warning');schedule();},
+  start(id){if(!allows(id)||!editable())return;const r=model.startProperty(id);if(!r.ok)say(P.reasons[r.reason]||'Organize uma estrutura cristalina para esta experiência.','warning');schedule();},
   field:()=>change({field:!model.state.properties.electrical.field}),
   heat:()=>change({heating:!model.state.properties.thermal.heating}),
   advance(){const p=model.state.properties.thermal;if(p.heating&&p.stage<P.limits.heatStages)return change({stage:p.stage+1});},
@@ -14,7 +14,7 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal})=>{
   light:()=>change({light:!model.state.properties.luster.light}),
   restore(){model.restoreProperty();schedule();},end(){model.endProperty();schedule();}
  };
- const info=()=>({state:model.state,eligibility:P.eligibility(model.state.metal?S.data.get(model.state.metal.atomicNumber):null),editable:editable(),reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok,message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}});
+ const info=()=>({state:model.state,eligibility:P.eligibility(model.state.metal?S.data.get(model.state.metal.atomicNumber):null),editable:editable(),reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}});
  const controls=S.createPropertyControls(document.getElementById('silm-properties'),{scope,info,actions,prefix:'silm-panel-property'});
  const scene={advanceHeat:actions.advance,controls:(host,viewScope)=>S.createPropertyControls(host,{scope:viewScope,info,actions,prefix:'silm-scene-property',compact:true})};
  const dialog=document.getElementById('silm-periodic-dialog'),body=document.getElementById('silm-periodic-body'),trigger=document.getElementById('silm-open-periodic');let tableScope;
@@ -25,7 +25,7 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal})=>{
  });
  document.getElementById('silm-close-periodic').addEventListener('click',()=>dialog.close());
  dialog.addEventListener('close',()=>{tableScope?.destroy();trigger.focus({preventScroll:true});});
- return {scene,update(){controls.update();document.getElementById('silm-properties').hidden=!model.state.metal;document.getElementById('silm-property-caption').textContent=model.state.properties.active?P.catalog[model.state.properties.active].limitation:'As experiências qualitativas são distintas dos dados tabelados do metal.';}};
+ return {scene,update(){controls.update();for(const id of P.ids){const b=document.getElementById('silm-panel-property-start-'+id);b.parentElement.hidden=!allows(id);}document.getElementById('silm-properties').hidden=!model.state.metal;document.getElementById('silm-property-caption').textContent=model.state.properties.active?P.catalog[model.state.properties.active].limitation:'As experiências qualitativas são distintas dos dados tabelados do metal.';}};
 };
 SILM.renderIntegrationMetalData=(host,e,state)=>{
  const S=SILM,el=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
