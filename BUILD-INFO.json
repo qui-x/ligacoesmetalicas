@@ -1,7 +1,7 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.14.0",
+  "versao": "0.14.1",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.3.1",
   "scientificSchemaVersion": 8,
@@ -116,5 +116,10 @@
     "commit": "463e242c21c451036644c9c79999cd20ffe8aa3c",
     "entrada": "index.html",
     "status": "interface única integrada ao motor científico SILM"
+  },
+  "atualizacaoParcialBase": {
+    "versaoConsultada": "0.9.17",
+    "commit": "68ed86cb416ea31489be481fc52d86aeedce2892",
+    "recurso": "Card Caderno na página Início; demais módulos mantêm snapshot 0.9.13"
   }
 }

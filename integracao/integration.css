@@ -27,4 +27,7 @@ button[aria-disabled=true]{opacity:.55;cursor:default}
 .edu-card .button{white-space:normal;max-width:100%;overflow-wrap:anywhere}.edu-card select{max-width:100%;width:100%;min-height:44px;font:inherit;background:var(--surface);color:var(--text)}.edu-card{overflow-wrap:anywhere}.si-home-path{min-width:0}.si-home-path strong{overflow-wrap:anywhere}
 .si-home-family .si-home-hero h1{overflow-wrap:anywhere}
 #home-title:focus{outline:none}
-.si-home-family .si-home-paths .si-home-path[href="#/roteiros"]{grid-column:span 2}
+/* Ações de montagem preservam espaço para o texto em telas estreitas. */
+@media(max-width:600px){.silm-assembly-tools{grid-auto-flow:row;grid-auto-columns:auto;grid-template-columns:repeat(auto-fit,minmax(min(100%,130px),1fr))}.silm-assembly-tools button{min-width:0;white-space:normal;overflow-wrap:anywhere}}
+/* Na horizontal, o painel de ações não deve consumir a largura da estrutura. */
+@media(max-height:500px) and (orientation:landscape){.silm-laboratory>.silm-assembly{display:grid;grid-template-columns:minmax(190px,30%) minmax(0,1fr);grid-template-rows:minmax(160px,1fr) auto;align-items:stretch;overflow:auto}.silm-laboratory .silm-assembly-bar{grid-column:1;grid-row:1;min-width:0;max-height:100%;overflow:auto;justify-content:flex-start}.silm-laboratory .silm-assembly-area{grid-column:2;grid-row:1;min-width:0;min-height:160px}.silm-laboratory .silm-assembly-footer{grid-column:1/-1;grid-row:2;max-width:100%}}

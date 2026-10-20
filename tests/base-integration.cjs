@@ -106,6 +106,7 @@ async function main(){
   await require('./integration-tools.cjs')(browser,url);
   await require('./routes-browser.cjs')(browser,url);
   await require('./learning-browser.cjs')(browser,url);
+  await require('./responsive-probe.cjs')(browser,url);
   assert.deepEqual(errors,[],'Console sem exceções');assert.deepEqual(failed,[],'Recursos locais disponíveis');
   console.log('PASS: base 0.9.13 + SILM — montagem, Desfazer, cristal FCC/HCP, projeção, elétrons, reload, exportação, importação >8 KB, rejeição inválida, isolamento, cancelamento, menu e docas em 320/390/768/1440 px.');
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}

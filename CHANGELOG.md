@@ -1,5 +1,12 @@
 # Registro de alterações
 
+## SILM 0.14.1 — Caderno no Início e responsividade
+
+- Card Caderno copiado da Base SI 0.9.17 (68ed86c), com acesso direto às observações.
+- Botões da montagem sem compressão em telas estreitas; estrutura com espaço adequado na horizontal.
+- Grade original da base com cinco caminhos; removido o atalho duplicado no rodapé.
+- Integração pontual: demais recursos da base continuam no snapshot 0.9.13.
+
 ## SILM 0.14.0 — Interface unificada, missões e temas
 
 - Interface da Base SI 0.9.13 integrada ao motor científico e à identidade SILM.

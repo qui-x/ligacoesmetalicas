@@ -1,10 +1,12 @@
-# SILM 0.14.0 — A Arquitetura dos Metais
+# SILM 0.14.1 — A Arquitetura dos Metais
+
+O Início inclui o card Caderno da Base SI 0.9.17, com acesso direto às observações. Esta atualização é pontual; os demais módulos da base permanecem no snapshot 0.9.13.
 
 Simulador Interativo de Ligações Metálicas sobre a Base SI 0.9.13. A interface reúne a Home e a navegação da base com o motor científico do SILM, identidade ouro/grafite e dados com fontes.
 
 ## Usar
 
-Abra index.html por um servidor estático. A Home oferece Laboratório, Aprender, Missões e Roteiros Experimentais. O menu também dá acesso ao manual operacional, à tabela para apresentação, ao caderno e ao relatório da investigação livre. O endereço completo.html é mantido como encaminhamento compatível, sem iniciar outro aplicativo.
+Abra index.html por um servidor estático. A Home oferece Laboratório, Aprender, Missões, Roteiros Experimentais e Caderno. O menu também dá acesso ao manual operacional, à tabela para apresentação, ao caderno e ao relatório da investigação livre. O endereço completo.html é mantido como encaminhamento compatível, sem iniciar outro aplicativo.
 
 O laboratório utiliza Montagem, Ver e Dados. Investigue metais elegíveis, organize estruturas CCC/CFC/HC, compare célula/rede/vizinhança e representações 2D/3D. Os mesmos serviços oferecem elétrons deslocalizados, cinco propriedades qualitativas, Medir e Calcular com origens explícitas. Dados ausentes não recebem valores inventados.
 
