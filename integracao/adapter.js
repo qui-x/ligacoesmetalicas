@@ -2,10 +2,11 @@
 /* Produto SILM sobre a Base 0.9.13. A ciência continua no serviço original schema 8. */
 (() => {
  const B=BaseDemoSI,S=SILM,$=id=>document.getElementById(id);
- B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.13.0 · desenvolvimento',
-  routes:B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'A Arquitetura dos Metais':route.title}))});
+ B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.14.0 · desenvolvimento',
+  routes:B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios','aprender','missoes','caderno','professor'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'A Arquitetura dos Metais':route.title}))});
  // A cena cristalina também usa data-view; o roteamento só pode atingir páginas do produto.
  B.updateRoute=()=>{
+  if(location.hash.startsWith('#/manual/')){location.replace('#/manual?topico='+encodeURIComponent(location.hash.slice(9)));return;}
   const selected=B.currentRoute(location.hash);
   if(!B.manifest.routes.some(r=>r.id===selected)){location.replace('#/inicio');return;}
   for(const page of document.querySelectorAll('#conteudo > [data-view]'))page.hidden=page.dataset.view!==selected;
@@ -47,13 +48,13 @@
  };
  function saveView(){storage.set('representation.view',representation);}
  const tools=S.createIntegrationTools({model,host:$('silm-tools'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
- const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);await start();}});
- routeUI=S.createRouteUI({model,storage,view:()=>representation,onView:value=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);saveView();},schedule,say,onModule:m=>B.selectModule(m)});
+ const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
+ routeUI=S.createRouteUI({model,storage,view:()=>representation,onView:value=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);saveView();},schedule,say,onModule:m=>B.selectModule(m),selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
  const run={
-  add(){if(routeUI.session.open())return;if(!model.state.structure)model.beginAssembly();return report(model.addUnit());},
-  move:(id,target,options)=>!routeUI.session.open()&&report(model.moveUnit(id,target,options)),
-  undo:()=>!routeUI.session.open()&&model.state.module.active==='explorar'&&report(model.undo()),
-  organize:()=>!routeUI.session.open()&&report(model.organize()),
+  add(){if(routeUI.session.open()&&!routeUI.canBuild())return;if(!model.state.structure)model.beginAssembly();return report(model.addUnit());},
+  move:(id,target,options)=>(!routeUI.session.open()||routeUI.canBuild())&&report(model.moveUnit(id,target,options)),
+  undo:()=>(!routeUI.session.open()||routeUI.canBuild())&&model.state.module.active==='explorar'&&report(model.undo()),
+  organize:()=>(!routeUI.session.open()||routeUI.canBuild())&&report(model.organize()),
   represent:value=>model.setCrystalRepresentation(value),
   select:id=>model.setCrystalRepresentation({selectedUnitId:id}),
   toggleNeighbors(){if(!allows('neighbors'))return;const r=model.state.structure?.crystallography?.representation;if(r)model.setCrystalRepresentation({neighbors:!r.neighbors});}
@@ -66,7 +67,7 @@
    else if(state.structure){
     scope=SimCore.createScope();const common={scope,model,element:e,actions:run,reducedMotion:reduced,representation:rep,moduleTitle:{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active],measure:tools.measure,calc:tools.calc,properties:experience.scene};
     if(state.structure.mode==='crystalline')view=S.createCrystalView($('silm-integration-scene'),{...common,geometry:S.crystal.geometry(e)});
-    else view=S.createAssemblyView($('silm-integration-scene'),{...common,editable:state.module.active==='explorar'&&!routeUI.session.open(),organize:{run:run.organize,state:()=>{
+    else view=S.createAssemblyView($('silm-integration-scene'),{...common,editable:state.module.active==='explorar'&&(!routeUI.session.open()||routeUI.canBuild()),organize:{run:run.organize,state:()=>{
      const eligibility=S.crystal.eligibility(e);return {disabled:!model.state.structure?.units.length||eligibility.status!=='available',reason:eligibility.status!=='available'?eligibility.message:''};
     }}});
     // Contextual help uses the Base route, whose router deliberately has no nested routes.
@@ -89,6 +90,7 @@
   const visible=!!state.electrons?.representation.visible;
   $('silm-motion').disabled=!visible||reduced();$('silm-motion').setAttribute('aria-pressed',String(visible&&!!state.electrons?.representation.motion&&!reduced()));
   text('silm-electrons',visible?'Ocultar elétrons':'Mostrar elétrons');$('silm-electrons').setAttribute('aria-pressed',String(visible));
+  $('silm-export-legacy').hidden=!legacyState();
   const data=$('silm-data');data.replaceChildren();
   if(e){
    S.renderIntegrationMetalData(data,e,state);
@@ -105,18 +107,20 @@
   if(routeUI.session.open())return;
   const z=Number($('silm-metal').value);
   if(model.state.investigation){const accepted=await B.confirmDialog({title:'Iniciar outra investigação?',description:'A investigação atual será substituída neste ambiente. Exporte-a em Dados se desejar guardá-la.',confirmText:'Iniciar',cancelText:'Cancelar'});if(!accepted)return;}
-  if(model.begin(z)){model.beginAssembly();say('Investigação iniciada com '+S.data.get(z).name+'.','success');}
+  if(model.begin(z)){model.beginAssembly();say('Investigação iniciada com '+S.data.get(z).name+'.','success');return true;}return false;
  }
  async function clear(){
-  if(routeUI.session.open())return;
+  if(routeUI.session.open()&&!routeUI.canBuild())return;
   if(!model.state.structure?.units.length)return;
   if(await B.confirmDialog({title:'Limpar estrutura?',description:'A estrutura será removida. O metal, as medições e os cálculos registrados serão preservados. Esta limpeza não pode ser desfeita.',confirmText:'Limpar estrutura',destructive:true})){
    model.clearStructure();model.beginAssembly();say('Estrutura limpa. Metal e registros preservados.');
   }
  }
- function exportState(){
-  const blob=new Blob([JSON.stringify({format:'silm-scientific-investigation',version:1,scientificState:model.snapshot()},null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='SILM-investigacao-'+model.state.metal.symbol+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ function legacyState(){try{const raw=localStorage.getItem('simcore_domain_silm_v1_scientific.state');if(!raw)return null;const r=S.validateScientificState(JSON.parse(raw));return r.ok&&r.value.investigation?r.value:null;}catch{return null;}}
+ function exportState(){downloadState(model.snapshot());}
+ function downloadState(snapshot){
+  const blob=new Blob([JSON.stringify({format:'silm-scientific-investigation',version:1,scientificState:snapshot},null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='SILM-investigacao-'+snapshot.metal.symbol+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
  }
  async function importState(event){
   if(routeUI.session.open()){event.target.value='';return;}
@@ -150,13 +154,14 @@
   if(raw!==null){try{const value=JSON.parse(raw),check=S.validateScientificState(value);if(!check.ok)throw new Error();model.restore(check.value,{allowLegacy:false});if(model.state.metal){selected=String(model.state.metal.atomicNumber);selector.value=selected;}}catch{storageOK=false;say('A investigação salva é inválida. O arquivo original foi preservado; nenhuma restauração foi aplicada.','warning');}}
   representation=S.representation.sanitize(storage.get('representation.view',null),model.state.investigation?.id??null);
   $('silm-start').addEventListener('click',start);$('silm-add').addEventListener('click',run.add);$('silm-organize').addEventListener('click',run.organize);
-  $('silm-free').addEventListener('click',()=>!routeUI.session.open()&&report(model.restoreFree()));
+  $('silm-free').addEventListener('click',()=>(!routeUI.session.open()||routeUI.canBuild())&&report(model.restoreFree()));
   $('scene-undo').addEventListener('click',run.undo);$('scene-clear').addEventListener('click',clear);
   B.setupActionMenu('scene-menu-toggle','scene-tools-menu',action=>{if(action==='clear')return clear();if(action==='help')location.hash='#/manual';});
   $('silm-electrons').addEventListener('click',()=>{
    if(model.state.electrons)model.setElectronRepresentation({visible:!model.state.electrons.representation.visible});else report(model.activateElectrons());
   });
   $('silm-motion').addEventListener('click',()=>{if(model.state.electrons)model.setElectronRepresentation({motion:!model.state.electrons.representation.motion});});
+  $('silm-export-legacy').addEventListener('click',()=>{const value=legacyState();if(value&&!routeUI.session.open())downloadState(value);});
   $('silm-export').addEventListener('click',exportState);$('silm-import').addEventListener('change',importState);
   window.addEventListener('si-route-changed',()=>{view?.update();});
   const appearance=new MutationObserver(()=>{document.documentElement.dataset.contrast=document.documentElement.classList.contains('si-highcontrast')?'on':'off';view?.update();window.dispatchEvent(new CustomEvent('silm:theme:changed'));});appearance.observe(document.documentElement,{attributes:true,attributeFilter:['class']});

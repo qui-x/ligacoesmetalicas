@@ -1,11 +1,7 @@
-# SILM — Base SI 0.9.13 integrada
+# Interface integrada do SILM
 
-A entrada principal utiliza os serviços científicos originais do SILM para montagem, cristais 2D/3D, elétrons, cinco propriedades, Medir e Calcular. A tabela periódica original conserva os 118 elementos e a elegibilidade dos 43 metais. Dados apresenta referências e fontes.
+A fonte da entrada é integracao/index.html; scripts/build-main-entry.cjs gera index.html com os caminhos da raiz. As duas URLs exibem o mesmo produto e usam a mesma persistência. completo.html encaminha à raiz e não carrega o shell antigo.
 
-A paleta e os tokens científicos são adaptados em silm-theme.css, com temas claro/escuro e alto contraste. O upstream permanece íntegro e fixado em base-lock.json; o gerador remove apenas o boot da demonstração.
+A Base SI 0.9.13 permanece íntegra em upstream, com hashes em base-lock.json. O boot da demonstração é substituído pelo adaptador científico. Home, painéis, preferências, caderno e componentes visuais são aproveitados da base; montagem, cristais, elétrons, propriedades, medidas e fórmulas vêm do domínio SILM.
 
-Uma sessão válida da interface anterior é copiada apenas quando a nova não possui sessão salva. O original é preservado. Exportação e importação JSON permanecem disponíveis. Relatórios e atividades anteriores ainda não migrados estão em ../completo.html.
-
-Versão 0.13.0. Consulte ../docs/SILM-0.12.3.md.
-
-Roteiros oficiais em domain/silm/routes.js usam um único módulo e o estado científico do laboratório. O adaptador reutiliza as portas de contexto e os painéis da Base, sem iniciar as atividades genéricas de demonstração. Relatórios contextuais têm campos editáveis e impressão equivalente.
+Missões e Roteiros compartilham createRouteSession; Temas não possuem outro laboratório. unified-ui.js reúne os conteúdos operacionais e os hubs na navegação da base. Os relatórios usam o mesmo componente com registros reais. A paleta e os tokens científicos estão em silm-theme.css.

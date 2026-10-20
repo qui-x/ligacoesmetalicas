@@ -11,17 +11,17 @@
  make('medindo-ordem','Medindo a Ordem','Parâmetro de rede no modelo cristalográfico','medir','Uma imagem ampliada parece maior. A medida científica também muda?',['Medir a e distinguir valor do modelo, dado tabelado e escala da tela.'],['distance','latticeParameter','coordination'],'crystalline',{action:'Use Parâmetro de rede e escolha dois sítios que delimitam a na célula. Consulte o registro em Dados.',hint:'Escolha uma aresta da célula. Zoom e rotação não alteram o valor em ångström.',criterion:'Registrar uma medida válida do parâmetro a.'},'measure-a'),
  make('volume-celula','Quanto Cabe em uma Célula?','Geometria e volume da célula unitária','calcular','O volume representado depende dos parâmetros de rede e da célula adotada. Investigue essa relação.',['Calcular o volume com entradas cuja origem esteja identificada.'],['cellVolume','effectiveAtoms'],'crystalline',{action:'Escolha a fórmula de volume e examine a origem de cada parâmetro antes de calcular.',hint:'No HC, observe que a célula adotada é o prisma hexagonal convencional.',criterion:'Registrar um cálculo válido de volume da célula.'},'cell-volume')
  ];
- const knownTools=new Set(['structure','unitCell','neighbors','electrons','malleability',...Object.keys(S.measurement.types),...Object.values(S.formulas).map(f=>f.quantity)]);
+ const knownTools=new Set(['structure','unitCell','neighbors','electrons',...S.properties.ids,...Object.keys(S.measurement.types),...Object.values(S.formulas).map(f=>f.quantity)]);
  function validate(registry){
   if(!Array.isArray(registry)||!registry.length)return {ok:false,reason:'REGISTRY_INVALID'};const ids=new Set();
   for(const r of registry){
    if(!r||!/^[-a-z0-9]{3,60}$/.test(r.id)||ids.has(r.id)||!Number.isInteger(r.version)||r.version<1)return {ok:false,reason:'IDENTITY_INVALID'};ids.add(r.id);
    if(!['explorar','medir','calcular'].includes(r.module)||r.secondaryModule!==undefined)return {ok:false,reason:'MODULE_INVALID'};
-   const criteria=['cell-and-lattice','electrons','deform-and-restore','measure-a','cell-volume'];
+   const criteria=['cell-and-lattice','electrons','deform-and-restore','measure-a','cell-volume','crystalline','neighbors','electrons-motion','property-field','packing-factor'];
    if(!criteria.includes(r.completionCriteria)||!r.initialState||r.initialState.mode!==r.structureRequirements||!['free','crystalline'].includes(r.initialState.mode)||!Number.isInteger(r.initialState.units)||r.initialState.units<1)return {ok:false,reason:'CONTEXT_INVALID'};
    if(!r.title||!r.subtitle||!r.description||!r.objectives?.length||!r.guidance?.criterion||!r.completionCriteria)return {ok:false,reason:'CONTENT_INVALID'};
    if(!Array.isArray(r.allowedTools)||!r.allowedTools.length||r.allowedTools.some(t=>!knownTools.has(t)))return {ok:false,reason:'TOOLS_INVALID'};
-   const permitted=r.module==='medir'?Object.keys(S.measurement.types):r.module==='calcular'?Object.values(S.formulas).map(f=>f.quantity):['structure','unitCell','neighbors','electrons','malleability'];
+   const permitted=r.module==='medir'?Object.keys(S.measurement.types):r.module==='calcular'?Object.values(S.formulas).map(f=>f.quantity):['structure','unitCell','neighbors','electrons',...S.properties.ids];
    if(r.allowedTools.some(t=>!permitted.includes(t)))return {ok:false,reason:'TOOLS_MODULE_INVALID'};
    if(r.metalSelection?.mode!=='choice'||!Array.isArray(r.metalSelection.atomicNumbers)||!r.metalSelection.atomicNumbers.length||r.metalSelection.atomicNumbers.some(z=>!all.includes(z)||(r.structureRequirements==='crystalline'&&!solid.includes(z))))return {ok:false,reason:'METALS_INVALID'};
    if(!r.sources?.length||r.sources.some(id=>!S.data.source(id)))return {ok:false,reason:'SOURCES_INVALID'};

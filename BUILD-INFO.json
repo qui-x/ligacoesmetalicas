@@ -1,7 +1,7 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.12.0",
+  "versao": "0.14.0",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.3.1",
   "scientificSchemaVersion": 8,
@@ -102,7 +102,7 @@
     }
   ],
   "observacaoOrigem": "Origem: entregas/SILM-0.11.0.zip deste repositório, verificado pelo SHA-512 externo; núcleo da Base Estrutural 0.3.1 sem alteração local.",
-  "status": "SILM 0.12.0: representação 3D científica — a mesma estrutura em ångström vista por uma câmera de órbita no renderizador comum, com perspectiva ou ortográfica, vistas 3D livre, XY, XZ e YZ, órbita por arrasto, teclado e botões, eixos de referência, comparação na mesma orientação e volta ao 2D científico se o 3D falhar; representationState v2 com migração da v1; medições e cálculos idênticos no 2D e no 3D. Nenhum dado científico alterado.",
+  "status": "Interface unificada da Base SI com motor científico SILM, seis missões e sete temas; dados anteriores preservados.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
   "dataBuild": "2026-10-19",
   "structureModelVersion": 2,
@@ -112,9 +112,9 @@
   "calculationModelVersion": 1,
   "representationModelVersion": 2,
   "integracaoBase": {
-    "versao": "0.9.8",
-    "commit": "cce03dfe9fbe06f47d1e012d702e1f8bf1490caa",
-    "entrada": "integracao/index.html",
-    "status": "integração funcional de Explorar; migração completa em andamento"
+    "versao": "0.9.13",
+    "commit": "463e242c21c451036644c9c79999cd20ffe8aa3c",
+    "entrada": "index.html",
+    "status": "interface única integrada ao motor científico SILM"
   }
 }

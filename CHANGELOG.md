@@ -1,5 +1,13 @@
 # Registro de alterações
 
+## SILM 0.14.0 — Interface unificada, missões e temas
+
+- Interface da Base SI 0.9.13 integrada ao motor científico e à identidade SILM.
+- Seis missões e sete temas conectados ao laboratório e aos roteiros existentes.
+- Manual, caderno, professor e relatórios acessíveis na mesma navegação.
+- Dados anteriores preservados, exportação da investigação antiga e redirecionamento da entrada legado.
+- Verificação em Chromium: ciência, atividades, migração, mobile e offline.
+
 ## SILM 0.12.0 — Representação 3D científica
 
 - Consolidação da branch `claude/optimistic-cerf-167d72` com a integração da Base Demo SI 0.9.8.

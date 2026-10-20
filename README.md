@@ -1,72 +1,31 @@
-# SILM 0.13.0 — A Arquitetura dos Metais
+# SILM 0.14.0 — A Arquitetura dos Metais
 
-**Simulador Interativo de Ligações Metálicas.** Esta versão mantém o banco científico (0.2.x) e a investigação persistente de um metal (0.3.x), a montagem manual da estrutura metálica (0.4.x), as estruturas cristalinas (0.5.x), o modelo eletrônico com elétrons deslocalizados (0.6.x), as propriedades metálicas (0.7.x), o módulo **Explorar** (0.8.x), o módulo **Medir** (0.9.x) e acrescenta o módulo **Calcular**: em **Ver → Analisar → Calcular**, obtenha o número efetivo de átomos, o volume da célula, o raio a partir do parâmetro (e o inverso), o fator de empacotamento, a densidade teórica e, no HC, a razão c/a. Cada entrada mostra a origem (dado tabelado, medida do modelo, valor informado ou calculado pelo SILM) e os registros ficam em **Dados → Cálculos**. Monte com **+ Adicionar unidade** e use **Organizar estrutura**: o SILM reorganiza a montagem segundo a estrutura de referência do banco (CCC, CFC ou HC), com célula unitária, rede extensa e vizinhança. O Laboratório usa os painéis **Montagem, Ver e Dados**, da mesma família do SIAB.
-
-Desde a 0.10.1, o SILM usa a gramática de interação da família de simuladores: a mesma forma de usar, com o núcleo da Base Estrutural 0.3.1 adotado sem alteração. Veja `docs/SILM-0.10.1.md`.
-
-Na 0.11.0, a cena ganhou um renderizador 2D comum. Há controles da vista (aproximar, afastar, enquadrar, centralizar, restaurar), projeções Isométrica, Frontal, Superior e Lateral, e a garantia de que a vista nunca muda a ciência: as medidas são as mesmas com qualquer zoom. Veja `docs/SILM-0.11.0.md`.
-
-Na 0.12.0, a estrutura cristalina também pode ser vista em 3D: a mesma estrutura, em ångström, girada por uma câmera de órbita, com perspectiva ou ortográfica e os planos XY, XZ e YZ. Medições e cálculos dão os mesmos valores no 2D e no 3D. Veja `docs/SILM-0.12.0.md`.
-
-## Integração com a base atual
-
-A página principal agora usa a nova Base SI 0.9.13, com a identidade ouro/grafite do SILM, exploração científica e representação 2D/3D. Medir e Calcular agora usam os mesmos serviços científicos na nova interface, com seleção em Ver e históricos em Dados. As cinco experiências de propriedades estão conectadas ao motor original, com tabela periódica, temas científicos e fontes na nova interface. Relatórios permanecem acessíveis na [interface anterior preservada](completo.html) enquanto sua migração avança. Uma sessão antiga válida é copiada quando o novo armazenamento está vazio, preservando o original. Use JSON para transportar outras investigações entre interfaces. Consulte [as instruções e os limites da integração](integracao/README.md).
+Simulador Interativo de Ligações Metálicas sobre a Base SI 0.9.13. A interface reúne a Home e a navegação da base com o motor científico do SILM, identidade ouro/grafite e dados com fontes.
 
 ## Usar
 
-Sirva esta pasta por HTTP ou HTTPS (por exemplo, `python3 -m http.server 8080`) e abra `http://localhost:8080`. Abrir o `index.html` como arquivo não prepara o uso offline.
+Abra index.html por um servidor estático. A Home oferece Laboratório, Aprender, Missões e Roteiros Experimentais. O menu também dá acesso ao manual operacional, à tabela para apresentação, ao caderno e ao relatório da investigação livre. O endereço completo.html é mantido como encaminhamento compatível, sem iniciar outro aplicativo.
 
-## Construir e testar
+O laboratório utiliza Montagem, Ver e Dados. Investigue metais elegíveis, organize estruturas CCC/CFC/HC, compare célula/rede/vizinhança e representações 2D/3D. Os mesmos serviços oferecem elétrons deslocalizados, cinco propriedades qualitativas, Medir e Calcular com origens explícitas. Dados ausentes não recebem valores inventados.
 
-| Comando | O que faz |
-|---|---|
-| `npm install` | instala as ferramentas de teste (Playwright e axe-core) |
-| `npm run build` | valida o banco e o estado científico (bloqueante) e gera bundle, layout e service worker |
-| `npm run test:scientific` | regressão do banco (118 elementos, 43 metais) e validador do estado (schema 8) |
-| `npm run test:browser` | todas as suítes de navegador (séries anteriores como regressão), com evidências em `docs/evidence-<versão>/` |
-| `node scripts/build-test-report.cjs` | gera o relatório de testes da versão |
-| `python3 -I scripts/finalize.py` | fecha a versão: relatório, auditoria, `SHA512SUMS.txt`, ZIP e SHA-512, com conferência |
-| `npm run audit` | auditoria da distribuição e do núcleo herdado |
+## Atividades e conteúdos
 
-Sem o navegador do Playwright instalado, defina `SILM_CHROMIUM` com o caminho de um Chromium.
+- Seis missões científicas independentes nos módulos Explorar, Medir e Calcular.
+- Cinco roteiros experimentais com orientações, contexto restrito e relatório.
+- Sete temas conceituais não lineares com missões, roteiros e fontes relacionados.
 
-## Estrutura
+Concluir mantém a bancada aberta. Encerrar restaura a investigação livre. Atividades concluídas continuam acessíveis/refazíveis; tentativas anteriores não dispensam evidências na nova execução. Há retomada, marcadores Concluído e uso offline após carregamento completo. Não há recompensas ou porcentagem gamificada.
 
-| Caminho | Finalidade |
-|---|---|
-| `index.html`, `a11y.js`, `css/`, `js/` | núcleo herdado da Base Estrutural 0.2.4 |
-| `domain/silm/` | domínio SILM: banco, estado, montagem, Tabela, Manual, identidade |
-| `domain/silm/assembly.js` | contrato da cena e assistência de posicionamento |
-| `domain/silm/assembly-view.js`, `assembly.css` | representação 2D da montagem |
-| `domain/silm/crystal.js`, `crystal-view.js` | modelo cristalográfico e vista de célula/rede |
-| `domain/silm/electron-view.js` | camada eletrônica qualitativa (canvas) e seus controles |
-| `domain/silm/properties.js`, `property-view.js` | propriedades: elegibilidade, dados, experiências e controles |
-| `domain/silm/exploration.js` | Explorar: foco, camadas, comparação derivada |
-| `domain/silm/measurements.js`, `measure-view.js` | Medir: medidas do modelo, unidades, cota e marcadores |
-| `domain/silm/calculations.js` | Calcular: constantes, catálogo de fórmulas, conversões e validação dos cálculos |
-| `domain/silm/abertura/`, `abertura.js` | abertura oficial (pacote do autor) e adaptador da família |
-| `domain/silm/state.js` | `scientificState` único (schema 8) |
-| `scripts/` | validação, build e auditoria |
-| `tests/` | testes do banco e do navegador |
-| `docs/` | documentação, evidências e relatórios |
+## Persistência e validação
+
+O estado científico permanece no schema 8. Uma sessão antiga válida é recuperada quando a nova está vazia, preservando o original. JSON de investigações continua disponível em Dados. Cores e acessibilidade não alteram valores científicos.
+
+`npm test` executa validação científica, contratos dos roteiros/missões/temas e integração de navegador. Playwright/Chromium precisam estar disponíveis no ambiente. `npm run build:integration` verifica o snapshot upstream e gera a entrada principal.
 
 ## Documentação
 
-- [SILM 0.10.0](docs/SILM-0.10.0.md) · [Módulo Calcular](docs/MODULO-CALCULAR.md) · [Contrato dos cálculos](docs/CONTRATO-CALCULOS.md) · [Fórmulas cristalográficas](docs/FORMULAS-CRISTALOGRAFICAS.md) · [Constantes científicas](docs/CONSTANTES-CIENTIFICAS.md)
-- [SILM 0.9.1](docs/SILM-0.9.1.md) (correção de homologação: cena prioritária no celular e no tablet)
-- [SILM 0.9.0](docs/SILM-0.9.0.md) · [Módulo Medir](docs/MODULO-MEDIR.md) · [Contrato das medições](docs/CONTRATO-MEDICOES.md) · [Instrumentos e unidades](docs/INSTRUMENTOS-E-UNIDADES.md) · [Identidade visual](docs/IDENTIDADE-VISUAL.md)
-- [SILM 0.8.0](docs/SILM-0.8.0.md) · [Módulo Explorar](docs/MODULO-EXPLORAR.md) · [Contrato da exploração](docs/CONTRATO-EXPLORACAO.md)
-- [SILM 0.7.0](docs/SILM-0.7.0.md) · [Propriedades metálicas](docs/PROPRIEDADES-METALICAS.md) · [Contrato das propriedades](docs/CONTRATO-PROPRIEDADES.md) · [Fontes e proveniência](docs/FONTES-E-PROVENIENCIA.md)
-- [SILM 0.6.0](docs/SILM-0.6.0.md) · [Modelo eletrônico](docs/MODELO-ELETRONICO.md) · [Limitações do modelo eletrônico](docs/LIMITACOES-MODELO-ELETRONICO.md)
-- [SILM 0.5.0](docs/SILM-0.5.0.md) · [Estruturas cristalinas](docs/ESTRUTURAS-CRISTALINAS.md) · [Contrato cristalográfico](docs/CONTRATO-CRISTALOGRAFICO.md) · [Cobertura dos metais](docs/COBERTURA-METAIS.md)
-- [SILM 0.4.0](docs/SILM-0.4.0.md) · [Montagem da estrutura metálica](docs/MONTAGEM-ESTRUTURA-METALICA.md) · [Estado científico (schema 7)](docs/SCIENTIFIC-STATE.md)
-- [Investigação](docs/INVESTIGACAO.md) · [Arquitetura científica](docs/ARQUITETURA-CIENTIFICA.md) · [Roadmap](docs/ROADMAP-SILM.md) · [Contrato de versionamento](docs/CONTRATO-VERSIONAMENTO.md)
-- [Paridade com o SIAB 1.0.0](docs/PARIDADE-SIAB-1.0.0.md) · [Relatório de build e testes](docs/RELATORIO-BUILD-TESTES-0.10.0.md) · [Registro de alterações](CHANGELOG.md)
+[0.14.0](docs/SILM-0.14.0.md) · [Missões](docs/MISSOES.md) · [Contrato de Missões](docs/CONTRATO-MISSOES.md) · [Temas](docs/APRENDER-TEMAS.md) · [Contrato de Temas](docs/CONTRATO-TEMAS.md) · [Auditoria](docs/AUDITORIA-GAMIFICACAO-0.14.0.md) · [Roteiros](docs/ROTEIROS-EXPERIMENTAIS.md) · [Cobertura](docs/COBERTURA-ROTEIROS.md).
 
-Licença: GNU GPL v3 (`LICENSE`).
+Esta etapa não finaliza a Área do Professor, o Manual nem a ampliação dos relatórios da 0.15.x. Testes desta rodada executados em Chromium; outros navegadores e dispositivos físicos ainda requerem homologação. Licença GPL-3.0.
 
-## Roteiros experimentais — 0.13.0
-
-O catálogo **Roteiros** apresenta cinco investigações orientadas no mesmo laboratório: estrutura, elétrons, maleabilidade, parâmetro de rede e volume da célula. Cada roteiro fixa um único módulo e ferramentas pertinentes. **Concluir roteiro** registra o critério científico e mantém a bancada aberta; **Encerrar atividade** restaura a investigação livre. Tentativas interrompidas podem ser retomadas, e o relatório contextual reúne registros reais, fontes e campos de interpretação.
-
-Documentação: [0.13.0](docs/SILM-0.13.0.md), [roteiros](docs/ROTEIROS-EXPERIMENTAIS.md), [contrato](docs/CONTRATO-ROTEIROS.md), [cobertura](docs/COBERTURA-ROTEIROS.md).
+Quando existem sessões antiga e atual distintas, Dados oferece Exportar investigação antiga (JSON). O original e a sessão atual permanecem intactos; a importação posterior usa o fluxo de confirmação do mesmo aplicativo.
