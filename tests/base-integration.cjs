@@ -96,6 +96,7 @@ async function main(){
     await page.locator('#si-expand-structure').click();
     await page.waitForFunction(()=>document.querySelector('#si-stage').classList.contains('si-scene-expanded'));
     const expanded=await page.locator('#si-stage').boundingBox();
+     assert.ok(await page.locator('#silm-camera-in').isVisible(),'Zoom continua visível durante a expansão móvel.');
     assert.ok(expanded.width>=width-2&&expanded.height>=898,'Expansão mobile deve preencher o viewport em '+width+' px.');
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Sem overflow durante a expansão em '+width+' px.');
     assert.deepEqual(await state(),beforeExpand,'A expansão mobile não altera a ciência.');

@@ -152,3 +152,10 @@ body.si-structure-expanded{overflow:hidden!important;overscroll-behavior:none!im
  .si-scene-region.si-scene-expanded .silm-assembly-symbol{width:30px;height:30px}
 }
 @media(prefers-reduced-motion:reduce){.si-scene-region.si-scene-expanded{scroll-behavior:auto}}
+
+/* No modo expandido móvel, sobrescreve a regra de recolhimento para voltar a expor
+   os controles reais da câmera; os botões marcados hidden permanecem ocultos. */
+@media(max-width:600px),(max-height:500px) and (orientation:landscape){
+ .si-scene-region.si-scene-expanded .silm-camera:not([data-open]) .silm-camera-bar.silm-camera-bar-has-expand>button:not([hidden]):not(#si-expand-structure){display:grid!important}
+ .si-scene-region.si-scene-expanded .silm-camera:not([data-open]) .silm-camera-bar.silm-camera-bar-has-expand>.silm-camera-zoom{display:block!important}
+}
