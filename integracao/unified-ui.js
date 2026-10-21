@@ -47,9 +47,10 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,say})=>{
  }
  function recordActivity(route,activity){
   if(!route||!activity?.checkpoint)return 'error';
-  const attemptId='attempt-silm-complete-'+route.id;
-  if(journal.snapshot().notes.some(n=>n.attemptId===attemptId))return 'duplicate';
   const state=activity.checkpoint,e=state.metal?S.data.get(state.metal.atomicNumber):null,type=route.type==='mission'?'Missão':'Roteiro',participle=route.type==='mission'?'concluída':'concluído';
+  const key=String(route.id+'-'+(state.investigation?.id||Date.now().toString(36))).toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-|-+$/g,'').slice(0,40);
+  const attemptId='attempt-silm-complete-'+key;
+  if(journal.snapshot().notes.some(n=>n.attemptId===attemptId))return 'duplicate';
   const structure=state.structure?.crystallography?.structureType||(state.structure?.mode==='crystalline'?'Estrutura cristalina':'Montagem livre');
   const lines=[
    'Título: '+type+' '+participle+': '+route.title,
@@ -68,8 +69,8 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,say})=>{
  function recordReport(record,route){
   if(!record?.checkpoint||!record.activityContext||!route)return 'error';
   const state=record.checkpoint,report=record.report||{},free=record.activityContext.type==='free';
-  const token=String(state.investigation?.id||('metal-'+(state.metal?.atomicNumber||'unknown'))).toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'livre';
-  const attemptId=free?'attempt-silm-report-free-'+token:'attempt-silm-report-'+record.activityContext.id;
+  const token=String((free?'livre':record.activityContext.id)+'-'+(state.investigation?.id||('metal-'+(state.metal?.atomicNumber||'unknown')))).toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-|-+$/g,'').slice(0,40)||'livre';
+  const attemptId='attempt-silm-report-'+token;
   if(journal.snapshot().notes.some(n=>n.attemptId===attemptId))return 'duplicate';
   const e=state.metal?S.data.get(state.metal.atomicNumber):null;
   const structure=state.structure?.crystallography?.structureType||(state.structure?.mode==='crystalline'?'Estrutura cristalina':'Montagem livre');
