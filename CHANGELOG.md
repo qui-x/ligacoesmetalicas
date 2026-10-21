@@ -1,5 +1,12 @@
 # Registro de alterações
 
+## SILM 0.14.6 — Tela inteira e controles integrados
+
+- A cena cristalina ocupa a janela inteira em modo expandido, aproveitando a maior área útil sem deformar a geometria da estrutura.
+- O botão **Expandir/Recolher** passa para a barra flutuante de controles da cena; o mesmo botão abre e fecha a visualização.
+- Em celulares, o botão permanece disponível mesmo quando o conjunto de controles está recolhido; durante a expansão, zoom, enquadramento e rotação permanecem expostos.
+- Os testes de integração foram atualizados para verificar posição, dimensões e preservação do estado científico.
+
 ## SILM 0.14.5 — Visualização expandida da estrutura cristalina
 
 - Adicionado o botão **Expandir** à barra da Oficina dos Metais; ele só é habilitado quando há uma estrutura cristalina organizada e com unidades.

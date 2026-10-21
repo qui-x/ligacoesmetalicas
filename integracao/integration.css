@@ -114,3 +114,41 @@ button[aria-disabled=true]{opacity:.55;cursor:default}
 @media(max-height:500px) and (max-width:900px) and (orientation:landscape){.si-scene-region.si-scene-expanded #workspace-focus{padding:34px 8px 6px}.si-scene-region.si-scene-expanded .si-stage-name{min-height:26px}}
 @media(prefers-reduced-motion:reduce){.si-scene-region.si-scene-expanded{scroll-behavior:auto}}
 @media print{.si-structure-expand,.si-scene-region.si-scene-expanded #si-collapse-structure{display:none!important}.si-scene-region.si-scene-expanded{position:static!important;width:auto!important;height:auto!important;max-height:none!important;padding:0!important;overflow:visible!important}}
+
+
+/* 0.14.6 — expansão de tela inteira, com os controles centrais e o botão no próprio dock. */
+body.si-structure-expanded{overflow:hidden!important;overscroll-behavior:none!important}
+.silm-camera-bar #si-expand-structure.si-structure-expand-in-camera{flex:none;gap:0;padding:0;min-width:44px;min-height:44px;border-radius:10px}
+.silm-camera-bar #si-expand-structure.si-structure-expand-in-camera svg{width:18px;height:18px;flex:none}
+.silm-camera-bar #si-expand-structure.si-structure-expand-in-camera span{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.si-scene-region.si-scene-expanded{position:fixed!important;inset:0!important;z-index:1000!important;width:100vw!important;height:100vh!important;height:100dvh!important;max-height:100dvh!important;min-height:0!important;flex:none!important;overflow:hidden!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:var(--bg)!important;overscroll-behavior:contain}
+.si-scene-region.si-scene-expanded #workspace-focus{box-sizing:border-box;width:100%;height:100%;min-width:0;min-height:0;padding:clamp(5px,1vw,14px);gap:0}
+.si-scene-region.si-scene-expanded #silm-integration-scene,.si-scene-region.si-scene-expanded .silm-laboratory{box-sizing:border-box;display:flex!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;flex:1 1 auto!important}
+.si-scene-region.si-scene-expanded .silm-assembly,.si-scene-region.si-scene-expanded .silm-crystal{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr)!important;gap:6px!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important}
+.si-scene-region.si-scene-expanded .silm-assembly-bar{grid-column:1!important;grid-row:1!important;min-width:0;max-height:none;overflow:visible}
+.si-scene-region.si-scene-expanded .silm-assembly-area{grid-column:1!important;grid-row:2!important;display:grid!important;place-items:center;position:relative;width:100%!important;height:100%!important;min-width:0!important;max-width:none!important;max-height:none!important;overflow:hidden!important;padding:0!important}
+.si-scene-region.si-scene-expanded .silm-assembly-stage{max-width:100%;max-height:100%;border-radius:var(--radius-lg)}
+.si-scene-region.si-scene-expanded .silm-assembly-footer{display:none!important}
+.si-scene-region.si-scene-expanded .silm-camera{z-index:30}
+.si-scene-region.si-scene-expanded .silm-camera-bar{display:flex!important;max-height:min(calc(var(--stage,300px) - 12px),calc(100dvh - 110px))}
+.si-scene-region.si-scene-expanded .silm-camera:not([data-open]) .silm-camera-bar{display:flex!important}
+.si-scene-region.si-scene-expanded .silm-camera-toggle{display:none!important}
+.si-scene-region.si-scene-expanded #si-expand-structure:focus-visible{outline:3px solid var(--ring);outline-offset:3px}
+@media(max-width:600px),(max-height:500px) and (orientation:landscape){
+ .silm-camera:not([data-open]) .silm-camera-bar.silm-camera-bar-has-expand{display:flex!important;flex-direction:row;justify-content:center;align-items:center;max-height:none;max-width:58px;padding:4px}
+ .silm-camera:not([data-open]) .silm-camera-bar.silm-camera-bar-has-expand>:not(#si-expand-structure){display:none!important}
+ .si-scene-region.si-scene-expanded .silm-camera-bar{display:flex!important;flex-direction:row;flex-wrap:wrap;justify-content:flex-end;align-content:flex-start;gap:4px;max-height:min(160px,calc(100dvh - 90px));max-width:min(340px,calc(100vw - 16px))}
+ .si-scene-region.si-scene-expanded #workspace-focus{padding:max(4px,env(safe-area-inset-top)) max(4px,env(safe-area-inset-right)) max(4px,env(safe-area-inset-bottom)) max(4px,env(safe-area-inset-left))}
+ .si-scene-region.si-scene-expanded .silm-assembly-bar{gap:5px;padding:6px}
+ .si-scene-region.si-scene-expanded .silm-assembly-tools{gap:4px}
+ .si-scene-region.si-scene-expanded .silm-assembly-tools button{min-width:0;min-height:40px;padding:5px 7px;font-size:.76rem}
+}
+@media(max-width:360px){
+ .si-scene-region.si-scene-expanded .silm-assembly-bar{align-items:flex-start}
+ .si-scene-region.si-scene-expanded .silm-assembly-identity h1{font-size:.95rem}
+}
+@media(max-height:500px) and (max-width:900px) and (orientation:landscape){
+ .si-scene-region.si-scene-expanded .silm-assembly-bar{gap:4px;padding:4px 6px}
+ .si-scene-region.si-scene-expanded .silm-assembly-symbol{width:30px;height:30px}
+}
+@media(prefers-reduced-motion:reduce){.si-scene-region.si-scene-expanded{scroll-behavior:auto}}

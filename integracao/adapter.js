@@ -2,7 +2,7 @@
 /* Produto SILM sobre a Base SI 0.9.17. O domínio científico SILM permanece no schema 8. */
 (() => {
  const B=BaseDemoSI,S=SILM,$=id=>document.getElementById(id);
- B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.14.5',
+ B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.14.6',
   routes:B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios','aprender','missoes','caderno','professor'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'Oficina dos Metais':route.title}))});
  // A cena cristalina também usa data-view; o roteamento só pode atingir páginas do produto.
  B.updateRoute=()=>{
@@ -59,9 +59,21 @@
   select:id=>model.setCrystalRepresentation({selectedUnitId:id}),
   toggleNeighbors(){if(!allows('neighbors'))return;const r=model.state.structure?.crystallography?.representation;if(r)model.setCrystalRepresentation({neighbors:!r.neighbors});}
  };
+ function placeExpansionButton(inCameraBar){
+  const button=$('si-expand-structure'),toolbar=document.querySelector('.si-workspace-toolbar'),bar=$('silm-camera-bar');
+  if(!button||!toolbar)return;
+  if(inCameraBar&&bar){
+   button.classList.remove('si-tab');button.classList.add('secondary-btn','silm-camera-btn','si-structure-expand-in-camera');
+   bar.classList.add('silm-camera-bar-has-expand');bar.append(button);
+  }else{
+   button.closest('.silm-camera-bar')?.classList.remove('silm-camera-bar-has-expand');
+   button.classList.remove('secondary-btn','silm-camera-btn','si-structure-expand-in-camera');button.classList.add('si-tab');
+   if(button.parentElement!==toolbar)toolbar.append(button);
+  }
+ }
  function renderScene(){
   const state=model.state,e=element(),key=e?state.investigation.id+':'+e.atomicNumber+':'+state.module.active+':'+(state.structure?.mode||'empty')+':'+(state.structure?.mode==='crystalline'?representation.viewMode:'2d'):'none';
-  if(viewKey!==key){scope?.destroy();scope=null;view=null;viewKey=key;$('silm-integration-scene').replaceChildren();
+  if(viewKey!==key){placeExpansionButton(false);scope?.destroy();scope=null;view=null;viewKey=key;$('silm-integration-scene').replaceChildren();
    if(!e){const p=document.createElement('p');p.textContent='Abra Montagem e escolha um metal para iniciar a investigação.';$('silm-integration-scene').append(p);}
    else if(!state.structure){const p=document.createElement('p');p.textContent='Use Adicionar unidade em Montagem para começar a estrutura de '+e.name+'.';$('silm-integration-scene').append(p);}
    else if(state.structure){
@@ -71,14 +83,24 @@
      const eligibility=S.crystal.eligibility(e);return {disabled:!model.state.structure?.units.length||eligibility.status!=='available',reason:eligibility.status!=='available'?eligibility.message:''};
     }}});
     // Contextual help uses the Base route, whose router deliberately has no nested routes.
-    for(const a of view.root.querySelectorAll('a.ajuda-link'))a.href='#/manual';
+    for(const link of view.root.querySelectorAll('a.ajuda-link'))link.href='#/manual';
+    placeExpansionButton(state.structure?.mode==='crystalline'&&!!state.structure.units?.length);
    }
-  }else view?.update();
+  }else{view?.update();placeExpansionButton(state.structure?.mode==='crystalline'&&!!state.structure.units?.length);}
  }
  let previousExpandFocus=null;
+ function syncExpansionButton(expanded){
+  const button=$('si-expand-structure'),label=button?.querySelector('span'),path=button?.querySelector('svg path');
+  if(!button)return;
+  if(label)label.textContent=expanded?'Recolher':'Expandir';
+  if(path)path.setAttribute('d',expanded?'M8 8H3V3M16 8h5V3M3 16h5v5M21 16h-5v5':'M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3');
+  button.setAttribute('aria-pressed',String(expanded));
+  button.setAttribute('aria-label',expanded?'Recolher visualização expandida da estrutura':'Expandir estrutura metálica configurada');
+  button.title=expanded?'Recolher estrutura (Escape)':'Expandir a estrutura cristalina configurada';
+ }
  function setStageExpanded(expanded,{restoreFocus=true}={}){
-  const stage=$('si-stage'),open=$('si-expand-structure'),close=$('si-collapse-structure');
-  if(!stage||!open||!close)return;
+  const stage=$('si-stage'),button=$('si-expand-structure');
+  if(!stage||!button)return;
   if(stage.classList.contains('si-scene-expanded')===expanded)return;
   if(expanded){
    const current=model.state.structure;
@@ -90,26 +112,27 @@
     const dock=$(id);if(dock&&!dock.hidden)dock.querySelector('[data-close-dock]')?.click();
    }
    stage.classList.add('si-scene-expanded');document.body.classList.add('si-structure-expanded');
-   open.hidden=true;close.hidden=false;open.setAttribute('aria-pressed','true');
-   requestAnimationFrame(()=>{view?.update();if(restoreFocus)close.focus({preventScroll:true});});
+   syncExpansionButton(true);
+   requestAnimationFrame(()=>{view?.update();if(restoreFocus)button.focus({preventScroll:true});});
   }else{
    stage.classList.remove('si-scene-expanded');document.body.classList.remove('si-structure-expanded');
-   close.hidden=true;open.hidden=false;open.setAttribute('aria-pressed','false');
+   syncExpansionButton(false);
    requestAnimationFrame(()=>{
     view?.update();
     if(!restoreFocus)return;
-    const target=B.currentRoute(location.hash)==='ambiente'?open:previousExpandFocus;
+    const target=B.currentRoute(location.hash)==='ambiente'?button:previousExpandFocus;
     if(target?.isConnected&&!target.closest('[hidden]'))target.focus({preventScroll:true});
     previousExpandFocus=null;
    });
   }
  }
+
  function text(id,value){if($(id))$(id).textContent=value;}
  function render(){
   const state=model.state,e=element(),s=state.structure,n=s?.units.length||0;
   const expandButton=$('si-expand-structure'),expandable=!!(e&&s?.mode==='crystalline'&&n>0);
   expandButton.disabled=!expandable;
-  expandButton.title=expandable?'Expandir a estrutura cristalina configurada':'Organize uma estrutura cristalina para habilitar a visualização expandida.';
+  expandButton.title=$('si-stage').classList.contains('si-scene-expanded')?'Recolher estrutura (Escape)':expandable?'Expandir a estrutura cristalina configurada':'Organize uma estrutura cristalina para habilitar a visualização expandida.';
   if(!expandable&&$('si-stage').classList.contains('si-scene-expanded'))setStageExpanded(false);
   if(representation.investigationId!==(state.investigation?.id??null))representation=S.representation.defaults(state.investigation?.id??null);
   tools.render();experience.update();renderScene();if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
@@ -186,8 +209,7 @@
 
   if(raw!==null){try{const value=JSON.parse(raw),check=S.validateScientificState(value);if(!check.ok)throw new Error();model.restore(check.value,{allowLegacy:false});if(model.state.metal){selected=String(model.state.metal.atomicNumber);selector.value=selected;}}catch{storageOK=false;say('A investigação salva é inválida. O arquivo original foi preservado; nenhuma restauração foi aplicada.','warning');}}
   representation=S.representation.sanitize(storage.get('representation.view',null),model.state.investigation?.id??null);
-  $('si-expand-structure').addEventListener('click',()=>setStageExpanded(true));
-  $('si-collapse-structure').addEventListener('click',()=>setStageExpanded(false));
+  $('si-expand-structure').addEventListener('click',()=>setStageExpanded(!$('si-stage').classList.contains('si-scene-expanded')));
   document.addEventListener('keydown',event=>{
    if(event.key==='Escape'&&$('si-stage').classList.contains('si-scene-expanded')){
     event.preventDefault();event.stopImmediatePropagation();setStageExpanded(false);
