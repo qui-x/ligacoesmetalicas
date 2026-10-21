@@ -1,5 +1,12 @@
 # Registro de alterações
 
+## SILM 0.14.4 — Oficina dos Metais
+
+- Renomeada a área de manipulação para **Oficina dos Metais**, nomeado a partir do tema A Arquitetura dos Metais e do trabalho de montar e investigar estruturas.
+- Atualizados Home, navegação global e móvel, título acessível da cena, retorno de atividades e instruções do Manual. A rota técnica `#/ambiente` foi preservada para compatibilidade.
+- Corrigida a informação desatualizada sobre o Caderno no Manual e o texto da seção Sobre, agora alinhado à Base SI 0.9.17.
+- Atualizados metadados do produto, PWA, cache e documentação. A execução de testes funcionais desta rodada ainda precisa ser confirmada.
+
 ## SILM 0.14.3 — Caderno integrado ao fluxo de aprendizagem
 
 - Missões e roteiros concluídos geram automaticamente uma entrada de conclusão no Caderno, com metal, estrutura, medidas e cálculos registrados; a criação é idempotente.

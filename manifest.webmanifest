@@ -2,7 +2,7 @@
   "id": "./",
   "name": "SILM — Simulador Interativo de Ligações Metálicas",
   "short_name": "SILM",
-  "description": "A Arquitetura dos Metais — investigação científica 2D e 3D, Caderno integrado 0.14.3.",
+  "description": "A Arquitetura dos Metais — Oficina dos Metais, montagem e investigação científica 2D/3D, 0.14.4.",
   "start_url": "./index.html#/inicio",
   "scope": "./",
   "display": "standalone",
