@@ -23,7 +23,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,say})=>{
  }
  function notebookPresentation(note){
   const raw=String(note.body||''),lines=raw.split(/\r?\n/),first=lines[0]||'';let title=first,bodyLines=lines;
-  if(first.startsWith('Título: ')){title=first.slice(8);bodyLines=lines.slice(1);if(bodyLines[0]==='')bodyLines=bodyLines.slice(1);}
+  if(first.startsWith('Título: ')){title=first.slice(8);bodyLines=lines.slice(1);if(bodyLines[0]==='')bodyLines=bodyLines.slice(1);}else{bodyLines=lines.slice(1);}
   const id=note.attemptId||'';let category=({observacao:'Anotação',hipotese:'Hipótese',conclusao:'Conclusão'})[note.kind]||'Registro';
   if(id.startsWith('attempt-silm-complete-'))category='Atividade concluída';
   else if(id.startsWith('attempt-silm-report-'))category='Relatório registrado';
