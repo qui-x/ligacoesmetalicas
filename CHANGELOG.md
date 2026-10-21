@@ -1,5 +1,12 @@
 # Registro de alterações
 
+## SILM 0.14.3 — Caderno integrado ao fluxo de aprendizagem
+
+- Missões e roteiros concluídos geram automaticamente uma entrada de conclusão no Caderno, com metal, estrutura, medidas e cálculos registrados; a criação é idempotente.
+- Relatórios podem ser registrados no Caderno. A referência preserva uma cópia do relatório e permite reabri-lo depois, inclusive para investigações livres.
+- Anotações manuais agora têm título próprio; a linha do tempo distingue atividades e relatórios, permite abrir a atividade/relatório associado e mantém filtros, exclusão confirmada, impressão e backups JSON/CSV.
+- Atualizados testes de navegador para conclusão automática, criação de referência e reabertura do relatório. A execução automatizada desta rodada ainda precisa ser confirmada.
+
 ## SILM 0.14.2 — Base SI 0.9.17 e Caderno didático
 
 - Snapshot sincronizado com Base SI 0.9.17 (commit 68ed86cb416ea31489be481fc52d86aeedce2892), preservando o motor científico no schema 8.

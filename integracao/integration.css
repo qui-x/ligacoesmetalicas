@@ -69,3 +69,22 @@ button[aria-disabled=true]{opacity:.55;cursor:default}
  body.silm-print-notebook #silm-notebook .silm-notebook-print{display:block!important;position:static;max-width:none;width:100%;padding:0;border:0;color:#000;background:#fff}
  body.silm-print-notebook #silm-notebook .silm-notebook-print p{white-space:pre-wrap;overflow-wrap:anywhere;color:#000}
 }
+
+/* 0.14.3 — Caderno alinhado ao fluxo documental do SIAB. */
+.silm-notebook-page-head{max-width:850px;margin:0 auto 18px;display:grid;gap:6px}
+.silm-notebook-page-head h1{margin:0;font-size:clamp(1.6rem,4vw,2.25rem);letter-spacing:-.02em}
+.silm-notebook-page-head>p:last-child{color:var(--muted);line-height:1.6}
+.silm-notebook-compose{border:1px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden}
+.silm-notebook-compose>summary{cursor:pointer;list-style-position:inside;padding:14px 16px;font-weight:700;min-height:48px;display:flex;align-items:center}
+.silm-notebook-compose[open]>summary{border-bottom:1px solid var(--border)}
+.silm-notebook-compose .silm-notebook-editor{padding:14px}
+.silm-notebook-editor input{min-height:44px}
+.silm-notebook-entry-head{display:grid;gap:4px;min-width:0}
+.silm-notebook-entry-head h2{font-size:1.05rem;line-height:1.4;overflow-wrap:anywhere;margin:0}
+.silm-notebook-eyebrow{font-size:.72rem;font-weight:750;letter-spacing:.055em;color:var(--muted);margin:0}
+.silm-notebook-entry-body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;margin-top:9px}
+.silm-notebook-entry .silm-notebook-open{justify-self:start;margin-top:8px}
+.silm-notebook-entry button{margin-top:8px}
+.silm-notebook-empty{color:var(--muted);padding:18px 8px;line-height:1.6}
+@media(max-width:600px){.silm-notebook-page-head{padding-inline:2px}.silm-notebook-compose .silm-notebook-editor{padding:12px}.silm-notebook-compose>summary{padding:12px}}
+@media print{.silm-notebook-page-head{display:block!important;margin-bottom:12mm}.silm-notebook-page-head p{color:#222!important}}

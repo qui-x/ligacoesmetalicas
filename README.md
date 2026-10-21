@@ -1,6 +1,6 @@
-# SILM 0.14.2 — A Arquitetura dos Metais
+# SILM 0.14.3 — A Arquitetura dos Metais
 
-O Início inclui o card Caderno da Base SI 0.9.17, com acesso direto às observações. A interface integrada usa o snapshot da Base SI 0.9.17. O motor científico, os dados e o schema 8 do SILM continuam separados e preservados.
+A página inicial mantém o card do Caderno como ponto de entrada e exibe a contagem de registros. O Caderno reúne anotações com título, conclusões de missões/roteiros e referências reabríveis a relatórios. A interface integrada usa o snapshot da Base SI 0.9.17; o motor científico, os dados e o schema 8 do SILM continuam separados e preservados.
 
 Simulador Interativo de Ligações Metálicas sobre a Base SI 0.9.17. A interface reúne a Home e a navegação da base com o motor científico do SILM, identidade ouro/grafite e dados com fontes.
 
@@ -26,13 +26,13 @@ O estado científico permanece no schema 8. Uma sessão antiga válida é recupe
 
 ## Documentação
 
-[0.14.0](docs/SILM-0.14.0.md) · [Missões](docs/MISSOES.md) · [Contrato de Missões](docs/CONTRATO-MISSOES.md) · [Temas](docs/APRENDER-TEMAS.md) · [Contrato de Temas](docs/CONTRATO-TEMAS.md) · [Auditoria](docs/AUDITORIA-GAMIFICACAO-0.14.0.md) · [Roteiros](docs/ROTEIROS-EXPERIMENTAIS.md) · [Cobertura](docs/COBERTURA-ROTEIROS.md).
+[0.14.3](docs/SILM-0.14.3.md) · [Relatório desta rodada](docs/RELATORIO-BUILD-TESTES-0.14.3.md) · [0.14.0](docs/SILM-0.14.0.md) · [Missões](docs/MISSOES.md) · [Contrato de Missões](docs/CONTRATO-MISSOES.md) · [Temas](docs/APRENDER-TEMAS.md) · [Contrato de Temas](docs/CONTRATO-TEMAS.md) · [Auditoria](docs/AUDITORIA-GAMIFICACAO-0.14.0.md) · [Roteiros](docs/ROTEIROS-EXPERIMENTAIS.md) · [Cobertura](docs/COBERTURA-ROTEIROS.md).
 
-Esta etapa não finaliza a Área do Professor, o Manual nem a ampliação dos relatórios da 0.15.x. Testes desta rodada executados em Chromium; outros navegadores e dispositivos físicos ainda requerem homologação. Licença GPL-3.0.
+A Área do Professor, o Manual e a ampliação dos relatórios da 0.15.x continuam em desenvolvimento. A execução automatizada dos testes desta rodada ainda precisa ser confirmada; outros navegadores e dispositivos físicos também requerem homologação. Licença GPL-3.0.
 
 Quando existem sessões antiga e atual distintas, Dados oferece Exportar investigação antiga (JSON). O original e a sessão atual permanecem intactos; a importação posterior usa o fluxo de confirmação do mesmo aplicativo.
 
 
-## Caderno didático — 0.14.2
+## Caderno didático — 0.14.3
 
-O Caderno registra observações, hipóteses e conclusões; filtra e exclui registros; importa backup JSON validado; exporta JSON/CSV e prepara impressão. A vinculação por tentativa aos relatórios permanece pendente.
+O Caderno registra observações, hipóteses e conclusões com título. Conclusões de missões/roteiros entram automaticamente na linha do tempo; relatórios podem ser vinculados e reabertos pelo próprio registro. Há filtros por tipo, atividade e relatório, exclusão confirmada, importação validada de JSON, exportação JSON/CSV e impressão. O contrato de armazenamento de notas da Base SI continua preservado.
