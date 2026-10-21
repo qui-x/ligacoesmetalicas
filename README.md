@@ -1,6 +1,6 @@
-# SILM 0.14.4 — A Arquitetura dos Metais
+# SILM 0.14.5 — A Arquitetura dos Metais
 
-A página inicial oferece a Oficina dos Metais como espaço de manipulação das estruturas e mantém o card do Caderno com a contagem de registros. O Caderno reúne anotações com título, conclusões de missões/roteiros e referências reabríveis a relatórios. A interface integrada usa o snapshot da Base SI 0.9.17; o motor científico, os dados e o schema 8 do SILM continuam separados e preservados.
+A página inicial oferece a Oficina dos Metais como espaço de manipulação das estruturas e mantém o card do Caderno com a contagem de registros. A versão 0.14.5 acrescenta a visualização expandida da estrutura cristalina já configurada ([notas da versão](docs/SILM-0.14.5.md)). O Caderno reúne anotações com título, conclusões de missões/roteiros e referências reabríveis a relatórios. A interface integrada usa o snapshot da Base SI 0.9.17; o motor científico, os dados e o schema 8 do SILM continuam separados e preservados.
 
 Simulador Interativo de Ligações Metálicas sobre a Base SI 0.9.17. A interface reúne a Home e a navegação da base com o motor científico do SILM, identidade ouro/grafite e dados com fontes.
 
@@ -8,7 +8,7 @@ Simulador Interativo de Ligações Metálicas sobre a Base SI 0.9.17. A interfac
 
 Abra index.html por um servidor estático. A página inicial oferece Oficina dos Metais, Aprender, Missões, Roteiros Experimentais e Caderno. O menu também dá acesso ao manual operacional, à tabela para apresentação, ao caderno e ao relatório da investigação livre. O endereço completo.html é mantido como encaminhamento compatível, sem iniciar outro aplicativo.
 
-A Oficina dos Metais utiliza Montagem, Ver e Dados. Investigue metais elegíveis, organize estruturas CCC/CFC/HC, compare célula/rede/vizinhança e representações 2D/3D. Os mesmos serviços oferecem elétrons deslocalizados, cinco propriedades qualitativas, Medir e Calcular com origens explícitas. Dados ausentes não recebem valores inventados.
+A Oficina dos Metais utiliza Montagem, Ver e Dados. Investigue metais elegíveis, organize estruturas CCC/CFC/HC, compare célula/rede/vizinhança e representações 2D/3D. Depois de organizar uma estrutura cristalina, use **Expandir** para abrir a mesma cena em uma área ampliada; pressione Esc ou use Voltar para retornar. Essa visualização não cria outra montagem nem altera os dados científicos. Os mesmos serviços oferecem elétrons deslocalizados, cinco propriedades qualitativas, Medir e Calcular com origens explícitas. Dados ausentes não recebem valores inventados.
 
 ## Atividades e conteúdos
 

@@ -1,5 +1,12 @@
 # Registro de alterações
 
+## SILM 0.14.5 — Visualização expandida da estrutura cristalina
+
+- Adicionado o botão **Expandir** à barra da Oficina dos Metais; ele só é habilitado quando há uma estrutura cristalina organizada e com unidades.
+- A mesma cena configurada ocupa a área visível, redimensionando a visualização 2D/3D existente. Não há clone, reset, nova investigação nem alteração do estado científico.
+- O modo expandido inclui **Voltar**, fecha as docas para liberar espaço, funciona com teclado e permite sair por Esc. Ajustes de layout consideram margens seguras de celulares e orientação paisagem.
+- Cobertura de integração ampliada para disponibilidade, expansão desktop/mobile, saída por Esc e invariância do estado científico. A execução da suíte precisa ser confirmada no ambiente de teste.
+
 ## SILM 0.14.4 — Oficina dos Metais
 
 - Renomeada a área de manipulação para **Oficina dos Metais**, nomeado a partir do tema A Arquitetura dos Metais e do trabalho de montar e investigar estruturas.

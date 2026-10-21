@@ -1,6 +1,6 @@
 {
   "name": "silm",
-  "version": "0.14.4",
+  "version": "0.14.5",
   "private": true,
   "description": "SILM — Estruturas cristalinas e rede metálica.",
   "license": "GPL-3.0",

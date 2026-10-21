@@ -2,7 +2,7 @@
 /* Produto SILM sobre a Base SI 0.9.17. O domínio científico SILM permanece no schema 8. */
 (() => {
  const B=BaseDemoSI,S=SILM,$=id=>document.getElementById(id);
- B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.14.4',
+ B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.14.5',
   routes:B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios','aprender','missoes','caderno','professor'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'Oficina dos Metais':route.title}))});
  // A cena cristalina também usa data-view; o roteamento só pode atingir páginas do produto.
  B.updateRoute=()=>{
@@ -75,9 +75,42 @@
    }
   }else view?.update();
  }
+ let previousExpandFocus=null;
+ function setStageExpanded(expanded,{restoreFocus=true}={}){
+  const stage=$('si-stage'),open=$('si-expand-structure'),close=$('si-collapse-structure');
+  if(!stage||!open||!close)return;
+  if(stage.classList.contains('si-scene-expanded')===expanded)return;
+  if(expanded){
+   const current=model.state.structure;
+   if(current?.mode!=='crystalline'||!current.units?.length){say('Organize a estrutura cristalina antes de expandir a visualização.','info');return;}
+   if(B.currentRoute(location.hash)!=='ambiente')return;
+   previousExpandFocus=document.activeElement;
+   if(document.querySelector('#workspace-overview:not([hidden])'))document.querySelector('[data-scene-view="focus"]')?.click();
+   for(const id of ['si-dock-left','si-dock-right']){
+    const dock=$(id);if(dock&&!dock.hidden)dock.querySelector('[data-close-dock]')?.click();
+   }
+   stage.classList.add('si-scene-expanded');document.body.classList.add('si-structure-expanded');
+   open.hidden=true;close.hidden=false;open.setAttribute('aria-pressed','true');
+   requestAnimationFrame(()=>{view?.update();if(restoreFocus)close.focus({preventScroll:true});});
+  }else{
+   stage.classList.remove('si-scene-expanded');document.body.classList.remove('si-structure-expanded');
+   close.hidden=true;open.hidden=false;open.setAttribute('aria-pressed','false');
+   requestAnimationFrame(()=>{
+    view?.update();
+    if(!restoreFocus)return;
+    const target=B.currentRoute(location.hash)==='ambiente'?open:previousExpandFocus;
+    if(target?.isConnected&&!target.closest('[hidden]'))target.focus({preventScroll:true});
+    previousExpandFocus=null;
+   });
+  }
+ }
  function text(id,value){if($(id))$(id).textContent=value;}
  function render(){
   const state=model.state,e=element(),s=state.structure,n=s?.units.length||0;
+  const expandButton=$('si-expand-structure'),expandable=!!(e&&s?.mode==='crystalline'&&n>0);
+  expandButton.disabled=!expandable;
+  expandButton.title=expandable?'Expandir a estrutura cristalina configurada':'Organize uma estrutura cristalina para habilitar a visualização expandida.';
+  if(!expandable&&$('si-stage').classList.contains('si-scene-expanded'))setStageExpanded(false);
   if(representation.investigationId!==(state.investigation?.id??null))representation=S.representation.defaults(state.investigation?.id??null);
   tools.render();experience.update();renderScene();if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
   text('silm-summary',e?e.name+' · '+n+' unidades · '+(s?.mode==='crystalline'?'estrutura cristalina':'montagem livre'):'Nenhuma investigação iniciada.');
@@ -153,6 +186,13 @@
 
   if(raw!==null){try{const value=JSON.parse(raw),check=S.validateScientificState(value);if(!check.ok)throw new Error();model.restore(check.value,{allowLegacy:false});if(model.state.metal){selected=String(model.state.metal.atomicNumber);selector.value=selected;}}catch{storageOK=false;say('A investigação salva é inválida. O arquivo original foi preservado; nenhuma restauração foi aplicada.','warning');}}
   representation=S.representation.sanitize(storage.get('representation.view',null),model.state.investigation?.id??null);
+  $('si-expand-structure').addEventListener('click',()=>setStageExpanded(true));
+  $('si-collapse-structure').addEventListener('click',()=>setStageExpanded(false));
+  document.addEventListener('keydown',event=>{
+   if(event.key==='Escape'&&$('si-stage').classList.contains('si-scene-expanded')){
+    event.preventDefault();event.stopImmediatePropagation();setStageExpanded(false);
+   }
+  },true);
   $('silm-start').addEventListener('click',start);$('silm-add').addEventListener('click',run.add);$('silm-organize').addEventListener('click',run.organize);
   $('silm-free').addEventListener('click',()=>(!routeUI.session.open()||routeUI.canBuild())&&report(model.restoreFree()));
   $('scene-undo').addEventListener('click',run.undo);$('scene-clear').addEventListener('click',clear);
@@ -163,7 +203,7 @@
   $('silm-motion').addEventListener('click',()=>{if(model.state.electrons)model.setElectronRepresentation({motion:!model.state.electrons.representation.motion});});
   $('silm-export-legacy').addEventListener('click',()=>{const value=legacyState();if(value&&!routeUI.session.open())downloadState(value);});
   $('silm-export').addEventListener('click',exportState);$('silm-import').addEventListener('change',importState);
-  window.addEventListener('si-route-changed',()=>{view?.update();});
+  window.addEventListener('si-route-changed',()=>{if(B.currentRoute(location.hash)!=='ambiente')setStageExpanded(false,{restoreFocus:false});view?.update();});
   const appearance=new MutationObserver(()=>{document.documentElement.dataset.contrast=document.documentElement.classList.contains('si-highcontrast')?'on':'off';view?.update();window.dispatchEvent(new CustomEvent('silm:theme:changed'));});appearance.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   document.addEventListener('keydown',event=>{if(!(event.ctrlKey||event.metaKey)||event.altKey||event.shiftKey||event.key.toLowerCase()!=='z'||B.isPlatformDialogOpen()||B.currentRoute(location.hash)!=='ambiente'||event.target.closest('input,select,textarea,[contenteditable]'))return;event.preventDefault();run.undo();});
   routeUI.init();B.selectModule(model.state.module.active);ready=true;render();

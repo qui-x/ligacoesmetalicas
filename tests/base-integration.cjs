@@ -28,6 +28,7 @@ async function main(){
   await page.waitForFunction(()=>window.SILMIntegration.snapshot().structure!==null);
   for(let i=0;i<3;i++)await page.locator('#silm-add').click();
   assert.equal((await state()).structure.units.length,3);
+  assert.equal(await page.locator('#si-expand-structure').isDisabled(),true,'A expansão só é habilitada para estrutura cristalina organizada.');
   await page.locator('[data-close-dock="left"]').click();
   await page.locator('#scene-undo').click();assert.equal((await state()).structure.units.length,2);
   const original=(await state()).structure.units[0].position;
@@ -37,6 +38,18 @@ async function main(){
   await page.locator('#scene-undo').click();assert.deepEqual((await state()).structure.units[0].position,original);
   await page.locator('#silm-assembly-organize').click();
   await page.waitForSelector('.silm-crystal');const crystal=await state();assert.equal(crystal.structure.crystallography.structureType,'FCC');
+  assert.equal(await page.locator('#si-expand-structure').isDisabled(),false,'A estrutura configurada deve permitir expansão.');
+  const beforeExpand=await state(),normalBounds=await page.locator('#si-stage').boundingBox(),viewport=page.viewportSize();
+  await page.locator('#si-expand-structure').click();
+  await page.waitForFunction(()=>document.querySelector('#si-stage').classList.contains('si-scene-expanded'));
+  assert.equal(await page.locator('#si-collapse-structure').isVisible(),true,'A expansão deve expor o botão de retorno.');
+  const expandedBounds=await page.locator('#si-stage').boundingBox();
+  assert.ok(expandedBounds.width>=viewport.width-2&&expandedBounds.height>=viewport.height-2,'A cena deve ocupar a área visível: '+JSON.stringify(expandedBounds));
+  assert.deepEqual(await state(),beforeExpand,'Expandir não altera o estado científico');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(()=>!document.querySelector('#si-stage').classList.contains('si-scene-expanded'));
+  assert.deepEqual(await state(),beforeExpand,'Sair da expansão preserva o estado científico');
+  assert.ok(normalBounds.width<expandedBounds.width||normalBounds.height<expandedBounds.height,'A cena expandida deve ser maior que a cena normal.');
   await page.locator('#silm-crystal-projection').selectOption('top');assert.deepEqual(await state(),crystal,'Projeção não altera a ciência');
   await page.evaluate(()=>document.getElementById('silm-assembly-stage').silmRenderer.setCamera({zoom:1.5625,x:.45,y:.5}));
   const camera2D=await page.evaluate(()=>JSON.parse(localStorage.getItem('silm-base-integration:representation.view')).cameras.crystal);
@@ -72,6 +85,19 @@ async function main(){
   for(const width of [320,390,768,1440]){
    await page.setViewportSize({width,height:900});
    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+   if(width<=390){
+    const beforeExpand=await state();
+    await page.locator('#si-expand-structure').click();
+    await page.waitForFunction(()=>document.querySelector('#si-stage').classList.contains('si-scene-expanded'));
+    const expanded=await page.locator('#si-stage').boundingBox();
+    assert.ok(expanded.width>=width-2&&expanded.height>=898,'Expansão mobile deve preencher o viewport em '+width+' px.');
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Sem overflow durante a expansão em '+width+' px.');
+    assert.deepEqual(await state(),beforeExpand,'A expansão mobile não altera a ciência.');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(()=>!document.querySelector('#si-stage').classList.contains('si-scene-expanded'));
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.deepEqual(await state(),beforeExpand,'Fechar a expansão mobile preserva a ciência.');
+   }
    const before=await page.locator('#silm-assembly-stage').boundingBox();
    await page.locator('[data-open-dock="dados"]').click();
    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));

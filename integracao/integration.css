@@ -88,3 +88,29 @@ button[aria-disabled=true]{opacity:.55;cursor:default}
 .silm-notebook-empty{color:var(--muted);padding:18px 8px;line-height:1.6}
 @media(max-width:600px){.silm-notebook-page-head{padding-inline:2px}.silm-notebook-compose .silm-notebook-editor{padding:12px}.silm-notebook-compose>summary{padding:12px}}
 @media print{.silm-notebook-page-head{display:block!important;margin-bottom:12mm}.silm-notebook-page-head p{color:#222!important}}
+
+
+/* 0.14.5 — área de visualização expandida da estrutura cristalina já configurada. */
+.si-structure-expand{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:none;min-height:44px;min-width:44px;white-space:nowrap}
+.si-structure-expand svg{width:17px;height:17px;flex:none}
+.si-structure-expand:disabled{opacity:.48;cursor:not-allowed;box-shadow:none}
+.si-structure-expand[aria-pressed=true]{border-color:var(--accent);background:var(--tint)}
+.si-scene-region.si-scene-expanded{position:fixed!important;inset:0!important;z-index:1000!important;width:auto!important;height:100dvh!important;max-height:100dvh!important;min-height:0!important;flex:none!important;overflow:hidden!important;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));border:0!important;border-radius:0!important;background:var(--bg)!important;overscroll-behavior:contain}
+.si-scene-region.si-scene-expanded #workspace-focus{width:100%;height:100%;min-width:0;min-height:0;padding:clamp(10px,2vw,28px);gap:8px}
+.si-scene-region.si-scene-expanded #silm-integration-scene{width:100%;height:100%;min-width:0;min-height:0;flex:1 1 auto}
+.si-scene-region.si-scene-expanded .silm-laboratory{width:100%;height:100%;min-width:0;min-height:0}
+.si-scene-region.si-scene-expanded .silm-assembly,.si-scene-region.si-scene-expanded .silm-crystal{min-width:0;min-height:0}
+.si-scene-region.si-scene-expanded #si-collapse-structure{position:absolute;z-index:1200;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:44px;min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);box-shadow:0 4px 18px #0002;font:inherit;font-size:12px;font-weight:750;cursor:pointer}
+.si-structure-collapse svg{width:17px;height:17px;flex:none}
+.si-scene-region.si-scene-expanded #si-collapse-structure:focus-visible{outline:3px solid var(--ring);outline-offset:3px}
+@media(max-width:900px){
+ .si-workspace-toolbar{justify-content:space-between;gap:7px}
+ .si-workspace-toolbar .si-view-tabs{width:auto;flex:1;gap:6px;min-width:0}
+ .si-workspace-toolbar .si-view-tabs button{flex:1;min-width:0;padding:7px 6px;font-size:11px}
+ .si-structure-expand{padding:7px 9px;font-size:11px}
+ .si-scene-region.si-scene-expanded #workspace-focus{padding:calc(34px + env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom))}
+}
+@media(max-width:360px){.si-structure-expand span{display:none}.si-workspace-toolbar .si-view-tabs button{font-size:10px;padding-inline:4px}.si-scene-region.si-scene-expanded #workspace-focus{padding-top:calc(32px + env(safe-area-inset-top))}}
+@media(max-height:500px) and (max-width:900px) and (orientation:landscape){.si-scene-region.si-scene-expanded #workspace-focus{padding:34px 8px 6px}.si-scene-region.si-scene-expanded .si-stage-name{min-height:26px}}
+@media(prefers-reduced-motion:reduce){.si-scene-region.si-scene-expanded{scroll-behavior:auto}}
+@media print{.si-structure-expand,.si-scene-region.si-scene-expanded #si-collapse-structure{display:none!important}.si-scene-region.si-scene-expanded{position:static!important;width:auto!important;height:auto!important;max-height:none!important;padding:0!important;overflow:visible!important}}

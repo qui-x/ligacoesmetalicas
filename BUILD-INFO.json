@@ -1,7 +1,7 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.14.4",
+  "versao": "0.14.5",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.3.1",
   "scientificSchemaVersion": 8,
@@ -102,7 +102,7 @@
     }
   ],
   "observacaoOrigem": "Origem: entregas/SILM-0.11.0.zip deste repositório, verificado pelo SHA-512 externo; núcleo da Base Estrutural 0.3.1 sem alteração local.",
-  "status": "Base SI 0.9.17 integrada; Oficina dos Metais renomeada e documentada; Caderno integrado ao fluxo de aprendizagem; domínio científico SILM e schema 8 preservados.",
+  "status": "Base SI 0.9.17 integrada; Oficina dos Metais com visualização expandida da estrutura cristalina configurada; Caderno integrado; motor científico SILM e schema 8 preservados.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
   "dataBuild": "2026-10-21",
   "structureModelVersion": 2,
