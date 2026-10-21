@@ -1,8 +1,8 @@
-# SILM 0.14.1 — A Arquitetura dos Metais
+# SILM 0.14.2 — A Arquitetura dos Metais
 
-O Início inclui o card Caderno da Base SI 0.9.17, com acesso direto às observações. Esta atualização é pontual; os demais módulos da base permanecem no snapshot 0.9.13.
+O Início inclui o card Caderno da Base SI 0.9.17, com acesso direto às observações. A interface integrada usa o snapshot da Base SI 0.9.17. O motor científico, os dados e o schema 8 do SILM continuam separados e preservados.
 
-Simulador Interativo de Ligações Metálicas sobre a Base SI 0.9.13. A interface reúne a Home e a navegação da base com o motor científico do SILM, identidade ouro/grafite e dados com fontes.
+Simulador Interativo de Ligações Metálicas sobre a Base SI 0.9.17. A interface reúne a Home e a navegação da base com o motor científico do SILM, identidade ouro/grafite e dados com fontes.
 
 ## Usar
 
@@ -31,3 +31,8 @@ O estado científico permanece no schema 8. Uma sessão antiga válida é recupe
 Esta etapa não finaliza a Área do Professor, o Manual nem a ampliação dos relatórios da 0.15.x. Testes desta rodada executados em Chromium; outros navegadores e dispositivos físicos ainda requerem homologação. Licença GPL-3.0.
 
 Quando existem sessões antiga e atual distintas, Dados oferece Exportar investigação antiga (JSON). O original e a sessão atual permanecem intactos; a importação posterior usa o fluxo de confirmação do mesmo aplicativo.
+
+
+## Caderno didático — 0.14.2
+
+O Caderno registra observações, hipóteses e conclusões; filtra e exclui registros; importa backup JSON validado; exporta JSON/CSV e prepara impressão. A vinculação por tentativa aos relatórios permanece pendente.

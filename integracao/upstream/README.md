@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.9.13
+# Base Demo Oficial - SI · 0.9.17
 
-Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.13 — Auditoria do percurso Aprender, Missões, Roteiros e autoria docente.**
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.17 — Caderno, exportação CSV, impressão e folhas de relatório para preenchimento manual.**
 
 ## Executar
 
@@ -82,8 +82,37 @@ Consulte `docs/AUDITORIA-MENU-0.9.10.md`.
 
 A Home mantém a identidade visual e os cinco caminhos aprovados. Quando existe uma atividade orientada válida, oferece ações para rever ou retomar essa atividade e para voltar à bancada, sempre consultando o catálogo oficial ou local e o progresso registrado. O vínculo é preservado no armazenamento local, validado a cada abertura e apagado ao encerrar a atividade; referências a atividades excluídas são ignoradas. O resumo de objetos é calculado a partir do projeto válido salvo, sem criar um segundo estado da cena. A navegação pelo teclado transfere o foco ao destino, e o layout adapta as ações contextualizadas a telefones estreitos. Ver `docs/AUDITORIA-HOME-0.9.12.md`.
 
-## Auditoria dos ambientes educacionais · 0.9.13
+## Auditoria dos ambientes educacionais · 0.9.15
 
 Aprender permite consultar os temas e marcar sua revisão sem iniciar uma atividade. Missões e Roteiros possuem detalhe separado do ato de **Montar na bancada**. A sessão orientada preserva a bancada livre, utiliza uma cena própria e mantém seu módulo de execução. O encerramento restaura a cena e o módulo anteriores, enquanto as tentativas incompletas podem retomar sua própria montagem por checkpoints locais. Os critérios de leitura utilizam a sequência de medições para evitar contar dados anteriores à tentativa.
 
-O editor do professor aceita missões de uma etapa e roteiros de duas a cinco etapas, com módulo declarado. Atividades locais já existentes sem o campo de módulo são aceitas por compatibilidade e utilizam a configuração Livre. Consulte `docs/AUDITORIA-EDUCACIONAL-0.9.13.md` para testes, limites e pendências.
+O editor do professor aceita missões de uma etapa e roteiros de duas a cinco etapas, com módulo declarado. Atividades locais já existentes sem o campo de módulo são aceitas por compatibilidade e utilizam a configuração Livre. Consulte `docs/AUDITORIA-EDUCACIONAL-0.9.15.md` para testes, limites e pendências.
+
+## 0.9.15 — Identificação e relatório por tentativa
+
+A identificação do participante acompanha a investigação orientada e seus checkpoints. A geração de relatórios agora vincula a atividade, o módulo e suas etapas aos registros da tentativa, filtrando notas e leituras anteriores. Ao encerrar com evidências, o documento é preservado antes da restauração da bancada livre; não há relatórios vazios ou duplicação do mesmo estado. [Contrato de aceitação](docs/ACEITE-0.9.15.md).
+
+## 0.9.15 — Integridade do ciclo de vida das atividades
+
+As transições entre a bancada livre e uma investigação orientada não compartilham mais o histórico de Desfazer/Refazer. A retomada preserva o identificador e os campos de identificação da **mesma tentativa** após recarregar checkpoints; registrar etapas, iniciar e encerrar dependem de confirmação de armazenamento. Vínculos legados incompletos não substituem a bancada livre. Consulte [a auditoria de aceitação 0.9.15](docs/ACEITE-0.9.15.md) para os critérios e testes.
+
+
+## 0.9.16 — Auditoria de recuperação e segurança operacional
+
+- **Conflitos entre abas:** a versão observada dos documentos críticos (cena, educação, relatórios, sessão e checkpoints) é conferida antes de gravar. O evento `storage` alerta sobre alterações externas; em caso de divergência, a aba interrompe modificações e solicita recarga, evitando sobrescritas silenciosas. Não equivale a transações atômicas entre abas: ações simultâneas no mesmo milissegundo e falhas totais do dispositivo ainda precisam de validação adicional.
+- **Importação de Caderno:** backups não substituem registros durante uma investigação ativa, inclusive se a atividade começar durante a confirmação.
+- **Importação de atividades:** limpeza dos checkpoints passa a preceder a troca da biblioteca, com restauração da cópia anterior se a gravação da nova biblioteca falhar. Não há garantia de transação multichave diante de desligamento abrupto.
+- **Encerramento:** se a sessão não puder ser removida do armazenamento, o checkpoint anterior é restaurado e a investigação permanece ativa.
+- **Offline:** sem serviços de rede ou bibliotecas novas. Testes de execução em PWA instalada e navegadores alternativos continuam pendentes.
+
+Consulte `docs/ACEITE-0.9.16.md` para o escopo e os resultados dos testes.
+
+## 0.9.17 — Auditoria documental
+
+- **Caderno:** filtros por observações, hipóteses e conclusões, com cronologia preservada.
+- **Exportações:** backup JSON continua completo; CSV independente oferece codificação UTF-8, tratamento de campos, aspas e valores potencialmente interpretados como fórmulas.
+- **Impressão:** Caderno com cabeçalhos e entradas históricas e relatório para preenchimento manual com identificação e campos de escrita. O modelo manual não cria dados ou relatórios artificiais.
+- **Limpeza:** apagar registros exige confirmação, é bloqueado durante atividades e não remove cópias históricas dos relatórios emitidos.
+- **Compatibilidade:** contratos JSON, edição de cena e fluxo educacional das versões anteriores preservados.
+
+Consulte `docs/ACEITE-0.9.17.md` para os cenários executados e as limitações de homologação.

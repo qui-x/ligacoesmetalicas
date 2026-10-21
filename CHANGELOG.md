@@ -1,5 +1,12 @@
 # Registro de alterações
 
+## SILM 0.14.2 — Base SI 0.9.17 e Caderno didático
+
+- Snapshot sincronizado com Base SI 0.9.17 (commit 68ed86cb416ea31489be481fc52d86aeedce2892), preservando o motor científico no schema 8.
+- Caderno ampliado com tipos de registro, filtro, exclusão, backup JSON validado, CSV e impressão.
+- Registros podem identificar o metal ativo; limpeza e restauração são bloqueadas durante atividades orientadas.
+- Alinhados metadados de versão do HTML, pacote, PWA e cache. Testes atualizados; execução automatizada ainda precisa ser confirmada.
+
 ## SILM 0.14.1 — Caderno no Início e responsividade
 
 - Card Caderno copiado da Base SI 0.9.17 (68ed86c), com acesso direto às observações.

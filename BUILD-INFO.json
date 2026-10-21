@@ -1,7 +1,7 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.14.1",
+  "versao": "0.14.2",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.3.1",
   "scientificSchemaVersion": 8,
@@ -102,9 +102,9 @@
     }
   ],
   "observacaoOrigem": "Origem: entregas/SILM-0.11.0.zip deste repositório, verificado pelo SHA-512 externo; núcleo da Base Estrutural 0.3.1 sem alteração local.",
-  "status": "Interface unificada da Base SI com motor científico SILM, seis missões e sete temas; dados anteriores preservados.",
+  "status": "Base SI 0.9.17 integrada; Caderno didático ampliado; domínio científico SILM e schema 8 preservados.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
-  "dataBuild": "2026-10-19",
+  "dataBuild": "2026-10-21",
   "structureModelVersion": 2,
   "electronModelVersion": 1,
   "propertiesModelVersion": 1,
@@ -112,14 +112,9 @@
   "calculationModelVersion": 1,
   "representationModelVersion": 2,
   "integracaoBase": {
-    "versao": "0.9.13",
-    "commit": "463e242c21c451036644c9c79999cd20ffe8aa3c",
-    "entrada": "index.html",
-    "status": "interface única integrada ao motor científico SILM"
-  },
-  "atualizacaoParcialBase": {
-    "versaoConsultada": "0.9.17",
+    "versao": "0.9.17",
     "commit": "68ed86cb416ea31489be481fc52d86aeedce2892",
-    "recurso": "Card Caderno na página Início; demais módulos mantêm snapshot 0.9.13"
+    "entrada": "integracao/index.html",
+    "status": "snapshot de execução sincronizado; motor científico separado"
   }
 }

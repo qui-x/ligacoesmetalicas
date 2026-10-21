@@ -1,8 +1,8 @@
 'use strict';
-/* Produto SILM sobre a Base 0.9.13. A ciência continua no serviço original schema 8. */
+/* Produto SILM sobre a Base SI 0.9.17. O domínio científico SILM permanece no schema 8. */
 (() => {
  const B=BaseDemoSI,S=SILM,$=id=>document.getElementById(id);
- B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.14.1 · desenvolvimento',
+ B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.14.2',
   routes:B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios','aprender','missoes','caderno','professor'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'A Arquitetura dos Metais':route.title}))});
  // A cena cristalina também usa data-view; o roteamento só pode atingir páginas do produto.
  B.updateRoute=()=>{
@@ -139,7 +139,7 @@
  function boot(){
   const live=document.createElement('p');live.id='silm-announcement';live.className='sr-only';live.setAttribute('role','status');live.setAttribute('aria-live','polite');document.body.append(live);
   // Only the new Base shell initializes. Demo scene, generic engine and demo extension never start.
-  B.setupPreferences();B.setupComponents();B.selectModule('explorar');
+  B.setupStorageConflictProtection();B.setupPreferences();B.setupComponents();B.selectModule('explorar');
   B.setupWorkspace(()=>({schemaVersion:1,entities:[],selectedId:null}),()=>{});
   B.setupNavigationDrawer();B.setupMenuReview();B.updateRoute();window.addEventListener('hashchange',B.updateRoute);
   const selector=$('silm-metal');
@@ -168,7 +168,7 @@
   document.addEventListener('keydown',event=>{if(!(event.ctrlKey||event.metaKey)||event.altKey||event.shiftKey||event.key.toLowerCase()!=='z'||B.isPlatformDialogOpen()||B.currentRoute(location.hash)!=='ambiente'||event.target.closest('input,select,textarea,[contenteditable]'))return;event.preventDefault();run.undo();});
   routeUI.init();B.selectModule(model.state.module.active);ready=true;render();
   // Read-only inspection facade: tests and debugging cannot mutate the authoritative state directly.
-  window.SILMIntegration=Object.freeze({snapshot:()=>model.snapshot(),baseVersion:'0.9.13',activity:()=>routeUI.session.snapshot()});
+  window.SILMIntegration=Object.freeze({snapshot:()=>model.snapshot(),baseVersion:'0.9.17',activity:()=>routeUI.session.snapshot()});
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
