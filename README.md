@@ -1,6 +1,6 @@
-# SILM 0.14.6 — A Arquitetura dos Metais
+# SILM 0.14.7 — A Arquitetura dos Metais
 
-A página inicial oferece a Oficina dos Metais como espaço de manipulação das estruturas e mantém o card do Caderno com a contagem de registros. A versão 0.14.6 reformula a expansão para ocupar a tela inteira e integra o botão à barra dos controles centrais ([notas da versão](docs/SILM-0.14.6.md)). O Caderno reúne anotações com título, conclusões de missões/roteiros e referências reabríveis a relatórios. A interface integrada usa o snapshot da Base SI 0.9.17; o motor científico, os dados e o schema 8 do SILM continuam separados e preservados.
+A página inicial oferece a Oficina dos Metais como espaço de manipulação das estruturas e mantém o card do Caderno com a contagem de registros. A versão 0.14.7 corrige a hierarquia da expansão: a oficina ocupa a janela, a barra global sai da frente e os menus contextuais permanecem acessíveis ([notas da versão](docs/SILM-0.14.7.md)). O Caderno reúne anotações com título, conclusões de missões/roteiros e referências reabríveis a relatórios. A interface integrada usa o snapshot da Base SI 0.9.17; o motor científico, os dados e o schema 8 do SILM continuam separados e preservados.
 
 Simulador Interativo de Ligações Metálicas sobre a Base SI 0.9.17. A interface reúne a Home e a navegação da base com o motor científico do SILM, identidade ouro/grafite e dados com fontes.
 

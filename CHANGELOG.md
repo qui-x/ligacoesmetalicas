@@ -1,5 +1,13 @@
 # Registro de alterações
 
+## SILM 0.14.7 — Barra contextual e expansão da oficina
+
+- A tela inteira agora é aplicada à oficina como um todo; a estrutura cristalina passa a ocupar apenas a área flexível abaixo da barra contextual.
+- A barra global de navegação deixa de sobrepor a cena durante a expansão.
+- Os controles Foco/Visão geral e os atalhos Montagem, Ver e Dados permanecem à mostra e funcionam no modo expandido.
+- Os painéis contextuais abertos ficam acima da cena e podem ser fechados normalmente; Escape ou o botão Expandir/Recolher retornam ao layout anterior.
+- Testes de integração atualizados para validar o viewport da oficina, a posição da cena sob a barra contextual e a disponibilidade dos menus em telas móveis.
+
 ## SILM 0.14.6 — Tela inteira e controles integrados
 
 - A cena cristalina ocupa a janela inteira em modo expandido, aproveitando a maior área útil sem deformar a geometria da estrutura.
