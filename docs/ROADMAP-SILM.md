@@ -20,7 +20,7 @@
 | **0.12.x** | **Representação 3D** | **0.12.0 entregue (câmera de órbita, perspectiva e ortográfica, XY/XZ/YZ, volta ao 2D)** |
 | 0.13.x | Roteiros experimentais | concluída (0.13.0) |
 | 0.14.x | Missões e Aprender/Temas | entregue; correções 0.14.7 |
-| **0.15.x** | **Cobertura de metais e estruturas; Manual, Professor e relatórios** | **0.15.0 entregue em cobertura compatível; tipos cristalográficos adicionais pendentes** |
+| **0.15.x** | **Cobertura de metais e estruturas; Manual, Professor e relatórios** | **0.15.1 — homologação automatizada dos registros existentes; modelos adicionais e revisão de evidências pendentes** |
 | 0.16.x | Acessibilidade e mobile das mecânicas científicas | planejada |
 | 0.17.x | Validação científica | planejada |
 | 0.18.x | Homologação técnica | planejada |

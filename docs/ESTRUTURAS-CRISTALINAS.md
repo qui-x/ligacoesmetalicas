@@ -28,7 +28,7 @@ Para cada metal, `SILM.crystal.eligibility` confere:
 | `REFERENCE_CONDITION_UNSUPPORTED` | condição de referência sem fase sólida |
 | `DATA_CONFLICT` | dados inconsistentes com o modelo; bloqueado para revisão |
 
-Mensagem exibida: *"Estrutura cristalina de referência registrada, mas ainda não disponível para visualização no SILM."* A investigação, a consulta e a montagem livre continuam disponíveis. A cobertura por metal está em [`COBERTURA-METAIS.md`](COBERTURA-METAIS.md): 48 metais com visualização (13 CCC, 14 CFC, 21 HC) e 9 investigáveis sem visualização cristalográfica. Na versão 0.15.0 foram homologados Ti, Cr, Co, Rb, Zr, Nb, Ru, Rh, Cd, Cs, Hf, Re, Os e Ir. Sistemas fora de CCC/CFC/HC permanecem bloqueados até a implementação de modelos geométricos específicos.
+Mensagem exibida: *"Estrutura cristalina de referência registrada, mas ainda não disponível para visualização no SILM."* A investigação, a consulta e a montagem livre continuam disponíveis. A cobertura por metal está em [`COBERTURA-METAIS.md`](COBERTURA-METAIS.md): 48 metais com visualização (13 CCC, 14 CFC, 21 HC) e 9 investigáveis sem visualização cristalográfica. Na versão 0.15.0 foram homologados Ti, Cr, Co, Rb, Zr, Nb, Ru, Rh, Cd, Cs, Hf, Re, Os e Ir. A versão 0.15.1 adiciona teste automatizado para os 57 registros e documenta os nove tipos fora dos modelos existentes. Consulte a auditoria em AUDITORIA-ESTRUTURAS-METAIS-0.15.1.md. Sistemas fora de CCC/CFC/HC permanecem bloqueados até a implementação de modelos geométricos específicos.
 
 ## 3. Os três modelos
 

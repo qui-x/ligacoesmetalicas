@@ -1,7 +1,7 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.15.0",
+  "versao": "0.15.1",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.3.1",
   "scientificSchemaVersion": 8,
@@ -102,9 +102,9 @@
     }
   ],
   "observacaoOrigem": "Origem: entregas/SILM-0.11.0.zip deste repositório, verificado pelo SHA-512 externo; núcleo da Base Estrutural 0.3.1 sem alteração local.",
-  "status": "Cobertura experimental ampliada para 57 metais investigáveis e 48 visualizáveis nos modelos CCC/CFC/HC; os demais tipos cristalográficos permanecem explicitamente bloqueados até implementação dedicada.",
+  "status": "Homologação automatizada dos 57 registros estruturais existentes; 48 visualizáveis e nove estruturas incompatíveis mantidas sem conversão.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
-  "dataBuild": "2026-10-21",
+  "dataBuild": "2026-10-22",
   "structureModelVersion": 2,
   "electronModelVersion": 1,
   "propertiesModelVersion": 1,

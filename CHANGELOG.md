@@ -1,5 +1,11 @@
 # Registro de alterações
 
+## SILM 0.15.1 — Homologação das estruturas existentes
+
+- Adicionado teste de cobertura para os 57 registros com estrutura de referência: valida fontes, fase sólida, geometria, sítios da célula e número de coordenação.
+- Formalizada a distinção entre 48 estruturas visualizáveis (CCC/CFC/HC) e nove estruturas registradas que precisam de modelos próprios.
+- Documentadas as lacunas de evidência local e as prioridades de pesquisa para as famílias metálicas.
+
 ## SILM 0.15.0 — Expansão da cobertura cristalográfica
 
 - Homologadas referências experimentais para 14 metais adicionais compatíveis com CCC, CFC ou HC: Ti, Cr, Co, Rb, Zr, Nb, Ru, Rh, Cd, Cs, Hf, Re, Os e Ir.

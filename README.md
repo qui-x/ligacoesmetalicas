@@ -1,6 +1,6 @@
-# SILM 0.15.0 — A Arquitetura dos Metais
+# SILM 0.15.1 — A Arquitetura dos Metais
 
-A página inicial oferece a Oficina dos Metais como espaço de manipulação das estruturas e mantém o card do Caderno com a contagem de registros. A versão 0.15.0 amplia a cobertura experimental: 57 metais podem ser investigados e 48 têm visualização cristalográfica em CCC, CFC ou HC ([notas da versão](docs/SILM-0.15.0.md)). Os nove metais com estruturas fora desses modelos continuam sinalizados, sem substituição artificial. A correção de tela inteira e menus contextuais está documentada em [0.14.7](docs/SILM-0.14.7.md). O Caderno reúne anotações com título, conclusões de missões/roteiros e referências reabríveis a relatórios. A interface integrada usa o snapshot da Base SI 0.9.17; o motor científico, os dados e o schema 8 do SILM continuam separados e preservados.
+A página inicial oferece a Oficina dos Metais como espaço de manipulação das estruturas e mantém o card do Caderno com a contagem de registros. A versão 0.15.1 amplia a cobertura experimental: 57 metais podem ser investigados e 48 têm visualização cristalográfica em CCC, CFC ou HC ([notas da versão](docs/SILM-0.15.1.md)). Os nove metais com estruturas fora desses modelos continuam sinalizados, sem substituição artificial. A correção de tela inteira e menus contextuais está documentada em [0.14.7](docs/SILM-0.14.7.md). O Caderno reúne anotações com título, conclusões de missões/roteiros e referências reabríveis a relatórios. A interface integrada usa o snapshot da Base SI 0.9.17; o motor científico, os dados e o schema 8 do SILM continuam separados e preservados.
 
 Simulador Interativo de Ligações Metálicas sobre a Base SI 0.9.17. A interface reúne a Home e a navegação da base com o motor científico do SILM, identidade ouro/grafite e dados com fontes.
 
@@ -26,7 +26,7 @@ O estado científico permanece no schema 8. Uma sessão antiga válida é recupe
 
 ## Documentação
 
-[0.15.0](docs/SILM-0.15.0.md) · [Relatório desta rodada](docs/RELATORIO-BUILD-TESTES-0.15.0.md) · [0.14.7](docs/SILM-0.14.7.md) · [0.14.4](docs/SILM-0.14.4.md) · [0.14.0](docs/SILM-0.14.0.md) · [Missões](docs/MISSOES.md) · [Contrato de Missões](docs/CONTRATO-MISSOES.md) · [Temas](docs/APRENDER-TEMAS.md) · [Contrato de Temas](docs/CONTRATO-TEMAS.md) · [Auditoria](docs/AUDITORIA-GAMIFICACAO-0.14.0.md) · [Roteiros](docs/ROTEIROS-EXPERIMENTAIS.md) · [Cobertura](docs/COBERTURA-ROTEIROS.md).
+[0.15.1](docs/SILM-0.15.1.md) · [Relatório desta rodada](docs/RELATORIO-BUILD-TESTES-0.15.1.md) · [0.14.7](docs/SILM-0.14.7.md) · [0.14.4](docs/SILM-0.14.4.md) · [0.14.0](docs/SILM-0.14.0.md) · [Missões](docs/MISSOES.md) · [Contrato de Missões](docs/CONTRATO-MISSOES.md) · [Temas](docs/APRENDER-TEMAS.md) · [Contrato de Temas](docs/CONTRATO-TEMAS.md) · [Auditoria](docs/AUDITORIA-GAMIFICACAO-0.14.0.md) · [Roteiros](docs/ROTEIROS-EXPERIMENTAIS.md) · [Cobertura](docs/COBERTURA-ROTEIROS.md).
 
 A Área do Professor, o Manual e a ampliação dos relatórios da 0.15.x continuam em desenvolvimento. A execução automatizada dos testes desta rodada ainda precisa ser confirmada; outros navegadores e dispositivos físicos também requerem homologação. Licença GPL-3.0.
 
