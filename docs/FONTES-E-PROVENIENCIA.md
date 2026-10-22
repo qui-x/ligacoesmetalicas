@@ -52,3 +52,8 @@ O banco não contém, nesta versão, valores homologados de condutividade elétr
 - **Dados → Tabela:** dados tabelados do metal e a situação dos dados de propriedades.
 - **Dados → Medições e Dados → Cálculos:** cada registro com a etiqueta da origem, as entradas e as fontes.
 - **Relatório:** fonte da estrutura de referência, medições, cálculos e as ressalvas dos modelos.
+
+
+## 4. Expansão da cobertura cristalográfica (0.15.0)
+
+Foram homologadas referências experimentais para Ti, Cr, Co, Rb, Zr, Nb, Ru, Rh, Cd, Cs, Hf, Re, Os e Ir. As fichas WebElements são fontes secundárias com a publicação primária indicada no próprio registro; Cr e Cd usam fichas da Crystallography Open Database (COD). Quando não há temperatura numérica publicada na ficha, o banco registra uma condição qualitativa de ambiente, sem convertê-la em dado medido. Os parâmetros devem ser interpretados nas condições da referência.

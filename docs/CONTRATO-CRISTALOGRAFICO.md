@@ -55,7 +55,7 @@ A elegibilidade e a geometria são recalculadas do banco a cada validação. Um 
 
 ## Testes geométricos (build)
 
-`scripts/validate-scientific-state.cjs` confere, para os 34 metais suportados:
+`scripts/validate-scientific-state.cjs` confere, para os 48 metais suportados:
 - sítios expandidos do banco = base do modelo;
 - papéis dos sítios da célula: CCC 8 + 1, CFC 8 + 6, HC 12 + 2 + 3;
 - ausência de sítios duplicados;

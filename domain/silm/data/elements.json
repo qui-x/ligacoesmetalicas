@@ -268,7 +268,7 @@
         "sourceId": "src-cod-9008542",
         "conditions": {
           "temperature": {
-            "value": 293.0,
+            "value": 293,
             "unit": "K",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008542",
@@ -320,21 +320,21 @@
             "display": "3.5093"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008542",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008542",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008542",
@@ -611,21 +611,21 @@
             "display": "3.5843"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012008",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012008",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012008",
@@ -1302,7 +1302,7 @@
         "sourceId": "src-cod-9008545",
         "conditions": {
           "temperature": {
-            "value": 293.0,
+            "value": 293,
             "unit": "K",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008545",
@@ -1354,21 +1354,21 @@
             "display": "4.2906"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008545",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008545",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008545",
@@ -1647,21 +1647,21 @@
             "display": "5.2103"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012001",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012001",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012001",
@@ -1866,21 +1866,21 @@
             "display": "4.04961"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012002",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012002",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012002",
@@ -2784,21 +2784,21 @@
             "display": "5.601"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012731",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012731",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012731",
@@ -3171,21 +3171,21 @@
             "display": "5.2733"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010985",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010985",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010985",
@@ -3292,9 +3292,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -3325,8 +3325,134 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "ti-reference",
+        "type": "HC",
+        "label": "HC · hexagonal compacta",
+        "spaceGroup": "P 63/m m c",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-ti",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ti"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-webelements-ti",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 2.9508,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ti",
+            "display": "2.9508"
+          },
+          "b": {
+            "value": 2.9508,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ti",
+            "display": "2.9508"
+          },
+          "c": {
+            "value": 4.6855,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ti",
+            "display": "4.6855"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ti",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ti",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 120,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ti",
+            "display": "120"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "-x,-x+y,1/2+z",
+            "x,x-y,1/2-z",
+            "-x+y,-x,1/2-z",
+            "x-y,x,1/2+z",
+            "-y,-x,z",
+            "y,x,-z",
+            "y,-x+y,-z",
+            "-y,x-y,z",
+            "x-y,-y,1/2+z",
+            "-x+y,y,1/2-z",
+            "x,y,1/2-z",
+            "-x,-y,1/2+z",
+            "x,x-y,z",
+            "-x,-x+y,-z",
+            "x-y,x,-z",
+            "-x+y,-x,z",
+            "y,x,1/2+z",
+            "-y,-x,1/2-z",
+            "-y,x-y,1/2-z",
+            "y,-x+y,1/2+z",
+            "-x+y,y,z",
+            "x-y,-y,-z",
+            "-x,-y,-z"
+          ],
+          "values": [
+            {
+              "x": "0.33333",
+              "y": "0.66667",
+              "z": "0.25000"
+            }
+          ],
+          "sourceId": "src-webelements-ti",
+          "kind": "TABULATED"
+        },
+        "notes": "WebElements lists HCP titanium, space group P63/mmc (194), a = b = 295.08 pm and c = 468.55 pm. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "ti-reference",
     "properties": {},
     "reviewedCandidates": [
       {
@@ -3334,6 +3460,12 @@
         "decision": "not-homologated",
         "evidenceType": "experimental",
         "note": "Consulta de auditoria; não usado como referência de investigação."
+      },
+      {
+        "sourceId": "src-webelements-ti",
+        "decision": "accepted",
+        "evidenceType": "experimental",
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -3483,21 +3615,21 @@
             "display": "3.0241"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012770",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012770",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012770",
@@ -3676,9 +3808,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -3709,15 +3841,213 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "cr-reference",
+        "type": "CCC",
+        "label": "CCC · cúbica de corpo centrado",
+        "spaceGroup": "I m -3 m",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-5000220",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-5000220"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-cod-5000220",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 2.8839,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-5000220",
+            "display": "2.8839"
+          },
+          "b": {
+            "value": 2.8839,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-5000220",
+            "display": "2.8839"
+          },
+          "c": {
+            "value": 2.8839,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-5000220",
+            "display": "2.8839"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-5000220",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-5000220",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-5000220",
+            "display": "90"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "1/2+x,1/2+y,1/2+z",
+            "z,-x,y",
+            "1/2+z,1/2-x,1/2+y",
+            "-y,z,-x",
+            "1/2-y,1/2+z,1/2-x",
+            "x,-y,z",
+            "1/2+x,1/2-y,1/2+z",
+            "-z,x,-y",
+            "1/2-z,1/2+x,1/2-y",
+            "y,-z,x",
+            "1/2+y,1/2-z,1/2+x",
+            "-x,y,-z",
+            "1/2-x,1/2+y,1/2-z",
+            "x,-z,-y",
+            "1/2+x,1/2-z,1/2-y",
+            "-z,y,x",
+            "1/2-z,1/2+y,1/2+x",
+            "y,-x,-z",
+            "1/2+y,1/2-x,1/2-z",
+            "-x,z,y",
+            "1/2-x,1/2+z,1/2+y",
+            "z,-y,-x",
+            "1/2+z,1/2-y,1/2-x",
+            "-y,x,z",
+            "1/2-y,1/2+x,1/2+z",
+            "x,z,y",
+            "1/2+x,1/2+z,1/2+y",
+            "-z,-y,-x",
+            "1/2-z,1/2-y,1/2-x",
+            "y,x,z",
+            "1/2+y,1/2+x,1/2+z",
+            "-x,-z,-y",
+            "1/2-x,1/2-z,1/2-y",
+            "z,y,x",
+            "1/2+z,1/2+y,1/2+x",
+            "-y,-x,-z",
+            "1/2-y,1/2-x,1/2-z",
+            "z,x,-y",
+            "1/2+z,1/2+x,1/2-y",
+            "-y,-z,x",
+            "1/2-y,1/2-z,1/2+x",
+            "x,y,-z",
+            "1/2+x,1/2+y,1/2-z",
+            "-z,-x,y",
+            "1/2-z,1/2-x,1/2+y",
+            "y,z,-x",
+            "1/2+y,1/2+z,1/2-x",
+            "-x,-y,z",
+            "1/2-x,1/2-y,1/2+z",
+            "-z,x,y",
+            "1/2-z,1/2+x,1/2+y",
+            "y,-z,-x",
+            "1/2+y,1/2-z,1/2-x",
+            "-x,y,z",
+            "1/2-x,1/2+y,1/2+z",
+            "z,-x,-y",
+            "1/2+z,1/2-x,1/2-y",
+            "-y,z,x",
+            "1/2-y,1/2+z,1/2+x",
+            "x,-y,-z",
+            "1/2+x,1/2-y,1/2-z",
+            "-x,z,-y",
+            "1/2-x,1/2+z,1/2-y",
+            "z,-y,x",
+            "1/2+z,1/2-y,1/2+x",
+            "-y,x,-z",
+            "1/2-y,1/2+x,1/2-z",
+            "x,-z,y",
+            "1/2+x,1/2-z,1/2+y",
+            "-z,y,-x",
+            "1/2-z,1/2+y,1/2-x",
+            "y,-x,z",
+            "1/2+y,1/2-x,1/2+z",
+            "-x,-z,y",
+            "1/2-x,1/2-z,1/2+y",
+            "z,y,-x",
+            "1/2+z,1/2+y,1/2-x",
+            "-y,-x,z",
+            "1/2-y,1/2-x,1/2+z",
+            "x,z,-y",
+            "1/2+x,1/2+z,1/2-y",
+            "-z,-y,x",
+            "1/2-z,1/2-y,1/2+x",
+            "y,x,-z",
+            "1/2+y,1/2+x,1/2-z",
+            "-z,-x,-y",
+            "1/2-z,1/2-x,1/2-y",
+            "y,z,x",
+            "1/2+y,1/2+z,1/2+x",
+            "-x,-y,-z",
+            "1/2-x,1/2-y,1/2-z",
+            "z,x,y",
+            "1/2+z,1/2+x,1/2+y",
+            "-y,-z,-x",
+            "1/2-y,1/2-z,1/2-x"
+          ],
+          "values": [
+            {
+              "x": "0.00000",
+              "y": "0.00000",
+              "z": "0.00000"
+            }
+          ],
+          "sourceId": "src-cod-5000220",
+          "kind": "TABULATED"
+        },
+        "notes": "COD entry 5000220 reports BCC chromium, space group Im-3m (229), a = b = c = 2.8839 Å. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "cr-reference",
     "properties": {},
     "reviewedCandidates": [
       {
         "sourceId": "src-cod-5000220",
-        "decision": "not-homologated",
+        "decision": "accepted",
         "evidenceType": "experimental",
-        "note": "Consulta de auditoria; não usado como referência de investigação."
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -3815,7 +4145,7 @@
         "sourceId": "src-cod-9011068",
         "conditions": {
           "temperature": {
-            "value": 298.0,
+            "value": 298,
             "unit": "K",
             "kind": "TABULATED",
             "sourceId": "src-cod-9011068",
@@ -3867,21 +4197,21 @@
             "display": "8.9125"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9011068",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9011068",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9011068",
@@ -4073,7 +4403,7 @@
         "sourceId": "src-cod-9006587",
         "conditions": {
           "temperature": {
-            "value": 298.0,
+            "value": 298,
             "unit": "K",
             "kind": "TABULATED",
             "sourceId": "src-cod-9006587",
@@ -4125,21 +4455,21 @@
             "display": "2.8654"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9006587",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9006587",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9006587",
@@ -4318,9 +4648,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "DATA_CONFLICT",
-      "note": "Registro de 1936 requer confirmação da unidade histórica dos parâmetros antes da homologação.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -4351,8 +4681,134 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "co-reference",
+        "type": "HC",
+        "label": "HC · hexagonal compacta",
+        "spaceGroup": "P 63/m m c",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-co",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-co"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-webelements-co",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 2.5071,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-co",
+            "display": "2.5071"
+          },
+          "b": {
+            "value": 2.5071,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-co",
+            "display": "2.5071"
+          },
+          "c": {
+            "value": 4.0695,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-co",
+            "display": "4.0695"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-co",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-co",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 120,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-co",
+            "display": "120"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "-x,-x+y,1/2+z",
+            "x,x-y,1/2-z",
+            "-x+y,-x,1/2-z",
+            "x-y,x,1/2+z",
+            "-y,-x,z",
+            "y,x,-z",
+            "y,-x+y,-z",
+            "-y,x-y,z",
+            "x-y,-y,1/2+z",
+            "-x+y,y,1/2-z",
+            "x,y,1/2-z",
+            "-x,-y,1/2+z",
+            "x,x-y,z",
+            "-x,-x+y,-z",
+            "x-y,x,-z",
+            "-x+y,-x,z",
+            "y,x,1/2+z",
+            "-y,-x,1/2-z",
+            "-y,x-y,1/2-z",
+            "y,-x+y,1/2+z",
+            "-x+y,y,z",
+            "x-y,-y,-z",
+            "-x,-y,-z"
+          ],
+          "values": [
+            {
+              "x": "0.33333",
+              "y": "0.66667",
+              "z": "0.25000"
+            }
+          ],
+          "sourceId": "src-webelements-co",
+          "kind": "TABULATED"
+        },
+        "notes": "WebElements lists HCP cobalt, space group P63/mmc (194), a = b = 250.71 pm and c = 406.95 pm. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "co-reference",
     "properties": {},
     "reviewedCandidates": [
       {
@@ -4360,6 +4816,12 @@
         "decision": "not-homologated",
         "evidenceType": "experimental",
         "note": "Consulta de auditoria; não usado como referência de investigação."
+      },
+      {
+        "sourceId": "src-webelements-co",
+        "decision": "accepted",
+        "evidenceType": "experimental",
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -4457,7 +4919,7 @@
         "sourceId": "src-cod-9013024",
         "conditions": {
           "temperature": {
-            "value": 293.0,
+            "value": 293,
             "unit": "K",
             "kind": "TABULATED",
             "sourceId": "src-cod-9013024",
@@ -4509,21 +4971,21 @@
             "display": "3.524"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9013024",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9013024",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9013024",
@@ -4892,21 +5354,21 @@
             "display": "3.6150"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
@@ -5097,21 +5559,21 @@
             "display": "4.947"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
@@ -5716,9 +6178,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "DATA_CONFLICT",
-      "note": "O registro consultado declara parâmetro estimado a 297 K; falta parâmetro experimental de referência homologado.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -5749,8 +6211,206 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "rb-reference",
+        "type": "CCC",
+        "label": "CCC · cúbica de corpo centrado",
+        "spaceGroup": "I m -3 m",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-rb",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rb"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-webelements-rb",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 5.585,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rb",
+            "display": "5.585"
+          },
+          "b": {
+            "value": 5.585,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rb",
+            "display": "5.585"
+          },
+          "c": {
+            "value": 5.585,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rb",
+            "display": "5.585"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rb",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rb",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rb",
+            "display": "90"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "1/2+x,1/2+y,1/2+z",
+            "z,-x,y",
+            "1/2+z,1/2-x,1/2+y",
+            "-y,z,-x",
+            "1/2-y,1/2+z,1/2-x",
+            "x,-y,z",
+            "1/2+x,1/2-y,1/2+z",
+            "-z,x,-y",
+            "1/2-z,1/2+x,1/2-y",
+            "y,-z,x",
+            "1/2+y,1/2-z,1/2+x",
+            "-x,y,-z",
+            "1/2-x,1/2+y,1/2-z",
+            "x,-z,-y",
+            "1/2+x,1/2-z,1/2-y",
+            "-z,y,x",
+            "1/2-z,1/2+y,1/2+x",
+            "y,-x,-z",
+            "1/2+y,1/2-x,1/2-z",
+            "-x,z,y",
+            "1/2-x,1/2+z,1/2+y",
+            "z,-y,-x",
+            "1/2+z,1/2-y,1/2-x",
+            "-y,x,z",
+            "1/2-y,1/2+x,1/2+z",
+            "x,z,y",
+            "1/2+x,1/2+z,1/2+y",
+            "-z,-y,-x",
+            "1/2-z,1/2-y,1/2-x",
+            "y,x,z",
+            "1/2+y,1/2+x,1/2+z",
+            "-x,-z,-y",
+            "1/2-x,1/2-z,1/2-y",
+            "z,y,x",
+            "1/2+z,1/2+y,1/2+x",
+            "-y,-x,-z",
+            "1/2-y,1/2-x,1/2-z",
+            "z,x,-y",
+            "1/2+z,1/2+x,1/2-y",
+            "-y,-z,x",
+            "1/2-y,1/2-z,1/2+x",
+            "x,y,-z",
+            "1/2+x,1/2+y,1/2-z",
+            "-z,-x,y",
+            "1/2-z,1/2-x,1/2+y",
+            "y,z,-x",
+            "1/2+y,1/2+z,1/2-x",
+            "-x,-y,z",
+            "1/2-x,1/2-y,1/2+z",
+            "-z,x,y",
+            "1/2-z,1/2+x,1/2+y",
+            "y,-z,-x",
+            "1/2+y,1/2-z,1/2-x",
+            "-x,y,z",
+            "1/2-x,1/2+y,1/2+z",
+            "z,-x,-y",
+            "1/2+z,1/2-x,1/2-y",
+            "-y,z,x",
+            "1/2-y,1/2+z,1/2+x",
+            "x,-y,-z",
+            "1/2+x,1/2-y,1/2-z",
+            "-x,z,-y",
+            "1/2-x,1/2+z,1/2-y",
+            "z,-y,x",
+            "1/2+z,1/2-y,1/2+x",
+            "-y,x,-z",
+            "1/2-y,1/2+x,1/2-z",
+            "x,-z,y",
+            "1/2+x,1/2-z,1/2+y",
+            "-z,y,-x",
+            "1/2-z,1/2+y,1/2-x",
+            "y,-x,z",
+            "1/2+y,1/2-x,1/2+z",
+            "-x,-z,y",
+            "1/2-x,1/2-z,1/2+y",
+            "z,y,-x",
+            "1/2+z,1/2+y,1/2-x",
+            "-y,-x,z",
+            "1/2-y,1/2-x,1/2+z",
+            "x,z,-y",
+            "1/2+x,1/2+z,1/2-y",
+            "-z,-y,x",
+            "1/2-z,1/2-y,1/2+x",
+            "y,x,-z",
+            "1/2+y,1/2+x,1/2-z",
+            "-z,-x,-y",
+            "1/2-z,1/2-x,1/2-y",
+            "y,z,x",
+            "1/2+y,1/2+z,1/2+x",
+            "-x,-y,-z",
+            "1/2-x,1/2-y,1/2-z",
+            "z,x,y",
+            "1/2+z,1/2+x,1/2+y",
+            "-y,-z,-x",
+            "1/2-y,1/2-z,1/2-x"
+          ],
+          "values": [
+            {
+              "x": "0.00000",
+              "y": "0.00000",
+              "z": "0.00000"
+            }
+          ],
+          "sourceId": "src-webelements-rb",
+          "kind": "TABULATED"
+        },
+        "notes": "WebElements lists BCC rubidium, space group Im-3m (229), a = b = c = 558.5 pm. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "rb-reference",
     "properties": {},
     "reviewedCandidates": [
       {
@@ -5758,6 +6418,12 @@
         "decision": "not-homologated",
         "evidenceType": "experimental",
         "note": "Consulta de auditoria; não usado como referência de investigação."
+      },
+      {
+        "sourceId": "src-webelements-rb",
+        "decision": "accepted",
+        "evidenceType": "experimental",
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -5907,21 +6573,21 @@
             "display": "6.076"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012726",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012726",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012726",
@@ -6294,21 +6960,21 @@
             "display": "5.7306"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010984",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010984",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010984",
@@ -6421,9 +7087,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -6454,10 +7120,143 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "zr-reference",
+        "type": "HC",
+        "label": "HC · hexagonal compacta",
+        "spaceGroup": "P 63/m m c",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-zr",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-zr"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-webelements-zr",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 3.232,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-zr",
+            "display": "3.232"
+          },
+          "b": {
+            "value": 3.232,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-zr",
+            "display": "3.232"
+          },
+          "c": {
+            "value": 5.147,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-zr",
+            "display": "5.147"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-zr",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-zr",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 120,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-zr",
+            "display": "120"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "-x,-x+y,1/2+z",
+            "x,x-y,1/2-z",
+            "-x+y,-x,1/2-z",
+            "x-y,x,1/2+z",
+            "-y,-x,z",
+            "y,x,-z",
+            "y,-x+y,-z",
+            "-y,x-y,z",
+            "x-y,-y,1/2+z",
+            "-x+y,y,1/2-z",
+            "x,y,1/2-z",
+            "-x,-y,1/2+z",
+            "x,x-y,z",
+            "-x,-x+y,-z",
+            "x-y,x,-z",
+            "-x+y,-x,z",
+            "y,x,1/2+z",
+            "-y,-x,1/2-z",
+            "-y,x-y,1/2-z",
+            "y,-x+y,1/2+z",
+            "-x+y,y,z",
+            "x-y,-y,-z",
+            "-x,-y,-z"
+          ],
+          "values": [
+            {
+              "x": "0.33333",
+              "y": "0.66667",
+              "z": "0.25000"
+            }
+          ],
+          "sourceId": "src-webelements-zr",
+          "kind": "TABULATED"
+        },
+        "notes": "WebElements lists HCP zirconium, space group P63/mmc (194), a = b = 323.2 pm and c = 514.7 pm. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "zr-reference",
     "properties": {},
-    "reviewedCandidates": [],
+    "reviewedCandidates": [
+      {
+        "sourceId": "src-webelements-zr",
+        "decision": "accepted",
+        "evidenceType": "experimental",
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
+      }
+    ],
     "notes": "Nome localizado em português brasileiro."
   },
   {
@@ -6507,9 +7306,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -6540,8 +7339,206 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "nb-reference",
+        "type": "CCC",
+        "label": "CCC · cúbica de corpo centrado",
+        "spaceGroup": "I m -3 m",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-nb",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-nb"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-webelements-nb",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 3.3004,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-nb",
+            "display": "3.3004"
+          },
+          "b": {
+            "value": 3.3004,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-nb",
+            "display": "3.3004"
+          },
+          "c": {
+            "value": 3.3004,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-nb",
+            "display": "3.3004"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-nb",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-nb",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-nb",
+            "display": "90"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "1/2+x,1/2+y,1/2+z",
+            "z,-x,y",
+            "1/2+z,1/2-x,1/2+y",
+            "-y,z,-x",
+            "1/2-y,1/2+z,1/2-x",
+            "x,-y,z",
+            "1/2+x,1/2-y,1/2+z",
+            "-z,x,-y",
+            "1/2-z,1/2+x,1/2-y",
+            "y,-z,x",
+            "1/2+y,1/2-z,1/2+x",
+            "-x,y,-z",
+            "1/2-x,1/2+y,1/2-z",
+            "x,-z,-y",
+            "1/2+x,1/2-z,1/2-y",
+            "-z,y,x",
+            "1/2-z,1/2+y,1/2+x",
+            "y,-x,-z",
+            "1/2+y,1/2-x,1/2-z",
+            "-x,z,y",
+            "1/2-x,1/2+z,1/2+y",
+            "z,-y,-x",
+            "1/2+z,1/2-y,1/2-x",
+            "-y,x,z",
+            "1/2-y,1/2+x,1/2+z",
+            "x,z,y",
+            "1/2+x,1/2+z,1/2+y",
+            "-z,-y,-x",
+            "1/2-z,1/2-y,1/2-x",
+            "y,x,z",
+            "1/2+y,1/2+x,1/2+z",
+            "-x,-z,-y",
+            "1/2-x,1/2-z,1/2-y",
+            "z,y,x",
+            "1/2+z,1/2+y,1/2+x",
+            "-y,-x,-z",
+            "1/2-y,1/2-x,1/2-z",
+            "z,x,-y",
+            "1/2+z,1/2+x,1/2-y",
+            "-y,-z,x",
+            "1/2-y,1/2-z,1/2+x",
+            "x,y,-z",
+            "1/2+x,1/2+y,1/2-z",
+            "-z,-x,y",
+            "1/2-z,1/2-x,1/2+y",
+            "y,z,-x",
+            "1/2+y,1/2+z,1/2-x",
+            "-x,-y,z",
+            "1/2-x,1/2-y,1/2+z",
+            "-z,x,y",
+            "1/2-z,1/2+x,1/2+y",
+            "y,-z,-x",
+            "1/2+y,1/2-z,1/2-x",
+            "-x,y,z",
+            "1/2-x,1/2+y,1/2+z",
+            "z,-x,-y",
+            "1/2+z,1/2-x,1/2-y",
+            "-y,z,x",
+            "1/2-y,1/2+z,1/2+x",
+            "x,-y,-z",
+            "1/2+x,1/2-y,1/2-z",
+            "-x,z,-y",
+            "1/2-x,1/2+z,1/2-y",
+            "z,-y,x",
+            "1/2+z,1/2-y,1/2+x",
+            "-y,x,-z",
+            "1/2-y,1/2+x,1/2-z",
+            "x,-z,y",
+            "1/2+x,1/2-z,1/2+y",
+            "-z,y,-x",
+            "1/2-z,1/2+y,1/2-x",
+            "y,-x,z",
+            "1/2+y,1/2-x,1/2+z",
+            "-x,-z,y",
+            "1/2-x,1/2-z,1/2+y",
+            "z,y,-x",
+            "1/2+z,1/2+y,1/2-x",
+            "-y,-x,z",
+            "1/2-y,1/2-x,1/2+z",
+            "x,z,-y",
+            "1/2+x,1/2+z,1/2-y",
+            "-z,-y,x",
+            "1/2-z,1/2-y,1/2+x",
+            "y,x,-z",
+            "1/2+y,1/2+x,1/2-z",
+            "-z,-x,-y",
+            "1/2-z,1/2-x,1/2-y",
+            "y,z,x",
+            "1/2+y,1/2+z,1/2+x",
+            "-x,-y,-z",
+            "1/2-x,1/2-y,1/2-z",
+            "z,x,y",
+            "1/2+z,1/2+x,1/2+y",
+            "-y,-z,-x",
+            "1/2-y,1/2-z,1/2-x"
+          ],
+          "values": [
+            {
+              "x": "0.00000",
+              "y": "0.00000",
+              "z": "0.00000"
+            }
+          ],
+          "sourceId": "src-webelements-nb",
+          "kind": "TABULATED"
+        },
+        "notes": "WebElements lists BCC niobium, space group Im-3m (229), a = b = c = 330.04 pm. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "nb-reference",
     "properties": {},
     "reviewedCandidates": [
       {
@@ -6549,6 +7546,12 @@
         "decision": "not-homologated",
         "evidenceType": "experimental",
         "note": "Consulta de auditoria; não usado como referência de investigação."
+      },
+      {
+        "sourceId": "src-webelements-nb",
+        "decision": "accepted",
+        "evidenceType": "experimental",
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -6694,21 +7697,21 @@
             "display": "3.1472"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
@@ -6893,9 +7896,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -6926,8 +7929,134 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "ru-reference",
+        "type": "HC",
+        "label": "HC · hexagonal compacta",
+        "spaceGroup": "P 63/m m c",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-ru",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ru"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-webelements-ru",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 2.7059,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ru",
+            "display": "2.7059"
+          },
+          "b": {
+            "value": 2.7059,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ru",
+            "display": "2.7059"
+          },
+          "c": {
+            "value": 4.2815,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ru",
+            "display": "4.2815"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ru",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ru",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 120,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ru",
+            "display": "120"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "-x,-x+y,1/2+z",
+            "x,x-y,1/2-z",
+            "-x+y,-x,1/2-z",
+            "x-y,x,1/2+z",
+            "-y,-x,z",
+            "y,x,-z",
+            "y,-x+y,-z",
+            "-y,x-y,z",
+            "x-y,-y,1/2+z",
+            "-x+y,y,1/2-z",
+            "x,y,1/2-z",
+            "-x,-y,1/2+z",
+            "x,x-y,z",
+            "-x,-x+y,-z",
+            "x-y,x,-z",
+            "-x+y,-x,z",
+            "y,x,1/2+z",
+            "-y,-x,1/2-z",
+            "-y,x-y,1/2-z",
+            "y,-x+y,1/2+z",
+            "-x+y,y,z",
+            "x-y,-y,-z",
+            "-x,-y,-z"
+          ],
+          "values": [
+            {
+              "x": "0.33333",
+              "y": "0.66667",
+              "z": "0.25000"
+            }
+          ],
+          "sourceId": "src-webelements-ru",
+          "kind": "TABULATED"
+        },
+        "notes": "WebElements lists HCP ruthenium, space group P63/mmc (194), a = b = 270.59 pm and c = 428.15 pm. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "ru-reference",
     "properties": {},
     "reviewedCandidates": [
       {
@@ -6935,6 +8064,12 @@
         "decision": "not-homologated",
         "evidenceType": "experimental",
         "note": "Consulta de auditoria; não usado como referência de investigação."
+      },
+      {
+        "sourceId": "src-webelements-ru",
+        "decision": "accepted",
+        "evidenceType": "experimental",
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -6986,9 +8121,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -7019,8 +8154,302 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "rh-reference",
+        "type": "CFC",
+        "label": "CFC · cúbica de faces centradas",
+        "spaceGroup": "F m -3 m",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-rh",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rh"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-webelements-rh",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 3.8034,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rh",
+            "display": "3.8034"
+          },
+          "b": {
+            "value": 3.8034,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rh",
+            "display": "3.8034"
+          },
+          "c": {
+            "value": 3.8034,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rh",
+            "display": "3.8034"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rh",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rh",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-rh",
+            "display": "90"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "x,1/2+y,1/2+z",
+            "1/2+x,y,1/2+z",
+            "1/2+x,1/2+y,z",
+            "z,-x,y",
+            "z,1/2-x,1/2+y",
+            "1/2+z,-x,1/2+y",
+            "1/2+z,1/2-x,y",
+            "-y,z,-x",
+            "-y,1/2+z,1/2-x",
+            "1/2-y,z,1/2-x",
+            "1/2-y,1/2+z,-x",
+            "x,-y,z",
+            "x,1/2-y,1/2+z",
+            "1/2+x,-y,1/2+z",
+            "1/2+x,1/2-y,z",
+            "-z,x,-y",
+            "-z,1/2+x,1/2-y",
+            "1/2-z,x,1/2-y",
+            "1/2-z,1/2+x,-y",
+            "y,-z,x",
+            "y,1/2-z,1/2+x",
+            "1/2+y,-z,1/2+x",
+            "1/2+y,1/2-z,x",
+            "-x,y,-z",
+            "-x,1/2+y,1/2-z",
+            "1/2-x,y,1/2-z",
+            "1/2-x,1/2+y,-z",
+            "x,-z,-y",
+            "x,1/2-z,1/2-y",
+            "1/2+x,-z,1/2-y",
+            "1/2+x,1/2-z,-y",
+            "-z,y,x",
+            "-z,1/2+y,1/2+x",
+            "1/2-z,y,1/2+x",
+            "1/2-z,1/2+y,x",
+            "y,-x,-z",
+            "y,1/2-x,1/2-z",
+            "1/2+y,-x,1/2-z",
+            "1/2+y,1/2-x,-z",
+            "-x,z,y",
+            "-x,1/2+z,1/2+y",
+            "1/2-x,z,1/2+y",
+            "1/2-x,1/2+z,y",
+            "z,-y,-x",
+            "z,1/2-y,1/2-x",
+            "1/2+z,-y,1/2-x",
+            "1/2+z,1/2-y,-x",
+            "-y,x,z",
+            "-y,1/2+x,1/2+z",
+            "1/2-y,x,1/2+z",
+            "1/2-y,1/2+x,z",
+            "x,z,y",
+            "x,1/2+z,1/2+y",
+            "1/2+x,z,1/2+y",
+            "1/2+x,1/2+z,y",
+            "-z,-y,-x",
+            "-z,1/2-y,1/2-x",
+            "1/2-z,-y,1/2-x",
+            "1/2-z,1/2-y,-x",
+            "y,x,z",
+            "y,1/2+x,1/2+z",
+            "1/2+y,x,1/2+z",
+            "1/2+y,1/2+x,z",
+            "-x,-z,-y",
+            "-x,1/2-z,1/2-y",
+            "1/2-x,-z,1/2-y",
+            "1/2-x,1/2-z,-y",
+            "z,y,x",
+            "z,1/2+y,1/2+x",
+            "1/2+z,y,1/2+x",
+            "1/2+z,1/2+y,x",
+            "-y,-x,-z",
+            "-y,1/2-x,1/2-z",
+            "1/2-y,-x,1/2-z",
+            "1/2-y,1/2-x,-z",
+            "z,x,-y",
+            "z,1/2+x,1/2-y",
+            "1/2+z,x,1/2-y",
+            "1/2+z,1/2+x,-y",
+            "-y,-z,x",
+            "-y,1/2-z,1/2+x",
+            "1/2-y,-z,1/2+x",
+            "1/2-y,1/2-z,x",
+            "x,y,-z",
+            "x,1/2+y,1/2-z",
+            "1/2+x,y,1/2-z",
+            "1/2+x,1/2+y,-z",
+            "-z,-x,y",
+            "-z,1/2-x,1/2+y",
+            "1/2-z,-x,1/2+y",
+            "1/2-z,1/2-x,y",
+            "y,z,-x",
+            "y,1/2+z,1/2-x",
+            "1/2+y,z,1/2-x",
+            "1/2+y,1/2+z,-x",
+            "-x,-y,z",
+            "-x,1/2-y,1/2+z",
+            "1/2-x,-y,1/2+z",
+            "1/2-x,1/2-y,z",
+            "-z,x,y",
+            "-z,1/2+x,1/2+y",
+            "1/2-z,x,1/2+y",
+            "1/2-z,1/2+x,y",
+            "y,-z,-x",
+            "y,1/2-z,1/2-x",
+            "1/2+y,-z,1/2-x",
+            "1/2+y,1/2-z,-x",
+            "-x,y,z",
+            "-x,1/2+y,1/2+z",
+            "1/2-x,y,1/2+z",
+            "1/2-x,1/2+y,z",
+            "z,-x,-y",
+            "z,1/2-x,1/2-y",
+            "1/2+z,-x,1/2-y",
+            "1/2+z,1/2-x,-y",
+            "-y,z,x",
+            "-y,1/2+z,1/2+x",
+            "1/2-y,z,1/2+x",
+            "1/2-y,1/2+z,x",
+            "x,-y,-z",
+            "x,1/2-y,1/2-z",
+            "1/2+x,-y,1/2-z",
+            "1/2+x,1/2-y,-z",
+            "-x,z,-y",
+            "-x,1/2+z,1/2-y",
+            "1/2-x,z,1/2-y",
+            "1/2-x,1/2+z,-y",
+            "z,-y,x",
+            "z,1/2-y,1/2+x",
+            "1/2+z,-y,1/2+x",
+            "1/2+z,1/2-y,x",
+            "-y,x,-z",
+            "-y,1/2+x,1/2-z",
+            "1/2-y,x,1/2-z",
+            "1/2-y,1/2+x,-z",
+            "x,-z,y",
+            "x,1/2-z,1/2+y",
+            "1/2+x,-z,1/2+y",
+            "1/2+x,1/2-z,y",
+            "-z,y,-x",
+            "-z,1/2+y,1/2-x",
+            "1/2-z,y,1/2-x",
+            "1/2-z,1/2+y,-x",
+            "y,-x,z",
+            "y,1/2-x,1/2+z",
+            "1/2+y,-x,1/2+z",
+            "1/2+y,1/2-x,z",
+            "-x,-z,y",
+            "-x,1/2-z,1/2+y",
+            "1/2-x,-z,1/2+y",
+            "1/2-x,1/2-z,y",
+            "z,y,-x",
+            "z,1/2+y,1/2-x",
+            "1/2+z,y,1/2-x",
+            "1/2+z,1/2+y,-x",
+            "-y,-x,z",
+            "-y,1/2-x,1/2+z",
+            "1/2-y,-x,1/2+z",
+            "1/2-y,1/2-x,z",
+            "x,z,-y",
+            "x,1/2+z,1/2-y",
+            "1/2+x,z,1/2-y",
+            "1/2+x,1/2+z,-y",
+            "-z,-y,x",
+            "-z,1/2-y,1/2+x",
+            "1/2-z,-y,1/2+x",
+            "1/2-z,1/2-y,x",
+            "y,x,-z",
+            "y,1/2+x,1/2-z",
+            "1/2+y,x,1/2-z",
+            "1/2+y,1/2+x,-z",
+            "-z,-x,-y",
+            "-z,1/2-x,1/2-y",
+            "1/2-z,-x,1/2-y",
+            "1/2-z,1/2-x,-y",
+            "y,z,x",
+            "y,1/2+z,1/2+x",
+            "1/2+y,z,1/2+x",
+            "1/2+y,1/2+z,x",
+            "-x,-y,-z",
+            "-x,1/2-y,1/2-z",
+            "1/2-x,-y,1/2-z",
+            "1/2-x,1/2-y,-z",
+            "z,x,y",
+            "z,1/2+x,1/2+y",
+            "1/2+z,x,1/2+y",
+            "1/2+z,1/2+x,y",
+            "-y,-z,-x",
+            "-y,1/2-z,1/2-x",
+            "1/2-y,-z,1/2-x",
+            "1/2-y,1/2-z,-x"
+          ],
+          "values": [
+            {
+              "x": "0.00000",
+              "y": "0.00000",
+              "z": "0.00000"
+            }
+          ],
+          "sourceId": "src-webelements-rh",
+          "kind": "TABULATED"
+        },
+        "notes": "WebElements lists FCC rhodium, space group Fm-3m (225), a = b = c = 380.34 pm. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "rh-reference",
     "properties": {},
     "reviewedCandidates": [
       {
@@ -7028,6 +8457,12 @@
         "decision": "not-homologated",
         "evidenceType": "experimental",
         "note": "Consulta de auditoria; não usado como referência de investigação."
+      },
+      {
+        "sourceId": "src-webelements-rh",
+        "decision": "accepted",
+        "evidenceType": "experimental",
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -7173,21 +8608,21 @@
             "display": "3.8898"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
@@ -7378,21 +8813,21 @@
             "display": "4.0862"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
@@ -7489,9 +8924,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -7522,15 +8957,141 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "cd-reference",
+        "type": "HC",
+        "label": "HC · hexagonal compacta",
+        "spaceGroup": "P 63/m m c",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008490",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008490"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-cod-9008490",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 2.97887,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008490",
+            "display": "2.97887"
+          },
+          "b": {
+            "value": 2.97887,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008490",
+            "display": "2.97887"
+          },
+          "c": {
+            "value": 5.61765,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008490",
+            "display": "5.61765"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008490",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008490",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 120,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008490",
+            "display": "120"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "-x,-x+y,1/2+z",
+            "x,x-y,1/2-z",
+            "-x+y,-x,1/2-z",
+            "x-y,x,1/2+z",
+            "-y,-x,z",
+            "y,x,-z",
+            "y,-x+y,-z",
+            "-y,x-y,z",
+            "x-y,-y,1/2+z",
+            "-x+y,y,1/2-z",
+            "x,y,1/2-z",
+            "-x,-y,1/2+z",
+            "x,x-y,z",
+            "-x,-x+y,-z",
+            "x-y,x,-z",
+            "-x+y,-x,z",
+            "y,x,1/2+z",
+            "-y,-x,1/2-z",
+            "-y,x-y,1/2-z",
+            "y,-x+y,1/2+z",
+            "-x+y,y,z",
+            "x-y,-y,-z",
+            "-x,-y,-z"
+          ],
+          "values": [
+            {
+              "x": "0.33333",
+              "y": "0.66667",
+              "z": "0.25000"
+            }
+          ],
+          "sourceId": "src-cod-9008490",
+          "kind": "TABULATED"
+        },
+        "notes": "COD entry 9008490 records HCP cadmium, space group P63/mmc (194), a = b = 2.97887 Å and c = 5.61765 Å. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "cd-reference",
     "properties": {},
     "reviewedCandidates": [
       {
         "sourceId": "src-cod-9008490",
-        "decision": "not-homologated",
+        "decision": "accepted",
         "evidenceType": "experimental",
-        "note": "Consulta de auditoria; não usado como referência de investigação."
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -7773,21 +9334,21 @@
             "display": "3.18129"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012005",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012005",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012005",
@@ -8246,9 +9807,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -8279,8 +9840,206 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "cs-reference",
+        "type": "CCC",
+        "label": "CCC · cúbica de corpo centrado",
+        "spaceGroup": "I m -3 m",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-cs",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-cs"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-webelements-cs",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 6.141,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-cs",
+            "display": "6.141"
+          },
+          "b": {
+            "value": 6.141,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-cs",
+            "display": "6.141"
+          },
+          "c": {
+            "value": 6.141,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-cs",
+            "display": "6.141"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-cs",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-cs",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-cs",
+            "display": "90"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "1/2+x,1/2+y,1/2+z",
+            "z,-x,y",
+            "1/2+z,1/2-x,1/2+y",
+            "-y,z,-x",
+            "1/2-y,1/2+z,1/2-x",
+            "x,-y,z",
+            "1/2+x,1/2-y,1/2+z",
+            "-z,x,-y",
+            "1/2-z,1/2+x,1/2-y",
+            "y,-z,x",
+            "1/2+y,1/2-z,1/2+x",
+            "-x,y,-z",
+            "1/2-x,1/2+y,1/2-z",
+            "x,-z,-y",
+            "1/2+x,1/2-z,1/2-y",
+            "-z,y,x",
+            "1/2-z,1/2+y,1/2+x",
+            "y,-x,-z",
+            "1/2+y,1/2-x,1/2-z",
+            "-x,z,y",
+            "1/2-x,1/2+z,1/2+y",
+            "z,-y,-x",
+            "1/2+z,1/2-y,1/2-x",
+            "-y,x,z",
+            "1/2-y,1/2+x,1/2+z",
+            "x,z,y",
+            "1/2+x,1/2+z,1/2+y",
+            "-z,-y,-x",
+            "1/2-z,1/2-y,1/2-x",
+            "y,x,z",
+            "1/2+y,1/2+x,1/2+z",
+            "-x,-z,-y",
+            "1/2-x,1/2-z,1/2-y",
+            "z,y,x",
+            "1/2+z,1/2+y,1/2+x",
+            "-y,-x,-z",
+            "1/2-y,1/2-x,1/2-z",
+            "z,x,-y",
+            "1/2+z,1/2+x,1/2-y",
+            "-y,-z,x",
+            "1/2-y,1/2-z,1/2+x",
+            "x,y,-z",
+            "1/2+x,1/2+y,1/2-z",
+            "-z,-x,y",
+            "1/2-z,1/2-x,1/2+y",
+            "y,z,-x",
+            "1/2+y,1/2+z,1/2-x",
+            "-x,-y,z",
+            "1/2-x,1/2-y,1/2+z",
+            "-z,x,y",
+            "1/2-z,1/2+x,1/2+y",
+            "y,-z,-x",
+            "1/2+y,1/2-z,1/2-x",
+            "-x,y,z",
+            "1/2-x,1/2+y,1/2+z",
+            "z,-x,-y",
+            "1/2+z,1/2-x,1/2-y",
+            "-y,z,x",
+            "1/2-y,1/2+z,1/2+x",
+            "x,-y,-z",
+            "1/2+x,1/2-y,1/2-z",
+            "-x,z,-y",
+            "1/2-x,1/2+z,1/2-y",
+            "z,-y,x",
+            "1/2+z,1/2-y,1/2+x",
+            "-y,x,-z",
+            "1/2-y,1/2+x,1/2-z",
+            "x,-z,y",
+            "1/2+x,1/2-z,1/2+y",
+            "-z,y,-x",
+            "1/2-z,1/2+y,1/2-x",
+            "y,-x,z",
+            "1/2+y,1/2-x,1/2+z",
+            "-x,-z,y",
+            "1/2-x,1/2-z,1/2+y",
+            "z,y,-x",
+            "1/2+z,1/2+y,1/2-x",
+            "-y,-x,z",
+            "1/2-y,1/2-x,1/2+z",
+            "x,z,-y",
+            "1/2+x,1/2+z,1/2-y",
+            "-z,-y,x",
+            "1/2-z,1/2-y,1/2+x",
+            "y,x,-z",
+            "1/2+y,1/2+x,1/2-z",
+            "-z,-x,-y",
+            "1/2-z,1/2-x,1/2-y",
+            "y,z,x",
+            "1/2+y,1/2+z,1/2+x",
+            "-x,-y,-z",
+            "1/2-x,1/2-y,1/2-z",
+            "z,x,y",
+            "1/2+z,1/2+x,1/2+y",
+            "-y,-z,-x",
+            "1/2-y,1/2-z,1/2-x"
+          ],
+          "values": [
+            {
+              "x": "0.00000",
+              "y": "0.00000",
+              "z": "0.00000"
+            }
+          ],
+          "sourceId": "src-webelements-cs",
+          "kind": "TABULATED"
+        },
+        "notes": "WebElements lists BCC caesium, space group Im-3m (229), a = b = c = 614.1 pm. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "cs-reference",
     "properties": {},
     "reviewedCandidates": [
       {
@@ -8288,6 +10047,12 @@
         "decision": "not-homologated",
         "evidenceType": "experimental",
         "note": "Consulta de auditoria; não usado como referência de investigação."
+      },
+      {
+        "sourceId": "src-webelements-cs",
+        "decision": "accepted",
+        "evidenceType": "experimental",
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -8437,21 +10202,21 @@
             "display": "5.013"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012729",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012729",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012729",
@@ -8728,21 +10493,21 @@
             "display": "12.159"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010986",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010986",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010986",
@@ -8947,21 +10712,21 @@
             "display": "5.1612"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010987",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010987",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010987",
@@ -9334,21 +11099,21 @@
             "display": "11.8354"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010988",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010988",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010988",
@@ -9553,21 +11318,21 @@
             "display": "11.7992"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010989",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010989",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010989",
@@ -10069,21 +11834,21 @@
             "display": "4.606"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010990",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010990",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010990",
@@ -10360,21 +12125,21 @@
             "display": "5.7826"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010991",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010991",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010991",
@@ -10579,21 +12344,21 @@
             "display": "5.6936"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010992",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010992",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010992",
@@ -10798,21 +12563,21 @@
             "display": "5.6475"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010993",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010993",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010993",
@@ -11017,21 +12782,21 @@
             "display": "5.6158"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010994",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010994",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010994",
@@ -11236,21 +13001,21 @@
             "display": "5.5874"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010995",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010995",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010995",
@@ -11455,21 +13220,21 @@
             "display": "5.5546"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010996",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010996",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010996",
@@ -11680,21 +13445,21 @@
             "display": "5.4862"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010997",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010997",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010997",
@@ -12067,21 +13832,21 @@
             "display": "5.5509"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010998",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010998",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9010998",
@@ -12188,9 +13953,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -12221,8 +13986,134 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "hf-reference",
+        "type": "HC",
+        "label": "HC · hexagonal compacta",
+        "spaceGroup": "P 63/m m c",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-hf",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-hf"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-webelements-hf",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 3.1964,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-hf",
+            "display": "3.1964"
+          },
+          "b": {
+            "value": 3.1964,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-hf",
+            "display": "3.1964"
+          },
+          "c": {
+            "value": 5.0511,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-hf",
+            "display": "5.0511"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-hf",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-hf",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 120,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-hf",
+            "display": "120"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "-x,-x+y,1/2+z",
+            "x,x-y,1/2-z",
+            "-x+y,-x,1/2-z",
+            "x-y,x,1/2+z",
+            "-y,-x,z",
+            "y,x,-z",
+            "y,-x+y,-z",
+            "-y,x-y,z",
+            "x-y,-y,1/2+z",
+            "-x+y,y,1/2-z",
+            "x,y,1/2-z",
+            "-x,-y,1/2+z",
+            "x,x-y,z",
+            "-x,-x+y,-z",
+            "x-y,x,-z",
+            "-x+y,-x,z",
+            "y,x,1/2+z",
+            "-y,-x,1/2-z",
+            "-y,x-y,1/2-z",
+            "y,-x+y,1/2+z",
+            "-x+y,y,z",
+            "x-y,-y,-z",
+            "-x,-y,-z"
+          ],
+          "values": [
+            {
+              "x": "0.33333",
+              "y": "0.66667",
+              "z": "0.25000"
+            }
+          ],
+          "sourceId": "src-webelements-hf",
+          "kind": "TABULATED"
+        },
+        "notes": "WebElements lists HCP hafnium, space group P63/mmc (194), a = b = 319.64 pm and c = 505.11 pm. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "hf-reference",
     "properties": {},
     "reviewedCandidates": [
       {
@@ -12230,6 +14121,12 @@
         "decision": "not-homologated",
         "evidenceType": "experimental",
         "note": "Consulta de auditoria; não usado como referência de investigação."
+      },
+      {
+        "sourceId": "src-webelements-hf",
+        "decision": "accepted",
+        "evidenceType": "experimental",
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -12375,21 +14272,21 @@
             "display": "3.3058"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
@@ -12522,7 +14419,7 @@
         "sourceId": "src-cod-9006486",
         "conditions": {
           "temperature": {
-            "value": 298.0,
+            "value": 298,
             "unit": "K",
             "kind": "TABULATED",
             "sourceId": "src-cod-9006486",
@@ -12574,21 +14471,21 @@
             "display": "3.1648"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9006486",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9006486",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9006486",
@@ -12767,9 +14664,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -12800,8 +14697,134 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "re-reference",
+        "type": "HC",
+        "label": "HC · hexagonal compacta",
+        "spaceGroup": "P 63/m m c",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-re",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-re"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-webelements-re",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 2.761,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-re",
+            "display": "2.761"
+          },
+          "b": {
+            "value": 2.761,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-re",
+            "display": "2.761"
+          },
+          "c": {
+            "value": 4.456,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-re",
+            "display": "4.456"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-re",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-re",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 120,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-re",
+            "display": "120"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "-x,-x+y,1/2+z",
+            "x,x-y,1/2-z",
+            "-x+y,-x,1/2-z",
+            "x-y,x,1/2+z",
+            "-y,-x,z",
+            "y,x,-z",
+            "y,-x+y,-z",
+            "-y,x-y,z",
+            "x-y,-y,1/2+z",
+            "-x+y,y,1/2-z",
+            "x,y,1/2-z",
+            "-x,-y,1/2+z",
+            "x,x-y,z",
+            "-x,-x+y,-z",
+            "x-y,x,-z",
+            "-x+y,-x,z",
+            "y,x,1/2+z",
+            "-y,-x,1/2-z",
+            "-y,x-y,1/2-z",
+            "y,-x+y,1/2+z",
+            "-x+y,y,z",
+            "x-y,-y,-z",
+            "-x,-y,-z"
+          ],
+          "values": [
+            {
+              "x": "0.33333",
+              "y": "0.66667",
+              "z": "0.25000"
+            }
+          ],
+          "sourceId": "src-webelements-re",
+          "kind": "TABULATED"
+        },
+        "notes": "WebElements lists HCP rhenium, space group P63/mmc (194), a = b = 276.1 pm and c = 445.6 pm. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "re-reference",
     "properties": {},
     "reviewedCandidates": [
       {
@@ -12809,6 +14832,12 @@
         "decision": "not-homologated",
         "evidenceType": "experimental",
         "note": "Consulta de auditoria; não usado como referência de investigação."
+      },
+      {
+        "sourceId": "src-webelements-re",
+        "decision": "accepted",
+        "evidenceType": "experimental",
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -12860,9 +14889,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -12893,8 +14922,134 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "os-reference",
+        "type": "HC",
+        "label": "HC · hexagonal compacta",
+        "spaceGroup": "P 63/m m c",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-os",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-os"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-webelements-os",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 2.7344,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-os",
+            "display": "2.7344"
+          },
+          "b": {
+            "value": 2.7344,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-os",
+            "display": "2.7344"
+          },
+          "c": {
+            "value": 4.3173,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-os",
+            "display": "4.3173"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-os",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-os",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 120,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-os",
+            "display": "120"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "-x,-x+y,1/2+z",
+            "x,x-y,1/2-z",
+            "-x+y,-x,1/2-z",
+            "x-y,x,1/2+z",
+            "-y,-x,z",
+            "y,x,-z",
+            "y,-x+y,-z",
+            "-y,x-y,z",
+            "x-y,-y,1/2+z",
+            "-x+y,y,1/2-z",
+            "x,y,1/2-z",
+            "-x,-y,1/2+z",
+            "x,x-y,z",
+            "-x,-x+y,-z",
+            "x-y,x,-z",
+            "-x+y,-x,z",
+            "y,x,1/2+z",
+            "-y,-x,1/2-z",
+            "-y,x-y,1/2-z",
+            "y,-x+y,1/2+z",
+            "-x+y,y,z",
+            "x-y,-y,-z",
+            "-x,-y,-z"
+          ],
+          "values": [
+            {
+              "x": "0.33333",
+              "y": "0.66667",
+              "z": "0.25000"
+            }
+          ],
+          "sourceId": "src-webelements-os",
+          "kind": "TABULATED"
+        },
+        "notes": "WebElements lists HCP osmium, space group P63/mmc (194), a = b = 273.44 pm and c = 431.73 pm. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "os-reference",
     "properties": {},
     "reviewedCandidates": [
       {
@@ -12902,6 +15057,12 @@
         "decision": "not-homologated",
         "evidenceType": "experimental",
         "note": "Consulta de auditoria; não usado como referência de investigação."
+      },
+      {
+        "sourceId": "src-webelements-os",
+        "decision": "accepted",
+        "evidenceType": "experimental",
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -12953,9 +15114,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Referência cristalográfica experimental homologada para visualização no modelo SILM compatível; parâmetros limitados às condições de referência.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -12986,8 +15147,302 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "ir-reference",
+        "type": "CFC",
+        "label": "CFC · cúbica de faces centradas",
+        "spaceGroup": "F m -3 m",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-ir",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Pressão ambiente; valor numérico não reportado"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ir"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica consultada",
+            "sourceId": "src-webelements-ir",
+            "kind": "TABULATED"
+          },
+          "notes": "Fase sólida de referência para condições ambientes. A temperatura numérica não foi explicitada na ficha consultada; não extrapolar os parâmetros para outras condições."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 3.839,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ir",
+            "display": "3.839"
+          },
+          "b": {
+            "value": 3.839,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ir",
+            "display": "3.839"
+          },
+          "c": {
+            "value": 3.839,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ir",
+            "display": "3.839"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ir",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ir",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-webelements-ir",
+            "display": "90"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "x,1/2+y,1/2+z",
+            "1/2+x,y,1/2+z",
+            "1/2+x,1/2+y,z",
+            "z,-x,y",
+            "z,1/2-x,1/2+y",
+            "1/2+z,-x,1/2+y",
+            "1/2+z,1/2-x,y",
+            "-y,z,-x",
+            "-y,1/2+z,1/2-x",
+            "1/2-y,z,1/2-x",
+            "1/2-y,1/2+z,-x",
+            "x,-y,z",
+            "x,1/2-y,1/2+z",
+            "1/2+x,-y,1/2+z",
+            "1/2+x,1/2-y,z",
+            "-z,x,-y",
+            "-z,1/2+x,1/2-y",
+            "1/2-z,x,1/2-y",
+            "1/2-z,1/2+x,-y",
+            "y,-z,x",
+            "y,1/2-z,1/2+x",
+            "1/2+y,-z,1/2+x",
+            "1/2+y,1/2-z,x",
+            "-x,y,-z",
+            "-x,1/2+y,1/2-z",
+            "1/2-x,y,1/2-z",
+            "1/2-x,1/2+y,-z",
+            "x,-z,-y",
+            "x,1/2-z,1/2-y",
+            "1/2+x,-z,1/2-y",
+            "1/2+x,1/2-z,-y",
+            "-z,y,x",
+            "-z,1/2+y,1/2+x",
+            "1/2-z,y,1/2+x",
+            "1/2-z,1/2+y,x",
+            "y,-x,-z",
+            "y,1/2-x,1/2-z",
+            "1/2+y,-x,1/2-z",
+            "1/2+y,1/2-x,-z",
+            "-x,z,y",
+            "-x,1/2+z,1/2+y",
+            "1/2-x,z,1/2+y",
+            "1/2-x,1/2+z,y",
+            "z,-y,-x",
+            "z,1/2-y,1/2-x",
+            "1/2+z,-y,1/2-x",
+            "1/2+z,1/2-y,-x",
+            "-y,x,z",
+            "-y,1/2+x,1/2+z",
+            "1/2-y,x,1/2+z",
+            "1/2-y,1/2+x,z",
+            "x,z,y",
+            "x,1/2+z,1/2+y",
+            "1/2+x,z,1/2+y",
+            "1/2+x,1/2+z,y",
+            "-z,-y,-x",
+            "-z,1/2-y,1/2-x",
+            "1/2-z,-y,1/2-x",
+            "1/2-z,1/2-y,-x",
+            "y,x,z",
+            "y,1/2+x,1/2+z",
+            "1/2+y,x,1/2+z",
+            "1/2+y,1/2+x,z",
+            "-x,-z,-y",
+            "-x,1/2-z,1/2-y",
+            "1/2-x,-z,1/2-y",
+            "1/2-x,1/2-z,-y",
+            "z,y,x",
+            "z,1/2+y,1/2+x",
+            "1/2+z,y,1/2+x",
+            "1/2+z,1/2+y,x",
+            "-y,-x,-z",
+            "-y,1/2-x,1/2-z",
+            "1/2-y,-x,1/2-z",
+            "1/2-y,1/2-x,-z",
+            "z,x,-y",
+            "z,1/2+x,1/2-y",
+            "1/2+z,x,1/2-y",
+            "1/2+z,1/2+x,-y",
+            "-y,-z,x",
+            "-y,1/2-z,1/2+x",
+            "1/2-y,-z,1/2+x",
+            "1/2-y,1/2-z,x",
+            "x,y,-z",
+            "x,1/2+y,1/2-z",
+            "1/2+x,y,1/2-z",
+            "1/2+x,1/2+y,-z",
+            "-z,-x,y",
+            "-z,1/2-x,1/2+y",
+            "1/2-z,-x,1/2+y",
+            "1/2-z,1/2-x,y",
+            "y,z,-x",
+            "y,1/2+z,1/2-x",
+            "1/2+y,z,1/2-x",
+            "1/2+y,1/2+z,-x",
+            "-x,-y,z",
+            "-x,1/2-y,1/2+z",
+            "1/2-x,-y,1/2+z",
+            "1/2-x,1/2-y,z",
+            "-z,x,y",
+            "-z,1/2+x,1/2+y",
+            "1/2-z,x,1/2+y",
+            "1/2-z,1/2+x,y",
+            "y,-z,-x",
+            "y,1/2-z,1/2-x",
+            "1/2+y,-z,1/2-x",
+            "1/2+y,1/2-z,-x",
+            "-x,y,z",
+            "-x,1/2+y,1/2+z",
+            "1/2-x,y,1/2+z",
+            "1/2-x,1/2+y,z",
+            "z,-x,-y",
+            "z,1/2-x,1/2-y",
+            "1/2+z,-x,1/2-y",
+            "1/2+z,1/2-x,-y",
+            "-y,z,x",
+            "-y,1/2+z,1/2+x",
+            "1/2-y,z,1/2+x",
+            "1/2-y,1/2+z,x",
+            "x,-y,-z",
+            "x,1/2-y,1/2-z",
+            "1/2+x,-y,1/2-z",
+            "1/2+x,1/2-y,-z",
+            "-x,z,-y",
+            "-x,1/2+z,1/2-y",
+            "1/2-x,z,1/2-y",
+            "1/2-x,1/2+z,-y",
+            "z,-y,x",
+            "z,1/2-y,1/2+x",
+            "1/2+z,-y,1/2+x",
+            "1/2+z,1/2-y,x",
+            "-y,x,-z",
+            "-y,1/2+x,1/2-z",
+            "1/2-y,x,1/2-z",
+            "1/2-y,1/2+x,-z",
+            "x,-z,y",
+            "x,1/2-z,1/2+y",
+            "1/2+x,-z,1/2+y",
+            "1/2+x,1/2-z,y",
+            "-z,y,-x",
+            "-z,1/2+y,1/2-x",
+            "1/2-z,y,1/2-x",
+            "1/2-z,1/2+y,-x",
+            "y,-x,z",
+            "y,1/2-x,1/2+z",
+            "1/2+y,-x,1/2+z",
+            "1/2+y,1/2-x,z",
+            "-x,-z,y",
+            "-x,1/2-z,1/2+y",
+            "1/2-x,-z,1/2+y",
+            "1/2-x,1/2-z,y",
+            "z,y,-x",
+            "z,1/2+y,1/2-x",
+            "1/2+z,y,1/2-x",
+            "1/2+z,1/2+y,-x",
+            "-y,-x,z",
+            "-y,1/2-x,1/2+z",
+            "1/2-y,-x,1/2+z",
+            "1/2-y,1/2-x,z",
+            "x,z,-y",
+            "x,1/2+z,1/2-y",
+            "1/2+x,z,1/2-y",
+            "1/2+x,1/2+z,-y",
+            "-z,-y,x",
+            "-z,1/2-y,1/2+x",
+            "1/2-z,-y,1/2+x",
+            "1/2-z,1/2-y,x",
+            "y,x,-z",
+            "y,1/2+x,1/2-z",
+            "1/2+y,x,1/2-z",
+            "1/2+y,1/2+x,-z",
+            "-z,-x,-y",
+            "-z,1/2-x,1/2-y",
+            "1/2-z,-x,1/2-y",
+            "1/2-z,1/2-x,-y",
+            "y,z,x",
+            "y,1/2+z,1/2+x",
+            "1/2+y,z,1/2+x",
+            "1/2+y,1/2+z,x",
+            "-x,-y,-z",
+            "-x,1/2-y,1/2-z",
+            "1/2-x,-y,1/2-z",
+            "1/2-x,1/2-y,-z",
+            "z,x,y",
+            "z,1/2+x,1/2+y",
+            "1/2+z,x,1/2+y",
+            "1/2+z,1/2+x,y",
+            "-y,-z,-x",
+            "-y,1/2-z,1/2-x",
+            "1/2-y,-z,1/2-x",
+            "1/2-y,1/2-z,-x"
+          ],
+          "values": [
+            {
+              "x": "0.00000",
+              "y": "0.00000",
+              "z": "0.00000"
+            }
+          ],
+          "sourceId": "src-webelements-ir",
+          "kind": "TABULATED"
+        },
+        "notes": "WebElements lists FCC iridium, space group Fm-3m (225), a = b = c = 383.9 pm. Fase sólida em condição ambiente. A base fracionária e as operações de simetria foram normalizadas à origem cristalográfica equivalente do modelo SILM; a validação geométrica é obrigatória antes de habilitar a visualização."
+      }
+    ],
+    "referenceStructure": "ir-reference",
     "properties": {},
     "reviewedCandidates": [
       {
@@ -12995,6 +15450,12 @@
         "decision": "not-homologated",
         "evidenceType": "experimental",
         "note": "Consulta de auditoria; não usado como referência de investigação."
+      },
+      {
+        "sourceId": "src-webelements-ir",
+        "decision": "accepted",
+        "evidenceType": "experimental",
+        "note": "Referência experimental homologada e validada contra o modelo cristalográfico compatível."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -13140,21 +15601,21 @@
             "display": "3.9231"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
@@ -13345,21 +15806,21 @@
             "display": "4.0786"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-nbs-539-v1",
@@ -13590,7 +16051,7 @@
         "sourceId": "src-cod-9008519",
         "conditions": {
           "temperature": {
-            "value": 297.0,
+            "value": 297,
             "unit": "K",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008519",
@@ -13642,21 +16103,21 @@
             "display": "5.525"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008519",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008519",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008519",
@@ -13863,21 +16324,21 @@
             "display": "4.95004"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012004",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012004",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9012004",
@@ -14198,7 +16659,7 @@
         "sourceId": "src-cod-9009658",
         "conditions": {
           "temperature": {
-            "value": 298.0,
+            "value": 298,
             "unit": "K",
             "kind": "TABULATED",
             "sourceId": "src-cod-9009658",
@@ -14250,21 +16711,21 @@
             "display": "11.862"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9009658",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9009658",
             "display": "90"
           },
           "gamma": {
-            "value": 120.0,
+            "value": 120,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9009658",
@@ -15291,21 +17752,21 @@
             "display": "6.663"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008585",
             "display": "90"
           },
           "beta": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008585",
             "display": "90"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008585",
@@ -15498,7 +17959,7 @@
             "display": "10.973"
           },
           "alpha": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008587",
@@ -15512,7 +17973,7 @@
             "display": "101.80"
           },
           "gamma": {
-            "value": 90.0,
+            "value": 90,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-9008587",

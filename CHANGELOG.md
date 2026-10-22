@@ -1,5 +1,13 @@
 # Registro de alterações
 
+## SILM 0.15.0 — Expansão da cobertura cristalográfica
+
+- Homologadas referências experimentais para 14 metais adicionais compatíveis com CCC, CFC ou HC: Ti, Cr, Co, Rb, Zr, Nb, Ru, Rh, Cd, Cs, Hf, Re, Os e Ir.
+- A cobertura passa de 43 para 57 metais investigáveis; o renderizador cristalográfico passa de 34 para 48 metais.
+- Atualizados banco canônico, fontes, bundle gerado, testes de cobertura e documentação da proveniência.
+- Não foram inventadas temperaturas numéricas ausentes nas fichas de referência; as condições ambientais sem valor publicado são marcadas como qualitativas.
+- O schema científico permanece na versão 8. Nove metais investigáveis com estruturas fora de CCC/CFC/HC continuam sem visualização até a implementação de modelos específicos.
+
 ## SILM 0.14.7 — Barra contextual e expansão da oficina
 
 - A tela inteira agora é aplicada à oficina como um todo; a estrutura cristalina passa a ocupar apenas a área flexível abaixo da barra contextual.

@@ -18,7 +18,13 @@
 | **0.10.x** | **Módulo Calcular** | **0.10.0 entregue; 0.10.1 (correção de origem: gramática da família, Base Estrutural 0.3.1)** |
 | 0.11.x | Representação 2D | 0.11.0 entregue (renderizador comum, câmera, projeções, representationState) |
 | **0.12.x** | **Representação 3D** | **0.12.0 entregue (câmera de órbita, perspectiva e ortográfica, XY/XZ/YZ, volta ao 2D)** |
-| 0.13.x – 0.18.x, 1.0.0-rc.x, 1.0.0 | ver abaixo | planejadas |
+| 0.13.x | Roteiros experimentais | concluída (0.13.0) |
+| 0.14.x | Missões e Aprender/Temas | entregue; correções 0.14.7 |
+| **0.15.x** | **Cobertura de metais e estruturas; Manual, Professor e relatórios** | **0.15.0 entregue em cobertura compatível; tipos cristalográficos adicionais pendentes** |
+| 0.16.x | Acessibilidade e mobile das mecânicas científicas | planejada |
+| 0.17.x | Validação científica | planejada |
+| 0.18.x | Homologação técnica | planejada |
+| 1.0.0-rc.x / 1.0.0 | Integração final e versão homologada | planejadas |
 
 ---
 
@@ -105,9 +111,9 @@ Conteúdo científico dos roteiros, estados iniciais, procedimentos, restriçõe
 Missões científicas, problemas, objetivos, validação, Temas e relações entre conteúdo, roteiro e missão. Sem score, ranking, XP, estrelas, medalhas ou porcentagem gamificada; "Concluído" é permitido, e os itens continuam refazíveis.
 
 # SILM 0.15.x
-## MANUAL, PROFESSOR, RELATÓRIO E CONTEÚDO PEDAGÓGICO
+## COBERTURA DE METAIS, ESTRUTURAS CRISTALINAS E CONTEÚDO PEDAGÓGICO
 
-Conteúdo definitivo do Manual, conteúdo conceitual e operacional, limitações do modelo, Área do Professor, recursos configuráveis, relatório científico e referências.
+Ampliar a cobertura dos metais com referências experimentais verificadas; atualizar os modelos cristalográficos sem substituir tipos incompatíveis; consolidar limitações do modelo e proveniência no Manual, Área do Professor e relatórios científicos. A versão 0.15.0 homologou 14 registros que se encaixam em CCC/CFC/HC. Permanecem planejados os modelos próprios para estruturas complexas e a conclusão dos conteúdos definitivos do Manual e da Área do Professor.
 
 # SILM 0.16.x
 ## ACESSIBILIDADE E MOBILE DAS MECÂNICAS CIENTÍFICAS
