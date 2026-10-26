@@ -35,7 +35,7 @@ jobs:
 
       - name: Validar scripts e catálogo
         run: |
-          python3 -m py_compile jazz-club/blender/build_audience.py jazz-club/blender/build_sommerfeld.py jazz-club/blender/refine_sommerfeld_06.py jazz-club/blender/face_anatomy.py
+          python3 -m py_compile jazz-club/blender/build_audience.py jazz-club/blender/build_sommerfeld.py jazz-club/blender/refine_sommerfeld_07.py jazz-club/blender/materials07.py jazz-club/blender/face_anatomy.py
           python3 -m unittest discover -s jazz-club/tests -p 'test_*.py' -v
           python3 - <<'PY'
           import json
@@ -49,6 +49,7 @@ jobs:
       - name: Criar plateia e Sommerfeld (GLB)
         run: |
           mkdir -p dist/jazz-club/assets
+          python3 jazz-club/blender/materials07.py --output dist/jazz-club/assets/materials07
           blender -b -t 2 --factory-startup --python jazz-club/blender/build_audience.py -- \
             --manifest jazz-club/data/scientists.json \
             --output dist/jazz-club/assets/scientists-proxy.glb
@@ -107,6 +108,7 @@ jobs:
           path: |
             jazz-club/web/dist/**
             dist/jazz-club/assets/sommerfeld-study.blend
+            dist/jazz-club/assets/materials07/*.png
             jazz-club/data/scientists.json
           if-no-files-found: error
           retention-days: 14
