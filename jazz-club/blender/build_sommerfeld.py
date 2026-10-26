@@ -99,7 +99,7 @@ def create():
     brass=color('brass-aged',(.57,.40,.19),metal=.7,rough=.35)
     root=ctrl('SOMMERFELD_ROOT',(0,0,0))
     root['scientistId']='sommerfeld'
-    root['modelStatus']='artistic-study-04-not-verified-likeness'
+    root['modelStatus']='artistic-study-05-not-verified-likeness'
     root['portraitSource']='https://www.loc.gov/item/2014715010/'
     root['sceneYear']='1925 (fictional historical meeting)'
     # Garments: editable shells and tailored lapels (not a shared primitive).
@@ -126,15 +126,26 @@ def create():
         piece('UpperSleeve',(0,0,0),(side*.08,.04,-.31),.115,coat,upper)
         fore=ctrl('ARM_'+('L' if side<0 else 'R')+'_FORE',(side*.08,.04,-.31),upper)
         piece('ForearmSleeve',(0,0,0),(-side*.15,.23,-.15),.095,coat,fore)
-        sphere('AnatomicalHand',(-side*.15,.23,-.15),(.07,.092,.049),skin,fore)
+        sphere('AnatomicalHand',(-side*.15,.23,-.15),(.064,.065,.037),skin,fore)
+        # Five digits with short proximal/distal segments: a pose proxy, not final skinning.
+        for finger in range(4):
+            fx=-side*.15+(finger-1.5)*.026
+            offset=.007 if finger in (1,2) else 0
+            a=(fx,.280,-.165+offset)
+            mid=(fx,.325,-.182+offset)
+            tip=(fx,.362,-.198+offset)
+            piece('Finger%02dProximal'%finger,a,mid,.011,skin,fore)
+            piece('Finger%02dDistal'%finger,mid,tip,.008,skin,fore)
+            sphere('Finger%02dJoint'%finger,mid,(.010,.010,.010),skin,fore)
+        piece('ThumbProximal',(-side*.22,.256,-.148),(-side*.237,.310,-.175),.019,skin,fore)
+        piece('ThumbDistal',(-side*.237,.310,-.175),(-side*.240,.334,-.184),.013,skin,fore)
         sphere('SeatedThigh',(side*.15,.16,.71),(.15,.29,.13),coat,root)
         piece('TrouserLeg',(side*.15,.35,.68),(side*.15,.42,.24),.11,coat,root)
         sphere('Shoe',(side*.15,.56,.14),(.14,.24,.08),coat,root)
     sphere('Neck',(0,0,1.46),(.10,.10,.14),skin,root)
     head=ctrl('HEAD_ANCHOR',(0,0,1.70),root)
     face_quadmesh(skin,head)
-    sphere('NoseBridge',(0,.188,.006),(.025,.029,.088),skin,head)
-    sphere('NoseTip',(0,.227,-.078),(.036,.038,.027),skin,head)
+    # Nose bridge and tip share the quad facial surface; no detached meshes.
     for side in (-1,1):
         sphere('Ear',(side*.199,-.006,-.012),(.037,.041,.087),skin,head)
         sphere('EarConcha',(side*.223,.037,-.012),(.018,.013,.047),shadow,head)
