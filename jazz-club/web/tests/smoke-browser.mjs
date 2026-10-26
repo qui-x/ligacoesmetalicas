@@ -44,7 +44,7 @@ try {
   const url = 'http://127.0.0.1:4173/?qa=1';
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(
-    () => window.__jazzQa?.snapshot()?.ready === true, { timeout: 120000 });
+    () => window.__jazzQa?.snapshot()?.ready === true, undefined, { timeout: 120000 });
   const initial = await page.evaluate(() => window.__jazzQa.snapshot());
   console.log('INITIAL_SCENE', JSON.stringify(initial));
   assert(initial.webGLVersion >= 1, 'WebGL context not available');
@@ -58,13 +58,13 @@ try {
   await page.locator('button[data-expression=smile]').click();
   await page.waitForFunction(
     () => (window.__jazzQa?.snapshot().morphWeights.Smile ?? 0) > .7,
-    { timeout: 15000 });
+    undefined, { timeout: 15000 });
   await page.screenshot({ path: resolve(out,'sommerfeld14-smile-desktop.png') });
 
   await page.locator('button[data-expression=jawopen]').click();
   await page.waitForFunction(
     () => (window.__jazzQa?.snapshot().morphWeights.JawOpen ?? 0) > .75,
-    { timeout: 15000 });
+    undefined, { timeout: 15000 });
   const jaw = await page.evaluate(() => window.__jazzQa.snapshot());
   assert((jaw.morphWeights.Smile ?? 0) < .08,
     'Smile morph remained active while JawOpen selected');
@@ -73,7 +73,7 @@ try {
   await page.locator('button[data-expression=neutral]').click();
   await page.waitForFunction(
     () => (window.__jazzQa?.snapshot().morphWeights.JawOpen ?? 1) < .05,
-    { timeout: 15000 });
+    undefined, { timeout: 15000 });
 
   const mobile = await browser.newPage({
     viewport: { width: 390, height: 844 }, reducedMotion: 'reduce',
@@ -82,11 +82,12 @@ try {
   mobile.on('pageerror', e => errors.push(e.message));
   await mobile.goto(url, { waitUntil: 'domcontentloaded' });
   await mobile.waitForFunction(
-    () => window.__jazzQa?.snapshot()?.ready === true, { timeout: 120000 });
+    () => window.__jazzQa?.snapshot()?.ready === true, undefined, { timeout: 120000 });
   const mobileStart = await mobile.evaluate(() => window.__jazzQa.snapshot());
   assert.equal(mobileStart.movementEnabled, false,
     'Reduced-motion setting should disable automatic movement');
   await mobile.locator('button[data-expression=smile]').click();
+  await mobile.waitForFunction(() => (window.__jazzQa?.snapshot().morphWeights.Smile ?? 0) > .8, undefined, { timeout: 15000 });
   const mobileEnd = await mobile.evaluate(() => window.__jazzQa.snapshot());
   assert((mobileEnd.morphWeights.Smile ?? 0) > .8,
     'User-requested static facial expression should remain available');
