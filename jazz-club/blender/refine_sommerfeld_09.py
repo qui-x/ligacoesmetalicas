@@ -93,15 +93,8 @@ def replace_nape_and_collar(root,head):
         curves.surface_ribbon('HairRearTemporalBridge09_'+str(side),p,
                               [.0007,.005,.007,.0004],hair,head)
 
-def main():
-    arguments=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
-    cli=argparse.ArgumentParser()
-    cli.add_argument('--output',required=True)
-    cli.add_argument('--blend',required=True)
-    args=cli.parse_args(arguments)
-    out,blend=Path(args.output).resolve(),Path(args.blend).resolve()
-    out.parent.mkdir(parents=True,exist_ok=True)
-    blend.parent.mkdir(parents=True,exist_ok=True)
+def assemble_scene(out):
+    """Compose one editable Blender scene without exporting it. Reusable by future sculpt studies."""
     root=previous.create_scene()
     head=bpy.data.objects.get('HEAD_ANCHOR')
     if not root or not head:
@@ -128,6 +121,18 @@ def main():
     face=bpy.data.objects.get('SOMMERFELD_FACE_QUAD_BASE')
     if not face or not face.data.shape_keys or len(face.data.shape_keys.key_blocks)<8:
         raise RuntimeError('The editable facial study lost morph keys')
+    return root
+
+def main():
+    arguments=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
+    cli=argparse.ArgumentParser()
+    cli.add_argument('--output',required=True)
+    cli.add_argument('--blend',required=True)
+    args=cli.parse_args(arguments)
+    out,blend=Path(args.output).resolve(),Path(args.blend).resolve()
+    out.parent.mkdir(parents=True,exist_ok=True)
+    blend.parent.mkdir(parents=True,exist_ok=True)
+    assemble_scene(out)
     bpy.ops.wm.save_as_mainfile(filepath=str(blend),compress=True)
     bpy.ops.export_scene.gltf(filepath=str(out),export_format='GLB',
                               export_extras=True,export_morph=True,
