@@ -175,6 +175,127 @@ def build():
     scene.frame_set(LAST)
     return master
 
+
+def attach_kinetic_title():
+    """Build genuine 3D lettering in the same Blender scene, not an SVG overlay."""
+    scene=bpy.context.scene
+    scene.render.resolution_x=960
+    scene.render.resolution_y=540
+    scene.render.resolution_percentage=100
+    scene.render.film_transparent=False
+    try:
+        scene.render.engine='BLENDER_EEVEE_NEXT'
+    except Exception:
+        scene.render.engine='BLENDER_EEVEE'
+    bpy.data.objects['SILM_LOGO_MASTER'].location.z=1.13
+
+    w=bpy.data.worlds.new('SILM_IVORY_STUDIO')
+    scene.world=w
+    w.use_nodes=True
+    w.node_tree.nodes.get('Background').inputs['Color'].default_value=(0.84,0.81,0.75,1)
+    w.node_tree.nodes.get('Background').inputs['Strength'].default_value=.8
+
+    def area(name,location,energy,color,size=4):
+        data=bpy.data.lights.new(name,'AREA')
+        data.energy=energy
+        data.color=color
+        data.shape='DISK'
+        data.size=size
+        obj=bpy.data.objects.new(name,data)
+        bpy.context.collection.objects.link(obj)
+        obj.location=location
+        obj.rotation_euler=(Vector((0,0,0))-obj.location).to_track_quat('-Z','Y').to_euler()
+        return obj
+
+    area('KEY_warm_studio',(-3,-5,5),1100,(1,.87,.66),5)
+    area('FILL_cool_studio',(4,-3,1.5),720,(.83,.92,1),4)
+    area('RIM_metallic',(0,2,4),1400,(1,.76,.41),3)
+    sweep=area('SWEEP_across_SILM',(-3,-2,-1.2),25,(1,.89,.62),2)
+
+    bpy.ops.object.camera_add(location=(0,-12,.12))
+    camera=bpy.context.object
+    camera.name='SILM_OPENING_CAMERA'
+    camera.rotation_euler=(Vector((0,0,0))-camera.location).to_track_quat('-Z','Y').to_euler()
+    camera.data.type='ORTHO'
+    camera.data.ortho_scale=7
+    scene.camera=camera
+
+    mat_name=material('TITULO_SILM_GOLD',(.70,.45,.12),metallic=.92,roughness=.21)
+    mat_desc=material('NOME_EXTENSO_GRAPHITE',(.10,.115,.13),metallic=.06,roughness=.72)
+    mat_tag=material('ARQUITETURA_DOS_METAIS',(.28,.30,.33),metallic=.03,roughness=.78)
+    from pathlib import Path
+    serif_paths=['/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf',
+                 '/usr/share/fonts/truetype/liberation2/LiberationSerif-Regular.ttf']
+    sans_paths=['/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+                '/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf']
+    italic_paths=['/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf',
+                  '/usr/share/fonts/truetype/liberation2/LiberationSerif-Italic.ttf']
+    def getfont(paths):
+        for p in paths:
+            if Path(p).exists(): return bpy.data.fonts.load(p)
+        return None
+    serif,sans,italic=(getfont(x) for x in (serif_paths,sans_paths,italic_paths))
+    def title_object(name,value,fontsize,material,ft):
+        cu=bpy.data.curves.new(name,'FONT')
+        cu.body=value
+        cu.size=fontsize
+        cu.align_x='CENTER'
+        cu.align_y='CENTER'
+        cu.extrude=.026 if fontsize>.5 else .003
+        cu.bevel_depth=.005 if fontsize>.5 else .001
+        if ft:cu.font=ft
+        obj=bpy.data.objects.new(name,cu)
+        bpy.context.collection.objects.link(obj)
+        obj.data.materials.append(material)
+        obj.rotation_euler=(math.pi/2,0,0)
+        return obj
+
+    text_nodes=[title_object('SILM_LETRA_'+s,s,1.0,mat_name,serif) for s in 'SILM']
+    bpy.context.view_layer.update()
+    widths=[o.dimensions.x for o in text_nodes]
+    gap=.10
+    cursor=-(sum(widths)+3*gap)/2
+    for i,o in enumerate(text_nodes):
+        x=cursor+widths[i]/2
+        cursor+=widths[i]+gap
+        start=90+i*7
+        poses=[(1,(x+(-.26 if i%2 else .26),.60,-1.45),.001,16),
+               (start,(x+(-.26 if i%2 else .26),.60,-1.45),.001,16),
+               (start+20,(x,-.13,-1.12),1.045,-1),
+               (start+28,(x,-.13,-1.17),1,0)]
+        for f,position,size,angle in poses:
+            o.location=position
+            o.scale=(size,size,size)
+            o.rotation_euler=(math.pi/2,0,math.radians(angle))
+            for p in ('location','scale','rotation_euler'):
+                o.keyframe_insert(data_path=p,frame=f)
+
+    description=title_object('SILM_NOME_COMPLETO','Simulador Interativo de Ligações Metálicas',.30,mat_desc,sans)
+    bpy.context.view_layer.update()
+    stretch=min(1,5.8/max(1e-6,description.dimensions.x))
+    for f,at,yz in [(1,.001,(.6,-1.96)),(121,.001,(.6,-1.96)),(146,1.02,(-.13,-1.91)),(153,1,(-.13,-1.94))]:
+        description.location=(0,yz[0],yz[1])
+        description.scale=(stretch*at,at,at)
+        description.keyframe_insert(data_path='location',frame=f)
+        description.keyframe_insert(data_path='scale',frame=f)
+    tagline=title_object('SILM_ASSINATURA','A Arquitetura dos Metais',.30,mat_tag,italic)
+    for f,at,z in [(1,.001,-2.39),(139,.001,-2.39),(168,1.02,-2.39),(183,1,-2.41)]:
+        tagline.location=(0,-.12,z)
+        tagline.scale=(at,at,at)
+        tagline.keyframe_insert(data_path='location',frame=f)
+        tagline.keyframe_insert(data_path='scale',frame=f)
+    for f,x,energy in [(99,-3,20),(117,-1.8,450),(147,.5,650),(168,2.6,340),(183,3.3,15)]:
+        sweep.location.x=x
+        sweep.data.energy=energy
+        sweep.keyframe_insert(data_path='location',frame=f)
+        sweep.data.keyframe_insert(data_path='energy',frame=f)
+    for f,name in [(1,'01 - Metal se organiza'),(28,'02 - Formacao das hastes'),
+                   (70,'03 - Eletrons'),(90,'04 - SILM letra a letra'),
+                   (121,'05 - Nome completo'),(139,'06 - A Arquitetura dos Metais'),
+                   (183,'07 - Marca completa')]:
+        scene.timeline_markers.new(name,frame=f)
+    scene.frame_set(1)
+
 def run():
     ap=argparse.ArgumentParser()
     ap.add_argument('--output',required=True)
@@ -192,6 +313,11 @@ def run():
                               export_extras=True,export_animations=True)
     assert os.path.isfile(out) and os.path.getsize(out)>5000
     print('SILM_OPENING_GLB_OK',out,os.path.getsize(out))
+    if opts.render and opts.frames:
+        os.makedirs(os.path.abspath(opts.frames),exist_ok=True)
+        bpy.context.scene.render.filepath=os.path.join(os.path.abspath(opts.frames),'SILM_')
+        bpy.ops.render.render(animation=True)
+        print('SILM_TITLE_RENDER_OK')
 
 if __name__=='__main__':
     run()
