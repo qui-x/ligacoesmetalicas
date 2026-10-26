@@ -34,7 +34,8 @@ export function normalizeCueSheet(value){
   if(!Array.isArray(entries)||entries.length>10000)throw new Error('Marcadores devem ser uma lista de até 10.000 eventos');
   const events=entries.map(x=>{
     const t=Number(x.time??x.t??((Number(x.beat??0))*60/bpm+beatOffset));
-    const energy=clamp(Number(x.energy??.55),0,1);
+    const energyValue=Number(x.energy??.55);
+    const energy=Number.isFinite(energyValue)?clamp(energyValue,0,1):.55;
     return {time:t,section:String(x.section??x.label??''),energy};
   }).filter(x=>Number.isFinite(x.time)&&x.time>=0).sort((a,b)=>a.time-b.time);
   return {bpm,beatOffset,events,track:String(value.title??value.name??'Faixa importada')};
@@ -45,7 +46,7 @@ export function danceFrame({seconds=0,bpm=120,beatOffset=0,formation='auto',inte
   const beat=Math.max(0,(time-Number(beatOffset)||0)*tempo/60);
   const phrase=Math.floor(beat/32);
   const chosen=formation==='auto'?formationForPhrase(phrase):H[formation]?formation:'trio';
-  const previous=formation==='auto'?formationForPhrase(phrase-1):chosen;
+  const previous=formation==='auto'?(phrase===0?chosen:formationForPhrase(phrase-1)):chosen;
   const transition=formation==='auto'?smooth((beat%32)/4):1;
   const amp=(reduced?0:clamp(Number(intensity)||0,0,1))*mix(.7,1.25,clamp(Number(energy)||0,0,1));
   const cycle=TAU*beat,quarter=cycle/4;
