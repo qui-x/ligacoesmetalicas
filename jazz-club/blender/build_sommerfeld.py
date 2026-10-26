@@ -5,6 +5,8 @@ Run: blender -b --factory-startup --python jazz-club/blender/build_sommerfeld.py
 import argparse, math, os, sys
 import bpy
 from mathutils import Vector
+# Explicit Blender --python import path, independent of the GitHub runner cwd.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import face_anatomy as face_profile
 
 def color(name, rgb, metal=0, rough=.78):
