@@ -5,13 +5,14 @@ const {
   PointLight,TransformNode,MeshBuilder,PBRMaterial,StandardMaterial
 } = window.BABYLON;
 import {PERFORMERS,FORMATIONS,danceFrame,normalizeCueSheet} from './dance-core.js';
+import {loadBuiltinTrack,releaseBuiltinTrack,BUILTIN_TRACK_NAME} from './builtin-track.js';
 
 
 const $=id=>document.getElementById(id);
 const canvas=$('dance-stage'),info=$('form-title'),bpmEl=$('bpm');
 const status=$('music-state'),announcer=$('announcer'),beatStatus=$('beat-status');
 const reduced=$('reduce-motion'),formationEl=$('formation'),intensity=$('intensity');
-const media=new Audio();media.preload='metadata';media.loop=false;
+const media=$('audio-player');media.preload='metadata';media.loop=false;
 let sourceUrl=null,ctx=null,analyser=null,clip=null,scene=null,engine=null;
 let dancers=[],clock=0,playing=true,lastTime=performance.now(),peak=0;
 let cues={bpm:120,beatOffset:0,events:[],track:'Ensaio rítmico sem áudio'};
@@ -239,7 +240,7 @@ function init(){
       scene.render();
     });
     window.addEventListener('resize',()=>engine.resize());
-    window.addEventListener('pagehide',()=>{if(engine)engine.dispose();if(sourceUrl)URL.revokeObjectURL(sourceUrl)});
+    window.addEventListener('pagehide',()=>{if(engine)engine.dispose();if(sourceUrl)URL.revokeObjectURL(sourceUrl);releaseBuiltinTrack()});
     $('camera-reset').onclick=()=>{
       camera.alpha=-Math.PI/2;camera.beta=1.18;camera.radius=12;
       camera.setTarget(new Vector3(0,1.5,0));say('Câmera restaurada');
@@ -285,6 +286,28 @@ intensity.addEventListener('input',()=>{$('intensity-output').textContent=intens
 bpmEl.addEventListener('input',()=>{
   $('bpm-output').textContent=bpmEl.value+' BPM';cues.bpm=Number(bpmEl.value);
 });
+$('builtin-track').addEventListener('click',async()=>{
+  const button=$('builtin-track'),label=$('builtin-track-status');
+  button.disabled=true;label.textContent='Preparando a faixa original…';
+  try{
+    const track=await loadBuiltinTrack((loaded,total)=>{
+      label.textContent='Carregando música: '+Math.round(loaded*100/total)+'%';
+    });
+    media.pause();
+    if(sourceUrl){URL.revokeObjectURL(sourceUrl);sourceUrl=null;}
+    media.src=track.objectUrl;media.load();
+    clip={name:BUILTIN_TRACK_NAME};
+    cues=normalizeCueSheet(track.cues);
+    bpmEl.value=String(cues.bpm);
+    $('bpm-output').textContent=bpmEl.value+' BPM';
+    $('audio-play').disabled=false;clock=0;lastCueFormation=null;
+    label.textContent='MP3 íntegro · 2min13s · 132 BPM · pronto para reproduzir';
+    updateMusicLabel();say('O Baile dos Elétrons carregado; clique em Reproduzir faixa.');
+  }catch(error){
+    label.textContent='Falha ao carregar a faixa: '+error.message;
+    say(label.textContent);console.error('Erro de carregamento musical:',error);
+  }finally{button.disabled=false;}
+});
 $('audio-file').addEventListener('change',e=>{
   const file=e.target.files?.[0];
   if(!file)return;
@@ -321,6 +344,9 @@ $('audio-play').addEventListener('click',async()=>{
   }catch(error){say('Não foi possível reproduzir a faixa: '+error.message)}
 });
 media.addEventListener('ended',()=>{media.pause();updateMusicLabel();say('Faixa encerrada')});
+media.addEventListener('play',updateMusicLabel);
+media.addEventListener('pause',updateMusicLabel);
+media.addEventListener('seeked',()=>{clock=media.currentTime;lastCueFormation=null;});
 reduced.addEventListener('change',()=>say(reduced.checked?'Movimento reduzido ativado':'Movimento reduzido desativado'));
 $('fullscreen').addEventListener('click',async()=>{
   try{if(document.fullscreenElement)await document.exitFullscreen();
