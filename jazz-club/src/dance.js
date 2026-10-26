@@ -5,7 +5,8 @@ const {
   PointLight,TransformNode,MeshBuilder,PBRMaterial,StandardMaterial
 } = window.BABYLON;
 import {PERFORMERS,FORMATIONS,danceFrame,normalizeCueSheet} from './dance-core.js';
-import {loadBuiltinTrack,releaseBuiltinTrack,BUILTIN_TRACK_NAME} from './builtin-track.js';
+import {initializeJukebox} from './jukebox-library.js';
+import {buildJukeboxInScene} from './jukebox-scene.js';
 
 
 const $=id=>document.getElementById(id);
@@ -13,7 +14,7 @@ const canvas=$('dance-stage'),info=$('form-title'),bpmEl=$('bpm');
 const status=$('music-state'),announcer=$('announcer'),beatStatus=$('beat-status');
 const reduced=$('reduce-motion'),formationEl=$('formation'),intensity=$('intensity');
 const media=$('audio-player');media.preload='metadata';media.loop=false;
-let sourceUrl=null,ctx=null,analyser=null,clip=null,scene=null,engine=null;
+let sourceUrl=null,ctx=null,analyser=null,clip=null,scene=null,engine=null,library=null;
 let dancers=[],clock=0,playing=true,lastTime=performance.now(),peak=0;
 let cues={bpm:120,beatOffset:0,events:[],track:'Ensaio rítmico sem áudio'};
 let activeForm='trio',errorState=false,previousForm=null,formationChangeAt=-999,lastCueFormation=null;
@@ -233,6 +234,8 @@ function init(){
     rim.intensity=90;rim.diffuse=color('#8cbbdf');
     const dots=createEnvironment();
     dancers=PERFORMERS.map(createDancer);
+    // Pickable model: actual Blender mesh when available, Babylon fallback otherwise.
+    buildJukeboxInScene(scene,canvas,library).catch(e=>console.error('Jukebox 3D:',e));
     const initial=danceFrame({seconds:0,bpm:120,intensity:0,reduced:true,formation:'trio'});
     initial.cast.forEach(p=>applyPose(dancers.find(d=>d.id===p.id),p));
     engine.runRenderLoop(()=>{
@@ -240,7 +243,7 @@ function init(){
       scene.render();
     });
     window.addEventListener('resize',()=>engine.resize());
-    window.addEventListener('pagehide',()=>{if(engine)engine.dispose();if(sourceUrl)URL.revokeObjectURL(sourceUrl);releaseBuiltinTrack()});
+    window.addEventListener('pagehide',()=>{if(engine)engine.dispose();if(sourceUrl)URL.revokeObjectURL(sourceUrl)});
     $('camera-reset').onclick=()=>{
       camera.alpha=-Math.PI/2;camera.beta=1.18;camera.radius=12;
       camera.setTarget(new Vector3(0,1.5,0));say('Câmera restaurada');
@@ -286,27 +289,6 @@ intensity.addEventListener('input',()=>{$('intensity-output').textContent=intens
 bpmEl.addEventListener('input',()=>{
   $('bpm-output').textContent=bpmEl.value+' BPM';cues.bpm=Number(bpmEl.value);
 });
-$('builtin-track').addEventListener('click',async()=>{
-  const button=$('builtin-track'),label=$('builtin-track-status');
-  button.disabled=true;label.textContent='Preparando a faixa original…';
-  try{
-    const track=await loadBuiltinTrack();
-    media.pause();
-    if(sourceUrl){URL.revokeObjectURL(sourceUrl);sourceUrl=null;}
-    media.src=track.objectUrl;media.load();
-    clip={name:BUILTIN_TRACK_NAME};
-    cues=normalizeCueSheet(track.cues);
-    bpmEl.value=String(cues.bpm);
-    $('bpm-output').textContent=bpmEl.value+' BPM';
-    $('audio-play').disabled=false;clock=0;lastCueFormation=null;
-    label.textContent='Arquivo oficial selecionado · 132 BPM · pronto para reproduzir';
-    button.textContent='Recarregar O Baile dos Elétrons';
-    updateMusicLabel();say('O Baile dos Elétrons carregado; clique em Reproduzir faixa.');
-  }catch(error){
-    label.textContent='Falha ao carregar a faixa: '+error.message;
-    say(label.textContent);console.error('Erro de carregamento musical:',error);
-  }finally{button.disabled=false;}
-});
 $('audio-file').addEventListener('change',e=>{
   const file=e.target.files?.[0];
   if(!file)return;
@@ -326,23 +308,7 @@ $('cues-file').addEventListener('change',async e=>{
     say('Marcadores carregados: '+cues.events.length+', '+cues.bpm+' BPM');
   }catch(err){say('Erro nos marcadores: '+err.message)}
 });
-$('audio-play').addEventListener('click',async()=>{
-  if(!media.src)return;
-  if(!media.paused){media.pause();updateMusicLabel();return}
-  try{
-    if(!ctx){
-      ctx=new (window.AudioContext||window.webkitAudioContext)();
-      analyser=ctx.createAnalyser();
-      analyser.fftSize=256;
-      ctx.createMediaElementSource(media).connect(analyser);
-      analyser.connect(ctx.destination);
-    }
-    await ctx.resume();
-    playing=true;$('transport').textContent='Pausar dança';
-    $('transport').setAttribute('aria-pressed','true');
-    await media.play();updateMusicLabel();say('Faixa em reprodução');
-  }catch(error){say('Não foi possível reproduzir a faixa: '+error.message)}
-});
+
 media.addEventListener('ended',()=>{media.pause();updateMusicLabel();say('Faixa encerrada')});
 media.addEventListener('play',updateMusicLabel);
 media.addEventListener('pause',updateMusicLabel);
@@ -370,6 +336,13 @@ media.addEventListener('error',()=>{
   if(label)label.textContent='Não foi possível reproduzir o MP3. Verifique a conexão ou recarregue a faixa.';
   say('Erro no áudio da faixa selecionada.');
 });
+library=initializeJukebox({media,onSelected:({track,cues:markers})=>{
+  cues=normalizeCueSheet(markers);
+  clip={name:track.title};
+  clock=0;lastCueFormation=null;previousForm=null;formationChangeAt=-999;
+  bpmEl.value=String(cues.bpm);
+  $('bpm-output').textContent=cues.bpm+' BPM';
+  $('audio-play').disabled=false;
+  updateMusicLabel();
+},onAnnounce:say});
 init();
-// Pré-seleciona a faixa oficial sem iniciar áudio automaticamente.
-$('builtin-track').click();
