@@ -2,7 +2,7 @@
 ## Espetáculo de Propriedades das Terras Raras
 **SILM · O Baile dos Elétrons · Jazz Club 1925**
 
-**Documento normativo de concepção v2.0 — 26/10/2026.** Substitui como diretriz criativa principal o título anterior `Rare Earth Revue`, mas os atos e pesquisas úteis do documento anterior continuam como base de trabalho. **Este texto documenta o projeto; não significa que os assets/modelos 3D tenham sido implementados, testados ou homologados.** Desenvolvimento somente na branch `feature/baile-eletrons-jazz-1925`, preservando a `main` para o motor científico.
+**Documento normativo de concepção v2.1 — 26/10/2026.** Substitui como diretriz criativa principal o título anterior `Rare Earth Revue`, mas os atos e pesquisas úteis do documento anterior continuam como base de trabalho. **Este texto documenta o projeto; não significa que os assets/modelos 3D tenham sido implementados, testados ou homologados.** Desenvolvimento somente na branch `feature/baile-eletrons-jazz-1925`, preservando a `main` para o motor científico.
 
 ### 1 — Naming consolidado
 - **Nome temático:** **Jazz e Metais**
@@ -97,7 +97,7 @@ D. COMPARAR:
 O brilho é deliberadamente metafórico. A visualização de partículas **não contabiliza elétrons de valência** e não reproduz velocidades, trajetórias ou funções de onda físicas.
 
 ### 8 — Implementação proposta / motores
-- **Cena visual:** protótipo **Unity Web (C# + Wasm)** em módulo isolado, como definido na especificação anterior; avaliação mediante protótipo real, com Babylon.js como alternativa.
+- **Cena visual:** **Babylon.js** (renderizador web principal escolhido), com geometria e animações geradas no **Blender/Python** e exportadas em GLB/glTF. O protótipo Unity Web foi descontinuado nesta ramificação. Builds são montadas por **GitHub Actions**, isoladas da `main`.
 - **Blender/Python:** criar rig humanoide estilizado único com variantes de roupas e acessórios; gerar variantes por geometria do tipo cristalográfico e por elementos; exportar animações.
 - **Dados estruturais:** adaptador **read-only** do SILM (metal selecionado, fase, geometria, sítios, labels e proveniência). Em Unity, gerar instâncias no espaço 3D a partir das posições estruturais; não inferir posições por pixels.
 - **Shader compartilhado:** um campo de brilho/partículas coletivo desacoplado das malhas de personagem; roupas em cena artística podem compartilhar a textura/efeito, mas elétrons visuais não são “anexos” de um indivíduo.
