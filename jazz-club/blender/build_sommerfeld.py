@@ -99,7 +99,7 @@ def create():
     brass=color('brass-aged',(.57,.40,.19),metal=.7,rough=.35)
     root=ctrl('SOMMERFELD_ROOT',(0,0,0))
     root['scientistId']='sommerfeld'
-    root['modelStatus']='artistic-study-03-not-verified-likeness'
+    root['modelStatus']='artistic-study-04-not-verified-likeness'
     root['portraitSource']='https://www.loc.gov/item/2014715010/'
     root['sceneYear']='1925 (fictional historical meeting)'
     # Garments: editable shells and tailored lapels (not a shared primitive).
@@ -133,35 +133,48 @@ def create():
     sphere('Neck',(0,0,1.46),(.10,.10,.14),skin,root)
     head=ctrl('HEAD_ANCHOR',(0,0,1.70),root)
     face_quadmesh(skin,head)
-    sphere('NoseBridge',(0,.193,.005),(.028,.035,.095),skin,head)
-    sphere('NoseTip',(0,.231,-.075),(.039,.045,.030),skin,head)
+    sphere('NoseBridge',(0,.188,.006),(.025,.029,.088),skin,head)
+    sphere('NoseTip',(0,.227,-.078),(.036,.038,.027),skin,head)
     for side in (-1,1):
         sphere('Ear',(side*.199,-.006,-.012),(.037,.041,.087),skin,head)
         sphere('EarConcha',(side*.223,.037,-.012),(.018,.013,.047),shadow,head)
-        sphere('EyeSclera',(side*.079,.174,.056),(.036,.019,.016),white,head)
-        sphere('Iris',(side*.079,.196,.056),(.014,.007,.014),eye,head)
-        lid=sphere('UpperLid_L' if side<0 else 'UpperLid_R',(side*.079,.197,.082),(.043,.011,.010),skin,head)
+        sphere('EyeSclera',(side*.079,.171,.056),(.030,.012,.012),white,head)
+        sphere('Iris',(side*.079,.187,.056),(.010,.006,.010),eye,head)
+        lid=sphere('UpperLid_L' if side<0 else 'UpperLid_R',(side*.079,.197,.082),(.039,.010,.008),skin,head)
         lid.shape_key_add(name='Basis',from_mix=False)
         blink=lid.shape_key_add(name='Blink_L' if side<0 else 'Blink_R',from_mix=False)
         # Object local Z axis is scaled to eyelid thickness; blend moves it toward iris.
         for v in lid.data.vertices:
             co=v.co
             blink.data[v.index].co=(co.x,co.y,co.z-.9)
-        brow=sphere('Eyebrow',(side*.084,.175,.127),(.067,.012,.013),hair,head)
+        brow=sphere('Eyebrow',(side*.084,.173,.127),(.061,.011,.011),hair,head)
         brow.rotation_euler.y=side*.10
         for k in range(6):
             f=(k+.5)/6
             sphere('MoustacheStrand',(side*(.018+.075*f),.218,-.122-.013*f),
-                   (.014,.010,.009),hair,head)
-    sphere('SweptHair',(0,-.025,.208),(.208,.190,.083),hair,head)
+                   (.012,.008,.0065),hair,head)
+    sphere('SweptHair',(0,-.025,.208),(.208,.191,.075),hair,head)
     for side in (-1,1):
         for k in range(6):
             sphere('TempleStrand',(side*(.174-.015*k),-.018,.135+.020*k),
-                   (.028,.034,.021),grey if k%3==0 else hair,head)
+                   (.019,.027,.015),grey if k%3==0 else hair,head)
+    # Subtle original facial surface detailing for closer portrait inspection.
+    # These are artistic volume cues; resemblance still requires manual sculpt approval.
+    for side in (-1,1):
+        wrinkle=piece('CheekCrease_L' if side<0 else 'CheekCrease_R',
+                      (side*.094,.151,-.082),(side*.118,.124,-.122),.0019,shadow,head)
+    for side in (-1,1):
+        for k in range(8):
+            hairline_x=side*(.012 + .021*k)
+            stroke=piece('HairlineStrand_%s_%s'%(side,k),
+                         (hairline_x,.055,.266-.002*k),
+                         (hairline_x-side*.008,-.049,.248-.004*k),
+                         .0015,grey if k%3==0 else hair,head)
+    # Eyeglass frames and hair remain independent objects for editable materials.
     # Frames are modeled as real geometry, not added as a 2D sprite.
     for side in (-1,1):
         bpy.ops.mesh.primitive_torus_add(major_segments=32,minor_segments=8,
-                         location=(0,0,0),major_radius=.055,minor_radius=.003)
+                         location=(0,0,0),major_radius=.051,minor_radius=.0024)
         o=bpy.context.object
         o.name='RoundSpectacles'
         o.parent=head
