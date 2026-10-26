@@ -36,7 +36,8 @@ export function normalizeCueSheet(value){
     const t=Number(x.time??x.t??((Number(x.beat??0))*60/bpm+beatOffset));
     const energyValue=Number(x.energy??.55);
     const energy=Number.isFinite(energyValue)?clamp(energyValue,0,1):.55;
-    return {time:t,section:String(x.section??x.label??''),energy};
+    const form=String(x.formation??'');
+    return {time:t,section:String(x.section??x.label??''),energy,formation:FORMATIONS.includes(form)&&form!=='auto'?form:null};
   }).filter(x=>Number.isFinite(x.time)&&x.time>=0).sort((a,b)=>a.time-b.time);
   return {bpm,beatOffset,events,track:String(value.title??value.name??'Faixa importada')};
 }
