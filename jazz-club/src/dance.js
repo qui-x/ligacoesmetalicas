@@ -301,7 +301,7 @@ $('builtin-track').addEventListener('click',async()=>{
     bpmEl.value=String(cues.bpm);
     $('bpm-output').textContent=bpmEl.value+' BPM';
     $('audio-play').disabled=false;clock=0;lastCueFormation=null;
-    label.textContent='MP3 íntegro · 2min13s · 132 BPM · pronto para reproduzir';
+    label.textContent='MP3 da coleção · 2min13s · 132 BPM · pronto para reproduzir';
     updateMusicLabel();say('O Baile dos Elétrons carregado; clique em Reproduzir faixa.');
   }catch(error){
     label.textContent='Falha ao carregar a faixa: '+error.message;

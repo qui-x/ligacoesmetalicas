@@ -51,4 +51,4 @@ Cada faixa tem MP3, OGG, MIDI editável, marcadores de sincronização e notas. 
 
 ## Publicação
 
-Os arquivos binários deste pacote precisam ser efetivamente copiados para o repositório GitHub. A existência do catálogo no GitHub não significa que os MP3/OGG/MIDI já estejam publicados.
+As 30 faixas já estão publicadas nesta pasta em MP3, OGG, MIDI e JSON. O catálogo contém os hashes SHA-256; o workflow verifica os 120 arquivos. A reprodução usa os URLs diretos, sem fragmentos Base64.

@@ -20,11 +20,11 @@
 
 **Código:** `src/dance-core.js` (coreografia), `src/dance.js` (Babylon), `src/dance.css` (UI), `src/dance-fallback.js` (compatibilidade).
 
-## Integridade e sincronização de “O Baile dos Elétrons”
-- A gravação original reorquestrada (v0.2) foi recuperada de uma conversa anterior. **MP3 original exato, sem transcodificação adicional**, com 3.203.700 bytes, 133,46 segundos e SHA-256 `1a0bd1ebc54d635ce1568004d6f3510013fd1f046ae1e8c33c5fd6916f866919`.
-- GitHub Pages entrega a música como **27 partes de texto Base64** na pasta `audio/`. O módulo `src/builtin-track.js` reúne essas partes e recria o MP3 binário no navegador, verificando tamanho e SHA-256 antes de habilitar a reprodução. Isso evita depender de um host externo para a faixa.
-- A pasta `audio/` contém `*.manifest.json` e `*.cues.json` (seis seções, BPM 132). A sincronização usa o relógio `HTMLAudioElement.currentTime`; os marcadores de seção são uma versão compacta do arquivo de sincronização aprovado. As faixas de ensaio antigas continuam opcionais.
-- A música requer conexão para o carregamento inicial dos 27 trechos; não faz parte do pré-cache inicial offline da PWA, para não atrasar a instalação.
-- O navegador não inicia som automaticamente. O usuário precisa interagir com os controles antes da reprodução. Modo Babylon.js e fallback Canvas2D compartilham o mesmo áudio.
-- **Teste local realizado sobre os dados:** reconstrução Base64 idêntica ao MP3 original, comparação SHA-256 e decodificação completa por FFmpeg sem erros. **Reprodução auditiva no GitHub Pages ainda depende da verificação no navegador do usuário.**
-- Teste reprodutível: `node --test jazz-club/tests/audio-integrity.test.mjs`.
+## Reprodução direta de “O Baile dos Elétrons”
+
+- O MP3 aprovado v0.2 está publicado completo em `jazz-club/audio/jazz e metais/faixas/01/01_O_Baile_dos_Eletrons_v02.mp3`, com 3.203.700 bytes e SHA-256 `1a0bd1ebc54d635ce1568004d6f3510013fd1f046ae1e8c33c5fd6916f866919`.
+- O carregador `src/builtin-track.js` usa o URL direto do MP3. Não há manifestos, fragmentos Base64 nem reconstrução do áudio.
+- O JSON completo de sincronização fica na pasta da faixa 01. Suas seções são adaptadas ao formato aceito pelo motor de dança, sem alterar o conteúdo científico.
+- A música é carregada sob demanda e precisa de interação do usuário para começar a tocar. Os 30 áudios não são adicionados ao pré-cache inicial da PWA.
+- O GitHub Actions verifica os 120 arquivos da coleção por SHA-256 e decodifica o MP3 da primeira faixa com FFmpeg.
+- Execute `node --test jazz-club/tests/audio-integrity.test.mjs` para repetir os testes. A reprodução no GitHub Pages ainda depende de conferir no navegador.
