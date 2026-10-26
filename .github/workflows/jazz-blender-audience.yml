@@ -35,7 +35,8 @@ jobs:
 
       - name: Validar scripts e catálogo
         run: |
-          python3 -m py_compile jazz-club/blender/build_audience.py jazz-club/blender/build_sommerfeld.py
+          python3 -m py_compile jazz-club/blender/build_audience.py jazz-club/blender/build_sommerfeld.py jazz-club/blender/face_anatomy.py
+          python3 -m unittest discover -s jazz-club/tests -p 'test_*.py' -v
           python3 - <<'PY'
           import json
           p=json.load(open('jazz-club/data/scientists.json',encoding='utf-8'))
