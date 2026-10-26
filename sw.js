@@ -1,7 +1,11 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.15.4-jazz-preview-1';
+const VERSION='0.15.4-jazz-music-1';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION,DOMAINS=CACHE+'::domains';
 const FILES=[
+  "jazz-club/src/builtin-track.js",
+  "jazz-club/audio/01_o_baile_dos_eletrons_v02.manifest.json",
+  "jazz-club/audio/01_o_baile_dos_eletrons_v02.cues.json",
+
   "jazz-club/index.html",
   "jazz-club/src/dance.js",
   "jazz-club/src/dance-core.js",
