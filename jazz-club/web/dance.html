@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14171c">
+<title>Jazz e Metais — Pista de dança 3D · SILM</title>
+<meta name="description" content="Cena musical interativa e acessível dos personagens das terras raras.">
+</head>
+<body>
+<div id="club">
+  <canvas id="dance-stage" tabindex="0" aria-label="Pista de dança tridimensional do Jazz e Metais; arraste para girar a câmera."></canvas>
+  <div class="ambient" aria-hidden="true"></div>
+  <header class="club-head">
+    <div><small>SILM · ESPETÁCULO DE PROPRIEDADES DAS TERRAS RARAS</small><h1>Jazz <em>e Metais</em></h1><p>O baile dos elétrons · Ensaio funcional</p></div>
+    <nav aria-label="Navegação"><a href="index.html">Personagens</a><a href="../../index.html">Voltar ao SILM</a></nav>
+  </header>
+  <section id="floor-info" aria-label="Informações da dança">
+    <div class="overline">NO PALCO · 1925</div>
+    <h2 id="form-title">Trio de abertura</h2>
+    <p id="dancers-note">Euria, Céria e Gádia dançam juntos com movimentos artísticos inspirados no jazz. Os gestos não representam trajetórias físicas de elétrons.</p>
+    <div class="beatline"><span id="beat-light" aria-hidden="true">●</span> <span id="beat-status">120 BPM · ritmo de ensaio</span></div>
+    <div class="cast-caption">Eu · Európio / Ce · Cério / Gd · Gadolínio</div>
+  </section>
+  <section id="dance-controls" aria-label="Controles do espetáculo">
+    <div class="control-heading"><strong>Direção de coreografia</strong><span id="music-state">Sem áudio · ensaio rítmico</span></div>
+    <div class="fields">
+      <label>Formação
+        <select id="formation">
+          <option value="auto">Automática · mudar a cada 32 tempos</option>
+          <option value="trio">Trio</option>
+          <option value="pares">Dueto + solista</option>
+          <option value="roda">Roda</option>
+          <option value="linha">Linha Charleston</option>
+          <option value="troca">Troca de lugares</option>
+        </select>
+      </label>
+      <label>Intensidade <output for="intensity" id="intensity-output">65%</output>
+        <input id="intensity" type="range" min="0" max="100" value="65">
+      </label>
+      <label>Ritmo <output for="bpm" id="bpm-output">120 BPM</output>
+        <input id="bpm" type="range" min="70" max="190" value="120">
+      </label>
+    </div>
+    <div class="actions">
+      <button id="transport" type="button" aria-pressed="true">Pausar dança</button>
+      <button id="audio-play" type="button" disabled>Reproduzir faixa</button>
+      <button id="camera-reset" type="button">Reiniciar câmera</button>
+      <button id="fullscreen" type="button">Tela inteira</button>
+    </div>
+    <div class="audio-box">
+      <label>Carregar faixa já produzida (MP3, OGG, WAV)
+        <input type="file" id="audio-file" accept=".mp3,.ogg,.wav,audio/*">
+      </label>
+      <label>Marcadores opcionais da música (JSON)
+        <input type="file" id="cues-file" accept=".json,application/json">
+      </label>
+      <label><input id="reduce-motion" type="checkbox"> Movimento reduzido</label>
+      <p>As músicas começam somente após clicar em reproduzir. O áudio importado permanece no navegador e não é enviado ao SILM.</p>
+    </div>
+    <p class="keyboard">Espaço: pausar/retomar · 1–5: formações · R: câmera · setas: girar</p>
+    <p id="announcer" aria-live="polite" class="sr-only"></p>
+  </section>
+  <div id="scene-error" role="alert" hidden>Não foi possível abrir o renderizador 3D. A pista permanece em modo de inspeção textual. Use um navegador com WebGL e tente novamente.</div>
+</div>
+<script type="module" src="./src/dance.js"></script>
+</body></html>
