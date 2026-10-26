@@ -4,9 +4,9 @@
  * Nenhum áudio é iniciado automaticamente pelo código.
  */
 const TRACK_BASE=new URL('../audio/jazz%20e%20metais/faixas/01/',import.meta.url);
-const AUDIO_URL=new URL('01_O_Baile_dos_Eletrons_v02.mp3',TRACK_BASE);
-const CUES_URL=new URL('01_O_Baile_dos_Eletrons_v02_cues.json',TRACK_BASE);
-export const BUILTIN_TRACK_NAME='O Baile dos Elétrons — reorquestração v0.2';
+const AUDIO_URL=new URL('O Baile dos Elétrons.mp3',TRACK_BASE);
+const CUES_URL=new URL('O Baile dos Elétrons.json',TRACK_BASE);
+export const BUILTIN_TRACK_NAME='O Baile dos Elétrons';
 export const BUILTIN_TRACK_URL=AUDIO_URL.href;
 export const BUILTIN_TRACK_BPM=132;
 let pending=null;

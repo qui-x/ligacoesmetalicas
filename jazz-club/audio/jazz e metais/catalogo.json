@@ -12,10 +12,10 @@
       "compasso": "4/4",
       "tonalidade": "Si bemol maior",
       "arquivos": {
-        "mp3": "faixas/01/01_O_Baile_dos_Eletrons_v02.mp3",
-        "ogg": "faixas/01/01_O_Baile_dos_Eletrons_v02.ogg",
-        "midi": "faixas/01/01_O_Baile_dos_Eletrons_v02.mid",
-        "sincronizacao": "faixas/01/01_O_Baile_dos_Eletrons_v02_cues.json"
+        "mp3": "faixas/01/O Baile dos Elétrons.mp3",
+        "ogg": "faixas/01/O Baile dos Elétrons.ogg",
+        "midi": "faixas/01/O Baile dos Elétrons.mid",
+        "sincronizacao": "faixas/01/O Baile dos Elétrons.json"
       },
       "sha256": {
         "mp3": "1a0bd1ebc54d635ce1568004d6f3510013fd1f046ae1e8c33c5fd6916f866919",
@@ -34,10 +34,10 @@
       "compasso": "4/4",
       "tonalidade": "Mi bemol maior",
       "arquivos": {
-        "mp3": "faixas/02/02_Corrente_no_Cabare_v02.mp3",
-        "ogg": "faixas/02/02_Corrente_no_Cabare_v02.ogg",
-        "midi": "faixas/02/02_Corrente_no_Cabare_v02.mid",
-        "sincronizacao": "faixas/02/02_Corrente_no_Cabare_v02_cues.json"
+        "mp3": "faixas/02/Corrente no Cabaré.mp3",
+        "ogg": "faixas/02/Corrente no Cabaré.ogg",
+        "midi": "faixas/02/Corrente no Cabaré.mid",
+        "sincronizacao": "faixas/02/Corrente no Cabaré.json"
       },
       "sha256": {
         "mp3": "0b0f63e23b7584be3eed7f9ef58e2d8d3eb4ad8422b275145f22c5d9b720fdde",
@@ -56,10 +56,10 @@
       "compasso": "4/4",
       "tonalidade": "Fá (blues)",
       "arquivos": {
-        "mp3": "faixas/03/03_Passos_da_Resistividade_v02.mp3",
-        "ogg": "faixas/03/03_Passos_da_Resistividade_v02.ogg",
-        "midi": "faixas/03/03_Passos_da_Resistividade_v02.mid",
-        "sincronizacao": "faixas/03/03_Passos_da_Resistividade_v02_cues.json"
+        "mp3": "faixas/03/Passos da Resistividade.mp3",
+        "ogg": "faixas/03/Passos da Resistividade.ogg",
+        "midi": "faixas/03/Passos da Resistividade.mid",
+        "sincronizacao": "faixas/03/Passos da Resistividade.json"
       },
       "sha256": {
         "mp3": "25f3a143894e80a9661ea044214438dee17174b3a5e96b45186194238378d94b",
@@ -78,10 +78,10 @@
       "compasso": "4/4",
       "tonalidade": "Si bemol maior (Bb) — cromatismos ragtime",
       "arquivos": {
-        "mp3": "faixas/04/04_O_Improviso_de_Drude.mp3",
-        "ogg": "faixas/04/04_O_Improviso_de_Drude.ogg",
-        "midi": "faixas/04/04_O_Improviso_de_Drude.mid",
-        "sincronizacao": "faixas/04/04_O_Improviso_de_Drude_cues.json"
+        "mp3": "faixas/04/O Improviso de Drude.mp3",
+        "ogg": "faixas/04/O Improviso de Drude.ogg",
+        "midi": "faixas/04/O Improviso de Drude.mid",
+        "sincronizacao": "faixas/04/O Improviso de Drude.json"
       },
       "sha256": {
         "mp3": "be7901738f0c65d5ff4e4b12a3cd6fe83990eb300e0a6ea36e34f7e87e282d4e",
@@ -100,10 +100,10 @@
       "compasso": "4/4",
       "tonalidade": "Mi bemol maior (Eb) com cromatismos",
       "arquivos": {
-        "mp3": "faixas/05/05_Sommerfeld_ao_Piano.mp3",
-        "ogg": "faixas/05/05_Sommerfeld_ao_Piano.ogg",
-        "midi": "faixas/05/05_Sommerfeld_ao_Piano.mid",
-        "sincronizacao": "faixas/05/05_Sommerfeld_ao_Piano_cues.json"
+        "mp3": "faixas/05/Sommerfeld ao Piano.mp3",
+        "ogg": "faixas/05/Sommerfeld ao Piano.ogg",
+        "midi": "faixas/05/Sommerfeld ao Piano.mid",
+        "sincronizacao": "faixas/05/Sommerfeld ao Piano.json"
       },
       "sha256": {
         "mp3": "d3bc296ef2e46b826622f60f2a064c684b97aca02c407cfb28f9357bb838865d",
@@ -122,10 +122,10 @@
       "compasso": "4/4",
       "tonalidade": "Fá maior com dominantes secundárias, modal mixture e cromatismos",
       "arquivos": {
-        "mp3": "faixas/06/06_A_Orquestra_das_Bandas.mp3",
-        "ogg": "faixas/06/06_A_Orquestra_das_Bandas.ogg",
-        "midi": "faixas/06/06_A_Orquestra_das_Bandas.mid",
-        "sincronizacao": "faixas/06/06_A_Orquestra_das_Bandas_cues.json"
+        "mp3": "faixas/06/A Orquestra das Bandas.mp3",
+        "ogg": "faixas/06/A Orquestra das Bandas.ogg",
+        "midi": "faixas/06/A Orquestra das Bandas.mid",
+        "sincronizacao": "faixas/06/A Orquestra das Bandas.json"
       },
       "sha256": {
         "mp3": "ddf5f95f0773854313741cd7cd3f7eefd25fe2eb25cf8910f8180065a61ff223",
@@ -144,10 +144,10 @@
       "compasso": "4/4",
       "tonalidade": null,
       "arquivos": {
-        "mp3": "faixas/07/07_A_Danca_das_Redes_Metalicas.mp3",
-        "ogg": "faixas/07/07_A_Danca_das_Redes_Metalicas.ogg",
-        "midi": "faixas/07/07_A_Danca_das_Redes_Metalicas.mid",
-        "sincronizacao": "faixas/07/07_A_Danca_das_Redes_Metalicas_cues.json"
+        "mp3": "faixas/07/A Dança das Redes Metálicas.mp3",
+        "ogg": "faixas/07/A Dança das Redes Metálicas.ogg",
+        "midi": "faixas/07/A Dança das Redes Metálicas.mid",
+        "sincronizacao": "faixas/07/A Dança das Redes Metálicas.json"
       },
       "sha256": {
         "mp3": "f789730dc645501854bd5e819ae05527f536cfdeab8abbe7bf91a2653a57bb68",
@@ -166,10 +166,10 @@
       "compasso": "4/4",
       "tonalidade": null,
       "arquivos": {
-        "mp3": "faixas/08/08_O_Contratempo_CCC.mp3",
-        "ogg": "faixas/08/08_O_Contratempo_CCC.ogg",
-        "midi": "faixas/08/08_O_Contratempo_CCC.mid",
-        "sincronizacao": "faixas/08/08_O_Contratempo_CCC_cues.json"
+        "mp3": "faixas/08/O Contratempo CCC.mp3",
+        "ogg": "faixas/08/O Contratempo CCC.ogg",
+        "midi": "faixas/08/O Contratempo CCC.mid",
+        "sincronizacao": "faixas/08/O Contratempo CCC.json"
       },
       "sha256": {
         "mp3": "437cad56350c9147f8b2bd4987c09ea2839074ee29cd1a476812416a4e4e6514",
@@ -188,10 +188,10 @@
       "compasso": "4/4",
       "tonalidade": "Mi bemol maior",
       "arquivos": {
-        "mp3": "faixas/09/09_O_Salao_CFC.mp3",
-        "ogg": "faixas/09/09_O_Salao_CFC.ogg",
-        "midi": "faixas/09/09_O_Salao_CFC.mid",
-        "sincronizacao": "faixas/09/09_O_Salao_CFC_cues.json"
+        "mp3": "faixas/09/O Salão CFC.mp3",
+        "ogg": "faixas/09/O Salão CFC.ogg",
+        "midi": "faixas/09/O Salão CFC.mid",
+        "sincronizacao": "faixas/09/O Salão CFC.json"
       },
       "sha256": {
         "mp3": "132d4288e30370ae8a32f3f8c84cc6ef3c5077823fcc0d6f0ac26823f311a1c3",
@@ -210,10 +210,10 @@
       "compasso": "4/4",
       "tonalidade": "Sol maior",
       "arquivos": {
-        "mp3": "faixas/10/10_Charleston_Hexagonal.mp3",
-        "ogg": "faixas/10/10_Charleston_Hexagonal.ogg",
-        "midi": "faixas/10/10_Charleston_Hexagonal.mid",
-        "sincronizacao": "faixas/10/10_Charleston_Hexagonal_cues.json"
+        "mp3": "faixas/10/Charleston Hexagonal.mp3",
+        "ogg": "faixas/10/Charleston Hexagonal.ogg",
+        "midi": "faixas/10/Charleston Hexagonal.mid",
+        "sincronizacao": "faixas/10/Charleston Hexagonal.json"
       },
       "sha256": {
         "mp3": "0b6880b2aad9edfb4a89e121ba67c1d970dc93ecd6adedf61dec6b4868657731",
@@ -232,10 +232,10 @@
       "compasso": "4/4",
       "tonalidade": "Ré maior",
       "arquivos": {
-        "mp3": "faixas/11/11_O_Dobrado_dos_Cristais.mp3",
-        "ogg": "faixas/11/11_O_Dobrado_dos_Cristais.ogg",
-        "midi": "faixas/11/11_O_Dobrado_dos_Cristais.mid",
-        "sincronizacao": "faixas/11/11_O_Dobrado_dos_Cristais_cues.json"
+        "mp3": "faixas/11/O Dobrado dos Cristais.mp3",
+        "ogg": "faixas/11/O Dobrado dos Cristais.ogg",
+        "midi": "faixas/11/O Dobrado dos Cristais.mid",
+        "sincronizacao": "faixas/11/O Dobrado dos Cristais.json"
       },
       "sha256": {
         "mp3": "b19bcccd7a2883f6f60def5da168a84e795386d52b96e8df6e3a3a5bf67aa2dd",
@@ -254,10 +254,10 @@
       "compasso": "3/4",
       "tonalidade": "Lá bemol maior",
       "arquivos": {
-        "mp3": "faixas/12/12_Valsa_Romboedrica.mp3",
-        "ogg": "faixas/12/12_Valsa_Romboedrica.ogg",
-        "midi": "faixas/12/12_Valsa_Romboedrica.mid",
-        "sincronizacao": "faixas/12/12_Valsa_Romboedrica_cues.json"
+        "mp3": "faixas/12/Valsa Romboédrica.mp3",
+        "ogg": "faixas/12/Valsa Romboédrica.ogg",
+        "midi": "faixas/12/Valsa Romboédrica.mid",
+        "sincronizacao": "faixas/12/Valsa Romboédrica.json"
       },
       "sha256": {
         "mp3": "2cbee16df15642d5de4dfc7931035de97bc47cb6ea47f50b9f854ee079a7674a",
@@ -276,10 +276,10 @@
       "compasso": "4/4",
       "tonalidade": "Fá maior/blues",
       "arquivos": {
-        "mp3": "faixas/13/13_Entre_Nucleos_e_Notas.mp3",
-        "ogg": "faixas/13/13_Entre_Nucleos_e_Notas.ogg",
-        "midi": "faixas/13/13_Entre_Nucleos_e_Notas.mid",
-        "sincronizacao": "faixas/13/13_Entre_Nucleos_e_Notas_cues.json"
+        "mp3": "faixas/13/Entre Núcleos e Notas.mp3",
+        "ogg": "faixas/13/Entre Núcleos e Notas.ogg",
+        "midi": "faixas/13/Entre Núcleos e Notas.mid",
+        "sincronizacao": "faixas/13/Entre Núcleos e Notas.json"
       },
       "sha256": {
         "mp3": "9cc3d26374e3def35e46c36d3b2f4579bf28c0e91cc98ea55a95912e394f51c9",
@@ -298,10 +298,10 @@
       "compasso": "4/4",
       "tonalidade": "Lá bemol maior",
       "arquivos": {
-        "mp3": "faixas/14/14_Martelo_e_Sincope.mp3",
-        "ogg": "faixas/14/14_Martelo_e_Sincope.ogg",
-        "midi": "faixas/14/14_Martelo_e_Sincope.mid",
-        "sincronizacao": "faixas/14/14_Martelo_e_Sincope_cues.json"
+        "mp3": "faixas/14/Martelo e Síncope.mp3",
+        "ogg": "faixas/14/Martelo e Síncope.ogg",
+        "midi": "faixas/14/Martelo e Síncope.mid",
+        "sincronizacao": "faixas/14/Martelo e Síncope.json"
       },
       "sha256": {
         "mp3": "6372847e53671e2b04071d1adb3285486c147b54e24112db34b147662319f185",
@@ -320,10 +320,10 @@
       "compasso": "4/4",
       "tonalidade": "Fá maior",
       "arquivos": {
-        "mp3": "faixas/15/15_O_Fio_de_Cobre.mp3",
-        "ogg": "faixas/15/15_O_Fio_de_Cobre.ogg",
-        "midi": "faixas/15/15_O_Fio_de_Cobre.mid",
-        "sincronizacao": "faixas/15/15_O_Fio_de_Cobre_cues.json"
+        "mp3": "faixas/15/O Fio de Cobre.mp3",
+        "ogg": "faixas/15/O Fio de Cobre.ogg",
+        "midi": "faixas/15/O Fio de Cobre.mid",
+        "sincronizacao": "faixas/15/O Fio de Cobre.json"
       },
       "sha256": {
         "mp3": "74049cac41818085517fdcdf3a89170d865764c7294c5f9ff815e016872c5f0e",
@@ -342,10 +342,10 @@
       "compasso": "4/4",
       "tonalidade": "Fá maior / blues",
       "arquivos": {
-        "mp3": "faixas/16/16_Elasticidade_em_Azul.mp3",
-        "ogg": "faixas/16/16_Elasticidade_em_Azul.ogg",
-        "midi": "faixas/16/16_Elasticidade_em_Azul.mid",
-        "sincronizacao": "faixas/16/16_Elasticidade_em_Azul_cues.json"
+        "mp3": "faixas/16/Elasticidade em Azul.mp3",
+        "ogg": "faixas/16/Elasticidade em Azul.ogg",
+        "midi": "faixas/16/Elasticidade em Azul.mid",
+        "sincronizacao": "faixas/16/Elasticidade em Azul.json"
       },
       "sha256": {
         "mp3": "0c6957bce7dd71b8b1b44f2805a6aed58531a7594e49201d3e266f56a277f7cb",
@@ -364,10 +364,10 @@
       "compasso": "4/4",
       "tonalidade": "Si bemol maior",
       "arquivos": {
-        "mp3": "faixas/17/17_Discordancias_no_Contratempo.mp3",
-        "ogg": "faixas/17/17_Discordancias_no_Contratempo.ogg",
-        "midi": "faixas/17/17_Discordancias_no_Contratempo.mid",
-        "sincronizacao": "faixas/17/17_Discordancias_no_Contratempo_cues.json"
+        "mp3": "faixas/17/Discordâncias no Contratempo.mp3",
+        "ogg": "faixas/17/Discordâncias no Contratempo.ogg",
+        "midi": "faixas/17/Discordâncias no Contratempo.mid",
+        "sincronizacao": "faixas/17/Discordâncias no Contratempo.json"
       },
       "sha256": {
         "mp3": "92369a5a061ac81ba81a6ef2ce31ca2fa21ea884449d3787dadd3f8e88c8e033",
@@ -386,10 +386,10 @@
       "compasso": "4/4",
       "tonalidade": "Mi bemol maior",
       "arquivos": {
-        "mp3": "faixas/18/18_O_Pulso_da_Resistencia.mp3",
-        "ogg": "faixas/18/18_O_Pulso_da_Resistencia.ogg",
-        "midi": "faixas/18/18_O_Pulso_da_Resistencia.mid",
-        "sincronizacao": "faixas/18/18_O_Pulso_da_Resistencia_cues.json"
+        "mp3": "faixas/18/O Pulso da Resistência.mp3",
+        "ogg": "faixas/18/O Pulso da Resistência.ogg",
+        "midi": "faixas/18/O Pulso da Resistência.mid",
+        "sincronizacao": "faixas/18/O Pulso da Resistência.json"
       },
       "sha256": {
         "mp3": "6958cdfd3f3b036b286d2aa3686e0967832d77651e1956c6b296c306f3c10873",
@@ -408,10 +408,10 @@
       "compasso": "4/4",
       "tonalidade": "Fá maior",
       "arquivos": {
-        "mp3": "faixas/19/19_Calor_em_Contraponto.mp3",
-        "ogg": "faixas/19/19_Calor_em_Contraponto.ogg",
-        "midi": "faixas/19/19_Calor_em_Contraponto.mid",
-        "sincronizacao": "faixas/19/19_Calor_em_Contraponto_cues.json"
+        "mp3": "faixas/19/Calor em Contraponto.mp3",
+        "ogg": "faixas/19/Calor em Contraponto.ogg",
+        "midi": "faixas/19/Calor em Contraponto.mid",
+        "sincronizacao": "faixas/19/Calor em Contraponto.json"
       },
       "sha256": {
         "mp3": "8127da018505be4d2a43eea0700f2ec4bff1975db17974987d8ceb091e18ea9a",
@@ -430,10 +430,10 @@
       "compasso": "4/4",
       "tonalidade": "Si bemol maior/blues",
       "arquivos": {
-        "mp3": "faixas/20/20_Reflexos_a_Meia_Noite.mp3",
-        "ogg": "faixas/20/20_Reflexos_a_Meia_Noite.ogg",
-        "midi": "faixas/20/20_Reflexos_a_Meia_Noite.mid",
-        "sincronizacao": "faixas/20/20_Reflexos_a_Meia_Noite_cues.json"
+        "mp3": "faixas/20/Reflexos à Meia-Noite.mp3",
+        "ogg": "faixas/20/Reflexos à Meia-Noite.ogg",
+        "midi": "faixas/20/Reflexos à Meia-Noite.mid",
+        "sincronizacao": "faixas/20/Reflexos à Meia-Noite.json"
       },
       "sha256": {
         "mp3": "097a155009e6b7094783b4a8499f381595a06d9ffce905034d77684e46e294bf",
@@ -452,10 +452,10 @@
       "compasso": "4/4",
       "tonalidade": "Ré maior",
       "arquivos": {
-        "mp3": "faixas/21/21_Dilatacao_em_Re_Maior.mp3",
-        "ogg": "faixas/21/21_Dilatacao_em_Re_Maior.ogg",
-        "midi": "faixas/21/21_Dilatacao_em_Re_Maior.mid",
-        "sincronizacao": "faixas/21/21_Dilatacao_em_Re_Maior_cues.json"
+        "mp3": "faixas/21/Dilatação em Ré Maior.mp3",
+        "ogg": "faixas/21/Dilatação em Ré Maior.ogg",
+        "midi": "faixas/21/Dilatação em Ré Maior.mid",
+        "sincronizacao": "faixas/21/Dilatação em Ré Maior.json"
       },
       "sha256": {
         "mp3": "f8bf03d8740f5c2e9d3fa66cbd602cd68ad2988dd6bfe37be8e499d31e681cdb",
@@ -474,10 +474,10 @@
       "compasso": "4/4",
       "tonalidade": "Sol menor",
       "arquivos": {
-        "mp3": "faixas/22/22_Vibracoes_da_Rede.mp3",
-        "ogg": "faixas/22/22_Vibracoes_da_Rede.ogg",
-        "midi": "faixas/22/22_Vibracoes_da_Rede.mid",
-        "sincronizacao": "faixas/22/22_Vibracoes_da_Rede_cues.json"
+        "mp3": "faixas/22/Vibrações da Rede.mp3",
+        "ogg": "faixas/22/Vibrações da Rede.ogg",
+        "midi": "faixas/22/Vibrações da Rede.mid",
+        "sincronizacao": "faixas/22/Vibrações da Rede.json"
       },
       "sha256": {
         "mp3": "dd0235bb80d43d647a23096276a814423401022f42bd4644f1d547c85f56e5c8",
@@ -496,10 +496,10 @@
       "compasso": "4/4",
       "tonalidade": "Ré menor",
       "arquivos": {
-        "mp3": "faixas/23/23_O_Contratempo_da_Fusao.mp3",
-        "ogg": "faixas/23/23_O_Contratempo_da_Fusao.ogg",
-        "midi": "faixas/23/23_O_Contratempo_da_Fusao.mid",
-        "sincronizacao": "faixas/23/23_O_Contratempo_da_Fusao_cues.json"
+        "mp3": "faixas/23/O Contratempo da Fusão.mp3",
+        "ogg": "faixas/23/O Contratempo da Fusão.ogg",
+        "midi": "faixas/23/O Contratempo da Fusão.mid",
+        "sincronizacao": "faixas/23/O Contratempo da Fusão.json"
       },
       "sha256": {
         "mp3": "19b48b574971d52d1fb0b7cf7cce8832f1f8962b789e46b60e71fd261127199f",
@@ -518,10 +518,10 @@
       "compasso": "4/4",
       "tonalidade": "Fá maior",
       "arquivos": {
-        "mp3": "faixas/24/24_Duas_Vias_para_o_Calor.mp3",
-        "ogg": "faixas/24/24_Duas_Vias_para_o_Calor.ogg",
-        "midi": "faixas/24/24_Duas_Vias_para_o_Calor.mid",
-        "sincronizacao": "faixas/24/24_Duas_Vias_para_o_Calor_cues.json"
+        "mp3": "faixas/24/Duas Vias para o Calor.mp3",
+        "ogg": "faixas/24/Duas Vias para o Calor.ogg",
+        "midi": "faixas/24/Duas Vias para o Calor.mid",
+        "sincronizacao": "faixas/24/Duas Vias para o Calor.json"
       },
       "sha256": {
         "mp3": "afa84dcfa39eef2c5595682fd83e1500cbf2ac75edd2d90b509259fa7eaaf4ee",
@@ -540,10 +540,10 @@
       "compasso": "4/4",
       "tonalidade": "Lá bemol maior",
       "arquivos": {
-        "mp3": "faixas/25/25_O_Encontro_do_Lantanio.mp3",
-        "ogg": "faixas/25/25_O_Encontro_do_Lantanio.ogg",
-        "midi": "faixas/25/25_O_Encontro_do_Lantanio.mid",
-        "sincronizacao": "faixas/25/25_O_Encontro_do_Lantanio_cues.json"
+        "mp3": "faixas/25/O Encontro do Lantânio.mp3",
+        "ogg": "faixas/25/O Encontro do Lantânio.ogg",
+        "midi": "faixas/25/O Encontro do Lantânio.mid",
+        "sincronizacao": "faixas/25/O Encontro do Lantânio.json"
       },
       "sha256": {
         "mp3": "86ad9539756e225a440937f429cb98b92f69f61b781ffcc6c17e839bcc10a69b",
@@ -562,10 +562,10 @@
       "compasso": "4/4",
       "tonalidade": "Sol menor",
       "arquivos": {
-        "mp3": "faixas/26/26_O_Cerio_em_Transformacao.mp3",
-        "ogg": "faixas/26/26_O_Cerio_em_Transformacao.ogg",
-        "midi": "faixas/26/26_O_Cerio_em_Transformacao.mid",
-        "sincronizacao": "faixas/26/26_O_Cerio_em_Transformacao_cues.json"
+        "mp3": "faixas/26/O Cério em Transformação.mp3",
+        "ogg": "faixas/26/O Cério em Transformação.ogg",
+        "midi": "faixas/26/O Cério em Transformação.mid",
+        "sincronizacao": "faixas/26/O Cério em Transformação.json"
       },
       "sha256": {
         "mp3": "54a640a3d0c53142563ea6d8c68eb3ff93af0e6bdf8da53ca9d0aa254bae28d5",
@@ -584,10 +584,10 @@
       "compasso": "4/4",
       "tonalidade": "Si bemol maior",
       "arquivos": {
-        "mp3": "faixas/27/27_Neodimio_no_Palco.mp3",
-        "ogg": "faixas/27/27_Neodimio_no_Palco.ogg",
-        "midi": "faixas/27/27_Neodimio_no_Palco.mid",
-        "sincronizacao": "faixas/27/27_Neodimio_no_Palco_cues.json"
+        "mp3": "faixas/27/Neodímio no Palco.mp3",
+        "ogg": "faixas/27/Neodímio no Palco.ogg",
+        "midi": "faixas/27/Neodímio no Palco.mid",
+        "sincronizacao": "faixas/27/Neodímio no Palco.json"
       },
       "sha256": {
         "mp3": "8346a8ed9a6a2571475a9c55000a4ac7f063645c0c1ce5a65dbd462e9dcc1f44",
@@ -606,10 +606,10 @@
       "compasso": "4/4",
       "tonalidade": "Mi bemol maior com inflexões de blues",
       "arquivos": {
-        "mp3": "faixas/28/28_Gadolinio_e_a_Temperatura.mp3",
-        "ogg": "faixas/28/28_Gadolinio_e_a_Temperatura.ogg",
-        "midi": "faixas/28/28_Gadolinio_e_a_Temperatura.mid",
-        "sincronizacao": "faixas/28/28_Gadolinio_e_a_Temperatura_cues.json"
+        "mp3": "faixas/28/Gadolínio e a Temperatura.mp3",
+        "ogg": "faixas/28/Gadolínio e a Temperatura.ogg",
+        "midi": "faixas/28/Gadolínio e a Temperatura.mid",
+        "sincronizacao": "faixas/28/Gadolínio e a Temperatura.json"
       },
       "sha256": {
         "mp3": "d4945e84ce396871485e39a02e078424ba4c67e4896d4ec78b167e98dbab8710",
@@ -628,10 +628,10 @@
       "compasso": "4/4",
       "tonalidade": "Si bemol maior, com passagem contrastante em Sol menor",
       "arquivos": {
-        "mp3": "faixas/29/29_O_Contratempo_do_Disprosio.mp3",
-        "ogg": "faixas/29/29_O_Contratempo_do_Disprosio.ogg",
-        "midi": "faixas/29/29_O_Contratempo_do_Disprosio.mid",
-        "sincronizacao": "faixas/29/29_O_Contratempo_do_Disprosio_cues.json"
+        "mp3": "faixas/29/O Contratempo do Disprósio.mp3",
+        "ogg": "faixas/29/O Contratempo do Disprósio.ogg",
+        "midi": "faixas/29/O Contratempo do Disprósio.mid",
+        "sincronizacao": "faixas/29/O Contratempo do Disprósio.json"
       },
       "sha256": {
         "mp3": "10ebdbe0e1e487312e0031a6b539f5bea21f56bb60ee288a96be2abbd16158e4",
@@ -650,10 +650,10 @@
       "compasso": "4/4",
       "tonalidade": "Si bemol maior (com excursões harmônicas)",
       "arquivos": {
-        "mp3": "faixas/30/30_A_Grande_Orquestra_dos_Metais.mp3",
-        "ogg": "faixas/30/30_A_Grande_Orquestra_dos_Metais.ogg",
-        "midi": "faixas/30/30_A_Grande_Orquestra_dos_Metais.mid",
-        "sincronizacao": "faixas/30/30_A_Grande_Orquestra_dos_Metais_cues.json"
+        "mp3": "faixas/30/A Grande Orquestra dos Metais.mp3",
+        "ogg": "faixas/30/A Grande Orquestra dos Metais.ogg",
+        "midi": "faixas/30/A Grande Orquestra dos Metais.mid",
+        "sincronizacao": "faixas/30/A Grande Orquestra dos Metais.json"
       },
       "sha256": {
         "mp3": "1753294dc97239df3e6e3419da5dfe7c2f18efc067cbeb60b1fda33b9ad16bf8",

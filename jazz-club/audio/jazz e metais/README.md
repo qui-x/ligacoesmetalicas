@@ -4,7 +4,7 @@ Coleção instrumental original do **SILM — Clube de Jazz**, com 30 músicas i
 
 Esta pasta contém as versões musicais selecionadas, incluindo as **reorquestrações v0.2 das faixas 01, 02 e 03**.
 
-Cada faixa tem MP3, OGG, MIDI editável, marcadores de sincronização e notas. O catálogo contém nomes de arquivos, BPM e SHA-256 de cada mídia.
+Cada faixa tem MP3, OGG, MIDI editável, marcadores de sincronização e notas. Os arquivos de cada pasta usam exclusivamente o título da música, sem numeração ou versão no nome. O catálogo contém nomes de arquivos, BPM e SHA-256 de cada mídia.
 
 ## Repertório
 

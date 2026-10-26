@@ -27,4 +27,4 @@ jobs:
       - name: Conferir os 120 arquivos musicais e SHA-256
         run: node --test jazz-club/tests/audio-integrity.test.mjs
       - name: Verificar decodificação direta do MP3 da faixa 01
-        run: ffmpeg -nostdin -v error -i "jazz-club/audio/jazz e metais/faixas/01/01_O_Baile_dos_Eletrons_v02.mp3" -f null -
+        run: ffmpeg -nostdin -v error -i "jazz-club/audio/jazz e metais/faixas/01/O Baile dos Elétrons.mp3" -f null -

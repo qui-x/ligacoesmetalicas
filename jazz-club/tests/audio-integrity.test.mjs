@@ -14,7 +14,8 @@ const formats = [['mp3','mp3'],['ogg','ogg'],['midi','mid'],['sincronizacao','js
 
 function checkFile(track, kind, shaKey) {
   const relativePath = track.arquivos?.[kind];
-  assert.match(relativePath ?? '', /^faixas\/\d{2}\/[\w.-]+\.(?:mp3|ogg|mid|json)$/);
+  const extension = kind === 'sincronizacao' ? 'json' : kind === 'midi' ? 'mid' : kind;
+  assert.equal(relativePath, `faixas/${String(track.numero).padStart(2,'0')}/${track.titulo}.${extension}`);
   const data = readFileSync(join(collection, relativePath));
   assert.ok(data.byteLength > 0, 'Arquivo vazio: ' + relativePath);
   assert.equal(createHash('sha256').update(data).digest('hex'), track.sha256?.[shaKey],
@@ -43,7 +44,7 @@ test('As 30 faixas contêm MP3, OGG, MIDI e marcadores íntegros', () => {
     }
   }
 });
-test('O Baile dos Elétrons v0.2 é o MP3 original', () => {
+test('O Baile dos Elétrons é o MP3 original', () => {
   const track = catalog.faixas[0];
   const mp3 = readFileSync(join(collection, track.arquivos.mp3));
   assert.equal(mp3.byteLength, 3203700);
