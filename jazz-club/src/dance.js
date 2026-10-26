@@ -253,8 +253,16 @@ function init(){
       })});
     }
   }catch(e){
-    errorState=true;$('scene-error').hidden=false;
+    errorState=true;
     console.error('Jazz e Metais: falha no palco Babylon',e);
+    try { if(engine) engine.dispose(); } catch {}
+    // Canvas cannot switch from WebGL to 2D without replacing the element.
+    const original=$('dance-stage'),replacement=original.cloneNode(false);
+    original.replaceWith(replacement);
+    import('./dance-fallback.js').catch(fallbackError=>{
+      console.error('Fallback Canvas2D indisponível',fallbackError);
+      $('scene-error').hidden=false;
+    });
   }
 }
 $('transport').addEventListener('click',()=>{
