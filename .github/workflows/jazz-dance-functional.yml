@@ -1,0 +1,62 @@
+name: Jazz e Metais | Danca 3D Funcional
+on:
+  push:
+    branches:
+      - feature/baile-eletrons-jazz-1925
+    paths:
+      - 'jazz-club/web/dance.html'
+      - 'jazz-club/web/src/dance*.js'
+      - 'jazz-club/web/src/dance*.css'
+      - 'jazz-club/web/tests/dance*'
+      - 'jazz-club/web/package.json'
+      - 'jazz-club/web/vite.config.js'
+      - '.github/workflows/jazz-dance-functional.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: jazz-functional-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  dance:
+    name: Coreografia + Babylon + Chromium
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar dependencias open-source
+        working-directory: jazz-club/web
+        run: npm install --no-fund --no-audit
+      - name: Validar passo/ritmo e formacoes sem GPU
+        working-directory: jazz-club/web
+        run: npm run test:dance
+      - name: Compilar as duas paginas Babylon
+        working-directory: jazz-club/web
+        run: npm run build
+      - name: Preparar Chromium com SwiftShader
+        working-directory: jazz-club/web
+        run: npx playwright install --with-deps chromium
+      - name: Teste real da pista 3D e acessibilidade mobile
+        working-directory: jazz-club/web
+        env:
+          CI: true
+        run: npm run qa:dance
+      - name: Publicar cena de testes como artefato
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jazz-e-metais-pista-babylon-${{ github.run_number }}
+          path: jazz-club/web/dist/**
+          if-no-files-found: error
+          retention-days: 14
+      - name: Guardar capturas e diagnosticos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jazz-e-metais-pista-qa-${{ github.run_number }}
+          path: jazz-club/web/qa-artifacts/**
+          if-no-files-found: warn
+          retention-days: 14
