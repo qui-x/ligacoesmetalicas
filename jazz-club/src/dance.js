@@ -173,7 +173,7 @@ function frame(now,dots){
   const delta=Math.min(.05,Math.max(0,(now-lastTime)/1000));lastTime=now;
   if(!playing) return;
   const isAudioActive=!!media.src&&!media.paused&&!media.ended;
-  if(isAudioActive)clock=media.currentTime;else clock+=delta;
+  if(media.src)clock=media.currentTime;else clock+=delta;
   const frameReduced=reduced.checked;
   const visualTime=frameReduced?0:clock;
   const bpm=Number(bpmEl.value);
@@ -290,9 +290,7 @@ $('builtin-track').addEventListener('click',async()=>{
   const button=$('builtin-track'),label=$('builtin-track-status');
   button.disabled=true;label.textContent='Preparando a faixa original…';
   try{
-    const track=await loadBuiltinTrack((loaded,total)=>{
-      label.textContent='Carregando música: '+Math.round(loaded*100/total)+'%';
-    });
+    const track=await loadBuiltinTrack();
     media.pause();
     if(sourceUrl){URL.revokeObjectURL(sourceUrl);sourceUrl=null;}
     media.src=track.objectUrl;media.load();
@@ -301,7 +299,8 @@ $('builtin-track').addEventListener('click',async()=>{
     bpmEl.value=String(cues.bpm);
     $('bpm-output').textContent=bpmEl.value+' BPM';
     $('audio-play').disabled=false;clock=0;lastCueFormation=null;
-    label.textContent='MP3 da coleção · 2min13s · 132 BPM · pronto para reproduzir';
+    label.textContent='Arquivo oficial selecionado · 132 BPM · pronto para reproduzir';
+    button.textContent='Recarregar O Baile dos Elétrons';
     updateMusicLabel();say('O Baile dos Elétrons carregado; clique em Reproduzir faixa.');
   }catch(error){
     label.textContent='Falha ao carregar a faixa: '+error.message;
@@ -315,7 +314,8 @@ $('audio-file').addEventListener('change',e=>{
   sourceUrl=URL.createObjectURL(file);
   media.pause();media.src=sourceUrl;media.load();
   clip=file;$('audio-play').disabled=false;
-  clock=0;lastCueFormation=null;updateMusicLabel();say('Faixa '+file.name+' carregada; clique para reproduzir');
+  clock=0;lastCueFormation=null;cues={bpm:Number(bpmEl.value),beatOffset:0,events:[],track:file.name};
+  updateMusicLabel();say('Faixa '+file.name+' carregada; clique para reproduzir');
 });
 $('cues-file').addEventListener('change',async e=>{
   const file=e.target.files?.[0];if(!file)return;
@@ -362,4 +362,14 @@ document.addEventListener('keydown',e=>{
     if(key){formationEl.value=key;formationEl.dispatchEvent(new Event('change'))}
   }
 });
+media.addEventListener('play',()=>{playing=true;lastTime=performance.now();updateMusicLabel()});
+media.addEventListener('pause',updateMusicLabel);
+media.addEventListener('ended',()=>{playing=false;updateMusicLabel();say('Música concluída')});
+media.addEventListener('error',()=>{
+  const label=$('builtin-track-status');
+  if(label)label.textContent='Não foi possível reproduzir o MP3. Verifique a conexão ou recarregue a faixa.';
+  say('Erro no áudio da faixa selecionada.');
+});
 init();
+// Pré-seleciona a faixa oficial sem iniciar áudio automaticamente.
+$('builtin-track').click();
