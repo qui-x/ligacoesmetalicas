@@ -1,4 +1,4 @@
-"""Pure-Python facial study surface for an artistic Sommerfeld interpretation.
+"""Pure-Python facial study surface for an artistic Sommerfeld interpretation (revision 05).
 Not a photogrammetric portrait or final facial edge-loop retopology.
 Quad mesh editable in Blender. Positive Y front, Z up; meters.
 """
@@ -32,10 +32,12 @@ def head_geometry(rows=ROWS,columns=COLUMNS):
                 -.026*bell(abs(x),z,.083,.065,.045,.039)
                 +.020*bell(abs(x),z,.125,-.043,.060,.068)
                 +.011*bell(x,z,0,.070,.043,.155)
-                +.055*bell(x,z,0,-.031,.052,.075)
-                -.012*bell(abs(x),z,.112,-.127,.032,.079)
-                +.012*bell(x,z,0,-.118,.056,.025)
-                +.016*bell(x,z,0,-.151,.061,.022)
+                +.043*bell(x,z,0,.014,.040,.092)  # nasal bridge in shared face mesh
+                +.043*bell(x,z,0,-.070,.041,.037)  # nasal tip in shared face mesh
+                +.012*bell(abs(x),z,.034,-.089,.027,.025)  # alae
+                -.014*bell(abs(x),z,.112,-.127,.032,.079)
+                +.008*bell(x,z,0,-.119,.055,.023)
+                +.010*bell(x,z,0,-.155,.051,.018)
                 +.018*bell(x,z,0,-.228,.091,.037)
                 -.010*bell(x,z,0,-.189,.07,.019)
             )
