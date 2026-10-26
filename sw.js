@@ -15,6 +15,7 @@ const FILES=[
   "integracao/legacy-entry.js",
   "integracao/metallic-experience.js",
   "integracao/pwa.js",
+  "integracao/responsive.css",
   "integracao/route-ui.js",
   "integracao/scientific-tools.js",
   "integracao/silm-theme.css",

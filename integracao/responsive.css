@@ -1,0 +1,40 @@
+/* Escala comum do produto; preserva a geometria das cenas e da tabela. */
+:root{--silm-control-text:.875rem;--silm-content-gap:clamp(12px,1.5vw,20px)}
+#conteudo>[data-view]{min-width:0;overflow-wrap:break-word}
+.silm-route-catalog{gap:var(--silm-content-gap)}
+.silm-route-catalog>article{min-width:0}
+.silm-route-catalog .button,.silm-report-actions .button{white-space:normal;overflow-wrap:anywhere;line-height:1.4}
+#si-workspace .si-workspace-toolbar button,#si-workspace .si-actionbar button{font-size:var(--silm-control-text);line-height:1.3;min-height:44px}
+#si-workspace .si-actionbar{gap:6px;flex-wrap:wrap}
+#si-workspace .si-workspace-toolbar .si-view-tabs button{font-size:var(--silm-control-text)}
+#si-workspace .si-dock button:not(.periodic-element):not(.silm-unit){min-height:44px;line-height:1.4}
+#si-workspace .si-dock input:not([type=range]):not([type=checkbox]):not([type=radio]),#si-workspace .si-dock select{min-height:44px;font:inherit;max-width:100%;min-width:0;box-sizing:border-box}
+#silm-comparison-items{padding:clamp(8px,1.2vw,16px);max-height:none;overflow:visible}
+#workspace-overview{overflow:auto;min-width:0;min-height:0;scroll-padding:12px}
+.silm-comparison-controls>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:8px 12px;padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius)}
+.silm-comparison-controls>div label{font-weight:600;line-height:1.5}
+.silm-comparison select,.silm-comparison button{box-sizing:border-box;min-width:0;width:100%;min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font:inherit;font-size:var(--silm-control-text);white-space:normal;cursor:pointer}
+.silm-comparison input[type=range]{width:100%;min-width:0;min-height:44px;accent-color:var(--accent)}
+.silm-comparison button[aria-pressed=true]{background:var(--tint);border-color:var(--accent);box-shadow:inset 0 -3px var(--accent)}
+.silm-comparison :is(button,select,input):focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.silm-comparison-cards{gap:var(--silm-content-gap)}
+.silm-comparison-cards article{background:var(--surface);border-color:var(--border);border-radius:var(--radius);padding:12px}
+.silm-comparison-cards h3{font-size:1rem;line-height:1.4;margin:0 0 8px}
+.silm-comparison-cards p,.silm-comparison>p{font-size:.875rem;line-height:1.6}
+.silm-comparison-cards small{font-size:.8rem;line-height:1.5;color:var(--muted)}
+.silm-route-report input,.silm-route-report textarea,#silm-notebook textarea{box-sizing:border-box;max-width:100%;border-radius:10px}
+#silm-periodic-dialog{box-sizing:border-box;overscroll-behavior:contain;scroll-padding:12px}
+.periodic-actions{display:flex;flex-wrap:wrap;gap:8px}.periodic-actions button{min-height:44px;white-space:normal}
+@media(max-width:600px){
+ #si-workspace .si-workspace-toolbar{gap:6px}
+ #si-workspace .si-workspace-toolbar .si-view-tabs button{padding-inline:6px;font-size:.8125rem}
+ #si-workspace .si-actionbar button{font-size:.8125rem;padding-inline:8px}
+ .silm-comparison-controls>div{grid-template-columns:minmax(0,1fr)}
+ .silm-report-actions>*{flex:1 1 180px}
+ #silm-periodic-dialog{width:calc(100vw - 16px);max-width:calc(100vw - 16px);padding:10px;border-radius:12px;max-height:calc(100dvh - 16px)}
+ .periodic-heading{gap:12px}.periodic-search{max-width:100%;min-width:0}
+ .periodic-actions button{flex:1 1 130px}
+}
+@media print{#workspace-overview{overflow:visible}.silm-comparison-controls>div{display:none}.silm-comparison-cards article{break-inside:avoid}}
+
+.silm-comparison-controls,.silm-comparison-help{margin-bottom:12px}.silm-comparison-controls>summary,.silm-comparison-help>summary{min-height:44px;padding:10px 12px;box-sizing:border-box;cursor:pointer;border:1px solid var(--border);border-radius:10px;background:var(--panel);font-size:.875rem}.silm-comparison-controls>summary:focus-visible,.silm-comparison-help>summary:focus-visible{outline:3px solid var(--ring)}
