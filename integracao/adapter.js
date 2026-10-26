@@ -2,7 +2,7 @@
 /* Produto SILM sobre a Base SI 0.9.17. O domínio científico SILM permanece no schema 8. */
 (() => {
  const B=BaseDemoSI,S=SILM,$=id=>document.getElementById(id);
- B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.15.0',
+ B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.15.2',
   routes:B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios','aprender','missoes','caderno','professor'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'Oficina dos Metais':route.title}))});
  // A cena cristalina também usa data-view; o roteamento só pode atingir páginas do produto.
  B.updateRoute=()=>{
@@ -47,7 +47,8 @@
   saveCamera(mode,value){representation.cameras[mode]=S.representation.sanitizeCamera(value);saveView();}
  };
  function saveView(){storage.set('representation.view',representation);}
- const tools=S.createIntegrationTools({model,host:$('silm-tools'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
+ const tools=S.createIntegrationTools({model,host:$('silm-tools'),moduleHost:$('silm-module-choice'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
+ const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session});
  const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
  routeUI=S.createRouteUI({model,storage,view:()=>representation,onView:value=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);saveView();},schedule,say,onModule:m=>B.selectModule(m),selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
  const run={
@@ -129,6 +130,7 @@
 
  function text(id,value){if($(id))$(id).textContent=value;}
  function render(){
+  const focused=document.activeElement,restoreControl=focused?.closest('#silm-tools,#silm-module-choice,#silm-history')?focused.id:null;
   const state=model.state,e=element(),s=state.structure,n=s?.units.length||0;
   const expandButton=$('si-expand-structure'),expandable=!!(e&&s?.mode==='crystalline'&&n>0);
   expandButton.disabled=!expandable;
@@ -157,7 +159,8 @@
    b.addEventListener('click',()=>{document.querySelector('[data-scene-view="focus"]').click();if(s.mode==='crystalline')run.select(u.id);view?.focusUnit(u.id);});list.append(b);
   }
   if(!n)list.textContent='Ainda não há unidades nesta investigação.';
-  routeUI.render();storageStatus();
+  routeUI.render();workspaceFamily.update();storageStatus();
+  const replacement=restoreControl?$(restoreControl):null;if(focused&&!focused.isConnected&&replacement?.getClientRects().length)replacement.focus({preventScroll:true});
  }
  async function start(){
   if(routeUI.session.open())return;
@@ -228,7 +231,7 @@
   window.addEventListener('si-route-changed',()=>{if(B.currentRoute(location.hash)!=='ambiente')setStageExpanded(false,{restoreFocus:false});view?.update();});
   const appearance=new MutationObserver(()=>{document.documentElement.dataset.contrast=document.documentElement.classList.contains('si-highcontrast')?'on':'off';view?.update();window.dispatchEvent(new CustomEvent('silm:theme:changed'));});appearance.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   document.addEventListener('keydown',event=>{if(!(event.ctrlKey||event.metaKey)||event.altKey||event.shiftKey||event.key.toLowerCase()!=='z'||B.isPlatformDialogOpen()||B.currentRoute(location.hash)!=='ambiente'||event.target.closest('input,select,textarea,[contenteditable]'))return;event.preventDefault();run.undo();});
-  routeUI.init();B.selectModule(model.state.module.active);ready=true;render();
+  routeUI.init();B.selectModule(model.state.module.active);workspaceFamily.init();ready=true;render();
   // Read-only inspection facade: tests and debugging cannot mutate the authoritative state directly.
   window.SILMIntegration=Object.freeze({snapshot:()=>model.snapshot(),baseVersion:'0.9.17',activity:()=>routeUI.session.snapshot()});
  }

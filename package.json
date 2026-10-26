@@ -1,6 +1,6 @@
 {
   "name": "silm",
-  "version": "0.15.1",
+  "version": "0.15.2",
   "private": true,
   "description": "SILM — investigação e estruturas cristalinas de metais com cobertura experimental ampliada.",
   "license": "GPL-3.0",
@@ -8,13 +8,14 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "node scripts/validate-scientific-data.cjs && node scripts/validate-scientific-state.cjs && node scripts/build-scientific-data.cjs && node scripts/build-layout.cjs && node scripts/build-sw.cjs && node scripts/build-coverage.cjs",
+    "build": "node scripts/validate-scientific-data.cjs && node scripts/validate-scientific-state.cjs && node scripts/build-scientific-data.cjs && node scripts/build-layout.cjs && node scripts/build-base-integration.cjs && node scripts/build-main-entry.cjs && node scripts/build-sw.cjs && node scripts/build-coverage.cjs",
     "test": "npm run test:scientific && npm run test:routes && npm run test:learning && npm run test:integration",
     "audit": "python3 scripts/audit-silm.py",
     "test:scientific": "node tests/scientific-data.cjs && node tests/crystal-coverage.cjs && node scripts/validate-scientific-state.cjs",
     "coverage": "node scripts/build-coverage.cjs",
     "test:browser": "npm run test:integration",
-    "build:integration": "node scripts/build-base-integration.cjs && node scripts/build-main-entry.cjs",
+    "test:a11y": "node tests/workspace-a11y.cjs",
+    "build:integration": "node scripts/build-base-integration.cjs && node scripts/build-main-entry.cjs && node scripts/build-sw.cjs",
     "test:integration": "npm run build:integration && node tests/base-integration.cjs",
     "test:routes": "node tests/routes.cjs",
     "test:routes:browser": "node tests/integration-runner.cjs",

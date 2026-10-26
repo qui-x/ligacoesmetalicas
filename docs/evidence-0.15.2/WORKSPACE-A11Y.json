@@ -1,0 +1,114 @@
+{
+  "browser": "153.0.8010.0",
+  "engine": "axe-core",
+  "scenarios": [
+    {
+      "width": 390,
+      "theme": "claro",
+      "scenario": "modulo",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "theme": "claro",
+      "scenario": "ver",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "theme": "claro",
+      "scenario": "dados",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "theme": "escuro",
+      "scenario": "modulo",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "theme": "escuro",
+      "scenario": "ver",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "theme": "escuro",
+      "scenario": "dados",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "theme": "contraste",
+      "scenario": "modulo",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "theme": "contraste",
+      "scenario": "ver",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "theme": "contraste",
+      "scenario": "dados",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "theme": "claro",
+      "scenario": "modulo",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "theme": "claro",
+      "scenario": "ver",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "theme": "claro",
+      "scenario": "dados",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "theme": "escuro",
+      "scenario": "modulo",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "theme": "escuro",
+      "scenario": "ver",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "theme": "escuro",
+      "scenario": "dados",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "theme": "contraste",
+      "scenario": "modulo",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "theme": "contraste",
+      "scenario": "ver",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "theme": "contraste",
+      "scenario": "dados",
+      "violations": []
+    }
+  ]
+}

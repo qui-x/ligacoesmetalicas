@@ -1,0 +1,25 @@
+/* Componentes do produto sobre geometria, docas e folhas móveis da Base SI. */
+.silm-module-card{border:1px solid var(--border);border-radius:var(--radius);margin:10px 0;background:var(--surface);overflow:hidden}
+.silm-module-card>summary{display:flex;gap:9px;align-items:center;min-height:48px;padding:10px 12px;cursor:pointer;list-style:none}
+.silm-module-card>summary::after{content:'+';margin-left:auto;font-weight:700}
+.silm-module-card[open]>summary::after{content:'−'}
+.silm-module-card.is-active{border-color:var(--accent);box-shadow:inset 3px 0 var(--accent)}
+.silm-module-number{display:grid;place-items:center;min-width:25px;height:25px;border-radius:50%;background:var(--tint);color:var(--accent);font-weight:700}
+.silm-module-badge{font-size:.72rem;font-weight:700;color:var(--accent)}
+.silm-module-body{padding:0 12px 12px;line-height:1.6}
+.silm-module-body h4{margin:8px 0}.silm-module-body .button{width:100%;white-space:normal}
+.silm-tool-description,#silm-module-context{font-size:.85rem;line-height:1.6;color:var(--muted)}
+#si-dock-right .si-dock-header{flex-wrap:wrap;gap:8px}
+#si-dock-viewer-back,#silm-data-back{font:inherit;font-size:.8rem;min-height:44px;max-width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);cursor:pointer}
+#si-viewer-catalog>#si-viewer-families{grid-template-columns:repeat(auto-fit,minmax(85px,1fr))}
+.silm-viewer-panel{min-width:0;overflow-wrap:anywhere}
+.silm-data-menu{display:grid;gap:10px}
+.silm-data-menu>button,.silm-data-menu>a{display:grid;gap:5px;text-align:left;min-height:64px;padding:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font:inherit;text-decoration:none;cursor:pointer;overflow-wrap:anywhere}
+.silm-data-menu>button:hover,.silm-data-menu>a:hover{background:var(--tint);border-color:var(--accent)}
+.silm-data-menu span,.silm-data-menu small{font-size:.8rem;color:var(--muted);line-height:1.5}
+.silm-data-documents{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.silm-data-documents .button{flex:1;white-space:normal}
+.silm-data-detail>h3{margin-top:10px}
+.primary-btn{color:var(--accent-ink)}
+.silm-module-card>summary:focus-visible,.silm-data-menu>*:focus-visible,#silm-data-back:focus-visible,#si-dock-viewer-back:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+@media(max-width:900px){#si-dock-right .si-dock-header h2{flex:1;min-width:80px}#si-dock-right .si-dock-scroll{scroll-padding-block:12px}}
+@media(forced-colors:active){.silm-module-card.is-active{border:2px solid Highlight}.silm-module-badge{color:CanvasText}}

@@ -1,4 +1,6 @@
-# SILM 0.15.1 — A Arquitetura dos Metais
+# SILM 0.15.2 — A Arquitetura dos Metais
+
+A 0.15.2 aproxima a operação da Oficina dos Metais à família SI: módulos em **Montagem**, famílias e ferramentas em **Ver**, consultas e documentos em **Dados**, com retorno contextual e expansão do painel pela Base. Consulte [o escopo e a validação desta correção](docs/PARIDADE-BASE-SI-0.15.2.md).
 
 A página inicial oferece a Oficina dos Metais como espaço de manipulação das estruturas e mantém o card do Caderno com a contagem de registros. A versão 0.15.1 amplia a cobertura experimental: 57 metais podem ser investigados e 48 têm visualização cristalográfica em CCC, CFC ou HC ([notas da versão](docs/SILM-0.15.1.md)). Os nove metais com estruturas fora desses modelos continuam sinalizados, sem substituição artificial. A correção de tela inteira e menus contextuais está documentada em [0.14.7](docs/SILM-0.14.7.md). O Caderno reúne anotações com título, conclusões de missões/roteiros e referências reabríveis a relatórios. A interface integrada usa o snapshot da Base SI 0.9.17; o motor científico, os dados e o schema 8 do SILM continuam separados e preservados.
 

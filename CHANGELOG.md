@@ -1,5 +1,18 @@
 # Registro de alterações
 
+## SILM 0.15.2 — Docas e módulos da família SI
+
+Correção de origem 0.1.x — gramática operacional compartilhada.
+
+- Montagem → Módulo reúne o seletor e os cartões explicativos de Explorar, Medir e Calcular, com estado ativo e bloqueio por atividade.
+- Ver registra ferramentas científicas na API de visualizadores da Base SI 0.9.17, com famílias permitidas pelo módulo, catálogo, detalhe, retorno de foco e expansão.
+- Dados organiza dados do metal/fontes, medições/cálculos, JSON, Caderno e relatório, sem duplicar a investigação.
+- Manual atualizado para os caminhos efetivamente disponíveis na interface integrada.
+- Build da integração inclui a atualização do service worker; o primeiro preparo offline não anuncia uma atualização inexistente.
+- Corrigida a regressão do teste de cobertura de roteiros, que ainda fixava 43 metais após a expansão para 57.
+- A validação e as diferenças ainda abertas em relação à Base/SIAB estão em `docs/PARIDADE-BASE-SI-0.15.2.md`.
+
+
 ## SILM 0.15.1 — Homologação das estruturas existentes
 
 - Adicionado teste de cobertura para os 57 registros com estrutura de referência: valida fontes, fase sólida, geometria, sítios da célula e número de coordenação.

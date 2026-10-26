@@ -1,4 +1,5 @@
 'use strict';
+const nav=require('./integration-navigation.cjs');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {chromium}=require('playwright');
 const root=path.resolve(__dirname,'..');
@@ -71,13 +72,13 @@ async function main(){
   assert.deepEqual(await state(),crystal,'Órbita 3D não altera a ciência');
   await page.locator('#silm-crystal-projection').selectOption('top');await page.waitForSelector('.silm-crystal[data-view-mode="2d"]');
   assert.deepEqual(await state(),crystal,'Retorno ao 2D preserva a ciência');
-  await page.locator('[data-open-dock="ver"]').click();await page.locator('#silm-electrons').click();
+  await nav.viewer(page,'eletrons');await page.locator('#silm-electrons').click();
   await page.waitForFunction(()=>window.SILMIntegration.snapshot().electrons?.representation.visible===true);
   await page.locator('[data-close-dock="right"]').click();
   const saved=await state();await page.reload();await page.waitForFunction(()=>window.SILMIntegration);
   assert.deepEqual(await state(),saved,'Reload preserva investigação');assert.equal(await page.locator('#silm-crystal-projection').inputValue(),'top');
   assert.equal(await page.evaluate(()=>localStorage.getItem('silm:legacy-sentinel')),'preservar');
-  await page.locator('[data-open-dock="dados"]').click();
+  await nav.data(page,'arquivo');
   const downloadPromise=page.waitForEvent('download');await page.locator('#silm-export').click();const download=await downloadPromise;
   const exported=JSON.parse(fs.readFileSync(await download.path(),'utf8'));assert.deepEqual(exported.scientificState,saved);
   await page.locator('#silm-import').setInputFiles({name:'invalido.json',mimeType:'application/json',buffer:Buffer.from('{"schemaVersion":8}')});
@@ -142,6 +143,7 @@ async function main(){
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Sem overflow em paisagem');
   const evidence=process.env.SILM_INTEGRATION_EVIDENCE;
   if(evidence){fs.mkdirSync(evidence,{recursive:true});await page.setViewportSize({width:1440,height:1000});await page.screenshot({path:path.join(evidence,'desktop.png')});await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(evidence,'mobile.png')});}
+  await require('./workspace-family.cjs')(browser,url);
   await require('./integration-tools.cjs')(browser,url);
   await require('./routes-browser.cjs')(browser,url);
   await require('./learning-browser.cjs')(browser,url);

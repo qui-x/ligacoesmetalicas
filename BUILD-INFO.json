@@ -1,7 +1,7 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.15.1",
+  "versao": "0.15.2",
   "tema": "A Arquitetura dos Metais",
   "versaoBase": "0.3.1",
   "scientificSchemaVersion": 8,
@@ -102,9 +102,9 @@
     }
   ],
   "observacaoOrigem": "Origem: entregas/SILM-0.11.0.zip deste repositório, verificado pelo SHA-512 externo; núcleo da Base Estrutural 0.3.1 sem alteração local.",
-  "status": "Homologação automatizada dos 57 registros estruturais existentes; 48 visualizáveis e nove estruturas incompatíveis mantidas sem conversão.",
+  "status": "Correção de origem 0.1.x: paridade de Montagem, Ver e Dados com a Base SI 0.9.17; validação desta rodada documentada separadamente.",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
-  "dataBuild": "2026-10-22",
+  "dataBuild": "2026-10-26",
   "structureModelVersion": 2,
   "electronModelVersion": 1,
   "propertiesModelVersion": 1,
@@ -116,5 +116,10 @@
     "commit": "68ed86cb416ea31489be481fc52d86aeedce2892",
     "entrada": "integracao/index.html",
     "status": "snapshot de execução sincronizado; motor científico separado"
+  },
+  "referenciasParidade": {
+    "base": "quimicaifbacampusvca/baseparasimuladores@68ed86cb416ea31489be481fc52d86aeedce2892",
+    "siab": "qui-x/acidobase@01de12390ec0b6bfb6ed22169b0d625e1dfe4961",
+    "origem": "qui-x/ligacoesmetalicas@79dd76727ef6e54c777e76856b7d01d6a377bdda"
   }
 }

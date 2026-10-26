@@ -1,6 +1,6 @@
 'use strict';
 /* Interface sobre os serviços científicos existentes. Não contém fórmulas próprias. */
-SILM.createIntegrationTools=({model,host,history,onChange,say,onModule,activity=()=>null})=>{
+SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,onModule,activity=()=>null})=>{
  const S=SILM,MS=S.measurement,CA=S.calculation,U=S.units;
  let context='',tool=null,picks=[],review=null,formula=null,choice={},user={},unit='Å';
  const node=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
@@ -62,8 +62,8 @@ SILM.createIntegrationTools=({model,host,history,onChange,say,onModule,activity=
  function render(){
   const state=model.state,key=state.investigation?.id+':'+state.structure?.mode;
   if(key!==context){context=key;reset();}
-  host.replaceChildren();history.replaceChildren();
-  field(host,'Módulo',select('silm-module',[['explorar','Explorar'],['medir','Medir'],['calcular','Calcular']],state.module.active,v=>{if(activity()?.lockedModule())return;reset();model.setModule(v);onModule(v);change();}));
+  host.replaceChildren();moduleHost.replaceChildren();history.replaceChildren();
+  field(moduleHost,'Módulo ativo',select('silm-module',[['explorar','Explorar'],['medir','Medir'],['calcular','Calcular']],state.module.active,v=>{if(activity()?.lockedModule())return;reset();model.setModule(v);onModule(v);change();}));
   document.getElementById('silm-module').disabled=!!activity()?.lockedModule();
   if(state.module.active!=='explorar'){
    host.append(node('p','Medições e cálculos usam o modelo cristalográfico em escala física. Zoom e projeção não alteram os valores.'));

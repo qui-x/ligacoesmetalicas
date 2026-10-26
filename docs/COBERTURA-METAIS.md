@@ -100,16 +100,17 @@ A elegibilidade de investigação (`silmEligibility`) e a elegibilidade cristalo
 | 114 | Fl | Fleróvio | indisponível · superpesado | — | — | — | — | — não investigável | — sem fase sólida de referência | — sem fase sólida de referência | — sem fase sólida de referência | — sem fase sólida de referência |
 | 115 | Mc | Moscóvio | indisponível · superpesado | — | — | — | — | — não investigável | — sem fase sólida de referência | — sem fase sólida de referência | — sem fase sólida de referência | — sem fase sólida de referência |
 | 116 | Lv | Livermório | indisponível · superpesado | — | — | — | — | — não investigável | — sem fase sólida de referência | — sem fase sólida de referência | — sem fase sólida de referência | — sem fase sólida de referência |
+
 ## Propriedades (0.7.x)
 
 Elegibilidade por propriedade (`SILM.properties.eligibility`), calculada do banco: **qualitativa** = experiência qualitativa disponível, sem valor tabelado homologado; **dado + experiência** = valor tabelado com valor, unidade, condição e fonte; **—** = indisponível, com motivo. As experiências de rede (térmica, maleabilidade, ductilidade e brilho) exigem a estrutura cristalina organizada; a condutividade elétrica também funciona na montagem livre. Nenhum valor típico preenche lacunas.
 
 | Propriedade | Dado + experiência | Qualitativa | Indisponível |
 |---|---|---|---|
-| Condutividade elétrica | 0 | 43 | 49 |
-| Condutividade térmica | 0 | 34 | 58 |
-| Maleabilidade | 0 | 34 | 58 |
-| Ductilidade | 0 | 34 | 58 |
-| Brilho metálico | 0 | 34 | 58 |
+| Condutividade elétrica | 0 | 57 | 35 |
+| Condutividade térmica | 0 | 48 | 44 |
+| Maleabilidade | 0 | 48 | 44 |
+| Ductilidade | 0 | 48 | 44 |
+| Brilho metálico | 0 | 48 | 44 |
 
 Nesta versão o banco não traz valores homologados de condutividade elétrica, resistividade ou condutividade térmica (`PROPERTY_DATA_MISSING`). Para o mercúrio, sem fase sólida de referência registrada, deformação de sólido, condução pela rede e superfície sólida ficam indisponíveis (`REFERENCE_PHASE_UNSUPPORTED`); o metal continua classificado como metal.
