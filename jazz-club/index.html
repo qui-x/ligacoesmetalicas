@@ -48,14 +48,20 @@
       <button id="fullscreen" type="button">Tela inteira</button>
     </div>
     <div class="audio-box">
-      <label>Carregar faixa já produzida (MP3, OGG, WAV)
+      <div class="club-track">
+        <strong>Mar de Elétrons · Trilha oficial de ensaio</strong>
+        <button id="builtin-track" type="button">Carregar “O Baile dos Elétrons” (v0.2)</button>
+        <span id="builtin-track-status" role="status" aria-live="polite">132 BPM · 2min13s · faixa completa</span>
+        <audio id="audio-player" controls preload="metadata" aria-label="Reprodução e volume da música do clube"></audio>
+      </div>
+      <label>Carregar outra faixa (MP3, OGG, WAV)
         <input type="file" id="audio-file" accept=".mp3,.ogg,.wav,audio/*">
       </label>
       <label>Marcadores opcionais da música (JSON)
         <input type="file" id="cues-file" accept=".json,application/json">
       </label>
       <label><input id="reduce-motion" type="checkbox"> Movimento reduzido</label>
-      <p>O motor 3D usa a biblioteca Babylon.js carregada online. As músicas começam somente após clicar em reproduzir. O áudio importado permanece no navegador e não é enviado ao SILM.</p>
+      <p>O motor 3D usa a biblioteca Babylon.js carregada online. As músicas começam somente após clicar em reproduzir. A faixa oficial é carregada do próprio site; arquivos importados permanecem no navegador e não são enviados ao SILM.</p>
     </div>
     <p class="keyboard">Espaço: pausar/retomar · 1–5: formações · R: câmera · setas: girar</p>
     <p id="announcer" aria-live="polite" class="sr-only"></p>
