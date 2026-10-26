@@ -14,6 +14,8 @@ const motionButtons = [...document.querySelectorAll('[data-motion]')];
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 if (reduced.matches) enabled.checked = false;
 let motion = 'idle';
+let expression = 'neutral';
+const expressionButtons = [...document.querySelectorAll('[data-expression]')];
 let scene, engine, camera, controls, morphs = [];
 let tick = 0;
 const bases = new WeakMap();
@@ -80,6 +82,12 @@ function selectMotion(next) {
   const names={idle:'Respiração discreta',observe:'Observando o palco',notes:'Consultando anotações',applause:'Aplausos discretos'};
   announce('Sommerfeld · '+names[motion]+(enabled.checked?'':' · movimento pausado'));
 }
+function selectExpression(next) {
+  expression = next;
+  for (const b of expressionButtons) b.setAttribute('aria-pressed', String(b.dataset.expression === next));
+  const labels = {neutral:'Expressão neutra', smile:'Sorriso de estudo', jawopen:'Abertura de boca de estudo'};
+  announce('Sommerfeld · ' + (labels[next] || 'Expressão'));
+}
 function changeCamera(type) {
   const plans={
     portrait: {alpha:-Math.PI/2+.12,beta:1.33,radius:1.56,target:new Vector3(0,1.72,0)},
@@ -122,7 +130,15 @@ function animation(now) {
   for (const mt of morphs) {
     if (/Blink_[LR]/i.test(mt.name)) mt.influence=blink;
     else if (/BrowRaise/i.test(mt.name)) mt.influence=(play && motion==='observe') ? 0.10 : 0;
-    else if (/Smile/i.test(mt.name)) mt.influence=(play && motion==='applause') ? 0.18 : 0;
+    else if (/Smile/i.test(mt.name)) {
+      const target = expression === 'smile' ? .85 : ((play && motion==='applause') ? .18 : 0);
+      mt.influence += (target-mt.influence)*((reduced.matches || !enabled.checked) ? 1 : .14);
+    }
+    else if (/JawOpen/i.test(mt.name)) {
+      const target = expression === 'jawopen' ? .93 : 0;
+      mt.influence += (target-mt.influence)*((reduced.matches || !enabled.checked) ? 1 : .14);
+    }
+    else if (/Pucker|Frown|Speech_A/i.test(mt.name)) mt.influence = 0;
   }
 }
 async function initialize() {
@@ -181,6 +197,7 @@ async function initialize() {
   }
 }
 motionButtons.forEach(button=>button.addEventListener('click',()=>selectMotion(button.dataset.motion)));
+expressionButtons.forEach(button=>button.addEventListener('click',()=>selectExpression(button.dataset.expression)));
 document.querySelectorAll('[data-camera]').forEach(button=>button.addEventListener('click',()=>changeCamera(button.dataset.camera)));
 document.querySelector('#reset-camera').addEventListener('click',()=>changeCamera('reset'));
 enabled.addEventListener('change',()=>selectMotion(motion));
