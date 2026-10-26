@@ -1,0 +1,43 @@
+{
+  "title": "Exemplo didático de marcação — não sincronizado a faixa aprovada",
+  "bpm": 120,
+  "beatOffset": 0,
+  "events": [
+    {
+      "beat": 0,
+      "section": "Introdução",
+      "formation": "trio",
+      "energy": 0.35
+    },
+    {
+      "beat": 32,
+      "section": "Dueto e resposta",
+      "formation": "pares",
+      "energy": 0.62
+    },
+    {
+      "beat": 64,
+      "section": "Improviso circular",
+      "formation": "roda",
+      "energy": 0.75
+    },
+    {
+      "beat": 96,
+      "section": "Charleston coletivo",
+      "formation": "linha",
+      "energy": 0.82
+    },
+    {
+      "beat": 128,
+      "section": "Troca de parceiros",
+      "formation": "troca",
+      "energy": 0.9
+    },
+    {
+      "beat": 160,
+      "section": "Retorno ao tema",
+      "formation": "trio",
+      "energy": 0.58
+    }
+  ]
+}
