@@ -1,4 +1,4 @@
-"""Pure-Python facial study surface for an artistic Sommerfeld interpretation (revision 05).
+"""Pure-Python facial study surface for an artistic Sommerfeld interpretation (revision 06).
 Not a photogrammetric portrait or final facial edge-loop retopology.
 Quad mesh editable in Blender. Positive Y front, Z up; meters.
 """
@@ -22,15 +22,15 @@ def head_geometry(rows=ROWS,columns=COLUMNS):
         sine=math.sin(polar)
         for col in range(columns):
             a=math.tau*col/columns
-            x=.200*sine*math.cos(a)
-            x*=1-.14*max(0,(-z-.065)/.215)
+            x=.202*sine*math.cos(a)
+            x*=1-.15*max(0,(-z-.055)/.225)
             y=.181*sine*math.sin(a)
             front=max(0,math.sin(a))**3
             relief=(
                 .010*bell(x,z,0,.165,.16,.064)
                 +.013*bell(abs(x),z,.088,.129,.048,.036)
-                -.026*bell(abs(x),z,.083,.065,.045,.039)
-                +.020*bell(abs(x),z,.125,-.043,.060,.068)
+                -.029*bell(abs(x),z,.083,.065,.047,.043)
+                +.024*bell(abs(x),z,.123,-.047,.065,.072)
                 +.011*bell(x,z,0,.070,.043,.155)
                 +.043*bell(x,z,0,.014,.040,.092)  # nasal bridge in shared face mesh
                 +.043*bell(x,z,0,-.070,.041,.037)  # nasal tip in shared face mesh
@@ -38,10 +38,10 @@ def head_geometry(rows=ROWS,columns=COLUMNS):
                 -.014*bell(abs(x),z,.112,-.127,.032,.079)
                 +.008*bell(x,z,0,-.119,.055,.023)
                 +.010*bell(x,z,0,-.155,.051,.018)
-                +.018*bell(x,z,0,-.228,.091,.037)
+                +.020*bell(x,z,0,-.222,.096,.043)
                 -.010*bell(x,z,0,-.189,.07,.019)
             )
-            asym=.0027*math.sin(17*x+5*z)*bell(x,z,0,0,.2,.21)
+            asym=.0022*math.sin(17*x+5*z)*bell(x,z,0,0,.2,.21)
             points.append((x,y+front*(relief+asym),z))
     faces=[]
     for row in range(rows):
