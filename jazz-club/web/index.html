@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#17181c">
+  <meta name="description" content="Jazz e Metais: estudo de personagem 3D da plateia do SILM.">
+  <title>Jazz e Metais — Sommerfeld, estudo 3D</title>
+</head>
+<body>
+  <div id="app">
+    <canvas id="stage" tabindex="0" aria-label="Cena tridimensional de inspeção de Arnold Sommerfeld; utilize os controles ao lado para explorar."></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <header class="masthead">
+      <div class="brand"><div class="eyebrow">SILM · O BAILE DOS ELÉTRONS</div><strong>Jazz <span>e Metais</span></strong><small>Estudo de personagem · plateia · 1925</small></div>
+      <a id="back" href="../../index.html" aria-label="Voltar ao SILM">Voltar</a>
+    </header>
+    <main class="panel" aria-labelledby="character-title">
+      <span class="micro">PERSONAGEM EM DESENVOLVIMENTO</span>
+      <h1 id="character-title">Arnold<br><em>Sommerfeld</em></h1>
+      <p>Modelo 3D de estudo com traje e feições de época. Esta é uma representação artística ainda sem aprovação de semelhança histórica.</p>
+      <div class="rule"></div>
+      <div class="group"><strong>Movimentos de plateia</strong>
+        <div class="actions" role="group" aria-label="Selecionar reação">
+          <button data-motion="idle" aria-pressed="true">Respirar</button>
+          <button data-motion="observe" aria-pressed="false">Observar palco</button>
+          <button data-motion="notes" aria-pressed="false">Anotar</button>
+          <button data-motion="applause" aria-pressed="false">Aplaudir</button>
+        </div>
+      </div>
+      <div class="group"><strong>Câmera</strong>
+        <div class="actions">
+          <button data-camera="portrait">Aproximar rosto</button>
+          <button data-camera="full">Corpo inteiro</button>
+          <button id="reset-camera">Reiniciar</button>
+        </div>
+      </div>
+      <label class="switch"><input id="motion-enabled" type="checkbox" checked> Ativar movimentos</label>
+      <div class="rule"></div>
+      <p class="scientific"><strong>Por que está aqui?</strong><br>Sommerfeld contribuiu para a descrição quântica dos elétrons nos metais. Seus trabalhos de 1927–1928 são posteriores ao cenário fictício de 1925.</p>
+      <p><a class="source" href="https://www.loc.gov/item/2014715010/" target="_blank" rel="noopener noreferrer">Referência fotográfica de época — Biblioteca do Congresso</a></p>
+    </main>
+    <footer class="status" id="status" role="status" aria-live="polite">Preparando a cena tridimensional…</footer>
+    <div id="fallback" hidden><strong>O modelo 3D não pôde ser iniciado.</strong><p>Confira se os arquivos GLB foram compilados e se o navegador suporta WebGL.</p></div>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
