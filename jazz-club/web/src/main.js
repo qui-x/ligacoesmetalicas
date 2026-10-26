@@ -181,6 +181,23 @@ async function initialize() {
       const manager=object.morphTargetManager;
       if (manager) for(let i=0;i<manager.numTargets;i++) morphs.push(manager.getTarget(i));
     }
+    // Only opt-in ?qa=1 exposes read-only browser evidence to CI. No internal
+    // scene-mutating functions are available through this diagnostic surface.
+    if (new URLSearchParams(window.location.search).has('qa')) {
+      window.__jazzQa = Object.freeze({
+        snapshot: () => ({
+          ready: !scene.isDisposed() && !!controls.head,
+          webGLVersion: engine.webGLVersion,
+          meshCount: scene.meshes.length,
+          animationClips: (imported.animationGroups || []).map(g => g.name),
+          morphNames: morphs.map(m => m.name),
+          morphWeights: Object.fromEntries(morphs.map(m => [m.name, m.influence])),
+          expression,
+          movementEnabled: enabled.checked,
+          renderId: scene.getRenderId()
+        })
+      });
+    }
     announce('Sommerfeld carregado · arraste para girar a câmera');
     let previous=performance.now();
     engine.runRenderLoop(()=>{
