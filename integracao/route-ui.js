@@ -15,7 +15,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   if(r.ok&&before){const activity=session.report(before.id),saved=unified.recordActivity(session.route(),activity);if(saved==='added')message+=' Conclusão registrada no Caderno.';else if(saved==='error'){message+=' Não foi possível guardar a referência no Caderno; registre-a manualmente.';kind='warning';}}
   say(message,kind);sync();return r;
  }
- function close(){const destination=isMission()?'#/missoes':'#/roteiros';session.close();onModule(model.state.module.active);location.hash=destination;say('Atividade encerrada. Sua investigação livre foi restaurada.');sync();}
+ function close(){const destination=isMission()?'#/missoes':'#/roteiros';if(!session.close())return false;onModule(model.state.module.active);location.hash=destination;say('Atividade encerrada. Sua investigação livre foi restaurada.');sync();}
  B.guidedActivityContext=()=>{const c=session.context(),r=session.route();return c?{url:url(c.id),title:r.title,kind:isMission()?'mission':'script',progress:c.status==='completed'?1:0,total:1}:null;};
  B.menuActivity=(kind,id)=>{const c=session.context(),r=session.route();return kind===(isMission()?'mission':'script')&&c?.id===id?{id:r.id,kind,title:r.title,module:r.module,steps:[{label:r.guidance.criterion,requirement:'manual',minimum:1}]}:undefined;};
  B.menuActivityProgress=id=>session.context()?.id===id&&session.context().status==='completed'?1:0;

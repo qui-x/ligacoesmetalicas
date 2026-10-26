@@ -1,4 +1,6 @@
-# SILM 0.15.2 — A Arquitetura dos Metais
+# SILM 0.15.3 — A Arquitetura dos Metais
+
+A 0.15.3 coordena a gravação da investigação e da sessão, protege abas obsoletas e inclui os relatórios completos no backup do Caderno.
 
 A 0.15.2 aproxima a operação da Oficina dos Metais à família SI: módulos em **Montagem**, famílias e ferramentas em **Ver**, consultas e documentos em **Dados**, com retorno contextual e expansão do painel pela Base. Consulte [o escopo e a validação desta correção](docs/PARIDADE-BASE-SI-0.15.2.md).
 

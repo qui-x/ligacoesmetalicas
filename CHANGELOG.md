@@ -1,3 +1,11 @@
+## 0.15.3 — Integridade de sessão e backup
+
+- Gravação coordenada, reversão em falhas e aviso por documento.
+- Bloqueio de edição em abas obsoletas.
+- Backup do Caderno com relatórios completos e validação de importação.
+- Correção dos links das atividades concluídas.
+- Validação: npm test; testes/notebook-backup.cjs (backup em contexto vazio e conflito entre abas).
+
 # Registro de alterações
 
 ## SILM 0.15.2 — Docas e módulos da família SI

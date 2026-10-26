@@ -1,9 +1,20 @@
 'use strict';
 SILM.createRouteSession=({model,storage,view,onView,say})=>{
  const S=SILM,registry=S.activities||S.routes,copy=x=>JSON.parse(JSON.stringify(x)),blank=()=>({name:'',date:new Date().toLocaleDateString('pt-BR'),observations:'',interpretation:'',conclusion:''});
- let doc={schemaVersion:1,current:null,attempts:{},completed:{},archives:{}};
+ let doc={schemaVersion:1,current:null,attempts:{},completed:{},archives:{}},transitioning=0;
  const route=()=>registry.get(doc.current?.activityContext.id),open=()=>!!doc.current&&doc.current.activityContext.status!=='closed';
  const save=()=>storage.set('route.session',doc);
+ function atomic(fn){
+  const previous=copy(doc),checkpoint=model.checkpoint(),previousView=copy(view());
+  const rollback=()=>{doc=previous;model.rollback(checkpoint);onView(previousView,{persist:false});if(!storage.transaction)storage.set('scientific.state',checkpoint.state);};
+  const run=()=>{const value=fn();if(value===false)throw Error('TRANSITION_REJECTED');if(!save())throw Error('STORAGE_FAILURE');return value;};
+  transitioning++;
+  try{
+   if(storage.transaction){const result=storage.transaction(run,{onRollback:rollback});if(result.ok)return {ok:true,value:result.value};}
+   else{try{return {ok:true,value:run()};}catch{rollback();}}
+   say('A alteração não foi salva. A sessão anterior foi preservada.','warning');return {ok:false};
+  }finally{transitioning--;}
+ }
  const validScience=s=>S.validateScientificState(s).ok;
  const validReport=r=>r&&['name','date','observations','interpretation','conclusion'].every(k=>typeof r[k]==='string'&&r[k].length<=10000);
  const validAttempt=a=>{const r=registry.get(a?.activityContext?.id);return r&&a.activityContext.version===r.version&&a.activityContext.type===(r.type||'route')&&['active','completed','closed'].includes(a.activityContext.status)&&validScience(a.checkpoint)&&a.checkpoint.module.active===r.module&&r.metalSelection.atomicNumbers.includes(a.checkpoint.metal?.atomicNumber)&&validReport(a.report)&&a.evidence&&['cell','lattice','deformation'].every(k=>typeof a.evidence[k]==='boolean');};
@@ -21,19 +32,25 @@ SILM.createRouteSession=({model,storage,view,onView,say})=>{
  }
  function start(id,z,{resume=false}={}){
   const r=registry.get(id);if(open()||!r||!r.metalSelection.atomicNumbers.includes(Number(z)))return false;
-  const freeState=model.snapshot(),freeView=copy(view());
-  const previous=resume?doc.attempts[id]:null;
-  if(previous){model.restore(previous.checkpoint,{allowLegacy:false});doc.current={...copy(previous),freeState,freeView};doc.current.activityContext.status='active';}
-  else{
-   model.begin(Number(z));model.beginAssembly();for(let i=0;i<r.initialState.units;i++)model.addUnit();if(r.initialState.mode==='crystalline'){const result=model.organize();if(!result.ok){model.restore(freeState,{allowLegacy:false});return false;}}
-   model.setModule(r.module);doc.current={activityContext:{type:r.type||'route',id:r.id,version:r.version,status:'active'},freeState,freeView,checkpoint:model.snapshot(),evidence:{cell:false,lattice:false,deformation:false},report:blank()};
-  }
-  delete doc.attempts[id];save();return true;
+  return atomic(()=>{
+   const freeState=model.snapshot(),freeView=copy(view()),previous=resume?doc.attempts[id]:null;
+   if(previous){if(!model.restore(previous.checkpoint,{allowLegacy:false}).ok)return false;doc.current={...copy(previous),freeState,freeView};doc.current.activityContext.status='active';}
+   else{
+    if(!model.begin(Number(z),r.type==='mission'?'mission':'route')||!model.beginAssembly())return false;
+    for(let i=0;i<r.initialState.units;i++)if(!model.addUnit().ok)return false;
+    if(r.initialState.mode==='crystalline'&&!model.organize().ok)return false;
+    if(!model.setModule(r.module))return false;
+    doc.current={activityContext:{type:r.type||'route',id:r.id,version:r.version,status:'active'},freeState,freeView,checkpoint:model.snapshot(),evidence:{cell:false,lattice:false,deformation:false},report:blank()};
+   }
+   delete doc.attempts[id];return true;
+  }).ok;
  }
  function observe(visible){
-  if(!open())return;const c=doc.current,s=model.state;if(s.investigation?.id!==c.checkpoint.investigation?.id)return;
-  if(visible){const v=s.structure?.crystallography?.representation?.view;if(v==='cell')c.evidence.cell=true;if(v==='lattice')c.evidence.lattice=true;if(s.properties.active==='malleability'&&s.properties.malleability.compression>0)c.evidence.deformation=true;}
-  const next=model.snapshot();if(JSON.stringify(next)!==JSON.stringify(c.checkpoint)){c.checkpoint=next;save();}else save();
+  if(!open()||transitioning)return;const c=doc.current,s=model.state;if(s.investigation?.id!==c.checkpoint.investigation?.id)return;
+  const evidence=copy(c.evidence);
+  if(visible){const v=s.structure?.crystallography?.representation?.view;if(v==='cell')evidence.cell=true;if(v==='lattice')evidence.lattice=true;if(s.properties.active==='malleability'&&s.properties.malleability.compression>0)evidence.deformation=true;}
+  const next=model.snapshot();if(JSON.stringify(next)===JSON.stringify(c.checkpoint)&&JSON.stringify(evidence)===JSON.stringify(c.evidence))return;
+  return atomic(()=>{doc.current.checkpoint=next;doc.current.evidence=evidence;return true;}).ok;
  }
  function ready(){
   if(!open())return false;const c=doc.current,s=model.state;
@@ -50,8 +67,8 @@ SILM.createRouteSession=({model,storage,view,onView,say})=>{
    case 'cell-volume':return s.calculations.some(c=>c.type==='cellVolume'&&S.calculation.current(c,s.structure));
   }return false;
  }
- function complete(){if(!open()||!ready())return {ok:false,message:'O critério científico ainda não foi atendido.'};doc.current.activityContext.status='completed';doc.completed[route().id]=route().version;doc.archives[route().id]=copy(doc.current);save();return {ok:true,message:(route().type==='mission'?'Missão concluída.':'Roteiro concluído.')+' A bancada continua aberta para revisão.'};}
- function close(){if(!open())return false;const c=doc.current;c.checkpoint=model.snapshot();const finished=c.activityContext.status==='completed';c.activityContext.status='closed';if(finished)doc.archives[c.activityContext.id]=copy(c);else doc.attempts[c.activityContext.id]=copy(c);model.restore(c.freeState,{allowLegacy:false});onView(c.freeView);doc.current=null;save();return true;}
- function edit(key,value){if(!open()||!Object.hasOwn(blank(),key)||typeof value!=='string'||value.length>10000)return false;doc.current.report[key]=value;save();return true;}
- return Object.freeze({load,start,observe,ready,complete,close,edit,open,route,snapshot:()=>copy(doc),context:()=>open()?copy(doc.current.activityContext):null,allows:tool=>!open()||route().allowedTools.includes(tool),lockedModule:()=>open()?route().module:null,report:id=>open()&&(!id||id===route().id)?copy(doc.current):copy(doc.archives[id]||null)});
+ function complete(){if(!open()||!ready())return {ok:false,message:'O critério científico ainda não foi atendido.'};const result=atomic(()=>{doc.current.activityContext.status='completed';doc.completed[route().id]=route().version;doc.archives[route().id]=copy(doc.current);return true;});return result.ok?{ok:true,message:(route().type==='mission'?'Missão concluída.':'Roteiro concluído.')+' A bancada continua aberta para revisão.'}:{ok:false,message:'Não foi possível guardar a conclusão. A atividade continua aberta.'};}
+ function close(){if(!open())return false;return atomic(()=>{const c=doc.current;c.checkpoint=model.snapshot();const finished=c.activityContext.status==='completed';c.activityContext.status='closed';if(finished)doc.archives[c.activityContext.id]=copy(c);else doc.attempts[c.activityContext.id]=copy(c);if(!model.restore(c.freeState,{allowLegacy:false}).ok)return false;if(onView(c.freeView)===false)return false;doc.current=null;return true;}).ok;}
+ function edit(key,value){if(!open()||!Object.hasOwn(blank(),key)||typeof value!=='string'||value.length>10000)return false;return atomic(()=>{doc.current.report[key]=value;return true;}).ok;}
+ return Object.freeze({load,start,observe,ready,complete,close,edit,open,route,get inTransition(){return transitioning>0;},snapshot:()=>copy(doc),context:()=>open()?copy(doc.current.activityContext):null,allows:tool=>!open()||route().allowedTools.includes(tool),lockedModule:()=>open()?route().module:null,report:id=>open()&&(!id||id===route().id)?copy(doc.current):copy(doc.archives[id]||null)});
 };

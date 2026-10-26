@@ -2,7 +2,7 @@
 SILM.createUnifiedUI=({model,storage,session,selectMetal,say})=>{
  const S=SILM,B=BaseDemoSI,$=id=>document.getElementById(id),N=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;},link=(text,href)=>{const a=N('a',text);a.className='button outline';a.href=href;return a;};
  const fields={name:'',date:new Date().toLocaleDateString('pt-BR'),observations:'',interpretation:'',conclusion:''};
- let progress={schemaVersion:1,completed:{}},table=null;const journal=B.createJournalStore(B.storage);let notebookFilter='todos',notebookRefresh=null;
+ let progress={schemaVersion:1,completed:{}},table=null;let journal=B.createJournalStore(B.storage);let notebookFilter='todos',notebookRefresh=null;
  function normalize(value){const completed={};for(const t of S.themes.registry)if(value?.completed?.[t.id]===t.version)completed[t.id]=t.version;return {schemaVersion:1,completed};}
  function init(){
   const raw=storage.get('learning.themes',null);progress=normalize(raw);
@@ -35,10 +35,37 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,say})=>{
   if(!archive||!archive.record?.checkpoint||!archive.record?.activityContext)return null;
   return archive;
  }
+ function exportNotebook(){
+  const document=journal.snapshot(),reports={};
+  for(const note of document.notes)if(note.attemptId?.startsWith('attempt-silm-report-')){
+   const value=archivedReport(note.attemptId);if(!value)throw Error('Há um relatório sem arquivo. Preserve o Caderno atual antes de exportar.');reports[note.attemptId]=value;
+  }
+  return JSON.stringify({format:'silm-notebook-v2',document,reports},null,2);
+ }
+ function decodeNotebook(text){
+  const value=JSON.parse(text);if(!value||!['silm-notebook-v2','base-demo-si-journal-v1'].includes(value.format)||!B.parseJournal(value.document))throw Error('Backup inválido; os dados atuais foram preservados.');
+  const reports=value.format==='silm-notebook-v2'?value.reports:{};
+  if(!reports||typeof reports!=='object'||Array.isArray(reports)||Object.keys(reports).length>500)throw Error('Arquivos de relatório inválidos.');
+  for(const [id,archive]of Object.entries(reports)){
+   const record=archive?.record;
+   if(!/^attempt-silm-report-[a-z0-9-]+$/.test(id)||!record?.activityContext||!S.validateScientificState(record.checkpoint).ok||typeof archive.title!=='string'||archive.title.length>300||!record.report||!['name','date','observations','interpretation','conclusion'].every(k=>typeof record.report[k]==='string'&&record.report[k].length<=10000))throw Error('Relatório incompatível; os dados atuais foram preservados.');
+  }
+  for(const note of value.document.notes)if(note.attemptId?.startsWith('attempt-silm-report-')&&!reports[note.attemptId]){
+   if(value.format==='base-demo-si-journal-v1'&&archivedReport(note.attemptId))reports[note.attemptId]=archivedReport(note.attemptId);
+   else throw Error('Este backup contém referências sem o relatório completo. Os dados atuais foram preservados.');
+  }
+  return {document:value.document,reports};
+ }
+ function restoreNotebook(value){
+  return storage.transaction(()=>{
+   for(const [id,archive]of Object.entries(value.reports))if(!storage.set('report.archive:'+id,archive))throw Error('Falha ao guardar relatório');
+   if(!journal.importJSON({format:'base-demo-si-journal-v1',document:value.document}))throw Error('Falha ao guardar Caderno');
+  },{onRollback:()=>{journal=B.createJournalStore(B.storage);}}).ok;
+ }
  function notebookRelatedAction(note){
   const id=note.attemptId||'',done='attempt-silm-complete-';
   if(id.startsWith(done)){
-   const activityId=id.slice(done.length);
+   const tail=id.slice(done.length),activityId=[...S.missions.registry,...S.routes.registry].map(r=>r.id).sort((a,b)=>b.length-a.length).find(key=>tail===key||tail.startsWith(key+'-'));
    if(S.missions.get(activityId))return {label:'Abrir missão',href:'#/missoes?item='+encodeURIComponent(activityId)};
    if(S.routes.get(activityId))return {label:'Abrir roteiro',href:'#/roteiros?item='+encodeURIComponent(activityId)};
   }
@@ -90,8 +117,8 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,say})=>{
   ].filter(Boolean);
   const body=lines.join('\n').slice(0,1200);
   const archive={record,title:route.title||'Investigação livre',module:route.module||state.module?.active||'explorar',archivedAt:new Date().toISOString()};
-  if(!storage.set('report.archive:'+attemptId,archive))return 'error';
-  if(!journal.addNote({kind:'observacao',body},notebookScene(state),attemptId))return 'error';
+  const saved=storage.transaction(()=>{if(!storage.set('report.archive:'+attemptId,archive)||!journal.addNote({kind:'observacao',body},notebookScene(state),attemptId))throw Error('Falha ao arquivar');},{onRollback:()=>{journal=B.createJournalStore(B.storage);}});
+  if(!saved.ok)return 'error';
   home();notebookRefresh?.();return 'added';
  }
  function themes(){
@@ -136,7 +163,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,say})=>{
   const actions=N('div');actions.className='silm-notebook-actions';
   const makeAction=(id,label,fn)=>{const b=N('button',label);b.type='button';b.id=id;b.className='button outline';b.addEventListener('click',fn);actions.append(b);return b;};
   const download=(name,content,type)=>{const url=URL.createObjectURL(new Blob([content],{type}));const a=N('a');a.href=url;a.download=name;a.hidden=true;host.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-  makeAction('notebook-export-json','Exportar backup JSON',()=>download('SILM-caderno.json',journal.exportJSON(),'application/json;charset=utf-8'));
+  makeAction('notebook-export-json','Exportar backup JSON',()=>download('SILM-caderno.json',exportNotebook(),'application/json;charset=utf-8'));
   makeAction('notebook-export-csv','Baixar Caderno (CSV)',()=>{if(typeof B.journalCSV!=='function'){say('Exportação CSV indisponível nesta base.','warning');return;}download('SILM-caderno.csv','\uFEFF'+B.journalCSV(journal.snapshot().notes),'text/csv;charset=utf-8');});
   makeAction('notebook-print','Imprimir Caderno',()=>{
    const sheet=N('article');sheet.className='silm-notebook-print';sheet.append(N('h1','Caderno de laboratório — SILM'),N('p','Emissão: '+new Date().toLocaleString('pt-BR')));
@@ -184,12 +211,11 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,say})=>{
   importInput.addEventListener('change',event=>{const file=event.currentTarget.files&&event.currentTarget.files[0];if(!file)return;void(async()=>{
    try{
     if(session.open()){say('Encerre a atividade orientada antes de restaurar um backup.','warning');return;}
-    if(file.size>300000)throw new Error('O arquivo excede o limite de 300 KB.');
-    const decoded=B.parseJournalImport(await file.text());
-    if(!decoded||typeof decoded!=='object'||Array.isArray(decoded)||decoded.format!=='base-demo-si-journal-v1'||!B.parseJournal(decoded.document))throw new Error('Backup inválido ou incompatível; os dados atuais foram preservados.');
+    if(file.size>5000000)throw new Error('O arquivo excede o limite de 5 MB.');
+    const decoded=decodeNotebook(await file.text());
     if(!await B.confirmDialog({title:'Restaurar o Caderno?',description:'O backup substituirá os registros e relatórios do Caderno neste navegador.',confirmText:'Restaurar',cancelText:'Cancelar'}))return;
     if(session.open()){say('A atividade foi iniciada durante a confirmação. O backup não foi importado.','warning');return;}
-    if(journal.importJSON(decoded)){notebookFilter='todos';filter.value='todos';home();renderEntries();say('Backup restaurado com validação.','success');}
+    if(restoreNotebook(decoded)){notebookFilter='todos';filter.value='todos';home();renderEntries();say('Backup restaurado com validação.','success');}
     else say('Não foi possível restaurar o backup. Os dados atuais foram preservados.','warning');
    }catch(error){say(error.message||'Falha na importação do Caderno.','error');}
    finally{importInput.value='';}

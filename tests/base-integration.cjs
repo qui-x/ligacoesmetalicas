@@ -63,11 +63,11 @@ async function main(){
   assert.ok(normalBounds.width<workspaceBounds.width||normalBounds.height<workspaceBounds.height,'A oficina expandida deve superar a área normal da cena.');
   await page.locator('#silm-crystal-projection').selectOption('top');assert.deepEqual(await state(),crystal,'Projeção não altera a ciência');
   await page.evaluate(()=>document.getElementById('silm-assembly-stage').silmRenderer.setCamera({zoom:1.5625,x:.45,y:.5}));
-  const camera2D=await page.evaluate(()=>JSON.parse(localStorage.getItem('silm-base-integration:representation.view')).cameras.crystal);
+  const camera2D=await page.evaluate(()=>JSON.parse(BaseDemoSI.storage.read('representation.view')).cameras.crystal);
   await page.locator('#silm-crystal-projection').selectOption('3d');await page.waitForSelector('.silm-crystal[data-view-mode="3d"]');
   await page.evaluate(()=>document.getElementById('silm-assembly-stage').silmRenderer.setCamera({zoom:2,x:.6,y:.5}));
   await page.locator('#silm-crystal-projection').selectOption('3d-xy');
-  assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('silm-base-integration:representation.view')).cameras.crystal),camera2D,'Reenquadrar plano 3D não sobrescreve câmera 2D');
+  assert.deepEqual(await page.evaluate(()=>JSON.parse(BaseDemoSI.storage.read('representation.view')).cameras.crystal),camera2D,'Reenquadrar plano 3D não sobrescreve câmera 2D');
   await page.locator('.silm-crystal-unit').first().focus();await page.keyboard.press('l');
   assert.deepEqual(await state(),crystal,'Órbita 3D não altera a ciência');
   await page.locator('#silm-crystal-projection').selectOption('top');await page.waitForSelector('.silm-crystal[data-view-mode="2d"]');

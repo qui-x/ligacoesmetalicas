@@ -2,7 +2,7 @@
 /* Produto SILM sobre a Base SI 0.9.17. O domínio científico SILM permanece no schema 8. */
 (() => {
  const B=BaseDemoSI,S=SILM,$=id=>document.getElementById(id);
- B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.15.2',
+ B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.15.3',
   routes:B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios','aprender','missoes','caderno','professor'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'Oficina dos Metais':route.title}))});
  // A cena cristalina também usa data-view; o roteamento só pode atingir páginas do produto.
  B.updateRoute=()=>{
@@ -15,19 +15,24 @@
   document.body.classList.toggle('route-ambiente',selected==='ambiente');window.dispatchEvent(new CustomEvent('si-route-changed',{detail:selected}));B.closeNavigationDrawer(false);
   requestAnimationFrame(()=>{const page=document.querySelector('#conteudo > [data-view="'+selected+'"]');const heading=page?.querySelector('h1,h2');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}});
  };
- const model=S.createScientificState();let view=null,scope=null,viewKey='',pending=false,ready=false,selected=null,focusAfterRender=null;
+ let view=null,scope=null,viewKey='',pending=false,ready=false,selected=null,focusAfterRender=null;
  let routeUI=null;
  const allows=tool=>!routeUI||routeUI.session.allows(tool);
- let representation=S.representation.defaults(null),storageOK=true,unavailable3D=false;
+ let representation=S.representation.defaults(null),invalidSavedState=false,unavailable3D=false;
  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.classList.contains('si-no-motion')||document.documentElement.classList.contains('si-simple-reading')||B.currentRoute(location.hash)!=='ambiente';
  const say=(text,kind='info')=>{SimCore.notifications.announce(text);B.notify(text,kind);};
- const storage={
-  get(key,fallback){try{const raw=B.storage.read(key);return raw===null?fallback:JSON.parse(raw);}catch{return fallback;}},
-  set(key,value){storageOK=B.storage.write(key,JSON.stringify(value));if(ready)storageStatus();return storageOK;}
- };
- function storageStatus(){if($('silm-storage-status'))$('silm-storage-status').textContent=storageOK?'Investigação salva neste navegador. Exporte em JSON para guardar uma cópia.':'Não foi possível salvar. Exporte a investigação antes de fechar.';}
+ const storage=S.createDurableStorage({backend:{getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),key:i=>localStorage.key(i),get length(){return localStorage.length;}},onStatus(){if(ready)storageStatus();},onConflict(){queueMicrotask(()=>{
+  if($('si-storage-conflict'))return;
+  const overlay=document.createElement('div');overlay.id='si-storage-conflict';overlay.setAttribute('role','alertdialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','silm-conflict-title');
+  const panel=document.createElement('div');panel.className='si-storage-conflict-panel';const title=document.createElement('h2');title.id='silm-conflict-title';title.textContent='Os dados desta aba precisam ser recarregados';
+  const text=document.createElement('p');text.textContent='Foi detectada outra versão dos documentos salvos. A edição foi bloqueada para preservar a investigação e os relatórios.';
+  const reload=document.createElement('button');reload.textContent='Recarregar dados';reload.onclick=()=>location.reload();panel.append(title,text,reload);overlay.append(panel);document.body.append(overlay);document.querySelector('.app-shell').inert=true;reload.focus();
+ });}});
+ B.storage={...B.storage,read:storage.read,write:storage.write};
+ const model=S.protectScientificModel(S.createScientificState(),storage,{onFailure:()=>say('Não foi possível salvar a alteração. O estado anterior foi preservado.','warning')});
+ function storageStatus(){const status=storage.status();if($('silm-storage-status'))$('silm-storage-status').textContent=status.conflict?'Edição bloqueada. Recarregue os dados antes de continuar.':status.ok&&!invalidSavedState?'Investigação salva neste navegador. Exporte em JSON para guardar uma cópia.':'Não foi possível salvar todos os documentos. Estado anterior preservado. Documentos: '+(status.documents.join(', ')||'investigação inválida')+'.';}
  function schedule(){if(!ready||pending)return;pending=true;queueMicrotask(()=>{pending=false;render();});}
- model.connect({storage,emit(name){if(name==='investigation:updated')schedule();}});
+ model.connect({storage,emit(name,detail){if(name==='investigation:updated'){if(detail?.change!=='storage:rollback'&&routeUI?.session.open()&&!routeUI.session.inTransition)routeUI.session.observe(false);schedule();}}});
  const report=r=>{if(r?.ok===false)say(S.crystal.reasons[r.reason]||'Esta operação não está disponível no contexto atual.','warning');schedule();return r;};
  function element(){return model.state.metal?S.data.get(model.state.metal.atomicNumber):null;}
  const rep={
@@ -46,11 +51,11 @@
   camera:mode=>representation.cameras[mode],
   saveCamera(mode,value){representation.cameras[mode]=S.representation.sanitizeCamera(value);saveView();}
  };
- function saveView(){storage.set('representation.view',representation);}
+ function saveView(){return storage.set('representation.view',representation);}
  const tools=S.createIntegrationTools({model,host:$('silm-tools'),moduleHost:$('silm-module-choice'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
  const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session});
  const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
- routeUI=S.createRouteUI({model,storage,view:()=>representation,onView:value=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);saveView();},schedule,say,onModule:m=>B.selectModule(m),selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
+ routeUI=S.createRouteUI({model,storage,view:()=>representation,onView:(value,{persist=true}={})=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);return persist?saveView():true;},schedule,say,onModule:m=>B.selectModule(m),selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
  const run={
   add(){if(routeUI.session.open()&&!routeUI.canBuild())return;if(!model.state.structure)model.beginAssembly();return report(model.addUnit());},
   move:(id,target,options)=>(!routeUI.session.open()||routeUI.canBuild())&&report(model.moveUnit(id,target,options)),
@@ -210,7 +215,7 @@
    if(legacy){const checked=S.validateScientificState(JSON.parse(legacy));if(checked.ok&&checked.value.investigation){raw=JSON.stringify(checked.value);B.storage.write('scientific.state',raw);}}
   }catch{/* O original permanece intacto; exportação/importação continua disponível. */}}
 
-  if(raw!==null){try{const value=JSON.parse(raw),check=S.validateScientificState(value);if(!check.ok)throw new Error();model.restore(check.value,{allowLegacy:false});if(model.state.metal){selected=String(model.state.metal.atomicNumber);selector.value=selected;}}catch{storageOK=false;say('A investigação salva é inválida. O arquivo original foi preservado; nenhuma restauração foi aplicada.','warning');}}
+  if(raw!==null){try{const value=JSON.parse(raw),check=S.validateScientificState(value);if(!check.ok)throw new Error();model.restore(check.value,{allowLegacy:false});if(model.state.metal){selected=String(model.state.metal.atomicNumber);selector.value=selected;}}catch{invalidSavedState=true;say('A investigação salva é inválida. O arquivo original foi preservado; nenhuma restauração foi aplicada.','warning');}}
   representation=S.representation.sanitize(storage.get('representation.view',null),model.state.investigation?.id??null);
   $('si-expand-structure').addEventListener('click',()=>setStageExpanded(!$('si-stage').classList.contains('si-scene-expanded')));
   document.addEventListener('keydown',event=>{

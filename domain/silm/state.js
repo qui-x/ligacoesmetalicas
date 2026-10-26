@@ -360,6 +360,8 @@ SILM.createScientificState=()=>{
  }
  function connect(options){storage=options.storage;emit=options.emit;}
  return Object.freeze({get state(){return snapshot();},snapshot,connect,begin,setModule,resetInvestigation,close,setStatus,restore,
+  checkpoint:()=>({state:snapshot(),history:JSON.parse(JSON.stringify(history))}),
+  rollback(value){replace(JSON.parse(JSON.stringify(value.state)));history=JSON.parse(JSON.stringify(value.history));emit?.('investigation:updated',{current:snapshot(),change:'storage:rollback'});},
   beginAssembly,addUnit,moveUnit,undo,clearStructure,setAssistance,setAssemblyStatus,organize,restoreFree,setCrystalRepresentation,activateElectrons,setElectronRepresentation,startProperty,setPropertyParams,restoreProperty,endProperty,propertyAvailability,addMeasurement,removeMeasurement,clearMeasurements,measurementAvailability,addCalculation,removeCalculation,clearCalculations,calculationAvailability,
   get canUndo(){return !!state.structure&&free()&&history.length>0;},get historySize(){return history.length;},
   get lastAction(){const last=history[history.length-1];return state.structure&&last?{type:last.type,unitId:last.unitId}:null;},
