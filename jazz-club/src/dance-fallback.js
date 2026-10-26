@@ -7,7 +7,7 @@ const ctx=canvas.getContext('2d');
 if(!ctx){$('scene-error').hidden=false;throw new Error('Canvas indisponível');}
 const media=$('audio-player');media.preload='metadata';
 media.addEventListener('seeked',()=>{t=media.currentTime});
-media.addEventListener('play',()=>{$('audio-play').textContent='Pausar faixa'});
+media.addEventListener('play',()=>{playing=true;$('transport').textContent='Pausar dança';$('transport').setAttribute('aria-pressed','true');$('audio-play').textContent='Pausar faixa'});
 media.addEventListener('pause',()=>{$('audio-play').textContent='Reproduzir faixa'});
 let url=null,cues={bpm:120,beatOffset:0,events:[]},t=0,playing=true,last=performance.now();
 const reduce=$('reduce-motion');reduce.checked=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -27,9 +27,18 @@ function draw(now){
   const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
   if(playing)t=media.src?media.currentTime:t+dt;
   const bpm=Number($('bpm').value),silent=reduce.checked;
+  // A música oficial fornece formações por seção e energia por batida.
+  const entries=cues.events||[];
+  let lo=0,hi=entries.length-1,idx=-1;
+  while(lo<=hi){const mid=(lo+hi)>>1;
+    if(entries[mid].time<=t){idx=mid;lo=mid+1}else hi=mid-1;}
+  const marker=idx<0?null:entries[idx];
+  const chosen=$('formation').value==='auto'&&marker?.formation
+    ?marker.formation:$('formation').value;
   const result=danceFrame({seconds:silent?0:t,bpm,
-    beatOffset:cues.beatOffset,formation:$('formation').value,
-    intensity:Number($('intensity').value)/100,reduced:silent});
+    beatOffset:cues.beatOffset,formation:chosen,
+    intensity:Number($('intensity').value)/100,reduced:silent,
+    energy:marker?.energy??.5});
   if(form!==result.formation){form=result.formation;$('form-title').textContent=notes[form]||'Espetáculo coletivo'}
   const [w,h]=updateCanvas(),cx=w*.49,cy=h*.54,scale=Math.min(w/12,h/8,82);
   const project=(x,z)=>({x:cx+(x*Math.cos(pan)-z*Math.sin(pan))*scale,
