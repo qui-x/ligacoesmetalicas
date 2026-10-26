@@ -5,6 +5,7 @@ Run: blender -b --factory-startup --python jazz-club/blender/build_sommerfeld.py
 import argparse, math, os, sys
 import bpy
 from mathutils import Vector
+import face_anatomy as face_profile
 
 def color(name, rgb, metal=0, rough=.78):
     m=bpy.data.materials.new(name)
@@ -57,50 +58,27 @@ def piece(name,start,end,radius,material,parent):
     return o
 
 def face_quadmesh(material,head):
-    rows,segments=38,64
-    vertices=[]
-    for i in range(rows+1):
-        polar=.001+(math.pi-.002)*i/rows
-        z=.285*math.cos(polar)
-        s=math.sin(polar)
-        for k in range(segments):
-            a=2*math.pi*k/segments
-            x=.203*s*math.cos(a)
-            y=.186*s*math.sin(a)
-            x*=1-.11*max(0,(-z-.045)/.24)
-            frontal=max(0.,math.sin(a))
-            def gauss(cx,cz,wx,wz):
-                return math.exp(-((x-cx)/wx)**2-((z-cz)/wz)**2)
-            y+=frontal*(.013*gauss(-.1,-.052,.064,.07)+
-                        .013*gauss(.1,-.052,.064,.07)-
-                        .019*gauss(-.075,.05,.049,.038)-
-                        .019*gauss(.075,.05,.049,.038)+
-                        .014*gauss(0,.076,.042,.14)+
-                        .045*gauss(0,-.03,.05,.05))
-            vertices.append((x,y,z))
-    quads=[]
-    for i in range(rows):
-        for k in range(segments):
-            a=i*segments+k
-            b=i*segments+(k+1)%segments
-            quads.append((a,b,b+segments,a+segments))
-    obj=mesh('SOMMERFELD_FACE_QUAD_BASE',vertices,quads,material,head)
+    # Shared, testable quad surface; editable anatomical study, not final likeness.
+    vertices,faces=face_profile.head_geometry()
+    targets=face_profile.facial_targets(vertices)
+    report=face_profile.validate_topology(vertices,faces,targets)
+    obj=mesh('SOMMERFELD_FACE_QUAD_BASE',vertices,faces,material,head)
+    obj['status']='historical-artistic-study; not an approved likeness'
+    obj['topologyReport']=str(report)
+    # Stable UVs permit baking skin materials and details in later passes.
+    uv=obj.data.uv_layers.new(name='PortraitUV')
+    cols=face_profile.COLUMNS
+    for polygon in obj.data.polygons:
+        for loop_index in polygon.loop_indices:
+            vertex_id=obj.data.loops[loop_index].vertex_index
+            row=vertex_id//cols
+            col=vertex_id%cols
+            uv.data[loop_index].uv=(col/cols,1-row/face_profile.ROWS)
     obj.shape_key_add(name='Basis',from_mix=False)
-    for name in ['Blink_L','Blink_R','BrowRaise','Smile']:
-        key=obj.shape_key_add(name=name,from_mix=False)
-        for j,v in enumerate(obj.data.vertices):
-            x,y,z=v.co
-            front=max(0,min(1,(y+.02)/.20))
-            if name=='BrowRaise':
-                g=math.exp(-((abs(x)-.08)/.075)**2-((z-.12)/.05)**2)
-                key.data[j].co=(x,y,z+.016*g*front)
-            elif name=='Smile':
-                g=math.exp(-((abs(x)-.105)/.057)**2-((z+.13)/.06)**2)
-                key.data[j].co=(x,y+.012*g*front,z+.008*g*front)
-            else:
-                side=-1 if name=='Blink_L' else 1
-                g=math.exp(-((x-side*.08)/.05)**2-((z-.054)/.046)**2)
-                key.data[j].co=(x,y-.014*g*front,z-.013*g*front)
+    for key_name,coords in targets.items():
+        key=obj.shape_key_add(name=key_name,from_mix=False)
+        for i,pos in enumerate(coords):
+            key.data[i].co=pos
     return obj
 
 def create():
@@ -160,7 +138,13 @@ def create():
         sphere('EarConcha',(side*.223,.037,-.012),(.024,.017,.059),shadow,head)
         sphere('EyeSclera',(side*.079,.172,.056),(.05,.032,.025),white,head)
         sphere('Iris',(side*.079,.201,.056),(.020,.011,.020),eye,head)
-        sphere('UpperLid',(side*.079,.197,.082),(.058,.017,.014),skin,head)
+        lid=sphere('UpperLid_L' if side<0 else 'UpperLid_R',(side*.079,.197,.082),(.058,.017,.014),skin,head)
+        lid.shape_key_add(name='Basis',from_mix=False)
+        blink=lid.shape_key_add(name='Blink_L' if side<0 else 'Blink_R',from_mix=False)
+        # Object local Z axis is scaled to eyelid thickness; blend moves it toward iris.
+        for v in lid.data.vertices:
+            co=v.co
+            blink.data[v.index].co=(co.x,co.y,co.z-.9)
         brow=sphere('Eyebrow',(side*.084,.175,.127),(.072,.017,.019),hair,head)
         brow.rotation_euler.y=side*.10
         for k in range(6):
