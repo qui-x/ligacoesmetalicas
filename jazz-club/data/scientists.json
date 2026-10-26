@@ -63,6 +63,35 @@
         "hair": "#8e887b",
         "accent": "#cca883",
         "glasses": true
+      },
+      "referencePortraits": [
+        {
+          "title": "A. Sommerfeld",
+          "catalog": "Library of Congress, Bain News Service, George Grantham Bain Collection",
+          "date": "ca. 1920–1925",
+          "url": "https://www.loc.gov/item/2014715010/",
+          "creator": "Bain News Service, publisher",
+          "rights": "No known restrictions on publication (Library of Congress advisory); verificar nota original antes de redistribuir arquivos derivados.",
+          "intendedUse": "Referência de fisionomia e figurino; não é textura nem fotografia incorporada ao produto.",
+          "publicationStatus": "metadata-only"
+        },
+        {
+          "title": "Portrait of Arnold Sommerfeld",
+          "catalog": "American Institute of Physics / W. F. Meggers Collection",
+          "date": "1923",
+          "url": "https://commons.wikimedia.org/wiki/File:Portrait_of_Arnold_Sommerfeld.jpg",
+          "rights": "AIP permits reuse with attribution; verificar o texto de licença/atribuição do arquivo antes de incluir.",
+          "intendedUse": "Referência comparativa da fisionomia de época.",
+          "publicationStatus": "metadata-only"
+        }
+      ],
+      "production": {
+        "stage": "research_reference",
+        "heroModel": "planned",
+        "likeness": "not-homologated",
+        "rig": "not-built",
+        "glb": "not-built",
+        "referenceWorkflow": "CrossMind Studio / Animated Character Creation in 3D"
       }
     },
     {
