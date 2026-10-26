@@ -15,7 +15,7 @@ const media=new Audio();media.preload='metadata';media.loop=false;
 let sourceUrl=null,ctx=null,analyser=null,clip=null,scene=null,engine=null;
 let dancers=[],clock=0,playing=true,lastTime=performance.now(),peak=0;
 let cues={bpm:120,beatOffset:0,events:[],track:'Ensaio rítmico sem áudio'};
-let activeForm='trio',errorState=false,previousForm=null,formationChangeAt=-999;
+let activeForm='trio',errorState=false,previousForm=null,formationChangeAt=-999,lastCueFormation=null;
 const quiet=window.matchMedia('(prefers-reduced-motion: reduce)');
 reduced.checked=quiet.matches;
 const say=s=>announcer.textContent=s;
@@ -158,10 +158,16 @@ function energy(){
   let sum=0;for(let i=0;i<take;i++)sum+=data[i]/255;
   return Math.min(1,sum/Math.max(1,take)*2.1);
 }
-function cueEnergy(t){
-  const matching=cues.events.filter(e=>e.time<=t).at(-1);
-  return matching?.energy ?? energy();
+function cueAt(t){
+  // Binary search avoids rescanning every timestamp 60 times/second.
+  const es=cues.events;
+  let low=0,high=es.length-1,best=-1;
+  while(low<=high){const mid=(low+high)>>1;
+    if(es[mid].time<=t){best=mid;low=mid+1}else high=mid-1;
+  }
+  return best<0?null:es[best];
 }
+function cueEnergy(t){return cueAt(t)?.energy ?? energy();}
 function frame(now,dots){
   const delta=Math.min(.05,Math.max(0,(now-lastTime)/1000));lastTime=now;
   if(!playing) return;
@@ -170,11 +176,17 @@ function frame(now,dots){
   const frameReduced=reduced.checked;
   const visualTime=frameReduced?0:clock;
   const bpm=Number(bpmEl.value);
+  const activeCue=cueAt(clock);
+  const cueFormation=formationEl.value==='auto'?activeCue?.formation:null;
+  if(cueFormation && cueFormation!==lastCueFormation){
+    previousForm=activeForm;formationChangeAt=clock;lastCueFormation=cueFormation;
+  }else if(!cueFormation)lastCueFormation=null;
+  const selectedFormation=cueFormation||formationEl.value;
   const result=danceFrame({
     seconds:visualTime,bpm,beatOffset:cues.beatOffset,
-    formation:formationEl.value,
-    previousFormation:(clock-formationChangeAt)<4*60/bpm?previousForm:null,
-    formationBlend:(clock-formationChangeAt)<4*60/bpm?(clock-formationChangeAt)*bpm/240:null,
+    formation:selectedFormation,
+    previousFormation:selectedFormation!=='auto'&&(clock-formationChangeAt)<4*60/bpm?previousForm:null,
+    formationBlend:selectedFormation!=='auto'&&(clock-formationChangeAt)<4*60/bpm?(clock-formationChangeAt)*bpm/240:null,
     intensity:Number(intensity.value)/100,
     reduced:frameReduced,energy:cueEnergy(clock)
   });
@@ -272,12 +284,12 @@ $('audio-file').addEventListener('change',e=>{
   sourceUrl=URL.createObjectURL(file);
   media.pause();media.src=sourceUrl;media.load();
   clip=file;$('audio-play').disabled=false;
-  clock=0;updateMusicLabel();say('Faixa '+file.name+' carregada; clique para reproduzir');
+  clock=0;lastCueFormation=null;updateMusicLabel();say('Faixa '+file.name+' carregada; clique para reproduzir');
 });
 $('cues-file').addEventListener('change',async e=>{
   const file=e.target.files?.[0];if(!file)return;
   try{
-    cues=normalizeCueSheet(JSON.parse(await file.text()));
+    cues=normalizeCueSheet(JSON.parse(await file.text()));lastCueFormation=null;
     bpmEl.value=String(Math.round(cues.bpm));
     $('bpm-output').textContent=bpmEl.value+' BPM';
     say('Marcadores carregados: '+cues.events.length+', '+cues.bpm+' BPM');
