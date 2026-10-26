@@ -18,7 +18,7 @@ concurrency:
 jobs:
   render-opening-study:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 55
     steps:
       - name: Baixar ramo experimental
         uses: actions/checkout@v4
@@ -38,7 +38,17 @@ jobs:
           blender --background --factory-startup -t 2 \
             --python opening-3d/blender/build_intro.py -- \
             --output dist/opening-3d/silm-opening.glb \
-            --blend dist/opening-3d/silm-opening.blend
+            --blend dist/opening-3d/silm-opening.blend \
+            --frames dist/opening-3d/frames --render
+
+      - name: Codificar vídeo MP4 da renderização Blender
+        run: |
+          ffmpeg -hide_banner -loglevel error -y -framerate 30 \
+            -i dist/opening-3d/frames/SILM_%04d.png \
+            -pix_fmt yuv420p -c:v libx264 -crf 21 -movflags +faststart \
+            dist/opening-3d/SILM-abertura-Blender-titulo.mp4
+          test -s dist/opening-3d/SILM-abertura-Blender-titulo.mp4
+          cp dist/opening-3d/frames/SILM_0183.png dist/opening-3d/quadro-final.png
 
       - name: Validar estrutura e movimento do GLB
         run: |
@@ -88,5 +98,7 @@ jobs:
           path: |
             opening-3d/web/dist/**
             dist/opening-3d/silm-opening.blend
+            dist/opening-3d/SILM-abertura-Blender-titulo.mp4
+            dist/opening-3d/quadro-final.png
           if-no-files-found: error
           retention-days: 14
