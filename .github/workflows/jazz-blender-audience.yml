@@ -35,7 +35,7 @@ jobs:
 
       - name: Validar scripts e catálogo
         run: |
-          python3 -m py_compile jazz-club/blender/build_audience.py jazz-club/blender/build_sommerfeld.py jazz-club/blender/refine_sommerfeld_06.py jazz-club/blender/refine_sommerfeld_07.py jazz-club/blender/refine_sommerfeld_08.py jazz-club/blender/refine_sommerfeld_09.py jazz-club/blender/refine_sommerfeld_10.py jazz-club/blender/refine_sommerfeld_11.py jazz-club/blender/facial_topology10.py jazz-club/blender/facial_mouth11.py jazz-club/blender/rev09_shapes.py jazz-club/blender/materials07.py jazz-club/blender/face_anatomy.py
+          python3 -m py_compile jazz-club/blender/build_audience.py jazz-club/blender/build_sommerfeld.py jazz-club/blender/refine_sommerfeld_06.py jazz-club/blender/refine_sommerfeld_07.py jazz-club/blender/refine_sommerfeld_08.py jazz-club/blender/refine_sommerfeld_09.py jazz-club/blender/refine_sommerfeld_10.py jazz-club/blender/refine_sommerfeld_11.py jazz-club/blender/refine_sommerfeld_12.py jazz-club/blender/face_integration12.py jazz-club/blender/facial_topology10.py jazz-club/blender/facial_mouth11.py jazz-club/blender/rev09_shapes.py jazz-club/blender/materials07.py jazz-club/blender/face_anatomy.py
           python3 -m unittest discover -s jazz-club/tests -p 'test_*.py' -v
           python3 - <<'PY'
           import json
@@ -53,7 +53,7 @@ jobs:
           blender -b -t 2 --factory-startup --python jazz-club/blender/build_audience.py -- \
             --manifest jazz-club/data/scientists.json \
             --output dist/jazz-club/assets/scientists-proxy.glb
-          blender -b -t 2 --factory-startup --python jazz-club/blender/refine_sommerfeld_11.py -- \
+          blender -b -t 2 --factory-startup --python jazz-club/blender/refine_sommerfeld_12.py -- \
             --output dist/jazz-club/assets/sommerfeld-study.glb \
             --blend dist/jazz-club/assets/sommerfeld-study.blend
           test -s dist/jazz-club/assets/sommerfeld-study.blend
@@ -81,10 +81,11 @@ jobs:
                             'RearHairNapeContinuous09','BackShoulderSeam09_-1',
                             'BackShoulderSeam09_1','UpperSleeve09_L',
                             'UpperSleeve09_R','ForearmSleeve09_L','ForearmSleeve09_R',
-                            'EyeSocketLoops10_L','EyeSocketLoops10_R','MouthLoops11','MouthCavityStudy11'}
+                            'EyeSocketLoops10_L','EyeSocketLoops10_R','MouthInterior12'}
                   assert required.issubset(names),f'Controladores faltando: {required-names}'
                   assert data.get('meshes'), 'Malhas nao encontradas'
-                  assert any('MouthLoops11' == node.get('name') for node in data.get('nodes',[])), 'Malha da boca ausente'
+                  assert any('SOMMERFELD_FACE_QUAD_BASE' == node.get('name') for node in data.get('nodes',[])), 'Malha craniana integrada ausente'
+                  assert not any('MouthLoops11' == node.get('name') for node in data.get('nodes',[])), 'Boca sobreposta legada presente'
                   assert any('targets' in mesh.get('primitives',[{}])[0]
                              for mesh in data.get('meshes',[]) if mesh.get('primitives')), 'Shape keys nao exportadas'
               print(f'{name}: GLB validado, {len(b)} bytes')
