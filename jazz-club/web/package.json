@@ -7,7 +7,9 @@
     "build": "vite build",
     "dev": "vite --host 0.0.0.0",
     "preview": "vite preview",
-    "qa:browser": "node tests/smoke-browser.mjs"
+    "qa:browser": "node tests/smoke-browser.mjs",
+    "test:dance": "node --test tests/dance-core.test.mjs",
+    "qa:dance": "node tests/dance-browser.mjs"
   },
   "dependencies": {
     "@babylonjs/core": "^8.0.0",
