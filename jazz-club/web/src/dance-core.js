@@ -40,14 +40,14 @@ export function normalizeCueSheet(value){
   }).filter(x=>Number.isFinite(x.time)&&x.time>=0).sort((a,b)=>a.time-b.time);
   return {bpm,beatOffset,events,track:String(value.title??value.name??'Faixa importada')};
 }
-export function danceFrame({seconds=0,bpm=120,beatOffset=0,formation='auto',intensity=.65,reduced=false,energy=.5}={}){
+export function danceFrame({seconds=0,bpm=120,beatOffset=0,formation='auto',previousFormation=null,formationBlend=null,intensity=.65,reduced=false,energy=.5}={}){
   const time=Math.max(0,Number(seconds)||0);
   const tempo=clamp(Number(bpm)||120,55,240);
   const beat=Math.max(0,(time-Number(beatOffset)||0)*tempo/60);
   const phrase=Math.floor(beat/32);
   const chosen=formation==='auto'?formationForPhrase(phrase):H[formation]?formation:'trio';
-  const previous=formation==='auto'?(phrase===0?chosen:formationForPhrase(phrase-1)):chosen;
-  const transition=formation==='auto'?smooth((beat%32)/4):1;
+  const previous=H[previousFormation]?previousFormation:(formation==='auto'?(phrase===0?chosen:formationForPhrase(phrase-1)):chosen);
+  const transition=formationBlend!==null?smooth(Number(formationBlend)):(formation==='auto'?smooth((beat%32)/4):1);
   const amp=(reduced?0:clamp(Number(intensity)||0,0,1))*mix(.7,1.25,clamp(Number(energy)||0,0,1));
   const cycle=TAU*beat,quarter=cycle/4;
   const footFall=(b,phase)=>Math.max(0,Math.sin(pi*((b+phase)%2)));
