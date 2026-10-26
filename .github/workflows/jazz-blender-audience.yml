@@ -35,7 +35,7 @@ jobs:
 
       - name: Validar scripts e catálogo
         run: |
-          python3 -m py_compile jazz-club/blender/build_audience.py jazz-club/blender/build_sommerfeld.py jazz-club/blender/refine_sommerfeld_07.py jazz-club/blender/materials07.py jazz-club/blender/face_anatomy.py
+          python3 -m py_compile jazz-club/blender/build_audience.py jazz-club/blender/build_sommerfeld.py jazz-club/blender/refine_sommerfeld_08.py jazz-club/blender/materials07.py jazz-club/blender/face_anatomy.py
           python3 -m unittest discover -s jazz-club/tests -p 'test_*.py' -v
           python3 - <<'PY'
           import json
@@ -74,7 +74,10 @@ jobs:
               assert data['asset']['version']=='2.0'
               if name.startswith('sommerfeld'):
                   names={node.get('name') for node in data.get('nodes',[])}
-                  required={'SOMMERFELD_ROOT','HEAD_ANCHOR','SOMMERFELD_FACE_QUAD_BASE'}
+                  required={'SOMMERFELD_ROOT','HEAD_ANCHOR','SOMMERFELD_FACE_QUAD_BASE',
+                            'CoatBackFullPanel08','RearNeckCollar08',
+                            'RearHairNapeContinuous08','BackShoulderSeam08_-1',
+                            'BackShoulderSeam08_1'}
                   assert required.issubset(names),f'Controladores faltando: {required-names}'
                   assert data.get('meshes'), 'Malhas nao encontradas'
                   assert any('targets' in mesh.get('primitives',[{}])[0]
