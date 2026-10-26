@@ -9,9 +9,6 @@ import json
 import struct
 from pathlib import Path
 
-DEFAULT_NAMES=('Blink_L','Blink_R','BrowRaise','Smile','JawOpen',
-               'Squint_L','Squint_R','Pucker','Frown','Speech_A')
-
 def read_glb(path):
     b=Path(path).read_bytes()
     if b[:4]!=b'glTF' or struct.unpack_from('<II',b,4)!=(2,len(b)):
@@ -59,9 +56,8 @@ def apply(path):
     if target_count<10:
         raise ValueError('Blender did not export 10 facial morph targets')
     names=mesh.get('extras',{}).get('targetNames')
-    if names is None and target_count==len(DEFAULT_NAMES):
-        names=list(DEFAULT_NAMES)
-        mesh.setdefault('extras',{})['targetNames']=names
+    # Never invent a morph order: a different exporter can reorder shape keys.
+    # A wrong mapping would silently animate a different anatomical feature.
     if not names or len(names)!=target_count:
         raise ValueError('Morph names unavailable; do not guess target order')
     if not set(('Smile','JawOpen','Blink_L','Blink_R')).issubset(names):
