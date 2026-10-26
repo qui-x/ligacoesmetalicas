@@ -1,0 +1,62 @@
+name: Jazz e Metais | Blender Audience GLB
+
+on:
+  push:
+    branches:
+      - feature/baile-eletrons-jazz-1925
+    paths:
+      - 'jazz-club/blender/**'
+      - 'jazz-club/data/scientists.json'
+      - '.github/workflows/jazz-blender-audience.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: jazz-blender-audience-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-audience:
+    name: Modelos Blender (maquete) para Babylon.js
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar Blender open-source
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends blender
+          blender --version | head -2
+
+      - name: Validar catálogo e sintaxe Python
+        run: |
+          python3 -m py_compile jazz-club/blender/build_audience.py
+          python3 - <<'PY'
+          import json
+          p=json.load(open('jazz-club/data/scientists.json',encoding='utf-8'))
+          assert len(p['scientists'])==8
+          assert len({s['id'] for s in p['scientists']})==8
+          print('Catalogo OK: 8 cientistas distintos')
+          PY
+
+      - name: Gerar maquete 3D com Blender
+        run: |
+          mkdir -p dist/jazz-club/assets
+          blender -b -t 2 --factory-startup --python jazz-club/blender/build_audience.py -- \
+            --manifest jazz-club/data/scientists.json \
+            --output dist/jazz-club/assets/scientists-proxy.glb
+          test -s dist/jazz-club/assets/scientists-proxy.glb
+
+      - name: Publicar GLB e catálogo como artefato de teste
+        uses: actions/upload-artifact@v4
+        with:
+          name: jazz-e-metais-plateia-maquete-${{ github.run_number }}
+          path: |
+            dist/jazz-club/assets/scientists-proxy.glb
+            jazz-club/data/scientists.json
+          if-no-files-found: error
+          retention-days: 14
