@@ -35,7 +35,7 @@ jobs:
 
       - name: Validar scripts e catálogo
         run: |
-          python3 -m py_compile jazz-club/blender/build_audience.py jazz-club/blender/build_sommerfeld.py jazz-club/blender/refine_sommerfeld_06.py jazz-club/blender/refine_sommerfeld_07.py jazz-club/blender/refine_sommerfeld_08.py jazz-club/blender/refine_sommerfeld_09.py jazz-club/blender/refine_sommerfeld_10.py jazz-club/blender/refine_sommerfeld_11.py jazz-club/blender/refine_sommerfeld_12.py jazz-club/blender/face_integration12.py jazz-club/blender/facial_topology10.py jazz-club/blender/facial_mouth11.py jazz-club/blender/rev09_shapes.py jazz-club/blender/materials07.py jazz-club/blender/face_anatomy.py
+          python3 -m py_compile jazz-club/blender/build_audience.py jazz-club/blender/build_sommerfeld.py jazz-club/blender/refine_sommerfeld_06.py jazz-club/blender/refine_sommerfeld_07.py jazz-club/blender/refine_sommerfeld_08.py jazz-club/blender/refine_sommerfeld_09.py jazz-club/blender/refine_sommerfeld_10.py jazz-club/blender/refine_sommerfeld_11.py jazz-club/blender/refine_sommerfeld_12.py jazz-club/blender/glb_clips13.py jazz-club/blender/face_integration12.py jazz-club/blender/facial_topology10.py jazz-club/blender/facial_mouth11.py jazz-club/blender/rev09_shapes.py jazz-club/blender/materials07.py jazz-club/blender/face_anatomy.py
           python3 -m unittest discover -s jazz-club/tests -p 'test_*.py' -v
           python3 - <<'PY'
           import json
@@ -58,6 +58,7 @@ jobs:
             --blend dist/jazz-club/assets/sommerfeld-study.blend
           test -s dist/jazz-club/assets/sommerfeld-study.blend
           test -s dist/jazz-club/assets/sommerfeld-study.glb
+          python3 jazz-club/blender/glb_clips13.py --glb dist/jazz-club/assets/sommerfeld-study.glb
 
       - name: Verificar conteudo binario e controladores do glTF
         shell: bash
@@ -84,6 +85,10 @@ jobs:
                             'EyeSocketLoops10_L','EyeSocketLoops10_R','MouthInterior12'}
                   assert required.issubset(names),f'Controladores faltando: {required-names}'
                   assert data.get('meshes'), 'Malhas nao encontradas'
+                  facial=[mesh for mesh in data['meshes'] if mesh.get('name')=='SOMMERFELD_FACE_QUAD_BASE']
+                  assert len(facial)==1, 'Malha craniana não é única'
+                  assert len(facial[0]['primitives'][0].get('targets',[]))>=10, 'Morph targets não exportados'
+                  assert {'SmileCycle','JawOpenCycle','BlinkCycle'}.issubset({a.get('name') for a in data.get('animations',[])}), 'Clipes faciais ausentes'
                   assert any('SOMMERFELD_FACE_QUAD_BASE' == node.get('name') for node in data.get('nodes',[])), 'Malha craniana integrada ausente'
                   assert not any('MouthLoops11' == node.get('name') for node in data.get('nodes',[])), 'Boca sobreposta legada presente'
                   assert any('targets' in mesh.get('primitives',[{}])[0]
