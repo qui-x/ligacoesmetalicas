@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#14171c">
 <title>Jazz e Metais — Pista de dança 3D · SILM (prévia)</title>
-<meta name="description" content="Cena musical interativa e acessível dos personagens das terras raras."><link rel="stylesheet" href="./src/dance.css">
+<meta name="description" content="Cena musical interativa e acessível dos personagens das terras raras."><link rel="stylesheet" href="./src/dance.css"><link rel="stylesheet" href="./src/jukebox.css">
 </head>
 <body>
 <div id="club">
@@ -21,54 +21,78 @@
     <div class="beatline"><span id="beat-light" aria-hidden="true">●</span> <span id="beat-status">120 BPM · ritmo de ensaio</span></div>
     <div class="cast-caption">Eu · Európio / Ce · Cério / Gd · Gadolínio</div>
   </section>
-  <section id="dance-controls" aria-label="Controles do espetáculo">
-    <div class="control-heading"><strong>Direção de coreografia</strong><span id="music-state">Sem áudio · ensaio rítmico</span></div>
+  <button type="button" id="jukebox-toggle" aria-expanded="false" aria-controls="jukebox-drawer" aria-label="Abrir jukebox com repertório de 30 discos">♫ Jukebox <span aria-hidden="true">▸</span></button>
+  <button type="button" id="jukebox-scene-open" aria-controls="jukebox-drawer" aria-expanded="false">Escolher disco no fonógrafo</button>
+  <div id="jukebox-mini" aria-live="off">
+    <span class="mini-disc" aria-hidden="true">◉</span>
+    <span id="jukebox-mini-title">Selecione um disco</span>
+  </div>
+  <aside id="jukebox-drawer" aria-label="Jukebox — seleção de discos" role="dialog" aria-modal="false" hidden>
+    <div class="jukebox-frame">
+      <div class="jukebox-topline"><span>SILM · GABINETE MUSICAL</span><button id="jukebox-close" type="button" aria-label="Fechar a jukebox">✕</button></div>
+      <h2>A Discoteca <em>do Jazz</em></h2>
+      <p class="jukebox-era">FONÓGRAFO AUTOMÁTICO · 1925</p>
+      <div class="jukebox-sconce" aria-hidden="true"><span></span><i></i><span></span></div>
+      <div class="jukebox-now" aria-label="Disco selecionado">
+        <div class="record-art" aria-hidden="true"><span id="jukebox-disc"></span></div>
+        <div class="now-copy"><small id="jukebox-now-collection">O Mar de Elétrons</small>
+          <strong id="jukebox-current-title">Carregando repertório...</strong>
+          <span id="jukebox-now-bpm">132 BPM</span>
+          <small id="jukebox-now-phenomenon">Deslocalização eletrônica</small>
+        </div>
+      </div>
+      <div class="jukebox-player">
+        <div class="jukebox-player-buttons">
+          <button type="button" id="jukebox-prev" aria-label="Disco anterior">⏮</button>
+          <button type="button" id="audio-play" disabled>Reproduzir música</button>
+          <button type="button" id="jukebox-next" aria-label="Próximo disco">⏭</button>
+        </div>
+        <audio id="audio-player" controls preload="metadata" aria-label="Faixa atual e posição da reprodução"></audio>
+        <label class="volume">Volume <input id="jukebox-volume" type="range" min="0" max="100" value="80"><output id="jukebox-volume-output" for="jukebox-volume">80%</output></label>
+      </div>
+      <p id="jukebox-status" role="status" aria-live="polite">Carregando os discos originais...</p>
+      <div class="jukebox-search">
+        <label for="jukebox-filter">Pesquisar no repertório</label>
+        <input id="jukebox-filter" type="search" autocomplete="off" placeholder="Nome, número ou propriedade">
+        <label for="jukebox-collection">Coleção</label>
+        <select id="jukebox-collection"><option value="">Todas as coleções</option></select>
+      </div>
+      <div class="jukebox-list-heading"><strong>CATÁLOGO DE DISCOS</strong><span id="jukebox-count">0 / 30 discos</span></div>
+      <ol id="jukebox-list" aria-label="Escolher uma das músicas do Jazz e Metais"></ol>
+      <details class="jukebox-import">
+        <summary>Reproduzir gravação externa</summary>
+        <label>Áudio MP3, OGG ou WAV <input type="file" id="audio-file" accept=".mp3,.ogg,.wav,audio/*"></label>
+        <label>Marcadores JSON <input type="file" id="cues-file" accept=".json,application/json"></label>
+      </details>
+      <p class="jukebox-note">Repertório original do SILM. Reprodução somente após você selecionar ou acionar a música.</p>
+    </div>
+  </aside>
+  <section id="dance-controls" aria-label="Direção do espetáculo">
+    <div class="control-heading"><strong>Coreografia</strong><span id="music-state">Ensaio · sem áudio</span></div>
     <div class="fields">
-      <label>Formação
-        <select id="formation">
-          <option value="auto">Automática · mudar a cada 32 tempos</option>
-          <option value="trio">Trio</option>
-          <option value="pares">Dueto + solista</option>
-          <option value="roda">Roda</option>
-          <option value="linha">Linha Charleston</option>
-          <option value="troca">Troca de lugares</option>
-        </select>
-      </label>
-      <label>Intensidade <output for="intensity" id="intensity-output">65%</output>
-        <input id="intensity" type="range" min="0" max="100" value="65">
-      </label>
-      <label>Ritmo <output for="bpm" id="bpm-output">120 BPM</output>
-        <input id="bpm" type="range" min="70" max="190" value="120">
-      </label>
+      <label>Formação <select id="formation">
+        <option value="auto">Seguir o disco · automático</option>
+        <option value="trio">Trio</option><option value="pares">Dueto + solista</option>
+        <option value="roda">Roda</option><option value="linha">Charleston</option>
+        <option value="troca">Troca de lugares</option>
+      </select></label>
+      <label>Intensidade <output id="intensity-output" for="intensity">65%</output>
+        <input id="intensity" type="range" min="0" max="100" value="65"></label>
+      <label class="tempo-readout">Ritmo da faixa <output id="bpm-output" for="bpm">132 BPM</output>
+        <input id="bpm" type="range" min="70" max="190" value="132" hidden aria-label="BPM da faixa"></label>
     </div>
     <div class="actions">
       <button id="transport" type="button" aria-pressed="true">Pausar dança</button>
-      <button id="audio-play" type="button" disabled>Reproduzir faixa</button>
       <button id="camera-reset" type="button">Reiniciar câmera</button>
       <button id="fullscreen" type="button">Tela inteira</button>
     </div>
-    <div class="audio-box">
-      <div class="club-track">
-        <strong>Mar de Elétrons · Trilha oficial de ensaio</strong>
-        <button id="builtin-track" type="button">Carregar “O Baile dos Elétrons”</button>
-        <span id="builtin-track-status" role="status" aria-live="polite">132 BPM · 2min13s · faixa completa</span>
-        <audio id="audio-player" controls preload="metadata" aria-label="Reprodução e volume da música do clube"></audio>
-      </div>
-      <label>Carregar outra faixa (MP3, OGG, WAV)
-        <input type="file" id="audio-file" accept=".mp3,.ogg,.wav,audio/*">
-      </label>
-      <label>Marcadores opcionais da música (JSON)
-        <input type="file" id="cues-file" accept=".json,application/json">
-      </label>
-      <label><input id="reduce-motion" type="checkbox"> Movimento reduzido</label>
-      <p>O motor 3D usa a biblioteca Babylon.js carregada online. As músicas começam somente após clicar em reproduzir. A faixa oficial é carregada do próprio site; arquivos importados permanecem no navegador e não são enviados ao SILM.</p>
-    </div>
-    <p class="keyboard">Espaço: pausar/retomar · 1–5: formações · R: câmera · setas: girar</p>
+    <label class="reduced-toggle"><input id="reduce-motion" type="checkbox"> Movimento reduzido</label>
+    <p class="keyboard">Clique no fonógrafo 3D ou abra a jukebox lateral · Espaço pausa a dança · R reinicia a câmera</p>
     <p id="announcer" aria-live="polite" class="sr-only"></p>
   </section>
   <div id="scene-error" role="alert" hidden>Não foi possível abrir o renderizador 3D. A pista permanece em modo de inspeção textual. Use um navegador com WebGL e tente novamente.</div>
 </div>
-<script defer src="https://cdn.babylonjs.com/babylon.js"></script>
+<script defer src="https://cdn.babylonjs.com/babylon.js"></script><script defer src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
 <script type="module">
   if (window.BABYLON?.Engine) {
     import('./src/dance.js').catch(error => {
