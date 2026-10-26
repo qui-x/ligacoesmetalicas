@@ -1,3 +1,11 @@
+## 0.15.4 — Comparação, elétrons 3D e seleção de metais
+
+- Visão Geral com até seis metais recentes, geometria documental e controles comuns de propriedades qualitativas.
+- Referências DHCP inconsistentes não são apresentadas como estruturas completas. Novas referências visuais ainda não habilitam medições/cálculos na bancada.
+- Mar de elétrons compartilhado nos quadros; movimento contínuo durante a órbita 3D, pausa explícita e movimento reduzido.
+- Escolha na tabela prepara o metal em Montagem sem substituir automaticamente a investigação.
+- Testes de comparação, elétrons 3D e seleção disponíveis em npm run test:comparison.
+
 ## 0.15.3 — Integridade de sessão e backup
 
 - Gravação coordenada, reversão em falhas e aviso por documento.

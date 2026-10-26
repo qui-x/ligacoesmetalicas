@@ -1,4 +1,6 @@
-# SILM 0.15.3 — A Arquitetura dos Metais
+# SILM 0.15.4 — A Arquitetura dos Metais
+
+A 0.15.4 compara referências recentes na Visão Geral, mantém os elétrons em movimento durante a órbita 3D e prepara Montagem ao selecionar um metal na tabela. Geometrias adicionais são referências visuais; sua integração com o motor de medições e cálculos continua pendente.
 
 A 0.15.3 coordena a gravação da investigação e da sessão, protege abas obsoletas e inclui os relatórios completos no backup do Caderno.
 

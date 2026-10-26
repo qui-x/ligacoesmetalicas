@@ -1,7 +1,7 @@
 'use strict';
 window.SILM=window.SILM||{};
 /* Um componente, dois contextos. O callback de investigação é a única escrita científica. */
-SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSources,canInvestigate=()=>true,toolbar=null})=>{
+SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSources,onSelect=()=>{},canInvestigate=()=>true,toolbar=null})=>{
  const U=SimCore.ExperienceUI,D=SILM.data,sequence=++SILM.tableSequence,prefix='periodic-'+sequence;
  const root=U.element('section',null,'silm-periodic');root.dataset.context=teacher?'presentation':'investigation';
  const head=U.element('header',null,'periodic-heading'),title=U.element('h1','Tabela Periódica');title.id=prefix+'-title';title.tabIndex=-1;
@@ -45,7 +45,7 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
   if(e.classification.note)summary.append(U.element('small',e.classification.note));
   if(!canInvestigate()&&e.silmEligibility.status==='available')summary.append(U.element('small','Encerre a atividade atual para iniciar outra investigação.'));
  }
- function inspect(z,focus=false){state.selection=z;update();if(focus){const b=buttons.get(z);b?.focus({preventScroll:true});b?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'auto'});}}
+ function inspect(z,focus=false){state.selection=z;update();const selected=D.get(z);if(selected?.silmEligibility.status==='available'&&canInvestigate())onSelect(selected);if(focus){const b=buttons.get(z);b?.focus({preventScroll:true});b?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'auto'});}}
  function updateSearch(focus){state.query=input.value;const results=D.search(input.value);for(const [z,b]of buttons)b.classList.toggle('is-match',!!input.value.trim()&&results.some(e=>e.atomicNumber===z));
   status.textContent=input.value.trim()?(results.length?results.length+' resultado'+(results.length===1?'':'s')+'. '+D.label(results[0]):'Nenhum elemento encontrado. A tabela continua completa.'):'118 elementos · grupos 1–18 · use as setas para navegar entre elementos.';
   if(input.value.trim()&&results.length){inspect(results[0].atomicNumber,focus);if(!focus)buttons.get(results[0].atomicNumber)?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'auto'});}else if(!input.value.trim()){update();}

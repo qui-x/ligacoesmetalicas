@@ -2,7 +2,7 @@
 /* Documento único de domínio: cada transição publica todos os seus documentos numa só gravação. */
 SILM.createDurableStorage=({backend,prefix='silm-base-integration:',onStatus=()=>{},onConflict=()=>{},events=globalThis.window})=>{
  const key=prefix+'documents-v1',format='silm-documents-v1',errors=new Set();
- const critical=k=>['scientific.state','route.session','representation.view','journal-document-v1','teacher.library','mounting.presets','operation.history','recovery.snapshot'].includes(k)||/^report\.(free|archive):/.test(k);
+ const critical=k=>['comparison.recent','scientific.state','route.session','representation.view','journal-document-v1','teacher.library','mounting.presets','operation.history','recovery.snapshot'].includes(k)||/^report\.(free|archive):/.test(k);
  let raw=null,document={format,revision:0,documents:{}},conflict=false,depth=0,draft=null,changed=new Set(),rollbacks=[],aborted=null;
  const copy=x=>JSON.parse(JSON.stringify(x));
  const read=k=>backend.getItem(k);

@@ -1,6 +1,6 @@
 {
   "name": "silm",
-  "version": "0.15.3",
+  "version": "0.15.4",
   "private": true,
   "description": "SILM — investigação e estruturas cristalinas de metais com cobertura experimental ampliada.",
   "license": "GPL-3.0",
@@ -20,7 +20,8 @@
     "test:routes": "node tests/routes.cjs && node tests/durable-storage.cjs",
     "test:routes:browser": "node tests/integration-runner.cjs",
     "test:learning": "node tests/learning.cjs",
-    "test:backup": "node tests/notebook-backup.cjs"
+    "test:backup": "node tests/notebook-backup.cjs",
+    "test:comparison": "node tests/structure-comparison.cjs && node tests/electrons-3d.cjs && node tests/table-mounting.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1",

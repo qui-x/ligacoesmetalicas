@@ -2,7 +2,7 @@
 /* Produto SILM sobre a Base SI 0.9.17. O domínio científico SILM permanece no schema 8. */
 (() => {
  const B=BaseDemoSI,S=SILM,$=id=>document.getElementById(id);
- B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.15.3',
+ B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.15.4',
   routes:B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios','aprender','missoes','caderno','professor'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'Oficina dos Metais':route.title}))});
  // A cena cristalina também usa data-view; o roteamento só pode atingir páginas do produto.
  B.updateRoute=()=>{
@@ -52,9 +52,10 @@
   saveCamera(mode,value){representation.cameras[mode]=S.representation.sanitizeCamera(value);saveView();}
  };
  function saveView(){return storage.set('representation.view',representation);}
+ const comparison=S.createStructureComparison({storage,host:$('silm-comparison-items')});
  const tools=S.createIntegrationTools({model,host:$('silm-tools'),moduleHost:$('silm-module-choice'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
  const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session});
- const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
+ const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,prepareMetal:z=>{if(routeUI?.session.open()||S.data.get(z)?.silmEligibility.status!=='available')return false;$('silm-metal').value=String(z);selected=String(z);schedule();return true;},selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
  routeUI=S.createRouteUI({model,storage,view:()=>representation,onView:(value,{persist=true}={})=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);return persist?saveView():true;},schedule,say,onModule:m=>B.selectModule(m),selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
  const run={
   add(){if(routeUI.session.open()&&!routeUI.canBuild())return;if(!model.state.structure)model.beginAssembly();return report(model.addUnit());},
@@ -158,12 +159,7 @@
   if(e){
    S.renderIntegrationMetalData(data,e,state);
   }else data.textContent='Inicie uma investigação para consultar os dados do metal.';
-  const list=$('scene-overview-items');list.replaceChildren();
-  for(const [index,u]of (s?.units||[]).entries()){
-   const b=document.createElement('button');b.type='button';b.className='si-overview-item';b.textContent=e.symbol+' · unidade '+(index+1);
-   b.addEventListener('click',()=>{document.querySelector('[data-scene-view="focus"]').click();if(s.mode==='crystalline')run.select(u.id);view?.focusUnit(u.id);});list.append(b);
-  }
-  if(!n)list.textContent='Ainda não há unidades nesta investigação.';
+  comparison.update(state);
   routeUI.render();workspaceFamily.update();storageStatus();
   const replacement=restoreControl?$(restoreControl):null;if(focused&&!focused.isConnected&&replacement?.getClientRects().length)replacement.focus({preventScroll:true});
  }
