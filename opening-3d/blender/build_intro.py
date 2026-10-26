@@ -300,9 +300,12 @@ def run():
     ap=argparse.ArgumentParser()
     ap.add_argument('--output',required=True)
     ap.add_argument('--blend',required=True)
+    ap.add_argument('--frames',default=None)
+    ap.add_argument('--render',action='store_true')
     args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
     opts=ap.parse_args(args)
     build()
+    attach_kinetic_title()
     out=os.path.abspath(opts.output)
     blend=os.path.abspath(opts.blend)
     os.makedirs(os.path.dirname(out),exist_ok=True)
