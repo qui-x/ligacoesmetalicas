@@ -1,3 +1,5 @@
+> **IDENTIDADE ATUALIZADA (26/10/2026):** o título vigente é **Jazz e Metais — Espetáculo de Propriedades das Terras Raras**. Consulte [o documento normativo de concepção](JAZZ-E-METAIS-IDENTIDADE-MODELO-3D.md). As menções a **Rare Earth Revue**, à transformação completa dos personagens em elétrons ou ao uso exclusivo de CCC/CFC/HC abaixo são **histórico de concepção, não decisões vigentes**. O personagem representa o centro metálico, e o figurino/campo coletivo fornece a ponte visual para os elétrons deslocalizados.
+
 # SILM — O Baile dos Elétrons: Jazz Club 1925
 ## Direção visual e arquitetura de protótipo
 *26 de outubro de 2026 — documento de concepção, não implementação.*
