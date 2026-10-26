@@ -1,0 +1,39 @@
+name: SILM Jazz | Integridade da música oficial
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'jazz-club/audio/**'
+      - 'jazz-club/src/builtin-track.js'
+      - 'jazz-club/tests/audio-integrity.test.mjs'
+      - '.github/workflows/jazz-audio-integrity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar formato dos scripts
+        run: |
+          node --check jazz-club/src/builtin-track.js
+          node --check jazz-club/src/dance.js
+          node --check jazz-club/src/dance-fallback.js
+      - name: Reconstruir MP3 de 27 partes e conferir SHA-256
+        run: node --test jazz-club/tests/audio-integrity.test.mjs
+      - name: Confirmar decodificação de áudio
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+          root=Path('jazz-club/audio')
+          text=''.join((root/f'01_o_baile_dos_eletrons_v02.part{i:02d}.b64').read_text() for i in range(27))
+          Path('/tmp/baile.mp3').write_bytes(base64.b64decode(text,validate=True))
+          PY
+          ffmpeg -nostdin -v error -i /tmp/baile.mp3 -f null -
