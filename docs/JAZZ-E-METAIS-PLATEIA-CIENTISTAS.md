@@ -1,6 +1,8 @@
 # Jazz e Metais — Plateia de cientistas (direção de personagens 3D)
 *Especificação criativa e técnica v1.0, 26 de outubro de 2026*
 
+> **Pipeline de personagens atualizada — 26/10/2026:** adotar a metodologia de topologia, modelagem e animação de [CrossMind Studio](JAZZ-E-METAIS-PIPELINE-CROSSMIND-PERSONAGENS.md) como referência didática principal para os assets originais. Para Sommerfeld, consultar as fontes históricas documentadas em `jazz-club/data/scientists.json`. As maquetes de primitivas são somente *blockout*, ainda sem fidelidade de rosto homologada.
+
 **Identidade vigente:** Jazz e Metais — Espetáculo de Propriedades das Terras Raras. **Motor visual:** Blender para assets/rig/animação, Babylon.js para renderização web. **Escopo:** personagens convidados na plateia; a companhia de 17 terras raras continua protagonista no palco. Trabalhar apenas em `feature/baile-eletrons-jazz-1925`.
 
 ## 1. Natureza da plateia: encontro científico imaginário
