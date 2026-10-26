@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "context": "Galeria histórica imaginária ambientada em Jazz Club 1925; personagens são interpretações artísticas e não comprovam encontro real.",
+  "scientists": [
+    {
+      "id": "drude",
+      "name": "Paul Drude",
+      "years": "1863–1906",
+      "seat": [
+        -3.9,
+        -1.8
+      ],
+      "role": "Teoria eletrônica clássica",
+      "contributionYear": "1900",
+      "description": "Modelo clássico de condução de elétrons em metais.",
+      "historicalNote": "Homenagem imaginária: Drude morreu antes de 1925.",
+      "reference": "https://doi.org/10.1002/andp.19003060312",
+      "costume": {
+        "coat": "#292e3d",
+        "vest": "#626071",
+        "hair": "#4e3e37",
+        "accent": "#d5aa59",
+        "glasses": false
+      }
+    },
+    {
+      "id": "lorentz",
+      "name": "Hendrik Antoon Lorentz",
+      "years": "1853–1928",
+      "seat": [
+        -2.7,
+        -1.8
+      ],
+      "role": "Teoria eletrônica",
+      "contributionYear": "1904–1909",
+      "description": "Contribuições à teoria clássica dos elétrons e transporte.",
+      "historicalNote": "Teoria clássica estabelecida antes de 1925.",
+      "reference": "https://doi.org/10.1103/RevModPhys.59.287",
+      "costume": {
+        "coat": "#252c30",
+        "vest": "#727779",
+        "hair": "#bbb3a7",
+        "accent": "#b4cee0",
+        "glasses": false
+      }
+    },
+    {
+      "id": "sommerfeld",
+      "name": "Arnold Sommerfeld",
+      "years": "1868–1951",
+      "seat": [
+        -1.45,
+        -1.8
+      ],
+      "role": "Modelo quântico de metais",
+      "contributionYear": "1927–1928",
+      "description": "Aperfeiçoamento quântico da teoria de elétrons em metais.",
+      "historicalNote": "Contribuições citadas posteriores ao ano ficcional de 1925.",
+      "reference": "https://doi.org/10.1103/RevModPhys.59.287",
+      "costume": {
+        "coat": "#34313a",
+        "vest": "#655e5d",
+        "hair": "#8e887b",
+        "accent": "#cca883",
+        "glasses": true
+      }
+    },
+    {
+      "id": "von-laue",
+      "name": "Max von Laue",
+      "years": "1879–1960",
+      "seat": [
+        1.5,
+        -1.8
+      ],
+      "role": "Difração de raios X",
+      "contributionYear": "1912",
+      "description": "Descoberta da difração de raios X por cristais.",
+      "historicalNote": "Trabalho anterior a 1925.",
+      "reference": "https://www.nobelprize.org/nobel_prizes/physics/laureates/1914/laue-bio.html",
+      "costume": {
+        "coat": "#2c3f45",
+        "vest": "#79746b",
+        "hair": "#393b34",
+        "accent": "#e1b677",
+        "glasses": false
+      }
+    },
+    {
+      "id": "wh-bragg",
+      "name": "William Henry Bragg",
+      "years": "1862–1942",
+      "seat": [
+        2.85,
+        -1.8
+      ],
+      "role": "Análise cristalina",
+      "contributionYear": "1913–1915",
+      "description": "Análise da estrutura cristalina por difração de raios X.",
+      "historicalNote": "Trabalho anterior a 1925.",
+      "reference": "https://www.nobelprize.org/prizes/physics/1915/wh-bragg/facts/",
+      "costume": {
+        "coat": "#252735",
+        "vest": "#6d6459",
+        "hair": "#b8ada2",
+        "accent": "#d6af74",
+        "glasses": false
+      }
+    },
+    {
+      "id": "wl-bragg",
+      "name": "William Lawrence Bragg",
+      "years": "1890–1971",
+      "seat": [
+        4.15,
+        -1.8
+      ],
+      "role": "Lei de Bragg",
+      "contributionYear": "1912–1915",
+      "description": "Lei e métodos de análise da organização interna dos cristais.",
+      "historicalNote": "Trabalho anterior a 1925.",
+      "reference": "https://www.iucr.org/what-we-do/awards-and-prizes/nobel-prize/w.l.bragg",
+      "costume": {
+        "coat": "#31404b",
+        "vest": "#6c7783",
+        "hair": "#554c44",
+        "accent": "#d1af73",
+        "glasses": false
+      }
+    },
+    {
+      "id": "bloch",
+      "name": "Felix Bloch",
+      "years": "1905–1983",
+      "seat": [
+        -1.7,
+        -3.7
+      ],
+      "role": "Teoria quântica dos sólidos",
+      "contributionYear": "1928",
+      "description": "Estados eletrônicos em redes cristalinas periódicas.",
+      "historicalNote": "Descoberta posterior a 1925; cameo histórico imaginário.",
+      "reference": "https://doi.org/10.1103/RevModPhys.59.287",
+      "costume": {
+        "coat": "#333638",
+        "vest": "#777d77",
+        "hair": "#554536",
+        "accent": "#b5c3bc",
+        "glasses": false
+      }
+    },
+    {
+      "id": "hume-rothery",
+      "name": "William Hume-Rothery",
+      "years": "1899–1968",
+      "seat": [
+        1.75,
+        -3.7
+      ],
+      "role": "Metalurgia e ligas",
+      "contributionYear": "Décadas de 1920–1930",
+      "description": "Regras e estudos sobre soluções sólidas e formação de ligas.",
+      "historicalNote": "Resultados importantes posteriores a 1925; cameo histórico imaginário.",
+      "reference": "https://www.phase-trans.msm.cam.ac.uk/2004/titanium/hume.rothery.html",
+      "costume": {
+        "coat": "#3a3331",
+        "vest": "#776a60",
+        "hair": "#6c6459",
+        "accent": "#bb965d",
+        "glasses": false
+      }
+    }
+  ]
+}
