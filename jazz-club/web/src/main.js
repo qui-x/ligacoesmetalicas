@@ -165,6 +165,9 @@ async function initialize() {
     createSet();
     announce('Carregando estudo 3D…');
     const imported=await SceneLoader.ImportMeshAsync('', './assets/', 'sommerfeld-study.glb',scene);
+    // Named animations travel with the exported GLB. Explicit UI controls drive
+    // their morph targets here; stop imported clips to avoid double animation.
+    for (const group of imported.animationGroups || []) group.stop();
     const all=[...imported.meshes,...imported.transformNodes];
     const match=name=>all.find(n=>n.name===name);
     controls={
