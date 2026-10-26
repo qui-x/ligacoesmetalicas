@@ -1,4 +1,4 @@
-"""Pure-Python facial study surface for an artistic Sommerfeld interpretation (revision 06).
+"""Pure-Python facial study surface for an artistic Sommerfeld interpretation (revision 07).
 Not a photogrammetric portrait or final facial edge-loop retopology.
 Quad mesh editable in Blender. Positive Y front, Z up; meters.
 """
@@ -23,25 +23,29 @@ def head_geometry(rows=ROWS,columns=COLUMNS):
         for col in range(columns):
             a=math.tau*col/columns
             x=.202*sine*math.cos(a)
-            x*=1-.15*max(0,(-z-.055)/.225)
-            y=.181*sine*math.sin(a)
+            x*=1-.12*max(0,(-z-.045)/.235)
+            x*=1-.045*bell(x,z,0,.205,.25,.075)
+            y=.184*sine*math.sin(a)
             front=max(0,math.sin(a))**3
             relief=(
                 .010*bell(x,z,0,.165,.16,.064)
                 +.013*bell(abs(x),z,.088,.129,.048,.036)
-                -.029*bell(abs(x),z,.083,.065,.047,.043)
-                +.024*bell(abs(x),z,.123,-.047,.065,.072)
+                -.033*bell(abs(x),z,.083,.069,.047,.046)
+                +.028*bell(abs(x),z,.125,-.045,.063,.075)
                 +.011*bell(x,z,0,.070,.043,.155)
-                +.043*bell(x,z,0,.014,.040,.092)  # nasal bridge in shared face mesh
-                +.043*bell(x,z,0,-.070,.041,.037)  # nasal tip in shared face mesh
-                +.012*bell(abs(x),z,.034,-.089,.027,.025)  # alae
-                -.014*bell(abs(x),z,.112,-.127,.032,.079)
+                +.050*bell(x,z,0,.011,.036,.105)  # nasal bridge in shared face mesh
+                +.050*bell(x,z,0,-.073,.043,.038)  # nasal tip in shared face mesh
+                +.014*bell(abs(x),z,.034,-.088,.026,.025)  # alae
+                -.018*bell(abs(x),z,.111,-.129,.032,.079)
                 +.008*bell(x,z,0,-.119,.055,.023)
                 +.010*bell(x,z,0,-.155,.051,.018)
-                +.020*bell(x,z,0,-.222,.096,.043)
+                +.021*bell(x,z,0,-.216,.097,.050)
+                -.009*bell(abs(x),z,.154,-.015,.023,.073)
+                +.008*bell(abs(x),z,.067,-.158,.040,.021)
+                -.004*bell(abs(x),z,.100,.014,.031,.018)
                 -.010*bell(x,z,0,-.189,.07,.019)
             )
-            asym=.0022*math.sin(17*x+5*z)*bell(x,z,0,0,.2,.21)
+            asym=.0028*math.sin(17*x+5*z)*bell(x,z,0,0,.2,.21)
             points.append((x,y+front*(relief+asym),z))
     faces=[]
     for row in range(rows):
