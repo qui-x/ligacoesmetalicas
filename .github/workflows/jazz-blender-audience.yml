@@ -35,7 +35,7 @@ jobs:
 
       - name: Validar scripts e catálogo
         run: |
-          python3 -m py_compile jazz-club/blender/build_audience.py jazz-club/blender/build_sommerfeld.py jazz-club/blender/refine_sommerfeld_08.py jazz-club/blender/materials07.py jazz-club/blender/face_anatomy.py
+          python3 -m py_compile jazz-club/blender/build_audience.py jazz-club/blender/build_sommerfeld.py jazz-club/blender/refine_sommerfeld_06.py jazz-club/blender/refine_sommerfeld_07.py jazz-club/blender/refine_sommerfeld_08.py jazz-club/blender/refine_sommerfeld_09.py jazz-club/blender/rev09_shapes.py jazz-club/blender/materials07.py jazz-club/blender/face_anatomy.py
           python3 -m unittest discover -s jazz-club/tests -p 'test_*.py' -v
           python3 - <<'PY'
           import json
@@ -53,9 +53,11 @@ jobs:
           blender -b -t 2 --factory-startup --python jazz-club/blender/build_audience.py -- \
             --manifest jazz-club/data/scientists.json \
             --output dist/jazz-club/assets/scientists-proxy.glb
-          blender -b -t 2 --factory-startup --python jazz-club/blender/refine_sommerfeld_06.py -- \
+          blender -b -t 2 --factory-startup --python jazz-club/blender/refine_sommerfeld_09.py -- \
             --output dist/jazz-club/assets/sommerfeld-study.glb \
             --blend dist/jazz-club/assets/sommerfeld-study.blend
+          test -s dist/jazz-club/assets/sommerfeld-study.blend
+          test -s dist/jazz-club/assets/sommerfeld-study.glb
 
       - name: Verificar conteudo binario e controladores do glTF
         shell: bash
@@ -75,9 +77,10 @@ jobs:
               if name.startswith('sommerfeld'):
                   names={node.get('name') for node in data.get('nodes',[])}
                   required={'SOMMERFELD_ROOT','HEAD_ANCHOR','SOMMERFELD_FACE_QUAD_BASE',
-                            'CoatBackFullPanel08','RearNeckCollar08',
-                            'RearHairNapeContinuous08','BackShoulderSeam08_-1',
-                            'BackShoulderSeam08_1'}
+                            'CoatBackFullPanel09','RearNeckCollar09',
+                            'RearHairNapeContinuous09','BackShoulderSeam09_-1',
+                            'BackShoulderSeam09_1','UpperSleeve09_L',
+                            'UpperSleeve09_R','ForearmSleeve09_L','ForearmSleeve09_R'}
                   assert required.issubset(names),f'Controladores faltando: {required-names}'
                   assert data.get('meshes'), 'Malhas nao encontradas'
                   assert any('targets' in mesh.get('primitives',[{}])[0]
