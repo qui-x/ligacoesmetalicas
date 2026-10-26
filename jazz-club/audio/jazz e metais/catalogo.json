@@ -1,0 +1,458 @@
+{
+  "nome": "Jazz e Metais",
+  "projeto": "SILM — Clube de Jazz",
+  "status": "catálogo publicado; mídia binária ainda não integralmente enviada para esta pasta",
+  "numero_de_faixas": 30,
+  "faixas": [
+    {
+      "numero": 1,
+      "titulo": "O Baile dos Elétrons",
+      "colecao": "O Mar de Elétrons",
+      "fenomeno": "Deslocalização eletrônica",
+      "bpm": 132,
+      "versao": "reorquestracao-v0.2",
+      "arquivos": {
+        "mp3": "faixas/01/01_O_Baile_dos_Eletrons_v02.mp3",
+        "ogg": "faixas/01/01_O_Baile_dos_Eletrons_v02.ogg",
+        "midi": "faixas/01/01_O_Baile_dos_Eletrons_v02.mid",
+        "sincronizacao": "faixas/01/01_O_Baile_dos_Eletrons_v02_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 2,
+      "titulo": "Corrente no Cabaré",
+      "colecao": "O Mar de Elétrons",
+      "fenomeno": "Condução elétrica sob campo aplicado",
+      "bpm": 138,
+      "versao": "reorquestracao-v0.2",
+      "arquivos": {
+        "mp3": "faixas/02/02_Corrente_no_Cabare_v02.mp3",
+        "ogg": "faixas/02/02_Corrente_no_Cabare_v02.ogg",
+        "midi": "faixas/02/02_Corrente_no_Cabare_v02.mid",
+        "sincronizacao": "faixas/02/02_Corrente_no_Cabare_v02_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 3,
+      "titulo": "Passos da Resistividade",
+      "colecao": "O Mar de Elétrons",
+      "fenomeno": "Resistividade elétrica",
+      "bpm": 104,
+      "versao": "reorquestracao-v0.2",
+      "arquivos": {
+        "mp3": "faixas/03/03_Passos_da_Resistividade_v02.mp3",
+        "ogg": "faixas/03/03_Passos_da_Resistividade_v02.ogg",
+        "midi": "faixas/03/03_Passos_da_Resistividade_v02.mid",
+        "sincronizacao": "faixas/03/03_Passos_da_Resistividade_v02_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 4,
+      "titulo": "O Improviso de Drude",
+      "colecao": "O Mar de Elétrons",
+      "fenomeno": "Modelo clássico de Drude",
+      "bpm": 122,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/04/04_O_Improviso_de_Drude.mp3",
+        "ogg": "faixas/04/04_O_Improviso_de_Drude.ogg",
+        "midi": "faixas/04/04_O_Improviso_de_Drude.mid",
+        "sincronizacao": "faixas/04/04_O_Improviso_de_Drude_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 5,
+      "titulo": "Sommerfeld ao Piano",
+      "colecao": "O Mar de Elétrons",
+      "fenomeno": "Modelo eletrônico de Sommerfeld",
+      "bpm": 116,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/05/05_Sommerfeld_ao_Piano.mp3",
+        "ogg": "faixas/05/05_Sommerfeld_ao_Piano.ogg",
+        "midi": "faixas/05/05_Sommerfeld_ao_Piano.mid",
+        "sincronizacao": "faixas/05/05_Sommerfeld_ao_Piano_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 6,
+      "titulo": "A Orquestra das Bandas",
+      "colecao": "O Mar de Elétrons",
+      "fenomeno": "Bandas eletrônicas",
+      "bpm": 128,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/06/06_A_Orquestra_das_Bandas.mp3",
+        "ogg": "faixas/06/06_A_Orquestra_das_Bandas.ogg",
+        "midi": "faixas/06/06_A_Orquestra_das_Bandas.mid",
+        "sincronizacao": "faixas/06/06_A_Orquestra_das_Bandas_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 7,
+      "titulo": "A Dança das Redes Metálicas",
+      "colecao": "A Arquitetura dos Metais",
+      "fenomeno": "Comparação de redes cristalinas",
+      "bpm": 144,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/07/07_A_Danca_das_Redes_Metalicas.mp3",
+        "ogg": "faixas/07/07_A_Danca_das_Redes_Metalicas.ogg",
+        "midi": "faixas/07/07_A_Danca_das_Redes_Metalicas.mid",
+        "sincronizacao": "faixas/07/07_A_Danca_das_Redes_Metalicas_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 8,
+      "titulo": "O Contratempo CCC",
+      "colecao": "A Arquitetura dos Metais",
+      "fenomeno": "Estrutura cúbica de corpo centrado",
+      "bpm": 124,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/08/08_O_Contratempo_CCC.mp3",
+        "ogg": "faixas/08/08_O_Contratempo_CCC.ogg",
+        "midi": "faixas/08/08_O_Contratempo_CCC.mid",
+        "sincronizacao": "faixas/08/08_O_Contratempo_CCC_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 9,
+      "titulo": "O Salão CFC",
+      "colecao": "A Arquitetura dos Metais",
+      "fenomeno": "Estrutura cúbica de faces centradas",
+      "bpm": 136,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/09/09_O_Salao_CFC.mp3",
+        "ogg": "faixas/09/09_O_Salao_CFC.ogg",
+        "midi": "faixas/09/09_O_Salao_CFC.mid",
+        "sincronizacao": "faixas/09/09_O_Salao_CFC_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 10,
+      "titulo": "Charleston Hexagonal",
+      "colecao": "A Arquitetura dos Metais",
+      "fenomeno": "Estrutura hexagonal compacta",
+      "bpm": 140,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/10/10_Charleston_Hexagonal.mp3",
+        "ogg": "faixas/10/10_Charleston_Hexagonal.ogg",
+        "midi": "faixas/10/10_Charleston_Hexagonal.mid",
+        "sincronizacao": "faixas/10/10_Charleston_Hexagonal_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 11,
+      "titulo": "O Dobrado dos Cristais",
+      "colecao": "A Arquitetura dos Metais",
+      "fenomeno": "Estrutura hexagonal dupla compacta",
+      "bpm": 120,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/11/11_O_Dobrado_dos_Cristais.mp3",
+        "ogg": "faixas/11/11_O_Dobrado_dos_Cristais.ogg",
+        "midi": "faixas/11/11_O_Dobrado_dos_Cristais.mid",
+        "sincronizacao": "faixas/11/11_O_Dobrado_dos_Cristais_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 12,
+      "titulo": "Valsa Romboédrica",
+      "colecao": "A Arquitetura dos Metais",
+      "fenomeno": "Rede romboédrica",
+      "bpm": 126,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/12/12_Valsa_Romboedrica.mp3",
+        "ogg": "faixas/12/12_Valsa_Romboedrica.ogg",
+        "midi": "faixas/12/12_Valsa_Romboedrica.mid",
+        "sincronizacao": "faixas/12/12_Valsa_Romboedrica_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 13,
+      "titulo": "Entre Núcleos e Notas",
+      "colecao": "Metais em Movimento",
+      "fenomeno": "Coesão metálica",
+      "bpm": 108,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/13/13_Entre_Nucleos_e_Notas.mp3",
+        "ogg": "faixas/13/13_Entre_Nucleos_e_Notas.ogg",
+        "midi": "faixas/13/13_Entre_Nucleos_e_Notas.mid",
+        "sincronizacao": "faixas/13/13_Entre_Nucleos_e_Notas_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 14,
+      "titulo": "Martelo e Síncope",
+      "colecao": "Metais em Movimento",
+      "fenomeno": "Maleabilidade",
+      "bpm": 134,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/14/14_Martelo_e_Sincope.mp3",
+        "ogg": "faixas/14/14_Martelo_e_Sincope.ogg",
+        "midi": "faixas/14/14_Martelo_e_Sincope.mid",
+        "sincronizacao": "faixas/14/14_Martelo_e_Sincope_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 15,
+      "titulo": "O Fio de Cobre",
+      "colecao": "Metais em Movimento",
+      "fenomeno": "Ductilidade",
+      "bpm": 142,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/15/15_O_Fio_de_Cobre.mp3",
+        "ogg": "faixas/15/15_O_Fio_de_Cobre.ogg",
+        "midi": "faixas/15/15_O_Fio_de_Cobre.mid",
+        "sincronizacao": "faixas/15/15_O_Fio_de_Cobre_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 16,
+      "titulo": "Elasticidade em Azul",
+      "colecao": "Metais em Movimento",
+      "fenomeno": "Deformação elástica",
+      "bpm": 96,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/16/16_Elasticidade_em_Azul.mp3",
+        "ogg": "faixas/16/16_Elasticidade_em_Azul.ogg",
+        "midi": "faixas/16/16_Elasticidade_em_Azul.mid",
+        "sincronizacao": "faixas/16/16_Elasticidade_em_Azul_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 17,
+      "titulo": "Discordâncias no Contratempo",
+      "colecao": "Metais em Movimento",
+      "fenomeno": "Movimento de discordâncias",
+      "bpm": 146,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/17/17_Discordancias_no_Contratempo.mp3",
+        "ogg": "faixas/17/17_Discordancias_no_Contratempo.ogg",
+        "midi": "faixas/17/17_Discordancias_no_Contratempo.mid",
+        "sincronizacao": "faixas/17/17_Discordancias_no_Contratempo_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 18,
+      "titulo": "O Pulso da Resistência",
+      "colecao": "Metais em Movimento",
+      "fenomeno": "Resistência à deformação",
+      "bpm": 130,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/18/18_O_Pulso_da_Resistencia.mp3",
+        "ogg": "faixas/18/18_O_Pulso_da_Resistencia.ogg",
+        "midi": "faixas/18/18_O_Pulso_da_Resistencia.mid",
+        "sincronizacao": "faixas/18/18_O_Pulso_da_Resistencia_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 19,
+      "titulo": "Calor em Contraponto",
+      "colecao": "Calor, Energia e Brilho",
+      "fenomeno": "Condutividade térmica",
+      "bpm": 128,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/19/19_Calor_em_Contraponto.mp3",
+        "ogg": "faixas/19/19_Calor_em_Contraponto.ogg",
+        "midi": "faixas/19/19_Calor_em_Contraponto.mid",
+        "sincronizacao": "faixas/19/19_Calor_em_Contraponto_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 20,
+      "titulo": "Reflexos à Meia-Noite",
+      "colecao": "Calor, Energia e Brilho",
+      "fenomeno": "Brilho metálico",
+      "bpm": 102,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/20/20_Reflexos_a_Meia_Noite.mp3",
+        "ogg": "faixas/20/20_Reflexos_a_Meia_Noite.ogg",
+        "midi": "faixas/20/20_Reflexos_a_Meia_Noite.mid",
+        "sincronizacao": "faixas/20/20_Reflexos_a_Meia_Noite_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 21,
+      "titulo": "Dilatação em Ré Maior",
+      "colecao": "Calor, Energia e Brilho",
+      "fenomeno": "Dilatação térmica",
+      "bpm": 118,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/21/21_Dilatacao_em_Re_Maior.mp3",
+        "ogg": "faixas/21/21_Dilatacao_em_Re_Maior.ogg",
+        "midi": "faixas/21/21_Dilatacao_em_Re_Maior.mid",
+        "sincronizacao": "faixas/21/21_Dilatacao_em_Re_Maior_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 22,
+      "titulo": "Vibrações da Rede",
+      "colecao": "Calor, Energia e Brilho",
+      "fenomeno": "Vibrações cristalinas",
+      "bpm": 140,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/22/22_Vibracoes_da_Rede.mp3",
+        "ogg": "faixas/22/22_Vibracoes_da_Rede.ogg",
+        "midi": "faixas/22/22_Vibracoes_da_Rede.mid",
+        "sincronizacao": "faixas/22/22_Vibracoes_da_Rede_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 23,
+      "titulo": "O Contratempo da Fusão",
+      "colecao": "Calor, Energia e Brilho",
+      "fenomeno": "Fusão metálica",
+      "bpm": 112,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/23/23_O_Contratempo_da_Fusao.mp3",
+        "ogg": "faixas/23/23_O_Contratempo_da_Fusao.ogg",
+        "midi": "faixas/23/23_O_Contratempo_da_Fusao.mid",
+        "sincronizacao": "faixas/23/23_O_Contratempo_da_Fusao_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 24,
+      "titulo": "Duas Vias para o Calor",
+      "colecao": "Calor, Energia e Brilho",
+      "fenomeno": "Transporte térmico eletrônico e vibracional",
+      "bpm": 126,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/24/24_Duas_Vias_para_o_Calor.mp3",
+        "ogg": "faixas/24/24_Duas_Vias_para_o_Calor.ogg",
+        "midi": "faixas/24/24_Duas_Vias_para_o_Calor.mid",
+        "sincronizacao": "faixas/24/24_Duas_Vias_para_o_Calor_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 25,
+      "titulo": "O Encontro do Lantânio",
+      "colecao": "O Espetáculo das Terras Raras",
+      "fenomeno": "Estrutura DHCP do lantânio",
+      "bpm": 120,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/25/25_O_Encontro_do_Lantanio.mp3",
+        "ogg": "faixas/25/25_O_Encontro_do_Lantanio.ogg",
+        "midi": "faixas/25/25_O_Encontro_do_Lantanio.mid",
+        "sincronizacao": "faixas/25/25_O_Encontro_do_Lantanio_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 26,
+      "titulo": "O Cério em Transformação",
+      "colecao": "O Espetáculo das Terras Raras",
+      "fenomeno": "Transição γ–α do cério",
+      "bpm": 114,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/26/26_O_Cerio_em_Transformacao.mp3",
+        "ogg": "faixas/26/26_O_Cerio_em_Transformacao.ogg",
+        "midi": "faixas/26/26_O_Cerio_em_Transformacao.mid",
+        "sincronizacao": "faixas/26/26_O_Cerio_em_Transformacao_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 27,
+      "titulo": "Neodímio no Palco",
+      "colecao": "O Espetáculo das Terras Raras",
+      "fenomeno": "Magnetismo de materiais à base de neodímio",
+      "bpm": 136,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/27/27_Neodimio_no_Palco.mp3",
+        "ogg": "faixas/27/27_Neodimio_no_Palco.ogg",
+        "midi": "faixas/27/27_Neodimio_no_Palco.mid",
+        "sincronizacao": "faixas/27/27_Neodimio_no_Palco_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 28,
+      "titulo": "Gadolínio e a Temperatura",
+      "colecao": "O Espetáculo das Terras Raras",
+      "fenomeno": "Transição ferromagnética do gadolínio",
+      "bpm": 106,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/28/28_Gadolinio_e_a_Temperatura.mp3",
+        "ogg": "faixas/28/28_Gadolinio_e_a_Temperatura.ogg",
+        "midi": "faixas/28/28_Gadolinio_e_a_Temperatura.mid",
+        "sincronizacao": "faixas/28/28_Gadolinio_e_a_Temperatura_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 29,
+      "titulo": "O Contratempo do Disprósio",
+      "colecao": "O Espetáculo das Terras Raras",
+      "fenomeno": "Anisotropia magnetocristalina",
+      "bpm": 142,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/29/29_O_Contratempo_do_Disprosio.mp3",
+        "ogg": "faixas/29/29_O_Contratempo_do_Disprosio.ogg",
+        "midi": "faixas/29/29_O_Contratempo_do_Disprosio.mid",
+        "sincronizacao": "faixas/29/29_O_Contratempo_do_Disprosio_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    },
+    {
+      "numero": 30,
+      "titulo": "A Grande Orquestra dos Metais",
+      "colecao": "O Espetáculo das Terras Raras",
+      "fenomeno": "Síntese comparativa das propriedades metálicas",
+      "bpm": 148,
+      "versao": "maquete",
+      "arquivos": {
+        "mp3": "faixas/30/30_A_Grande_Orquestra_dos_Metais.mp3",
+        "ogg": "faixas/30/30_A_Grande_Orquestra_dos_Metais.ogg",
+        "midi": "faixas/30/30_A_Grande_Orquestra_dos_Metais.mid",
+        "sincronizacao": "faixas/30/30_A_Grande_Orquestra_dos_Metais_cues.json"
+      },
+      "disponivel_online_nesta_pasta": false
+    }
+  ]
+}
