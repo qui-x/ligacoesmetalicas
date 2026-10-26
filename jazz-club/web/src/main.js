@@ -1,7 +1,7 @@
 import {
   Engine, Scene, ArcRotateCamera, Vector3, Vector2, Color3, Color4,
-  HemisphericLight, PointLight, MeshBuilder, PBRMaterial, StandardMaterial,
-  Quaternion, SceneLoader, DefaultRenderingPipeline
+  HemisphericLight, PointLight, MeshBuilder, PBRMaterial,
+  Quaternion, SceneLoader
 } from '@babylonjs/core';
 import '@babylonjs/loaders/glTF';
 import './style.css';
@@ -121,8 +121,8 @@ function animation(now) {
   const blink=play?Math.exp(-Math.pow(((t%4.15)-1.4)/.055,2)):.0;
   for (const mt of morphs) {
     if (/Blink_[LR]/i.test(mt.name)) mt.influence=blink;
-    else if (/BrowRaise/i.test(mt.name)) mt.influence=play && motion==='observe'?.10:0;
-    else if (/Smile/i.test(mt.name)) mt.influence=play && motion==='applause'?.18:0;
+    else if (/BrowRaise/i.test(mt.name)) mt.influence=(play && motion==='observe') ? 0.10 : 0;
+    else if (/Smile/i.test(mt.name)) mt.influence=(play && motion==='applause') ? 0.18 : 0;
   }
 }
 async function initialize() {
@@ -143,9 +143,9 @@ async function initialize() {
     const hemi=new HemisphericLight('ambient',new Vector3(0,1,0),scene);
     hemi.intensity=.48;hemi.diffuse=new Color3(.63,.70,.86);
     const key=new PointLight('warm key',new Vector3(-1.6,3.3,-1.8),scene);
-    key.intensity=95;key.diffuse=new Color3(1,.73,.42);
+    key.intensity=7;key.diffuse=new Color3(1,.73,.42);
     const rim=new PointLight('rim',new Vector3(1.2,2.6,2.15),scene);
-    rim.intensity=75;rim.diffuse=new Color3(.35,.62,.81);
+    rim.intensity=4.5;rim.diffuse=new Color3(.35,.62,.81);
     createSet();
     announce('Carregando estudo 3D…');
     const imported=await SceneLoader.ImportMeshAsync('', './assets/', 'sommerfeld-study.glb',scene);
