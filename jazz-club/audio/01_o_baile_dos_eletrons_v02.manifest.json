@@ -1,0 +1,13 @@
+{
+  "track": "O Baile dos Elétrons",
+  "arrangement": "v0.2",
+  "format": "audio/mpeg",
+  "duration": 133.459592,
+  "bpm": 132,
+  "parts": 27,
+  "partSizeBase64": 160000,
+  "base64Length": 4271600,
+  "bytes": 3203700,
+  "sha256": "1a0bd1ebc54d635ce1568004d6f3510013fd1f046ae1e8c33c5fd6916f866919",
+  "pathPrefix": "01_o_baile_dos_eletrons_v02"
+}
