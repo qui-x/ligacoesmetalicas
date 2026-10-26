@@ -15,7 +15,7 @@ const media=new Audio();media.preload='metadata';media.loop=false;
 let sourceUrl=null,ctx=null,analyser=null,clip=null,scene=null,engine=null;
 let dancers=[],clock=0,playing=true,lastTime=performance.now(),peak=0;
 let cues={bpm:120,beatOffset:0,events:[],track:'Ensaio rítmico sem áudio'};
-let activeForm='trio',errorState=false;
+let activeForm='trio',errorState=false,previousForm=null,formationChangeAt=-999;
 const quiet=window.matchMedia('(prefers-reduced-motion: reduce)');
 reduced.checked=quiet.matches;
 const say=s=>announcer.textContent=s;
@@ -172,7 +172,10 @@ function frame(now,dots){
   const bpm=Number(bpmEl.value);
   const result=danceFrame({
     seconds:visualTime,bpm,beatOffset:cues.beatOffset,
-    formation:formationEl.value,intensity:Number(intensity.value)/100,
+    formation:formationEl.value,
+    previousFormation:(clock-formationChangeAt)<4*60/bpm?previousForm:null,
+    formationBlend:(clock-formationChangeAt)<4*60/bpm?(clock-formationChangeAt)*bpm/240:null,
+    intensity:Number(intensity.value)/100,
     reduced:frameReduced,energy:cueEnergy(clock)
   });
   if(activeForm!==result.formation){
@@ -252,6 +255,8 @@ $('transport').addEventListener('click',()=>{
   updateMusicLabel();
 });
 formationEl.addEventListener('change',()=>{
+  previousForm=activeForm;
+  formationChangeAt=clock;
   const labels={auto:'Coreografia automática',trio:'Trio',pares:'Dueto e solista',
     roda:'Roda',linha:'Linha Charleston',troca:'Troca de posições'};
   say(labels[formationEl.value]||'Formação alterada');
