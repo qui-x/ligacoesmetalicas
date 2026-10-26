@@ -1,10 +1,14 @@
 /* Jazz e Metais / compatibilidade 2D: música e coreografia sem WebGL.
    Somente provisório; não representa o motor 3D Babylon. */
 import {PERFORMERS,danceFrame,normalizeCueSheet} from './dance-core.js';
+import {loadBuiltinTrack,releaseBuiltinTrack,BUILTIN_TRACK_NAME} from './builtin-track.js';
 const $=id=>document.getElementById(id),canvas=$('dance-stage');
 const ctx=canvas.getContext('2d');
 if(!ctx){$('scene-error').hidden=false;throw new Error('Canvas indisponível');}
-const media=new Audio();media.preload='metadata';
+const media=$('audio-player');media.preload='metadata';
+media.addEventListener('seeked',()=>{t=media.currentTime});
+media.addEventListener('play',()=>{$('audio-play').textContent='Pausar faixa'});
+media.addEventListener('pause',()=>{$('audio-play').textContent='Reproduzir faixa'});
 let url=null,cues={bpm:120,beatOffset:0,events:[]},t=0,playing=true,last=performance.now();
 const reduce=$('reduce-motion');reduce.checked=matchMedia('(prefers-reduced-motion: reduce)').matches;
 $('scene-error').hidden=true;
@@ -68,6 +72,27 @@ $('transport').addEventListener('click',()=>{
   playing=!playing;$('transport').textContent=playing?'Pausar dança':'Retomar dança';
   $('transport').setAttribute('aria-pressed',String(playing));if(!playing)media.pause();
 });
+$('builtin-track').addEventListener('click',async()=>{
+  const button=$('builtin-track'),label=$('builtin-track-status');
+  button.disabled=true;label.textContent='Preparando a faixa original…';
+  try{
+    const track=await loadBuiltinTrack((loaded,total)=>{
+      label.textContent='Carregando música: '+Math.round(loaded*100/total)+'%';
+    });
+    media.pause();
+    if(url){URL.revokeObjectURL(url);url=null;}
+    media.src=track.objectUrl;media.load();
+    cues=normalizeCueSheet(track.cues);
+    $('bpm').value=String(cues.bpm);$('bpm').dispatchEvent(new Event('input'));
+    t=0;$('audio-play').disabled=false;
+    $('music-state').textContent=BUILTIN_TRACK_NAME+' · pronta para reproduzir';
+    label.textContent='MP3 íntegro · 2min13s · 132 BPM · pronto para reproduzir';
+    $('announcer').textContent='O Baile dos Elétrons carregado. Clique em Reproduzir faixa.';
+  }catch(error){
+    label.textContent='Falha ao carregar a faixa: '+error.message;
+    $('announcer').textContent=label.textContent;console.error(error);
+  }finally{button.disabled=false;}
+});
 $('audio-file').addEventListener('change',e=>{
   const f=e.target.files?.[0];if(!f)return;
   if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);
@@ -93,7 +118,7 @@ $('fullscreen').addEventListener('click',async()=>{
 canvas.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;canvas.setPointerCapture(e.pointerId)});
 canvas.addEventListener('pointermove',e=>{if(drag){pan+=(e.clientX-lastX)*.007;lastX=e.clientX}});
 canvas.addEventListener('pointerup',()=>drag=false);
-window.addEventListener('pagehide',()=>{if(url)URL.revokeObjectURL(url)});
+window.addEventListener('pagehide',()=>{if(url)URL.revokeObjectURL(url);releaseBuiltinTrack()});
 document.addEventListener('keydown',e=>{
   if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement?.tagName))return;
   if(e.code==='Space'){e.preventDefault();$('transport').click();}
