@@ -14,7 +14,7 @@ const canvas=$('dance-stage'),info=$('form-title'),bpmEl=$('bpm');
 const status=$('music-state'),announcer=$('announcer'),beatStatus=$('beat-status');
 const reduced=$('reduce-motion'),formationEl=$('formation'),intensity=$('intensity');
 const media=$('audio-player');media.preload='metadata';media.loop=false;
-let sourceUrl=null,ctx=null,analyser=null,clip=null,scene=null,engine=null,library=null;
+let clip=null,scene=null,engine=null,library=null;
 let dancers=[],clock=0,playing=true,lastTime=performance.now(),peak=0;
 let cues={bpm:120,beatOffset:0,events:[],track:'Ensaio rítmico sem áudio'};
 let activeForm='trio',errorState=false,previousForm=null,formationChangeAt=-999,lastCueFormation=null;
@@ -148,18 +148,11 @@ function applyPose(rig,pose){
   rig.knees[1].rotation.x=-pose.rightKnee*.72;
 }
 function updateMusicLabel(){
-  const track=media.src?('Faixa · '+(clip?.name||'importada')):'Ritmo silencioso';
+  const track=media.src?('Faixa · '+(clip?.name||'repertório oficial')):'Ritmo silencioso';
   status.textContent=track+(media.paused?' · pausada':' · tocando');
   $('audio-play').textContent=media.paused?'Reproduzir faixa':'Pausar faixa';
 }
-function energy(){
-  if(!analyser)return .5;
-  const data=new Uint8Array(analyser.frequencyBinCount);
-  analyser.getByteFrequencyData(data);
-  const take=Math.min(32,data.length);
-  let sum=0;for(let i=0;i<take;i++)sum+=data[i]/255;
-  return Math.min(1,sum/Math.max(1,take)*2.1);
-}
+function energy(){return .5;}
 function cueAt(t){
   // Binary search avoids rescanning every timestamp 60 times/second.
   const es=cues.events;
@@ -243,7 +236,7 @@ function init(){
       scene.render();
     });
     window.addEventListener('resize',()=>engine.resize());
-    window.addEventListener('pagehide',()=>{if(engine)engine.dispose();if(sourceUrl)URL.revokeObjectURL(sourceUrl)});
+    window.addEventListener('pagehide',()=>{if(engine)engine.dispose()});
     $('camera-reset').onclick=()=>{
       camera.alpha=-Math.PI/2;camera.beta=1.18;camera.radius=12;
       camera.setTarget(new Vector3(0,1.5,0));say('Câmera restaurada');
@@ -289,26 +282,6 @@ intensity.addEventListener('input',()=>{$('intensity-output').textContent=intens
 bpmEl.addEventListener('input',()=>{
   $('bpm-output').textContent=bpmEl.value+' BPM';cues.bpm=Number(bpmEl.value);
 });
-$('audio-file').addEventListener('change',e=>{
-  const file=e.target.files?.[0];
-  if(!file)return;
-  if(sourceUrl)URL.revokeObjectURL(sourceUrl);
-  sourceUrl=URL.createObjectURL(file);
-  media.pause();media.src=sourceUrl;media.load();
-  clip=file;$('audio-play').disabled=false;
-  clock=0;lastCueFormation=null;cues={bpm:Number(bpmEl.value),beatOffset:0,events:[],track:file.name};
-  updateMusicLabel();say('Faixa '+file.name+' carregada; clique para reproduzir');
-});
-$('cues-file').addEventListener('change',async e=>{
-  const file=e.target.files?.[0];if(!file)return;
-  try{
-    cues=normalizeCueSheet(JSON.parse(await file.text()));lastCueFormation=null;
-    bpmEl.value=String(Math.round(cues.bpm));
-    $('bpm-output').textContent=bpmEl.value+' BPM';
-    say('Marcadores carregados: '+cues.events.length+', '+cues.bpm+' BPM');
-  }catch(err){say('Erro nos marcadores: '+err.message)}
-});
-
 media.addEventListener('ended',()=>{media.pause();updateMusicLabel();say('Faixa encerrada')});
 media.addEventListener('play',updateMusicLabel);
 media.addEventListener('pause',updateMusicLabel);
