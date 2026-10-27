@@ -1,7 +1,7 @@
 /* Jazz e Metais / compatibilidade 2D: música e coreografia sem WebGL.
    Somente provisório; não representa o motor 3D Babylon. */
 import {PERFORMERS,danceFrame,normalizeCueSheet} from './dance-core.js';
-import {loadBuiltinTrack,releaseBuiltinTrack,BUILTIN_TRACK_NAME} from './builtin-track.js';
+import {initializeJukebox} from './jukebox-library.js';
 const $=id=>document.getElementById(id),canvas=$('dance-stage');
 const ctx=canvas.getContext('2d');
 if(!ctx){$('scene-error').hidden=false;throw new Error('Canvas indisponível');}
@@ -76,9 +76,14 @@ function draw(now){
   $('builtin-track-status').textContent='Não foi possível reproduzir a faixa. Verifique a conexão.';
   $('announcer').textContent='Erro no áudio da faixa selecionada.';
 });
+const jukebox=initializeJukebox({media,onSelected:({track,cues:markers})=>{
+  cues=normalizeCueSheet(markers);
+  $('bpm').value=String(cues.bpm);$('bpm').dispatchEvent(new Event('input'));
+  t=0;form='';
+  $('music-state').textContent=track.title+' · selecionada';
+  $('audio-play').disabled=false;
+},onAnnounce:text=>{$('announcer').textContent=text}});
 requestAnimationFrame(draw);
-// Pré-seleção não é reprodução automática.
-$('builtin-track').click();
 }
 $('formation').addEventListener('change',()=>{$('announcer').textContent='Formação: '+($('formation').selectedOptions[0]?.text||'')});
 $('intensity').addEventListener('input',()=>{$('intensity-output').textContent=$('intensity').value+'%'});
@@ -87,26 +92,6 @@ $('transport').addEventListener('click',()=>{
   playing=!playing;$('transport').textContent=playing?'Pausar dança':'Retomar dança';
   $('transport').setAttribute('aria-pressed',String(playing));if(!playing)media.pause();
 });
-$('builtin-track').addEventListener('click',async()=>{
-  const button=$('builtin-track'),label=$('builtin-track-status');
-  button.disabled=true;label.textContent='Preparando a faixa original…';
-  try{
-    const track=await loadBuiltinTrack();
-    media.pause();
-    if(url){URL.revokeObjectURL(url);url=null;}
-    media.src=track.objectUrl;media.load();
-    cues=normalizeCueSheet(track.cues);
-    $('bpm').value=String(cues.bpm);$('bpm').dispatchEvent(new Event('input'));
-    t=0;$('audio-play').disabled=false;
-    $('music-state').textContent=BUILTIN_TRACK_NAME+' · pronta para reproduzir';
-    label.textContent='Arquivo oficial selecionado · 132 BPM · pronto para reproduzir';
-    button.textContent='Recarregar O Baile dos Elétrons';
-    $('announcer').textContent='O Baile dos Elétrons carregado. Clique em Reproduzir faixa.';
-  }catch(error){
-    label.textContent='Falha ao carregar a faixa: '+error.message;
-    $('announcer').textContent=label.textContent;console.error(error);
-  }finally{button.disabled=false;}
-});
 $('audio-file').addEventListener('change',e=>{
   const f=e.target.files?.[0];if(!f)return;
   if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);
@@ -114,12 +99,7 @@ $('audio-file').addEventListener('change',e=>{
   cues={bpm:Number($('bpm').value),beatOffset:0,events:[],track:f.name};
   $('audio-play').disabled=false;$('music-state').textContent=f.name+' · pronto para reproduzir';
 });
-$('audio-play').addEventListener('click',async()=>{
-  try{
-    if(media.paused){playing=true;await media.play();$('audio-play').textContent='Pausar faixa'}
-    else{media.pause();$('audio-play').textContent='Reproduzir faixa'}
-  }catch(e){$('announcer').textContent='Não foi possível tocar a faixa: '+e.message}
-});
+
 $('cues-file').addEventListener('change',async e=>{
   try{const f=e.target.files?.[0];if(!f)return;cues=normalizeCueSheet(JSON.parse(await f.text()));
     $('bpm').value=cues.bpm;$('bpm').dispatchEvent(new Event('input'));$('announcer').textContent='Marcadores carregados';}
@@ -133,7 +113,7 @@ $('fullscreen').addEventListener('click',async()=>{
 canvas.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;canvas.setPointerCapture(e.pointerId)});
 canvas.addEventListener('pointermove',e=>{if(drag){pan+=(e.clientX-lastX)*.007;lastX=e.clientX}});
 canvas.addEventListener('pointerup',()=>drag=false);
-window.addEventListener('pagehide',()=>{if(url)URL.revokeObjectURL(url);releaseBuiltinTrack()});
+window.addEventListener('pagehide',()=>{if(url)URL.revokeObjectURL(url)});
 document.addEventListener('keydown',e=>{
   if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement?.tagName))return;
   if(e.code==='Space'){e.preventDefault();$('transport').click();}
