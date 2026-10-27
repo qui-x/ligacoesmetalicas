@@ -9,6 +9,7 @@ export function initializeJukebox({media,onSelected,onAnnounce=()=>{}}){
   const badge=$('jukebox-count'),status=$('jukebox-status'),indicator=$('jukebox-mini-title');
   const play=$('audio-play'),volume=$('jukebox-volume'),toggle=$('jukebox-toggle');
   let tracks=[],active=null,request=0,open=false,focusBefore=null,focusSceneFn=null;
+  let triedOgg=false,requestedPlayback=false;
   media.volume=Number(volume.value)/100;
   const tell=value=>{status.textContent=value;onAnnounce(value)};
   const emit=(type,detail)=>document.dispatchEvent(new CustomEvent('jazz:jukebox:'+type,{detail}));
@@ -53,10 +54,22 @@ export function initializeJukebox({media,onSelected,onAnnounce=()=>{}}){
   filter.addEventListener('input',render);group.addEventListener('change',render);
   volume.addEventListener('input',()=>{media.volume=Number(volume.value)/100;
     $('jukebox-volume-output').textContent=volume.value+'%'});
-  media.addEventListener('play',()=>{play.textContent='Pausar música';renderPlay()});
+  media.addEventListener('play',()=>{requestedPlayback=true;play.textContent='Pausar música';renderPlay()});
   media.addEventListener('pause',()=>{play.textContent='Reproduzir música';renderPlay()});
   media.addEventListener('ended',()=>{renderPlay();tell('Faixa encerrada. Selecione outro disco.')});
-  media.addEventListener('error',()=>{if(active)tell('Não foi possível reproduzir '+active.title+'. Confira o áudio publicado.')});
+  media.addEventListener('error',()=>{
+    if(!active)return;
+    if(!triedOgg && active.ogg && media.src!==active.ogg){
+      triedOgg=true;
+      tell('Não foi possível carregar o MP3. Tentando o formato OGG...');
+      const resume=requestedPlayback;
+      media.src=active.ogg;
+      media.load();
+      if(resume)media.play().catch(()=>tell('Áudio alternativo pronto. Clique em Reproduzir música.'));
+      return;
+    }
+    tell('O áudio deste disco não carregou. Confira a conexão e tente novamente.');
+  });
   function renderPlay(){const title=active?.title||'Nenhum disco selecionado';
     indicator.textContent=title;now.textContent=title;
     $('jukebox-disc').classList.toggle('turning',!media.paused&&!!media.src)}
@@ -64,12 +77,19 @@ export function initializeJukebox({media,onSelected,onAnnounce=()=>{}}){
     const track=tracks.find(t=>t.number===Number(number));
     if(!track)throw new Error('Disco não encontrado: '+number);
     const ticket=++request;active=track;
-    media.pause();media.src=track.mp3;media.load();
+    media.pause();triedOgg=false;requestedPlayback=autoplay;
+    const support=media.canPlayType?.('audio/mpeg')??'probably';
+    if(support===''&&track.ogg)triedOgg=true;
+    media.src=triedOgg?track.ogg:track.mp3;
+    media.load();
     // Sinalizar o novo disco antes de aguardar a rede: o relógio de dança
     // não deve ser reiniciado depois do áudio ter começado a tocar.
     onSelected({track,cues:{title:track.title,bpm:track.bpm,beatOffset:0,events:[]},phase:'selected'});
     // Call media.play() synchronously before the first await: browser gesture.
-    const playback=autoplay?media.play().catch(error=>tell('Reprodução bloqueada: '+error.message)):null;
+    const playback=autoplay?media.play().catch(error=>{
+      // O evento media.error tentará o arquivo OGG se o MP3 não puder carregar.
+      if(!media.error)tell('Reprodução bloqueada: '+error.message);
+    }):null;
     now.textContent=track.title;indicator.textContent=track.title;
     $('jukebox-now-collection').textContent=track.collection;
     $('jukebox-now-bpm').textContent=track.bpm+' BPM';
@@ -96,8 +116,9 @@ export function initializeJukebox({media,onSelected,onAnnounce=()=>{}}){
   }
   play.addEventListener('click',async()=>{
     if(!active){if(tracks[0])await select(tracks[0].number,{play:true});return;}
-    if(media.paused){try{await media.play()}catch(error){tell('Não foi possível tocar a música: '+error.message)}}
-    else media.pause();
+    if(media.paused){requestedPlayback=true;try{await media.play()}catch(error){
+      if(!media.error)tell('Não foi possível tocar a música: '+error.message);
+    }} else{requestedPlayback=false;media.pause();}
   });
   $('jukebox-prev').addEventListener('click',()=>{
     if(!tracks.length)return;
