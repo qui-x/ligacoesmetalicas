@@ -7,6 +7,39 @@ export async function buildJukeboxInScene(scene,canvas,library){
   const {MeshBuilder,TransformNode,Vector3,StandardMaterial,Color3,DynamicTexture,SceneLoader}=B;
   const root=new TransformNode('Jazz1925Jukebox',scene);
   root.position.set(4.65,0,3.2);
+  const camera=scene.activeCamera;
+  const savedCamera=camera?{
+    alpha:camera.alpha,beta:camera.beta,radius:camera.radius,
+    target:camera.target.clone()
+  }:null;
+  let focused=false,cameraDestination=null;
+  const cameraObserver=scene.onBeforeRenderObservable.add(()=>{
+    if(!camera||!cameraDestination)return;
+    const t=Math.min(.22,scene.getEngine().getDeltaTime()/220);
+    camera.alpha+=(cameraDestination.alpha-camera.alpha)*t;
+    camera.beta+=(cameraDestination.beta-camera.beta)*t;
+    camera.radius+=(cameraDestination.radius-camera.radius)*t;
+    const next=Vector3.Lerp(camera.target,cameraDestination.target,t);
+    camera.setTarget(next);
+    if(Math.abs(camera.radius-cameraDestination.radius)<.006 &&
+       Vector3.Distance(camera.target,cameraDestination.target)<.009)
+      cameraDestination=null;
+  });
+  function focus(){
+    if(!camera)return;
+    focused=true;
+    cameraDestination={
+      alpha:-Math.PI/2,beta:1.32,radius:3.7,
+      target:new Vector3(root.position.x,1.7,root.position.z)
+    };
+    document.querySelector('#jukebox-scene-open').textContent='Inspecionando o fonógrafo';
+  }
+  function restoreCamera(){
+    focused=false;
+    if(savedCamera)cameraDestination={...savedCamera};
+    document.querySelector('#jukebox-scene-open').textContent='Ver visor no fonógrafo';
+  }
+  library.registerSceneFocus(()=>focused?restoreCamera():focus());
   const wood=new StandardMaterial('CabinetFallbackMahogany',scene);
   wood.diffuseColor=Color3.FromHexString('#542b1d');wood.specularColor=Color3.FromHexString('#825332');
   const brass=new StandardMaterial('CabinetFallbackBrass',scene);
@@ -101,6 +134,7 @@ export async function buildJukeboxInScene(scene,canvas,library){
     if(!pick?.hit||!pick.pickedMesh)return;
     let mesh=pick.pickedMesh;
     while(mesh&&mesh!==root){
+      if(mesh.name.startsWith('JB_')&&!focused){focus();return}
       if(mesh===screen||mesh.name.includes('JB_SELECTION_WINDOW')){selectFromGlass(pick);return}
       if(mesh.name.startsWith('JB_PREV')){page=Math.max(0,page-1);draw();return}
       if(mesh.name.startsWith('JB_NEXT')){page=(page+1)%Math.max(1,Math.ceil(library.state().tracks.length/5));draw();return}
@@ -114,7 +148,11 @@ export async function buildJukeboxInScene(scene,canvas,library){
     const loaded=await SceneLoader.ImportMeshAsync('','./assets/','jukebox-1925.glb',scene);
     const glass=loaded.meshes.find(m=>m.name==='JB_SELECTION_WINDOW_1925');
     if(!glass)throw new Error('Modelo sem visor físico selecionável');
-    for(const m of loaded.meshes)if(!m.parent)m.parent=root;
+    // Blender Z-up is converted to glTF Y-up, but Blender's negative Y
+    // (cabinet front) becomes positive glTF Z. Rotate 180° to face the stage.
+    const blenderRoot=new TransformNode('JB_BLENDER_ORIENTATION_1925',scene);
+    blenderRoot.parent=root;blenderRoot.rotation.y=Math.PI;
+    for(const m of loaded.meshes)if(!m.parent)m.parent=blenderRoot;
     glass.material=screenMaterial;glass.isPickable=true;
     loaded.meshes.forEach(m=>{if(m.name.startsWith('JB_'))m.isPickable=true});
     fallback.forEach(m=>m.dispose());
@@ -124,6 +162,8 @@ export async function buildJukeboxInScene(scene,canvas,library){
     console.info('Jukebox Blender GLB indisponível; gabinete 3D provisório ativo:',error.message);
   }
   return {root,draw,isBlenderModel:()=>usingBlender,
+    focus,restoreCamera,
     dispose:()=>{scene.onPointerObservable.remove(pointerObserver);
+      scene.onBeforeRenderObservable.remove(cameraObserver);
       document.removeEventListener('jazz:jukebox:ready',redraw);root.dispose()}};
 }
