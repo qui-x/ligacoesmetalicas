@@ -43,6 +43,11 @@ test('interpolacao musical utiliza os 288 pulsos e todas as 6 secoes',()=>{
    ['trio','linha','pares','roda','troca']);
  assert.equal(adapted.events[0].time,0);
 });
+test('nomes originais com acentos e espaços permanecem íntegros',()=>{
+ assert.equal(tracks[0].mp3.endsWith('/faixas/01/O%20Baile%20dos%20El%C3%A9trons.mp3'),true);
+ assert.equal(tracks[1].cues.endsWith('/faixas/02/Corrente%20no%20Cabar%C3%A9.json'),true);
+ assert.equal(decodeURIComponent(tracks[0].mp3).split('/').at(-1),'O Baile dos Elétrons.mp3');
+});
 test('rejeita caminhos do catalogo que escapem da biblioteca',()=>{
  assert.throws(()=>catalogueEntries({faixas:[{numero:1,titulo:'Teste',bpm:120,
    arquivos:{mp3:'../../password.mp3',sincronizacao:'faixas/01/ok.json'}}]}),
