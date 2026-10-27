@@ -282,9 +282,6 @@ intensity.addEventListener('input',()=>{$('intensity-output').textContent=intens
 bpmEl.addEventListener('input',()=>{
   $('bpm-output').textContent=bpmEl.value+' BPM';cues.bpm=Number(bpmEl.value);
 });
-media.addEventListener('ended',()=>{media.pause();updateMusicLabel();say('Faixa encerrada')});
-media.addEventListener('play',updateMusicLabel);
-media.addEventListener('pause',updateMusicLabel);
 media.addEventListener('seeked',()=>{clock=media.currentTime;lastCueFormation=null;});
 reduced.addEventListener('change',()=>say(reduced.checked?'Movimento reduzido ativado':'Movimento reduzido desativado'));
 $('fullscreen').addEventListener('click',async()=>{
@@ -304,11 +301,6 @@ document.addEventListener('keydown',e=>{
 media.addEventListener('play',()=>{playing=true;lastTime=performance.now();updateMusicLabel()});
 media.addEventListener('pause',updateMusicLabel);
 media.addEventListener('ended',()=>{playing=false;updateMusicLabel();say('Música concluída')});
-media.addEventListener('error',()=>{
-  const label=$('jukebox-status');
-  if(label)label.textContent='Não foi possível reproduzir este disco. Verifique sua conexão.';
-  say('Erro no áudio da faixa selecionada.');
-});
 library=initializeJukebox({media,onSelected:({track,cues:markers,phase})=>{
   cues=normalizeCueSheet(markers);
   clip={name:track.title};
