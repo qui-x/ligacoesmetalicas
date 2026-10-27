@@ -76,10 +76,11 @@ function draw(now){
   $('jukebox-status').textContent='Não foi possível reproduzir a faixa. Verifique a conexão.';
   $('announcer').textContent='Erro no áudio da faixa selecionada.';
 });
-const jukebox=initializeJukebox({media,onSelected:({track,cues:markers})=>{
+const jukebox=initializeJukebox({media,onSelected:({track,cues:markers,phase})=>{
   cues=normalizeCueSheet(markers);
   $('bpm').value=String(cues.bpm);$('bpm').dispatchEvent(new Event('input'));
-  t=0;form='';
+  if(phase==='selected'){t=0;form='';}
+  else t=media.currentTime;
   $('music-state').textContent=track.title+' · selecionada';
   $('audio-play').disabled=false;
 },onAnnounce:text=>{$('announcer').textContent=text}});
