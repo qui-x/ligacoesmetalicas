@@ -32,6 +32,26 @@ try{
  await page.waitForFunction(()=>document.querySelectorAll('#jukebox-list li').length===30,
    undefined,{timeout:20000});
  assert.equal(await page.locator('#jukebox-drawer').getAttribute('hidden'),null);
+ assert.equal(await page.locator('input[type="file"]').count(),0,
+   'A interface não pode pedir importação de músicas ou JSON');
+ // A fonte deve ser o MP3 já publicado na pasta oficial do repositório.
+ const audio=page.locator('#audio-player');
+ await page.waitForFunction(()=>Boolean(document.querySelector('#audio-player')?.src),
+   undefined,{timeout:15000});
+ const firstSource=await audio.evaluate(el=>decodeURIComponent(el.src));
+ assert(firstSource.endsWith('/faixas/01/O Baile dos Elétrons.mp3'),firstSource);
+ // O gesto real de clique precisa tirar o elemento de audio do estado de pausa.
+ await page.locator('#audio-play').click();
+ await page.waitForFunction(()=>{
+   const el=document.querySelector('#audio-player');
+   return el && !el.paused && !el.error && el.readyState>=2;
+ },undefined,{timeout:20000});
+ const t0=await audio.evaluate(el=>el.currentTime);
+ await page.waitForTimeout(950);
+ const t1=await audio.evaluate(el=>el.currentTime);
+ assert(t1>t0+.2,'MP3 oficial selecionado não está avançando');
+ await page.locator('#audio-play').click();
+ assert(await audio.evaluate(el=>el.paused),'Pausa do player falhou');
  const labels=await page.locator('#jukebox-list li').allTextContents();
  assert(labels[0].includes('O Baile dos Elétrons'));
  assert(labels.at(-1).includes('Grande Orquestra'));
@@ -39,6 +59,11 @@ try{
  assert.equal(await page.locator('#jukebox-list li').count(),1);
  await page.locator('#jukebox-filter').fill('');
  await page.locator('#jukebox-list button[data-track="2"]').click();
+ await page.waitForFunction(()=>{
+   const el=document.querySelector('#audio-player');
+   return el?.src?.includes('Corrente') && !el.paused && !el.error && el.readyState>=2;
+ },undefined,{timeout:20000});
+ await audio.evaluate(el=>el.pause());
  await page.waitForFunction(()=>document.querySelector('#jukebox-current-title').textContent.includes('Corrente no Cabaré'),
   undefined,{timeout:15000});
  assert.equal(await page.locator('#bpm-output').textContent(),'138 BPM');
