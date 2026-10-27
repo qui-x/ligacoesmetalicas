@@ -9,6 +9,7 @@ export function initializeJukebox({media,onSelected,onAnnounce=()=>{}}){
   const badge=$('jukebox-count'),status=$('jukebox-status'),indicator=$('jukebox-mini-title');
   const play=$('audio-play'),volume=$('jukebox-volume'),toggle=$('jukebox-toggle');
   let tracks=[],active=null,request=0,open=false,focusBefore=null;
+  media.volume=Number(volume.value)/100;
   const tell=value=>{status.textContent=value;onAnnounce(value)};
   const emit=(type,detail)=>document.dispatchEvent(new CustomEvent('jazz:jukebox:'+type,{detail}));
   const state=()=>({tracks:tracks.map(t=>({number:t.number,title:t.title,bpm:t.bpm,collection:t.collection})),
@@ -95,8 +96,18 @@ export function initializeJukebox({media,onSelected,onAnnounce=()=>{}}){
     if(media.paused){try{await media.play()}catch(error){tell('Não foi possível tocar a música: '+error.message)}}
     else media.pause();
   });
-  $('jukebox-prev').addEventListener('click',()=>select(tracks[(Math.max(0,tracks.indexOf(active))-1+tracks.length)%tracks.length]?.number,{play:!media.paused}));
-  $('jukebox-next').addEventListener('click',()=>select(tracks[(Math.max(0,tracks.indexOf(active))+1)%tracks.length]?.number,{play:!media.paused}));
+  $('jukebox-prev').addEventListener('click',()=>{
+    if(!tracks.length)return;
+    const idx=active?tracks.indexOf(active):0;
+    select(tracks[(idx-1+tracks.length)%tracks.length].number,{play:!media.paused})
+      .catch(error=>tell(error.message));
+  });
+  $('jukebox-next').addEventListener('click',()=>{
+    if(!tracks.length)return;
+    const idx=active?tracks.indexOf(active):-1;
+    select(tracks[(idx+1)%tracks.length].number,{play:!media.paused})
+      .catch(error=>tell(error.message));
+  });
   const ready=(async()=>{
     try{
       const response=await fetch(catalogueURL);
