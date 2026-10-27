@@ -38,3 +38,13 @@
 @media print{#workspace-overview{overflow:visible}.silm-comparison-controls>div{display:none}.silm-comparison-cards article{break-inside:avoid}}
 
 .silm-comparison-controls,.silm-comparison-help{margin-bottom:12px}.silm-comparison-controls>summary,.silm-comparison-help>summary{min-height:44px;padding:10px 12px;box-sizing:border-box;cursor:pointer;border:1px solid var(--border);border-radius:10px;background:var(--panel);font-size:.875rem}.silm-comparison-controls>summary:focus-visible,.silm-comparison-help>summary:focus-visible{outline:3px solid var(--ring)}
+/* Comparação: a estrutura ocupa o primeiro plano; a documentação abre sob demanda. */
+#workspace-overview>h2{font-size:1.125rem;margin:8px 0 12px;line-height:1.4}
+#silm-comparison-items{padding:0;max-height:none;overflow:visible}
+.silm-comparison-cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));align-items:start}
+.silm-comparison-cards article>p{margin:4px 0 8px;font-size:.8125rem}
+.silm-comparison-stage{width:100%;max-width:300px;margin:0 auto;aspect-ratio:300/230}
+.silm-comparison-reference{border-top:1px solid var(--border);margin-top:8px}
+.silm-comparison-reference summary{min-height:44px;padding:10px 0;box-sizing:border-box;font-size:.8125rem;cursor:pointer;color:var(--muted)}
+.silm-comparison-reference p{margin:4px 0;font-size:.8125rem}
+@media(min-width:901px){.silm-comparison-controls,.silm-comparison-help{max-width:900px}.silm-comparison-controls>div{grid-template-columns:minmax(100px,.6fr) minmax(150px,1fr)}}
