@@ -336,10 +336,14 @@ media.addEventListener('error',()=>{
   if(label)label.textContent='Não foi possível reproduzir este disco. Verifique sua conexão.';
   say('Erro no áudio da faixa selecionada.');
 });
-library=initializeJukebox({media,onSelected:({track,cues:markers})=>{
+library=initializeJukebox({media,onSelected:({track,cues:markers,phase})=>{
   cues=normalizeCueSheet(markers);
   clip={name:track.title};
-  clock=0;lastCueFormation=null;previousForm=null;formationChangeAt=-999;
+  if(phase==='selected'){
+    clock=0;lastCueFormation=null;previousForm=null;formationChangeAt=-999;
+  } else {
+    clock=media.currentTime;lastCueFormation=null;
+  }
   bpmEl.value=String(cues.bpm);
   $('bpm-output').textContent=cues.bpm+' BPM';
   $('audio-play').disabled=false;
