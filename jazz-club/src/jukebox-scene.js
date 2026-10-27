@@ -13,6 +13,7 @@ export async function buildJukeboxInScene(scene,canvas,library){
     target:camera.target.clone()
   }:null;
   let focused=false,cameraDestination=null;
+  const defaultMinRadius=camera?.lowerRadiusLimit??7;
   const cameraObserver=scene.onBeforeRenderObservable.add(()=>{
     if(!camera||!cameraDestination)return;
     const t=Math.min(.22,scene.getEngine().getDeltaTime()/220);
@@ -22,12 +23,16 @@ export async function buildJukeboxInScene(scene,canvas,library){
     const next=Vector3.Lerp(camera.target,cameraDestination.target,t);
     camera.setTarget(next);
     if(Math.abs(camera.radius-cameraDestination.radius)<.006 &&
-       Vector3.Distance(camera.target,cameraDestination.target)<.009)
+       Vector3.Distance(camera.target,cameraDestination.target)<.009){
       cameraDestination=null;
+      if(!focused)camera.lowerRadiusLimit=defaultMinRadius;
+    }
   });
   function focus(){
     if(!camera)return;
     focused=true;
+    // A distância mínima do passeio (7 m) impediria ler o visor em detalhe.
+    camera.lowerRadiusLimit=2.9;
     cameraDestination={
       alpha:-Math.PI/2,beta:1.32,radius:3.7,
       target:new Vector3(root.position.x,1.7,root.position.z)
