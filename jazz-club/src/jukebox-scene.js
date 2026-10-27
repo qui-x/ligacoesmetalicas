@@ -65,6 +65,11 @@ export async function buildJukeboxInScene(scene,canvas,library){
   box('JB_LOWER_PANEL_FALLBACK_1925',[1.15,.48,.09],[0,.67,-.465],black);
   box('JB_CONTROLS_FALLBACK_1925',[1.10,.24,.10],[0,1.07,-.48],brass);
   box('JB_ROOF_FALLBACK_1925',[1.66,.19,1.00],[0,2.88,0],brass);
+  for(const [name,x] of [['JB_PREV_1925',-.40],['JB_PLAY_1925',0],['JB_NEXT_1925',.40]]){
+    const key=MeshBuilder.CreateCylinder(name,{diameter:.145,height:.09,tessellation:20},scene);
+    key.parent=root;key.position.set(x,1.04,-.59);key.rotation.x=Math.PI/2;
+    key.material=brass;key.isPickable=true;fallback.push(key);
+  }
   screen=MeshBuilder.CreatePlane('JB_SELECTION_WINDOW_1925',{width:1.08,height:1.26},scene);
   screen.parent=root;screen.position.set(0,1.96,-.55);
   screen.material=screenMaterial;screen.isPickable=true;fallback.push(screen);
@@ -128,6 +133,13 @@ export async function buildJukeboxInScene(scene,canvas,library){
     try{await library.select(item.number,{play:true})}
     catch(error){console.warn('Jukebox não conseguiu selecionar disco:',error);library.open();}
   }
+  function selectRelative(delta){
+    const collection=library.state().tracks;
+    if(!collection.length)return;
+    const index=collection.findIndex(t=>t.number===library.state().selected);
+    const selected=collection[((index<0?0:index)+delta+collection.length)%collection.length];
+    library.select(selected.number,{play:true}).catch(error=>console.warn('Jukebox:',error));
+  }
   const pointerObserver=scene.onPointerObservable.add(info=>{
     if(info.type!==B.PointerEventTypes.POINTERPICK)return;
     const pick=info.pickInfo;
@@ -136,8 +148,9 @@ export async function buildJukeboxInScene(scene,canvas,library){
     while(mesh&&mesh!==root){
       if(mesh.name.startsWith('JB_')&&!focused){focus();return}
       if(mesh===screen||mesh.name.includes('JB_SELECTION_WINDOW')){selectFromGlass(pick);return}
-      if(mesh.name.startsWith('JB_PREV')){page=Math.max(0,page-1);draw();return}
-      if(mesh.name.startsWith('JB_NEXT')){page=(page+1)%Math.max(1,Math.ceil(library.state().tracks.length/5));draw();return}
+      if(mesh.name.startsWith('JB_PREV')){selectRelative(-1);return}
+      if(mesh.name.startsWith('JB_NEXT')){selectRelative(1);return}
+      if(mesh.name.startsWith('JB_PLAY')){document.querySelector('#audio-play').click();return}
       if(mesh.name.startsWith('JB_')||mesh.name.includes('Jukebox')){library.open();return}
       mesh=mesh.parent;
     }
