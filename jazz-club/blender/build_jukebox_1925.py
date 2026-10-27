@@ -95,7 +95,7 @@ def cabinet():
     for x,label in [(-.42,'JB_PREV_1925'),(.42,'JB_NEXT_1925')]:
         cylinder(label,(x,-.618,1.01),.092,.060,lacquer,32,(math.pi/2,0,0))
         cylinder(label+'_EDGE',(x,-.655,1.01),.061,.018,brassLight,32,(math.pi/2,0,0))
-    cylinder('JB_MAIN_PLAY_1925',(0,-.628,1.01),.13,.07,brassLight,40,(math.pi/2,0,0))
+    cylinder('JB_PLAY_1925',(0,-.628,1.01),.13,.07,brassLight,40,(math.pi/2,0,0))
     cube('JB_COIN_SLOT_BRASS_1925',(0,-.50,.72),(.34,.04,.155),brass,.014)
     cube('JB_COIN_BLACK_1925',(0,-.526,.725),(.18,.013,.021),lacquer,.003)
     # Fan-shaped acoustic grille, historical automatic phonograph language
@@ -115,9 +115,10 @@ def main():
     if len(args)!=1:raise SystemExit('Blender: provide output GLB after --')
     target=Path(args[0]).resolve();target.parent.mkdir(parents=True,exist_ok=True)
     screen=cabinet()
+    bpy.ops.wm.save_as_mainfile(filepath=str(target.with_suffix('.blend')),compress=True)
     # Export all meshes/text, including UVs/materials and selectable mesh name.
     bpy.ops.export_scene.gltf(filepath=str(target),export_format='GLB',export_apply=True,
          export_materials='EXPORT',export_extras=True)
     assert target.exists() and target.stat().st_size>10000
-    print('JAZZ_JUKEBOX_1925_READY',target,target.stat().st_size,screen.name)
+    print('JAZZ_JUKEBOX_1925_READY',target,target.stat().st_size,screen.name,target.with_suffix('.blend'))
 if __name__=='__main__':main()
