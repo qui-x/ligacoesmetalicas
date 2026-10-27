@@ -47,23 +47,28 @@ jobs:
           names={n.get('name') for n in payload.get('nodes',[])}
           assert 'JB_SELECTION_WINDOW_1925' in names,names
           assert 'JB_CABINET_BODY_1925' in names
+          for control in ('JB_PREV_1925','JB_NEXT_1925','JB_PLAY_1925'):
+            assert control in names, control+' ausente no GLB'
+          assert f.with_suffix('.blend').is_file(), 'Arquivo nativo Blender ausente'
           print('BLENDER_JUKEBOX_READY',len(raw),'bytes',len(payload.get('meshes',[])),'meshes')
           PY
       - name: Entregar GLB Blender e SHA256 como artefato
         uses: actions/upload-artifact@v4
         with:
           name: jazz-fonografo-blender-1925-${{ github.run_number }}
-          path: jazz-club/assets/jukebox-1925.glb
+          path: |
+            jazz-club/assets/jukebox-1925.glb
+            jazz-club/assets/jukebox-1925.blend
           retention-days: 20
       - name: Publicar modelo Blender para a cena da main
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add jazz-club/assets/jukebox-1925.glb
+          git add jazz-club/assets/jukebox-1925.glb jazz-club/assets/jukebox-1925.blend
           if git diff --cached --quiet; then
             echo 'GLB unchanged; no commit needed'
           else
-            git commit -m 'build(jazz): publicar gabinete 1925 modelado no Blender'
+            git commit -m 'build(jazz): publicar modelo Blender nativo e GLB do fonografo'
             git pull --rebase origin main
             git push origin HEAD:main
           fi
