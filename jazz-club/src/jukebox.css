@@ -52,10 +52,6 @@
 .record-details strong{font:.86rem/1.15 Georgia,serif;overflow-wrap:anywhere}
 .record-details small{font:.62rem/1.2 system-ui,sans-serif;color:#655246}
 .record-bpm{font:.71rem system-ui,sans-serif;white-space:nowrap;color:#6b4d32}
-.jukebox-import{border-top:1px solid #b18c536e;margin-top:17px;padding-top:12px;color:#e7d2a5;font-size:.75rem}
-.jukebox-import summary{cursor:pointer;font-weight:700}
-.jukebox-import label{display:block;margin:11px 0}
-.jukebox-import input{display:block;max-width:100%;font-size:.7rem;margin-top:6px}
 .jukebox-note{color:#cbb9a0;font-size:.7rem;line-height:1.45;margin-top:12px}
 #dance-controls{right:auto!important;left:20px;bottom:20px;width:min(300px,31vw);max-height:42vh;padding:14px 17px}
 #dance-controls .control-heading{margin-bottom:8px}
