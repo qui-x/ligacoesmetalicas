@@ -98,10 +98,6 @@ document.addEventListener('keydown',e=>{
     $('formation').value=['trio','pares','roda','linha','troca'][Number(e.key)-1];
     $('formation').dispatchEvent(new Event('change'));}
 });
-media.addEventListener('error',()=>{
-  $('jukebox-status').textContent='Não foi possível reproduzir a faixa. Verifique a conexão.';
-  $('announcer').textContent='Erro no áudio da faixa selecionada.';
-});
 const jukebox=initializeJukebox({media,onSelected:({track,cues:markers,phase})=>{
   cues=normalizeCueSheet(markers);
   $('bpm').value=String(cues.bpm);$('bpm').dispatchEvent(new Event('input'));
