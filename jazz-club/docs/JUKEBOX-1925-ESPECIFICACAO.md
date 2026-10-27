@@ -9,7 +9,7 @@ Criar um **gabinete fonográfico cênico** de inspiração anos 1920, integrado 
 
 A interface musical deve ter **um único catálogo e um único player** em dois modos equivalentes:
 1. **Modelo 3D Blender/Babylon.js:** seleção por visor físico, botão anterior, próximo e reproduzir/pausar. Um clique inicial no gabinete enquadra o visor com a câmera; novo clique na superfície escolhe uma faixa. O botão de cena alterna entre foco do gabinete e enquadramento anterior.
-2. **Painel lateral HTML acessível:** busca, filtro de coleção, lista com 30 discos, volume, player nativo, importação de arquivo externo, teclado e modo móvel. Serve também como alternativa quando WebGL estiver indisponível.
+2. **Painel lateral HTML acessível:** busca, filtro de coleção, lista com 30 discos, volume, player nativo, controle de reprodução, teclado e modo móvel. Serve também como alternativa quando WebGL estiver indisponível.
 
 ## 2. Modelo autoral Blender e nomes obrigatórios
 **Fonte editável:** `jazz-club/blender/build_jukebox_1925.py`.  
@@ -79,3 +79,11 @@ Dados por disco:
 
 ## 7. Próximos incrementos (após homologação)
 Melhorar o giro/elevação da câmera e a leitura do visor em dispositivos pequenos; adicionar transições de luz de acordo com seções musicais; modular figurino/público; continuar direção de arte sem bloquear funcionalidade. Mantém-se o princípio: dança é metáfora artística, **não simulação de movimento físico de elétrons**.
+
+## Atualização — 27/10/2026: biblioteca integrada (sem importação)
+- Os controles de envio de MP3/OGG/WAV e JSON foram retirados de `jazz-club/index.html` e dos controladores 3D/2D.
+- Os 30 discos são obtidos exclusivamente do `catalogo.json`, com caminhos reais incluindo espaços e acentos.
+- O player prioriza MP3, usando o OGG original da mesma composição como alternativa de formato quando necessário.
+- A seleção carrega os marcadores sem impedir o início da reprodução por clique.
+- O relógio da dança utiliza `audio.currentTime`; não se altera BPM manualmente ao escolher uma faixa.
+- Testes de navegador agora exigem carregamento e avanço do relógio do áudio oficial e ausência de campos de importação.
