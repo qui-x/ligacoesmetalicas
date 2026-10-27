@@ -8,7 +8,7 @@ export function initializeJukebox({media,onSelected,onAnnounce=()=>{}}){
   const group=$('jukebox-collection'),now=$('jukebox-current-title');
   const badge=$('jukebox-count'),status=$('jukebox-status'),indicator=$('jukebox-mini-title');
   const play=$('audio-play'),volume=$('jukebox-volume'),toggle=$('jukebox-toggle');
-  let tracks=[],active=null,request=0,open=false,focusBefore=null;
+  let tracks=[],active=null,request=0,open=false,focusBefore=null,focusSceneFn=null;
   media.volume=Number(volume.value)/100;
   const tell=value=>{status.textContent=value;onAnnounce(value)};
   const emit=(type,detail)=>document.dispatchEvent(new CustomEvent('jazz:jukebox:'+type,{detail}));
@@ -21,7 +21,7 @@ export function initializeJukebox({media,onSelected,onAnnounce=()=>{}}){
     emit('open',{open});
   }
   toggle.addEventListener('click',()=>setOpen(!open));
-  $('jukebox-scene-open').addEventListener('click',()=>setOpen(!open));
+  $('jukebox-scene-open').addEventListener('click',()=>{if(focusSceneFn)focusSceneFn();else setOpen(true)});
   $('jukebox-close').addEventListener('click',()=>setOpen(false));
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&open){e.preventDefault();setOpen(false)}});
   function render(){
@@ -45,7 +45,7 @@ export function initializeJukebox({media,onSelected,onAnnounce=()=>{}}){
       details.append(title,subtitle);
       const tempo=document.createElement('span');tempo.className='record-bpm';tempo.textContent=track.bpm+' BPM';
       button.append(serial,details,tempo);
-      button.addEventListener('click',()=>select(track.number,{play:true}));
+      button.addEventListener('click',()=>select(track.number,{play:true}).catch(error=>tell(error.message)));
       item.append(button);list.append(item);
     }
     badge.textContent=shown.length+' / '+tracks.length+' discos';
@@ -65,6 +65,9 @@ export function initializeJukebox({media,onSelected,onAnnounce=()=>{}}){
     if(!track)throw new Error('Disco não encontrado: '+number);
     const ticket=++request;active=track;
     media.pause();media.src=track.mp3;media.load();
+    // Sinalizar o novo disco antes de aguardar a rede: o relógio de dança
+    // não deve ser reiniciado depois do áudio ter começado a tocar.
+    onSelected({track,cues:{title:track.title,bpm:track.bpm,beatOffset:0,events:[]},phase:'selected'});
     // Call media.play() synchronously before the first await: browser gesture.
     const playback=autoplay?media.play().catch(error=>tell('Reprodução bloqueada: '+error.message)):null;
     now.textContent=track.title;indicator.textContent=track.title;
@@ -82,11 +85,11 @@ export function initializeJukebox({media,onSelected,onAnnounce=()=>{}}){
       const raw=await response.json();
       if(ticket!==request)return;
       const cues=cuesForTrack(raw,track);
-      onSelected({track,cues});
+      onSelected({track,cues,phase:'markers'});
       tell(track.title+' · '+track.bpm+' BPM · '+cues.events.length+' marcações');
     }catch(error){
       if(ticket!==request)return;
-      onSelected({track,cues:{bpm:track.bpm,beatOffset:0,events:[],title:track.title}});
+      onSelected({track,cues:{bpm:track.bpm,beatOffset:0,events:[],title:track.title},phase:'markers'});
       tell('Música selecionada; marcadores indisponíveis: '+error.message);
     }
     if(playback)await playback;
@@ -123,5 +126,5 @@ export function initializeJukebox({media,onSelected,onAnnounce=()=>{}}){
     }catch(error){tell('Não foi possível carregar o catálogo: '+error.message);throw error;}
   })();
   return {ready,select,open:()=>setOpen(true),close:()=>setOpen(false),toggle:()=>setOpen(!open),
-    state,media,selected:()=>active};
+    state,media,selected:()=>active,registerSceneFocus(fn){focusSceneFn=fn}};
 }
