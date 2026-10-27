@@ -73,7 +73,7 @@ function draw(now){
   });
   $('beat-status').textContent=`${bpm} BPM · compasso ${Math.floor(result.beat/4)+1} · ${form}`;
   media.addEventListener('error',()=>{
-  $('builtin-track-status').textContent='Não foi possível reproduzir a faixa. Verifique a conexão.';
+  $('jukebox-status').textContent='Não foi possível reproduzir a faixa. Verifique a conexão.';
   $('announcer').textContent='Erro no áudio da faixa selecionada.';
 });
 const jukebox=initializeJukebox({media,onSelected:({track,cues:markers})=>{
