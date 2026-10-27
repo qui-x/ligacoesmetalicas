@@ -7,11 +7,12 @@ export function catalogueEntries(catalogue){
   const numbers=new Set();
   const tracks=catalogue.faixas.map(entry=>{
     const number=Number(entry.numero),bpm=Number(entry.bpm);
-    const mp3=entry.arquivos?.mp3,cues=entry.arquivos?.sincronizacao;
+    const mp3=entry.arquivos?.mp3,ogg=entry.arquivos?.ogg,cues=entry.arquivos?.sincronizacao;
     if(!Number.isInteger(number)||number<1||number>999||numbers.has(number)||
        !(bpm>=55&&bpm<=240)||typeof mp3!=='string'||
        typeof cues!=='string'||!/^faixas\/[0-9]{2}\/[^\\\/\x00-\x1f?#%]+\.mp3$/iu.test(mp3)||
        !/^faixas\/[0-9]{2}\/[^\\\/\x00-\x1f?#%]+\.json$/iu.test(cues)||
+       (ogg!==undefined && (typeof ogg!=='string'||!/^faixas\/[0-9]{2}\/[^\\\/\x00-\x1f?#%]+\.ogg$/iu.test(ogg)||ogg.includes('..')))||
        mp3.includes('..')||cues.includes('..'))throw new Error('Metadados inválidos na faixa '+number);
     numbers.add(number);
     return Object.freeze({
@@ -19,6 +20,7 @@ export function catalogueEntries(catalogue){
       phenomenon:String(entry.fenomeno||''),bpm,
       duration:Number(entry.duracao_segundos)||0,
       mp3:new URL(AUDIO_ROOT+mp3,locationSafe()).href,
+      ogg:ogg?new URL(AUDIO_ROOT+ogg,locationSafe()).href:null,
       cues:new URL(AUDIO_ROOT+cues,locationSafe()).href
     });
   });
