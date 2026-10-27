@@ -16,7 +16,7 @@ let browser;
 try{
  let started=false;
  for(let i=0;i<65;i++){
-   try{const r=await fetch('http://127.0.0.1:4179/jazz-club/index.html');
+   try{const r=await fetch('http://127.0.0.1:4179/jazz-club/index.html?qa=1');
      if(r.ok){started=true;break}}catch{}
    if(server.exitCode!==null)throw Error('HTTP server falhou');
    await new Promise(r=>setTimeout(r,380));
@@ -26,7 +26,7 @@ try{
    args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const page=await browser.newPage({viewport:{width:1380,height:870}});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto('http://127.0.0.1:4179/jazz-club/index.html',
+ await page.goto('http://127.0.0.1:4179/jazz-club/index.html?qa=1',
    {waitUntil:'domcontentloaded',timeout:60000});
  await page.locator('#jukebox-toggle').click();
  await page.waitForFunction(()=>document.querySelectorAll('#jukebox-list li').length===30,
@@ -49,10 +49,20 @@ try{
  await page.screenshot({path:resolve(dest,'jazz-jukebox-1925-desktop.png')});
  await page.locator('#jukebox-close').click();
  assert(await page.locator('#jukebox-drawer').isHidden());
+ // Testar o foco 3D somente quando Babylon/WebGL foi realmente inicializado.
+ const native3D=await page.evaluate(()=>Boolean(window.__jazzJukeboxQa));
+ if(native3D){
+   const snapshot=await page.evaluate(()=>window.__jazzJukeboxQa.snapshot());
+   assert(snapshot.ready && snapshot.screenPickable);
+   assert(snapshot.physicalButtons.every(btn=>btn.exists));
+   await page.locator('#jukebox-scene-open').click();
+   await page.waitForFunction(()=>window.__jazzJukeboxQa?.snapshot()?.focused===true,
+     undefined,{timeout:9000});
+ }
  const mobile=await browser.newPage({viewport:{width:390,height:844},
    deviceScaleFactor:1,reducedMotion:'reduce',hasTouch:true,isMobile:true});
  mobile.on('pageerror',e=>errors.push(e.message));
- await mobile.goto('http://127.0.0.1:4179/jazz-club/index.html',{waitUntil:'domcontentloaded'});
+ await mobile.goto('http://127.0.0.1:4179/jazz-club/index.html?qa=1',{waitUntil:'domcontentloaded'});
  await mobile.locator('#jukebox-toggle').click();
  await mobile.waitForFunction(()=>document.querySelectorAll('#jukebox-list li').length===30,
    undefined,{timeout:20000});
@@ -60,7 +70,7 @@ try{
  assert(dims.scroll<=dims.width+5,'Jukebox excede a largura mobile');
  await mobile.screenshot({path:resolve(dest,'jazz-jukebox-1925-mobile.png')});
  assert.deepEqual(errors,[],'Erros JS de pagina');
- console.log('JUKEBOX_BROWSER_PASS',JSON.stringify({tracks:labels.length,music,dims}));
+ console.log('JUKEBOX_BROWSER_PASS',JSON.stringify({tracks:labels.length,music,dims,native3D}));
 }finally{
  if(browser)await browser.close();
  server.kill('SIGTERM');
