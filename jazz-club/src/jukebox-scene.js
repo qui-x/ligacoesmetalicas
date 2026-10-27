@@ -174,6 +174,16 @@ export async function buildJukeboxInScene(scene,canvas,library){
   }catch(error){
     console.info('Jukebox Blender GLB indisponível; gabinete 3D provisório ativo:',error.message);
   }
+  if(new URLSearchParams(window.location.search).has('qa')){
+    window.__jazzJukeboxQa=Object.freeze({snapshot:()=>({
+      ready:!scene.isDisposed(),model:usingBlender?'blender':'provisional',
+      focused,page,selected:library.state().selected,screenName:screen?.name,
+      screenPickable:Boolean(screen?.isPickable),
+      physicalButtons:['JB_PREV_1925','JB_PLAY_1925','JB_NEXT_1925']
+        .map(name=>({name,exists:scene.meshes.some(mesh=>mesh.name===name)})),
+      tracks:library.state().tracks.length
+    })});
+  }
   return {root,draw,isBlenderModel:()=>usingBlender,
     focus,restoreCamera,
     dispose:()=>{scene.onPointerObservable.remove(pointerObserver);
