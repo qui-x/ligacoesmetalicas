@@ -10,8 +10,8 @@ export function catalogueEntries(catalogue){
     const mp3=entry.arquivos?.mp3,cues=entry.arquivos?.sincronizacao;
     if(!Number.isInteger(number)||number<1||number>999||numbers.has(number)||
        !(bpm>=55&&bpm<=240)||typeof mp3!=='string'||
-       typeof cues!=='string'||!/^faixas\/[a-zA-Z0-9_./-]+$/.test(mp3)||
-       !/^faixas\/[a-zA-Z0-9_./-]+$/.test(cues)||
+       typeof cues!=='string'||!/^faixas\/[0-9]{2}\/[^\\\/\x00-\x1f?#%]+\.mp3$/iu.test(mp3)||
+       !/^faixas\/[0-9]{2}\/[^\\\/\x00-\x1f?#%]+\.json$/iu.test(cues)||
        mp3.includes('..')||cues.includes('..'))throw new Error('Metadados inválidos na faixa '+number);
     numbers.add(number);
     return Object.freeze({
