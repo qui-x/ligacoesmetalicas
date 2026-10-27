@@ -9,7 +9,7 @@ const media=$('audio-player');media.preload='metadata';
 media.addEventListener('seeked',()=>{t=media.currentTime});
 media.addEventListener('play',()=>{playing=true;$('transport').textContent='Pausar dança';$('transport').setAttribute('aria-pressed','true');$('audio-play').textContent='Pausar faixa'});
 media.addEventListener('pause',()=>{$('audio-play').textContent='Reproduzir faixa'});
-let url=null,cues={bpm:120,beatOffset:0,events:[]},t=0,playing=true,last=performance.now();
+let cues={bpm:132,beatOffset:0,events:[]},t=0,playing=true,last=performance.now();
 const reduce=$('reduce-motion');reduce.checked=matchMedia('(prefers-reduced-motion: reduce)').matches;
 $('scene-error').hidden=true;
 $('music-state').textContent='Visualização de compatibilidade 2D';
@@ -81,19 +81,6 @@ $('transport').addEventListener('click',()=>{
   playing=!playing;$('transport').textContent=playing?'Pausar dança':'Retomar dança';
   $('transport').setAttribute('aria-pressed',String(playing));if(!playing)media.pause();
 });
-$('audio-file').addEventListener('change',e=>{
-  const f=e.target.files?.[0];if(!f)return;
-  if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);
-  media.pause();media.src=url;media.load();
-  cues={bpm:Number($('bpm').value),beatOffset:0,events:[],track:f.name};
-  $('audio-play').disabled=false;$('music-state').textContent=f.name+' · pronto para reproduzir';
-});
-
-$('cues-file').addEventListener('change',async e=>{
-  try{const f=e.target.files?.[0];if(!f)return;cues=normalizeCueSheet(JSON.parse(await f.text()));
-    $('bpm').value=cues.bpm;$('bpm').dispatchEvent(new Event('input'));$('announcer').textContent='Marcadores carregados';}
-  catch(e){$('announcer').textContent='Arquivo de marcadores inválido: '+e.message}
-});
 $('camera-reset').addEventListener('click',()=>{pan=0});
 $('fullscreen').addEventListener('click',async()=>{
   try{if(document.fullscreenElement)await document.exitFullscreen();
@@ -102,7 +89,7 @@ $('fullscreen').addEventListener('click',async()=>{
 canvas.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;canvas.setPointerCapture(e.pointerId)});
 canvas.addEventListener('pointermove',e=>{if(drag){pan+=(e.clientX-lastX)*.007;lastX=e.clientX}});
 canvas.addEventListener('pointerup',()=>drag=false);
-window.addEventListener('pagehide',()=>{if(url)URL.revokeObjectURL(url)});
+
 document.addEventListener('keydown',e=>{
   if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement?.tagName))return;
   if(e.code==='Space'){e.preventDefault();$('transport').click();}
