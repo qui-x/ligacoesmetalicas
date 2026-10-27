@@ -43,7 +43,8 @@ try{
   undefined,{timeout:15000});
  assert.equal(await page.locator('#bpm-output').textContent(),'138 BPM');
  const music=await page.locator('#audio-player').evaluate(x=>x.currentSrc||x.src);
- assert(music.endsWith('02_Corrente_no_Cabare_v02.mp3'));
+ assert(decodeURIComponent(music).endsWith('/faixas/02/Corrente no Cabaré.mp3'));
+ assert.equal(await page.locator('#jukebox-current-title').textContent(),'Corrente no Cabaré');
  await page.locator('#jukebox-volume').evaluate(el=>{el.value='45';el.dispatchEvent(new Event('input',{bubbles:true}))});
  assert.equal(await page.locator('#audio-player').evaluate(x=>x.volume),.45);
  await page.screenshot({path:resolve(dest,'jazz-jukebox-1925-desktop.png')});
