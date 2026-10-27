@@ -25,7 +25,7 @@ def cube(name,loc,scale,mat,bevel=0.0):
     if bevel:
         modifier=obj.modifiers.new('Rounded handcrafted edge','BEVEL')
         modifier.width=bevel;modifier.segments=3
-        modifier.affect='EDGES' if hasattr(modifier,'affect') else None
+        if hasattr(modifier,'affect'):modifier.affect='EDGES'
         obj.modifiers.new('Corner normals','WEIGHTED_NORMAL')
     return obj
 
@@ -50,6 +50,10 @@ def text(name,body,loc,size,mat,align='CENTER'):
     o=bpy.data.objects.new(name,curve);bpy.context.collection.objects.link(o)
     o.location=loc;o.rotation_euler=(math.pi/2,0,0)
     o.data.materials.append(mat)
+    bpy.ops.object.select_all(action='DESELECT')
+    o.select_set(True);bpy.context.view_layer.objects.active=o
+    bpy.ops.object.convert(target='MESH')
+    o=bpy.context.object
     return o
 
 def cabinet():
