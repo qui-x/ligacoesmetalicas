@@ -332,8 +332,8 @@ media.addEventListener('play',()=>{playing=true;lastTime=performance.now();updat
 media.addEventListener('pause',updateMusicLabel);
 media.addEventListener('ended',()=>{playing=false;updateMusicLabel();say('Música concluída')});
 media.addEventListener('error',()=>{
-  const label=$('builtin-track-status');
-  if(label)label.textContent='Não foi possível reproduzir o MP3. Verifique a conexão ou recarregue a faixa.';
+  const label=$('jukebox-status');
+  if(label)label.textContent='Não foi possível reproduzir este disco. Verifique sua conexão.';
   say('Erro no áudio da faixa selecionada.');
 });
 library=initializeJukebox({media,onSelected:({track,cues:markers})=>{
