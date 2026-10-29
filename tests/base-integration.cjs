@@ -62,6 +62,37 @@ async function main(){
   assert.equal(pinch.left,pinch.before.left,'cancelamento restaura left sem posição intermediária');
   assert.equal(pinch.top,pinch.before.top,'cancelamento restaura top sem posição intermediária');
   assert.deepEqual(await state(),beforePinch,'pinça cancelada não altera o estado científico');
+
+  // Arrasto real de mouse: uma operação é gravada e um único Desfazer restaura o snapshot.
+  const beforeMouse=await state();
+  const drag=await page.evaluate(()=>{
+   const stage=document.getElementById('silm-assembly-stage'),units=SILMIntegration.snapshot().structure.units,moving=units[0];
+   const deltas=[{x:.18,y:0},{x:-.18,y:0},{x:0,y:.18},{x:0,y:-.18},{x:.18,y:.12},{x:-.18,y:-.12}];
+   const target=deltas.map(d=>({x:moving.position.x+d.x,y:moving.position.y+d.y}))
+    .find(p=>p.x>.05&&p.x<.95&&p.y>.05&&p.y<.95&&SILM.assembly.isFree(units,p,moving.id));
+   if(!target)throw new Error('Não foi encontrado destino livre para o teste de arrasto.');
+   return {id:moving.id,original:moving.position,from:stage.silmRenderer.toClient(moving.position),to:stage.silmRenderer.toClient(target)};
+  });
+  await page.mouse.move(drag.from.x,drag.from.y);await page.mouse.down();
+  await page.mouse.move((drag.from.x+drag.to.x)/2,(drag.from.y+drag.to.y)/2,{steps:5});
+  await page.mouse.move(drag.to.x,drag.to.y,{steps:6});await page.mouse.up();
+  await page.waitForFunction(({id,original})=>{const u=SILMIntegration.snapshot().structure.units.find(x=>x.id===id);return u&&(Math.abs(u.position.x-original.x)>1e-4||Math.abs(u.position.y-original.y)>1e-4);},{id:drag.id,original:drag.original});
+  const afterMouse=await state();
+  assert.notDeepEqual(afterMouse.structure.units.find(x=>x.id===drag.id).position,drag.original,'arrasto de mouse altera a posição científica por ação explícita');
+  await page.locator('#scene-undo').click();
+  await page.waitForFunction(({id,original})=>{const u=SILMIntegration.snapshot().structure.units.find(x=>x.id===id);return u&&Math.abs(u.position.x-original.x)<1e-8&&Math.abs(u.position.y-original.y)<1e-8;},{id:drag.id,original:drag.original});
+  assert.deepEqual(await state(),beforeMouse,'um único Desfazer reverte todo o arrasto');
+
+  // Soltar uma unidade em outra unidade é rejeitado sem mudança científica.
+  const occupied=await page.evaluate(()=>{
+   const stage=document.getElementById('silm-assembly-stage'),units=SILMIntegration.snapshot().structure.units,moving=units[0],other=units[1];
+   return {id:moving.id,original:moving.position,from:stage.silmRenderer.toClient(moving.position),to:stage.silmRenderer.toClient(other.position)};
+  });
+  await page.mouse.move(occupied.from.x,occupied.from.y);await page.mouse.down();
+  await page.mouse.move((occupied.from.x+occupied.to.x)/2,(occupied.from.y+occupied.to.y)/2,{steps:5});
+  await page.mouse.move(occupied.to.x,occupied.to.y,{steps:6});await page.mouse.up();
+  await page.waitForFunction(()=>document.getElementById('silm-assembly-feedback')?.textContent.includes('Destino ocupado'));
+  assert.deepEqual(await state(),beforeMouse,'destino ocupado preserva o modelo científico');
   await page.locator('#silm-assembly-organize').click();
   await page.waitForSelector('.silm-crystal');const crystal=await state();assert.equal(crystal.structure.crystallography.structureType,'FCC');
   assert.equal(await page.locator('#si-expand-structure').isDisabled(),false,'A estrutura configurada deve permitir expansão.');
