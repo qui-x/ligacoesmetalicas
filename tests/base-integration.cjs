@@ -64,7 +64,7 @@ async function main(){
   assert.deepEqual(await state(),beforePinch,'pinça cancelada não altera o estado científico');
 
   // Arrasto real de mouse: uma operação é gravada e um único Desfazer restaura o snapshot.
-  const beforeMouse=await state();
+  const beforeMouse=await state(),withoutUpdatedAt=value=>JSON.parse(JSON.stringify(value,(key,val)=>key==='updatedAt'?undefined:val));
   const drag=await page.evaluate(()=>{
    const stage=document.getElementById('silm-assembly-stage'),units=SILMIntegration.snapshot().structure.units,moving=units[0];
    const deltas=[{x:.18,y:0},{x:-.18,y:0},{x:0,y:.18},{x:0,y:-.18},{x:.18,y:.12},{x:-.18,y:-.12}];
@@ -81,7 +81,7 @@ async function main(){
   assert.notDeepEqual(afterMouse.structure.units.find(x=>x.id===drag.id).position,drag.original,'arrasto de mouse altera a posição científica por ação explícita');
   await page.locator('#scene-undo').click();
   await page.waitForFunction(({id,original})=>{const u=SILMIntegration.snapshot().structure.units.find(x=>x.id===id);return u&&Math.abs(u.position.x-original.x)<1e-8&&Math.abs(u.position.y-original.y)<1e-8;},{id:drag.id,original:drag.original});
-  assert.deepEqual(await state(),beforeMouse,'um único Desfazer reverte todo o arrasto');
+  assert.deepEqual(withoutUpdatedAt(await state()),withoutUpdatedAt(beforeMouse),'um único Desfazer reverte todo o arrasto; somente updatedAt é atualizado');
 
   // Com a assistência habilitada por padrão, um destino ocupado deve ajustar a posição
   // e identificá-la como assistida; o posicionamento continua sendo reversível.
@@ -99,7 +99,7 @@ async function main(){
   assert.ok(await page.evaluate(id=>{const units=SILMIntegration.snapshot().structure.units,u=units.find(x=>x.id===id);return SILM.assembly.isFree(units,u.position,id);},occupied.id),'a posição ajustada não sobrepõe outra unidade');
   await page.locator('#scene-undo').click();
   await page.waitForFunction(({id,original})=>{const u=SILMIntegration.snapshot().structure.units.find(x=>x.id===id);return u&&Math.abs(u.position.x-original.x)<1e-8&&Math.abs(u.position.y-original.y)<1e-8;},{id:occupied.id,original:occupied.original});
-  assert.deepEqual(await state(),beforeMouse,'um único Desfazer restaura a investigação após posicionamento assistido');
+  assert.deepEqual(withoutUpdatedAt(await state()),withoutUpdatedAt(beforeMouse),'um único Desfazer restaura o estado da investigação (os carimbos updatedAt avançam) após posicionamento assistido');
   await page.locator('#silm-assembly-organize').click();
   await page.waitForSelector('.silm-crystal');const crystal=await state();assert.equal(crystal.structure.crystallography.structureType,'FCC');
   assert.equal(await page.locator('#si-expand-structure').isDisabled(),false,'A estrutura configurada deve permitir expansão.');
