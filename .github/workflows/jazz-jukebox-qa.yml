@@ -10,6 +10,9 @@ on:
       - 'jazz-club/src/dance-fallback.js'
       - 'jazz-club/tests/jukebox-catalogue.test.mjs'
       - 'jazz-club/web/tests/jukebox-browser.mjs'
+      - 'sw.js'
+      - 'scripts/sw-template.js'
+      - 'scripts/build-sw.cjs'
       - '.github/workflows/jazz-jukebox-qa.yml'
   workflow_dispatch:
 permissions:
@@ -32,6 +35,23 @@ jobs:
           node --check jazz-club/src/dance.js
           node --check jazz-club/src/dance-fallback.js
           python3 -m py_compile jazz-club/blender/build_jukebox_1925.py
+      - name: Validar precache do service worker
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const source = fs.readFileSync('sw.js', 'utf8');
+          const match = source.match(/const FILES=(\\[[\\s\\S]*?\\]);\\nconst local/);
+          if (!match) throw new Error('Não foi possível ler FILES no sw.js');
+          const files = JSON.parse(match[1]);
+          const missing = files.filter(file => file !== './' && !fs.existsSync(file));
+          if (missing.length) throw new Error('Arquivos ausentes no precache: ' + missing.join(', '));
+          const template = fs.readFileSync('scripts/sw-template.js', 'utf8');
+          const generatedVersion = source.match(/const VERSION='([^']+)'/);
+          const templateVersion = template.match(/const VERSION='([^']+)'/);
+          if (!generatedVersion || !templateVersion || generatedVersion[1] !== templateVersion[1])
+            throw new Error('sw.js e sw-template.js usam versões de cache diferentes');
+          console.log('Precache válido:', files.length, 'recursos; cache', generatedVersion[1]);
+          NODE
       - name: Validar 30 faixas + 30 JSON + 288 batidas do primeiro disco
         run: node --test jazz-club/tests/jukebox-catalogue.test.mjs
   chromium:
