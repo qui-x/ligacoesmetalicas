@@ -102,7 +102,7 @@ try {
         await page.keyboard.press('Escape');
         let escapeClosed = false;
         try {
-          await page.waitForFunction(() => document.querySelector('#sidebar')?.getAttribute('aria-hidden') === 'true', { timeout: 1800 });
+          await page.waitForFunction(() => document.querySelector('#sidebar')?.getAttribute('aria-hidden') === 'true', null, { timeout: 1800 });
           escapeClosed = true;
         } catch {}
         report('SILM Escape fecha o menu', escapeClosed);
