@@ -14,7 +14,6 @@ const FILES=[
   "jazz-club/src/dance-core.js",
   "jazz-club/src/dance.css",
   "jazz-club/src/dance-fallback.js",
-
   "./",
   "index.html",
   "completo.html",
