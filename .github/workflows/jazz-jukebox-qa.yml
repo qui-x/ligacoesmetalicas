@@ -40,7 +40,7 @@ jobs:
           node <<'NODE'
           const fs = require('node:fs');
           const source = fs.readFileSync('sw.js', 'utf8');
-          const match = source.match(/const FILES=(\\[[\\s\\S]*?\\]);\\nconst local/);
+          const match = source.match(/const FILES=(\[[\s\S]*?\]);\nconst local/);
           if (!match) throw new Error('Não foi possível ler FILES no sw.js');
           const files = JSON.parse(match[1]);
           const missing = files.filter(file => file !== './' && !fs.existsSync(file));
