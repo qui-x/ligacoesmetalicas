@@ -781,7 +781,7 @@ A próxima parte da direção técnica é definir como o trabalho artístico de 
 - Vantagens: equilíbrio entre controle artístico e flexibilidade do espetáculo.
 - Custos/riscos: requer contrato claro entre rigs, nomes de clipes, estados e sincronização; a mistura de animações deve evitar que múltiplas camadas tentem controlar as mesmas articulações de modo incompatível.
 
-**Recomendação preliminar:** aprofundar a opção C. Não é aprovação definitiva até analisar o rig atual, a forma de exportação, o fallback Canvas2D e os testes necessários.
+**Direção escolhida para aprofundamento: C — modelo híbrido.** O Blender será responsável pela autoria artística de clipes reutilizáveis; Babylon.js coordenará os clipes, formações, posições no palco, camadas de participação e sincronização musical. A escolha da direção não significa que a arquitetura completa esteja congelada ou implementada: rig, contrato dos clipes, mistura, transições e integração com o fallback ainda exigem validação.
 
 ### 17.2 Princípios que independem da opção final
 
@@ -815,12 +815,125 @@ Antes de criar animações exclusivas para todos os personagens:
 - A cena pública permanece livre dos controles do editor local.
 - Os critérios de desempenho são medidos com equipamento e navegador identificados; metas de FPS ainda não são consideradas garantidas.
 
-### 17.5 Questão a decidir antes do congelamento
+### 17.5 Delimitação da escolha
 
-A preferência preliminar é o **modelo híbrido (C)**. A discussão seguinte deve avaliar se ele será usado como arquitetura principal para todas as ações ou se algumas categorias terão exceções deliberadas, por exemplo:
+Foi escolhida a direção **C — modelo híbrido** para orientar o desenvolvimento da especificação. A divisão de responsabilidades será a regra principal, com exceções deliberadas por categoria de movimento, por exemplo:
 - clipes pré-produzidos para solos e gestos de personagem;
 - cálculo procedural para deslocamento, formação e reposicionamento;
 - movimentos genéricos e mais econômicos para a camada de presença cênica;
 - fallback Canvas2D com uma representação simplificada da mesma sequência de eventos.
 
 O contrato de clipes, os rigs, os estados e a estratégia de mistura só devem ser congelados depois dessa discussão e de uma prova funcional com os ativos existentes.
+
+
+### 17.6 Consequências artísticas da arquitetura híbrida
+
+**Benefício central:** movimentos expressivos podem ser refinados como animações artísticas, enquanto a encenação pode variar em tempo de execução sem exigir um clipe novo para cada combinação de personagens.
+
+Divisão artística sugerida:
+- **Clipes do Blender:** transferência de peso, passos e footwork, isolamentos de cabeça/ombros/torso/quadril, giros, gestos de personagem, solos e sequências de alta exigência expressiva.
+- **Coordenação procedural do Babylon.js:** deslocamento do personagem pela pista, orientação, formação, espaçamento, entrada/saída, foco de grupo e convergência do final.
+- **Presença cênica:** ciclos curtos e discretos, com variações econômicas, para que personagens que não estejam em destaque continuem vivos sem competir com o foco principal.
+- **Direção visual:** pode modular intensidade, luz e enquadramento segundo a partitura, mas não deve ser usada para esconder problemas de animação ou legibilidade.
+
+Não se deve converter todo movimento em uma fórmula procedural nem criar um clipe de Blender para cada posição possível na pista. O modelo híbrido só traz ganho se cada responsabilidade ficar clara.
+
+As referências audiovisuais servirão para observar princípios de movimento e construir animações originais. O objetivo é melhorar apoio, continuidade, sincopação, isolamento de partes do corpo, transições e personalidade; não copiar literalmente sequências protegidas.
+
+### 17.7 Contrato técnico mínimo de cada clipe
+
+Antes da produção de muitos clipes, definir um catálogo com identificadores estáveis e metadados. Cada clipe deverá descrever pelo menos:
+- `id` e nome legível;
+- versão do rig ou declaração de rigs compatíveis;
+- arquivo GLB de origem;
+- ação corporal que realiza e camada de uso (base, conjunto, destaque, entrada/saída);
+- duração e se pode repetir em loop;
+- pose inicial e final esperadas;
+- se inclui deslocamento global (*root motion*) ou se o personagem deve permanecer no ponto;
+- transições permitidas e duração de crossfade, quando aplicável;
+- canais/articulações controladas, se houver sobreposição planejada;
+- limitações, como ausência de contato de pé adequado ou incompatibilidade com certas poses.
+
+Esse contrato evita que um clipe com deslocamento embutido seja combinado inadvertidamente com deslocamento procedural, provocando deslize, deriva de posição ou avanço duplicado. Também reduz as suposições implícitas entre quem anima no Blender e quem programa a cena.
+
+### 17.8 Política para misturar animações
+
+Embora o Babylon.js suporte grupos de animação e mecanismos de blending/ponderação, misturar clipes não garante automaticamente uma pose convincente. Quando dois clipes alteram as mesmas articulações ou propriedades do mesmo esqueleto, o resultado precisa ser planejado e testado. Referências:
+- Babylon.js — blending de animações: https://doc.babylonjs.com/features/featuresDeepDive/animation/advancedAnimations
+- Babylon.js — personagens animados: https://doc.babylonjs.com/features/featuresDeepDive/animation/animatedCharacter/
+- Blender 5.x Manual — animações glTF e organização por Actions/NLA: https://docs.blender.org/manual/en/dev/addons/scene_gltf2.html
+- Babylon.js — exportação Blender → glTF: https://doc.babylonjs.com/preparingArtForBabylon/dccToGltf
+
+Para o primeiro protótipo, recomendar uma política conservadora:
+1. executar um clipe corporal principal por personagem de cada vez;
+2. permitir transição entre clipes por crossfade somente quando as poses e os rigs forem compatíveis;
+3. manter movimentação global/posicionamento sob responsabilidade do controlador de palco quando o clipe não usar root motion;
+4. permitir movimento de base simultâneo ao solo apenas se o teste demonstrar que os canais não entram em conflito e que a pose continua natural;
+5. evitar sobreposição irrestrita de clipes completos de corpo;
+6. após validar o básico, testar camada rítmica mais destaque com combinação explícita de peso e articulações controladas.
+
+Essa restrição inicial não impede a meta artística de movimento em camadas. Ela evita que a primeira implementação tente resolver imediatamente todos os problemas de mistura corporal. O comportamento discreto dos personagens sem destaque pode começar com clipes de base ou ciclos econômicos, enquanto o controlador evita misturas não suportadas.
+
+### 17.9 Contrato de integração e limites do runtime
+
+A arquitetura deve manter um limite claro entre:
+- **partitura:** qual ação deve ocorrer em determinado instante;
+- **controlador de coreografia:** quem participa, em que formação, com qual prioridade e estado;
+- **executor de animações:** inicia, mistura ou interrompe os clipes corporais adequados;
+- **controlador de palco:** posições, orientação, espaçamento e trajetória;
+- **renderer:** Babylon.js, ou fallback Canvas2D com realização simplificada.
+
+O tempo da música permanece a fonte temporal da partitura. Após pausa, busca, retomada ou troca de faixa, o sistema deverá reconstruir o estado esperado e escolher uma pose coerente, não simplesmente continuar um clipe que ficou parado numa posição intermediária.
+
+A implementação deverá inspecionar os módulos existentes antes de escolher como expor o núcleo ao editor local. O editor ficará fora do repositório público, sem Git e com backups manuais datados; o motor de runtime, entretanto, continuará sendo o do clone local do projeto para evitar cópias divergentes.
+
+### 17.10 Consequências de manutenção
+
+Vantagens:
+- o repertório de movimentos pode crescer sem multiplicar exponencialmente as combinações de coreografia;
+- a direção artística pode ajustar um clipe reutilizado em diferentes faixas;
+- a partitura escolhe participantes e ações sem conter detalhes internos dos rigs;
+- os 17 personagens podem partilhar movimentos compatíveis e receber exceções individuais onde elas realmente acrescentem identidade.
+
+Custos:
+- precisa haver consistência de rig e nomes de clipes;
+- mudanças no rig podem exigir reexportação e reteste de muitos clipes;
+- os arquivos GLB e suas animações precisam ter uma política de versão e identificação;
+- a mistura, a pose de saída e a propriedade do deslocamento têm de ser verificadas;
+- o fallback pode simplificar a realização visual, mas não deve divergir na progressão narrativa.
+
+### 17.11 Etapas e marcos de implementação
+
+1. **Auditar o protótipo:** identificar o que hoje é procedural, o que é clipe/pose e quais partes dependem diretamente da cena ou do DOM.
+2. **Prova Blender → GLB → Babylon:** exportar um personagem com rig e vários clipes nomeados; conferir orientação, escala, materiais, deformação e nomes das animações.
+3. **Biblioteca mínima:** criar ou adaptar groove/base, footwork/transferência de peso, isolamento, giro/transição, entrada e destaque.
+4. **Controlador de transições:** testar crossfade e a regra de um clipe corporal principal por personagem.
+5. **Movimento em camadas:** adicionar o ciclo discreto dos personagens sem destaque e comprovar que não conflita com o solo.
+6. **Três personagens:** testar trocas de formação, entradas, recorrências, pause/seek e troca de faixa.
+7. **Elenco de 17 com modelos provisórios:** medir desempenho, legibilidade das formações e comportamento do clímax.
+8. **Refinamento individual:** produzir figurinos e movimentos específicos conforme a necessidade artística.
+9. **Verificação do fallback e do editor local:** os eventos narrativos são os mesmos, a pré-visualização usa o runtime compartilhado e nenhum arquivo do editor entra no site público.
+
+O cronograma não deve atribuir datas rígidas antes de completar as etapas 1–4; elas revelarão o grau real de reutilização dos rigs e de mistura de animações necessário.
+
+### 17.12 Critérios de aceite adicionais
+
+- Exportação GLB conserva as animações e os nomes esperados.
+- Orientação, escala, pivô e convenções de eixos são consistentes; não se adicionam rotações compensatórias sem verificar a transformação do importador.
+- Cada clipe declara se move o root ou se é local ao personagem.
+- Transições entre clipes não causam estalos, poses quebradas ou deriva de posição.
+- A combinação de groove e destaque é testada; se não for convincente, usa-se alternância/crossfade ou movimento procedural limitado, em vez de forçar sobreposição.
+- A passagem de tempo reconstruída após seek define uma pose e formação válidas.
+- A mesma intenção coreográfica aparece no fallback, mesmo que com menos detalhes.
+- O clímax dos 17 personagens é aprovado visualmente antes do refinamento de todos os modelos.
+
+### 17.13 Decisões ainda pendentes antes do congelamento
+
+1. Qual rig existente será usado na primeira prova de exportação e qual convenção de nomes e articulações será oficial?
+2. Qual clipe será considerado “base rítmica” e quais partes do corpo controla?
+3. Para a primeira versão, groove e destaque serão alternados ou já serão misturados sobre articulações compatíveis?
+4. A movimentação global usará trajetórias calculadas pelo Babylon.js como padrão, mantendo root motion apenas para clipes específicos que o exijam?
+5. Qual conjunto de navegadores/dispositivos será o alvo principal para validar animações e desempenho?
+6. Que limites de transição e de perda de quadros podem ser aceitos na prova inicial?
+
+A direção híbrida está escolhida para orientar o desenho; a arquitetura detalhada permanece aberta até validar a prova de exportação e o controlador de três personagens.
