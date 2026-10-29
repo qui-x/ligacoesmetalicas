@@ -7,7 +7,6 @@ const FILES=[
   "jazz-club/src/jukebox-library.js",
   "jazz-club/src/jukebox-scene.js",
   "jazz-club/audio/jazz e metais/catalogo.json",
-
   "jazz-club/src/builtin-track.js",
   "jazz-club/",
   "jazz-club/index.html",
