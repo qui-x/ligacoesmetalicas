@@ -301,3 +301,123 @@ A data de demonstração mencionada em conversas anteriores não é uma garantia
 ---
 
 **Regra de mudança:** quando uma proposta for formalmente aprovada ou alterada, atualizar este documento distinguindo: decisão anterior, nova decisão, razão da mudança, arquivos afetados e testes necessários. Não transformar exemplos ou matrizes provisórias em classificação científica final sem validação documental.
+
+
+## 12. Sincronização musical híbrida — DIREÇÃO ESCOLHIDA PARA APROFUNDAMENTO
+
+A direção escolhida é **C — sincronização híbrida**. A música fornece a referência temporal; a partitura determina os eventos cênicos. Esta decisão orienta o desenho técnico, mas os detalhes de implementação e os critérios de aceite ainda precisam ser congelados.
+
+### 12.1 Princípios
+
+1. **Relógio principal:** a posição real de reprodução da faixa é a referência temporal da partitura. Para a reprodução baseada em `HTMLMediaElement`, usar a posição de mídia em segundos como referência, considerando que o valor é atualizado pelo navegador e pode não avançar a cada leitura. Documentação: https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/currentTime
+2. **BPM:** utilizado para estimar batidas e organizar padrões rítmicos. Não deve ser o único mecanismo de sincronização de atos, solos, entradas ou mudanças de formação.
+3. **Marcadores por faixa:** faixas importantes terão eventos definidos especificamente para introdução, entradas, destaques, mudanças de formação, crescimento de intensidade, clímax e encerramento.
+4. **Partitura genérica:** faixas sem marcadores completos devem continuar funcionando com um conjunto de movimentos reutilizáveis e eventos básicos inferidos de metadados disponíveis, sem inventar entradas ou acontecimentos dramáticos específicos.
+5. **Recuperação determinística:** a cena deve conseguir reconstruir o estado esperado diretamente a partir do tempo atual. Não deve depender apenas de temporizadores que contam o tempo desde que uma ação começou.
+6. **Motor compartilhado:** a partitura e a resolução dos eventos devem ser independentes da renderização. Babylon.js e Canvas2D devem consumir o mesmo estado de apresentação, ainda que tenham níveis visuais diferentes.
+
+### 12.2 Relógio, eventos e precisão
+
+A interface `HTMLMediaElement.currentTime` expressa a posição atual de reprodução em segundos e também permite solicitar uma busca para outro instante. A documentação observa que a posição reportada é uma aproximação da posição da mídia e que leituras consecutivas podem retornar o mesmo valor; logo, a precisão não pode ser deduzida apenas pelo número de casas decimais.
+
+O evento `timeupdate` varia com as condições de execução e pode ocorrer aproximadamente entre 4 e 66 vezes por segundo. Por isso, deve servir para atualizar indicadores de interface e notificações gerais, não ser o único acionador de cada pose de dança. Referência: https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/timeupdate_event
+
+A proposta de execução é consultar a posição atual da faixa no ciclo de atualização visual e resolver a pose correspondente ao tempo atual. Os marcadores de evento não devem depender do quadro exato em que o navegador notificou um evento.
+
+Se uma implementação posterior usar Web Audio API para agendar áudio com precisão adicional, o relógio do AudioContext deve ser tratado conscientemente: ele é uma linha temporal própria e diferente do relógio de sistema. Evitar misturar relógios sem uma conversão explícita. Referência: https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/currentTime
+
+### 12.3 Modelo de metadados e partitura
+
+Metadados conceituais por faixa:
+- identificador estável e título;
+- duração esperada quando conhecida;
+- BPM estimado ou confirmado;
+- `beatOffset`/offset musical para ajustar o início da grade rítmica;
+- marcadores com tempos em segundos;
+- opcionalmente, referência à posição por compasso/batida para edição humana;
+- eventos e estado cênico associados a cada marcador;
+- versão do formato e informações da fonte/autor da marcação.
+
+Os tempos em segundos devem permanecer como referência executável, porque BPM sozinho não representa mudanças de andamento e pode sofrer imprecisão de estimativa. Os campos de compasso/batida facilitam a edição musical, mas devem ser resolvidos para tempos concretos e verificados contra o áudio real.
+
+Exemplos de tipos de evento:
+- `section-start`: início de introdução, verso, refrão, ponte ou outra seção nomeada;
+- `enter` / `exit`: entrada ou saída deliberada de um personagem ou grupo;
+- `focus`: definição de personagem ou grupo em destaque;
+- `formation`: troca de formação;
+- `intensity`: alteração da energia cênica;
+- `lighting` / `camera`: evento de apresentação opcional;
+- `collective-finale`: convergência para a coreografia com os 17 elementos;
+- `ending`: pose e comportamento final.
+
+Os nomes são proposta de esquema e ainda precisam de validação antes de se tornarem interface pública de dados.
+
+### 12.4 Comportamento em interrupções e navegação na faixa
+
+- **Play:** iniciar o áudio por uma ação permitida do usuário e acompanhar a posição real de reprodução; não afirmar que a faixa começou até a reprodução ser confirmada.
+- **Pause:** congelar a progressão musical da coreografia de forma coerente, mantendo um estado visual legível.
+- **Resume:** continuar a partir da posição atual, sem reiniciar os eventos já ultrapassados.
+- **Seek para frente ou para trás:** reconstruir o estado cênico correspondente ao novo tempo, sem disparar sequencialmente todos os eventos intermediários como se tivessem acabado de acontecer.
+- **Troca de faixa:** encerrar ou transicionar o estado da faixa anterior e inicializar a partitura nova; não carregar automaticamente o solo ou a formação da faixa anterior sem regra explícita de continuidade.
+- **Buffering/interrupção:** distinguir áudio pausado, aguardando dados e efetivamente em reprodução. Evitar que personagens avancem enquanto o áudio está interrompido.
+- **Fim da faixa:** resolver para um encerramento definido pela partitura ou para uma pose segura, evitando continuar indefinidamente um estado de destaque.
+- **Faixa sem partitura completa:** manter groove e formações genéricas, mas não inventar entradas narrativas específicas.
+
+### 12.5 Relação com as camadas de movimento
+
+A partitura determina quem participa e quando; o controlador de pose resolve a mistura de movimentos. Para cada instante, o estado deve considerar:
+- elenco presente, em entrada ou em saída;
+- participante em destaque;
+- grupo coreográfico;
+- camada de presença cênica;
+- intensidade e formação;
+- clipes ativos e prioridades;
+- posição e orientação de cada personagem.
+
+O tempo atual da música deve selecionar os estados e a interpolação entre eles. A arquitetura não pode exigir que uma animação termine naturalmente antes de calcular um estado posterior, pois isso falharia após um seek ou uma troca de faixa.
+
+### 12.6 Plano mínimo de validação
+
+1. Reproduzir uma sequência com marcador no início, entrada de grupo, destaque e final.
+2. Pausar no meio de uma transição, retomar e verificar continuidade e sincronização.
+3. Avançar e retroceder na faixa, conferindo que o estado se reconstrói sem personagens duplicados ou poses antigas.
+4. Trocar de faixa durante uma entrada e durante um solo.
+5. Reproduzir uma faixa sem marcadores específicos e confirmar a coreografia genérica.
+6. Comparar Babylon.js e Canvas2D quanto à ordem de entradas, formações, destaque e final.
+7. Testar com renderização irregular e registrar deriva percebida entre evento musical e pose.
+8. Testar pelo menos uma faixa com alterações de BPM ou marcadores de seção para garantir que BPM fixo não é tratado como verdade absoluta.
+9. Conferir que a troca de faixa mantém responsivos os controles da jukebox.
+10. Registrar navegador, dispositivo, áudio usado, tempo do evento e resultado observado.
+
+### 12.7 Limites de escopo e risco de cronograma
+
+A solução híbrida permite que algumas faixas tenham uma partitura detalhada enquanto as demais usam movimentos genéricos. Isso torna a produção incremental: primeiro criar uma faixa completa de referência, validar o motor e só então ampliar o repertório.
+
+O principal risco é tentar marcar todas as faixas detalhadamente antes de validar o formato e o controlador. O segundo risco é assumir que BPM resolve automaticamente as entradas dramáticas. O terceiro é depender de notificações de tempo da interface em vez de reconstruir o estado a partir da posição atual do áudio.
+
+Sequência sugerida:
+1. estabilizar a jukebox e os controles da reprodução;
+2. documentar o esquema de uma partitura;
+3. produzir uma faixa de teste com marcadores editados manualmente;
+4. validar play/pause/seek/troca de faixa;
+5. criar o comportamento genérico para faixas sem partitura completa;
+6. expandir para as faixas selecionadas para o espetáculo.
+
+### 12.8 Referências técnicas
+
+- MDN — `HTMLMediaElement.currentTime`: https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/currentTime
+- MDN — evento `timeupdate`: https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/timeupdate_event
+- MDN — `BaseAudioContext.currentTime`: https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/currentTime
+- W3C — Web Audio API: https://www.w3.org/TR/webaudio/
+- Babylon.js — personagens animados e Animation Groups: https://doc.babylonjs.com/features/featuresDeepDive/animation/animatedCharacter/
+
+### 12.9 Pontos ainda pendentes
+
+Antes de congelar essa seção, decidir:
+1. se os marcadores serão editados manualmente em JSON, em uma ferramenta visual ou nos dois;
+2. qual formato de partitura será considerado oficial e versionado;
+3. se os eventos serão expressos apenas em segundos ou se a edição terá compassos/batidas além dos segundos executáveis;
+4. qual será a política de transição visual ao trocar de faixa;
+5. se a primeira faixa de referência será “O Baile dos Elétrons” ou outra faixa com estrutura musical mais conveniente;
+6. quais desvios temporais e comportamentos de pausa/seek serão aceitos nos testes.
+
