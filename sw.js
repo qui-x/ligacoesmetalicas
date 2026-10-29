@@ -9,7 +9,6 @@ const FILES=[
   "jazz-club/audio/jazz e metais/catalogo.json",
 
   "jazz-club/src/builtin-track.js",
-
   "jazz-club/",
   "jazz-club/index.html",
   "jazz-club/src/dance.js",
