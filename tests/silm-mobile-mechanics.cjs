@@ -33,11 +33,12 @@ const nav=require('./integration-navigation.cjs');
     await page.waitForFunction(()=>document.querySelector('.silm-crystal'));
     await page.locator('[data-close-dock="left"]').tap();
 
-    const before=await page.evaluate(()=>SILMIntegration.snapshot());
     const first=page.locator('.silm-crystal-unit').first();
     await first.tap();
     assert.equal(await first.getAttribute('aria-pressed'),'true',
      v.label+': o toque seleciona uma unidade cristalográfica');
+    // selectedUnitId pertence à representação; a referência científica começa depois da seleção.
+    const before=await page.evaluate(()=>SILMIntegration.snapshot());
 
     // Alternar a projeção para 3D é apenas representação: não muda o estado científico.
     await page.locator('#silm-crystal-projection').selectOption('3d');
@@ -61,7 +62,18 @@ const nav=require('./integration-navigation.cjs');
      v.label+': o palco permanece dentro da largura visível: '+JSON.stringify(geometry.stage));
 
     // Medição pelo fluxo visível da interface.
-    const ids=await page.evaluate(()=>SILMIntegration.snapshot().structure.units.slice(0,2).map(u=>u.id));
+    const ids=await page.evaluate(()=>{
+     const nodes=[...document.querySelectorAll('.silm-crystal-unit')].map(node=>{
+      const r=node.getBoundingClientRect();return {id:node.dataset.unitId,x:r.x+r.width/2,y:r.y+r.height/2};
+     }).filter(u=>u.id);
+     let best=null,bestDistance=-1;
+     for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+      const distance=Math.hypot(nodes[i].x-nodes[j].x,nodes[i].y-nodes[j].y);
+      if(distance>bestDistance){bestDistance=distance;best=[nodes[i].id,nodes[j].id];}
+     }
+     return best;
+    });
+    assert.equal(ids.length,2,v.label+': há dois alvos distintos para medir distância');
     await nav.moduleChoice(page,'medir');
     await nav.viewer(page,'instrumentos');
     await page.locator('#silm-instrument').selectOption('distance');
@@ -76,7 +88,7 @@ const nav=require('./integration-navigation.cjs');
     await nav.moduleChoice(page,'calcular');
     await nav.viewer(page,'calculos');
     await page.locator('#silm-formula').selectOption('cell-volume-cubic');
-    await page.locator('#silm-calc-run').tap();
+    await page.getByRole('button',{name:'Calcular',exact:true}).tap();
     await page.waitForFunction(()=>SILMIntegration.snapshot().calculations.length===1);
     const calc=await page.evaluate(()=>SILMIntegration.snapshot().calculations[0]);
     assert.equal(calc.formulaId,'cell-volume-cubic',v.label+': volume da célula calculado');
