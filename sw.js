@@ -1,5 +1,5 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.15.4-jazz-audio-1';
+const VERSION='0.15.4-jazz-cache-repair-1';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION,DOMAINS=CACHE+'::domains';
 const FILES=[
   "jazz-club/src/jukebox.css",
@@ -9,7 +9,6 @@ const FILES=[
   "jazz-club/audio/jazz e metais/catalogo.json",
 
   "jazz-club/src/builtin-track.js",
-  "jazz-club/audio/jazz e metais/faixas/01/01_O_Baile_dos_Eletrons_v02_cues.json",
 
   "jazz-club/index.html",
   "jazz-club/src/dance.js",
