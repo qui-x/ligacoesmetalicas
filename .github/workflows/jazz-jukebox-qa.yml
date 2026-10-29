@@ -76,6 +76,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jazz-jukebox-qa-${{ github.run_number }}
-          path: jazz-club/web/qa-artifacts/jazz-jukebox-1925-*.png
+          path: jazz-club/web/qa-artifacts/jazz-jukebox-1925-*
           if-no-files-found: warn
           retention-days: 14
