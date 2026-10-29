@@ -532,7 +532,7 @@ O cronograma deve ser recalculado após a Fase 1, porque o grau de acoplamento e
 
 
 
-## 14. Editor privado com controle de acesso — DIREÇÃO ESCOLHIDA; TOPOLOGIA E CRITÉRIOS EM DISCUSSÃO
+## 14. Editor de partituras — direção de privacidade escolhida; MVP exclusivamente local no ambiente de desenvolvimento
 
 A direção escolhida é **C — ambiente privado com controle de acesso apropriado**. Isso significa que a ferramenta de autoria e seus recursos devem ser acessíveis somente aos usuários autorizados. Esta seção analisa as consequências e propõe critérios de aceite; o método de hospedagem e a política de acesso ainda não estão congelados.
 
@@ -619,13 +619,51 @@ A privacidade torna a hospedagem e o acesso uma dependência explícita do edito
 
 A primeira demonstração do motor musical pode acontecer localmente enquanto a topologia de acesso remoto é definida; a experiência privada completa não deve ser declarada pronta antes dos testes de autenticação e acesso direto.
 
-### 14.7 Decisões pendentes antes do congelamento
+### 14.7 Decisão de execução local — ESCOLHIDA PARA O MVP
 
-1. O editor precisa ser acessível remotamente a partir de outros dispositivos ou pode inicialmente funcionar apenas no ambiente de desenvolvimento?
-2. Existe domínio próprio sob controle do projeto e possibilidade de gerir seu DNS?
-3. O ambiente atual oferece GitHub Enterprise Cloud ou devemos desconsiderar GitHub Pages privado?
-4. Qual identidade será utilizada para autorizar os usuários (por exemplo, um IdP/conta existente ou uma política de acesso dedicada)?
-5. Onde ficará hospedada a aplicação de autoria e como a origem ficará inacessível diretamente?
-6. A primeira entrega será um protótipo local seguido de implantação privada, ou o protótipo já deverá nascer atrás do controle de acesso escolhido?
+Foi escolhida a execução **somente no ambiente de desenvolvimento**, por ser a alternativa mais simples nesta fase. Esta decisão substitui a necessidade imediata de hospedagem remota privada, domínio próprio, provedor de identidade e configuração de autenticação remota.
 
-Até que esses pontos sejam respondidos e os critérios de aceite testados, o ambiente privado permanece a direção escolhida, mas a topologia e a implantação não estão congeladas.
+Consequências:
+- O editor não será publicado no GitHub Pages nem incorporado à apresentação pública do Clube de Jazz.
+- O acesso inicial ocorrerá apenas no ambiente de desenvolvimento, com a aplicação servida localmente.
+- Se for necessário iniciar um servidor de desenvolvimento, ele deverá escutar apenas em loopback (`127.0.0.1` ou equivalente local), salvo decisão explícita e documentada posterior. Não expor portas à rede local ou à internet por conveniência.
+- A ferramenta não receberá token de escrita do GitHub e não modificará a partitura oficial automaticamente.
+- O fluxo do MVP será importar/abrir JSON → editar → validar → pré-visualizar → exportar → revisar e incorporar por fluxo normal de Git.
+- A apresentação pública e seus controles não serão alterados para acomodar o editor.
+- A necessidade de autenticação remota será reconsiderada apenas se surgir uma necessidade real de colaboração fora do ambiente de desenvolvimento.
+
+### 14.8 Critérios de aceite específicos para execução local
+
+1. A ferramenta não é publicada nem referenciada a partir da apresentação pública.
+2. O servidor de desenvolvimento, quando usado, aceita conexões apenas de loopback por padrão.
+3. A aplicação abre e edita uma partitura sem credenciais ou tokens de escrita do GitHub.
+4. Importar um arquivo inválido apresenta erros compreensíveis e não sobrescreve o último arquivo válido.
+5. A pré-visualização usa o núcleo comum da partitura e mantém sincronização em play/pause/seek.
+6. Exportar e reabrir o arquivo preserva os campos e eventos reconhecidos pelo formato.
+7. Alterar ou exportar uma partitura não altera automaticamente a branch `main`.
+8. As instruções para iniciar e encerrar o editor local são documentadas junto do código, quando a implementação começar.
+9. Verifica-se que a ferramenta não escuta em endereço público nem expõe uma rota remota inadvertidamente.
+
+Os critérios anteriores de autenticação remota e bloqueio de URL/origem direta aplicam-se somente a uma futura implantação remota e não são requisito para a primeira execução local.
+
+
+## 15. Decisão registrada: editor exclusivamente no ambiente de desenvolvimento
+
+Em 29 de outubro de 2026, foi escolhida a opção **executar apenas no ambiente de desenvolvimento**, por ser mais simples e adequada à fase atual.
+
+### Limites da decisão
+- Não criar agora serviço de hospedagem remota privada nem fluxo de autenticação remota.
+- Não publicar o editor no GitHub Pages, nem mesmo numa URL não listada.
+- Não alterar a experiência pública do Clube de Jazz para incluir controles de autoria.
+- Priorizar o núcleo de partitura, a pré-visualização sincronizada e o ciclo de edição/exportação.
+- Reavaliar a necessidade de acesso remoto apenas se colaboração fora do ambiente de desenvolvimento tornar-se um requisito explícito.
+
+### Próxima sequência técnica
+1. Inspecionar e modularizar a lógica existente de partitura/coreografia, sem duplicar o motor.
+2. Definir e validar o JSON Schema e as regras semânticas.
+3. Criar uma faixa-piloto com marcadores.
+4. Implementar pré-visualização local com play/pause/seek.
+5. Acrescentar edição mínima, validação, desfazer/refazer e exportação.
+6. Verificar que a versão pública permanece independente do editor.
+
+Esta escolha determina o ambiente de execução do primeiro MVP; não congela ainda o desenho completo da interface nem o formato final dos eventos.
