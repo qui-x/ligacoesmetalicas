@@ -243,7 +243,7 @@ function init(){
     };
     if(new URLSearchParams(location.search).has('qa')){
       window.__danceQa=Object.freeze({snapshot:()=>({
-        ready:!scene.isDisposed(),cast:dancers.length,formation:activeForm,
+        ready:!scene.isDisposed,cast:dancers.length,formation:activeForm,
         beat:clock*Number(bpmEl.value)/60,meshCount:scene.meshes.length,
         audioActive:!media.paused, reduced:reduced.checked,
         dancers:dancers.map(d=>({id:d.id,x:d.root.position.x,z:d.root.position.z}))

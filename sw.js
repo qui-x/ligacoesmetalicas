@@ -1,5 +1,5 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.15.4-jazz-cache-repair-1';
+const VERSION='0.15.4-jazz-route-cache-2';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION,DOMAINS=CACHE+'::domains';
 const FILES=[
   "jazz-club/src/jukebox.css",
@@ -7,15 +7,13 @@ const FILES=[
   "jazz-club/src/jukebox-library.js",
   "jazz-club/src/jukebox-scene.js",
   "jazz-club/audio/jazz e metais/catalogo.json",
-
   "jazz-club/src/builtin-track.js",
-
+  "jazz-club/",
   "jazz-club/index.html",
   "jazz-club/src/dance.js",
   "jazz-club/src/dance-core.js",
   "jazz-club/src/dance.css",
   "jazz-club/src/dance-fallback.js",
-
   "./",
   "index.html",
   "completo.html",
