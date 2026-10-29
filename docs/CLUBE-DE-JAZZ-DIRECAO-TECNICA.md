@@ -421,3 +421,112 @@ Antes de congelar essa seção, decidir:
 5. se a primeira faixa de referência será “O Baile dos Elétrons” ou outra faixa com estrutura musical mais conveniente;
 6. quais desvios temporais e comportamentos de pausa/seek serão aceitos nos testes.
 
+
+
+## 13. Editor separado com pré-visualização sincronizada — PROPOSTA ESCOLHIDA PARA ANÁLISE, NÃO CONGELADA
+
+A direção escolhida para aprofundamento é **C — ferramenta de autoria separada da apresentação pública, com pré-visualização sincronizada da cena e da música**. A escolha define a intenção de separar papéis; ainda faltam decisões de implantação, isolamento da pré-visualização e fluxo de publicação.
+
+### 13.1 Objetivo e princípios
+
+O editor é uma ferramenta de produção para criar, validar e ensaiar partituras. A apresentação pública continua sendo uma experiência independente, sem painéis de depuração, edição de eventos, controles de desenvolvimento ou funcionalidades exclusivas de autoria.
+
+Princípios:
+1. **Um formato oficial:** JSON versionado é a fonte de verdade. O editor visual lê e modifica esse formato; não cria uma representação paralela que exija conversão posterior.
+2. **Um motor de execução:** a pré-visualização deve reutilizar o motor e a lógica de resolução da partitura usados no espetáculo. Não criar uma segunda implementação de coreografia que possa divergir.
+3. **Isolamento da apresentação:** os controles do editor vivem em uma ferramenta/rota separada e não são adicionados à UI do público.
+4. **Salvar não é publicar:** a edição gera uma cópia local, um download ou um artefato de revisão. Não altera automaticamente os arquivos oficiais nem a branch `main`.
+5. **Pré-visualização sincronizada:** alterações em rascunho podem ser testadas na cena e no áudio antes de serem promovidas à coleção oficial de partituras.
+6. **Validação visível:** o editor distingue sintaxe JSON inválida, falhas de esquema, referências desconhecidas e problemas semânticos/cênicos.
+7. **Sem segredos no cliente:** a ferramenta estática não guarda tokens de GitHub, credenciais ou outras chaves de escrita.
+
+### 13.2 Arquitetura preliminar
+
+Componentes lógicos sugeridos:
+- **Editor de partitura:** lista de faixas, linha do tempo, formulário de propriedades, seleção de eventos, comandos de desfazer/refazer e estados de rascunho.
+- **Validador:** JSON Schema versionado e regras adicionais de domínio, como identificadores existentes, intervalos temporais, participantes, formações e tipos de eventos suportados.
+- **Núcleo da partitura:** leitura, normalização, resolução temporal e seleção do estado esperado para uma posição da música, sem dependência do DOM do editor.
+- **Pré-visualização:** cena Babylon.js que usa o mesmo runtime do espetáculo; quando necessário, Canvas2D deve reproduzir a mesma lógica narrativa com apresentação simplificada.
+- **Adaptador de sincronização:** controla play/pause/seek e transmite a partitura não publicada para a pré-visualização.
+- **Exportação:** gera JSON validado para revisão e incorporação posterior no repositório.
+
+A organização concreta entre módulo compartilhado, painel embutido e iframe de pré-visualização continua pendente. Deve ser escolhida após inspecionar quanto de `dance.js` e da UI atual ainda depende diretamente de elementos específicos de `jazz-club/index.html`. Evitar copiar o motor para o editor. Um iframe pode isolar a interface visual, mas acrescenta um protocolo de mensagens e testes extras; um painel com módulos compartilhados é mais simples, desde que o runtime seja desacoplado dos controles da apresentação.
+
+### 13.3 Implicações técnicas e manutenção
+
+A pré-visualização requer que o núcleo da dança possa ser instanciado sem pressupor que todos os controles do palco público estejam presentes. Esta separação também ajuda a prevenir falhas como tentativas de adicionar listeners a elementos DOM ausentes.
+
+A partitura e o motor devem ter responsabilidades distintas:
+- partitura: define eventos e intenção cênica;
+- núcleo: valida e resolve qual estado corresponde ao tempo atual;
+- renderer: representa esse estado em Babylon.js ou Canvas2D;
+- editor: ajuda a autoria sem assumir a execução final.
+
+O JSON Schema deve ser versionado e validado no browser e nos testes automatizados. JSON Schema 2020-12 permite descrever e validar a estrutura dos documentos; as regras próprias do projeto (por exemplo, referências válidas a participantes) requerem verificações semânticas adicionais. Referências: https://json-schema.org/draft/2020-12/ e https://json-schema.org/draft/2020-12/json-schema-validation
+
+### 13.4 Segurança operacional e publicação
+
+O caminho inicial recomendado é **importar, editar, validar, pré-visualizar e exportar**:
+1. O editor abre um arquivo JSON escolhido explicitamente pelo usuário ou uma cópia de referência.
+2. O áudio pode usar uma faixa pública da coleção; para arquivos de ensaio, a seleção local deve ser explícita.
+3. A ferramenta mantém alterações como rascunho durante a sessão e oferece exportação.
+4. O JSON exportado passa por testes/revisão e só depois é adicionado à branch de trabalho e incorporado por pull request.
+5. Não conceder ao editor acesso de escrita ao GitHub no primeiro MVP.
+
+O navegador pode ler arquivos locais que o usuário seleciona explicitamente por controles de arquivo ou arrastar e soltar. Isso não exige enviar tais arquivos a um servidor. Referência: https://developer.mozilla.org/en-US/docs/Web/API/File_API
+
+**Limite importante:** se a ferramenta for publicada em um repositório público e num site estático público, uma URL separada ou não listada na apresentação não torna o editor privado. O código e a página continuarão acessíveis a quem obtiver a URL. Para restringir realmente o acesso, deve permanecer local/de desenvolvimento ou ser hospedada num ambiente que implemente controle de acesso. A ausência de credenciais e de capacidade de escrita reduz o risco, mas não equivale a autenticação.
+
+Se a pré-visualização utilizar `postMessage` entre o editor e um iframe/janela, deve validar a origem e a fonte da mensagem, verificar o formato do conteúdo e usar um `targetOrigin` exato quando aplicável. Não aceitar mensagens arbitrárias nem executar texto de JSON como código. Referência: https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
+
+### 13.5 Facilidade de autoria
+
+A primeira interface útil não precisa ser um editor musical completo. Deve permitir:
+- carregar/selecionar uma faixa e uma partitura;
+- exibir tempo atual, duração e marcadores numa linha do tempo;
+- selecionar, criar, mover, editar e remover um evento;
+- associar personagens, grupos, formação, destaque e intensidade;
+- reproduzir, pausar, avançar e retroceder;
+- ver o estado da cena no tempo selecionado;
+- validar a partitura e localizar os erros;
+- desfazer/refazer edições;
+- exportar o JSON e reabrir a cópia para confirmar que não houve perda.
+
+A edição precisa oferecer entrada numérica de tempo em segundos, além de deslocamento pela linha do tempo. O ajuste por batida/compasso pode ser acrescentado quando o esquema de música estiver estabilizado; não deve obrigar todos os eventos a usar um BPM presumidamente constante.
+
+A ferramenta deve distinguir claramente **rascunho alterado**, **válido para pré-visualização** e **aprovado para integração**. Estar sintaticamente válido não significa que uma coreografia seja artisticamente aprovada.
+
+### 13.6 Escopo faseado
+
+**Fase 1 — Fundamento:** isolar o núcleo da partitura do DOM e dos controles de interface; definir JSON Schema e regras semânticas; criar testes para uma faixa piloto.
+
+**Fase 2 — Pré-visualização:** abrir a mesma partitura e áudio; sincronizar play/pause/seek; mostrar os marcadores e o estado cênico no tempo atual.
+
+**Fase 3 — Editor mínimo:** criar e editar eventos, associar participantes, validar, desfazer/refazer e exportar JSON.
+
+**Fase 4 — Usabilidade musical:** zoom, ajuste de grade, duplicação de eventos, avisos de colisão/ordem, navegação entre seções e pré-visualização do clímax com elenco provisório.
+
+**Fase 5 — Expansão:** preparar mais partituras, integrar a revisão de conteúdo e adicionar ferramentas de autoria conforme a necessidade real.
+
+O cronograma deve ser recalculado após a Fase 1, porque o grau de acoplamento entre `dance.js`, o HTML atual e o fallback ainda precisa ser confirmado.
+
+### 13.7 Critérios para considerar a primeira versão útil
+
+- Abrir um JSON válido e detectar um inválido com mensagens localizáveis.
+- Não alterar o JSON oficial ao editar um rascunho.
+- Pré-visualizar uma partitura com a mesma lógica narrativa do espetáculo.
+- Fazer play/pause/seek e reconstruir o estado sem duplicação ou poses obsoletas.
+- Alterar um marcador e ver o resultado na pré-visualização sem recarregar a página inteira.
+- Exportar e reabrir o JSON mantendo todos os campos suportados.
+- Confirmar que a apresentação pública continua sem controles de autoria/de desenvolvimento.
+- Confirmar que a ferramenta não precisa de token de GitHub nem envia os arquivos locais selecionados a um serviço remoto.
+- Testar a operação em navegadores-alvo e registrar limitações.
+
+### 13.8 Decisões ainda pendentes
+
+1. A ferramenta será apenas local/de desenvolvimento, ou será publicada como ferramenta estática separada no GitHub Pages? A publicação estática em repositório público não oferece privacidade por esconder a URL.
+2. A pré-visualização será um painel que instancia o runtime compartilhado ou um iframe isolado? A escolha depende do desacoplamento do motor atual e do nível de isolamento desejado.
+3. Qual é a faixa piloto e qual conjunto mínimo de eventos será necessário para demonstrar a sincronização?
+4. A edição automática de arquivo ficará fora do primeiro MVP (recomendado), usando exportação e revisão manual de Git, ou haverá uma integração de escrita posterior?
+5. Quais testes serão executados automaticamente em cada alteração da partitura?
+
