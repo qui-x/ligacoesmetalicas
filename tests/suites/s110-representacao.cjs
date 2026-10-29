@@ -221,14 +221,14 @@ module.exports={series:'0.11',async run(kit,{screenshots=false}={}){
  await test('0.11-16','Pinça que começa numa unidade não a move (o arrasto é desfeito sem escrita)',async use=>{
   const page=await use({width:390,height:844,mobile:true});await investigate(page,'Cu');await assemble(page,4);
   const before=JSON.stringify((await state(page)).structure.units),z0=(await snap(page)).camera.zoom;
-  const r=await page.evaluate(()=>{const st=document.getElementById('silm-assembly-stage'),node=document.querySelector('.silm-unit[data-unit-id]'),unitId=node.dataset.unitId,b=node.getBoundingClientRect(),x=b.x+b.width/2,y=b.y+b.height/2,s=st.getBoundingClientRect();
+  const r=await page.evaluate(()=>{const st=document.getElementById('silm-assembly-stage'),node=document.querySelector('.silm-unit[data-unit-id]'),unitId=node.dataset.unitId;node.click();const selectedBefore=node.getAttribute('aria-pressed'),b=node.getBoundingClientRect(),x=b.x+b.width/2,y=b.y+b.height/2,s=st.getBoundingClientRect();
    const ev=(el,type,id,cx,cy)=>el.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',isPrimary:id===1,clientX:cx,clientY:cy,bubbles:true,cancelable:true}));
    ev(node,'pointerdown',1,x,y);ev(node,'pointermove',1,x+12,y+6);ev(node,'pointermove',1,x+20,y+10);const dragged=node.hasAttribute('data-dragging');
    const x2=s.x+s.width*.85,y2=s.y+s.height*.85;ev(st,'pointerdown',2,x2,y2);
    for(let k=1;k<=6;k++){ev(node,'pointermove',1,x+20-k*10,y+10-k*10);ev(st,'pointermove',2,x2+k*6,y2+k*6);}
-   ev(node,'pointerup',1,x-40,y-50);ev(st,'pointerup',2,x2+36,y2+36);node.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,detail:1}));return {dragged,after:node.hasAttribute('data-dragging'),unitId,selectedAfterResidualClick:node.getAttribute('aria-pressed')};});
+   ev(node,'pointerup',1,x-40,y-50);ev(st,'pointerup',2,x2+36,y2+36);node.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,detail:1}));return {dragged,after:node.hasAttribute('data-dragging'),unitId,selectedBefore,selectedAfterResidualClick:node.getAttribute('aria-pressed')};});
   await page.waitForTimeout(250);
-  assert.ok(r.dragged,'o arrasto tinha começado');assert.equal(r.after,false,'arrasto desfeito');assert.equal(r.selectedAfterResidualClick,'true','clique residual da pinça não alterna a seleção');
+  assert.ok(r.dragged,'o arrasto tinha começado');assert.equal(r.after,false,'arrasto desfeito');assert.equal(r.selectedBefore,'true','unidade selecionada antes da pinça');assert.equal(r.selectedAfterResidualClick,r.selectedBefore,'clique residual da pinça não alterna a seleção');
   assert.equal(JSON.stringify((await state(page)).structure.units),before,'nenhuma unidade movida');
   const z1=(await snap(page)).camera.zoom;assert.ok(z1>z0*1.2,'a pinça aproximou: '+z0+' → '+z1);return {z0,z1};
  });
