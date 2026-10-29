@@ -1035,3 +1035,177 @@ Esta é uma direção selecionada para desenvolvimento da especificação. O mot
 - Determinar quais canais pertencem ao groove de base e quais pertencem ao destaque.
 - Confirmar se a primeira forma de mistura usará máscaras/camadas de articulações ou clipes deliberadamente preparados para sobreposição.
 - Selecionar os navegadores e dispositivos para o teste de desempenho.
+
+
+## 19. Primeira biblioteca de movimentos — prioridade em deslocamento e conjunto
+
+A direção escolhida para a primeira biblioteca é **B — priorizar deslocamento e conjunto**: entradas, saídas, giros, trocas de posição e formações. A mecânica corporal continua sendo uma dependência mínima do rig e dos clipes, mas não será a frente de refinamento artístico principal nesta primeira etapa.
+
+A biblioteca será desenvolvida sob a arquitetura híbrida já escolhida: clipes artísticos pré-produzidos no Blender e coordenação de palco, posições e formações pelo Babylon.js. A regra combinada continua válida: clipe corporal principal como comportamento seguro; combinação simultânea de groove e destaque apenas onde for demonstrada compatibilidade.
+
+### 19.1 O que queremos resolver primeiro
+
+O objetivo imediato é que os personagens saibam **entrar, ocupar a pista, mudar de formação, girar para o parceiro ou para o público, trocar de lugar e sair com intenção cênica**. O primeiro resultado deve ser uma pequena sequência coletiva legível e sincronizável com a partitura, e não uma grande coleção de passos isolados.
+
+O deslocamento deve reforçar:
+- a progressão dramática do elenco;
+- a permanência cumulativa no palco, com saídas e reentradas apenas quando houver função dramática;
+- as formações que suportam grupos variáveis e o elenco final de 17 elementos;
+- o destaque principal e a presença cênica dos demais;
+- a identidade de figurino CFC, CCC, HC e DHC sem perder legibilidade durante movimentos e giros.
+
+### 19.2 Estado atual observado no repositório público
+
+Na branch `main`, a auditoria dos arquivos consultados mostrou que:
+- `jazz-club/src/dance-core.js` define três protagonistas e pontos de formação indexados para esse elenco;
+- `danceFrame` calcula proceduralmente posições, direção, movimentos e poses a partir de BPM, tempo e formação;
+- `jazz-club/src/dance.js` constrói os corpos de dançarinos usando meshes e `TransformNode` do Babylon.js e aplica as poses aos pivôs;
+- esse arquivo, na versão consultada, não contém chamadas diretas de carregamento de modelos GLB/GLTF para os dançarinos.
+
+Consequentemente, a etapa inicial **não deve assumir que já existe um rig Blender pronto e integrado**. Primeiro será necessário validar um rig/ativo GLB e definir como ele passa a substituir ou coexistir com os dançarinos procedurais atuais. O atual rig procedural pode continuar como fallback de protótipo enquanto o ativo exportado é validado; isso não comprova, por si só, a pipeline Blender.
+
+Referências aos arquivos examinados:
+- `jazz-club/src/dance-core.js`
+- `jazz-club/src/dance.js`
+- `jazz-club/src/dance-fallback.js`
+- `jazz-club/README.md`
+
+### 19.3 Biblioteca inicial proposta
+
+A prioridade não é congelar uma longa lista de movimentos, mas provar as capacidades necessárias para deslocamento e conjunto:
+
+1. **Entrada no palco:** sair de uma posição fora da área visível, percorrer um trajeto e estabilizar na posição atribuída sem teleporte ou deslize final.
+2. **Saída deliberada:** percorrer uma trajetória de saída e passar para o estado fora do palco; não desaparecer instantaneamente salvo evento explicitamente estilizado.
+3. **Giro/pivô:** virar para uma nova direção de palco, parceiro ou público, com apoio e pose final legíveis.
+4. **Troca de posição:** dois ou mais dançarinos trocam posições sem se atravessar visualmente; trajetórias e timing precisam considerar o volume ocupado.
+5. **Transição entre formações:** migrar de trio/roda/linha/pares para outra formação, interpolando posições e orientações sem saltos.
+6. **Reposicionamento para destaque:** abrir espaço para solo ou foco de grupo, mantendo os outros personagens em presença cênica.
+7. **Reunião coletiva:** convergir para uma formação final escalável que inclua os 17 personagens.
+8. **Pose de chegada/espera:** ter estado inicial/final consistente em entradas e saídas para que uma busca no áudio possa reconstruir a cena sem depender do histórico de frames.
+
+Este inventário é o escopo de prova para a primeira biblioteca, não uma declaração de que todos os clipes já existem nem que cada item será um arquivo de animação único. Alguns comportamentos serão trajetórias procedurais; outros serão clipes corporais de Blender; alguns combinarão as duas coisas com um contrato explícito.
+
+### 19.4 Divisão de responsabilidades: palco versus corpo
+
+Para reduzir conflitos e manter as formações adaptáveis, a regra proposta é:
+
+**Babylon.js / controlador de palco**
+- calcula o destino de cada personagem por formação;
+- determina posição mundial, orientação e trajeto entre espaços;
+- decide o escalonamento temporal de entradas, saídas e trocas;
+- impede sobreposição de trajetórias através de pontos intermediários, faixas distintas ou deslocamento temporal;
+- reconstrói o estado pela posição absoluta da partitura;
+- coordena a formação final para 17 elementos.
+
+**Blender / clipes corporais**
+- fornece qualidade artística para passos, balanço de jazz, pivôs corporais, postura de chegada e gestos de entrada/saída;
+- define poses de início e fim bem comportadas para a transição;
+- cria movimentos reutilizáveis que podem ser executados no lugar (*in-place*) quando a posição global deve ser controlada pelo palco.
+
+**Regra padrão:** separar a trajetória global do movimento corporal. Usar clipes *in-place* para a maioria dos passos quando a coreografia exigir destino espacial exato. A biblioteca pode incluir clipes com *root motion* quando o deslocamento pertence à própria ação, mas o metadado deve ser explícito e o controlador não pode aplicar a mesma translação duas vezes.
+
+Babylon.js documenta que *root motion* pode extrair deslocamento do clipe e aplicá-lo ao nó do personagem; também documenta restrições para evitar que a animação sobrescreva a transformação movida pelo controlador. Isso deve ser usado apenas depois de um teste direcionado: https://doc.babylonjs.com/features/featuresDeepDive/animation/rootMotion/
+
+### 19.5 Requisitos mínimos de rig para esse escopo
+
+A primeira prova com Blender deve adotar um rig consistente, reutilizável e suficiente para passos, orientação e giros. O rig mínimo a testar deve incluir:
+- nó exterior de personagem/âncora para posição e orientação mundial;
+- raiz/pelve e coluna/torso;
+- pescoço e cabeça;
+- ombros, braços superiores, antebraços e mãos;
+- coxas, joelhos, canelas e pés;
+- pivôs e hierarquia compreensíveis e estáveis;
+- deformação e pesos sem quebra visível nos passos, giros e poses amplas.
+
+Dedos individualizados e facialidade avançada podem ser adiados se não forem necessários para os clipes de entrada, deslocamento e conjunto. Não se deve simplificar de forma que joelhos, tornozelos ou pés não consigam expressar apoio e mudança de direção; isso tornaria a biblioteca prioritária artificial.
+
+Definir nomes estáveis para as articulações e os clipes antes de produzir muitas animações. É necessário provar que o rig conserva escala, orientação, pivôs e deformação ao exportar e carregar. O rig atual construído com nós procedurais não deve ser confundido automaticamente com um armature/blend rig do Blender: é uma base de protótipo e fallback.
+
+### 19.6 Exportação Blender → GLB → Babylon.js
+
+O processo de exportação precisa ser uma prova técnica antes de se criar a biblioteca final:
+1. escolher um personagem-piloto e estabelecer escala/unidades, eixo vertical, frente do personagem, origem, pé no chão e posição de repouso;
+2. criar os clipes como Actions/NLA conforme a organização escolhida;
+3. exportar um GLB com o rig e múltiplas animações nomeadas;
+4. carregar o GLB no Babylon.js e listar os grupos de animação recebidos;
+5. reproduzir cada clipe individualmente, verificando rig, materiais, duração, pose inicial/final e articulações;
+6. confirmar as conversões de eixos e o nó de raiz criados pelo carregador antes de acrescentar rotações compensatórias manuais;
+7. experimentar um clip *in-place* e uma ação com deslocamento explicitamente conhecido;
+8. guardar um procedimento reproduzível de exportação, com opções documentadas e teste de regressão.
+
+A documentação do Babylon.js alerta que as convenções de eixos entre Blender, glTF e Babylon.js diferem, e que o carregador estabelece um nó raiz `__root__` e faz conversões. Portanto, a correção deve ser conferida no ativo real em vez de aplicar rotação de correção às cegas. Referência: https://doc.babylonjs.com/features/featuresDeepDive/Exporters/Blender_to_glTF
+
+O pipeline glTF aceita animações esqueléticas e múltiplas animações; a organização das Actions/NLA e as opções de exportação determinam como elas são representadas no arquivo. Referências:
+- https://doc.babylonjs.com/preparingArtForBabylon/dccToGltf
+- https://docs.blender.org/manual/en/5.0/addons/import_export/scene_gltf2.html
+
+### 19.7 Referências de dança e sua aplicação específica
+
+As referências audiovisuais já listadas na seção 5 devem ser analisadas com foco especial nos aspectos de deslocamento e conjunto, não só na pose final.
+
+- **Charleston dos anos 1920:** observar deslocamento curto, apoio alternado, transferência de peso, direção do corpo e entrada/saída da frase musical. Serve como referência histórica mais próxima do cenário.
+- **The Big Apple (1939):** observar formações coletivas, chamadas e respostas, reorganização do grupo e legibilidade de trajetórias. É posterior aos anos 1920 e deve ser tratado como referência complementar, não como representação exata da época de 1925.
+- **Isolamentos e pivôs técnicos:** usar para entender como o tronco e a orientação podem preparar um giro enquanto os pés e a base corporal sustentam o movimento.
+- **Registros de jazz dance em grupo:** analisar distância entre participantes, mudanças de direção, cruzamentos e como preservar um foco quando várias pessoas se movem.
+
+A ficha de referência deve registrar o intervalo do vídeo, início/fim do gesto, caminho dos pés, orientação de entrada e saída, contagem musical aproximada e finalidade da animação no nosso sistema. As coreografias desenvolvidas devem ser originais, inspiradas em princípios de movimento; não presumir que uma gravação dá autorização para reproduzir uma sequência protegida no produto.
+
+### 19.8 Formações escaláveis e segurança espacial
+
+O sistema atual tem posições de palco definidas para três protagonistas. O escopo futuro de 17 requer abandonar a suposição de que cada formação tem exatamente três slots.
+
+A futura definição de formação deve receber, no mínimo:
+- número de participantes ativos;
+- largura e profundidade úteis do palco;
+- espaçamento mínimo desejado;
+- ordem/prioridade de destaque;
+- slots de entrada/saída;
+- orientação dos participantes;
+- limites da câmera e visibilidade do conjunto.
+
+As formações de trio, roda, linha, pares e troca devem ser generalizadas para diferentes quantidades, com estratégia documentada quando o número for ímpar ou quando um personagem estiver em solo. A formação final deverá suportar 17 sem sobrepor os corpos nem esconder os identificadores cristalinos.
+
+Não é obrigatório introduzir um motor de física completo para esse MVP. Uma solução determinística baseada em slots, trajetórias por pontos intermédios e atribuição temporal pode ser suficiente desde que os testes demonstrem que não há colisões visuais nem cruzamentos confusos. Se os casos de troca exigirem, acrescentar detecção/planejamento mais avançado como fase seguinte.
+
+### 19.9 Critérios de aceite da primeira biblioteca
+
+**Rig/exportação**
+1. O GLB carrega sem erros no navegador alvo.
+2. Os nomes esperados de rig e clips são encontrados no runtime.
+3. Escala, orientação, origem, pé no chão, materiais e deformação estão corretos.
+4. A biblioteca pode reproduzir cada ação isolada com pose de saída válida.
+5. Não existem correções de eixo/pivô ad hoc sem justificativa documentada.
+
+**Deslocamento e conjunto**
+6. Entrada: o personagem sai de fora da área visível, alcança o slot e termina estável, sem teleporte ou deslize inintencional.
+7. Saída: o personagem percorre a trajetória prevista e passa ao estado correto.
+8. Giro: a orientação final coincide com a direção de cena/partitura e a pose preserva equilíbrio visual.
+9. Troca de lugar: dois ou mais personagens não atravessam visualmente os corpos e não ocupam o mesmo slot.
+10. Mudança de formação: as posições e orientações transitam sem saltos; os participantes mantêm os IDs corretos.
+11. Clímax: 17 personagens provisórios podem ocupar a formação final dentro dos limites do palco e da câmera.
+
+**Sincronização e recuperação**
+12. Entradas, saídas e trajetórias derivam da posição absoluta da partitura; pause/seek/resume refaz o estado.
+13. Ao saltar o áudio para o meio de uma entrada, o personagem assume a posição coerente com o tempo, sem precisar completar frames passados.
+14. Ao trocar a faixa, não ficam trajetórias antigas ou animações residuais.
+15. Se a mistura de clipes não for compatível, o motor recorre à política sequencial segura.
+
+**Visual e fallback**
+16. O movimento em grupo mantém uma hierarquia de atenção entre destaque, conjunto e presença cênica.
+17. CFC, CCC, HC e DHC continuam visualmente discerníveis durante giros e deslocamento, conforme a ficha científica de cada personagem.
+18. O fallback Canvas2D preserva ordem de entrada, eventos e formação, ainda que represente o movimento de modo simplificado.
+19. O desempenho é medido com navegador, dispositivo, número de personagens e configuração gráfica registados.
+
+### 19.10 Ordem de desenvolvimento proposta
+
+1. Auditar o coreográfico atual e registrar as formações fixas a três.
+2. Definir as convenções do rig e criar um personagem-piloto no Blender.
+3. Provar exportação de múltiplos clipes no GLB e reprodução no Babylon.js.
+4. Implementar um controlador de palco com um ponto de entrada, slots e trajetórias determinísticas.
+5. Provar entrada, giro e troca de lugar com três personagens.
+6. Generalizar os slots e as formações para 17 participantes provisórios.
+7. Validar final coletivo e recuperação do estado após seek/troca de faixa.
+8. Refinar clipes e figurinos em lotes, adicionando camadas simultâneas só quando testadas.
+9. Repetir testes no fallback e na apresentação pública, sem exigir que o editor local esteja presente.
+
+Esta sequência mantém a prioridade B de deslocamento e conjunto. O trabalho de mecânica corporal não é eliminado: será refinado até o nível necessário para dar credibilidade às entradas, aos giros e às trocas, enquanto uma biblioteca de isolamentos e gestos mais rica pode ser expandida posteriormente.
