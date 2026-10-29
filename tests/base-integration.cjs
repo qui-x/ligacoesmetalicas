@@ -37,6 +37,31 @@ async function main(){
   const unit=page.locator('.silm-unit').first();await unit.press('Enter');await unit.press(direction);
   await page.waitForFunction(original=>JSON.stringify(SILMIntegration.snapshot().structure.units[0].position)!==JSON.stringify(original),original);
   await page.locator('#scene-undo').click();assert.deepEqual((await state()).structure.units[0].position,original);
+  // Regressão mecânica: ao começar uma pinça sobre uma unidade, cancelar o arrasto
+  // deve restaurar a posição, preservar o modelo e suprimir o clique residual.
+  await page.evaluate(()=>{const node=document.querySelector('#silm-assembly-stage .silm-unit[data-unit-id]');if(node?.getAttribute('aria-pressed')!=='true')node.click();});
+  const beforePinch=await state();
+  const pinch=await page.evaluate(()=>{
+   const stage=document.getElementById('silm-assembly-stage'),node=stage.querySelector('.silm-unit[data-unit-id]');
+   const selectedBefore=node.getAttribute('aria-pressed'),before={left:node.style.left,top:node.style.top};
+   const b=node.getBoundingClientRect(),x=b.x+b.width/2,y=b.y+b.height/2,s=stage.getBoundingClientRect(),x2=s.x+s.width*.85,y2=s.y+s.height*.85;
+   const ev=(el,type,id,cx,cy)=>el.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',isPrimary:id===1,clientX:cx,clientY:cy,bubbles:true,cancelable:true,button:0,buttons:type==='pointerup'?0:1}));
+   ev(node,'pointerdown',1,x,y);ev(node,'pointermove',1,x+12,y+6);ev(node,'pointermove',1,x+20,y+10);
+   const began=node.hasAttribute('data-dragging');
+   ev(stage,'pointerdown',2,x2,y2);
+   const canceled=!node.hasAttribute('data-dragging');
+   for(let k=1;k<=4;k++){ev(node,'pointermove',1,x+20-k*5,y+10-k*3);ev(stage,'pointermove',2,x2+k*8,y2+k*8);}
+   ev(node,'pointerup',1,x,y);ev(stage,'pointerup',2,x2+32,y2+32);
+   node.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,detail:1}));
+   return {began,canceled,selectedBefore,selectedAfter:node.getAttribute('aria-pressed'),before,left:node.style.left,top:node.style.top,unitId:node.dataset.unitId};
+  });
+  assert.ok(pinch.began,'o arrasto inicial da unidade começou');
+  assert.ok(pinch.canceled,'início da pinça cancela o arrasto');
+  assert.equal(pinch.selectedBefore,'true','unidade selecionada antes da pinça');
+  assert.equal(pinch.selectedAfter,pinch.selectedBefore,'clique residual da pinça não alterna a seleção');
+  assert.equal(pinch.left,pinch.before.left,'cancelamento restaura left sem posição intermediária');
+  assert.equal(pinch.top,pinch.before.top,'cancelamento restaura top sem posição intermediária');
+  assert.deepEqual(await state(),beforePinch,'pinça cancelada não altera o estado científico');
   await page.locator('#silm-assembly-organize').click();
   await page.waitForSelector('.silm-crystal');const crystal=await state();assert.equal(crystal.structure.crystallography.structureType,'FCC');
   assert.equal(await page.locator('#si-expand-structure').isDisabled(),false,'A estrutura configurada deve permitir expansão.');
