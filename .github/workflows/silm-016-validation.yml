@@ -49,6 +49,8 @@ jobs:
         run: npm run test:a11y
       - name: Validar comparação, elétrons 3D e seleção na tabela
         run: npm run test:comparison
+      - name: Validar toques, medição e cálculo em três viewports móveis
+        run: npm run test:mobile-mechanics
       - name: Validar navegação móvel, foco, expansão e estado científico
         run: npm run test:routes:browser
         env:

@@ -21,7 +21,8 @@
     "test:routes:browser": "node tests/integration-runner.cjs",
     "test:learning": "node tests/learning.cjs",
     "test:backup": "node tests/notebook-backup.cjs",
-    "test:comparison": "node tests/structure-comparison.cjs && node tests/electrons-3d.cjs && node tests/table-mounting.cjs"
+    "test:comparison": "node tests/structure-comparison.cjs && node tests/electrons-3d.cjs && node tests/table-mounting.cjs",
+    "test:mobile-mechanics": "node tests/silm-mobile-mechanics.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1",
