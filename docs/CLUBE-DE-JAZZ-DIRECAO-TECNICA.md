@@ -530,3 +530,102 @@ O cronograma deve ser recalculado após a Fase 1, porque o grau de acoplamento e
 4. A edição automática de arquivo ficará fora do primeiro MVP (recomendado), usando exportação e revisão manual de Git, ou haverá uma integração de escrita posterior?
 5. Quais testes serão executados automaticamente em cada alteração da partitura?
 
+
+
+## 14. Editor privado com controle de acesso — DIREÇÃO ESCOLHIDA; TOPOLOGIA E CRITÉRIOS EM DISCUSSÃO
+
+A direção escolhida é **C — ambiente privado com controle de acesso apropriado**. Isso significa que a ferramenta de autoria e seus recursos devem ser acessíveis somente aos usuários autorizados. Esta seção analisa as consequências e propõe critérios de aceite; o método de hospedagem e a política de acesso ainda não estão congelados.
+
+### 14.1 Requisito de segurança
+
+Não é suficiente:
+- esconder o link do editor;
+- confiar numa variável JavaScript que decide mostrar ou não os controles;
+- exibir uma tela de senha no cliente sem proteção dos recursos no servidor/proxy;
+- publicar os arquivos estáticos em uma URL pública e presumir que a URL pouco conhecida os torna privados.
+
+O controle precisa acontecer antes de disponibilizar a aplicação e os recursos protegidos. A autorização feita apenas no cliente é contornável e não deve ser usada como decisão final de acesso. Referência: OWASP Authorization Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html
+
+A política mínima proposta é negar por padrão e permitir somente identidades explicitamente autorizadas. A lista de pessoas/grupos autorizados, o método de autenticação e o processo para revogar acesso devem ser definidos antes da implantação.
+
+### 14.2 Implicações de GitHub Pages
+
+GitHub Pages é hosting estático e, por padrão, os sites publicados ficam acessíveis publicamente, mesmo quando o repositório de origem é privado, salvo se a publicação privada com controle de acesso tiver sido configurada.
+
+A documentação atual do GitHub indica que a publicação de um site Pages privado com controle de acesso exige **GitHub Enterprise Cloud** e um repositório privado/interno pertencente a uma organização compatível. Não se deve presumir que o plano pessoal atual e um repositório sob o usuário `qui-x` suportem essa modalidade. Referências oficiais:
+- https://docs.github.com/en/enterprise-cloud%40latest/pages/getting-started-with-github-pages/changing-the-visibility-of-your-github-pages-site
+- https://docs.github.com/en/enterprise-cloud%40latest/pages/getting-started-with-github-pages/creating-a-github-pages-site
+
+Consequência: simplesmente criar `editor/` ou uma branch separada na publicação pública do SILM **não** satisfaz o requisito de privacidade. O editor não deve ser distribuído nessa publicação antes de se definir o controle de acesso efetivo.
+
+### 14.3 Topologias possíveis
+
+**Opção A — ambiente local de desenvolvimento:** executar o editor num servidor local e manter a superfície acessível apenas na máquina/ambiente de desenvolvimento. Reduz a exposição externa e pode ser a etapa inicial de protótipo, mas não oferece automaticamente colaboração remota. O processo de execução e atualização deverá ser documentado.
+
+**Opção B — aplicação hospedada atrás de proxy de identidade:** hospedar a ferramenta num ambiente servidor e colocar um controle de acesso real antes da aplicação. Uma possibilidade é Cloudflare Access, que atua como proxy com políticas baseadas em identidade. A documentação pede um domínio ativo na Cloudflare para a opção de publicar uma aplicação em hostname público e define políticas de acesso, com negação por padrão se não houver uma regra de permissão adequada:
+- https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/
+- https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/self-hosted-public-app/
+
+Esta opção exige confirmar a disponibilidade de domínio/DNS, local de hospedagem, política de identidade, custos e como impedir acesso direto à origem que contorne o proxy. Usar apenas o Access no hostname público não resolve caso o serviço de origem também permaneça diretamente exposto.
+
+**Opção C — publicação privada no GitHub Pages:** considerar somente se houver organização/plano elegível no GitHub Enterprise Cloud e se a restrição de acesso aos membros do repositório corresponder aos requisitos. Não deve ser tratada como disponível sem confirmar o plano e a propriedade/visibilidade do repositório.
+
+A escolha entre essas opções depende de uma decisão sobre a necessidade de abrir o editor remotamente a partir de outros dispositivos. Não assumir a existência de domínio próprio, assinatura empresarial, servidor, conta de hospedagem ou provedor de identidade antes de confirmar os recursos disponíveis.
+
+### 14.4 Segredos e permissões de escrita
+
+O primeiro MVP deve manter o fluxo **importar → editar → validar → pré-visualizar → exportar → revisar → incorporar por pull request**.
+
+Regras:
+- Não colocar token de GitHub, chave de API ou segredo de hospedagem dentro de arquivos JavaScript, JSON, variáveis de build públicas ou dados do navegador.
+- Não conceder permissão de escrita ao repositório a partir da interface de autoria no MVP.
+- Manter as alterações de partitura como rascunhos separados da versão oficial.
+- Se, numa fase futura, for necessária publicação automatizada, realizá-la por um workflow controlado, com permissões mínimas, revisão de origem e credenciais de curta duração quando possível.
+- Evitar armazenar conteúdo de partituras privadas em logs de autenticação ou telemetria sem necessidade.
+- Não considerar a autenticação de entrada uma garantia de autorização para todas as operações; validar separadamente o que cada identidade pode ler, exportar ou publicar.
+
+Para futuras implantações automatizadas, GitHub Actions suporta OIDC para trocar uma identidade de workflow por uma credencial de curta duração no provedor, em vez de manter credenciais permanentes como secrets; a configuração deverá restringir repositórios/branches/ambientes confiáveis:
+https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-cloud-providers
+
+### 14.5 Critérios de aceite de segurança e operação
+
+A decisão de arquitetura só pode ser considerada implementável quando os testes demonstrarem:
+
+1. **Usuário autorizado:** consegue autenticar e abrir o editor.
+2. **Usuário não autorizado:** recebe negação de acesso antes de obter a aplicação e seus recursos protegidos.
+3. **Revogação:** removendo a identidade da política autorizada, o acesso é bloqueado depois da atualização/expiração aplicável das sessões.
+4. **URL/origem direta:** não há uma rota, subdomínio ou origem alternativa que permita contornar o controle de acesso.
+5. **Apresentação pública isolada:** a página pública do Clube de Jazz continua sem controles editoriais e sem referenciar/embutir a aplicação privada.
+6. **Sem credenciais no cliente:** arquivos entregues ao navegador não contêm tokens persistentes ou segredos de implantação.
+7. **Partitura sem escrita automática:** editar e exportar não altera a partitura oficial nem a branch `main`.
+8. **Importação segura:** JSON inválido, eventos desconhecidos, conteúdo fora dos limites e referências inexistentes são rejeitados com mensagens compreensíveis.
+9. **Fluxo musical:** play/pause/seek e troca de faixa reconstruem o estado sem duplicação de personagens, poses obsoletas ou descompasso permanente.
+10. **Disponibilidade e recuperação:** é documentado como atualizar, voltar à versão anterior e recuperar o acesso administrativo sem enfraquecer a política global.
+11. **Auditoria mínima:** ficam registrados os eventos administrativos pertinentes (alteração de políticas/deploy), sem coletar dados pessoais desnecessários.
+12. **Teste em navegador-alvo:** a autenticação e o editor funcionam sem controles editoriais aparecerem no modo público e sem comprometer a pré-visualização.
+
+Os critérios 2, 3 e 4 precisam ser testados como controle real no perímetro de hospedagem, não por simples inspeção da interface.
+
+### 14.6 Implicações para o cronograma
+
+A privacidade torna a hospedagem e o acesso uma dependência explícita do editor. A ordem recomendada é:
+1. confirmar se o editor será acessado apenas no ambiente de desenvolvimento ou remotamente;
+2. verificar os recursos reais disponíveis (plano de GitHub, domínio/DNS, hospedagem e provedor de identidade);
+3. selecionar a topologia de acesso e documentar a política de negação por padrão;
+4. validar o perímetro com testes de acesso autorizado, acesso negado e origem direta;
+5. concluir o protótipo de partitura e pré-visualização;
+6. desenvolver o editor visual;
+7. só depois pensar em publicação automatizada ou escrita direta no GitHub.
+
+A primeira demonstração do motor musical pode acontecer localmente enquanto a topologia de acesso remoto é definida; a experiência privada completa não deve ser declarada pronta antes dos testes de autenticação e acesso direto.
+
+### 14.7 Decisões pendentes antes do congelamento
+
+1. O editor precisa ser acessível remotamente a partir de outros dispositivos ou pode inicialmente funcionar apenas no ambiente de desenvolvimento?
+2. Existe domínio próprio sob controle do projeto e possibilidade de gerir seu DNS?
+3. O ambiente atual oferece GitHub Enterprise Cloud ou devemos desconsiderar GitHub Pages privado?
+4. Qual identidade será utilizada para autorizar os usuários (por exemplo, um IdP/conta existente ou uma política de acesso dedicada)?
+5. Onde ficará hospedada a aplicação de autoria e como a origem ficará inacessível diretamente?
+6. A primeira entrega será um protótipo local seguido de implantação privada, ou o protótipo já deverá nascer atrás do controle de acesso escolhido?
+
+Até que esses pontos sejam respondidos e os critérios de aceite testados, o ambiente privado permanece a direção escolhida, mas a topologia e a implantação não estão congeladas.
