@@ -667,3 +667,78 @@ Em 29 de outubro de 2026, foi escolhida a opção **executar apenas no ambiente 
 6. Verificar que a versão pública permanece independente do editor.
 
 Esta escolha determina o ambiente de execução do primeiro MVP; não congela ainda o desenho completo da interface nem o formato final dos eventos.
+
+
+## 16. Código do editor em pasta local fora do repositório público — OPÇÃO ESCOLHIDA PARA ANÁLISE
+
+Foi indicada a opção **C — manter o código do editor apenas numa pasta local de desenvolvimento, fora do repositório público**. A escolha responde à intenção de não publicar o editor nem seus arquivos; as medidas de manutenção, versionamento e ligação com os ativos do espetáculo ainda precisam ser definidas antes de congelar a solução.
+
+### 16.1 Benefícios
+
+- O código e a interface de autoria não entram na publicação estática pública do SILM.
+- Não há necessidade imediata de um repositório privado remoto, serviço de autenticação ou hospedagem do editor.
+- O desenvolvimento pode se concentrar na modelagem JSON, na pré-visualização sincronizada e no controlador da partitura.
+- A apresentação pública pode continuar sendo validada de forma independente.
+- Os arquivos de rascunho e as partituras em edição não são enviados automaticamente ao repositório público.
+
+### 16.2 Riscos de manutenção
+
+Manter uma pasta fora do repositório não garante, por si só, histórico de alterações, backup ou recuperabilidade. Se os arquivos forem perdidos, o editor pode precisar ser reconstruído. Sem histórico, também ficará mais difícil comparar versões, desfazer mudanças ou diagnosticar regressões.
+
+Mitigação recomendada:
+- criar uma pasta local separada do clone público;
+- inicializar nela um repositório Git **local, sem remote configurado**, se o usuário concordar;
+- registrar commits locais para alterações de funcionalidade;
+- criar backups periódicos e verificáveis da pasta e das partituras de trabalho;
+- não armazenar tokens, senhas ou credenciais no editor;
+- documentar como restaurar uma cópia e iniciar o ambiente de desenvolvimento;
+- rever a estratégia se houver necessidade de colaboração entre máquinas ou de recuperação remota.
+
+Um repositório Git local não publica o código por conta própria, mas só registra o histórico na máquina. Se a máquina falhar, o histórico local também pode ser perdido; por isso, backups continuam necessários. Se for desejada cópia remota posterior, escolher conscientemente um destino privado e rever a decisão de acesso antes de configurar um remote.
+
+### 16.3 Como reutilizar o motor sem duplicá-lo
+
+O editor deve reutilizar o núcleo de partitura/coreografia que já existe em `jazz-club/src/`, sem criar uma cópia independente do algoritmo.
+
+Como os arquivos do editor ficarão fora do clone público, será necessário definir um ponto de integração local. A opção técnica preferida para investigar é um servidor de desenvolvimento que exponha, sob loopback apenas, a interface do editor local e os módulos de runtime existentes do clone, sem modificar o artefato público. A configuração precisa:
+- resolver os caminhos locais explicitamente;
+- não escutar em interfaces públicas por padrão;
+- impedir importações que dependam de diretórios arbitrários do computador;
+- usar os mesmos módulos de runtime empregados pelo espetáculo, e não versões copiadas que possam divergir;
+- deixar claro como funciona se o diretório do clone for movido;
+- não depender de recursos de autoria no build público.
+
+A escolha entre um pequeno servidor local próprio, configuração de ferramenta de desenvolvimento ou outro mecanismo de integração deve ocorrer após inspeção do código e dos caminhos de importação atuais. Não se deve assumir que abrir arquivos diretamente com `file://` será suficiente para módulos ES, carregamento de áudio e sincronização, pois restrições de origem e CORS podem impedir operações.
+
+### 16.4 Separação de conteúdo e código
+
+Tratar separadamente:
+- **código do editor:** apenas na pasta local fora do repositório público;
+- **módulos do runtime:** continuam sendo os módulos versionados do projeto, sem cópias divergentes;
+- **rascunhos de partitura:** guardados localmente durante a edição;
+- **partitura aprovada:** exportada, validada e incorporada ao fluxo de mudanças do projeto apenas quando estiver pronta;
+- **ativos de áudio/modelos:** referenciados a partir da coleção existente quando possível, sem duplicação desnecessária.
+
+Não copiar arquivos de áudio grandes para a pasta do editor só para conseguir pré-visualizá-los, a menos que exista necessidade técnica documentada. A ferramenta deve indicar com clareza o caminho e o identificador da faixa que está usando.
+
+### 16.5 Critérios de aceite
+
+1. Nenhum arquivo-fonte do editor é adicionado à árvore do repositório público nem ao artefato publicado.
+2. A ferramenta roda no ambiente local, e qualquer servidor de desenvolvimento escuta apenas em loopback por padrão.
+3. A pré-visualização utiliza o mesmo núcleo de partitura/coreografia do projeto.
+4. Mover ou não encontrar o clone do projeto gera uma mensagem explícita, não uma falha silenciosa nem a utilização de uma cópia antiga.
+5. O editor importa, valida, edita, exporta e reabre um JSON sem perda dos campos suportados.
+6. A edição não altera automaticamente a partitura oficial nem a branch `main`.
+7. Existe uma política aprovada de versionamento local e backup antes de produzir partituras importantes.
+8. A apresentação publicada não ganha dependências em tempo de execução do editor local.
+9. O passo a passo para iniciar o editor, encerrar o servidor e restaurar a pasta está documentado.
+
+### 16.6 Decisões ainda abertas
+
+- O usuário aprova inicializar um Git local sem remote para manter histórico, ou prefere pasta sem histórico Git e backups manuais?
+- Qual será o caminho local da pasta de desenvolvimento, sem pressupor a letra de unidade ou a organização atual da máquina?
+- Qual servidor/configuração local será utilizado para expor a pré-visualização em loopback?
+- Como o editor resolverá a localização do clone `qui-x/ligacoesmetalicas` sem fixar um caminho frágil?
+- Qual frequência e local de backup serão suficientes para os arquivos de autoria?
+
+A escolha C continua sendo uma proposta em análise até que essas consequências sejam aceitas e os critérios principais sejam definidos.
