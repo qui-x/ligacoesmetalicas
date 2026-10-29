@@ -83,16 +83,23 @@ async function main(){
   await page.waitForFunction(({id,original})=>{const u=SILMIntegration.snapshot().structure.units.find(x=>x.id===id);return u&&Math.abs(u.position.x-original.x)<1e-8&&Math.abs(u.position.y-original.y)<1e-8;},{id:drag.id,original:drag.original});
   assert.deepEqual(await state(),beforeMouse,'um único Desfazer reverte todo o arrasto');
 
-  // Soltar uma unidade em outra unidade é rejeitado sem mudança científica.
+  // Com a assistência habilitada por padrão, um destino ocupado deve ajustar a posição
+  // e identificá-la como assistida; o posicionamento continua sendo reversível.
   const occupied=await page.evaluate(()=>{
    const stage=document.getElementById('silm-assembly-stage'),units=SILMIntegration.snapshot().structure.units,moving=units[0],other=units[1];
-   return {id:moving.id,original:moving.position,from:stage.silmRenderer.toClient(moving.position),to:stage.silmRenderer.toClient(other.position)};
+   return {id:moving.id,original:{...moving.position},from:stage.silmRenderer.toClient(moving.position),to:stage.silmRenderer.toClient(other.position)};
   });
   await page.mouse.move(occupied.from.x,occupied.from.y);await page.mouse.down();
   await page.mouse.move((occupied.from.x+occupied.to.x)/2,(occupied.from.y+occupied.to.y)/2,{steps:5});
   await page.mouse.move(occupied.to.x,occupied.to.y,{steps:6});await page.mouse.up();
-  await page.waitForFunction(()=>document.getElementById('silm-assembly-feedback')?.textContent.includes('Destino ocupado'));
-  assert.deepEqual(await state(),beforeMouse,'destino ocupado preserva o modelo científico');
+  await page.waitForFunction(()=>document.getElementById('silm-assembly-feedback')?.textContent.includes('Posição ajustada para evitar sobreposição'));
+  const assistedState=await state(),assistedUnit=assistedState.structure.units.find(x=>x.id===occupied.id);
+  assert.notDeepEqual(assistedUnit.position,occupied.original,'a assistência busca uma posição livre');
+  assert.equal(assistedUnit.placement,'assisted','o tipo de posicionamento identifica a assistência');
+  assert.ok(await page.evaluate(id=>{const units=SILMIntegration.snapshot().structure.units,u=units.find(x=>x.id===id);return SILM.assembly.isFree(units,u.position,id);},occupied.id),'a posição ajustada não sobrepõe outra unidade');
+  await page.locator('#scene-undo').click();
+  await page.waitForFunction(({id,original})=>{const u=SILMIntegration.snapshot().structure.units.find(x=>x.id===id);return u&&Math.abs(u.position.x-original.x)<1e-8&&Math.abs(u.position.y-original.y)<1e-8;},{id:occupied.id,original:occupied.original});
+  assert.deepEqual(await state(),beforeMouse,'um único Desfazer restaura a investigação após posicionamento assistido');
   await page.locator('#silm-assembly-organize').click();
   await page.waitForSelector('.silm-crystal');const crystal=await state();assert.equal(crystal.structure.crystallography.structureType,'FCC');
   assert.equal(await page.locator('#si-expand-structure').isDisabled(),false,'A estrutura configurada deve permitir expansão.');
