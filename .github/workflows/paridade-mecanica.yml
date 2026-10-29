@@ -1,0 +1,62 @@
+name: Paridade mecânica SIAB × SILM
+on:
+  push:
+    branches:
+      - feat/paridade-mecanica-siab-silm-20261029-audit
+  pull_request:
+    branches: [main]
+    paths:
+      - 'domain/silm/assembly-view.js'
+      - 'tests/suites/s110-representacao.cjs'
+      - 'tests/public-parity-smoke.mjs'
+      - 'docs/PARIDADE-MECANICA-SIAB-SILM-2026-10-29.md'
+      - '.github/workflows/paridade-mecanica.yml'
+permissions:
+  contents: read
+jobs:
+  local-regressions:
+    name: Build, regressões e acessibilidade (Chromium)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+      - name: Instalar Chromium para Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Build completo
+        run: npm run build
+      - name: Testes do pacote
+        run: npm test
+      - name: Acessibilidade automatizada
+        run: npm run test:a11y
+      - name: Comparação, elétrons 3D e tabela periódica
+        run: npm run test:comparison
+      - name: Navegação de roteiros com navegador
+        run: npm run test:routes:browser
+      - name: Regressão específica — pinça e clique residual
+        run: node tests/browser.cjs 0.11-16
+      - name: Auditoria da distribuição (diagnóstico; a versão publicada permanece separada)
+        continue-on-error: true
+        run: python3 scripts/audit-silm.py
+
+  published-smoke:
+    name: Smoke test das páginas públicas (sem service worker antigo)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+      - name: Instalar Chromium para Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Verificar SIAB e SILM públicos em cinco viewports
+        run: node tests/public-parity-smoke.mjs
