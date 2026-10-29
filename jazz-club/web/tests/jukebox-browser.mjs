@@ -3,7 +3,7 @@
 import {chromium} from 'playwright';
 import {spawn} from 'node:child_process';
 import {resolve} from 'node:path';
-import {mkdir} from 'node:fs/promises';
+import {mkdir,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 
 const root=resolve('../..');
@@ -73,15 +73,25 @@ try{
  await page.locator('#jukebox-volume').evaluate(el=>{el.value='45';el.dispatchEvent(new Event('input',{bubbles:true}))});
  assert.equal(await page.locator('#audio-player').evaluate(x=>x.volume),.45);
  await page.screenshot({path:resolve(dest,'jazz-jukebox-1925-desktop.png')});
+ const diagnostic={native3D:await page.evaluate(()=>Boolean(window.__jazzJukeboxQa)),
+   beforeClose:{hiddenAttribute:await page.locator('#jukebox-drawer').getAttribute('hidden'),
+     isHidden:await page.locator('#jukebox-drawer').isHidden()},
+   initialSnapshot:await page.evaluate(()=>window.__jazzJukeboxQa?.snapshot()??null)};
  await page.locator('#jukebox-close').click();
- assert(await page.locator('#jukebox-drawer').isHidden());
+ diagnostic.afterClose={hiddenAttribute:await page.locator('#jukebox-drawer').getAttribute('hidden'),
+   isHidden:await page.locator('#jukebox-drawer').isHidden()};
+ await writeFile(resolve(dest,'jazz-jukebox-1925-diagnostics.json'),JSON.stringify(diagnostic,null,2));
+ assert(await page.locator('#jukebox-drawer').isHidden(),'A gaveta não fechou pelo botão X');
  // Testar o foco 3D somente quando Babylon/WebGL foi realmente inicializado.
- const native3D=await page.evaluate(()=>Boolean(window.__jazzJukeboxQa));
+ const native3D=diagnostic.native3D;
  if(native3D){
-   const snapshot=await page.evaluate(()=>window.__jazzJukeboxQa.snapshot());
-   assert(snapshot.ready && snapshot.screenPickable);
-   assert(snapshot.physicalButtons.every(btn=>btn.exists));
+   const snapshot=diagnostic.initialSnapshot;
+   assert(snapshot?.ready && snapshot?.screenPickable,JSON.stringify(snapshot));
+   assert(snapshot.physicalButtons.every(btn=>btn.exists),JSON.stringify(snapshot.physicalButtons));
    await page.locator('#jukebox-scene-open').click();
+   await page.waitForTimeout(350);
+   diagnostic.afterSceneButton=await page.evaluate(()=>window.__jazzJukeboxQa?.snapshot()??null);
+   await writeFile(resolve(dest,'jazz-jukebox-1925-diagnostics.json'),JSON.stringify(diagnostic,null,2));
    await page.waitForFunction(()=>window.__jazzJukeboxQa?.snapshot()?.focused===true,
      undefined,{timeout:9000});
  }
