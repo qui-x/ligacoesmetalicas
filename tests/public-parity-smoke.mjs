@@ -80,8 +80,11 @@ try {
         await page.waitForFunction(() => document.querySelector('#app-drawer')?.open === true);
         report('SIAB menu abre e expõe aria-expanded', await page.locator('#menu-btn').getAttribute('aria-expanded') === 'true');
         await page.keyboard.press('Escape');
-        await page.waitForFunction(() => document.querySelector('#app-drawer')?.open === false);
-        report('SIAB Escape fecha o menu', await page.locator('#menu-btn').getAttribute('aria-expanded') === 'false');
+        await page.waitForFunction(() => {
+          const drawer = document.querySelector('#app-drawer');
+          return drawer && !drawer.open && document.querySelector('#menu-btn')?.getAttribute('aria-expanded') === 'false';
+        });
+        report('SIAB Escape fecha o menu e sincroniza aria-expanded', true);
         report('SIAB foco volta ao botão de menu', await page.evaluate(() => document.activeElement?.id === 'menu-btn'));
 
         await page.evaluate(route => { location.hash = route; }, app.route);
