@@ -51,6 +51,7 @@ async function main(){
   assert.equal(await page.locator('.si-global-header').isVisible(),false,'A barra global é retirada da área expandida.');
   assert.ok(await page.locator('.si-workspace-toolbar').isVisible(),'A barra contextual da oficina continua visível.');
   assert.ok(await page.locator('[data-open-dock="montagem"]').isVisible(),'O menu de contexto Montagem permanece disponível.');
+  await page.waitForFunction(({width,height})=>{const stage=document.querySelector('#silm-assembly-stage');if(!stage)return false;const r=stage.getBoundingClientRect();return r.width>width+40&&r.height>height+40;},{width:normalCanvas.width,height:normalCanvas.height},{timeout:4000});
   const workspaceBounds=await page.locator('#si-workspace').boundingBox(),expandedBounds=await page.locator('#si-stage').boundingBox(),expandedCanvas=await page.locator('#silm-assembly-stage').boundingBox(),toolbarBounds=await page.locator('.si-workspace-toolbar').boundingBox();
   assert.ok(expandedCanvas.width>normalCanvas.width+40&&expandedCanvas.height>normalCanvas.height+40,'O palco cristalino cresce na tela expandida.');
   assert.ok(workspaceBounds.x<=1&&workspaceBounds.y<=1&&workspaceBounds.width>=viewport.width-2&&workspaceBounds.height>=viewport.height-2,'A oficina ocupa o viewport: '+JSON.stringify(workspaceBounds));
