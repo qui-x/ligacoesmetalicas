@@ -7,7 +7,7 @@ on:
     branches: [main]
     paths:
       - 'domain/silm/assembly-view.js'
-      - 'tests/suites/s110-representacao.cjs'
+      - 'tests/base-integration.cjs'
       - 'tests/public-parity-smoke.mjs'
       - 'docs/PARIDADE-MECANICA-SIAB-SILM-2026-10-29.md'
       - '.github/workflows/paridade-mecanica.yml'
@@ -38,8 +38,8 @@ jobs:
         run: npm run test:comparison
       - name: Navegação de roteiros com navegador
         run: npm run test:routes:browser
-      - name: Regressão específica — pinça e clique residual
-        run: node tests/browser.cjs 0.11-16
+      - name: Regressão de pinça/click residual na entrada integrada
+        run: node tests/base-integration.cjs
       - name: Auditoria da distribuição (diagnóstico; a versão publicada permanece separada)
         continue-on-error: true
         run: python3 scripts/audit-silm.py
