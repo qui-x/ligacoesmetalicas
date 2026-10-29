@@ -937,3 +937,101 @@ O cronograma não deve atribuir datas rígidas antes de completar as etapas 1–
 6. Que limites de transição e de perda de quadros podem ser aceitos na prova inicial?
 
 A direção híbrida está escolhida para orientar o desenho; a arquitetura detalhada permanece aberta até validar a prova de exportação e o controlador de três personagens.
+
+
+## 18. Política combinada de animação: clipes sequenciais + camadas seletivas — DIREÇÃO ESCOLHIDA PARA DESENVOLVIMENTO
+
+A escolha do usuário é **A e B em conjunto**, não uma exclusão entre elas:
+
+- **A — um clipe corporal principal por vez** será a regra de base para a primeira prova funcional e para movimentos cujas misturas não tenham sido validadas;
+- **B — groove e destaque simultâneos** será permitido seletivamente quando os clipes, articulações e regras de mistura tiverem sido verificados.
+
+Esta combinação é coerente com o requisito artístico de movimento em camadas: o sistema deve ser capaz de animar em camadas, mas não precisa forçar combinações simultâneas em todas as ações desde o primeiro protótipo.
+
+### 18.1 Política de execução por níveis
+
+**Nível 1 — Sequencial seguro (base obrigatória)**
+- Um clipe corporal principal por personagem.
+- Transições de um clipe para outro usando crossfade apenas quando a pose de entrada/saída e o rig forem compatíveis.
+- Movimento global, posição, orientação e formação são coordenados separadamente pelo controlador de palco quando o clipe não usa root motion.
+- Se uma mistura não for suportada ou falhar, o sistema retorna à sequência segura em vez de produzir uma pose conflitante.
+
+**Nível 2 — Groove de base com ação principal (camada seletiva)**
+- Um ciclo discreto de groove pode continuar enquanto o personagem realiza um solo ou ação principal, desde que os canais de articulação não entrem em conflito ou que a prioridade/máscara de articulações esteja definida.
+- A camada principal deve poder reduzir ou substituir os movimentos de base nas articulações que controla.
+- A sobreposição precisa ter regras explícitas de peso, prioridade e transição; não basta ativar dois clipes simultaneamente.
+- Os clipes incompatíveis devem ser alternados ou misturados por crossfade, e não executados simultaneamente.
+
+**Nível 3 — Crescendo coletivo**
+- A intensidade do espetáculo aumenta com as entradas, alterações de formação, participação de grupos e transições da partitura.
+- A atividade de fundo pode aumentar, mas o foco precisa continuar legível.
+- O grande final deve reunir os 17 elementos; as camadas simultâneas poderão ser utilizadas depois de testadas em um conjunto menor e, em seguida, com elenco provisório completo.
+
+### 18.2 Regras de prioridade
+
+Para a primeira implementação, seguir a seguinte ordem conceitual:
+1. pose/estado seguro após reconstrução temporal, troca de faixa ou seek;
+2. ação principal ou destaque;
+3. coreografia de grupo;
+4. groove de base;
+5. presença cênica econômica.
+
+Esta hierarquia é uma regra de resolução de conflitos, não uma ordem para remover automaticamente todos os movimentos inferiores. Se a ação principal controla uma articulação, o groove não deverá aplicar outra rotação conflitante a essa mesma articulação. A camada de base só permanece ativa onde for compatível.
+
+### 18.3 Contrato de clipes e metadados de compatibilidade
+
+Além dos metadados já propostos, cada clipe deve declarar:
+- categoria: base, conjunto, destaque, entrada/saída, transição ou encerramento;
+- se é permitido misturá-lo com outras categorias;
+- articulações/canais que controla, quando necessário;
+- prioridades ou máscara de articulações esperada;
+- condição para repetir em loop;
+- se contém root motion;
+- tags de compatibilidade e restrições conhecidas;
+- pose inicial/final e transições recomendadas.
+
+A biblioteca de clipes deve poder responder à pergunta “estes dois clipes podem ser misturados?” antes de executar a mistura. Se não houver metadados ou um teste que comprove compatibilidade, a resposta padrão deve ser **não misturar simultaneamente**.
+
+### 18.4 Exemplos de aplicação
+
+- **Personagem em presença cênica:** groove de baixa intensidade sem solo; usa o Nível 1.
+- **Solo de um personagem:** começa com o clipe de destaque como principal; a camada rítmica só continua em articulações compatíveis e testadas.
+- **Grupo em coreografia:** clipe principal do grupo, com movimento global e formação controlados pelo motor de palco.
+- **Entrada de novo grupo:** trajetórias e estados de palco são calculados pelo motor; a animação corporal de entrada é um clipe ou uma sequência de clipes.
+- **Final com 17 personagens:** todos seguem a mesma partitura temporal; as camadas de fundo só são ativadas em combinações verificadas e com desempenho aceitável.
+
+### 18.5 Plano de prova e critérios de aceite
+
+1. Exportar do Blender para GLB pelo menos um rig com clipes nomeados de base, transição e destaque.
+2. Demonstrar que cada clipe pode ser executado isoladamente e termina numa pose válida.
+3. Demonstrar transição sequencial entre dois clipes sem estalo, deslizamento não intencional ou pose quebrada.
+4. Combinar groove + destaque num único personagem e verificar tronco, ombros, quadris, braços e pernas, articulando explicitamente quais canais cada camada controla.
+5. Mostrar o fallback para a sequência segura quando os clipes forem incompatíveis.
+6. Testar a lógica com três personagens antes de expandir para 17.
+7. Executar pausa, seek, retomada e troca de música durante a camada simultânea e confirmar que o estado cênico é reconstruído sem clipes residuais.
+8. Medir desempenho com 17 personagens provisórios e dois personagens da plateia.
+9. Confirmar que a intensidade do grupo em destaque é visualmente legível e que a camada de fundo não compete com ele.
+10. Conferir que o fallback Canvas2D preserva os mesmos eventos e níveis de participação, ainda que simplifique o desenho.
+
+**Critério de aprovação:** a camada simultânea só será ativada para combinações de clipes que passem por verificação técnica e visual. Qualquer mistura não validada cai para o modo sequencial seguro.
+
+### 18.6 Consequências para manutenção e cronograma
+
+A estratégia evita duas situações indesejáveis: construir o espetáculo inteiro exclusivamente com clipes separados, limitando a expressividade, ou tentar combinar todas as animações desde o primeiro dia, multiplicando conflitos e retrabalho.
+
+O esforço passa a ser:
+- primeiro estabilizar rig, exportação, clipes e transição sequencial;
+- depois adicionar misturas aprovadas à biblioteca;
+- registrar por que cada par/categoria é compatível;
+- ampliar as combinações apenas conforme as necessidades da partitura;
+- manter a regra segura como fallback permanente.
+
+Esta é uma direção selecionada para desenvolvimento da especificação. O motor não foi alterado por esta decisão, e a política ainda depende da prova funcional com os ativos do projeto.
+
+### 18.7 Pontos ainda pendentes
+
+- Escolher o rig específico para o primeiro teste de Blender → GLB → Babylon.js.
+- Definir o conjunto inicial de clipes e a convenção final de nomes.
+- Determinar quais canais pertencem ao groove de base e quais pertencem ao destaque.
+- Confirmar se a primeira forma de mistura usará máscaras/camadas de articulações ou clipes deliberadamente preparados para sobreposição.
+- Selecionar os navegadores e dispositivos para o teste de desempenho.
