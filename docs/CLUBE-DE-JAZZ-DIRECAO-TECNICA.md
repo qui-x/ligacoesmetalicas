@@ -687,14 +687,14 @@ Manter uma pasta fora do repositório não garante, por si só, histórico de al
 
 Mitigação recomendada:
 - criar uma pasta local separada do clone público;
-- inicializar nela um repositório Git **local, sem remote configurado**, se o usuário concordar;
-- registrar commits locais para alterações de funcionalidade;
-- criar backups periódicos e verificáveis da pasta e das partituras de trabalho;
+- manter a pasta sem repositório Git, conforme decisão do usuário;
+- criar backups manuais datados da pasta e das partituras de trabalho;
+- verificar periodicamente se os backups são legíveis e restauráveis;
 - não armazenar tokens, senhas ou credenciais no editor;
 - documentar como restaurar uma cópia e iniciar o ambiente de desenvolvimento;
 - rever a estratégia se houver necessidade de colaboração entre máquinas ou de recuperação remota.
 
-Um repositório Git local não publica o código por conta própria, mas só registra o histórico na máquina. Se a máquina falhar, o histórico local também pode ser perdido; por isso, backups continuam necessários. Se for desejada cópia remota posterior, escolher conscientemente um destino privado e rever a decisão de acesso antes de configurar um remote.
+A pasta não terá histórico Git. Portanto, backups manuais datados são a forma definida para recuperar versões anteriores. Sem cópia adicional, uma falha do computador ou perda do diretório pode eliminar tanto o código como as partituras de trabalho. Se a colaboração remota ou histórico refinado se tornar necessário, rever a política antes de escolher um novo destino de versionamento.
 
 ### 16.3 Como reutilizar o motor sem duplicá-lo
 
@@ -733,12 +733,94 @@ Não copiar arquivos de áudio grandes para a pasta do editor só para conseguir
 8. A apresentação publicada não ganha dependências em tempo de execução do editor local.
 9. O passo a passo para iniciar o editor, encerrar o servidor e restaurar a pasta está documentado.
 
-### 16.6 Decisões ainda abertas
+### 16.6 Política de manutenção escolhida
 
-- O usuário aprova inicializar um Git local sem remote para manter histórico, ou prefere pasta sem histórico Git e backups manuais?
-- Qual será o caminho local da pasta de desenvolvimento, sem pressupor a letra de unidade ou a organização atual da máquina?
+Foi escolhida a opção **B — pasta local sem Git, com backups manuais datados**.
+
+Procedimento proposto:
+- guardar o código do editor fora do clone público;
+- fazer cópias datadas após marcos funcionais e antes de alterações estruturais;
+- manter pelo menos uma cópia de backup em local diferente da pasta de trabalho;
+- verificar periodicamente a abertura/restauração de uma cópia;
+- incluir nos backups as partituras e configurações necessárias para reconstruir o ambiente, sem credenciais ou segredos;
+- documentar como identificar a versão mais recente e recuperar um marco anterior.
+
+Como essa política não oferece comparação automática de diffs, os nomes das cópias devem indicar data e finalidade, por exemplo `editor-partituras_2026-10-29_previa-inicial`. A frequência e o destino dos backups podem ser refinados antes da implementação, mas devem estar definidos antes de criar partituras importantes.
+
+### 16.7 Decisões locais ainda abertas
+
+- Qual será o caminho da pasta do editor, sem pressupor a letra de unidade ou a organização atual da máquina?
 - Qual servidor/configuração local será utilizado para expor a pré-visualização em loopback?
 - Como o editor resolverá a localização do clone `qui-x/ligacoesmetalicas` sem fixar um caminho frágil?
-- Qual frequência e local de backup serão suficientes para os arquivos de autoria?
+- Qual frequência prática dos backups manuais datados será adequada para cada etapa de trabalho?
 
-A escolha C continua sendo uma proposta em análise até que essas consequências sejam aceitas e os critérios principais sejam definidos.
+A opção escolhida determina a política de manutenção do primeiro MVP; não congela o desenho completo da interface nem o formato final da partitura.
+
+
+## 17. Arquitetura de animação e coreografia — próxima decisão técnica em análise
+
+A próxima parte da direção técnica é definir como o trabalho artístico de animação será dividido entre Blender e Babylon.js. A meta é aumentar a mobilidade e a expressividade observadas nas referências de dança sem tornar inviável a produção de 17 personagens e a coreografia coletiva.
+
+### 17.1 Opções a comparar
+
+**A — Animação predominantemente pré-produzida no Blender**
+- As sequências corporais são animadas e refinadas no Blender, exportadas como clipes e selecionadas durante a reprodução.
+- Vantagens: controle artístico direto, maior previsibilidade de poses e continuidade expressiva.
+- Custos/riscos: a quantidade de clipes pode crescer rapidamente; combinações entre grupos podem exigir muitas variações ou transições extras.
+- Adequação provável: solos e movimentos de alta exigência artística; menos flexível para gerar novas formações em tempo real.
+
+**B — Coreografia predominantemente procedural no Babylon.js**
+- Posições, articulações, ritmos e formações são calculados em execução por regras e parâmetros.
+- Vantagens: flexibilidade, adaptação às quantidades de personagens e possibilidade de criar variações sem exportar clipes exclusivos.
+- Custos/riscos: maior trabalho de programação e refinamento; movimentos podem parecer mecânicos ou apresentar conflitos biomecânicos se a abordagem for usada para todas as ações.
+- Adequação provável: formações, deslocamentos, reposicionamento e movimentos de fundo; risco maior para gestos artísticos complexos.
+
+**C — Modelo híbrido: clipes artísticos + coordenação procedural**
+- Blender fornece clipes reutilizáveis, transições e ações de maior exigência expressiva.
+- Babylon.js coordena participantes, formações, posições no palco, prioridades, pesos de animação, intensidade e sincronização com a partitura.
+- Vantagens: equilíbrio entre controle artístico e flexibilidade do espetáculo.
+- Custos/riscos: requer contrato claro entre rigs, nomes de clipes, estados e sincronização; a mistura de animações deve evitar que múltiplas camadas tentem controlar as mesmas articulações de modo incompatível.
+
+**Recomendação preliminar:** aprofundar a opção C. Não é aprovação definitiva até analisar o rig atual, a forma de exportação, o fallback Canvas2D e os testes necessários.
+
+### 17.2 Princípios que independem da opção final
+
+1. O controlador deverá resolver uma pose coerente por personagem, com prioridade explícita para camada rítmica, coreografia de grupo e destaque.
+2. A partitura musical determina o estado no tempo; o motor deve reconstruir o estado por tempo absoluto e não exigir que cada clipe anterior termine naturalmente.
+3. Entrada, saída, destaque e presença cênica devem usar estados documentados; um personagem não pode ficar preso numa transição depois de seek ou troca de música.
+4. Os clipes devem ser reutilizáveis entre personagens compatíveis, mas não se deve presumir compatibilidade de rigs sem testar a exportação e a deformação.
+5. Movimentos de referência observados em vídeos devem ser traduzidos em animações originais, sem exigir cópia literal de uma coreografia protegida.
+6. A assinatura de CFC, CCC, HC ou DHC no figurino deve continuar legível durante os movimentos, e o movimento não será tratado como representação literal da estrutura microscópica.
+7. Babylon.js e Canvas2D devem consumir a mesma intenção coreográfica, ainda que o fallback simplifique a realização visual.
+
+### 17.3 Protótipo de prova
+
+Antes de criar animações exclusivas para todos os personagens:
+1. selecionar um dos rigs existentes e confirmar sua compatibilidade com a pipeline Blender → glTF/GLB → Babylon.js;
+2. criar um pequeno conjunto de movimentos: groove base, isolamentos, transferência de peso/passos, entrada, giro/transição e destaque;
+3. coordenar três personagens com as camadas de movimento já escolhidas;
+4. validar pause/seek/troca de faixa, incluindo reconstrução do estado da pose;
+5. aumentar para 17 personagens com modelos provisórios;
+6. medir desempenho e conferir a legibilidade das quatro assinaturas cristalinas antes de refinar todos os modelos.
+
+### 17.4 Critérios de aceite
+
+- O ciclo de peso, pés, quadris, tronco, ombros e cabeça parece articulado, e não como um corpo rígido.
+- Nenhuma animação deixa o personagem deslizando sem apoio de forma não intencional.
+- Os isolamentos e gestos de destaque podem ser combinados com o movimento de base sem conflito perceptível.
+- A entrada e a saída terminam em poses válidas, e seek não deixa personagens em poses intermediárias obsoletas.
+- A composição de três personagens é convincente antes de ser ampliada para 17.
+- O teste com elenco completo permite distinguir destaque, conjunto e presença cênica.
+- A estrutura visual continua legível durante giros e deslocamentos.
+- A cena pública permanece livre dos controles do editor local.
+- Os critérios de desempenho são medidos com equipamento e navegador identificados; metas de FPS ainda não são consideradas garantidas.
+
+### 17.5 Questão a decidir antes do congelamento
+
+A preferência preliminar é o **modelo híbrido (C)**. A discussão seguinte deve avaliar se ele será usado como arquitetura principal para todas as ações ou se algumas categorias terão exceções deliberadas, por exemplo:
+- clipes pré-produzidos para solos e gestos de personagem;
+- cálculo procedural para deslocamento, formação e reposicionamento;
+- movimentos genéricos e mais econômicos para a camada de presença cênica;
+- fallback Canvas2D com uma representação simplificada da mesma sequência de eventos.
+
+O contrato de clipes, os rigs, os estados e a estratégia de mistura só devem ser congelados depois dessa discussão e de uma prova funcional com os ativos existentes.
