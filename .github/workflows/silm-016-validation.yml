@@ -1,0 +1,57 @@
+name: SILM 0.16 — acessibilidade e mobile
+
+on:
+  push:
+    branches:
+      - feat/silm-0.16-acessibilidade-mobile
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "domain/silm/**"
+      - "css/**"
+      - "js/**"
+      - "tests/**"
+      - "scripts/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/silm-016-validation.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: silm-016-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Build, regressão, acessibilidade e mecânicas 3D
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Obter repositório
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Instalar dependências
+        run: npm ci
+      - name: Instalar Chromium para Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Validar dados científicos, integração, layout e cache
+        run: npm run build
+      - name: Validar toques, medição e cálculo em três viewports móveis
+        run: npm run test:mobile-mechanics
+      - name: Executar testes automatizados da aplicação
+        run: npm test
+      - name: Auditar acessibilidade WCAG 2.0/2.1/2.2 AA e sete viewports
+        run: npm run test:a11y
+      - name: Validar comparação, elétrons 3D e seleção na tabela
+        run: npm run test:comparison
+      - name: Validar navegação móvel, foco, expansão e estado científico
+        run: npm run test:routes:browser
+        env:
+          SILM_BROWSER_SUITE: workspace-family
