@@ -1,6 +1,6 @@
 'use strict';
 SILM.createRouteSession=({model,storage,view,onView,say})=>{
- const S=SILM,registry=S.activities||S.routes,copy=x=>JSON.parse(JSON.stringify(x)),blank=()=>({name:'',className:'',date:new Date().toLocaleDateString('pt-BR'),teacher:'',group:'',observations:'',interpretation:'',conclusion:''});
+ const S=SILM,registry=S.activities||S.routes,copy=x=>JSON.parse(JSON.stringify(x)),blank=()=>({name:'',className:'',date:new Date().toLocaleDateString('pt-BR'),teacher:'',group:'',observations:'',analysis:'',interpretation:'',answer:'',conclusion:''});
  let doc={schemaVersion:1,current:null,attempts:{},completed:{},archives:{}},transitioning=0;
  const route=()=>registry.get(doc.current?.activityContext.id),open=()=>!!doc.current&&doc.current.activityContext.status!=='closed';
  const save=()=>storage.set('route.session',doc);

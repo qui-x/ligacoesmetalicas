@@ -151,18 +151,111 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   else{const b=button(isMission()?'Concluir missão':'Concluir roteiro',complete,prefix()+'-complete');b.disabled=!session.ready();host.append(b);}
   host.append(button(isMission()?'Encerrar missão':'Encerrar atividade',async()=>{if(await B.confirmDialog({title:'Encerrar atividade?',description:'A investigação livre será restaurada. Uma tentativa ainda não concluída ficará disponível para retomada.',confirmText:'Encerrar'}))close();},prefix()+'-close'));
  }
- function report(){const host=$('silm-route-report');host.replaceChildren();const params=new URLSearchParams(location.hash.split('?')[1]||''),archiveKey=params.get('arquivo'),archived=archiveKey?unified.archivedReport(archiveKey):null,id=params.get('roteiro')||session.context()?.id,record=archived?.record||session.report(id)||(!id&&!archiveKey?unified.freeReport():null);if(!record){host.append(N('p','Conclua um roteiro para abrir seu relatório.'));return;}const r=registry.get(record.activityContext.id)||{id:'laboratorio',title:archived?.title||'Investigação livre',subtitle:'Registros do laboratório',module:archived?.module||record.checkpoint.module.active,sources:[]},s=record.checkpoint,e=S.data.get(s.metal.atomicNumber),editable=!archived&&(record.activityContext.type==='free'||session.context()?.id===r.id);
-  host.append(N('h1','Relatório — '+r.title),N('p',r.subtitle+' · Módulo '+r.module),N('p','Metal: '+e.name+' ('+e.symbol+') · Estrutura: '+(s.structure?.crystallography?.structureType||'montagem livre')+' · Unidades: '+(s.structure?.units.length||0)));
-  const structure=S.data.structure(e);for(const key of ['temperature','pressure','phase']){const d=structure?.conditions?.[key];if(d)host.append(N('p',d.display||String(d.value)));}
-  const identity=N('fieldset');identity.className='silm-identity';identity.append(N('legend','Identificação'));host.append(identity);
-  for(const [key,label]of [['name','Nome'],['className','Turma'],['date','Data'],['teacher','Professor'],['group','Grupo'],['observations','Observações'],['interpretation','Interpretação'],['conclusion','Conclusão']]){const l=N('label',label);l.htmlFor='report-'+key;const input=N(['name','className','date','teacher','group'].includes(key)?'input':'textarea');input.id=l.htmlFor;input.value=record.report[key]||'';input.readOnly=!editable;input.maxLength=10000;const print=N('div',input.value);print.className='silm-print-value';input.addEventListener('input',()=>{if(record.activityContext.type==='free'?unified.editReport(key,input.value):session.edit(key,input.value))print.textContent=input.value;});if(['name','className','date','teacher','group'].includes(key)){const f=N('div');f.className='silm-field';f.append(l,input,print);identity.append(f);}else host.append(l,input,print);}
-  host.append(N('h2','Registros científicos'));
-  const observations=[];if(record.evidence.cell)observations.push('Célula unitária observada');if(record.evidence.lattice)observations.push('Rede observada');if(record.evidence.deformation)observations.push('Compressão representada');if(s.electrons?.representation.visible)observations.push('Distribuição eletrônica visível');if(observations.length)host.append(N('p',observations.join(' · ')));
-  for(const m of s.measurements)host.append(N('p',S.measurement.types[m.type].label+(m.parameter?' '+m.parameter:'')+': '+S.units.format(m.value,m.unit)+' · Medida do modelo · resolução '+S.units.format(m.resolution,m.unit)+' · fonte '+m.source.latticeSourceId));
-  for(const c of s.calculations){host.append(N('p',S.formulas[c.formulaId].name+': '+S.calculation.format(c.result,c.unit)+' · Calculado pelo SILM'),N('p',S.formulas[c.formulaId].expression));for(const x of c.inputs)host.append(N('p',x.symbol+' = '+(Array.isArray(x.value)?x.value.join(' – '):x.value)+' '+x.unit+' · '+S.calculation.origins[x.origin]));}
-  if(!s.measurements.length&&!s.calculations.length)host.append(N('p','Esta investigação registra observações qualitativas; não foram produzidas medições nem cálculos.'));
-  const sources=new Set([...S.data.sourceIds(e),...r.sources,...s.calculations.flatMap(c=>c.provenance.references)]);host.append(N('h2','Fontes'));for(const id of sources){const src=S.data.source(id);if(src)host.append(N('p',src.institution+' — '+src.title+(src.url?' · '+src.url:'')));}
-  const controls=N('div');controls.className='silm-report-actions';if(!archived)controls.append(button('Registrar no Caderno',()=>{const latest=record.activityContext.type==='free'?unified.freeReport():session.report(r.id),saved=unified.recordReport(latest||record,r);if(saved==='added')say('Referência do relatório registrada no Caderno.','success');else if(saved==='duplicate')say('Este relatório já está registrado no Caderno.','info');else say('Não foi possível registrar o relatório no Caderno.','warning');},'route-report-notebook'));controls.append(button('Imprimir / salvar em PDF',()=>window.print(),'route-print'),button(session.open()||record.activityContext.type==='free'?'Voltar à oficina':'Voltar aos roteiros',()=>{location.hash=session.open()||record.activityContext.type==='free'?'#/ambiente':'#/roteiros';}));host.append(controls);
+ /* Relatório (Etapa 8 do plano de paridade SIAB): ações no topo, "Preparar relatório" com os modos do SIAB (completo, para
+    preencher à mão e atividade de análise do Professor) e o documento em seções numeradas, que separa dado tabelado, medida
+    do modelo, cálculo do SILM e texto do estudante. O SILM não cria dados hipotéticos: a análise usa os dados da investigação. */
+ const REPORT_TEXTS=[['observations','Observações'],['analysis','Análise'],['interpretation','Interpretação'],['answer','Resposta à investigação'],['conclusion','Conclusão']];
+ const REPORT_DATA={conditions:'Condições de referência',measurements:'Medições do modelo',calculations:'Cálculos do SILM',state:'Estado da investigação'};
+ const REPORT_MODES={completo:'Relatório completo',mao:'Para preencher à mão',analise:'Atividade de análise · Professor'};
+ const REPORT_LINES=[5,10,15,20,25],MODULE_NAMES={explorar:'Explorar',medir:'Medir',calcular:'Calcular'};
+ const reportDefaults=()=>({mode:'completo',lines:10,include:Object.fromEntries(Object.keys(REPORT_DATA).map(k=>[k,true])),blank:Object.fromEntries(REPORT_TEXTS.map(([k])=>[k,true])),proposal:'',question:''});
+ function reportConfig(key){
+  const saved=storage.get('report.config:'+key,null),d=reportDefaults(),v=saved&&typeof saved==='object'?saved:{};
+  const c={...d,mode:REPORT_MODES[v.mode]?v.mode:'completo',lines:REPORT_LINES.includes(Number(v.lines))?Number(v.lines):10,proposal:typeof v.proposal==='string'?v.proposal.slice(0,2000):'',question:typeof v.question==='string'?v.question.slice(0,500):''};
+  for(const k of Object.keys(d.include))if(typeof v.include?.[k]==='boolean')c.include[k]=v.include[k];
+  for(const k of Object.keys(d.blank))if(typeof v.blank?.[k]==='boolean')c.blank[k]=v.blank[k];
+  return c;
+ }
+ function reportTable(caption,headers,rows){
+  const wrap=N('div');wrap.className='silm-report-table';wrap.tabIndex=0;wrap.setAttribute('role','region');wrap.setAttribute('aria-label',caption);
+  const t=N('table'),head=N('tr'),body=N('tbody');t.append(N('caption',caption));for(const h of headers){const th=N('th',h);th.scope='col';head.append(th);}
+  const thead=N('thead');thead.append(head);for(const row of rows){const tr=N('tr');for(const cell of row)tr.append(N('td',cell));body.append(tr);}t.append(thead,body);wrap.append(t);return wrap;
+ }
+ function report(){
+  const host=$('silm-route-report');host.replaceChildren();
+  const params=new URLSearchParams(location.hash.split('?')[1]||''),archiveKey=params.get('arquivo'),archived=archiveKey?unified.archivedReport(archiveKey):null,id=params.get('roteiro')||session.context()?.id,record=archived?.record||session.report(id)||(!id&&!archiveKey?unified.freeReport():null);
+  if(!record){const empty=N('div');empty.className='silm-report-empty';empty.append(N('h1','Relatório'),N('p','Conclua um roteiro para abrir seu relatório.'));host.append(empty);return;}
+  const r=registry.get(record.activityContext.id)||{id:'laboratorio',title:archived?.title||'Investigação livre',subtitle:'Registros da Oficina',module:archived?.module||record.checkpoint.module.active,sources:[]},s=record.checkpoint,e=S.data.get(s.metal.atomicNumber),free=record.activityContext.type==='free',editable=!archived&&(free||session.context()?.id===r.id);
+  // "Atividade de análise" é preparação do Professor: só fora de uma atividade e nunca num relatório arquivado (como no SIAB).
+  const teacher=!archived&&!session.open(),key=archived?'arquivo:'+archiveKey:free?'livre:'+(s.investigation?.id||'sem-investigacao'):'atividade:'+r.id;
+  const config=reportConfig(key);if(config.mode==='analise'&&!teacher)config.mode='completo';
+  const save=(patch,focus)=>{storage.set('report.config:'+key,{...config,...patch});report();if(focus)$(focus)?.focus();};
+  const mode=config.mode,inc=k=>mode!=='analise'||config.include[k]!==false,blankField=k=>mode==='mao'||(mode==='analise'&&config.blank[k]!==false);
+  /* Ações, na ordem do SIAB. */
+  const actions=N('div');actions.className='silm-report-actions';
+  if(!archived){
+   actions.append(button('Atualizar dados da investigação',()=>{report();$('route-report-refresh')?.focus();say('Dados da investigação atualizados.','success');},'route-report-refresh'));
+   actions.append(button('Registrar no Caderno',()=>{const latest=free?unified.freeReport():session.report(r.id),saved=unified.recordReport(latest||record,r);if(saved==='added')say('Referência do relatório registrada no Caderno.','success');else if(saved==='duplicate')say('Este relatório já está registrado no Caderno.','info');else say('Não foi possível registrar o relatório no Caderno.','warning');},'route-report-notebook'));
+  }
+  actions.append(button('Imprimir / salvar em PDF',()=>window.print(),'route-print'),button('Imprimir para preencher à mão',()=>{save({mode:'mao'});window.print();},'route-print-blank'));
+  const backTo=archived?['Voltar ao Caderno','#/caderno']:session.open()||free?['Voltar à oficina','#/ambiente']:r.type==='mission'?['Voltar às missões','#/missoes']:['Voltar aos roteiros','#/roteiros'];
+  actions.append(button(backTo[0],()=>{location.hash=backTo[1];},'route-report-back'));
+  if(!archived&&session.open())actions.append(button('Encerrar atividade',async()=>{if(await B.confirmDialog({title:'Encerrar atividade?',description:'A investigação livre será restaurada. Uma tentativa ainda não concluída ficará disponível para retomada.',confirmText:'Encerrar'}))close();},'route-report-close'));
+  /* Preparar relatório. */
+  const settings=N('section');settings.className='silm-report-settings';settings.setAttribute('aria-labelledby','report-settings-title');
+  const st=N('h2','Preparar relatório');st.id='report-settings-title';settings.append(st);
+  const grid=N('div');grid.className='silm-report-setting-grid';
+  const select=(id,label,options,value,onChange)=>{const f=N('div');f.className='silm-field';const l=N('label',label);l.htmlFor=id;const sel=N('select');sel.id=id;for(const [v,t] of options){const o=N('option',t);o.value=String(v);o.selected=String(v)===String(value);sel.append(o);}sel.addEventListener('change',()=>onChange(sel.value));f.append(l,sel);grid.append(f);};
+  select('report-mode','Modo',Object.entries(REPORT_MODES).filter(([v])=>v!=='analise'||teacher),mode,v=>save({mode:v},'report-mode'));
+  if(mode!=='completo')select('report-lines','Linhas por resposta',REPORT_LINES.map(n=>[n,n+' linhas']),config.lines,v=>save({lines:Number(v)},'report-lines'));
+  settings.append(grid);
+  if(mode==='analise'){
+   const boxes=N('div');boxes.className='silm-report-setting-grid';
+   const group=(legend,entries,kind,values)=>{const fs=N('fieldset');fs.append(N('legend',legend));for(const [k,l] of entries){const row=N('label');row.className='silm-check-row';const c=N('input');c.type='checkbox';c.id='report-'+kind+'-'+k;c.checked=values[k]!==false;c.addEventListener('change',()=>save({[kind]:{...values,[k]:c.checked}},c.id));row.append(c,document.createTextNode(l));fs.append(row);}boxes.append(fs);};
+   group('Incluir dados',Object.entries(REPORT_DATA),'include',config.include);group('Deixar em branco',REPORT_TEXTS,'blank',config.blank);settings.append(boxes);
+   for(const [k,label,tag,max] of [['proposal','Proposta para a turma','textarea',2000],['question','Questão para investigar','input',500]]){const f=N('div');f.className='silm-field';const l=N('label',label);l.htmlFor='report-'+k;const input=N(tag);input.id='report-'+k;input.maxLength=max;input.value=config[k];input.addEventListener('change',()=>save({[k]:input.value.slice(0,max)},input.id));f.append(l,input);settings.append(f);}
+  }
+  const hint=N('p',{completo:'Os dados da investigação são automáticos. Identificação e textos são salvos enquanto você escreve.',mao:'Os dados científicos permanecem na folha. Identificação e respostas ficam em linhas para escrever à mão.',analise:'Escolha os dados desta investigação que a turma vai interpretar e as respostas que ficam em branco. O SILM não cria dados hipotéticos.'}[mode]);hint.className='silm-report-hint';settings.append(hint);
+  /* Documento. */
+  const doc=N('article');doc.className='silm-report-doc';doc.dataset.reportMode=mode;
+  const head=N('header');head.className='silm-report-doc-head';const brand=N('div');brand.className='silm-report-brand';const logo=N('img');logo.src=document.querySelector('.si-global-brand img')?.getAttribute('src')||'';logo.alt='';logo.width=36;logo.height=36;brand.append(logo,N('strong','SILM'));
+  const eyebrow=N('p',REPORT_MODES[mode].replace(' · Professor',''));eyebrow.className='eyebrow';
+  head.append(brand,eyebrow,N('h1','Relatório — '+r.title),N('p',r.subtitle+' · Módulo '+(MODULE_NAMES[r.module]||r.module)+' · SILM '+B.manifest.version));doc.append(head);
+  const section=(n,title,name)=>{const sec=N('section');sec.dataset.reportSection=name;sec.append(N('h2',(n?n+'. ':'')+title));doc.append(sec);return sec;};
+  // 1. Identificação.
+  const ident=section(1,'Identificação','identificacao'),idFields=[['name','Nome'],['className','Turma'],['date','Data'],['teacher','Professor'],['group','Grupo']];
+  if(mode==='completo'){const fs=N('fieldset');fs.className='silm-identity';fs.append(N('legend','Identificação'));
+   for(const [k,label] of idFields){const f=N('div');f.className='silm-field';const l=N('label',label);l.htmlFor='report-'+k;const input=N('input');input.id=l.htmlFor;input.value=record.report[k]||'';input.readOnly=!editable;input.maxLength=10000;const print=N('div',input.value);print.className='silm-print-value';input.addEventListener('input',()=>{if(free?unified.editReport(k,input.value):session.edit(k,input.value))print.textContent=input.value;});f.append(l,input,print);fs.append(f);}ident.append(fs);}
+  else{const dl=N('dl');dl.className='silm-report-ident';for(const [k,label] of idFields){const d=N('div');d.append(N('dt',label),N('dd',record.report[k]||'________________________'));dl.append(d);}ident.append(dl);}
+  // 2. Proposta da investigação.
+  const proposal=section(2,'Proposta da investigação','proposta');
+  if(mode==='analise'&&config.proposal)proposal.append(N('p',config.proposal));
+  else if(r.description){proposal.append(N('p',r.description));if(r.objectives?.length){const ul=N('ul');for(const o of r.objectives)ul.append(N('li',o));proposal.append(ul);}}
+  else proposal.append(N('p','Investigação livre: descreva a questão investigada na resposta à investigação.'));
+  if(mode==='analise'&&config.question)proposal.append(N('h3','Questão para investigar'),N('p',config.question));
+  const note=N('p','Dados do modelo SILM: dado tabelado, medida do modelo e cálculo do SILM aparecem identificados separadamente.');note.className='silm-report-note';proposal.append(note);
+  // 3. Condições de referência: metal e estrutura como dados tabelados, montagem como representação didática.
+  if(inc('conditions')){const sec=section(3,'Condições de referência','condicoes'),structure=S.data.structure(e),crystalline=s.structure?.mode==='crystalline';
+   const rows=[['Metal',e.name+' ('+e.symbol+'), Z = '+e.atomicNumber,'Dado tabelado'],['Estrutura',crystalline?S.crystal.label(s.structure.crystallography?.structureType):'Montagem livre, sem organização cristalina',crystalline?'Dado tabelado':'Representação didática'],['Montagem',(s.structure?.units.length||0)+' unidades','Representação didática']];
+   for(const [k,label] of [['temperature','Temperatura'],['pressure','Pressão'],['phase','Fase']]){const d=structure?.conditions?.[k];if(d)rows.push([label,d.display||String(d.value),'Condição de referência']);}
+   sec.append(reportTable('Metal, estrutura e condições',['Item','Valor','Origem'],rows));}
+  // 4. Medições do modelo.
+  if(inc('measurements')){const sec=section(4,'Medições do modelo','medicoes');
+   if(s.measurements.length)sec.append(reportTable('Medições registradas',['Medida','Valor','Resolução','Origem','Fonte da rede'],s.measurements.map(m=>[S.measurement.types[m.type].label+(m.parameter?' '+m.parameter:''),S.units.format(m.value,m.unit),S.units.format(m.resolution,m.unit),'Medida do modelo',S.data.source(m.source.latticeSourceId)?.title||m.source.latticeSourceId])));
+   else sec.append(N('p','Nenhuma medição registrada.'));}
+  // 5. Cálculos do SILM.
+  if(inc('calculations')){const sec=section(5,'Cálculos do SILM','calculos');
+   if(s.calculations.length)for(const c of s.calculations){const f=S.formulas[c.formulaId],box=N('div');box.className='silm-report-calc';box.append(N('h3',f.name),N('p',f.expression),reportTable('Entradas · '+f.name,['Entrada','Valor','Origem'],c.inputs.map(x=>[x.symbol,(Array.isArray(x.value)?x.value.join(' – '):x.value)+' '+x.unit,S.calculation.origins[x.origin]])));const res=N('p','Resultado: '+S.calculation.format(c.result,c.unit)+' · Calculado pelo SILM');res.className='silm-report-result';box.append(res);sec.append(box);}
+   else sec.append(N('p','Nenhum cálculo registrado.'));}
+  // 6. Estado da investigação.
+  if(inc('state')){const sec=section(6,'Estado da investigação','estado'),observed=[];if(record.evidence.cell)observed.push('Célula unitária observada');if(record.evidence.lattice)observed.push('Rede observada');if(record.evidence.deformation)observed.push('Compressão representada');if(s.electrons?.representation.visible)observed.push('Distribuição eletrônica visível (representação qualitativa)');
+   if(observed.length){const ul=N('ul');for(const o of observed)ul.append(N('li',o));sec.append(ul);}else sec.append(N('p','Nenhuma observação registrada na Oficina.'));}
+  // 7 a 10. Seções autorais.
+  const authorLabel=N('p','As seções seguintes são autorais.');authorLabel.className='silm-report-student-label';doc.append(authorLabel);
+  const field=(sec,k,label)=>{const box=N('div');box.className='silm-report-author';box.dataset.authorField=k;box.append(N('h3',label));
+   if(blankField(k)){const w=N('div');w.className='silm-writing';w.setAttribute('role','img');w.setAttribute('aria-label',label+': '+config.lines+' linhas para escrever à mão');for(let i=0;i<config.lines;i++){const line=N('div');line.className='silm-writing-line';w.append(line);}box.append(w);}
+   else if(mode==='completo'){const l=N('label',label);l.className='sr-only';l.htmlFor='report-'+k;const ta=N('textarea');ta.id=l.htmlFor;ta.value=record.report[k]||'';ta.readOnly=!editable;ta.maxLength=10000;const print=N('div',ta.value);print.className='silm-print-value';ta.addEventListener('input',()=>{if(free?unified.editReport(k,ta.value):session.edit(k,ta.value))print.textContent=ta.value;});box.append(l,ta,print);}
+   else box.append(N('p',record.report[k]||'—'));sec.append(box);};
+  field(section(7,'Observações','observacoes'),'observations','Observações');
+  const analysis=section(8,'Análise / interpretação','analise');field(analysis,'analysis','Análise');field(analysis,'interpretation','Interpretação');
+  field(section(9,'Resposta à investigação','resposta'),'answer','Resposta');
+  field(section(10,'Conclusão','conclusao'),'conclusion','Conclusão');
+  // Fontes e nota sobre o modelo.
+  const sources=new Set([...S.data.sourceIds(e),...(r.sources||[]),...s.calculations.flatMap(c=>c.provenance.references)]),sourceSec=section(0,'Fontes','fontes'),list=N('ul');
+  for(const sid of sources){const src=S.data.source(sid);if(src)list.append(N('li',src.institution+' — '+src.title+(src.url?' · '+src.url:'')));}sourceSec.append(list);
+  const modelNote=section(0,'Nota sobre o modelo','nota');modelNote.classList.add('silm-report-model-note');
+  modelNote.append(N('p','O metal e a estrutura de referência são dados tabelados, com as fontes acima. A montagem é uma representação didática. As medições são medidas do modelo, feitas sobre as coordenadas científicas da estrutura, e não medidas de uma amostra real. Os cálculos são do SILM, com a origem de cada entrada. Representações qualitativas, como os elétrons deslocalizados e as propriedades, não são resultados experimentais.'));
+  host.append(actions,settings,doc);
  }
  function render(){
   session.observe(B.currentRoute(location.hash)==='ambiente');
