@@ -5,7 +5,7 @@
    (compatibilidade) ou {items, layout:'list'|'cards', heading:{title, lead}, marker:{done, pending, action}, detailHint}.
    Cada tema pode trazer investigate:{label, run(ctx)} para preparar o laboratório. */
 SimCore.createThemes=(ctx,experience)=>{
- const S=SimCore,U=S.ExperienceUI,records=new Map();let view={layout:'list',heading:{title:'Temas',lead:'Escolha um tema.'},marker:{done:'Revisado',pending:'Não revisado',action:'Marcar como revisado'},detailHint:'Aprofunde o tema na Oficina dos Metais.'};
+ const S=SimCore,U=S.ExperienceUI,records=new Map();let view={layout:'list',heading:{title:'Temas',lead:'Escolha um tema.'},marker:{done:'Revisado',pending:'Não revisado',action:'Marcar como revisado'},detailHint:''};
  const normalize=spec=>{
   if(!spec||!U.id(spec.id)||!(spec.title||spec.titulo))throw new TypeError('Tema inválido');
   const related=spec.related||spec.conteudosRelacionados||{};
