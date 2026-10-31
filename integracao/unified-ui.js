@@ -179,9 +179,63 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   lastTheme=t.id;if(previous!==t.id)requestAnimationFrame(()=>{window.scrollTo(0,0);title.focus({preventScroll:true});});
  }
  const operation=text=>String(text).replaceAll('Montagem → Metal','Montagem → Preparo').replaceAll('Ver → Analisar → Calcular','Ver → Analisar → Cálculos cristalográficos').replaceAll('Ver → Observar → Camadas','Ver → Observar → Estrutura e representação').replaceAll('O Caderno não está ativado no SILM.','O Caderno guarda observações locais.');
- function manual(){const host=$('silm-manual');host.replaceChildren();const search=N('input');search.type='search';search.id='manual-search';const label=N('label','Buscar no manual');label.htmlFor=search.id;const list=N('div');list.className='silm-route-catalog';host.append(label,search,list);
-  function fill(query=''){list.replaceChildren();const chosen=new URLSearchParams(location.hash.split('?')[1]||'').get('topico');for(const t of S.manual.topics.filter(t=>(t.title+' '+t.summary+' '+(t.keywords||[]).join(' ')).toLocaleLowerCase().includes(query.toLocaleLowerCase()))){const d=N('details');d.className='edu-card';d.open=t.id===chosen;d.append(N('summary',t.title),N('p',operation(t.summary)));for(const key of ['purpose','content'])if(t[key])d.append(N('p',operation(t[key])));if(t.steps){const ol=N('ol');t.steps.forEach(s=>ol.append(N('li',operation(s))));d.append(ol);}for(const x of t.details||[])d.append(N('h3',x.title),N('p',operation(x.text)));list.append(d);}}
-  search.addEventListener('input',()=>fill(search.value));fill();
+ /* Manual na arquitetura do SIAB: barra com busca, "Voltar à oficina" e impressão; início com apresentação, "Quero saber" e
+    grupos de tópicos; tópico com caminho, artigo, detalhes recolhíveis, "Veja também" e retorno; resultados de busca. */
+ const MANUAL_GROUPS=[['Investigue',['interface','selecionar-metal','montagem','estruturas-cristalinas','eletrons-deslocalizados','propriedades-metalicas','explorar','medir','calcular','vista','vista-3d']],['Prepare e registre',['atividades','caderno','relatorio']],['Orientação',['navegacao','problemas','manual','preferencias','abertura','reiniciar','offline','sobre-silm']],['Para ensinar',['professor']]];
+ const MANUAL_QUICK=[['selecionar-metal','Como escolher um metal'],['medir','Como medir o parâmetro de rede'],['problemas','Por que uma opção não aparece']];
+ const arrowSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+ let manualKey='';
+ window.addEventListener('si-route-changed',event=>{if(event.detail!=='manual')manualKey='';});
+ function manual(){
+  const host=$('silm-manual');if(!host)return;const params=new URLSearchParams(location.hash.split('?')[1]||''),id=params.get('topico'),query=(params.get('busca')||'').trim();
+  const topics=S.manual.topics,find=x=>topics.find(t=>t.id===x)||topics.find(t=>t.id===S.manual.aliases?.[x]),topic=id?find(id):null;
+  const key=(id||'')+'|'+query;if(key===manualKey&&host.childElementCount)return;const previous=manualKey;manualKey=key;host.replaceChildren();
+  const href=x=>'#/manual?topico='+encodeURIComponent(x);
+  const arrowLink=(text,to,cls)=>{const a=N('a',text+' ');a.href=to;if(cls)a.className=cls;a.insertAdjacentHTML('beforeend',arrowSvg);return a;};
+  // Barra: busca, voltar à oficina e imprimir.
+  const bar=N('div');bar.className='silm-manual-bar';const form=N('form');form.className='silm-manual-search';form.setAttribute('role','search');
+  const label=N('label','Buscar no Manual');label.htmlFor='manual-search';const input=N('input');input.type='search';input.id='manual-search';input.placeholder='Metal, estrutura, medir, Caderno…';input.value=query;
+  const go=N('button','Buscar');go.type='submit';go.className='button outline';const row=N('div');row.className='silm-manual-search-row';row.append(input,go);form.append(label,row);
+  form.addEventListener('submit',event=>{event.preventDefault();const q=input.value.trim();location.hash=q?'#/manual?busca='+encodeURIComponent(q):'#/manual';});
+  const tools=N('div');tools.className='silm-manual-tools';const back=link('Voltar à oficina','#/ambiente');back.id='manual-workspace';
+  const print=N('button',topic?'Imprimir tópico':'Imprimir guia rápido');print.type='button';print.className='button outline';print.id='manual-print';
+  print.addEventListener('click',()=>{if(!topic){const sheet=N('section');sheet.className='silm-manual-guide';sheet.append(N('h1','Guia rápido do SILM'));for(const t of topics){sheet.append(N('h2',t.title),N('p',operation(t.summary)));if(t.steps){const ol=N('ol');t.steps.forEach(x=>ol.append(N('li',operation(x))));sheet.append(ol);}}host.append(sheet);document.body.classList.add('silm-print-manual');
+   const done=()=>{document.body.classList.remove('silm-print-manual');sheet.remove();window.removeEventListener('afterprint',done);};window.addEventListener('afterprint',done);window.print();setTimeout(done,1000);}else window.print();});
+  tools.append(back,print);bar.append(form,tools);host.append(bar);
+  let focusTarget=null;
+  if(query){
+   // Resultados da busca: título, lista com resumo e limpar.
+   const q=query.toLocaleLowerCase(),found=topics.filter(t=>[t.title,t.summary,t.purpose,t.content,(t.keywords||[]).join(' ')].join(' ').toLocaleLowerCase().includes(q));
+   const box=N('section');box.className='silm-manual-results';const eyebrow=N('p','BUSCA NO MANUAL');eyebrow.className='eyebrow';const h1=N('h1',found.length?'Resultados para “'+query+'”':'Nenhum resultado para “'+query+'”');h1.id='manual-title';h1.tabIndex=-1;
+   box.append(eyebrow,h1);if(!found.length)box.append(N('p','Tente outra palavra, como metal, estrutura, medir ou Caderno, ou consulte os grupos do Manual.'));
+   const list=N('div');list.className='silm-content-list';for(const t of found){const a=N('a');a.className='silm-content-row';a.href=href(t.id);const span=N('span');span.append(N('strong',t.title),N('small',operation(t.summary)));a.append(span);list.append(a);}
+   box.append(list,link('Limpar busca','#/manual'));host.append(box);focusTarget=h1;
+  }else if(id){
+   if(!topic){const h1=N('h1','Tópico não encontrado');h1.id='manual-title';h1.tabIndex=-1;host.append(h1,N('p','Este endereço não corresponde a um tópico do Manual.'),link('Voltar ao Manual','#/manual'));focusTarget=h1;}
+   else{
+    const group=MANUAL_GROUPS.find(([,ids])=>ids.includes(topic.id))?.[0]||'Manual';
+    const crumb=N('nav');crumb.className='silm-manual-breadcrumb';crumb.setAttribute('aria-label','Caminho do Manual');const home=N('a','Manual');home.href='#/manual';const here=N('span',topic.title);here.setAttribute('aria-current','page');
+    crumb.append(home,N('span','/'),N('span',group),N('span','/'),here);for(const sep of crumb.querySelectorAll('span:not([aria-current])'))if(sep.textContent==='/')sep.setAttribute('aria-hidden','true');
+    const article=N('article');article.className='silm-reading silm-manual-article';const eyebrow=N('p',group.toUpperCase());eyebrow.className='eyebrow';const h1=N('h1',topic.title);h1.id='manual-title';h1.tabIndex=-1;const lead=N('p',operation(topic.summary));lead.className='silm-lead';
+    article.append(eyebrow,h1,lead);for(const k of ['purpose','content'])if(topic[k])article.append(N('p',operation(topic[k])));
+    if(topic.steps){article.append(N('h2','Passo a passo'));const ol=N('ol');topic.steps.forEach(x=>ol.append(N('li',operation(x))));article.append(ol);}
+    if(topic.details?.length){article.append(N('h2','Saiba mais'));for(const d of topic.details){const det=N('details');det.append(N('summary',d.title),N('p',operation(d.text)));article.append(det);}}
+    const related=(topic.related||[]).map(find).filter(Boolean);if(related.length){const nav=N('nav');nav.className='silm-manual-related';nav.setAttribute('aria-label','Veja também');nav.append(N('h2','Veja também'));const box=N('div');for(const r of related)box.append(arrowLink(r.title,href(r.id)));nav.append(box);article.append(nav);}
+    const backLink=link('Voltar ao Manual','#/manual');backLink.id='manual-back';article.append(backLink);host.append(crumb,article);focusTarget=h1;
+   }
+  }else{
+   // Início do Manual: apresentação, "Quero saber" e grupos.
+   const hero=N('header');hero.className='silm-manual-hero';const eyebrow=N('p','MANUAL DO USUÁRIO');eyebrow.className='eyebrow';const h1=N('h1','Encontre seu próximo passo.');h1.id='manual-title';h1.tabIndex=-1;
+   const actions=N('div');actions.className='silm-actions';const start=arrowLink('Começar a usar',href('interface'),'button primary');start.id='manual-start';actions.append(start);
+   hero.append(eyebrow,h1,N('p','Uma dúvida na Oficina? Consulte uma ferramenta, entenda um resultado ou descubra por onde começar.'),actions);
+   const quick=N('nav');quick.className='silm-manual-quick';quick.setAttribute('aria-label','Quero saber');const qt=N('p','QUERO SABER');qt.className='eyebrow';quick.append(qt);for(const [x,text] of MANUAL_QUICK)if(find(x))quick.append(arrowLink(text,href(x)));
+   host.append(hero,quick);
+   for(const [name,ids] of MANUAL_GROUPS){const sec=N('section');sec.className='silm-manual-group';sec.append(N('h2',name));const grid=N('div');grid.className='silm-manual-grid';
+    for(const x of ids){const t=find(x);if(!t)continue;const a=N('a');a.className='silm-manual-card';a.href=href(t.id);a.append(N('h3',t.title),N('p',operation(t.summary)));const act=N('span','Consultar ');act.className='silm-manual-card-action';act.insertAdjacentHTML('beforeend',arrowSvg);a.append(act);grid.append(a);}
+    sec.append(grid);host.append(sec);}
+   if(previous)focusTarget=h1;
+  }
+  if(focusTarget&&previous!==key&&previous!=='')requestAnimationFrame(()=>{window.scrollTo(0,0);focusTarget.focus({preventScroll:true});});
  }
  function notebook(){
   const host=$('silm-notebook');if(!host)return;host.replaceChildren();

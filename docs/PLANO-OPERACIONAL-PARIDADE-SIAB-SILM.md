@@ -75,7 +75,7 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 5.4 | Dados | Oficina → Dados | Aceito em 31/10/2026 — registro na seção 8 |
 | 5.5 | Visão geral | Oficina → Visão geral | Aceito em 31/10/2026 — registro na seção 8 |
 | 6 | Caderno | Caderno | Aceito em 31/10/2026 — registro na seção 8 |
-| 7 | Manual | Manual | Não iniciado |
+| 7 | Manual | Manual | Aceito em 31/10/2026 — registro na seção 8 |
 
 Depois das sete telas principais, percorrer os recursos secundários na ordem em que aparecem no menu do SIAB: **Montagens prontas → Tour da bancada → Área do Professor → apoio pedagógico e aula acessível → Preferências e Acessibilidade → Modo projetor → Aplicativo / instalação / Sobre**.
 
@@ -322,33 +322,33 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 
 **Referência SIAB:** `data-tela="manual"`, `js/telas/manual.js`, `js/data/manual.js`, `docs/MANUAL.md`.
 
-**SILM:** `data-view="manual"`, `js/manual/manual.js`, `js/manual/registry.js`, `domain/silm/manual.js`, documentação científica em `docs/`.
+**SILM:** `integracao/index.html` `data-view="manual"`, `integracao/unified-ui.js` função `manual()` (início, tópico, busca, impressão), `domain/silm/manual.js` (tópicos, aliases), documentação científica em `docs/`. Os ponteiros antigos (`js/manual/*`) não são carregados.
 
 ### Tarefas de interface
 
-- [ ] `MANUAL-01` — Replicar hero curto, busca, atalhos de consulta, grupos de categorias e índice.
-- [ ] `MANUAL-02` — Implementar busca com resultados, vazio, limpeza e navegação direta para artigo.
-- [ ] `MANUAL-03` — Implementar artigo com breadcrumb, título, resumo, finalidade, etapas, exemplos, detalhes recolhíveis, ilustrações, relacionados e fontes.
-- [ ] `MANUAL-04` — Implementar comandos/ações contextuais quando fizerem sentido no SILM: abrir tela, abrir painel, iniciar tour ou selecionar ferramenta.
-- [ ] `MANUAL-05` — Implementar impressão do tópico e do guia rápido.
-- [ ] `MANUAL-06` — Verificar links internos e retorno à tela anterior.
-- [ ] `MANUAL-07` — Adicionar ajuda contextual para os painéis da Oficina, atividades, relatórios e preferências.
-- [ ] `MANUAL-08` — Conferir busca por teclado, leitor de tela, accordions e impressão.
+- [x] `MANUAL-01` — Barra com busca, "Voltar à oficina" e impressão; apresentação "Encontre seu próximo passo."; "Quero saber"; quatro grupos de tópicos.
+- [x] `MANUAL-02` — Busca com resultados, vazio com sugestão, "Limpar busca" e navegação direta ao tópico (`#/manual?busca=`).
+- [x] `MANUAL-03` — Tópico com caminho, sobretítulo, título com foco, resumo, conteúdo, passo a passo, "Saiba mais" recolhível e "Veja também". `N/A`: ilustrações (sem conteúdo homologado).
+- [x] `MANUAL-04` — Ações contextuais: "Começar a usar", atalhos e links para telas (Oficina); iniciar tour fica para a Etapa 10.
+- [x] `MANUAL-05` — "Imprimir tópico" (sem a barra) e "Imprimir guia rápido" (todos os tópicos).
+- [x] `MANUAL-06` — Links internos válidos (todos os cartões e "Veja também" testados), alias, endereço antigo `#/manual/<id>` e retorno.
+- [x] `MANUAL-07` — Ajuda contextual: painel Ver → tópico da vista; "Mais → Como usar" na Oficina; o "?" nas docas fica para a Etapa 10.
+- [x] `MANUAL-08` — Busca por teclado (Enter), foco no título, detalhes recolhíveis nativos, impressão; axe sem violações nas suítes gerais.
 
 ### Tarefas de conteúdo SILM
 
-- [ ] `MANUAL-CONTENT-01` — Completar Primeiros passos, Início e navegação.
-- [ ] `MANUAL-CONTENT-02` — Documentar selecionar metal, 118 elementos, estados de disponibilidade, condições e fontes.
-- [ ] `MANUAL-CONTENT-03` — Documentar montagem livre, organização, posição assistida, desfazer e persistência.
-- [ ] `MANUAL-CONTENT-04` — Documentar estruturas cristalinas suportadas e metais com referência sem visualização; não apresentar substitutos artificiais.
-- [ ] `MANUAL-CONTENT-05` — Documentar elétrons deslocalizados, natureza qualitativa e limites.
-- [ ] `MANUAL-CONTENT-06` — Documentar as propriedades metálicas e as diferenças entre representação qualitativa, dado tabelado e indisponível.
-- [ ] `MANUAL-CONTENT-07` — Documentar Explorar, Medir e Calcular: instrumentos, fórmulas, unidades, origens de entrada e limites.
-- [ ] `MANUAL-CONTENT-08` — Documentar câmera 2D/3D, projeções, teclado, toque e fallback.
-- [ ] `MANUAL-CONTENT-09` — Documentar Missões, Roteiros, restrições, conclusão, retomada e refazer.
-- [ ] `MANUAL-CONTENT-10` — Documentar Caderno, Relatórios, importação/exportação e impressão após implementação.
-- [ ] `MANUAL-CONTENT-11` — Documentar Professor, Montagens prontas, Tour, Acessibilidade, Projetor, PWA e solução de problemas.
-- [ ] `MANUAL-CONTENT-12` — Revisar todos os exemplos e referências com fontes rastreáveis; remover marcadores de “documentação provisória”.
+- [x] `MANUAL-CONTENT-01` — Primeiros passos e navegação: "Conheça a Oficina dos Metais", "Como navegar", "Pesquisar no Manual".
+- [x] `MANUAL-CONTENT-02` — "Selecionar um metal" (118 elementos, disponibilidade, condições e fontes).
+- [x] `MANUAL-CONTENT-03` — "Montar a estrutura metálica" e "Reorganizar e reiniciar".
+- [x] `MANUAL-CONTENT-04` — "Estruturas cristalinas" e "Por que uma opção não aparece" (metais com referência sem visualização, sem substitutos).
+- [x] `MANUAL-CONTENT-05` — "Elétrons deslocalizados" (qualitativo e limites).
+- [x] `MANUAL-CONTENT-06` — "Propriedades metálicas" (qualitativa, tabelada, indisponível).
+- [x] `MANUAL-CONTENT-07` — "Explorar", "Medir" e "Calcular" (instrumentos, fórmulas, unidades, origens, limites).
+- [x] `MANUAL-CONTENT-08` — "Mover a vista" e "Ver a estrutura em 3D" (projeções, teclado, toque, volta ao 2D).
+- [x] `MANUAL-CONTENT-09` — "Roteiros, missões e atividades restritas".
+- [x] `MANUAL-CONTENT-10` — "Usar o Caderno" (novo) e "Registrar e imprimir".
+- [~] `MANUAL-CONTENT-11` — Professor, acessibilidade e instalação offline cobertos; Tour e Montagens prontas entram com as Etapas 9 e 10; Projetor a revisar na Etapa 12.
+- [x] `MANUAL-CONTENT-12` — Marcadores "Documentação provisória" removidos; relacionados validados pelo teste.
 
 **Aceite da etapa:** Manual navegável e pesquisável, com cobertura suficiente para todas as funções liberadas no SILM; não precisa copiar o conteúdo ácido-base nem a mesma quantidade de tópicos.
 
@@ -480,7 +480,7 @@ O comando `npm test` já reúne os testes científicos, de rotas, aprendizagem e
 - [x] `TEST-ROUTE` — lista/detalhe/identificação/módulo único/preparação/retomada: `tests/parity/route.cjs`.
 - [x] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem: `tests/parity/workspace.cjs` (5.1 a 5.5).
 - [x] `TEST-NOTEBOOK` — criação, filtros, persistência, backup, importação inválida, CSV, impressão e exclusão: `tests/parity/notebook.cjs` (com `notebook-backup`).
-- [ ] `TEST-MANUAL` — busca, índice, artigo, links, ajuda contextual e impressão.
+- [x] `TEST-MANUAL` — busca, índice, artigo, links, ajuda contextual e impressão: `tests/parity/manual.cjs`.
 - [ ] `TEST-REPORT` — sessões, captura de dados, edição, impressão e acesso restrito.
 - [ ] `TEST-TEACHER` — CRUD de biblioteca, prévia, permissões e import/export.
 - [ ] `TEST-SHELL` — navegação, drawer, foco, preferências, projetor e startup.
@@ -708,6 +708,26 @@ Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (ro
   test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
 Evidências: docs/evidence-parity/NOTE/
 Pendências: filtro por metal/atividade (possível extensão); Firefox, Safari e aparelhos físicos
+Estado: [x]
+```
+
+### Registro — Etapa 7, Manual (fecha as sete telas principais)
+
+```text
+ID da etapa: MANUAL (01 a 08) e MANUAL-CONTENT (01 a 12)
+Tela SIAB: Manual — data-tela="manual", js/telas/manual.js (acidosebases1.0.0@73848f0)
+Tela SILM: Manual — integracao/index.html data-view="manual", integracao/unified-ui.js manual(), domain/silm/manual.js
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 7, Manual" (PR da etapa)
+Viewport(s): 1366×768, 1024×768, 390×844, 320×640, 844×390 (início); tópico e busca em 1366×768 e 390×844
+Arquivos alterados: integracao/index.html (+ index.html gerado), integracao/unified-ui.js, integracao/integration.css,
+  domain/silm/manual.js (2 tópicos novos, marcadores provisórios removidos, aliases), tests/parity/manual.cjs,
+  tests/parity-screens.cjs, tests/learning-browser.cjs
+Diferenças de domínio / N/A: 23 tópicos nos quatro grupos do SIAB (não 52); sem ilustrações; índice lateral substituído
+  pelos grupos e pelo caminho; tour na Etapa 10
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
+Evidências: docs/evidence-parity/MANUAL/
+Pendências: MANUAL-CONTENT-11 parcial (Tour, Montagens prontas, Projetor); Firefox, Safari e aparelhos físicos
 Estado: [x]
 ```
 

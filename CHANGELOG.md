@@ -1,4 +1,15 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 6: Caderno
+## Em desenvolvimento — Paridade SIAB, Etapa 7: Manual (fecha as sete telas principais)
+
+- O Manual ganhou a arquitetura do SIAB:
+  - barra com "Buscar no Manual", "Voltar à oficina" e impressão;
+  - apresentação "Encontre seu próximo passo.";
+  - atalhos "Quero saber";
+  - os quatro grupos de tópicos em cartões.
+- Cada tópico tem página própria, com caminho, "Passo a passo", "Saiba mais" recolhível, "Veja também" e "Voltar ao Manual". A busca tem resultados, mensagem para busca vazia e "Limpar busca".
+- Dois tópicos novos: "Usar o Caderno" e "Por que uma opção não aparece". Os marcadores "Documentação provisória" saíram.
+- TEST-MANUAL em `npm run test:parity`; evidências em `docs/evidence-parity/MANUAL/`.
+
+## Paridade SIAB, Etapa 6: Caderno (mesclada em #28)
 
 - O Caderno segue a ordem do SIAB: ações ("Baixar caderno (CSV)", "Imprimir", "Apagar caderno" em destaque de risco), filtro, nova anotação e lista.
 - O backup JSON fica num grupo próprio no fim da página, com a nota sobre dados locais.
