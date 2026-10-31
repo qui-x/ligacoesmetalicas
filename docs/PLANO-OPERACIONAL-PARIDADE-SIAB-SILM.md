@@ -74,7 +74,7 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 5.3 | Ver / investigação | Oficina → Ver | Aceito em 31/10/2026 — registro na seção 8 |
 | 5.4 | Dados | Oficina → Dados | Aceito em 31/10/2026 — registro na seção 8 |
 | 5.5 | Visão geral | Oficina → Visão geral | Aceito em 31/10/2026 — registro na seção 8 |
-| 6 | Caderno | Caderno | Não iniciado; a tela está ativa em `integracao/unified-ui.js` |
+| 6 | Caderno | Caderno | Aceito em 31/10/2026 — registro na seção 8 |
 | 7 | Manual | Manual | Não iniciado |
 
 Depois das sete telas principais, percorrer os recursos secundários na ordem em que aparecem no menu do SIAB: **Montagens prontas → Tour da bancada → Área do Professor → apoio pedagógico e aula acessível → Preferências e Acessibilidade → Modo projetor → Aplicativo / instalação / Sobre**.
@@ -300,21 +300,21 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 
 **Referência SIAB:** `index.html` `data-tela="caderno"`; `js/telas/caderno.js`; `SIAB.cadernoCSV`; impressão e detalhe de prática.
 
-**SILM:** `index.html` seção `data-view="caderno"`; `js/experience/notebook.js`; `integracao/unified-ui.js`; `domain/silm/bootstrap.js` (`notebook.enabled:false`).
+**SILM:** `integracao/index.html` seção `data-view="caderno"`; `integracao/unified-ui.js` função `notebook()` (registros, filtro, CSV, impressão, backup, exclusão) e `recordActivity`/`recordReport` (registros automáticos). Os ponteiros antigos (`js/experience/notebook.js`, `bootstrap.js` com `notebook.enabled:false`) não são carregados.
 
 ### Tarefas
 
-- [ ] `NOTE-01` — Definir e implementar o modelo científico de registro: observação, hipótese, conclusão, medição, cálculo e vínculo à investigação/atividade.
-- [ ] `NOTE-02` — Habilitar a rota somente quando o Caderno tiver integração funcional; remover o estado atual de indisponibilidade.
-- [ ] `NOTE-03` — Implementar lista cronológica com filtros por tipo, data, metal, atividade e/ou sessão.
-- [ ] `NOTE-04` — Implementar criação e edição de anotações, autosave, feedback e validação de conteúdo.
-- [ ] `NOTE-05` — Implementar detalhe de prática/registro com dados, medições, cálculos e link para relatório.
-- [ ] `NOTE-06` — Implementar CSV com cabeçalhos documentados e valores/unidades/origens preservados.
-- [ ] `NOTE-07` — Implementar backup JSON versionado, exportação, importação validada, rollback e prevenção de duplicatas.
-- [ ] `NOTE-08` — Implementar impressão e layout de papel sem controles da interface.
-- [ ] `NOTE-09` — Implementar exclusão individual e limpeza total com confirmação, preservando relatórios arquivados conforme a regra definida.
-- [ ] `NOTE-10` — Integrar registro automático de conclusão de missão/roteiro e registro de relatório, sem registrar uma mesma tentativa duas vezes.
-- [ ] `NOTE-11` — Testar persistência, navegação, importação inválida, backup e recuperação.
+- [x] `NOTE-01` — Anotação, hipótese e conclusão; registros automáticos de missão/roteiro (com a conclusão do estudante) e de relatório (com a identificação); vínculo com cena e tentativa (`attemptId`).
+- [x] `NOTE-02` — Rota ativa; o cartão do Início e "Abrir Caderno" em Dados levam a ela (TEST-HOME, TEST-WORKSPACE).
+- [x] `NOTE-03` — Lista cronológica com filtro por tipo (TEST-NOTEBOOK); os tipos já separam registros de atividade e pessoais.
+- [x] `NOTE-04` — Criação com tipo, título obrigatório e texto, retorno de sucesso. `N/A`: edição (o SIAB também só cria e apaga).
+- [x] `NOTE-05` — Registros de relatório abrem o relatório arquivado (`learning-browser`).
+- [x] `NOTE-06` — CSV com cabeçalho e BOM UTF-8 (TEST-NOTEBOOK).
+- [x] `NOTE-07` — Backup JSON versionado, importação validada, rollback e sem duplicatas (`notebook-backup`, `learning-browser`).
+- [x] `NOTE-08` — Impressão só com cabeçalho e registros, também por Ctrl+P (TEST-NOTEBOOK).
+- [x] `NOTE-09` — Exclusão individual e total com confirmação; relatórios arquivados preservados (TEST-NOTEBOOK, `learning-browser`).
+- [x] `NOTE-10` — Missão, roteiro e relatório registrados uma vez por tentativa (`attemptId`, `learning-browser`).
+- [x] `NOTE-11` — `tests/parity/notebook.cjs` (TEST-NOTEBOOK) mais `notebook-backup` e `learning-browser`.
 
 **Aceite da etapa:** nenhum link “Abrir Caderno” pode levar a uma tela vazia ou desabilitada; todo registro deve ser recuperável e exportável.
 
@@ -479,7 +479,7 @@ O comando `npm test` já reúne os testes científicos, de rotas, aprendizagem e
 - [x] `TEST-MISSION` — lista/detalhe/evidência/conclusão/refazer/restrições: `tests/parity/mission.cjs`.
 - [x] `TEST-ROUTE` — lista/detalhe/identificação/módulo único/preparação/retomada: `tests/parity/route.cjs`.
 - [x] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem: `tests/parity/workspace.cjs` (5.1 a 5.5).
-- [ ] `TEST-NOTEBOOK` — criação, filtros, persistência, backup, importação inválida, CSV, impressão e exclusão.
+- [x] `TEST-NOTEBOOK` — criação, filtros, persistência, backup, importação inválida, CSV, impressão e exclusão: `tests/parity/notebook.cjs` (com `notebook-backup`).
 - [ ] `TEST-MANUAL` — busca, índice, artigo, links, ajuda contextual e impressão.
 - [ ] `TEST-REPORT` — sessões, captura de dados, edição, impressão e acesso restrito.
 - [ ] `TEST-TEACHER` — CRUD de biblioteca, prévia, permissões e import/export.
@@ -690,6 +690,24 @@ Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (ro
   test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
 Evidências: docs/evidence-parity/LAB-OVERVIEW/
 Pendências: Firefox, Safari e aparelhos físicos
+Estado: [x]
+```
+
+### Registro — Etapa 6, Caderno
+
+```text
+ID da etapa: NOTE (NOTE-01 a NOTE-11)
+Tela SIAB: Caderno — data-tela="caderno", js/telas/caderno.js (acidosebases1.0.0@73848f0)
+Tela SILM: Caderno — integracao/index.html data-view="caderno", integracao/unified-ui.js notebook()
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 6, Caderno" (PR da etapa)
+Viewport(s): 1366×768, 1024×768, 390×844, 320×640, 844×390
+Arquivos alterados: integracao/index.html (+ index.html gerado), integracao/unified-ui.js, integracao/integration.css,
+  tests/parity/notebook.cjs, tests/parity-screens.cjs
+Diferenças de domínio / N/A: tipos de filtro do domínio SILM; backup JSON como extensão; sem edição (como no SIAB)
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
+Evidências: docs/evidence-parity/NOTE/
+Pendências: filtro por metal/atividade (possível extensão); Firefox, Safari e aparelhos físicos
 Estado: [x]
 ```
 

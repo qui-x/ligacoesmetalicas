@@ -1,0 +1,76 @@
+{
+ "id": "NOTE",
+ "siab": "qui-x/acidobase acidosebases1.0.0@73848f0",
+ "captures": [
+  {
+   "app": "siab",
+   "viewport": "1366x768",
+   "route": "#/caderno",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "1366x768",
+   "route": "#/caderno",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "viewport": "1024x768",
+   "route": "#/caderno",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "1024x768",
+   "route": "#/caderno",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "viewport": "390x844",
+   "route": "#/caderno",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "390x844",
+   "route": "#/caderno",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "viewport": "320x640",
+   "route": "#/caderno",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "320x640",
+   "route": "#/caderno",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "viewport": "844x390",
+   "route": "#/caderno",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "844x390",
+   "route": "#/caderno",
+   "horizontalOverflow": 0,
+   "errors": []
+  }
+ ]
+}
