@@ -2,7 +2,7 @@
 /* Comparação de referências: geometria documental separada das medições da bancada. */
 SILM.referenceGeometry=e=>{
  const r=e?.structures?.find(x=>x.id===e.referenceStructure);if(!r||r.conditions?.phase?.value!=='solid')return null;
- const known=SILM.crystal.geometry(e);if(known)return {points:known.cell.map(x=>x.cart),edges:known.edges(),center:known.center,label:known.model.name,source:r.sourceId,canonical:true};
+ const known=SILM.crystal.geometry(e);if(known)return {points:known.cell.map(x=>x.cart),edges:known.edges(),center:known.center,label:known.model.name,code:known.model.code,source:r.sourceId,canonical:true};
  const sites=SILM.crystal.expandSites(r.fractionalSites);if(r.type==='DHCP'&&sites.length!==4)return null;
  const p=r.latticeParameters,v=k=>p[k]?.value,rad=Math.PI/180,a=v('a'),b=v('b'),c=v('c'),alpha=v('alpha')*rad,beta=v('beta')*rad,gamma=v('gamma')*rad;
  if(![a,b,c,alpha,beta,gamma].every(Number.isFinite)||Math.min(a,b,c)<=0||Math.abs(Math.sin(gamma))<1e-8)return null;
@@ -10,7 +10,7 @@ SILM.referenceGeometry=e=>{
  const L=[[a,0,0],[b*Math.cos(gamma),b*Math.sin(gamma),0],[cx,cy,Math.sqrt(cz2)]],cart=f=>[0,1,2].map(i=>f.reduce((n,x,j)=>n+x*L[j][i],0));
  const corners=[0,1].flatMap(x=>[0,1].flatMap(y=>[0,1].map(z=>[x,y,z]))),edges=[];
  for(let i=0;i<8;i++)for(let j=i+1;j<8;j++)if(corners[i].filter((v,k)=>v!==corners[j][k]).length===1)edges.push([cart(corners[i]),cart(corners[j])]);
- return {points:sites.map(cart),edges,center:cart([.5,.5,.5]),label:r.label||r.type,source:r.sourceId,canonical:false};
+ return {points:sites.map(cart),edges,center:cart([.5,.5,.5]),label:r.label||r.type,code:r.type||'Referência',source:r.sourceId,canonical:false};
 };
 SILM.createStructureComparison=({storage,host})=>{
  const S=SILM,N=(tag,text)=>{const n=document.createElement(tag);if(text)n.textContent=text;return n;},svgNS='http://www.w3.org/2000/svg';
@@ -20,13 +20,30 @@ SILM.createStructureComparison=({storage,host})=>{
  function syncLayers(){const visible=!host.closest('[hidden]')&&location.hash.startsWith('#/ambiente');for(const item of layers)item.layer.update({...item.options,visible:visible&&showElectrons,motion:moving&&!reduced()});}
  new MutationObserver(syncLayers).observe(document.getElementById('workspace-overview'),{attributes:true,attributeFilter:['hidden']});window.addEventListener('hashchange',syncLayers);
  host.replaceChildren();host.classList.add('silm-comparison');
- const controls=N('div'),label=N('label','Aplicar propriedade a todas as estruturas'),select=N('select');select.id='silm-comparison-property';label.htmlFor=select.id;
- for(const [id,title]of [['none','Estruturas de referência'],...S.properties.ids.map(id=>[id,S.properties.catalog[id].title])]){const o=N('option',title);o.value=id;select.append(o);}
- const amountLabel=N('label','Intensidade didática'),amount=N('input');amount.type='range';amount.min=0;amount.max=3;amount.step=1;amount.value=0;amount.id='silm-comparison-level';amountLabel.htmlFor=amount.id;
- const status=N('output','Nível 0 de 3'),reset=N('button','Restaurar comparação');reset.type='button';
- const electrons=N('button','Mar de elétrons'),motion=N('button','Movimento eletrônico');electrons.type=motion.type='button';electrons.id='comparison-electrons';motion.id='comparison-motion';electrons.setAttribute('aria-pressed','true');motion.setAttribute('aria-pressed','false');electrons.onclick=()=>{showElectrons=!showElectrons;electrons.setAttribute('aria-pressed',String(showElectrons));syncLayers();};motion.onclick=()=>{moving=!moving;motion.setAttribute('aria-pressed',String(moving));syncLayers();};controls.append(label,select,amountLabel,amount,status,reset,electrons,motion);
- const note=N('p','Até seis metais estudados recentemente. Cada quadro usa sua própria referência. As representações estão ajustadas ao quadro, sem escala comum. A intensidade é didática e não permite classificar qual metal conduz ou deforma mais.'),cards=N('div');cards.className='silm-comparison-cards';host.append(controls,note,cards);
- select.onchange=()=>{property=select.value;render();};amount.oninput=()=>{level=Number(amount.value);status.textContent='Nível '+level+' de 3';render();};reset.onclick=()=>{property='none';level=0;select.value='none';amount.value=0;status.textContent='Nível 0 de 3';render();};
+ const controls=N('div');controls.className='silm-comparison-controls';
+ const propertyField=N('div');propertyField.className='silm-comparison-field';
+ const label=N('label','Propriedade'),select=N('select');select.id='silm-comparison-property';select.className='silm-comparison-select';label.htmlFor=select.id;
+ for(const [id,title]of [['none','Referência'],...S.properties.ids.map(id=>[id,S.properties.catalog[id].title])]){const o=N('option',title);o.value=id;select.append(o);}
+ propertyField.append(label,select);
+ const intensityField=N('div');intensityField.className='silm-comparison-field';
+ const amountLabel=N('label','Intensidade'),amount=N('input');amount.type='range';amount.min=0;amount.max=3;amount.step=1;amount.value=0;amount.id='silm-comparison-level';amountLabel.htmlFor=amount.id;
+ const status=N('output','0/3');status.setAttribute('aria-live','polite');status.className='silm-comparison-level';intensityField.append(amountLabel,amount,status);
+ const actions=N('div');actions.className='silm-comparison-actions';
+ const reset=N('button','Restaurar');reset.type='button';reset.className='secondary-btn';
+ const electrons=N('button','Elétrons');electrons.type='button';electrons.id='comparison-electrons';electrons.className='secondary-btn';electrons.setAttribute('aria-pressed','true');electrons.title='Mostrar ou ocultar os elétrons deslocalizados';
+ const motion=N('button','Movimento');motion.type='button';motion.id='comparison-motion';motion.className='secondary-btn';motion.setAttribute('aria-pressed','false');motion.title='Ativar ou pausar o movimento eletrônico';
+ electrons.onclick=()=>{showElectrons=!showElectrons;electrons.setAttribute('aria-pressed',String(showElectrons));syncLayers();};
+ motion.onclick=()=>{moving=!moving;motion.setAttribute('aria-pressed',String(moving));syncLayers();};
+ actions.append(reset,electrons,motion);controls.append(propertyField,intensityField,actions);
+ const note=N('p','Até seis estruturas recentes. Cada uma usa sua referência; não há escala comum.');note.className='silm-comparison-intro';
+ const limits=document.createElement('details');limits.className='silm-comparison-limits';
+ const limitsTitle=N('summary','Limites da comparação');
+ const limitsText=N('p','A intensidade é didática. As cenas não permitem classificar qual metal conduz ou deforma mais. Algumas estruturas são apenas visualizações de referência e ainda não dispõem de medições e cálculos na bancada.');
+ limits.append(limitsTitle,limitsText);
+ const cards=N('div');cards.className='silm-comparison-cards';host.append(controls,note,limits,cards);
+ select.onchange=()=>{property=select.value;render();};
+ amount.oninput=()=>{level=Number(amount.value);status.textContent=level+'/3';render();};
+ reset.onclick=()=>{property='none';level=0;select.value='none';amount.value=0;status.textContent='0/3';render();};
  function draw(g,e){
   const svg=document.createElementNS(svgNS,'svg');svg.setAttribute('viewBox','0 0 300 230');svg.setAttribute('role','img');svg.setAttribute('aria-label',e.name+' — '+g.label+' — '+(property==='none'?'referência':S.properties.catalog[property].title)+', nível '+level);
   const eligible=S.properties.eligibility(e)[property],apply=property!=='none'&&eligible?.status!=='unavailable';
@@ -43,11 +60,22 @@ SILM.createStructureComparison=({storage,host})=>{
   return {svg,eligible,apply,centers:pts.map(p=>({x:p[0]/300,y:p[1]/230}))};
  }
  function render(){for(const scope of scopes)scope.destroy();scopes=[];layers=[];cards.replaceChildren();if(!recent.length){cards.append(N('p','Inicie uma investigação para incluir a primeira estrutura.'));return;}
-  for(const z of recent){const e=S.data.get(z),card=N('article');card.append(N('h3',e.name+' ('+e.symbol+')'));let g=null;try{g=S.referenceGeometry(e);}catch{}
-   if(g){card.append(N('p',g.label));const {svg,eligible,apply,centers}=draw(g,e),stage=N('div');stage.className='silm-comparison-stage';stage.append(svg);card.append(stage);const scope=SimCore.createScope();scopes.push(scope);const layer=S.createElectronLayer(stage,{scope,reducedMotion:reduced});layers.push({layer,options:{centers,spacing:.12,connect:true,field:apply&&property==='electrical'&&level>0}});card.append(N('p',g.canonical?'Célula do modelo cristalográfico.':'Célula de referência: sítios expandidos das operações de simetria registradas. Medições e cálculos da bancada ainda indisponíveis para este modelo.'));
-    if(property!=='none')card.append(N('p',apply?'Representação qualitativa · nível '+level+' de 3.':eligible?.message||'Propriedade indisponível nesta referência.'));
-    card.append(N('small','Fonte: '+g.source));
-   }else card.append(N('p','Referência ainda sem geometria validada para comparação. A estrutura não foi substituída por outro modelo.'));
+  for(const z of recent){
+   const e=S.data.get(z),card=N('article');let g=null;try{g=S.referenceGeometry(e);}catch{}
+   if(g){
+    const heading=N('header');heading.className='silm-comparison-card-heading';
+    heading.append(N('h3',e.name+' ('+e.symbol+')'),N('span',g.canonical?(g.code||g.label):(g.label||g.code),'silm-comparison-structure'));card.append(heading);
+    const {svg,eligible,apply,centers}=draw(g,e),stage=N('div');stage.className='silm-comparison-stage';stage.append(svg);card.append(stage);
+    const scope=SimCore.createScope();scopes.push(scope);const layer=S.createElectronLayer(stage,{scope,reducedMotion:reduced});layers.push({layer,options:{centers,spacing:.12,connect:true,field:apply&&property==='electrical'&&level>0}});
+    if(property!=='none'){const state=N('p',apply?'Qualitativa · '+level+'/3':eligible?.message||'Indisponível nesta estrutura.');state.className='silm-comparison-card-state';card.append(state);}
+    const details=document.createElement('details');details.className='silm-comparison-details';details.append(N('summary','Fonte e limites'));
+    const detailBody=N('div');let sourceTitle=g.source;try{sourceTitle=S.data.source(g.source)?.title||g.source;}catch(_){}
+    detailBody.append(N('p','Fonte: '+(sourceTitle||'Não informada')+'.'));
+    if(!g.canonical)detailBody.append(N('p','Célula de referência construída a partir dos sítios e das operações de simetria registrados. Medições e cálculos desta estrutura ainda não estão disponíveis na bancada.'));
+    details.append(detailBody);card.append(details);
+   }else{
+    card.append(N('h3',e.name+' ('+e.symbol+')'),N('p','Geometria de referência indisponível.'));
+   }
    cards.append(card);
   }
   syncLayers();
