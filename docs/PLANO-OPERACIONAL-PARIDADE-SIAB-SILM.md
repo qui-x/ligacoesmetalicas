@@ -66,7 +66,7 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 |---:|---|---|---|
 | 1 | Início | Início | Aceito em 31/10/2026 — registro na seção 8 |
 | 2 | Aprender | Aprender / Temas | Aceito em 31/10/2026 — registro na seção 8 |
-| 3 | Missões | Missões | Não iniciado |
+| 3 | Missões | Missões | Aceito em 31/10/2026 — registro na seção 8 |
 | 4 | Roteiros Experimentais | Roteiros Experimentais | Não iniciado |
 | 5 | Laboratório | Oficina dos Metais | Não iniciado; inclui as cinco subáreas abaixo |
 | 5.1 | Bancada em Foco | Oficina → Foco | Não iniciado |
@@ -168,20 +168,20 @@ Não marcar uma tela como concluída apenas porque o texto foi encurtado ou o HT
 
 **Referência SIAB:** `index.html` `data-tela="missoes"` e `data-tela="atividade"`; `js/telas/missao.js`; `js/data/missoes.js`; extensões em `js/data/temas.js`; `js/ui/activity-ui.js`.
 
-**SILM:** `index.html` `data-view="missoes"`; `js/experience/experience.js` função `activityList('mission')`; `js/experience/activity.js`; `domain/silm/missions.js`; `domain/silm/route-session.js`.
+**SILM:** `integracao/index.html` `data-view="missoes"`; `integracao/route-ui.js` funções `missionCatalogue()` (lista e especificação, `#/missoes?item=<id>`) e `missionPanel()` (painel na Oficina, aba Missão); `domain/silm/missions.js`; `domain/silm/route-session.js`. Os ponteiros antigos (`js/experience/*`) não são carregados.
 
 ### Tarefas
 
-- [ ] `MISSION-01` — Comparar catálogo: título, resumo, estado concluído/não concluído, ordenação, cartão e abertura do detalhe.
-- [ ] `MISSION-02` — Comparar detalhe: problema, objetivo, regras, requisitos, condições, evidências, perguntas e contexto recolhível.
-- [ ] `MISSION-03` — Garantir exibição de objetivos acionáveis e atualização do estado de cada evidência.
-- [ ] `MISSION-04` — Garantir campo de conclusão editável, salvamento da sessão e feedback de conclusão.
-- [ ] `MISSION-05` — Comparar iniciar, continuar, concluir, refazer e retomar após recarregar.
-- [ ] `MISSION-06` — Comparar atividade restrita: destinos bloqueados, recursos permitidos, ajuda, relatório e encerramento do contexto.
-- [ ] `MISSION-07` — Conferir passagem das evidências e conclusão ao relatório e ao futuro Caderno.
-- [ ] `MISSION-08` — Verificar cobertura de missões do SILM. O catálogo de seis missões é próprio do domínio; ampliar só com investigações científicas justificadas e critérios de conclusão verificáveis.
-- [ ] `MISSION-09` — Testar casos de missão inválida, recurso indisponível, sessão concluída e sessão interrompida.
-- [ ] `MISSION-10` — Registrar testes automatizados de catálogo, sessão, evidências, conclusão, repetição e restrição.
+- [x] `MISSION-01` — Lista em linhas com título, resumo (subtítulo, módulo, conceito) e situação "Não realizado"/"Em andamento"/"Concluído" à direita; ordem do catálogo; o cartão inteiro abre a especificação.
+- [x] `MISSION-02` — Especificação e painel com "MISSÃO · situação", título, "O problema", "Objetivo e regras" (módulo, recursos liberados, condições), dica recolhível, temas relacionados e fontes.
+- [x] `MISSION-03` — "Evidência" no painel com o rótulo do que `route-session` confere e o estado "Pendente"/"Atendida" atualizado ao vivo.
+- [x] `MISSION-04` — Campo "Conclusão" salvo na sessão a cada digitação, preservado entre redesenhos e depois de recarregar; retorno em `role="status"`.
+- [x] `MISSION-05` — Iniciar, continuar, concluir, encerrar, refazer e retomar depois de recarregar ("Retomar na oficina") conferidos no teste.
+- [x] `MISSION-06` — Contexto restrito: Início, Oficina, a própria missão, relatórios e Manual; as outras telas voltam para a missão com aviso; a aba do painel diz "Missão".
+- [x] `MISSION-07` — O registro da missão concluída no Caderno inclui a conclusão do estudante.
+- [x] `MISSION-08` — As 6 missões cobrem os três módulos e os critérios verificáveis existentes; nenhuma missão nova sem critério homologado.
+- [x] `MISSION-09` — Missão inexistente volta à lista com aviso; sessão concluída bloqueia a conclusão e oferece Refazer; sessão interrompida é retomada.
+- [x] `MISSION-10` — `tests/parity/mission.cjs` (TEST-MISSION) em `npm run test:parity`.
 
 **Aceite da etapa:** uma missão deve oferecer problema, evidência, conclusão e ciclo de retomada tão claros quanto no SIAB, com critérios científicos e recursos exclusivos do SILM.
 
@@ -476,7 +476,7 @@ O comando `npm test` já reúne os testes científicos, de rotas, aprendizagem e
 
 - [x] `TEST-HOME` — teste do Início (hero, caminhos, contagem, retomada, links): `tests/parity/home.cjs`.
 - [x] `TEST-LEARN` — lista/detalhe/retorno e conexão com investigação: `tests/parity/learn.cjs`.
-- [ ] `TEST-MISSION` — lista/detalhe/evidência/conclusão/refazer/restrições.
+- [x] `TEST-MISSION` — lista/detalhe/evidência/conclusão/refazer/restrições: `tests/parity/mission.cjs`.
 - [ ] `TEST-ROUTE` — lista/detalhe/identificação/módulo único/preparação/retomada.
 - [ ] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem.
 - [ ] `TEST-NOTEBOOK` — criação, filtros, persistência, backup, importação inválida, CSV, impressão e exclusão.
@@ -573,6 +573,27 @@ Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (ro
   test:backup; test:mobile-mechanics; test:parity (TEST-HOME e TEST-LEARN); scripts/audit-silm.py — Chromium
 Evidências: docs/evidence-parity/LEARN/ (lista + README) e docs/evidence-parity/LEARN-DETAIL/ (tema)
 Pendências: lacunas de conteúdo para validação do autor (README da etapa); Firefox, Safari e aparelhos físicos
+Estado: [x]
+```
+
+### Registro — Etapa 3, Missões
+
+```text
+ID da etapa: MISSION (MISSION-01 a MISSION-10)
+Tela SIAB: Missões e missão na bancada — data-tela="missoes", js/telas/missao.js (#painel-missao) (acidosebases1.0.0@73848f0)
+Tela SILM: Missões — integracao/index.html data-view="missoes"; integracao/route-ui.js missionCatalogue() e missionPanel()
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 3, Missões" (PR da etapa)
+Viewport(s): lista e especificação nos 5 tamanhos; painel em 1366×768 e 390×844
+Arquivos alterados: integracao/index.html (+ index.html gerado), integracao/route-ui.js, integracao/unified-ui.js
+  (conclusão no Caderno), integracao/integration.css, tests/parity/mission.cjs, tests/parity-screens.cjs,
+  tests/learning-browser.cjs
+Diferenças de domínio / N/A: especificação antes de montar (escolha do metal e investigação livre guardada); conclusão
+  escrita incentivada e registrada, sem bloquear o critério científico homologado; Refazer na especificação e
+  relatório digital só nos roteiros
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity (HOME, LEARN, MISSION); scripts/audit-silm.py — Chromium
+Evidências: docs/evidence-parity/MISSION/ (lista + README), MISSION-DETAIL/ (especificação), MISSION-PANEL/ (painel)
+Pendências: Firefox, Safari e aparelhos físicos
 Estado: [x]
 ```
 

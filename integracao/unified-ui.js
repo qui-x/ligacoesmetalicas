@@ -96,7 +96,8 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    'Unidades na montagem: '+(state.structure?.units?.length||0),
    'Medições registradas: '+(state.measurements?.length||0),
    'Cálculos registrados: '+(state.calculations?.length||0),
-   'Critério de conclusão: '+(route.guidance?.criterion||route.completionCriteria||'Atividade concluída')
+   'Critério de conclusão: '+(route.guidance?.criterion||route.completionCriteria||'Atividade concluída'),
+   String(activity.report?.conclusion||'').trim()?'Conclusão do estudante: '+String(activity.report.conclusion).trim().slice(0,600):''
   ].filter(Boolean);
   if(!journal.addNote({kind:'conclusao',body:lines.join('\n')},notebookScene(state),attemptId))return 'error';
   home();notebookRefresh?.();return 'added';
