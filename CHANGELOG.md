@@ -1,4 +1,17 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 2: Aprender
+## Em desenvolvimento — Paridade SIAB, Etapa 3: Missões
+
+- Lista de missões em linhas, com situação à direita ("Não realizado", "Em andamento", "Concluído").
+- Especificação em coluna de leitura: "MISSÃO · situação", "O problema", "Objetivo e regras", metal da investigação, temas relacionados e fontes.
+- Painel da missão na Oficina, na estrutura do SIAB:
+  - evidência acompanhada ao vivo ("Pendente"/"Atendida");
+  - dica;
+  - campo "Conclusão" salvo na sessão (sobrevive a recarregar);
+  - retorno em `role="status"`.
+- A aba do painel diz "Missão" durante uma missão.
+- O registro da missão concluída no Caderno inclui a conclusão do estudante.
+- TEST-MISSION em `npm run test:parity`; evidências em `docs/evidence-parity/MISSION/`, `MISSION-DETAIL/` e `MISSION-PANEL/`.
+
+## Paridade SIAB, Etapa 2: Aprender (mesclada em #21)
 
 - Lista "Temas" na arquitetura do SIAB: uma linha por tema (o cartão inteiro é o link) com resumo curto e situação "Não revisado"/"Revisado" à direita.
 - Tema em coluna de leitura: "APRENDER · TEMA", título, ideia principal como abertura e as ações "Investigar na oficina" e "Marcar como revisado". Logo abaixo ficam o conteúdo relacionado (missões e roteiros pelo nome), "Aprofunde" e as fontes.
