@@ -1,4 +1,25 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 7: Manual (fecha as sete telas principais)
+## Em desenvolvimento — Paridade SIAB, Etapa 12: Menu, preferências, projetor e aplicativo
+
+- O Menu voltou a ter os itens que a Base SI já trazia e o SILM tinha retirado:
+  - "Relatório" no menu da atividade;
+  - "Área do Professor";
+  - "Animação de abertura";
+  - "Tela inicial".
+- Ajuda, "Apoio pedagógico" e "Como apresentar à turma" abrem o tópico certo do Manual.
+- "Tela inicial": janela "Como deseja iniciar?" (Página inicial ou Oficina dos Metais), como no SIAB:
+  - aparece na primeira visita sem destino;
+  - tem "Redefinir preferência" e "Agora não";
+  - também abre por "Configurações de inicialização", no rodapé do Início.
+- "Sobre o SILM" abre uma janela com versão, licença e atalhos para o Manual. A página `#/sobre` mostra o mesmo conteúdo.
+- O botão Acessibilidade do cabeçalho abre o Menu com o foco no grupo de acessibilidade.
+- A animação de abertura respeita "Animação de abertura" e "Reduzir animações" e mostra "Toque ou aperte uma tecla para pular".
+- O cabeçalho tem a altura do SIAB e não mostra mais a versão. A barra inferior do celular usa ícones de linha. O "Agora" do Menu virou cartão e mostra o contexto da tela.
+- O modo projetor amplia o texto (19 px, como no SIAB).
+- "Instalar aplicativo" aparece sempre que a instalação é possível. Sem pedido do navegador, abre as instruções do Manual.
+- Corrigidos os tópicos "professor" e "abertura" do Manual, que descreviam botões inexistentes.
+- TEST-SHELL em `npm run test:parity`; evidências em `docs/evidence-parity/SHELL/`.
+
+## Paridade SIAB, Etapa 7: Manual (mesclada em #29)
 
 - O Manual ganhou a arquitetura do SIAB:
   - barra com "Buscar no Manual", "Voltar à oficina" e impressão;

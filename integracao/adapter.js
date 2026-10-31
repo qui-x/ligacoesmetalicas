@@ -2,6 +2,12 @@
 /* Produto SILM sobre a Base SI 0.9.17. O domínio científico SILM permanece no schema 8. */
 (() => {
  const B=BaseDemoSI,S=SILM,$=id=>document.getElementById(id);
+ // Etapa 12 (paridade SIAB): a abertura respeita "Animação de abertura" e "Reduzir animações" do Menu. Este script roda
+ // antes da animação oficial, que só começa com <html data-opening> diferente de "off".
+ try{const pref=JSON.parse(localStorage.getItem('silm-base-integration:family-menu-v1')||'null');if(pref&&(pref.intro===false||pref.motion===true))document.documentElement.dataset.opening='off';}catch{/* vale o padrão: ligada */}
+ // Endereço com que o SILM foi aberto: a tela inicial escolhida só vale para a abertura sem destino, como no SIAB.
+ const entryHash=location.hash,specificEntry=!!entryHash&&!['#','#/'].includes(entryHash);
+ const startupChoice=()=>{const v=B.storage.read('startup.choice');return v==='inicio'||v==='ambiente'?v:null;};
  B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.15.5',
   routes:B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios','aprender','missoes','caderno','professor'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'Oficina dos Metais':route.title}))});
  // A cena cristalina também usa data-view; o roteamento só pode atingir páginas do produto.
@@ -218,11 +224,48 @@
    say('Investigação aberta com dados e proveniência preservados.','success');
   }catch(error){say(error.message,'error');}finally{input.value='';}
  }
+ // Etapa 12 do plano de paridade: Menu, preferências e aplicativo como no SIAB 1.0.0.
+ function shell(){
+  const startup=$('silm-startup-dialog'),about=$('silm-about-dialog');
+  // Janelas nativas (<dialog>): Escape fecha e o foco volta ao controle de origem.
+  document.addEventListener('click',event=>{const close=event.target.closest('[data-close-dialog]');if(close)close.closest('dialog')?.close();});
+  const openDialog=dialog=>{B.closeNavigationDrawer(true);if(!dialog.open)dialog.showModal();};
+  // Tela inicial: Página inicial ou Oficina dos Metais; "Redefinir preferência" volta a perguntar na próxima abertura.
+  const syncStartup=()=>{const choice=startupChoice();for(const b of startup.querySelectorAll('[data-startup]:not([data-startup="reset"])'))b.setAttribute('aria-pressed',String(b.dataset.startup===choice));};
+  const openStartup=()=>{syncStartup();openDialog(startup);$('silm-startup-title').focus();};
+  document.addEventListener('click',event=>{
+   if(event.target.closest('[data-startup-settings]')){event.preventDefault();openStartup();return;}
+   const option=event.target.closest('#silm-startup-dialog [data-startup]');if(!option)return;
+   if(option.dataset.startup==='reset'){B.storage.write('startup.choice','');syncStartup();startup.querySelector('[data-startup="inicio"]').focus();say('Escolha novamente sua tela inicial.');return;}
+   B.storage.write('startup.choice',option.dataset.startup);startup.close();location.hash='#/'+option.dataset.startup;
+  });
+  // Primeira visita sem destino: o convite aparece depois da abertura e não interrompe outra navegação, janela ou atividade.
+  if(!specificEntry&&!startupChoice()&&!routeUI.session.open()){
+   const invite=()=>{if(B.currentRoute(location.hash)!=='inicio'||routeUI.session.open()||startupChoice()||document.querySelector('dialog[open]')||B.isPlatformDialogOpen()||document.body.classList.contains('nav-open'))return;
+    if($('silm-intro-v3')){setTimeout(invite,150);return;}openStartup();};
+   setTimeout(invite,250);
+  }
+  // Sobre: a mesma informação na janela do Menu e na página #/sobre.
+  $('si-about-open').addEventListener('click',()=>openDialog(about));
+  const page=$('silm-about-page');if(page){const body=about.querySelector('.silm-about-body').cloneNode(true);for(const a of body.querySelectorAll('[data-close-dialog]'))a.removeAttribute('data-close-dialog');page.append(body);}
+  // Acessibilidade no cabeçalho abre o Menu já no grupo de acessibilidade, com o foco nele (como no SIAB).
+  $('si-header-access').addEventListener('click',()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{const toggle=$('si-a11y-toggle');if(!document.body.classList.contains('nav-open')||!toggle)return;toggle.focus({preventScroll:true});toggle.scrollIntoView({block:'start'});})));
+  // "Agora": o contexto da tela, como no SIAB (Oficina com o módulo ou a atividade; Manual com o grupo e o tópico).
+  const nowTitle=$('si-now-title'),nowText=$('si-now-description'),cont=$('si-nav-continue');
+  const now=()=>{const route=B.currentRoute(location.hash),context=routeUI.session.context();let text='Seu contexto atual';
+   if(route==='ambiente'){const module=($('si-module-tag')?.textContent||'').split('·').pop().trim();text=(context?routeUI.session.route()?.title||'Atividade':'Oficina livre')+(module?' · '+module:'');}
+   else if(route==='manual'){const crumbs=(document.querySelector('#silm-manual .silm-manual-breadcrumb')?.textContent||'').split('/').map(x=>x.trim()).filter(Boolean);text=crumbs.length>1?crumbs.slice(1).join(' › '):'Guia de uso e consulta';}
+   if(nowText&&nowText.textContent!==text)nowText.textContent=text;
+   const label=route==='ambiente'?'Continuar na oficina':'Continuar nesta tela';if(cont&&cont.textContent!==label)cont.textContent=label;};
+  const watch=new MutationObserver(now);for(const node of [nowTitle,nowText,cont])if(node)watch.observe(node,{childList:true,characterData:true,subtree:true});
+  window.addEventListener('si-route-changed',now);now();
+ }
  function boot(){
   const live=document.createElement('p');live.id='silm-announcement';live.className='sr-only';live.setAttribute('role','status');live.setAttribute('aria-live','polite');document.body.append(live);
   // Only the new Base shell initializes. Demo scene, generic engine and demo extension never start.
   B.setupStorageConflictProtection();B.setupPreferences();B.setupComponents();B.selectModule('explorar');
   B.setupWorkspace(()=>({schemaVersion:1,entities:[],selectedId:null}),()=>{});
+  if(!specificEntry&&startupChoice()==='ambiente')history.replaceState(null,'','#/ambiente');
   B.setupNavigationDrawer();B.setupMenuReview();B.updateRoute();window.addEventListener('hashchange',B.updateRoute);
   const selector=$('silm-metal');
   for(const e of S.data.elements.filter(e=>e.silmEligibility.status==='available')){const o=document.createElement('option');o.value=e.atomicNumber;o.textContent=e.symbol+' — '+e.name;selector.append(o);}
@@ -254,7 +297,7 @@
   window.addEventListener('si-route-changed',()=>{if(B.currentRoute(location.hash)!=='ambiente')setStageExpanded(false,{restoreFocus:false});view?.update();});
   const appearance=new MutationObserver(()=>{document.documentElement.dataset.contrast=document.documentElement.classList.contains('si-highcontrast')?'on':'off';view?.update();window.dispatchEvent(new CustomEvent('silm:theme:changed'));});appearance.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   document.addEventListener('keydown',event=>{if(!(event.ctrlKey||event.metaKey)||event.altKey||event.shiftKey||event.key.toLowerCase()!=='z'||B.isPlatformDialogOpen()||B.currentRoute(location.hash)!=='ambiente'||event.target.closest('input,select,textarea,[contenteditable]'))return;event.preventDefault();run.undo();});
-  routeUI.init();B.selectModule(model.state.module.active);workspaceFamily.init();ready=true;render();
+  routeUI.init();B.selectModule(model.state.module.active);workspaceFamily.init();shell();ready=true;render();
   // Read-only inspection facade: tests and debugging cannot mutate the authoritative state directly.
   window.SILMIntegration=Object.freeze({snapshot:()=>model.snapshot(),baseVersion:'0.9.17',activity:()=>routeUI.session.snapshot()});
  }

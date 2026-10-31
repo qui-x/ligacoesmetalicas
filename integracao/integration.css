@@ -431,3 +431,81 @@ body:is([data-silm-route="aprender"],[data-silm-route="missoes"],[data-silm-rout
 }
 .silm-manual-search #manual-search{width:auto;max-width:none;margin:0}
 .silm-manual-search{grid-template-columns:minmax(0,1fr)}.silm-manual-search-row{min-width:0}
+/* ===== Etapa 12 — Menu, preferências e aplicativo (paridade SIAB 1.0.0) ===== */
+/* Cabeçalho com a altura do SIAB (57 px; 56 px no celular). A Oficina mantém a altura própria, aceita na Etapa 5. */
+:root{--si-header-height:57px}
+body:not(.route-ambiente) .topbar.si-global-header{padding-block:6px}
+body:not(.route-ambiente) .si-global-nav a{min-height:44px;align-self:center;border-radius:6px}
+#si-header-access{min-width:44px;min-height:44px;justify-content:center}
+@media(max-width:760px){body:not(.route-ambiente) .topbar.si-global-header{height:56px;min-height:56px;padding-block:6px}}
+/* Barra inferior do celular com ícones de linha, como no SIAB (antes eram símbolos de texto). */
+.si-mobile-bottom-nav a{gap:2px;font-weight:600}
+.si-mobile-bottom-nav a svg{width:22px;height:22px;flex:none}
+/* Menu: "Agora" em cartão; ações (botões) com contorno e destinos (links) sem contorno, como no SIAB. */
+.si-drawer-section.si-drawer-now{border:1px solid var(--border);border-radius:12px;background:var(--panel);padding:16px 6px 14px}
+.si-drawer-continue{min-height:44px;background:transparent;color:var(--text);font-weight:600}
+.si-drawer-continue:hover{background:var(--tint);border-color:var(--accent)}
+.si-drawer-nav-toggle{font-size:.9rem;font-weight:600}
+#si-nav-group-toggle,.si-drawer-item.si-drawer-action{border-color:var(--border)}
+.si-drawer-links .si-drawer-item.si-drawer-action+.si-drawer-item.si-drawer-action{margin-top:8px}
+/* Modo projetor: texto maior, como no SIAB (19 px de base, multiplicado pelo tamanho de texto escolhido). */
+html:has(> body.si-projector-mode){font-size:calc(19px * var(--si-font-factor,1))!important}
+/* Abertura: o SIAB avisa como pular; a animação do SILM aceita toque, clique ou tecla. */
+#silm-intro-v3::after{content:'Toque ou aperte uma tecla para pular';position:absolute;left:0;right:0;bottom:max(24px,env(safe-area-inset-bottom,0px));text-align:center;font:600 13px/1.4 system-ui,sans-serif;color:#d8dde6;opacity:.8;pointer-events:none}
+/* Janelas do SILM: Tela inicial e Sobre. */
+dialog.silm-dialog{border:0;padding:0;color:var(--text);background:transparent;max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);overflow:visible}
+dialog.silm-dialog::backdrop{background:rgba(6,9,14,.72);backdrop-filter:blur(6px)}
+.silm-dialog-close{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--text);cursor:pointer;flex:none}
+.silm-dialog-close:hover{background:var(--tint);border-color:var(--border)}
+.silm-dialog-close svg{width:20px;height:20px}
+.silm-startup-dialog{width:min(940px,calc(100vw - 32px))}
+.silm-startup-dialog[open]{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,512px);align-items:center;gap:24px}
+.silm-startup-brand{display:grid;justify-items:center;gap:10px;text-align:center}
+.silm-startup-brand img{width:176px;height:176px}
+.silm-startup-brand strong{display:block;font-size:44px;letter-spacing:.12em;color:var(--accent);line-height:1.1}
+.silm-startup-brand span{color:var(--text)}
+.silm-startup-panel,.silm-about-dialog[open]{background:var(--panel);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:16px;box-shadow:0 24px 60px #0008;padding:24px 28px 26px;overflow:auto;max-height:calc(100dvh - 32px)}
+.silm-startup-top,.silm-dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.silm-startup-top .eyebrow{margin:0}
+.silm-startup-panel h2{margin:10px 0 8px;font-size:1.6rem;line-height:1.2}
+.silm-startup-panel p{color:var(--muted);margin:0}
+.silm-startup-options{display:grid;gap:12px;margin:22px 0 18px}
+.silm-startup-option{display:flex;align-items:center;gap:14px;width:100%;min-height:76px;padding:14px 16px;border:1px solid var(--border);border-radius:12px;background:var(--panel2);color:var(--text);text-align:left;cursor:pointer;font:inherit}
+.silm-startup-option:hover,.silm-startup-option[aria-pressed="true"]{border-color:var(--accent);background:var(--tint)}
+.silm-startup-option>span:nth-child(2){flex:1;display:grid;gap:2px}
+.silm-startup-option small{color:var(--muted);font-size:.82rem}
+.silm-startup-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:var(--bg);color:var(--accent);flex:none}
+.silm-startup-icon svg{width:22px;height:22px}
+.silm-startup-arrow{width:18px;height:18px;color:var(--muted);flex:none}
+.silm-startup-help{font-size:.82rem}
+.silm-startup-footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
+.silm-about-dialog{width:min(600px,calc(100vw - 32px))}
+.silm-dialog-heading{padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.silm-dialog-heading h2{margin:0;font-size:1.2rem}
+.silm-about-body p{margin:0 0 10px;color:var(--text)}
+.silm-about-links{display:grid;gap:12px;margin-top:16px}
+.silm-about-links .button{justify-content:center;width:100%}
+.silm-about-page .silm-about-body{max-width:640px}
+.si-home-support .si-startup-settings{display:inline-flex;align-items:center;gap:8px}
+.si-home-support .si-startup-settings svg{width:18px;height:18px;flex:none}
+@media(max-width:760px){
+ .silm-startup-dialog[open]{grid-template-columns:minmax(0,1fr);gap:14px;width:min(352px,calc(100vw - 32px));align-content:start}
+ .silm-startup-brand{grid-template-columns:auto auto;justify-content:center;align-items:center;text-align:left;gap:14px}
+ .silm-startup-brand img{width:72px;height:72px}
+ .silm-startup-brand strong{font-size:30px}
+ .silm-startup-panel,.silm-about-dialog[open]{padding:20px}
+ .silm-startup-panel h2{font-size:1.35rem}
+ .silm-startup-option{min-height:72px;padding:12px}
+}
+@media(max-height:500px) and (orientation:landscape){
+ .silm-startup-dialog[open]{grid-template-columns:minmax(0,1fr);width:min(560px,calc(100vw - 32px))}
+ .silm-startup-brand{display:none}
+ .silm-startup-panel{padding:16px 20px}
+ .silm-startup-options{grid-template-columns:1fr 1fr;margin:12px 0}
+}
+/* Título com foco programático (leitor de tela começa por ele), sem contorno de controle. */
+.silm-startup-panel h2:focus{outline:none}
+/* Botões secundários das janelas e do rodapé do Início: contorno, sem o fundo cinza padrão do navegador. */
+.silm-dialog .button.secondary,.si-home-support .si-startup-settings{background:transparent;color:var(--text);border:1px solid var(--border);border-radius:10px;min-height:44px;padding:10px 16px;font:inherit;font-size:.9rem;font-weight:600;cursor:pointer;text-decoration:none}
+.silm-dialog .button.secondary:hover,.si-home-support .si-startup-settings:hover{background:var(--tint);border-color:var(--accent)}
+@media print{dialog.silm-dialog{display:none!important}}
