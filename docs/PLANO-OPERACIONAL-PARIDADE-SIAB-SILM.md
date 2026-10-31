@@ -70,7 +70,7 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 4 | Roteiros Experimentais | Roteiros Experimentais | Aceito em 31/10/2026 — registro na seção 8 |
 | 5 | Laboratório | Oficina dos Metais | Em andamento; subáreas na ordem abaixo |
 | 5.1 | Bancada em Foco | Oficina → Foco | Aceito em 31/10/2026 — registro na seção 8 |
-| 5.2 | Montagem / prateleira | Oficina → Montagem | Não iniciado |
+| 5.2 | Montagem / prateleira | Oficina → Montagem | Aceito em 31/10/2026 — registro na seção 8 |
 | 5.3 | Ver / investigação | Oficina → Ver | Não iniciado |
 | 5.4 | Dados | Oficina → Dados | Não iniciado |
 | 5.5 | Visão geral | Oficina → Visão geral | Rodada preliminar aplicada; revisar e homologar nesta posição |
@@ -230,17 +230,17 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 
 **Referência SIAB:** painel de laboratório, prateleira, escolha de soluções/reagentes, módulos e atividade; `js/ui/prateleira.js`, `js/ui/modulos.js`, `js/ui/layout-bancada.js`.
 
-**SILM:** dock `#si-dock-left`, `integracao/workspace-family.js`, `domain/silm/bootstrap.js`, `domain/silm/periodic-table.js`, `domain/silm/assembly.js`.
+**SILM:** dock `#si-dock-left` (`integracao/index.html`), `integracao/adapter.js` (resumo `#silm-summary-list`, ações), `integracao/workspace-family.js`, `domain/silm/periodic-table.js`, `domain/silm/assembly.js`. O ponteiro antigo `bootstrap.js` não é carregado.
 
-- [ ] `LAB-MOUNT-01` — Comparar navegação por grupos recolhíveis, cabeçalho do painel, abas, rolagem e botão fechar.
-- [ ] `LAB-MOUNT-02` — Comparar o resumo da investigação e identidade do metal.
-- [ ] `LAB-MOUNT-03` — Comparar seleção de metal/Tabela Periódica: busca, seleção, disponibilidade, fontes e confirmação de troca.
-- [ ] `LAB-MOUNT-04` — Comparar estrutura/montagem: iniciar, adicionar unidades, organizar estrutura, retornar à montagem livre e limpar.
-- [ ] `LAB-MOUNT-05` — Comparar propriedades: seleção da propriedade, ação de controle, leitura do resultado, restaurar e encerrar.
-- [ ] `LAB-MOUNT-06` — Comparar escolha do módulo e explicação breve do módulo ativo.
-- [ ] `LAB-MOUNT-07` — Comparar ligação de roteiro/atividade e mostrar apenas os controles permitidos pelo contexto.
-- [ ] `LAB-MOUNT-08` — Manter indisponibilidade científica explícita para metais sem geometria validada; nunca substituir sua estrutura por CCC/CFC/HC.
-- [ ] `LAB-MOUNT-09` — Conferir alvos de toque, teclado, leitor de tela, estados desabilitados e retorno de foco.
+- [x] `LAB-MOUNT-01` — Cabeçalho com "Fechar" escrito, abas Resumo/Preparo/Unidades/Módulo, grupos rotulados na aba Preparo e rolagem da doca conferidos.
+- [x] `LAB-MOUNT-02` — Resumo em pares rótulo/valor (Metal, Estrutura com o nome completo, Unidades, Módulo, Medições, Cálculos; atividade quando houver).
+- [x] `LAB-MOUNT-03` — Tabela Periódica: seleção, elegibilidade e troca com confirmação (`table-mounting`).
+- [x] `LAB-MOUNT-04` — Iniciar (agora ação principal), adicionar, organizar, voltar à montagem livre e limpar (`base-integration`, TEST-WORKSPACE).
+- [x] `LAB-MOUNT-05` — Propriedades: iniciar, controlar, ler, restaurar (`base-integration`, TEST-MISSION).
+- [x] `LAB-MOUNT-06` — Módulo ativo e explicação curta na aba Módulo (`workspace-family`); etiqueta do módulo na barra (5.1).
+- [x] `LAB-MOUNT-07` — Só os controles liberados pela atividade (TEST-MISSION, TEST-ROUTE).
+- [x] `LAB-MOUNT-08` — Metal sem geometria validada: organizar bloqueado com o motivo escrito e nenhuma estrutura cristalina inventada (TEST-WORKSPACE com o manganês).
+- [x] `LAB-MOUNT-09` — Controles com 44 px, "Fechar" devolve o foco ao botão Montagem, axe sem violações (`workspace-a11y`).
 
 ### 5.3 — Oficina: Ver
 
@@ -478,7 +478,7 @@ O comando `npm test` já reúne os testes científicos, de rotas, aprendizagem e
 - [x] `TEST-LEARN` — lista/detalhe/retorno e conexão com investigação: `tests/parity/learn.cjs`.
 - [x] `TEST-MISSION` — lista/detalhe/evidência/conclusão/refazer/restrições: `tests/parity/mission.cjs`.
 - [x] `TEST-ROUTE` — lista/detalhe/identificação/módulo único/preparação/retomada: `tests/parity/route.cjs`.
-- [~] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem: `tests/parity/workspace.cjs` (5.1 pronta; 5.2–5.5 a seguir).
+- [~] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem: `tests/parity/workspace.cjs` (5.1 e 5.2 prontas; 5.3–5.5 a seguir).
 - [ ] `TEST-NOTEBOOK` — criação, filtros, persistência, backup, importação inválida, CSV, impressão e exclusão.
 - [ ] `TEST-MANUAL` — busca, índice, artigo, links, ajuda contextual e impressão.
 - [ ] `TEST-REPORT` — sessões, captura de dados, edição, impressão e acesso restrito.
@@ -634,6 +634,25 @@ Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (ro
   test:backup; test:mobile-mechanics; test:parity (HOME, LEARN, MISSION, ROUTE, WORKSPACE); audit-silm.py — Chromium
 Evidências: docs/evidence-parity/LAB-FOCUS/
 Pendências: aviso de primeira visita (Etapa 10); Firefox, Safari e aparelhos físicos
+Estado: [x]
+```
+
+### Registro — Etapa 5.2, Oficina → Montagem
+
+```text
+ID da etapa: LAB-MOUNT (LAB-MOUNT-01 a LAB-MOUNT-09)
+Tela SIAB: doca Montagem da bancada (Resumo, Preparo, Objetos, Módulo) (acidosebases1.0.0@73848f0)
+Tela SILM: doca #si-dock-left (Resumo, Preparo, Unidades, Módulo)
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 5.2, Oficina → Montagem" (PR da etapa)
+Viewport(s): 1366×768 e 390×844 (doca), mais as suítes de 5 e 7 tamanhos
+Arquivos alterados: integracao/index.html (+ index.html gerado), integracao/adapter.js, integracao/integration.css,
+  tests/parity/workspace.cjs
+Diferenças de domínio / N/A: "Frascos" viram a escolha do metal; "Objetos" viram "Unidades"; o "?" de ajuda no
+  cabeçalho da doca fica para a Etapa 10
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
+Evidências: docs/evidence-parity/LAB-MOUNT/
+Pendências: ajuda contextual "?" (Etapa 10); Firefox, Safari e aparelhos físicos
 Estado: [x]
 ```
 

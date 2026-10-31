@@ -1,4 +1,12 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 5.1: Oficina → Foco
+## Em desenvolvimento — Paridade SIAB, Etapa 5.2: Oficina → Montagem
+
+- A doca Montagem fecha com "Fechar" escrito, como no SIAB.
+- A aba Preparo ganhou dois grupos rotulados: "Metal da investigação" e "Estrutura".
+- "Iniciar investigação" virou a ação principal. Antes ele tinha o fundo cinza do navegador e parecia desativado.
+- O Resumo mostra pares rótulo/valor: Metal, Estrutura (com o nome completo), Unidades, Módulo, Medições e Cálculos.
+- TEST-WORKSPACE ganhou a parte 5.2. Ela confere que um metal sem geometria validada nunca recebe estrutura cristalina inventada. Evidências em `docs/evidence-parity/LAB-MOUNT/`.
+
+## Paridade SIAB, Etapa 5.1: Oficina → Foco (mesclada em #24)
 
 - "Oficina vazia" no padrão da "Bancada vazia" do SIAB: ilustração, o que fazer e as ações "Abrir Montagem", "Começar com o cobre" e "Tabela periódica".
 - Metal sem estrutura também ganha um cartão com a ação certa para o módulo.
