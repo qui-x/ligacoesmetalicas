@@ -68,8 +68,8 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 2 | Aprender | Aprender / Temas | Aceito em 31/10/2026 — registro na seção 8 |
 | 3 | Missões | Missões | Aceito em 31/10/2026 — registro na seção 8 |
 | 4 | Roteiros Experimentais | Roteiros Experimentais | Aceito em 31/10/2026 — registro na seção 8 |
-| 5 | Laboratório | Oficina dos Metais | Não iniciado; inclui as cinco subáreas abaixo |
-| 5.1 | Bancada em Foco | Oficina → Foco | Não iniciado |
+| 5 | Laboratório | Oficina dos Metais | Em andamento; subáreas na ordem abaixo |
+| 5.1 | Bancada em Foco | Oficina → Foco | Aceito em 31/10/2026 — registro na seção 8 |
 | 5.2 | Montagem / prateleira | Oficina → Montagem | Não iniciado |
 | 5.3 | Ver / investigação | Oficina → Ver | Não iniciado |
 | 5.4 | Dados | Oficina → Dados | Não iniciado |
@@ -214,17 +214,17 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 
 **Referência SIAB:** `data-tela="bancada"`, `js/telas/laboratorio.js`, `js/telas/bancada.js`, `js/ui/workspace.js`, `js/ui/trilho.js`.
 
-**SILM:** `data-view="ambiente"`, `#workspace-focus`, `#silm-integration-scene`, `integracao/adapter.js`, `domain/silm/assembly-view.js`, `domain/silm/crystal-view.js`.
+**SILM:** `data-view="ambiente"`, `#workspace-focus`, `#silm-integration-scene`, `integracao/adapter.js` (`renderScene()`, `emptyState()`, etiqueta `#si-module-tag`), `domain/silm/assembly-view.js`, `domain/silm/crystal-view.js`.
 
-- [ ] `LAB-FOCUS-01` — Comparar tamanho e posição da cena, cabeçalho contextual, barra de ações e espaço para os painéis.
-- [ ] `LAB-FOCUS-02` — Comparar estados sem metal, com metal, sem montagem, montagem livre e estrutura cristalina.
-- [ ] `LAB-FOCUS-03` — Comparar seleção de unidade, adição, movimentação, posicionamento assistido, desfazer e limpar.
-- [ ] `LAB-FOCUS-04` — Conferir que uma mudança de módulo não apaga a investigação e que Medir/Calcular não editam a montagem.
-- [ ] `LAB-FOCUS-05` — Conferir câmera, projeção, zoom, enquadramento, centralização, seleção por teclado e toque.
-- [ ] `LAB-FOCUS-06` — Comparar ações persistentes e menu “Mais”; retirar duplicações entre barra, painel e menu.
-- [ ] `LAB-FOCUS-07` — Conferir estado da atividade/roteiro, ajuda e retorno ao contexto anterior.
-- [ ] `LAB-FOCUS-08` — Verificar expansão em tela inteira, rolagem, painel sobreposto e restauração do foco.
-- [ ] `LAB-FOCUS-09` — Criar teste visual e funcional do estado vazio, seleção, montagem, desfazer e retorno.
+- [x] `LAB-FOCUS-01` — Cena, barra e docas comparadas nos 5 tamanhos; etiqueta do módulo logo após as abas, como no SIAB.
+- [x] `LAB-FOCUS-02` — Sem metal: cartão "Oficina vazia" com três ações funcionais; metal sem estrutura: cartão próprio; montagem vazia, livre e cristalina conferidas.
+- [x] `LAB-FOCUS-03` — Adicionar e desfazer (TEST-WORKSPACE); seleção, mover e posicionamento assistido (`base-integration`, `silm-mobile-mechanics`).
+- [x] `LAB-FOCUS-04` — Trocar para Medir preserva metal e unidades e bloqueia a edição da montagem (TEST-WORKSPACE).
+- [x] `LAB-FOCUS-05` — Câmera, projeção, zoom, enquadrar, centralizar, teclado e toque cobertos por `silm-mobile-mechanics`, `base-integration` e `workspace-a11y`.
+- [x] `LAB-FOCUS-06` — Sem comandos repetidos: Desfazer só na barra; "Limpar estrutura" só no menu Mais; o cabeçalho da cena fica com Adicionar e Organizar.
+- [x] `LAB-FOCUS-07` — Estado da atividade na etiqueta ("Missão · …"/"Roteiro · …") e nos painéis das Etapas 3 e 4; ajuda em "Mais → Como usar".
+- [x] `LAB-FOCUS-08` — Expansão, painel sobreposto e retorno do foco cobertos por `workspace-family` (cinco tamanhos).
+- [x] `LAB-FOCUS-09` — `tests/parity/workspace.cjs` (TEST-WORKSPACE, parte 5.1) em `npm run test:parity`.
 
 ### 5.2 — Oficina: Montagem
 
@@ -478,7 +478,7 @@ O comando `npm test` já reúne os testes científicos, de rotas, aprendizagem e
 - [x] `TEST-LEARN` — lista/detalhe/retorno e conexão com investigação: `tests/parity/learn.cjs`.
 - [x] `TEST-MISSION` — lista/detalhe/evidência/conclusão/refazer/restrições: `tests/parity/mission.cjs`.
 - [x] `TEST-ROUTE` — lista/detalhe/identificação/módulo único/preparação/retomada: `tests/parity/route.cjs`.
-- [ ] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem.
+- [~] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem: `tests/parity/workspace.cjs` (5.1 pronta; 5.2–5.5 a seguir).
 - [ ] `TEST-NOTEBOOK` — criação, filtros, persistência, backup, importação inválida, CSV, impressão e exclusão.
 - [ ] `TEST-MANUAL` — busca, índice, artigo, links, ajuda contextual e impressão.
 - [ ] `TEST-REPORT` — sessões, captura de dados, edição, impressão e acesso restrito.
@@ -615,6 +615,25 @@ Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (ro
   test:backup; test:mobile-mechanics; test:parity (HOME, LEARN, MISSION, ROUTE); scripts/audit-silm.py — Chromium
 Evidências: docs/evidence-parity/ROUTE/ (lista + README), ROUTE-DETAIL/ (roteiro), ROUTE-PANEL/ (depois de montar)
 Pendências: Firefox, Safari e aparelhos físicos
+Estado: [x]
+```
+
+### Registro — Etapa 5.1, Oficina → Foco
+
+```text
+ID da etapa: LAB-FOCUS (LAB-FOCUS-01 a LAB-FOCUS-09)
+Tela SIAB: Bancada — data-tela="bancada", js/telas/laboratorio.js e bancada.js (acidosebases1.0.0@73848f0)
+Tela SILM: Oficina → Foco — data-view="ambiente", integracao/adapter.js renderScene()/emptyState()
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 5.1, Oficina → Foco" (PR da etapa)
+Viewport(s): 1366×768, 1024×768, 390×844, 320×640, 844×390
+Arquivos alterados: integracao/adapter.js, integracao/index.html (+ index.html gerado), integracao/integration.css,
+  domain/silm/assembly-view.js (sem Desfazer duplicado), tests/parity/workspace.cjs, tests/parity-screens.cjs
+Diferenças de domínio / N/A: aviso de primeira visita com tour fica para a Etapa 10; "Tabela periódica" no lugar de
+  "Montagens prontas" (Etapa 9)
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity (HOME, LEARN, MISSION, ROUTE, WORKSPACE); audit-silm.py — Chromium
+Evidências: docs/evidence-parity/LAB-FOCUS/
+Pendências: aviso de primeira visita (Etapa 10); Firefox, Safari e aparelhos físicos
 Estado: [x]
 ```
 

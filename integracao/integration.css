@@ -328,3 +328,17 @@ body:is([data-silm-route="aprender"],[data-silm-route="missoes"],[data-silm-rout
 @media print{.silm-identity .silm-field input{display:none}}
 .silm-row-next{display:flex;flex-direction:column;align-items:flex-end;gap:2px}.silm-row-next svg{width:20px;height:20px}
 @media(max-width:370px){.silm-row-next{flex-direction:row;align-items:center;gap:6px}}
+
+/* Paridade SIAB — Etapa 5.1, Oficina → Foco: estado vazio como a "Bancada vazia" e etiqueta do módulo na barra. */
+.si-empty-state{max-width:420px;margin:clamp(16px,6vh,56px) auto;padding:26px 22px;border:1px dashed var(--border);border-radius:16px;text-align:center;display:grid;justify-items:center;gap:10px;background:color-mix(in srgb,var(--surface) 55%,transparent)}
+.si-empty-art{width:120px;height:96px;color:var(--muted)}
+.si-empty-art .si-empty-accent{color:var(--accent);stroke:var(--accent);fill:color-mix(in srgb,var(--accent) 35%,transparent)}
+.si-empty-state h2{font-size:1.2rem;margin:0}
+.si-empty-state p{color:var(--muted);margin:0;line-height:1.5}
+.si-empty-state p strong{color:var(--text)}
+.si-empty-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:6px}
+.si-empty-actions .button{min-height:44px}
+.si-module-tag{margin-right:auto;align-self:center;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;padding:0 4px}
+@media(max-width:640px){.si-module-tag{display:none}.si-empty-state{margin:12px auto;padding:20px 16px}}
+/* LAB-FOCUS-06: "Limpar estrutura" fica no menu Mais (ação destrutiva, um passo a mais); o botão da barra continua no DOM para a Base. */
+.si-actionbar>#scene-clear{display:none}

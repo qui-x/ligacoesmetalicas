@@ -37,7 +37,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  const meta=U.element('p','','silm-assembly-meta');meta.id='silm-assembly-meta';titles.append(eyebrow,heading,meta);identity.append(badge,titles);
  const tools=U.element('div',null,'silm-assembly-tools');let add=null,undo=null;
  let organizeButton=null;
- if(editable){add=SILM.actionButton('Adicionar unidade',()=>actions.add(),scope,{id:'silm-assembly-add',primary:true,glyph:'+'});undo=SILM.actionButton('Desfazer',()=>actions.undo(),scope,{id:'silm-assembly-undo',glyph:'↶',label:'Desfazer última ação'});tools.append(add,undo);
+ if(editable){add=SILM.actionButton('Adicionar unidade',()=>actions.add(),scope,{id:'silm-assembly-add',primary:true,glyph:'+'});tools.append(add); // Desfazer fica só na barra de ações da Oficina (#scene-undo), sem duplicar o comando na cena.
   // 0.5.x: organização cristalográfica segundo a estrutura de referência do banco.
   if(organize){organizeButton=SILM.actionButton('Organizar estrutura',()=>organize.run(),scope,{id:'silm-assembly-organize'});organizeButton.setAttribute('aria-describedby','silm-assembly-crystal-reason');tools.append(organizeButton);}}
  else if(canExplore())tools.append(SILM.actionButton('Montar em Explorar',onExplore,scope,{id:'silm-assembly-explore'}));
