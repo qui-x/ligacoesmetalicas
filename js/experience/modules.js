@@ -16,8 +16,7 @@ SimCore.createModules=(ctx,experience)=>{
   const controls=U.element('div',null,'module-controls');host.append(box,controls);
   const cleanup=()=>{if(releaseControl){const release=releaseControl;releaseControl=null;release();}controlScope=null;};
   local.scope.cleanup(()=>{controlScope?.destroy();controlScope=null;});
-  /* Cartões da família: cabeçalho com ícone, nome, número e selo "Ativo"; um só cartão aberto; corpo com o botão
-     "Ativar módulo X" / "Módulo X em uso", a definição, um quadro de fatos e uma nota (todos opcionais, vindos do domínio). */
+  /* Cartões objetivos: nome, estado e resumo. O aprofundamento fica dentro do módulo. */
   for(const m of records.values()){
    const card=U.element('section',null,'module-card');card.dataset.module=m.id;if(m.accent)card.style.setProperty('--mod',m.accent);
    const head=U.element('button',null,'module-head');head.type='button';head.id='module-head-'+m.id;head.setAttribute('aria-controls','module-body-'+m.id);head.title=m.tooltip||m.description||m.title;
@@ -38,7 +37,7 @@ SimCore.createModules=(ctx,experience)=>{
   async function choose(id){
    const m=records.get(id);if(!m)return;
    if(selected===id){S.notifications.announce('O módulo '+m.title+' já está em uso.');return;}
-   if(await select(id)){ctx.history?.log({action:'Módulo: '+m.title+'.'});S.notifications.announce('Módulo '+m.title+' ativado.'+(m.description?' '+m.description:''));ctx.notify('Módulo '+m.title+' ativado.',{type:'success',duration:3600});}
+   if(await select(id)){ctx.history?.log({action:'Módulo: '+m.title+'.'});S.notifications.announce('Módulo '+m.title+' ativado.');ctx.notify('Módulo '+m.title+' ativado.',{type:'success',duration:3600});}
   }
   function update(refreshControls=true){
    for(const m of records.values()){const card=box.querySelector('[data-module="'+m.id+'"]'),active=selected===m.id,open=expanded===m.id;
