@@ -1,4 +1,13 @@
-## Em desenvolvimento — Paridade SIAB, Etapas 5.3 e 5.4: Oficina → Ver e Dados
+## Em desenvolvimento — Paridade SIAB, Etapa 5.5: Oficina → Visão geral (fecha a Etapa 5)
+
+- Corrigido o layout da Visão geral. O contêiner herdava a grade de colunas de 160 px da Base, o que espremia controles, aviso e cartões lado a lado e cortava botões no celular ("Restau", "Elétro").
+- Agora, como "Sua bancada" no SIAB:
+  - a barra de controles ocupa a largura toda;
+  - o aviso fica logo abaixo;
+  - os cartões, com no mínimo 300 px, formam a grade.
+- TEST-WORKSPACE (parte 5.5) roda em 1366×768, 390×844 e 844×390. Evidências em `docs/evidence-parity/LAB-OVERVIEW/`.
+
+## Paridade SIAB, Etapas 5.3 e 5.4: Oficina → Ver e Dados (mesclada em #26)
 
 - Os painéis abertos por Ver e Dados se chamam "Investigar" e "Dados da investigação", como no SIAB, sem título repetido dentro deles.
 - Dados ganhou a seção "Relatório" ("Dados medidos e registro da investigação."), com "Abrir relatório" e "Abrir Caderno" em largura total.

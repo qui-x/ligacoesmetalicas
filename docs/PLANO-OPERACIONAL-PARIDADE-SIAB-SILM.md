@@ -68,12 +68,12 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 2 | Aprender | Aprender / Temas | Aceito em 31/10/2026 — registro na seção 8 |
 | 3 | Missões | Missões | Aceito em 31/10/2026 — registro na seção 8 |
 | 4 | Roteiros Experimentais | Roteiros Experimentais | Aceito em 31/10/2026 — registro na seção 8 |
-| 5 | Laboratório | Oficina dos Metais | Em andamento; subáreas na ordem abaixo |
+| 5 | Laboratório | Oficina dos Metais | Aceito em 31/10/2026 — as cinco subáreas abaixo |
 | 5.1 | Bancada em Foco | Oficina → Foco | Aceito em 31/10/2026 — registro na seção 8 |
 | 5.2 | Montagem / prateleira | Oficina → Montagem | Aceito em 31/10/2026 — registro na seção 8 |
 | 5.3 | Ver / investigação | Oficina → Ver | Aceito em 31/10/2026 — registro na seção 8 |
 | 5.4 | Dados | Oficina → Dados | Aceito em 31/10/2026 — registro na seção 8 |
-| 5.5 | Visão geral | Oficina → Visão geral | Rodada preliminar aplicada; revisar e homologar nesta posição |
+| 5.5 | Visão geral | Oficina → Visão geral | Aceito em 31/10/2026 — registro na seção 8 |
 | 6 | Caderno | Caderno | Não iniciado; a tela está ativa em `integracao/unified-ui.js` |
 | 7 | Manual | Manual | Não iniciado |
 
@@ -282,17 +282,17 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 
 **SILM:** `#workspace-overview`, `integracao/structure-comparison.js`, `integracao/workspace-family.css`.
 
-**Estado atual:** primeira rodada preliminar já aplicada antes da definição da ordem. Não considerar homologada até esta subseção ser executada.
+**Estado atual:** homologada em 31/10/2026. A grade da Base (`si-overview-grid`, colunas de 160 px) espremia controles e cartões; o contêiner passou a ter uma coluna só.
 
-- [~] `LAB-OVERVIEW-01` — Encurtar cabeçalho e retirar introdução repetida.
-- [~] `LAB-OVERVIEW-02` — Resumir controles e cartões, recolher fontes/limites e remover legenda longa repetida.
-- [~] `LAB-OVERVIEW-03` — Remover rolagem interna que competia com a rolagem do workspace.
-- [ ] `LAB-OVERVIEW-04` — Comparar estrutura da grade, quantidade de cartões, ordem, espaçamento, alinhamento e comportamento com 1, 2 e 6 metais.
-- [ ] `LAB-OVERVIEW-05` — Comparar ações e estados: aplicar propriedade, intensidade, elétrons, movimento e restaurar.
-- [ ] `LAB-OVERVIEW-06` — Garantir rótulo curto de metal/estrutura, fonte por cartão e aviso de limitação recolhido sem ocultar informação essencial.
-- [ ] `LAB-OVERVIEW-07` — Testar referências sem geometria, modelos fora de CCC/CFC/HC e propriedades indisponíveis.
-- [ ] `LAB-OVERVIEW-08` — Testar grade em desktop, tablet, celular e paisagem, sem cartões cortados nem segundo scroll.
-- [ ] `LAB-OVERVIEW-09` — Rodar `tests/structure-comparison.cjs` e testes de camada eletrônica; criar evidência visual final.
+- [x] `LAB-OVERVIEW-01` — Cabeçalho curto, sem introdução repetida (rodada do autor, conferida).
+- [x] `LAB-OVERVIEW-02` — Controles resumidos em uma barra de largura total; fontes e limites recolhidos ("Fonte e limites", "Limites da comparação").
+- [x] `LAB-OVERVIEW-03` — Sem rolagem interna concorrendo com a do workspace (conferido em 3 tamanhos).
+- [x] `LAB-OVERVIEW-04` — Grade em coluna única no contêiner, cartões de no mínimo 300 px; 2 cartões (TEST-WORKSPACE) e 6 referências (`structure-comparison`).
+- [x] `LAB-OVERVIEW-05` — Propriedade, intensidade e Restaurar (TEST-WORKSPACE); elétrons, movimento e movimento reduzido (`structure-comparison`).
+- [x] `LAB-OVERVIEW-06` — Rótulo curto do metal e da estrutura, fonte por cartão e limites recolhidos; estado qualitativo ou motivo da indisponibilidade em cada cartão.
+- [x] `LAB-OVERVIEW-07` — Referência inconsistente bloqueada, cinco geometrias e propriedades indisponíveis (`structure-comparison`).
+- [x] `LAB-OVERVIEW-08` — 1366×768, 390×844 e 844×390 sem cartões cortados, controles cortados nem rolagem lateral (TEST-WORKSPACE).
+- [x] `LAB-OVERVIEW-09` — `structure-comparison` e `electrons-3d` aprovados; evidência em `docs/evidence-parity/LAB-OVERVIEW/`.
 
 **Aceite da Oficina:** Foco, Montagem, Ver, Dados e Visão geral foram comparados e testados na ordem. As mesmas entidades científicas são exibidas nos painéis; não criar uma segunda fonte de verdade visual.
 
@@ -478,7 +478,7 @@ O comando `npm test` já reúne os testes científicos, de rotas, aprendizagem e
 - [x] `TEST-LEARN` — lista/detalhe/retorno e conexão com investigação: `tests/parity/learn.cjs`.
 - [x] `TEST-MISSION` — lista/detalhe/evidência/conclusão/refazer/restrições: `tests/parity/mission.cjs`.
 - [x] `TEST-ROUTE` — lista/detalhe/identificação/módulo único/preparação/retomada: `tests/parity/route.cjs`.
-- [~] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem: `tests/parity/workspace.cjs` (5.1 a 5.4 prontas; 5.5 a seguir).
+- [x] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem: `tests/parity/workspace.cjs` (5.1 a 5.5).
 - [ ] `TEST-NOTEBOOK` — criação, filtros, persistência, backup, importação inválida, CSV, impressão e exclusão.
 - [ ] `TEST-MANUAL` — busca, índice, artigo, links, ajuda contextual e impressão.
 - [ ] `TEST-REPORT` — sessões, captura de dados, edição, impressão e acesso restrito.
@@ -672,6 +672,24 @@ Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (ro
   test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
 Evidências: docs/evidence-parity/LAB-VIEW/ (README das duas subáreas) e docs/evidence-parity/LAB-DATA/
 Pendências: ajuda contextual "?" (Etapa 10); Firefox, Safari e aparelhos físicos
+Estado: [x]
+```
+
+### Registro — Etapa 5.5, Oficina → Visão geral (fecha a Etapa 5)
+
+```text
+ID da etapa: LAB-OVERVIEW (01 a 09)
+Tela SIAB: overview-view ("Sua bancada") (acidosebases1.0.0@73848f0)
+Tela SILM: #workspace-overview ("Estruturas recentes"), integracao/structure-comparison.js
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 5.5, Visão geral" (PR da etapa)
+Viewport(s): 1366×768, 390×844, 844×390
+Arquivos alterados: integracao/integration.css (contêiner em coluna única, grade de cartões), tests/parity/workspace.cjs
+Diferenças de domínio / N/A: sem selecionar/ordenar recipientes nem "Em foco" — estruturas independentes, sem escala
+  comum (ordenar sugeriria classificação)
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
+Evidências: docs/evidence-parity/LAB-OVERVIEW/
+Pendências: Firefox, Safari e aparelhos físicos
 Estado: [x]
 ```
 
