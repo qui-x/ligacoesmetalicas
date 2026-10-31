@@ -1,4 +1,20 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 12: Menu, preferências, projetor e aplicativo
+## Em desenvolvimento — Paridade SIAB, Etapa 8: Relatórios
+
+- O Relatório ganhou a organização do SIAB:
+  - ações no topo ("Atualizar dados da investigação", "Registrar no Caderno", "Imprimir / salvar em PDF", "Imprimir para preencher à mão", "Voltar" para a origem e "Encerrar atividade");
+  - painel "Preparar relatório";
+  - folha em dez seções numeradas, com "Fontes" e "Nota sobre o modelo".
+- Três modos:
+  - **Relatório completo:** campos editáveis.
+  - **Para preencher à mão:** identificação e respostas em linhas, de 5 a 25 por resposta.
+  - **Atividade de análise · Professor:** só fora de uma atividade. O professor escolhe os dados incluídos, as respostas em branco, a proposta e a questão. O SILM não cria dados hipotéticos.
+- Cada dado mostra a origem: dado tabelado, representação didática, condição de referência, medida do modelo ou calculado pelo SILM (com a origem de cada entrada).
+- Novos campos "Análise" e "Resposta à investigação", como no SIAB. Relatórios antigos continuam válidos.
+- O relatório arquivado (aberto pelo Caderno) fica só para leitura e tem "Voltar ao Caderno".
+- Tópico "Registrar e imprimir" do Manual atualizado.
+- TEST-REPORT em `npm run test:parity`; evidências em `docs/evidence-parity/REPORT/`.
+
+## Paridade SIAB, Etapa 12: Menu, preferências, projetor e aplicativo (mesclada em #30)
 
 - O Menu voltou a ter os itens que a Base SI já trazia e o SILM tinha retirado:
   - "Relatório" no menu da atividade;

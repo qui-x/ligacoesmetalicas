@@ -1,0 +1,132 @@
+{
+ "id": "REPORT",
+ "siab": "qui-x/acidobase acidosebases1.0.0@73848f0",
+ "captures": [
+  {
+   "app": "siab",
+   "shot": "completo",
+   "viewport": "1366x768",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "completo",
+   "viewport": "1366x768",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "completo",
+   "viewport": "1024x768",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "completo",
+   "viewport": "1024x768",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "completo",
+   "viewport": "390x844",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "completo",
+   "viewport": "390x844",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "completo",
+   "viewport": "320x640",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "completo",
+   "viewport": "320x640",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "completo",
+   "viewport": "844x390",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "completo",
+   "viewport": "844x390",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "mao",
+   "viewport": "1366x768",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "analise",
+   "viewport": "1366x768",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "mao",
+   "viewport": "1366x768",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "analise",
+   "viewport": "1366x768",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "mao",
+   "viewport": "390x844",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "analise",
+   "viewport": "390x844",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "mao",
+   "viewport": "390x844",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "analise",
+   "viewport": "390x844",
+   "horizontalOverflow": 0,
+   "errors": []
+  }
+ ]
+}

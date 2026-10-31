@@ -1,7 +1,7 @@
 'use strict';
 SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
  const S=SILM,B=BaseDemoSI,$=id=>document.getElementById(id),N=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;},link=(text,href)=>{const a=N('a',text);a.className='button outline';a.href=href;return a;};
- const fields={name:'',className:'',date:new Date().toLocaleDateString('pt-BR'),teacher:'',group:'',observations:'',interpretation:'',conclusion:''};
+ const fields={name:'',className:'',date:new Date().toLocaleDateString('pt-BR'),teacher:'',group:'',observations:'',analysis:'',interpretation:'',answer:'',conclusion:''};
  let progress={schemaVersion:1,completed:{}},table=null;let journal=B.createJournalStore(B.storage);let notebookFilter='todos',notebookRefresh=null;
  function normalize(value){const completed={};for(const t of S.themes.registry)if(value?.completed?.[t.id]===t.version)completed[t.id]=t.version;return {schemaVersion:1,completed};}
  function init(){
@@ -122,7 +122,9 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    'Cálculos registrados: '+(state.calculations?.length||0),
    [report.name,report.className,report.group].some(x=>short(x))?'Identificação: '+[report.name,report.className&&('Turma '+report.className),report.group&&('Grupo '+report.group),report.teacher&&('Professor '+report.teacher)].map(x=>short(x,80)).filter(Boolean).join(' · '):'',
    short(report.observations)?'Observações: '+short(report.observations):'',
+   short(report.analysis)?'Análise: '+short(report.analysis):'',
    short(report.interpretation)?'Interpretação: '+short(report.interpretation):'',
+   short(report.answer)?'Resposta: '+short(report.answer):'',
    short(report.conclusion)?'Conclusão: '+short(report.conclusion):''
   ].filter(Boolean);
   const body=lines.join('\n').slice(0,1200);

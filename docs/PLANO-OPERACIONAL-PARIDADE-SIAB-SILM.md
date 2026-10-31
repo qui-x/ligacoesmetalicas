@@ -52,7 +52,7 @@ Desde a integração com a Base SI 0.9.17, a entrada carrega só a Base (travada
 | Missões e Roteiros | `integracao/route-ui.js` (`catalogue`, `guidance`, `guard`, `report`), `domain/silm/missions.js`, `domain/silm/routes.js`, `domain/silm/route-session.js` |
 | Oficina | `integracao/workspace-family.js`, `integracao/scientific-tools.js`, `integracao/metallic-experience.js`, `integracao/structure-comparison.js`, `integracao/workspace-family.css`, vistas em `domain/silm/*-view.js` |
 | Caderno, Manual, Professor | `integracao/unified-ui.js` (`notebook`, `manual`, `professor`), `domain/silm/manual.js` |
-| Relatórios | `integracao/route-ui.js` `report()`, `integracao/unified-ui.js` `freeReport()` |
+| Relatórios | `integracao/route-ui.js` `report()` (ações, "Preparar relatório", documento em 10 seções; configuração em `report.config:<relatório>`), `integracao/unified-ui.js` `freeReport()` e `recordReport()`, campos em `domain/silm/route-session.js` |
 | Montagens prontas e Tour | Sem tela na entrada atual (lacunas das etapas 9 e 10) |
 | Menu, preferências, PWA | Gaveta, janelas Tela inicial e Sobre em `integracao/index.html`; `integracao/adapter.js` `shell()` (tela inicial, Sobre, "Agora", acessibilidade direta, abertura); `integracao/base-core.js` (gerado da Base: `setupMenuReview`); `integracao/pwa.js`; `sw.js` (gerado por `scripts/build-sw.cjs`) |
 
@@ -76,6 +76,7 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 5.5 | Visão geral | Oficina → Visão geral | Aceito em 31/10/2026 — registro na seção 8 |
 | 6 | Caderno | Caderno | Aceito em 31/10/2026 — registro na seção 8 |
 | 7 | Manual | Manual | Aceito em 31/10/2026 — registro na seção 8 |
+| 8 | Relatório | Relatório | Aceito em 31/10/2026 — registro na seção 8 |
 | 12 | Menu, preferências, projetor e aplicativo | Menu, preferências, projetor e aplicativo | Aceito em 31/10/2026 — registro na seção 8 (MENU-05 entra com as Etapas 9 e 10) |
 
 Depois das sete telas principais, percorrer os recursos secundários na ordem em que aparecem no menu do SIAB: **Montagens prontas → Tour da bancada → Área do Professor → apoio pedagógico e aula acessível → Preferências e Acessibilidade → Modo projetor → Aplicativo / instalação / Sobre**.
@@ -361,15 +362,15 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 
 **SILM:** `data-view="relatorios"`, `js/experience/reports.js`, `domain/silm/bootstrap.js` função `report.collect()`.
 
-- [ ] `REPORT-01` — Comparar abertura a partir de atividade, oficina e Caderno; retornar à origem correta.
-- [ ] `REPORT-02` — Comparar seleção de sessão/relatório arquivado e atualização dos dados da investigação.
-- [ ] `REPORT-03` — Definir relatório completo com identificação, proposta/objetivo, condições, estrutura, medições, cálculos, fontes, observações, análise, resposta e conclusão.
-- [ ] `REPORT-04` — Identificar claramente dado tabelado, medida do modelo, cálculo do SILM e texto autoral do estudante.
-- [ ] `REPORT-05` — Implementar modos aplicáveis: completo, para preencher à mão e atividade de análise do Professor.
-- [ ] `REPORT-06` — Implementar seleção de seções incluídas, campos deixados em branco e opções de impressão sem apagar registros científicos.
-- [ ] `REPORT-07` — Garantir persistência por sessão, edição, relatório arquivado e restauração após recarregar.
-- [ ] `REPORT-08` — Testar tabelas longas, cálculos, fontes, impressão/PDF, preenchimento manual e acesso restrito.
-- [ ] `REPORT-09` — Testar que o relatório não confunda intensidade didática com resultado experimental nem medida do modelo com medida de amostra real.
+- [x] `REPORT-01` — Comparar abertura a partir de atividade, oficina e Caderno; retornar à origem correta.
+- [x] `REPORT-02` — Comparar seleção de sessão/relatório arquivado e atualização dos dados da investigação.
+- [x] `REPORT-03` — Definir relatório completo com identificação, proposta/objetivo, condições, estrutura, medições, cálculos, fontes, observações, análise, resposta e conclusão.
+- [x] `REPORT-04` — Identificar claramente dado tabelado, medida do modelo, cálculo do SILM e texto autoral do estudante.
+- [x] `REPORT-05` — Implementar modos aplicáveis: completo, para preencher à mão e atividade de análise do Professor.
+- [x] `REPORT-06` — Implementar seleção de seções incluídas, campos deixados em branco e opções de impressão sem apagar registros científicos.
+- [x] `REPORT-07` — Garantir persistência por sessão, edição, relatório arquivado e restauração após recarregar.
+- [x] `REPORT-08` — Testar tabelas longas, cálculos, fontes, impressão/PDF, preenchimento manual e acesso restrito.
+- [x] `REPORT-09` — Testar que o relatório não confunda intensidade didática com resultado experimental nem medida do modelo com medida de amostra real.
 
 ## ETAPA 9 — Montagens prontas
 
@@ -482,7 +483,7 @@ O comando `npm test` já reúne os testes científicos, de rotas, aprendizagem e
 - [x] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem: `tests/parity/workspace.cjs` (5.1 a 5.5).
 - [x] `TEST-NOTEBOOK` — criação, filtros, persistência, backup, importação inválida, CSV, impressão e exclusão: `tests/parity/notebook.cjs` (com `notebook-backup`).
 - [x] `TEST-MANUAL` — busca, índice, artigo, links, ajuda contextual e impressão: `tests/parity/manual.cjs`.
-- [ ] `TEST-REPORT` — sessões, captura de dados, edição, impressão e acesso restrito.
+- [x] `TEST-REPORT` — sessões, captura de dados, edição, impressão e acesso restrito: `tests/parity/report.cjs`.
 - [ ] `TEST-TEACHER` — CRUD de biblioteca, prévia, permissões e import/export.
 - [x] `TEST-SHELL` — navegação, drawer, foco, preferências, projetor e startup: `tests/parity/shell.cjs`.
 - [ ] `TEST-PWA` — instalação, cache, atualização e uso offline sem falha de dados.
@@ -729,6 +730,26 @@ Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (ro
   test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
 Evidências: docs/evidence-parity/MANUAL/
 Pendências: MANUAL-CONTENT-11 parcial (Tour, Montagens prontas, Projetor); Firefox, Safari e aparelhos físicos
+Estado: [x]
+```
+
+### Registro — Etapa 8, Relatórios
+
+```text
+ID da etapa: REPORT (01 a 09)
+Tela SIAB: Relatório — data-tela="relatorio", js/telas/relatorios.js (acidosebases1.0.0@73848f0)
+Tela SILM: Relatório — integracao/index.html data-view="relatorios", integracao/route-ui.js report()
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 8, Relatórios" (PR da etapa)
+Viewport(s): 1366×768, 1024×768, 390×844, 320×640, 844×390 (completo); à mão e análise em 1366×768 e 390×844
+Arquivos alterados: integracao/route-ui.js (report()), integracao/unified-ui.js (campos e resumo no Caderno),
+  domain/silm/route-session.js (campos "analysis" e "answer"), integracao/integration.css, domain/silm/manual.js
+  (tópico "Registrar e imprimir"), tests/parity/report.cjs, tests/parity-screens.cjs
+Diferenças de domínio / N/A: sem dados hipotéticos (a análise usa os dados da investigação); sem gráficos de leituras;
+  seção 6 como "Estado da investigação" (a estrutura não tem condições finais)
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
+Evidências: docs/evidence-parity/REPORT/
+Pendências: guia do Professor imprimível (TEST-PRINT) na Etapa 11; Firefox, Safari e aparelhos físicos
 Estado: [x]
 ```
 
