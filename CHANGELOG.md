@@ -1,4 +1,16 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 10: Tour e ajuda contextual
+## Em desenvolvimento — Verificação das estruturas e interação com o modelo
+
+- Auditoria da construção das 48 estruturas visualizáveis (13 CCC, 14 CFC, 21 HC), sítio por sítio. Ela compara a vizinhança, os átomos efetivos, os instrumentos do Medir e as fórmulas do Calcular com a cristalografia e com um cálculo independente: nenhuma divergência. Os 9 metais com estrutura fora de CCC/CFC/HC continuam bloqueados, com motivo.
+- Construção de todos os 57 metais pela interface (2D e 3D), sem erros.
+- Relatório em `docs/VERIFICACAO-ESTRUTURAS.md`, com a tabela por metal e os achados de dados para a revisão científica: o parâmetro do rubídio e a fonte secundária em 12 metais.
+- Interação:
+  - o motivo de "Organizar estrutura" indisponível aparece junto do botão, na cena e no Preparo;
+  - seleções inválidas no Medir e falhas no Calcular são explicadas em linguagem do estudante (sem códigos internos);
+  - o Calcular indica a fórmula que vem antes quando uma entrada depende de outro cálculo, com "Ir para…";
+  - corrigidos o singular e o plural ("1 unidade", "2 pontos").
+- Testes permanentes: `tests/structure-audit.cjs` (em `test:scientific`) e `tests/model-interaction.cjs` (em `test:comparison`).
+
+## Paridade SIAB, Etapa 10: Tour e ajuda contextual (mesclada em #32)
 
 - Tour da oficina em 5 passos, no estilo do SIAB:
   - cada passo contorna um controle real (Montagem → Preparo, Módulo, a estrutura, a cena, Ver e Dados);

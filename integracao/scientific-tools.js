@@ -13,6 +13,23 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
  const change=()=>onChange();
  const allowed=t=>!activity()||activity().allows(t);
  function value(m){return U.format(m.value,m.unit==='Å'?unit:m.unit);}
+ const points=n=>n+(n===1?' ponto':' pontos');
+ /* O que fazer quando a seleção não serve ao instrumento: explicação em linguagem do estudante, sem códigos internos. */
+ function measureHelp(reason){
+  const hex=type()==='HCP';
+  return {NOT_LATTICE_VECTOR:'Esses centros não ocupam posições equivalentes da rede (por exemplo, um vértice e um centro). Para o parâmetro de rede, escolha dois centros equivalentes ligados por uma aresta da célula'+(hex?' (aresta da base para a; aresta vertical para c).':'.'),
+   NOT_CELL_EDGE:'Esses centros são equivalentes, mas a linha entre eles não é uma aresta da célula. Escolha dois vértices vizinhos na mesma aresta'+(hex?' (aresta da base para a; aresta vertical para c).':'.'),
+   SAME_POINT:'Os pontos precisam ser diferentes. Escolha outro centro.',POINTS_INVALID:'A seleção não foi reconhecida. Selecione os pontos de novo.',
+   MEASUREMENTS_LIMIT:'Esta investigação já tem o máximo de 200 medidas. Use Dados para consultar as anteriores.',DEFORMED:'Restaure a experiência de deformação em Explorar para medir a estrutura de referência.',
+   NO_SCALE:'Organize a estrutura cristalina em Explorar para medir: a montagem livre não tem escala física.'}[reason]||'Essa seleção não serve para este instrumento. Tente outros pontos.';
+ }
+ function calcHelp(reason){
+  return {INPUT_MISSING:'Falta um valor de entrada. Escolha a origem de cada valor.',INPUT_INVALID:'Um valor de entrada não é válido. Confira os números informados.',
+   RESULT_INVALID:'Com esses valores, o resultado não é fisicamente possível (por exemplo, empacotamento acima de 100 %). Confira os valores informados.',
+   FORMULA_NOT_APPLICABLE:'Esta fórmula não se aplica à estrutura atual.',CALCULATIONS_LIMIT:'Esta investigação já tem o máximo de cálculos. Use Dados para consultar os anteriores.',
+   CALCULATION_CONTEXT_INVALID:'A estrutura mudou desde que os valores foram obtidos. Escolha os valores de novo.',DEFORMED:'Restaure a experiência de deformação em Explorar para calcular a estrutura de referência.',
+   NO_SCALE:'Organize a estrutura cristalina em Explorar para calcular: a montagem livre não tem escala física.'}[reason]||'Não foi possível calcular com esses valores. Confira as entradas.';
+ }
  function result(c){return CA.format(c.result,c.unit);}
  function options(spec){
   const state=model.state,e=S.data.get(state.metal.atomicNumber),out=[];
@@ -40,7 +57,7 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
   }
   const r=model.addCalculation(f.id,inputs);
   if(r.ok)say('Calculado pelo SILM: '+f.outputSymbol+' = '+result(r.calculation));
-  else say('Não foi possível calcular: '+r.reason,'warning');
+  else say(calcHelp(r.reason),'warning');
   change();
  }
  function pick(id){
@@ -49,7 +66,7 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
   if(picks.length===MS.types[tool].points){
    const r=model.addMeasurement(tool,picks);picks=[];
    if(r.ok){review=r.measurement.id;say('Medida do modelo: '+value(r.measurement));if(tool==='coordination')model.setCrystalRepresentation({neighbors:true,selectedUnitId:id});}
-   else say('Seleção inválida para este instrumento: '+r.reason+'. Tente outros pontos.','warning');
+   else say(measureHelp(r.reason),'warning');
   }else say('Ponto '+picks.length+' selecionado. Selecione o próximo ponto da medida.');
   change();
  }
@@ -69,7 +86,7 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
    host.append(node('p','Medições e cálculos usam o modelo cristalográfico em escala física. Zoom e projeção não alteram os valores.'));
    if(!available())host.append(node('p',model.measurementAvailability().reason==='DEFORMED'?'Restaure a experiência de deformação em Explorar para medir ou calcular a estrutura de referência.':'Organize uma estrutura cristalina em Explorar para usar este módulo. A montagem livre não tem escala física.'));
    else if(state.module.active==='medir'){
-    field(host,'Instrumento',select('silm-instrument',[['','Escolha um instrumento'],...Object.entries(MS.types).filter(([k])=>allowed(k)).map(([k,t])=>[k,t.label])],tool||'',v=>{tool=v||null;picks=[];review=null;change();say(v?'Selecione '+MS.types[v].points+' ponto(s) na cena.':'Instrumento desligado.');}));
+    field(host,'Instrumento',select('silm-instrument',[['','Escolha um instrumento'],...Object.entries(MS.types).filter(([k])=>allowed(k)).map(([k,t])=>[k,t.label])],tool||'',v=>{tool=v||null;picks=[];review=null;change();say(v?'Selecione '+points(MS.types[v].points)+' na cena.':'Instrumento desligado.');}));
     field(host,'Unidade de comprimento',select('silm-measure-unit',Object.keys(U.length).map(k=>[k,k]),unit,v=>{unit=v;change();}));
     host.append(node('p',tool?'Selecionados: '+picks.length+' de '+MS.types[tool].points+'. Para ângulos, B é o vértice.':'Selecione um instrumento para medir na cena.'));
     host.append(button('Cancelar seleção',()=>{tool=null;picks=[];change();}));
@@ -81,6 +98,10 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
      for(const spec of f.requiredInputs){
       const opts=options(spec);if(!opts.some(o=>o.id===choice[spec.key]))choice[spec.key]=opts[0]?.id;
       field(host,spec.symbol+' — '+spec.name+' ('+spec.unit+')',select('silm-origin-'+spec.key,opts.map(o=>[o.id,o.label]),choice[spec.key],v=>{choice[spec.key]=v;change();}));
+      // Entrada que o SILM calcula (V, r…) mas que ainda não foi calculada: indicar a fórmula que vem antes.
+      const before=spec.origins.includes('CALCULATED')&&spec.key!=='n'&&!opts.some(o=>o.origin!=='USER')?CA.applicable(type()).find(x=>x.quantity===spec.quantity&&x.id!==f.id&&allowed(x.quantity)):null;
+      if(before){const hint=node('p');hint.className='silm-calc-dependency';hint.id='silm-dependency-'+spec.key;hint.textContent='Ainda não há '+spec.name+' calculado nesta investigação. Calcule antes “'+before.name+'” ou informe o valor.';
+       const go=button('Ir para “'+before.name+'”',()=>{formula=before.id;choice={};user={};change();say('Fórmula escolhida: '+before.name+'.');document.getElementById('silm-formula')?.focus();});go.id='silm-dependency-go-'+spec.key;host.append(hint,go);}
       if(choice[spec.key]==='user'){
        const input=node('input');input.id='silm-input-'+spec.key;input.type='text';input.inputMode='decimal';input.value=user[spec.key]||'';input.addEventListener('input',()=>{user[spec.key]=input.value;});field(host,'Valor de '+spec.symbol+' em '+spec.unit,input);
       }

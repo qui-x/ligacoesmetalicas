@@ -31,6 +31,7 @@
  const allows=tool=>!routeUI||routeUI.session.allows(tool);
  let representation=S.representation.defaults(null),invalidSavedState=false,unavailable3D=false;
  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.classList.contains('si-no-motion')||document.documentElement.classList.contains('si-simple-reading')||B.currentRoute(location.hash)!=='ambiente';
+ const units=n=>n+(n===1?' unidade':' unidades');
  const say=(text,kind='info')=>{SimCore.notifications.announce(text);B.notify(text,kind);};
  const storage=S.createDurableStorage({backend:{getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),key:i=>localStorage.key(i),get length(){return localStorage.length;}},onStatus(){if(ready)storageStatus();},onConflict(){queueMicrotask(()=>{
   if($('si-storage-conflict'))return;
@@ -106,6 +107,9 @@
    later.addEventListener('click',()=>{storage.set('tour.seen',true);note.remove();box.querySelector('.si-empty-actions .button')?.focus();});acts.append(tour,manual,later);note.append(t,acts);box.append(note);}
   $('silm-integration-scene').append(box);
  }
+ /* "Organizar estrutura" indisponível: diga para qual metal, qual estrutura está registrada e o que continua possível. */
+ function organizeReason(e,eligibility){const label=eligibility.registeredLabel?' ('+eligibility.registeredLabel+')':'';
+  return 'Organizar indisponível para '+e.name.toLowerCase()+': '+eligibility.message.replace(/\.$/,'')+label+'. A montagem livre continua disponível.';}
  function openLeft(tab){const open=document.querySelector('[data-open-dock="montagem"]');if(open&&open.getAttribute('aria-expanded')!=='true')open.click();requestAnimationFrame(()=>document.querySelector('[data-left-tab="'+tab+'"]:not([hidden])')?.click());}
  function renderScene(){
   const state=model.state,e=element(),key=e?state.investigation.id+':'+e.atomicNumber+':'+state.module.active+':'+(state.structure?.mode||'empty')+':'+(state.structure?.mode==='crystalline'?representation.viewMode:'2d'):'none';
@@ -116,7 +120,7 @@
     scope=SimCore.createScope();const common={scope,model,element:e,actions:run,reducedMotion:reduced,representation:rep,moduleTitle:{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active],measure:tools.measure,calc:tools.calc,properties:experience.scene};
     if(state.structure.mode==='crystalline')view=S.createCrystalView($('silm-integration-scene'),{...common,geometry:S.crystal.geometry(e)});
     else view=S.createAssemblyView($('silm-integration-scene'),{...common,editable:state.module.active==='explorar'&&(!routeUI.session.open()||routeUI.canBuild()),organize:{run:run.organize,state:()=>{
-     const eligibility=S.crystal.eligibility(e);return {disabled:!model.state.structure?.units.length||eligibility.status!=='available',reason:eligibility.status!=='available'?eligibility.message:''};
+     const eligibility=S.crystal.eligibility(e);return {disabled:!model.state.structure?.units.length||eligibility.status!=='available',reason:eligibility.status!=='available'?organizeReason(e,eligibility):'',more:{label:'Por que uma opção não aparece',href:'#/manual?topico=problemas'}};
     }}});
     // Contextual help uses the Base route, whose router deliberately has no nested routes.
     for(const link of view.root.querySelectorAll('a.ajuda-link'))link.href='#/manual';
@@ -174,15 +178,15 @@
   if(!expandable&&$('si-stage').classList.contains('si-scene-expanded'))setStageExpanded(false);
   if(representation.investigationId!==(state.investigation?.id??null))representation=S.representation.defaults(state.investigation?.id??null);
   tools.render();experience.update();renderScene();if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
-  text('silm-summary',e?e.name+' · '+n+' unidades · '+(s?.mode==='crystalline'?'estrutura cristalina':'montagem livre'):'Nenhuma investigação iniciada.');
+  text('silm-summary',e?e.name+' · '+units(n)+' · '+(s?.mode==='crystalline'?'estrutura cristalina':'montagem livre'):'Nenhuma investigação iniciada.');
   // Resumo em pares rótulo/valor, como o resumo da bancada do SIAB (só leitura do estado; nada é recalculado aqui).
   const list=$('silm-summary-list');if(list){const rows=e?[['Metal',e.name+' ('+e.symbol+')'],['Estrutura',s?.mode==='crystalline'?S.crystal.label(s.crystallography?.structureType):'Montagem livre'],['Unidades',String(n)],['Módulo',{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active]],['Medições',String(state.measurements?.length||0)],['Cálculos',String(state.calculations?.length||0)]]:[];
    const c=routeUI.session.context();if(c)rows.unshift([c.type==='mission'?'Missão':'Roteiro',routeUI.session.route().title]);
    const key=JSON.stringify(rows);if(list.dataset.key!==key){list.dataset.key=key;list.replaceChildren(...rows.flatMap(([k,v])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;return [dt,dd];}));}}
-  text('scene-count',n+' unidades');text('silm-metal-information',selected?S.data.get(Number(selected)).name:'');
+  text('scene-count',units(n));text('silm-metal-information',selected?S.data.get(Number(selected)).name:'');
   $('scene-undo').disabled=state.module.active!=='explorar'||!model.canUndo;$('scene-clear').disabled=state.module.active!=='explorar'||!n;
-  $('si-compact-clear').disabled=state.module.active!=='explorar'||!n;$('scene-count').dataset.compactCount=n+' unidades';
-  $('silm-add').disabled=state.module.active!=='explorar'||!e||s?.mode==='crystalline';$('silm-organize').disabled=state.module.active!=='explorar'||!n||s?.mode==='crystalline'||S.crystal.eligibility(e).status!=='available';
+  $('si-compact-clear').disabled=state.module.active!=='explorar'||!n;$('scene-count').dataset.compactCount=units(n);
+  $('silm-add').disabled=state.module.active!=='explorar'||!e||s?.mode==='crystalline';$('silm-organize').disabled=state.module.active!=='explorar'||!n||s?.mode==='crystalline'||S.crystal.eligibility(e).status!=='available';{const el=e?S.crystal.eligibility(e):null,why=$('silm-organize-reason');if(why){why.textContent=el&&el.status!=='available'?organizeReason(e,el):'';why.hidden=!why.textContent;}}
   $('silm-free').hidden=s?.mode!=='crystalline';$('silm-free').disabled=state.module.active!=='explorar';$('silm-export').disabled=!e;
   $('silm-electrons').disabled=n<2;
   const visible=!!state.electrons?.representation.visible;
