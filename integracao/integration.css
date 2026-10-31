@@ -266,7 +266,7 @@ body[data-silm-route="inicio"] main{padding-top:0}
    cabeçalho curto, lista de linhas com situação à direita, coluna de leitura e fileira de ações. */
 .silm-screen{max-width:1080px;margin:0 auto;padding:28px 20px 48px}
 /* Como no SIAB, a tela centraliza a própria coluna; o main não soma recuo no topo nem nas laterais (o de baixo protege a barra do celular). */
-body:is([data-silm-route="aprender"],[data-silm-route="missoes"]) main{padding-top:0;padding-left:0;padding-right:0}
+body:is([data-silm-route="aprender"],[data-silm-route="missoes"],[data-silm-route="roteiros"]) main{padding-top:0;padding-left:0;padding-right:0}
 .silm-screen-head{margin:0 0 22px}
 .silm-screen-head h1{font-size:clamp(1.5rem,4vw,2rem);line-height:1.2;margin:4px 0 8px}
 .silm-screen-head p{color:var(--muted);max-width:68ch;margin:0}
@@ -317,3 +317,14 @@ body:is([data-silm-route="aprender"],[data-silm-route="missoes"]) main{padding-t
 #mission-feedback{font-size:.86rem;color:var(--muted);margin:4px 0}
 #silm-route-guidance .silm-actions{margin:10px 0 4px}
 #silm-route-guidance .silm-actions .button{min-height:44px}
+
+/* Paridade SIAB — Etapa 4, Roteiros: identificação em duas colunas (uma no celular), como o fieldset do SIAB. */
+.silm-identity{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px;margin:20px 0 6px;padding:0;border:0;min-width:0}
+.silm-identity legend{font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;padding:0}
+.silm-identity .silm-field{max-width:none;margin:6px 0}
+.silm-field input{font:inherit;min-height:44px;padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);width:100%}
+.silm-route-report .silm-identity{margin-top:12px}
+@media(max-width:640px){.silm-identity{grid-template-columns:1fr}}
+@media print{.silm-identity .silm-field input{display:none}}
+.silm-row-next{display:flex;flex-direction:column;align-items:flex-end;gap:2px}.silm-row-next svg{width:20px;height:20px}
+@media(max-width:370px){.silm-row-next{flex-direction:row;align-items:center;gap:6px}}

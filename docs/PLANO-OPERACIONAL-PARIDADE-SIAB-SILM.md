@@ -67,7 +67,7 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 1 | Início | Início | Aceito em 31/10/2026 — registro na seção 8 |
 | 2 | Aprender | Aprender / Temas | Aceito em 31/10/2026 — registro na seção 8 |
 | 3 | Missões | Missões | Aceito em 31/10/2026 — registro na seção 8 |
-| 4 | Roteiros Experimentais | Roteiros Experimentais | Não iniciado |
+| 4 | Roteiros Experimentais | Roteiros Experimentais | Aceito em 31/10/2026 — registro na seção 8 |
 | 5 | Laboratório | Oficina dos Metais | Não iniciado; inclui as cinco subáreas abaixo |
 | 5.1 | Bancada em Foco | Oficina → Foco | Não iniciado |
 | 5.2 | Montagem / prateleira | Oficina → Montagem | Não iniciado |
@@ -189,20 +189,20 @@ Não marcar uma tela como concluída apenas porque o texto foi encurtado ou o HT
 
 **Referência SIAB:** `index.html` `data-tela="roteiros"` e `data-tela="roteiro"`; `js/telas/roteiros.js`; `js/data/experimentos.js`; `js/data/montagens.js`.
 
-**SILM:** `index.html` `data-view="roteiros"`; `js/experience/experience.js` função `activityList('route')`; `js/experience/activity.js`; `domain/silm/routes.js`; `js/experience/route-session.js` / `integracao/route-ui.js`.
+**SILM:** `integracao/index.html` `data-view="roteiros"`; `integracao/route-ui.js` funções `routeCatalogue()` (lista e roteiro com identificação, `#/roteiros?item=<id>`), `routePanel()` (painel na Oficina) e `report()`; `domain/silm/routes.js`; `domain/silm/route-session.js` (identificação no relatório da sessão). Os ponteiros antigos (`js/experience/*`) não são carregados.
 
 ### Tarefas
 
-- [ ] `ROUTE-01` — Comparar catálogo, resumo, módulo, estado e ação para abrir cada roteiro.
-- [ ] `ROUTE-02` — Comparar detalhe: problema, pergunta central, objetivo, procedimento, requisitos, evidências, condições e fontes.
-- [ ] `ROUTE-03` — Comparar identificação de aluno/turma/grupo/data quando aplicável e preservar a configuração durante a sessão.
-- [ ] `ROUTE-04` — Verificar criação da investigação e estado inicial da estrutura, incluindo metal elegível e pré-requisitos.
-- [ ] `ROUTE-05` — Garantir que cada roteiro do SILM use exatamente um módulo principal (Explorar, Medir ou Calcular), sem módulo secundário.
-- [ ] `ROUTE-06` — Comparar navegação livre/restrita, ferramentas permitidas, conclusão, retorno e retomada.
-- [ ] `ROUTE-07` — Conferir relatório gerado a partir da sessão e ligação com evidências, medições e cálculos.
-- [ ] `ROUTE-08` — Auditar os cinco roteiros atuais do SILM quanto à cobertura dos três módulos, variedade de metais e elegibilidade cristalográfica.
-- [ ] `ROUTE-09` — Comparar casos inválidos: metal sem suporte, requisito ausente, instrumento indisponível, estrutura incompatível e conclusão incompleta.
-- [ ] `ROUTE-10` — Criar testes de catálogo, detalhe, configuração inicial, restrições e sessão.
+- [x] `ROUTE-01` — Lista em linhas com título, subtítulo e o módulo com seta à direita (mais a situação, quando houver); o cartão inteiro abre o roteiro.
+- [x] `ROUTE-02` — Roteiro em coluna de leitura: "O problema", "Objetivo", "O que você vai fazer", "Na oficina", "O que observar", "Critério de conclusão", temas relacionados e fontes. `N/A`: "Pergunta central" já está no problema.
+- [x] `ROUTE-03` — Identificação (Nome, Turma, Data, Professor, Grupo) antes de montar, guardada para a próxima montagem e copiada para o relatório da sessão; o relatório e o registro no Caderno mostram a identificação.
+- [x] `ROUTE-04` — "Na oficina" descreve o estado inicial (montagem livre com N unidades ou estrutura de referência) e os metais elegíveis; o seletor só oferece metais elegíveis.
+- [x] `ROUTE-05` — Cada roteiro tem exatamente um módulo (testado no catálogo inteiro; o validador recusa módulo secundário); o módulo fica fixado na sessão.
+- [x] `ROUTE-06` — Restrição, recursos permitidos, conclusão, retorno e retomada depois de recarregar conferidos no teste; painel Roteiro com evidência ao vivo.
+- [x] `ROUTE-07` — Relatório da sessão pelo botão "Relatório" do painel, com identificação, medições e cálculos com origem e campos de texto.
+- [x] `ROUTE-08` — 5 roteiros: 3 Explorar, 1 Medir, 1 Calcular; 48 metais nos cristalinos e 57 no de elétrons (`docs/COBERTURA-ROTEIROS.md`).
+- [x] `ROUTE-09` — Roteiro inexistente volta à lista; metais sem estrutura fora dos roteiros cristalinos; instrumentos fora do roteiro ocultos ou desativados; conclusão bloqueada até a evidência.
+- [x] `ROUTE-10` — `tests/parity/route.cjs` (TEST-ROUTE) em `npm run test:parity`.
 
 **Aceite da etapa:** os roteiros têm navegação, identificação, preparação e detalhe comparáveis ao SIAB, mas descrevem procedimentos próprios de investigação de metais.
 
@@ -477,7 +477,7 @@ O comando `npm test` já reúne os testes científicos, de rotas, aprendizagem e
 - [x] `TEST-HOME` — teste do Início (hero, caminhos, contagem, retomada, links): `tests/parity/home.cjs`.
 - [x] `TEST-LEARN` — lista/detalhe/retorno e conexão com investigação: `tests/parity/learn.cjs`.
 - [x] `TEST-MISSION` — lista/detalhe/evidência/conclusão/refazer/restrições: `tests/parity/mission.cjs`.
-- [ ] `TEST-ROUTE` — lista/detalhe/identificação/módulo único/preparação/retomada.
+- [x] `TEST-ROUTE` — lista/detalhe/identificação/módulo único/preparação/retomada: `tests/parity/route.cjs`.
 - [ ] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem.
 - [ ] `TEST-NOTEBOOK` — criação, filtros, persistência, backup, importação inválida, CSV, impressão e exclusão.
 - [ ] `TEST-MANUAL` — busca, índice, artigo, links, ajuda contextual e impressão.
@@ -593,6 +593,27 @@ Diferenças de domínio / N/A: especificação antes de montar (escolha do metal
 Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
   test:backup; test:mobile-mechanics; test:parity (HOME, LEARN, MISSION); scripts/audit-silm.py — Chromium
 Evidências: docs/evidence-parity/MISSION/ (lista + README), MISSION-DETAIL/ (especificação), MISSION-PANEL/ (painel)
+Pendências: Firefox, Safari e aparelhos físicos
+Estado: [x]
+```
+
+### Registro — Etapa 4, Roteiros Experimentais
+
+```text
+ID da etapa: ROUTE (ROUTE-01 a ROUTE-10)
+Tela SIAB: Roteiros e roteiro — data-tela="roteiros" e "roteiro", js/telas/roteiros.js (acidosebases1.0.0@73848f0)
+Tela SILM: Roteiros — integracao/index.html data-view="roteiros"; integracao/route-ui.js routeCatalogue(), routePanel(), report()
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 4, Roteiros" (PR da etapa)
+Viewport(s): lista e roteiro nos 5 tamanhos; painel em 1366×768 e 390×844
+Arquivos alterados: integracao/index.html (+ index.html gerado), integracao/route-ui.js (o catálogo antigo compartilhado
+  saiu), integracao/unified-ui.js (identificação no relatório livre e no Caderno), domain/silm/route-session.js (campos
+  de identificação; sessões antigas ganham campos vazios), integracao/integration.css, tests/parity/route.cjs,
+  tests/parity-screens.cjs
+Diferenças de domínio / N/A: "Pergunta central" dentro do problema; "Na bancada" vira "Na oficina"; painel Roteiro
+  mantido como extensão (o SIAB só prepara a bancada)
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity (HOME, LEARN, MISSION, ROUTE); scripts/audit-silm.py — Chromium
+Evidências: docs/evidence-parity/ROUTE/ (lista + README), ROUTE-DETAIL/ (roteiro), ROUTE-PANEL/ (depois de montar)
 Pendências: Firefox, Safari e aparelhos físicos
 Estado: [x]
 ```

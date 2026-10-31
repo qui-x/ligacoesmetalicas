@@ -1,6 +1,6 @@
 'use strict';
 SILM.createRouteSession=({model,storage,view,onView,say})=>{
- const S=SILM,registry=S.activities||S.routes,copy=x=>JSON.parse(JSON.stringify(x)),blank=()=>({name:'',date:new Date().toLocaleDateString('pt-BR'),observations:'',interpretation:'',conclusion:''});
+ const S=SILM,registry=S.activities||S.routes,copy=x=>JSON.parse(JSON.stringify(x)),blank=()=>({name:'',className:'',date:new Date().toLocaleDateString('pt-BR'),teacher:'',group:'',observations:'',interpretation:'',conclusion:''});
  let doc={schemaVersion:1,current:null,attempts:{},completed:{},archives:{}},transitioning=0;
  const route=()=>registry.get(doc.current?.activityContext.id),open=()=>!!doc.current&&doc.current.activityContext.status!=='closed';
  const save=()=>storage.set('route.session',doc);
@@ -26,7 +26,7 @@ SILM.createRouteSession=({model,storage,view,onView,say})=>{
    for(const [id,a]of [...Object.entries(saved.attempts),...Object.entries(saved.archives)])if(id!==a.activityContext?.id||!validAttempt(a))throw Error();
    for(const [id,v]of Object.entries(saved.completed))if(v!==registry.get(id)?.version)throw Error();
    if(saved.current&&(!validAttempt(saved.current)||!validScience(saved.current.freeState)||!saved.current.freeView))throw Error();
-   const cleanAttempt=a=>{const value={};for(const key of ['activityContext','freeState','freeView','checkpoint','evidence','report'])if(a[key]!==undefined)value[key]=copy(a[key]);if(value.freeView&&S.representation)value.freeView=S.representation.sanitize(value.freeView,value.freeState?.investigation?.id??null);value.activityContext={type:a.activityContext.type,id:a.activityContext.id,version:a.activityContext.version,status:a.activityContext.status};value.evidence={cell:a.evidence.cell,lattice:a.evidence.lattice,deformation:a.evidence.deformation};value.report=Object.fromEntries(Object.keys(blank()).map(k=>[k,a.report[k]]));return value;};
+   const cleanAttempt=a=>{const value={};for(const key of ['activityContext','freeState','freeView','checkpoint','evidence','report'])if(a[key]!==undefined)value[key]=copy(a[key]);if(value.freeView&&S.representation)value.freeView=S.representation.sanitize(value.freeView,value.freeState?.investigation?.id??null);value.activityContext={type:a.activityContext.type,id:a.activityContext.id,version:a.activityContext.version,status:a.activityContext.status};value.evidence={cell:a.evidence.cell,lattice:a.evidence.lattice,deformation:a.evidence.deformation};value.report=Object.fromEntries(Object.keys(blank()).map(k=>[k,typeof a.report[k]==='string'?a.report[k]:'']));return value;};
    doc={schemaVersion:1,current:saved.current?cleanAttempt(saved.current):null,attempts:Object.fromEntries(Object.entries(saved.attempts).map(([id,a])=>[id,cleanAttempt(a)])),completed:copy(saved.completed),archives:Object.fromEntries(Object.entries(saved.archives).map(([id,a])=>[id,cleanAttempt(a)]))};if(JSON.stringify(doc)!==JSON.stringify(saved))save();if(open())model.restore(doc.current.checkpoint,{allowLegacy:false});return open();
   }catch{say('O registro de roteiros salvo é incompatível. O original foi preservado; a investigação científica permanece disponível.','warning');return false;}
  }
