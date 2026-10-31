@@ -17,7 +17,7 @@
   // ao trocar de tela, a página volta ao topo e o foco vai para o título da nova tela.
   const previous=lastRoute;lastRoute=selected;if(previous===null)return;
   if(previous!==selected)window.scrollTo(0,0);
-  requestAnimationFrame(()=>{const page=document.querySelector('#conteudo > [data-view="'+selected+'"]');const heading=page?.querySelector('h1,h2');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}});
+  requestAnimationFrame(()=>{const page=document.querySelector('#conteudo > [data-view="'+selected+'"]');if(!page||page.contains(document.activeElement))return;const heading=[...page.querySelectorAll('h1,h2')].find(h=>h.getClientRects().length);if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}});
  };
  let lastRoute=null;
  let view=null,scope=null,viewKey='',pending=false,ready=false,selected=null,focusAfterRender=null;
@@ -60,8 +60,9 @@
  const comparison=S.createStructureComparison({storage,host:$('silm-comparison-items')});
  const tools=S.createIntegrationTools({model,host:$('silm-tools'),moduleHost:$('silm-module-choice'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
  const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session});
- const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,prepareMetal:z=>{if(routeUI?.session.open()||S.data.get(z)?.silmEligibility.status!=='available')return false;$('silm-metal').value=String(z);selected=String(z);schedule();return true;},selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
- routeUI=S.createRouteUI({model,storage,view:()=>representation,onView:(value,{persist=true}={})=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);return persist?saveView():true;},schedule,say,onModule:m=>B.selectModule(m),selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
+ const prepareMetal=z=>{if(routeUI?.session.open()||S.data.get(z)?.silmEligibility.status!=='available')return false;$('silm-metal').value=String(z);selected=String(z);schedule();return true;};
+ const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,prepareMetal,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
+ routeUI=S.createRouteUI({model,storage,prepareMetal,view:()=>representation,onView:(value,{persist=true}={})=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);return persist?saveView():true;},schedule,say,onModule:m=>B.selectModule(m),selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
  const run={
   add(){if(routeUI.session.open()&&!routeUI.canBuild())return;if(!model.state.structure)model.beginAssembly();return report(model.addUnit());},
   move:(id,target,options)=>(!routeUI.session.open()||routeUI.canBuild())&&report(model.moveUnit(id,target,options)),

@@ -65,7 +65,7 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | Ordem | Tela de referência | Tela do SILM | Estado da etapa |
 |---:|---|---|---|
 | 1 | Início | Início | Aceito em 31/10/2026 — registro na seção 8 |
-| 2 | Aprender | Aprender / Temas | Não iniciado |
+| 2 | Aprender | Aprender / Temas | Aceito em 31/10/2026 — registro na seção 8 |
 | 3 | Missões | Missões | Não iniciado |
 | 4 | Roteiros Experimentais | Roteiros Experimentais | Não iniciado |
 | 5 | Laboratório | Oficina dos Metais | Não iniciado; inclui as cinco subáreas abaixo |
@@ -148,19 +148,19 @@ Não marcar uma tela como concluída apenas porque o texto foi encurtado ou o HT
 
 **Referência SIAB:** `index.html` `data-tela="aprender"` e `data-tela="tema"`; `js/telas/aprender.js`; `js/data/temas.js`; categorias e artigos do Manual.
 
-**SILM:** `index.html` `data-view="aprender"`; rota `tema` registrada em `js/experience/experience.js`; `js/experience/learning.js`; `domain/silm/themes.js`; itens configurados em `domain/silm/bootstrap.js`.
+**SILM:** `integracao/index.html` `data-view="aprender"`; `integracao/unified-ui.js` função `themes()` (lista e tema na mesma rota, `#/aprender?tema=<id>`); `domain/silm/themes.js`; `integracao/integration.css` (bloco "Etapa 2, Aprender"). Os ponteiros antigos (`js/experience/*`, `bootstrap.js`) não são carregados.
 
 ### Tarefas
 
-- [ ] `LEARN-01` — Comparar cabeçalho, introdução, lista de temas, cartões, ícones, estados e hierarquia da lista SIAB.
-- [ ] `LEARN-02` — Verificar abertura de detalhe de tema, retorno à lista e preservação do tema selecionado.
-- [ ] `LEARN-03` — Comparar campos do detalhe: título, conceito central, explicação, exemplos, fontes, conteúdo relacionado e ação principal.
-- [ ] `LEARN-04` — Adaptar a ação “Investigar” para abrir o Laboratório com o metal representativo, sem iniciar investigação sem o gesto explícito do usuário.
-- [ ] `LEARN-05` — Mapear os quatro temas atuais do SILM (ligação metálica, estrutura, elétrons e propriedades) para o escopo científico completo; identificar lacunas de conteúdo sem copiar os 14 temas ácido-base do SIAB.
-- [ ] `LEARN-06` — Conferir marcadores de tema concluído e revisita. A conclusão não deve impedir repetição nem introduzir pontos, ranking ou porcentagem de progresso.
-- [ ] `LEARN-07` — Comparar conteúdo relacionado: Manual, roteiros, missões e metais relevantes; retirar links vazios ou sem destino.
-- [ ] `LEARN-08` — Conferir textos curtos na lista e aprofundamento dentro do tema, sem descrições duplicadas.
-- [ ] `LEARN-09` — Adicionar testes de lista, detalhe, retorno, marcador e ação de investigação.
+- [x] `LEARN-01` — Cabeçalho "Temas" + introdução do SIAB; lista de linhas (o cartão inteiro é o link; título, resumo curto e situação "Não revisado"/"Revisado" à direita) no lugar da grade com botão separado.
+- [x] `LEARN-02` — Abrir o tema leva ao topo com foco no título; "Todos os temas" e o Voltar do navegador devolvem a lista com o foco na linha do tema aberto; tema inexistente volta à lista com aviso.
+- [x] `LEARN-03` — Tema em coluna de leitura: "APRENDER · TEMA", título, ideia principal como abertura, subtítulo + descrição, ações; depois conteúdo relacionado, "Aprofunde" (três conceitos) e fontes.
+- [x] `LEARN-04` — "Investigar na oficina" prepara o metal representativo na Montagem e abre a Oficina com a Montagem aberta; a investigação só começa com Iniciar e uma investigação em andamento nunca é substituída.
+- [x] `LEARN-05` — Os temas são 7 (não 4) e cobrem os três módulos, todas as missões e todos os roteiros. Lacunas possíveis registradas para validação do autor em `docs/evidence-parity/LEARN/README.md` (tendências periódicas, ligas, defeitos), sem conteúdo inventado.
+- [x] `LEARN-06` — "Marcar como revisado" / "Revisado · desmarcar" com `aria-pressed`, foco preservado, persistência e repetição livre; o teste confere a ausência de pontos, ranking e porcentagem.
+- [x] `LEARN-07` — Conteúdo relacionado: todas as missões e roteiros do tema pelo nome, só com destinos do catálogo (testado); metais para observar; o Manual segue acessível pela navegação.
+- [x] `LEARN-08` — Lista com resumo de uma ou duas linhas; aprofundamento só dentro do tema; a ideia principal saiu da lista de detalhes porque virou a abertura (sem texto repetido na tela).
+- [x] `LEARN-09` — `tests/parity/learn.cjs` (TEST-LEARN) em `npm run test:parity`.
 
 **Aceite da etapa:** lista e detalhe apresentam uma arquitetura equivalente à do SIAB, com explicação e conexões específicas de ligações metálicas.
 
@@ -475,7 +475,7 @@ O comando `npm test` já reúne os testes científicos, de rotas, aprendizagem e
 ### Testes de tela que ainda precisam ser criados ou ampliados
 
 - [x] `TEST-HOME` — teste do Início (hero, caminhos, contagem, retomada, links): `tests/parity/home.cjs`.
-- [ ] `TEST-LEARN` — lista/detalhe/retorno e conexão com investigação.
+- [x] `TEST-LEARN` — lista/detalhe/retorno e conexão com investigação: `tests/parity/learn.cjs`.
 - [ ] `TEST-MISSION` — lista/detalhe/evidência/conclusão/refazer/restrições.
 - [ ] `TEST-ROUTE` — lista/detalhe/identificação/módulo único/preparação/retomada.
 - [ ] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem.
@@ -553,6 +553,26 @@ Testes executados: npm test; test:a11y (84 cenários, 0 violações); test:compa
 Evidências: docs/evidence-parity/HOME/ (10 capturas, capturas.json, README com a comparação)
 Pendências: cabeçalho 10 px mais alto, pílula de versão, barra inferior com caracteres e ícone de tubo de
   ensaio da Oficina no menu lateral (Etapa 12); Firefox, Safari e aparelhos físicos não testados
+Estado: [x]
+```
+
+### Registro — Etapa 2, Aprender / Temas
+
+```text
+ID da etapa: LEARN (LEARN-01 a LEARN-09)
+Tela SIAB: Temas e Tema — data-tela="aprender" e "tema", js/telas/aprender.js (acidosebases1.0.0@73848f0)
+Tela SILM: Aprender — integracao/index.html data-view="aprender", integracao/unified-ui.js themes()
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 2, Aprender" (PR da etapa)
+Viewport(s): 1366×768, 1024×768, 390×844, 320×640, 844×390 (lista e tema)
+Arquivos alterados: integracao/index.html (+ index.html gerado), integracao/unified-ui.js, integracao/integration.css,
+  integracao/adapter.js (prepareMetal compartilhado; foco respeita o que a tela já focou), integracao/route-ui.js,
+  tests/parity/learn.cjs, tests/parity-screens.cjs, tests/learning-browser.cjs
+Diferenças de domínio / N/A: 7 temas × 14; missões e roteiros relacionados aparecem pelo nome abaixo das ações
+  (até dois de cada tipo no SILM, um no SIAB); Investigar prepara em vez de substituir (plano: gesto explícito)
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity (TEST-HOME e TEST-LEARN); scripts/audit-silm.py — Chromium
+Evidências: docs/evidence-parity/LEARN/ (lista + README) e docs/evidence-parity/LEARN-DETAIL/ (tema)
+Pendências: lacunas de conteúdo para validação do autor (README da etapa); Firefox, Safari e aparelhos físicos
 Estado: [x]
 ```
 
