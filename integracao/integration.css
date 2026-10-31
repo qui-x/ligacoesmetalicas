@@ -372,3 +372,19 @@ body:is([data-silm-route="aprender"],[data-silm-route="missoes"],[data-silm-rout
 #silm-comparison-items .silm-comparison-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
 #silm-comparison-items .silm-comparison-limits{margin-top:-6px}
 @media(max-width:520px){#silm-comparison-items .silm-comparison-actions button{flex:1 1 30%}}
+
+/* Paridade SIAB — Etapa 6, Caderno: coluna única alinhada ao cabeçalho, ações compactas, "Apagar" como ação de risco
+   e o backup JSON (extensão do SILM) num grupo próprio no fim da página. */
+.silm-notebook-page #silm-notebook{margin-inline:auto;width:100%}
+.silm-notebook-page .silm-notebook-actions{margin:0}
+.silm-notebook-page .silm-notebook-actions button{flex:0 1 auto}
+.silm-destructive{border-color:color-mix(in srgb,var(--danger,#e5484d) 70%,var(--border));color:var(--danger,#ff8a8a)}
+.silm-destructive:hover{background:color-mix(in srgb,var(--danger,#e5484d) 14%,transparent)}
+.silm-notebook-backup{display:grid;gap:8px;margin-top:8px;padding-top:12px;border-top:1px solid var(--border)}
+.silm-notebook-backup .silm-notebook-intro{margin:0;font-size:.86rem}
+.silm-notebook-backup-actions{display:flex;flex-wrap:wrap;gap:8px}
+.silm-notebook-backup-actions button{min-height:44px}
+@media(max-width:600px){.silm-notebook-page .silm-notebook-actions button{flex:1 1 40%}}
+@media print{.silm-notebook-backup{display:none!important}}
+/* NOTE-08: no papel ficam só o cabeçalho e os registros, também quando a impressão começa pelo navegador (Ctrl+P). */
+@media print{.silm-notebook-page .silm-notebook-actions,.silm-notebook-page .silm-notebook-filter,.silm-notebook-page .silm-notebook-compose,.silm-notebook-page .silm-notebook-backup,.silm-notebook-page .silm-notebook-entry button{display:none!important}}

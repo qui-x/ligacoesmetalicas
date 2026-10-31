@@ -186,7 +186,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
  function notebook(){
   const host=$('silm-notebook');if(!host)return;host.replaceChildren();
   const typeNames={observacao:'Anotação',hipotese:'Hipótese',conclusao:'Conclusão'};
-  const intro=N('p','Os registros feitos aqui e nas atividades do laboratório ficam reunidos nesta linha do tempo. Os dados são locais; exporte um backup para transferi-los entre dispositivos.');intro.className='silm-notebook-intro';
+  const intro=N('p','Os registros ficam neste navegador. Exporte um backup para transferi-los entre dispositivos.');intro.className='silm-notebook-intro';
   const composer=N('details');composer.className='silm-notebook-compose';composer.open=false;
   composer.append(N('summary','Nova anotação / hipótese / descoberta'));
   const editor=N('section');editor.className='silm-notebook-editor';
@@ -209,11 +209,13 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   });
   editor.append(kindLabel,titleLabel,bodyLabel,add);composer.append(editor);
   const actions=N('div');actions.className='silm-notebook-actions';
-  const makeAction=(id,label,fn)=>{const b=N('button',label);b.type='button';b.id=id;b.className='button outline';b.addEventListener('click',fn);actions.append(b);return b;};
+  // Como no SIAB: CSV, Imprimir e Apagar logo abaixo do cabeçalho; o backup JSON (extensão do SILM) fica num grupo próprio.
+  const backup=N('section');backup.className='silm-notebook-backup';backup.setAttribute('aria-label','Backup do Caderno');const backupActions=N('div');backupActions.className='silm-notebook-backup-actions';
+  const makeAction=(id,label,fn,box=actions)=>{const b=N('button',label);b.type='button';b.id=id;b.className='button outline';b.addEventListener('click',fn);box.append(b);return b;};
   const download=(name,content,type)=>{const url=URL.createObjectURL(new Blob([content],{type}));const a=N('a');a.href=url;a.download=name;a.hidden=true;host.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-  makeAction('notebook-export-json','Exportar backup JSON',()=>download('SILM-caderno.json',exportNotebook(),'application/json;charset=utf-8'));
-  makeAction('notebook-export-csv','Baixar Caderno (CSV)',()=>{if(typeof B.journalCSV!=='function'){say('Exportação CSV indisponível nesta base.','warning');return;}download('SILM-caderno.csv','\uFEFF'+B.journalCSV(journal.snapshot().notes),'text/csv;charset=utf-8');});
-  makeAction('notebook-print','Imprimir Caderno',()=>{
+  makeAction('notebook-export-json','Exportar backup JSON',()=>download('SILM-caderno.json',exportNotebook(),'application/json;charset=utf-8'),backupActions);
+  makeAction('notebook-export-csv','Baixar caderno (CSV)',()=>{if(typeof B.journalCSV!=='function'){say('Exportação CSV indisponível nesta base.','warning');return;}download('SILM-caderno.csv','\uFEFF'+B.journalCSV(journal.snapshot().notes),'text/csv;charset=utf-8');});
+  makeAction('notebook-print','Imprimir',()=>{
    const sheet=N('article');sheet.className='silm-notebook-print';sheet.append(N('h1','Caderno de laboratório — SILM'),N('p','Emissão: '+new Date().toLocaleString('pt-BR')));
    const notes=journal.snapshot().notes;
    for(const note of notes){const display=notebookPresentation(note),card=N('section');card.className='silm-notebook-print-entry';card.append(N('p',display.category+' · '+new Date(note.createdAt).toLocaleString('pt-BR')),N('h2',display.title),N('p',display.body));if(note.entityLabel)card.append(N('p','Metal associado: '+note.entityLabel));sheet.append(card);}
@@ -224,7 +226,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    try{window.print();}catch{cleanup();say('A impressão não está disponível neste navegador.','warning');}
   });
   const importInput=N('input');importInput.id='notebook-import';importInput.type='file';importInput.accept='.json,application/json';importInput.hidden=true;importInput.className='silm-notebook-file';
-  makeAction('notebook-import-trigger','Importar backup JSON',()=>importInput.click());
+  makeAction('notebook-import-trigger','Importar backup JSON',()=>importInput.click(),backupActions);
   const filter=N('select');filter.id='notebook-filter';
   for(const [value,label] of [['todos','Todos os registros'],['observacao','Anotações'],['hipotese','Hipóteses'],['conclusao','Conclusões'],['atividade','Missões e roteiros concluídos'],['relatorio','Relatórios associados']]){const option=N('option',label);option.value=value;filter.append(option);}
   filter.value=['todos','observacao','hipotese','conclusao','atividade','relatorio'].includes(notebookFilter)?notebookFilter:'todos';notebookFilter=filter.value;
@@ -276,9 +278,10 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    if(journal.clearNotes()){notebookFilter='todos';filter.value='todos';home();renderEntries();say('Caderno apagado. Os relatórios arquivados foram preservados.','success');}
    else say('Não foi possível apagar o Caderno.','warning');
   }
-  const clearButton=makeAction('notebook-clear','Apagar Caderno',clearNotes);
-  if(session.open()){clearButton.disabled=true;clearButton.title='Encerre a atividade orientada antes de apagar registros.';actions.querySelector('#notebook-import-trigger').disabled=true;}
-  host.append(intro,composer,actions,filterLabel,entries,importInput);renderEntries();
+  const clearButton=makeAction('notebook-clear','Apagar caderno',clearNotes);clearButton.classList.add('silm-destructive');
+  if(session.open()){clearButton.disabled=true;clearButton.title='Encerre a atividade orientada antes de apagar registros.';backupActions.querySelector('#notebook-import-trigger').disabled=true;}
+  backup.append(intro,backupActions);
+  host.append(actions,filterLabel,composer,entries,backup,importInput);renderEntries();
  }
  function professor(){if(table)return;const scope=SimCore.createScope();table=S.createPeriodicTable($('silm-professor-table'),{scope,state:{selection:model.state.metal?.atomicNumber||29,query:''},teacher:true,canInvestigate:()=>!session.open(),onInvestigate:async e=>{if(await selectMetal(e.atomicNumber))location.hash='#/ambiente';},onSources:e=>{$('silm-professor-sources').textContent=S.data.sourceIds(e).map(id=>{const s=S.data.source(id);return s.institution+' — '+s.title;}).join('\n');}});}
  function freeReport(){if(!model.state.investigation)return null;const saved=storage.get('report.free:'+model.state.investigation.id,{}),report={...fields};for(const k of Object.keys(report))if(typeof saved[k]==='string')report[k]=saved[k].slice(0,10000);return {activityContext:{id:'laboratorio',type:'free'},checkpoint:model.snapshot(),evidence:{cell:false,lattice:false,deformation:false},report};}

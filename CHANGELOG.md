@@ -1,4 +1,12 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 5.5: Oficina → Visão geral (fecha a Etapa 5)
+## Em desenvolvimento — Paridade SIAB, Etapa 6: Caderno
+
+- O Caderno segue a ordem do SIAB: ações ("Baixar caderno (CSV)", "Imprimir", "Apagar caderno" em destaque de risco), filtro, nova anotação e lista.
+- O backup JSON fica num grupo próprio no fim da página, com a nota sobre dados locais.
+- O cabeçalho e o conteúdo ficaram na mesma coluna.
+- Ao imprimir, também por Ctrl+P, no papel ficam só o cabeçalho e os registros.
+- TEST-NOTEBOOK em `npm run test:parity`; evidências em `docs/evidence-parity/NOTE/`.
+
+## Paridade SIAB, Etapa 5.5: Oficina → Visão geral (mesclada em #27)
 
 - Corrigido o layout da Visão geral. O contêiner herdava a grade de colunas de 160 px da Base, o que espremia controles, aviso e cartões lado a lado e cortava botões no celular ("Restau", "Elétro").
 - Agora, como "Sua bancada" no SIAB:
