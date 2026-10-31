@@ -84,11 +84,22 @@
    if(button.parentElement!==toolbar)toolbar.append(button);
   }
  }
+ /* Estado vazio no padrão do SIAB ("Bancada vazia"): ilustração, título, o que fazer e ações que funcionam. */
+ function emptyState({title,text,actions}){
+  const box=document.createElement('div');box.className='si-empty-state';box.setAttribute('role','region');box.setAttribute('aria-label',title);
+  box.insertAdjacentHTML('afterbegin','<svg class="si-empty-art" viewBox="0 0 120 96" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M30 30h44v44H30Z"/><path d="M50 14h44v44H50Z" stroke-dasharray="5 5"/><path d="m30 30 20-16M74 30l20-16M74 74l20-16M30 74l20-16" stroke-dasharray="5 5"/><circle cx="30" cy="30" r="5"/><circle cx="74" cy="30" r="5"/><circle cx="30" cy="74" r="5"/><circle cx="74" cy="74" r="5"/><circle cx="52" cy="52" r="5" class="si-empty-accent"/></svg>');
+  const h=document.createElement('h2');h.textContent=title;const p=document.createElement('p');
+  text.forEach((part,i)=>{if(i%2){const b=document.createElement('strong');b.textContent=part;p.append(b);}else p.append(part);});
+  const row=document.createElement('div');row.className='si-empty-actions';
+  for(const [label,fn,kind] of actions){const b=document.createElement('button');b.type='button';b.className='button '+(kind==='primary'?'primary':'outline');b.textContent=label;b.addEventListener('click',fn);row.append(b);}
+  box.append(h,p,row);$('silm-integration-scene').append(box);
+ }
+ function openLeft(tab){const open=document.querySelector('[data-open-dock="montagem"]');if(open&&open.getAttribute('aria-expanded')!=='true')open.click();requestAnimationFrame(()=>document.querySelector('[data-left-tab="'+tab+'"]:not([hidden])')?.click());}
  function renderScene(){
   const state=model.state,e=element(),key=e?state.investigation.id+':'+e.atomicNumber+':'+state.module.active+':'+(state.structure?.mode||'empty')+':'+(state.structure?.mode==='crystalline'?representation.viewMode:'2d'):'none';
   if(viewKey!==key){placeExpansionButton(false);scope?.destroy();scope=null;view=null;viewKey=key;$('silm-integration-scene').replaceChildren();
-   if(!e){const p=document.createElement('p');p.textContent='Abra Montagem e escolha um metal para iniciar a investigação.';$('silm-integration-scene').append(p);}
-   else if(!state.structure){const p=document.createElement('p');p.textContent='Use Adicionar unidade em Montagem para começar a estrutura de '+e.name+'.';$('silm-integration-scene').append(p);}
+   if(!e)emptyState({title:'Oficina vazia',text:['Abra ','Montagem → Preparo',' para escolher um metal. Depois adicione unidades e organize a estrutura.'],actions:[['Abrir Montagem',()=>openLeft('preparo'),'primary'],['Começar com o cobre',async()=>{$('silm-metal').value='29';selected='29';await start();}],['Tabela periódica',()=>$('silm-open-periodic').click()]]});
+   else if(!state.structure)emptyState({title:'Estrutura de '+e.name+' vazia',text:state.module.active==='explorar'?['Use ','Adicionar unidade',' para montar a estrutura de '+e.name+'. Depois organize segundo a estrutura de referência.']:['A estrutura ainda não foi montada. Volte ao módulo ','Explorar',' para adicionar unidades.'],actions:state.module.active==='explorar'&&(!routeUI.session.open()||routeUI.canBuild())?[['Adicionar unidade',()=>run.add(),'primary'],['Abrir Montagem',()=>openLeft('objetos')]]:[['Abrir Montagem',()=>openLeft('modulo'),'primary']]});
    else if(state.structure){
     scope=SimCore.createScope();const common={scope,model,element:e,actions:run,reducedMotion:reduced,representation:rep,moduleTitle:{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active],measure:tools.measure,calc:tools.calc,properties:experience.scene};
     if(state.structure.mode==='crystalline')view=S.createCrystalView($('silm-integration-scene'),{...common,geometry:S.crystal.geometry(e)});
@@ -144,6 +155,7 @@
  function render(){
   const focused=document.activeElement,restoreControl=focused?.closest('#silm-tools,#silm-module-choice,#silm-history')?focused.id:null;
   const state=model.state,e=element(),s=state.structure,n=s?.units.length||0;
+  const tag=$('si-module-tag');if(tag){const c=routeUI.session.context();tag.textContent=(c?(c.type==='mission'?'Missão':'Roteiro'):'Módulo')+' · '+({explorar:'Explorar',medir:'Medir',calcular:'Calcular'})[state.module.active];}
   const expandButton=$('si-expand-structure'),expandable=!!(e&&s?.mode==='crystalline'&&n>0);
   expandButton.disabled=!expandable;
   expandButton.title=$('si-stage').classList.contains('si-scene-expanded')?'Recolher estrutura (Escape)':expandable?'Expandir a estrutura cristalina configurada':'Organize uma estrutura cristalina para habilitar a visualização expandida.';

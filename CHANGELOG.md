@@ -1,4 +1,12 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 4: Roteiros Experimentais
+## Em desenvolvimento — Paridade SIAB, Etapa 5.1: Oficina → Foco
+
+- "Oficina vazia" no padrão da "Bancada vazia" do SIAB: ilustração, o que fazer e as ações "Abrir Montagem", "Começar com o cobre" e "Tabela periódica".
+- Metal sem estrutura também ganha um cartão com a ação certa para o módulo.
+- Etiqueta do módulo na barra da Oficina ("Módulo · Explorar"; numa atividade, "Missão · …" ou "Roteiro · …").
+- Sem comandos repetidos: Desfazer só na barra; "Limpar estrutura" só no menu Mais.
+- TEST-WORKSPACE (parte 5.1) em `npm run test:parity`; evidências em `docs/evidence-parity/LAB-FOCUS/`.
+
+## Paridade SIAB, Etapa 4: Roteiros Experimentais (mesclada em #23)
 
 - Lista de roteiros em linhas, com o módulo e uma seta à direita.
 - Roteiro em coluna de leitura, na ordem do SIAB: "O problema", "Objetivo", "O que você vai fazer", "Na oficina", "O que observar" e "Critério de conclusão".
