@@ -5,7 +5,7 @@
    (compatibilidade) ou {items, layout:'list'|'cards', heading:{title, lead}, marker:{done, pending, action}, detailHint}.
    Cada tema pode trazer investigate:{label, run(ctx)} para preparar o laboratório. */
 SimCore.createThemes=(ctx,experience)=>{
- const S=SimCore,U=S.ExperienceUI,records=new Map();let view={layout:'list',heading:{title:'Temas',lead:'Escolha um tema. Todos permanecem disponíveis para revisitar.'},marker:{done:'Revisado',pending:'Não revisado',action:'Marcar como revisado'},detailHint:'Investigue no Laboratório e use os painéis para conectar observações, medidas e representações.'};
+ const S=SimCore,U=S.ExperienceUI,records=new Map();let view={layout:'list',heading:{title:'Temas',lead:'Escolha um tema.'},marker:{done:'Revisado',pending:'Não revisado',action:'Marcar como revisado'},detailHint:'Aprofunde o tema na Oficina dos Metais.'};
  const normalize=spec=>{
   if(!spec||!U.id(spec.id)||!(spec.title||spec.titulo))throw new TypeError('Tema inválido');
   const related=spec.related||spec.conteudosRelacionados||{};
@@ -25,7 +25,7 @@ SimCore.createThemes=(ctx,experience)=>{
  }
  function renderList(host){
   if(view.layout==='list'){U.heading(host,view.heading.title,view.heading.lead);const list=U.element('div',null,'content-list theme-list');for(const theme of records.values())list.append(row(theme));host.append(list);if(!records.size)host.append(U.element('p','Nenhum tema foi registrado neste domínio.','panel-empty'));return;}
-  U.heading(host,'Aprender','Temas são pontos de entrada para conteúdo, investigações e atividades relacionadas. Todos permanecem disponíveis para revisitar.');
+  U.heading(host,'Aprender','Escolha um tema para aprofundar.');
   const grid=U.element('div',null,'theme-grid');for(const theme of records.values())grid.append(card(theme));host.append(grid);if(!records.size)host.append(U.element('p','Nenhum tema foi registrado neste domínio.','panel-empty'));
  }
  function relatedLinks(host,theme,{skip=[]}={}){
