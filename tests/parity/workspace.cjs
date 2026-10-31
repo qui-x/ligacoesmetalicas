@@ -77,6 +77,44 @@ module.exports=async(browser,url)=>{
   assert.match(await p.locator('#silm-assembly-crystal-reason').innerText(),/não disponível para visualização/);
   assert.notEqual(await p.evaluate(()=>SILMIntegration.snapshot().structure.mode),'crystalline');
  }finally{await mctx.close();}
+ /* 4. 5.3 Ver e 5.4 Dados: títulos do SIAB, famílias do módulo, camadas sem efeito científico, origem das entradas,
+    registros rotulados ("Medida do modelo", "Calculado pelo SILM") e seção Relatório. */
+ const nav=require('../integration-navigation.cjs');
+ const vctx=await browser.newContext({viewport:{width:1366,height:900},reducedMotion:'reduce'});
+ try{
+  const p=await open(vctx,'#/ambiente');await p.getByRole('button',{name:'Começar com o cobre',exact:true}).click();await p.waitForFunction(()=>SILMIntegration.snapshot().metal?.atomicNumber===29);
+  await p.locator('[data-open-dock="montagem"]').click();for(let i=0;i<4;i++)await p.locator('#silm-add').click();await p.locator('#silm-organize').click();
+  await p.waitForFunction(()=>SILMIntegration.snapshot().structure?.mode==='crystalline');await p.locator('[data-close-dock="left"]').click();
+  const families=async()=>{await p.waitForFunction(()=>[...document.querySelectorAll('#si-viewer-families [role="tab"]')].some(t=>t.getClientRects().length),'',{timeout:4000});return p.evaluate(()=>[...document.querySelectorAll('#si-viewer-families [role="tab"]')].filter(t=>t.getClientRects().length).map(t=>t.textContent.trim()));};
+  await p.locator('[data-open-dock="ver"]').click();await p.waitForFunction(()=>document.getElementById('si-right-title')?.textContent==='Investigar','',{timeout:4000});
+  assert.equal(await p.locator('#si-viewer-catalog h3').count(),0,'Sem título repetido dentro do painel');
+  assert.deepEqual(await families(),['Observar'],'Explorar mostra só a família Observar');
+  await nav.viewer(p,'eletrons');await p.waitForFunction(()=>document.getElementById('si-right-title')?.textContent==='Elétrons deslocalizados','',{timeout:4000});
+  const science=()=>p.evaluate(()=>{const s=SILMIntegration.snapshot();return JSON.stringify({metal:s.metal,units:s.structure.units,measurements:s.measurements,calculations:s.calculations,mode:s.structure.mode});});
+  const before=await science();await p.locator('#silm-electrons').click();await p.waitForTimeout(200);assert.equal(await science(),before,'Mostrar elétrons não altera o estado científico');
+  await p.locator('#si-dock-viewer-back').click();await p.waitForFunction(()=>document.getElementById('si-right-title')?.textContent==='Investigar','',{timeout:4000});
+  await p.locator('[data-close-dock="right"]').click();
+  // Medir: família Medir, uma medida válida de a.
+  await nav.moduleChoice(p,'medir');await p.locator('[data-open-dock="ver"]').click();assert.deepEqual(await families(),['Observar','Medir'],'Medir acrescenta a família Medir');await nav.viewer(p,'instrumentos');
+  await p.locator('#silm-instrument').selectOption('latticeParameter');await p.locator('[data-close-dock="right"]').click();
+  const pair=await p.evaluate(()=>{const s=SILMIntegration.snapshot(),g=SILM.crystal.geometry(SILM.data.get(s.metal.atomicNumber));for(const a of s.structure.units)for(const b of s.structure.units){const m=SILM.measurement.compute('latticeParameter',g,[a.site,b.site]);if(m.ok&&m.parameter==='a')return[a.id,b.id];}});
+  for(const id of pair)await p.locator('[data-unit-id="'+id+'"]').press('Enter');await p.waitForFunction(()=>SILMIntegration.snapshot().measurements.length===1);
+  // Calcular: família Analisar; a entrada a mostra as origens possíveis, inclusive a medida do modelo.
+  await nav.moduleChoice(p,'calcular');await p.locator('[data-open-dock="ver"]').click();assert.deepEqual(await families(),['Observar','Analisar'],'Calcular acrescenta a família Analisar');await nav.viewer(p,'calculos');
+  await p.locator('#silm-formula').selectOption('cell-volume-cubic');const panel=await p.locator('#si-dock-right').innerText();
+  assert.match(panel,/Dado tabelado/);assert.match(panel,/Medida do modelo/);
+  await p.getByRole('button',{name:'Calcular',exact:true}).click();await p.waitForFunction(()=>SILMIntegration.snapshot().calculations.length===1);await p.locator('[data-close-dock="right"]').click();
+  // Dados: título do SIAB, três consultas, registros rotulados e seção Relatório.
+  await p.locator('[data-open-dock="dados"]').click();await p.waitForFunction(()=>document.getElementById('si-right-title')?.textContent==='Dados da investigação','',{timeout:4000});
+  assert.deepEqual(await p.evaluate(()=>[...document.querySelectorAll('[data-silm-data-open] strong')].map(x=>x.textContent)),['Dados do metal','Medições e cálculos','Arquivos da investigação']);
+  assert.equal(await p.locator('#silm-record-count').innerText(),'1 medições · 1 cálculos');
+  const docs=await p.evaluate(()=>{const box=document.querySelector('#silm-data-catalog .silm-data-documents');return {title:box.querySelector('h3').textContent,links:[...box.querySelectorAll('a')].map(a=>({text:a.textContent,href:a.getAttribute('href'),h:a.getBoundingClientRect().height,w:a.getBoundingClientRect().width,box:box.getBoundingClientRect().width}))};});
+  assert.equal(docs.title,'Relatório');assert.deepEqual(docs.links.map(l=>[l.text,l.href]),[['Abrir relatório','#/relatorios'],['Abrir Caderno','#/caderno']]);
+  for(const l of docs.links){assert.ok(l.h>=44,'Ação de documento com 44 px');assert.ok(l.w>=l.box-2,'Ação de documento em largura total, como no SIAB');}
+  await nav.data(p,'registros');const records=await p.locator('#silm-history').innerText();
+  assert.match(records,/Calculado pelo SILM/);assert.match(records,/Parâmetro de rede/);
+  await p.locator('#silm-data-back').click();await p.waitForFunction(()=>document.activeElement?.matches('[data-silm-data-open="registros"]'),'',{timeout:4000});
+ }finally{await vctx.close();}
  assert.deepEqual(errors,[]);
- console.log('PASS TEST-WORKSPACE 5.1–5.2: Oficina vazia em 5 tamanhos com ações funcionais, etiqueta do módulo, adicionar/desfazer, troca de módulo sem perder a investigação; Montagem com Fechar, grupos, ação principal, resumo em pares, retorno do foco e indisponibilidade explícita.');
+ console.log('PASS TEST-WORKSPACE 5.1–5.4: Oficina vazia em 5 tamanhos com ações funcionais, etiqueta do módulo, adicionar/desfazer, troca de módulo sem perder a investigação; Montagem com Fechar, grupos, ação principal, resumo em pares, retorno do foco e indisponibilidade explícita; Investigar e Dados da investigação com famílias do módulo, camadas sem efeito científico, origens, registros rotulados e seção Relatório.');
 };

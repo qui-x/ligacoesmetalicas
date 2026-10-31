@@ -219,7 +219,6 @@
               <div class="si-dock-scroll" id="si-right-scroll">
                 <div data-right-panel="ver">
                   <div id="si-viewer-catalog" class="si-viewer-controls" role="group" aria-label="Visualizações científicas">
-                    <h3>Investigar a estrutura</h3><p>Escolha uma visualização.</p>
                     <div id="si-viewer-families" class="si-viewer-family-tabs" role="tablist" aria-label="Famílias do painel Ver"></div>
                     <div id="si-viewer-family-panel" class="si-viewer-family-panel" role="tabpanel" aria-label="Ferramentas da família escolhida">
                       <p id="si-viewer-family-description" class="si-viewer-caption"></p>
@@ -237,13 +236,13 @@
                 <div data-right-panel="dados" hidden>
                   <button id="silm-data-back" type="button" hidden>← Dados</button>
                   <div id="silm-data-catalog">
-                    <h3>Dados da investigação</h3><p>Consulte valores, registros e arquivos.</p>
+                    <p class="silm-data-intro">Consulte valores, registros e arquivos.</p>
                     <nav class="silm-data-menu" aria-label="Consultas da investigação">
                       <button type="button" data-silm-data-open="tabela"><strong>Dados do metal</strong><span>Estrutura de referência, propriedades, fontes e condições.</span></button>
                       <button type="button" data-silm-data-open="registros"><strong>Medições e cálculos</strong><span id="silm-record-count">0 medições · 0 cálculos</span></button>
                       <button type="button" data-silm-data-open="arquivo"><strong>Arquivos da investigação</strong><span>Exporte ou abra uma investigação em JSON.</span></button>
                     </nav>
-                    <div class="silm-data-documents"><a id="silm-report-link" class="button outline" href="#/relatorios">Relatório desta investigação</a><a class="button outline" href="#/caderno">Abrir Caderno</a></div>
+                    <section class="silm-data-documents" aria-labelledby="silm-data-documents-title"><h3 id="silm-data-documents-title">Relatório</h3><p>Dados medidos e registro da investigação.</p><a id="silm-report-link" class="button outline" href="#/relatorios">Abrir relatório</a><a class="button outline" href="#/caderno">Abrir Caderno</a></section>
                   </div>
                   <section class="silm-data-detail" data-silm-data-panel="tabela" hidden><h3>Dados científicos e fontes</h3><div id="silm-data"></div></section>
                   <section class="silm-data-detail" data-silm-data-panel="registros" hidden><div id="silm-history"></div></section>
