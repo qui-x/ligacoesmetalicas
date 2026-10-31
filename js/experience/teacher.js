@@ -14,7 +14,7 @@ SimCore.createTeacher=(ctx,experience)=>{
  const save=config=>{draft=validate(config);ctx.storage.set('experience.teacher',draft);return U.clone(draft);};
  async function open(config){const c=validate(config);return experience.activity.startTeacher(c,c.identification);}
  function render(host,local){
-  U.heading(host,'Área do Professor','Configure uma atividade, revise os recursos disponíveis e abra a experiência como aluno.');
+  U.heading(host,'Área do Professor','Crie atividades e teste-as como aluno.');
   const projector=U.button('Modo Projetor',()=>S.shell.setProjector(!S.shell.projector),local.scope,{id:'teacher-projector'});projector.setAttribute('aria-pressed',String(S.shell.projector));local.scope.on('shell:projector',event=>projector.setAttribute('aria-pressed',String(event.detail.on)));host.append(projector);
   // Extensão opcional de recursos pedagógicos; o formulário e seu fluxo permanecem na Base.
   if(typeof experience.options.teacherResources==='function'){const cleanup=experience.options.teacherResources(host,local);if(typeof cleanup==='function')local.scope.cleanup(cleanup);}

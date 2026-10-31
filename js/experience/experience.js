@@ -71,7 +71,7 @@ SimCore.createExperience=ctx=>{
   const route=type==='route'?'roteiros':'missoes',title=type==='route'?'Roteiros Experimentais':'Missões',a=experience.activity.current;
   const items=experience.activity.list(type),selected=items.find(x=>x.id===local.params);
   if(local.params&&!selected){U.heading(host,'Atividade não encontrada','O registro pode ter mudado.');host.append(U.link('Voltar à lista',route));return;}
-  if(!selected){U.heading(host,title,type==='route'?'Escolha uma investigação e prepare o Laboratório.':'Problemas abertos à investigação, com condições de sucesso.');
+  if(!selected){U.heading(host,title,type==='route'?'Escolha uma investigação.':'Escolha um desafio.');
    /* Lista discreta da família: título, uma frase e o estado (missões) ou o módulo (roteiros) à direita. */
    const list=U.element('div',null,'content-list activity-list');for(const spec of items){const row=U.element('a',null,'content-row activity-row');row.id=type+'-open-'+spec.id;row.href=S.router.href(route,spec.id);const body=U.element('span');body.append(U.element('strong',spec.title),U.element('small',spec.subtitle||spec.description||''));
     let meta;if(type==='mission'){const done=experience.activity.completed(spec.id);meta=U.element('span',done?'Concluído':'Não realizado','status-text'+(done?' is-done':''));}else{meta=U.element('span',experience.modules.get(spec.module).title,'row-meta');meta.append(U.icon('arrow'));}
@@ -123,7 +123,7 @@ SimCore.createExperience=ctx=>{
     confirm troca a confirmação pedida quando já há dados (0.3.1): {title, text, label}, ou uma função (ctx) que devolve
     esse objeto conforme o estado atual, ou null/false quando não há nada a perder. O produto diz o que de fato acontece. */
  function presetsScreen(host,local){
-  U.heading(host,'Montagens prontas','Configurações rápidas do Laboratório.');const grid=U.element('div',null,'setup-grid');
+  U.heading(host,'Montagens prontas');const grid=U.element('div',null,'setup-grid');
   for(const p of experience.options.presets||[]){const card=U.element('article',null,'setup-card');card.id='preset-'+p.id;const mod=experience.modules.get(p.module)?.title;card.append(U.element('p',[mod,p.meta].filter(Boolean).join(' · '),'eyebrow'),U.element('h2',p.title));if(p.objective)card.append(U.element('p',p.objective));
    if(p.facts?.length){const ul=U.element('ul',null,'setup-facts');p.facts.forEach(f=>ul.append(U.element('li',f)));card.append(ul);}
    if(p.steps?.length){card.append(U.element('h3','Investigue'));const ol=U.element('ol');p.steps.forEach(s=>ol.append(U.element('li',s)));card.append(ol);}

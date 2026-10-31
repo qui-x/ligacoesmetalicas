@@ -15,7 +15,7 @@ SimCore.createReports=(ctx,experience)=>{
   const serial={sections:(data.sections||[]).map(s=>({title:U.text(s.title,200),text:U.text(s.text,12000),...(s.table?{table:U.clone(s.table)}:{})}))};ctx.storage.set('experience.report-data.'+a.sessionId,serial);return data;
  }
  async function render(host,local){
-  U.heading(host,'Relatórios','Registre observações, análise e conclusão. A identificação e o contexto acompanham o documento.');
+  U.heading(host,'Relatórios');
   const active=experience.activity.current,history=ctx.storage.get('experience.history',[]);const items=[...(active?[active]:[]),...(active?.navigationMode==='restricted'?[]:Array.isArray(history)?history:[])].filter((v,i,a)=>a.findIndex(x=>x.sessionId===v.sessionId)===i);
   const target=local.params?items.find(a=>a.sessionId===local.params):active;
   const controls=U.element('div',null,'action-row report-controls');controls.append(U.link('Voltar ao Laboratório','laboratorio','','report-back'));host.append(controls);
