@@ -71,8 +71,8 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 5 | Laboratório | Oficina dos Metais | Em andamento; subáreas na ordem abaixo |
 | 5.1 | Bancada em Foco | Oficina → Foco | Aceito em 31/10/2026 — registro na seção 8 |
 | 5.2 | Montagem / prateleira | Oficina → Montagem | Aceito em 31/10/2026 — registro na seção 8 |
-| 5.3 | Ver / investigação | Oficina → Ver | Não iniciado |
-| 5.4 | Dados | Oficina → Dados | Não iniciado |
+| 5.3 | Ver / investigação | Oficina → Ver | Aceito em 31/10/2026 — registro na seção 8 |
+| 5.4 | Dados | Oficina → Dados | Aceito em 31/10/2026 — registro na seção 8 |
 | 5.5 | Visão geral | Oficina → Visão geral | Rodada preliminar aplicada; revisar e homologar nesta posição |
 | 6 | Caderno | Caderno | Não iniciado; a tela está ativa em `integracao/unified-ui.js` |
 | 7 | Manual | Manual | Não iniciado |
@@ -246,35 +246,35 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 
 **Referência SIAB:** painel VER, trilho de investigação e visualizações; `js/ui/ver-investigacao.js`, `js/ui/grafico.js`, `js/ui/equacao.js`, `js/ui/render.js`.
 
-**SILM:** dock `#si-dock-right`, `#si-viewer-catalog`, `integracao/workspace-family.js`, `domain/silm/exploration.js`, `domain/silm/measure-view.js`, `domain/silm/property-view.js`, `domain/silm/calculations.js`.
+**SILM:** dock `#si-dock-right`, `#si-viewer-catalog`, `integracao/workspace-family.js` (título "Investigar"), `integracao/scientific-tools.js`, `domain/silm/measure-view.js`, `domain/silm/property-view.js`, `domain/silm/calculations.js`. O ponteiro antigo `exploration.js` não é carregado.
 
-- [ ] `LAB-VIEW-01` — Comparar catálogo de famílias, subabas, botão voltar, detalhe e hierarquia do resultado.
-- [ ] `LAB-VIEW-02` — Organizar o conteúdo em caminhos claros: Observar, Medir e Analisar; evitar misturar descrição, instrumento e resultado.
-- [ ] `LAB-VIEW-03` — Conferir síntese contextual e foco da observação (estrutura, célula, rede, elétrons, propriedade).
-- [ ] `LAB-VIEW-04` — Conferir camadas que podem ser mostradas/ocultadas sem alterar o estado científico.
-- [ ] `LAB-VIEW-05` — Conferir propriedades metálicas e seus estados: qualitativa, dado tabelado ou indisponível, sempre com motivo.
-- [ ] `LAB-VIEW-06` — Conferir instrumentos, unidades, seleção de pontos e leitura de medida; identificar explicitamente “medida do modelo”.
-- [ ] `LAB-VIEW-07` — Conferir fórmulas, entradas, intermediários, origem de cada entrada e resultado de cálculo; identificar “calculado pelo SILM”.
-- [ ] `LAB-VIEW-08` — Conferir comparação A/B e comparação de referências sem escala comum; não transformar intensidade didática em classificação de desempenho.
-- [ ] `LAB-VIEW-09` — Conferir 2D/3D, projeções, câmera, fallback quando 3D falhar e invariância de medições/cálculos.
-- [ ] `LAB-VIEW-10` — Conferir que o texto da ajuda esteja ao lado da ação e que o detalhe aprofundado permaneça no Manual.
-- [ ] `LAB-VIEW-11` — Criar testes de alternância de famílias, camadas, instrumentos, cálculo e invariância de estado.
+- [x] `LAB-VIEW-01` — Painel "Investigar" como no SIAB, abas de família, lista de recursos, detalhe com título próprio e "← Ver" de volta.
+- [x] `LAB-VIEW-02` — Observar, Medir e Analisar separados; cada módulo acrescenta só a sua família (testado nos três módulos).
+- [x] `LAB-VIEW-03` — Cada recurso tem uma frase curta de foco (estrutura, elétrons, propriedades, instrumentos, cálculos) ao lado da ação.
+- [x] `LAB-VIEW-04` — Mostrar elétrons não altera metal, unidades, medições nem cálculos (TEST-WORKSPACE).
+- [x] `LAB-VIEW-05` — Propriedades com estado qualitativo, tabelado ou indisponível e motivo (`base-integration`, TEST-MISSION).
+- [x] `LAB-VIEW-06` — Instrumento, unidade e pontos; a leitura é anunciada como "Medida do modelo" e registrada em Dados.
+- [x] `LAB-VIEW-07` — Cada entrada mostra a origem ("Dado tabelado", "Medida do modelo", "Valor informado"); o resultado diz "Calculado pelo SILM".
+- [x] `LAB-VIEW-08` — Comparação de referências sem escala comum nem classificação (`structure-comparison`, Etapa 5.5).
+- [x] `LAB-VIEW-09` — 2D/3D, projeções, volta ao 2D e invariância (`electrons-3d`, `base-integration`).
+- [x] `LAB-VIEW-10` — Texto curto junto da ação; aprofundamento no Manual (link "Ajuda sobre representação").
+- [x] `LAB-VIEW-11` — TEST-WORKSPACE parte 5.3: famílias, camadas, instrumento, cálculo e invariância.
 
 ### 5.4 — Oficina: Dados
 
 **Referência SIAB:** dados medidos, registro da investigação, gráficos, tabelas e atalho para relatório; `js/ui/workspace.js`, `js/ui/ver-investigacao.js`, `js/telas/relatorios.js`.
 
-**SILM:** subpainel Dados em `index.html`, `integracao/workspace-family.js`, `integracao/scientific-tools.js`, `domain/silm/data-api.js`, `js/experience/history.js`, `integracao/durable-storage.js`.
+**SILM:** `#silm-data-catalog` em `integracao/index.html`, `integracao/workspace-family.js` (título "Dados da investigação", páginas), `integracao/scientific-tools.js` (registros `#silm-history`), `domain/silm/data-api.js`, `integracao/durable-storage.js`. O ponteiro antigo `js/experience/history.js` não é carregado.
 
-- [ ] `LAB-DATA-01` — Comparar catálogo, retorno, detalhe e hierarquia de cada conjunto de dados.
-- [ ] `LAB-DATA-02` — Conferir Dados do metal: valores, unidades, condições de referência, disponibilidade e fontes.
-- [ ] `LAB-DATA-03` — Conferir lista de medições: instrumento, pontos, unidade, valor, remoção e limpeza.
-- [ ] `LAB-DATA-04` — Conferir lista de cálculos: fórmula, entradas, origem, intermediários, resultado e dependências.
-- [ ] `LAB-DATA-05` — Conferir Histórico cronológico, distinção entre ação científica e alteração apenas visual, e recuperação após recarregar.
-- [ ] `LAB-DATA-06` — Conferir exportar/abrir investigação JSON, validação, avisos e preservação de estado anterior em importação inválida.
-- [ ] `LAB-DATA-07` — Conferir atalho do Relatório e acesso ao Caderno sem oferecer destino funcional que esteja desabilitado.
-- [ ] `LAB-DATA-08` — Conferir conflitos de armazenamento, abas concorrentes, falha de persistência e mensagem de recuperação.
-- [ ] `LAB-DATA-09` — Criar testes de catálogo/detalhe, histórico, exportação, importação e rollback.
+- [x] `LAB-DATA-01` — "Dados da investigação" como no SIAB, três consultas, detalhe e "← Dados" com retorno do foco.
+- [x] `LAB-DATA-02` — Dados do metal com valores, unidades, condições, disponibilidade e fontes (`base-integration`).
+- [x] `LAB-DATA-03` — Medições com instrumento, unidade, valor e procedência (TEST-WORKSPACE, `base-integration`).
+- [x] `LAB-DATA-04` — Cálculos com fórmula, entradas, origem e "Calculado pelo SILM" (TEST-WORKSPACE, relatório da Etapa 4).
+- [x] `LAB-DATA-05` — Histórico preservado depois de recarregar (`base-integration`, TEST-MISSION).
+- [x] `LAB-DATA-06` — Exportar e abrir JSON, rejeição de arquivo inválido sem perder o estado (`base-integration`, `notebook-backup`).
+- [x] `LAB-DATA-07` — Seção "Relatório" com "Abrir relatório" e "Abrir Caderno" (o Caderno está ativo); o relatório some durante uma atividade, que tem o seu.
+- [x] `LAB-DATA-08` — Aba obsoleta bloqueada e falha de persistência tratada (`notebook-backup`, `durable-storage`).
+- [x] `LAB-DATA-09` — TEST-WORKSPACE parte 5.4: consultas, contagem, registros rotulados, seção Relatório e retorno.
 
 ### 5.5 — Oficina: Visão geral
 
@@ -478,7 +478,7 @@ O comando `npm test` já reúne os testes científicos, de rotas, aprendizagem e
 - [x] `TEST-LEARN` — lista/detalhe/retorno e conexão com investigação: `tests/parity/learn.cjs`.
 - [x] `TEST-MISSION` — lista/detalhe/evidência/conclusão/refazer/restrições: `tests/parity/mission.cjs`.
 - [x] `TEST-ROUTE` — lista/detalhe/identificação/módulo único/preparação/retomada: `tests/parity/route.cjs`.
-- [~] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem: `tests/parity/workspace.cjs` (5.1 e 5.2 prontas; 5.3–5.5 a seguir).
+- [~] `TEST-WORKSPACE` — Foco, painéis, estado vazio, seleção, teclado, toque e rolagem: `tests/parity/workspace.cjs` (5.1 a 5.4 prontas; 5.5 a seguir).
 - [ ] `TEST-NOTEBOOK` — criação, filtros, persistência, backup, importação inválida, CSV, impressão e exclusão.
 - [ ] `TEST-MANUAL` — busca, índice, artigo, links, ajuda contextual e impressão.
 - [ ] `TEST-REPORT` — sessões, captura de dados, edição, impressão e acesso restrito.
@@ -652,6 +652,25 @@ Diferenças de domínio / N/A: "Frascos" viram a escolha do metal; "Objetos" vir
 Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
   test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
 Evidências: docs/evidence-parity/LAB-MOUNT/
+Pendências: ajuda contextual "?" (Etapa 10); Firefox, Safari e aparelhos físicos
+Estado: [x]
+```
+
+### Registro — Etapas 5.3 e 5.4, Oficina → Ver e Dados
+
+```text
+ID da etapa: LAB-VIEW (01 a 11) e LAB-DATA (01 a 09)
+Tela SIAB: painel "Investigar" (Ver) e "Dados da investigação" da bancada (acidosebases1.0.0@73848f0)
+Tela SILM: doca #si-dock-right — catálogo de visualizações e consultas de Dados
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapas 5.3 e 5.4, Ver e Dados" (PR da etapa)
+Viewport(s): 1366×768 e 390×844 (docas), mais as suítes de 5 e 7 tamanhos
+Arquivos alterados: integracao/index.html (+ index.html gerado), integracao/workspace-family.js, integracao/integration.css,
+  tests/parity/workspace.cjs
+Diferenças de domínio / N/A: famílias liberadas por módulo; análises são as fórmulas cristalográficas; "?" nas docas
+  fica para a Etapa 10
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
+Evidências: docs/evidence-parity/LAB-VIEW/ (README das duas subáreas) e docs/evidence-parity/LAB-DATA/
 Pendências: ajuda contextual "?" (Etapa 10); Firefox, Safari e aparelhos físicos
 Estado: [x]
 ```

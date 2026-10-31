@@ -1,4 +1,16 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 5.2: Oficina → Montagem
+## Em desenvolvimento — Paridade SIAB, Etapas 5.3 e 5.4: Oficina → Ver e Dados
+
+- Os painéis abertos por Ver e Dados se chamam "Investigar" e "Dados da investigação", como no SIAB, sem título repetido dentro deles.
+- Dados ganhou a seção "Relatório" ("Dados medidos e registro da investigação."), com "Abrir relatório" e "Abrir Caderno" em largura total.
+- TEST-WORKSPACE (partes 5.3 e 5.4) confere:
+  - as famílias de cada módulo;
+  - que mostrar elétrons não muda o estado científico;
+  - a origem das entradas do cálculo;
+  - os registros "Calculado pelo SILM";
+  - o retorno do foco.
+- Evidências em `docs/evidence-parity/LAB-VIEW/` e `LAB-DATA/`.
+
+## Paridade SIAB, Etapa 5.2: Oficina → Montagem (mesclada em #25)
 
 - A doca Montagem fecha com "Fechar" escrito, como no SIAB.
 - A aba Preparo ganhou dois grupos rotulados: "Metal da investigação" e "Estrutura".

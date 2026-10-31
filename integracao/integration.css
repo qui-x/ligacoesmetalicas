@@ -357,3 +357,10 @@ body:is([data-silm-route="aprender"],[data-silm-route="missoes"],[data-silm-rout
 .silm-summary-list{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:10px 0 0;font-size:.86rem}
 .silm-summary-list dt{color:var(--muted)}
 .silm-summary-list dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+
+/* Paridade SIAB — Etapas 5.3 e 5.4, Ver e Dados: títulos do SIAB nas docas e seção "Relatório" com ações de largura total. */
+.silm-data-intro{margin:0 0 10px;color:var(--muted);font-size:.86rem}
+#silm-data-catalog .silm-data-documents{display:grid;gap:8px;margin:16px 0 0;padding-top:12px;border-top:1px solid var(--border)}
+.silm-data-documents h3{margin:0;font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+.silm-data-documents p{margin:0;font-size:.84rem;color:var(--muted)}
+.silm-data-documents .button{min-height:44px;width:100%;justify-content:center;display:inline-flex;align-items:center}
