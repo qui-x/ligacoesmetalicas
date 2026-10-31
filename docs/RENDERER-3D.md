@@ -34,7 +34,7 @@ palco → tela (px)
 
 - 0,4° por pixel de arrasto. Arrastar para a direita traz a frente para a direita; para baixo, mostra mais o topo.
 - A inclinação fica entre −90° e 90°. A guinada é guardada entre −180° e 180°.
-- Durante o gesto, cada quadro só redesenha (via `requestAnimationFrame`), sem gravar, e os elétrons ficam ocultos. Ao soltar, a orientação é gravada, os elétrons voltam e há um anúncio: "Vista 3D girada: 25° na horizontal, 20° na vertical."
+- Durante o gesto, cada quadro só redesenha (via `requestAnimationFrame`), sem gravar. Desde a 0.15.4, os elétrons continuam visíveis e animados durante a órbita, acompanhando os centros projetados (na 0.12.0 eles ficavam ocultos). Ao soltar, a orientação é gravada e há um anúncio: "Vista 3D girada: 25° na horizontal, 20° na vertical."
 - Teclas e botões dão passos de 24 px (9,6°), com gravação e anúncio a cada passo.
 - O clique que o navegador gera ao fim do giro é descartado, como no deslocamento da 0.11.x.
 

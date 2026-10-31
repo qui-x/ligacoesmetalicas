@@ -1,4 +1,6 @@
-# SILM 0.15.4 — A Arquitetura dos Metais
+# SILM 0.15.5 — A Arquitetura dos Metais
+
+A 0.15.5 consolida o trabalho da segunda quinzena de outubro. Ela junta a auditoria de paridade mecânica com o SIAB, os textos enxutos e os testes de acessibilidade e celular. Também unifica a versão, enxuga o cache offline e atualiza a auditoria para a arquitetura atual, e as esferas do palco ganham alvos de toque de 24 px. Veja `docs/SILM-0.15.5.md`.
 
 A 0.15.4 compara referências recentes na Visão Geral, mantém os elétrons em movimento durante a órbita 3D e prepara Montagem ao selecionar um metal na tabela. Geometrias adicionais são referências visuais; sua integração com o motor de medições e cálculos continua pendente.
 

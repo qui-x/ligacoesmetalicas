@@ -1,9 +1,9 @@
 {
   "produto": "SILM",
   "nome": "Simulador Interativo de Ligações Metálicas",
-  "versao": "0.15.2",
+  "versao": "0.15.5",
   "tema": "A Arquitetura dos Metais",
-  "versaoBase": "0.3.1",
+  "versaoBase": "Base SI 0.9.17 (baseparasimuladores@68ed86c, travada em integracao/base-lock.json)",
   "scientificSchemaVersion": 8,
   "origens": [
     {
@@ -101,10 +101,10 @@
       "verificado": true
     }
   ],
-  "observacaoOrigem": "Origem: entregas/SILM-0.11.0.zip deste repositório, verificado pelo SHA-512 externo; núcleo da Base Estrutural 0.3.1 sem alteração local.",
-  "status": "Correção de origem 0.1.x: paridade de Montagem, Ver e Dados com a Base SI 0.9.17; validação desta rodada documentada separadamente.",
+  "observacaoOrigem": "Origem: main@893076b (SILM 0.15.4) com as branches de auditoria de paridade mecânica, textos enxutos/matriz de telas e testes de acessibilidade e celular (0.16) mescladas. O núcleo antigo (Base Estrutural 0.3.1 em js/, css/, a11y.js) não é mais carregado; permanece no repositório como histórico.",
+  "status": "SILM 0.15.5: consolidação — versão única conferida no build, fonte da entrada integrada com os textos enxutos, entrada do Jazz e Metais preservada, cache offline só com os recursos usados pela página, auditoria da arquitetura atual. Nenhum dado científico alterado (schema 8).",
   "hashDoZip": "Consulte o manifesto SHA-512 externo de entrega; este arquivo integra o ZIP imutável.",
-  "dataBuild": "2026-10-26",
+  "dataBuild": "2026-10-31",
   "structureModelVersion": 2,
   "electronModelVersion": 1,
   "propertiesModelVersion": 1,

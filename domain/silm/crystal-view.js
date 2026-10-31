@@ -95,7 +95,9 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const nodes=new Map();
  let focusId=null,frame=0,unitFraction=.1;
  /* 0.9.1: o símbolo acompanha o diâmetro da esfera na tela e some quando não cabe (a unidade continua nomeada por aria-label). */
- const sizeSymbols=()=>{const px=(R.size||300)*unitFraction*R.camera.zoom;stage.style.setProperty('--unit-px',px.toFixed(1)+'px');root.dataset.symbols=px<16?'hidden':'shown';root.dataset.labelsFit=px<20?'no':'yes';};
+ const sizeSymbols=()=>{const px=(R.size||300)*unitFraction*R.camera.zoom;stage.style.setProperty('--unit-px',px.toFixed(1)+'px');root.dataset.symbols=px<16?'hidden':'shown';root.dataset.labelsFit=px<20?'no':'yes';
+  // Alvo mínimo de 24 px na tela (com folga): margem transparente em coordenadas do palco, descontando zoom e profundidade.
+  const visual=(R.size||300)*unitFraction,zoom=R.camera.zoom||1;for(const node of nodes.values()){const ds=parseFloat(node.style.getPropertyValue('--depth-scale'))||1;node.style.setProperty('--hit-pad',Math.max(0,(25/(zoom*ds)-visual)/2).toFixed(2)+'px');}};
  const shortRole={corner:'V',face:'F',body:'C','base-vertex':'A','base-center':'A',interior:'B',outside:''};
  /* 0.10.x: fração de cada centro que pertence à célula (contagem do número efetivo). */
  const SHARE={BCC:{corner:'1/8',body:'1'},FCC:{corner:'1/8',face:'1/2'},HCP:{'base-vertex':'1/6','base-center':'1/2',interior:'1'}};
@@ -127,7 +129,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  function createNode(u){
   const node=U.element('button',null,'silm-unit silm-crystal-unit');node.type='button';node.dataset.unitId=u.id;node.tabIndex=-1;node.setAttribute('aria-describedby','silm-assembly-help');
   const core=U.element('span',element.symbol,'silm-unit-core');core.setAttribute('aria-hidden','true');const tag=U.element('span','','silm-site-label');tag.setAttribute('aria-hidden','true');
-  node.append(core,tag);units.append(node);return node;
+  // O corpo guarda o tamanho visual da esfera; o botão em volta cresce até 24 px na tela (alvo de toque, WCAG 2.5.8).
+  const body=U.element('span',null,'silm-unit-body');body.setAttribute('aria-hidden','true');body.append(core,tag);node.append(body);units.append(node);return node;
  }
  const projectionName=()=>RP.LABELS[rep2.projection()]||RP.LABELS.isometric;
  const orientationNow=()=>layout?.orientation||null;
@@ -267,7 +270,16 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  function unitAction(id){const current=model.state.structure?.crystallography?.representation.selectedUnitId;
   if(measureOptions?.pickActive()){focusId=id;measureOptions.onPick(id);return;}   // com instrumento ativo, o clique (ou Enter) escolhe o ponto
   actions.select(current===id?null:id);}
- scope.listen(units,'click',event=>{const node=event.target.closest('.silm-unit');if(!node)return;unitAction(node.dataset.unitId);});
+ /* Com as margens de toque, os botões podem se sobrepor: no clique de ponteiro vale a unidade de centro mais próximo
+    (a da frente quando o ponto cai em mais de uma esfera), como no toque central do renderizador. Enter e Espaço
+    (detail 0) usam a própria unidade em foco. */
+ function nearestUnit(event){
+  const p=R.clientToScene(event);let best=null;
+  for(const it of unitItems){const d=Math.hypot(it.x-p.x,it.y-p.y)-it.r,inside=d<=0;
+   if(!best||(inside&&(!best.inside||it.depth<best.depth))||(!inside&&!best.inside&&d<best.d))best={id:it.id,d,inside,depth:it.depth};}
+  return best?.id||null;
+ }
+ scope.listen(units,'click',event=>{const node=event.target.closest('.silm-unit');if(!node)return;unitAction((event.detail>0&&nearestUnit(event))||node.dataset.unitId);});
  scope.listen(units,'focusin',event=>{const node=event.target.closest('.silm-unit');if(node)focusId=node.dataset.unitId;});
  scope.listen(units,'keydown',event=>{
   const node=event.target.closest('.silm-unit');if(!node||event.altKey||event.ctrlKey||event.metaKey)return;const list=model.state.structure.units,k=list.findIndex(u=>u.id===node.dataset.unitId);
