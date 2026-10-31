@@ -1,7 +1,7 @@
 ## 0.15.5 — Consolidação
 
 - Mescladas a auditoria de paridade mecânica SIAB × SILM (correção da pinça cancelada, testes e CI), os textos enxutos com a matriz de paridade de telas e os testes de acessibilidade e de mecânicas no celular.
-- Os textos enxutos passaram para a fonte da entrada (`integracao/index.html`); antes, um build os desfaria. A entrada do Jazz e Metais pelo símbolo do SILM foi preservada.
+- Os textos enxutos passaram para a fonte da entrada (`integracao/index.html`); antes, um build os desfaria. Como pede o plano de paridade, a página inicial não tem atalho para o Clube de Jazz; o clube continua intacto.
 - Versão única: `VERSION` é a fonte e `scripts/check-version.cjs` confere pacote, lock, BUILD-INFO, manifesto, rótulos e cache.
 - Cache offline só com o que a página usa: 81 recursos em vez de 193.
 - Auditoria (`scripts/audit-silm.py`) reescrita para a arquitetura atual: Base SI travada, entrada gerada, um único shell, ordem do motor, cache, contratos científicos.

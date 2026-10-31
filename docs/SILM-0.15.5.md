@@ -13,7 +13,7 @@ Entre 19 e 30 de outubro, o SILM passou a rodar sobre a Base SI, com Roteiros, M
 - **Metadados desencontrados:** 0.15.4 no pacote, 0.15.2 no `BUILD-INFO.json` e no site.
 - **Ferramentas de verificação que ainda olhavam para a arquitetura antiga.**
 
-A 0.15.5 junta tudo, sem mexer no clube Jazz e Metais.
+A 0.15.5 junta tudo, sem mexer no clube Jazz e Metais (só o atalho da página inicial sai, como o plano de paridade pede).
 
 ## O que muda
 
@@ -22,7 +22,7 @@ A 0.15.5 junta tudo, sem mexer no clube Jazz e Metais.
    - `refactor/silm-copy-slim-20261030`: textos enxutos, Visão geral com os controles compactos e a matriz `docs/PARIDADE-SIAB-SILM.md`;
    - `feat/silm-0.16-acessibilidade-mobile`: axe em sete tamanhos e três temas, toque real no celular e CI.
 2. **Os textos enxutos agora estão na fonte da entrada.** A branch de textos editava só o `index.html`, que é gerado. Qualquer build desfaria os textos. Agora eles estão em `integracao/index.html`. A auditoria confere que o `index.html` é exatamente a saída do gerador.
-3. **Entrada do Jazz e Metais preservada.** A mesclagem dos textos removia o link do símbolo do SILM para o clube. Ele foi restaurado exatamente como estava, porque o clube fica fora desta etapa.
+3. **Página inicial sem atalho para o Clube de Jazz.** A seção 9 do plano operacional de paridade (`docs/PLANO-OPERACIONAL-PARIDADE-SIAB-SILM.md`) pede isso: o símbolo do SILM aparece no Início, mas não leva ao clube. O clube continua intacto em `jazz-club/`, inclusive no cache offline.
 4. **Versão única.**
    - `VERSION` é a fonte da versão. `scripts/check-version.cjs` confere pacote, lock, `BUILD-INFO.json`, o manifesto da Base no `adapter.js`, os rótulos da página e a versão do cache.
    - A conferência roda no fim do build e nos testes científicos.
