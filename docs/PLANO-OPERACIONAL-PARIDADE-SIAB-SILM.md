@@ -53,7 +53,8 @@ Desde a integração com a Base SI 0.9.17, a entrada carrega só a Base (travada
 | Oficina | `integracao/workspace-family.js`, `integracao/scientific-tools.js`, `integracao/metallic-experience.js`, `integracao/structure-comparison.js`, `integracao/workspace-family.css`, vistas em `domain/silm/*-view.js` |
 | Caderno, Manual, Professor | `integracao/unified-ui.js` (`notebook`, `manual`, `professor`), `domain/silm/manual.js` |
 | Relatórios | `integracao/route-ui.js` `report()` (ações, "Preparar relatório", documento em 10 seções; configuração em `report.config:<relatório>`), `integracao/unified-ui.js` `freeReport()` e `recordReport()`, campos em `domain/silm/route-session.js` |
-| Montagens prontas e Tour | Sem tela na entrada atual (lacunas das etapas 9 e 10) |
+| Montagens prontas | Sem tela na entrada atual (lacuna da etapa 9) |
+| Tour e ajuda | `integracao/adapter.js` `shell()` (tour, ajuda "?" das docas, aviso de primeira visita em `emptyState`), janelas `#silm-tour` e `#silm-help-dialog` |
 | Menu, preferências, PWA | Gaveta, janelas Tela inicial e Sobre em `integracao/index.html`; `integracao/adapter.js` `shell()` (tela inicial, Sobre, "Agora", acessibilidade direta, abertura); `integracao/base-core.js` (gerado da Base: `setupMenuReview`); `integracao/pwa.js`; `sw.js` (gerado por `scripts/build-sw.cjs`) |
 
 Evidências de cada etapa: `node scripts/parity-capture.cjs <ID> <rota-SIAB> <rota-SILM> --siab <pasta do SIAB>`. Testes de tela: `npm run test:parity` (`tests/parity-screens.cjs`, um módulo por etapa em `tests/parity/`).
@@ -77,6 +78,7 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 6 | Caderno | Caderno | Aceito em 31/10/2026 — registro na seção 8 |
 | 7 | Manual | Manual | Aceito em 31/10/2026 — registro na seção 8 |
 | 8 | Relatório | Relatório | Aceito em 31/10/2026 — registro na seção 8 |
+| 10 | Tour e ajuda contextual | Tour da oficina e ajuda dos painéis | Aceito em 31/10/2026 — registro na seção 8 |
 | 12 | Menu, preferências, projetor e aplicativo | Menu, preferências, projetor e aplicativo | Aceito em 31/10/2026 — registro na seção 8 (MENU-05 entra com as Etapas 9 e 10) |
 
 Depois das sete telas principais, percorrer os recursos secundários na ordem em que aparecem no menu do SIAB: **Montagens prontas → Tour da bancada → Área do Professor → apoio pedagógico e aula acessível → Preferências e Acessibilidade → Modo projetor → Aplicativo / instalação / Sobre**.
@@ -390,12 +392,12 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 
 **SILM:** `js/experience/tour.js`, `domain/silm/bootstrap.js` configuração `tour`, `js/experience/experience.js` `details()`, `about()`.
 
-- [ ] `TOUR-01` — Comparar abertura, passos, progresso, pular, voltar, próximo, fechar e foco.
-- [ ] `TOUR-02` — Garantir que cada etapa aponte para um controle real e visível na versão atual.
-- [ ] `TOUR-03` — Comparar primeira visita, opção de não iniciar e redução de movimento.
-- [ ] `TOUR-04` — Ligar cada ajuda contextual ao tópico correto do Manual.
-- [ ] `TOUR-05` — Conferir que o tour não bloqueie controles, painéis nem atividade em curso.
-- [ ] `TOUR-06` — Testar em desktop e celular com rolagem e painel aberto.
+- [x] `TOUR-01` — Comparar abertura, passos, progresso, pular, voltar, próximo, fechar e foco.
+- [x] `TOUR-02` — Garantir que cada etapa aponte para um controle real e visível na versão atual.
+- [x] `TOUR-03` — Comparar primeira visita, opção de não iniciar e redução de movimento.
+- [x] `TOUR-04` — Ligar cada ajuda contextual ao tópico correto do Manual.
+- [x] `TOUR-05` — Conferir que o tour não bloqueie controles, painéis nem atividade em curso.
+- [x] `TOUR-06` — Testar em desktop e celular com rolagem e painel aberto.
 
 ## ETAPA 11 — Área do Professor e apoio pedagógico
 
@@ -750,6 +752,25 @@ Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (ro
   test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
 Evidências: docs/evidence-parity/REPORT/
 Pendências: guia do Professor imprimível (TEST-PRINT) na Etapa 11; Firefox, Safari e aparelhos físicos
+Estado: [x]
+```
+
+### Registro — Etapa 10, Tour e ajuda contextual
+
+```text
+ID da etapa: TOUR (01 a 06)
+Tela SIAB: tour da bancada (js/ui/tour.js), aviso #boas-vindas, ajuda contextual SIAB.ajuda (acidosebases1.0.0@73848f0)
+Tela SILM: tour da oficina (#silm-tour), aviso de primeira visita no estado vazio, ajuda "?" das docas (#silm-help-dialog)
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 10, Tour e ajuda contextual" (PR da etapa)
+Viewport(s): 1366×768, 1024×768, 390×844, 320×640, 844×390
+Arquivos alterados: integracao/index.html (+ index.html gerado), integracao/adapter.js, integracao/unified-ui.js,
+  integracao/integration.css, domain/silm/manual.js (tópico "tour"), tests/parity/tour.cjs, tests/parity/shell.cjs,
+  tests/parity-screens.cjs
+Diferenças de domínio / N/A: Montagens prontas entram no aviso e em Recursos com a Etapa 9
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
+Evidências: docs/evidence-parity/TOUR/
+Pendências: Firefox, Safari e aparelhos físicos
 Estado: [x]
 ```
 

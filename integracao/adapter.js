@@ -98,7 +98,13 @@
   text.forEach((part,i)=>{if(i%2){const b=document.createElement('strong');b.textContent=part;p.append(b);}else p.append(part);});
   const row=document.createElement('div');row.className='si-empty-actions';
   for(const [label,fn,kind] of actions){const b=document.createElement('button');b.type='button';b.className='button '+(kind==='primary'?'primary':'outline');b.textContent=label;b.addEventListener('click',fn);row.append(b);}
-  box.append(h,p,row);$('silm-integration-scene').append(box);
+  box.append(h,p,row);
+  if(!storage.get('tour.seen',false)&&!routeUI?.session.open()){const note=document.createElement('div');note.className='silm-welcome';note.setAttribute('role','note');
+   const t=document.createElement('p'),strong=document.createElement('strong');strong.textContent='Primeira vez na Oficina?';t.append(strong,' O tour mostra cada parte da oficina. Consulte o Manual e explore Roteiros e Missões.');
+   const acts=document.createElement('div');acts.className='silm-welcome-actions';const tour=document.createElement('button');tour.type='button';tour.className='button primary';tour.textContent='Fazer o tour';tour.dataset.tourStart='';
+   const manual=document.createElement('a');manual.className='button outline';manual.href='#/manual';manual.textContent='Abrir o manual';const later=document.createElement('button');later.type='button';later.className='button outline';later.textContent='Agora não';
+   later.addEventListener('click',()=>{storage.set('tour.seen',true);note.remove();box.querySelector('.si-empty-actions .button')?.focus();});acts.append(tour,manual,later);note.append(t,acts);box.append(note);}
+  $('silm-integration-scene').append(box);
  }
  function openLeft(tab){const open=document.querySelector('[data-open-dock="montagem"]');if(open&&open.getAttribute('aria-expanded')!=='true')open.click();requestAnimationFrame(()=>document.querySelector('[data-left-tab="'+tab+'"]:not([hidden])')?.click());}
  function renderScene(){
@@ -230,6 +236,8 @@
   // Janelas nativas (<dialog>): Escape fecha e o foco volta ao controle de origem.
   document.addEventListener('click',event=>{const close=event.target.closest('[data-close-dialog]');if(close)close.closest('dialog')?.close();});
   const openDialog=dialog=>{B.closeNavigationDrawer(true);if(!dialog.open)dialog.showModal();};
+  // Escape fecha a janela aberta do SILM (tour, ajuda, tela inicial, Sobre) antes de a Base usar a tecla para fechar uma doca.
+  window.addEventListener('keydown',event=>{if(event.key!=='Escape')return;const open=[...document.querySelectorAll('dialog.silm-dialog[open],dialog.silm-tour[open]')].pop();if(!open)return;event.preventDefault();event.stopImmediatePropagation();open.close();},true);
   // Tela inicial: Página inicial ou Oficina dos Metais; "Redefinir preferência" volta a perguntar na próxima abertura.
   const syncStartup=()=>{const choice=startupChoice();for(const b of startup.querySelectorAll('[data-startup]:not([data-startup="reset"])'))b.setAttribute('aria-pressed',String(b.dataset.startup===choice));};
   const openStartup=()=>{syncStartup();openDialog(startup);$('silm-startup-title').focus();};
@@ -245,6 +253,56 @@
     if($('silm-intro-v3')){setTimeout(invite,150);return;}openStartup();};
    setTimeout(invite,250);
   }
+  // Tour da oficina (Etapa 10): coachmark como no SIAB, só na oficina livre; cada passo aponta um controle real e visível.
+  const TOUR=[
+   {title:'Prepare a oficina',text:'Abra Montagem → Preparo para escolher o metal e usar Iniciar investigação. A Tabela periódica mostra os metais disponíveis.',left:'preparo',target:()=>$('si-dock-left'),mobile:'[data-open-dock="montagem"]'},
+   {title:'Escolha um módulo',text:'Explorar, Medir e Calcular são independentes. Escolha em Montagem → Módulo, pelo objetivo da investigação.',left:'modulo',target:()=>$('si-dock-left'),mobile:'[data-open-dock="montagem"]'},
+   {title:'Monte a estrutura',text:'Em Explorar, use Adicionar unidade e Organizar estrutura para dispor as unidades na estrutura de referência. Desfazer recupera o estado anterior.',left:'preparo',target:()=>$('silm-group-structure')?.closest('section,.silm-dock-group')||$('silm-add'),mobile:'[data-open-dock="montagem"]'},
+   {title:'Observe',text:'A cena mostra a montagem. Girar, aproximar ou trocar a vista não altera medições nem cálculos.',target:()=>$('si-stage'),mobile:'#si-stage'},
+   {title:'Investigue e consulte os dados',text:'Em Ver, observe, meça e analise conforme o módulo. Em Dados, consulte os valores, as fontes e o relatório.',right:'ver',target:()=>$('si-dock-right'),mobile:'[data-open-dock="ver"]'}];
+  const tourDialog=$('silm-tour'),ring=tourDialog.querySelector('.si-coach-ring'),card=tourDialog.querySelector('.si-coach-card');let step=0,opener=null;
+  const sheets=()=>matchMedia('(max-width: 900px)').matches;
+  const shown=el=>!!el&&el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden';
+  const closeDocks=()=>{for(const side of ['left','right']){const pane=$('si-dock-'+side);if(pane&&!pane.hidden)document.querySelector('[data-close-dock="'+side+'"]')?.click();}};
+  const tourTarget=()=>{const s=TOUR[step],el=sheets()?document.querySelector(s.mobile):s.target();return shown(el)?el:null;};
+  const placeTour=()=>{if(!tourDialog.open)return;const el=tourTarget(),vw=innerWidth,vh=innerHeight,M=12,c=card.getBoundingClientRect();
+   if(!el){ring.hidden=true;card.style.left=Math.max(M,(vw-c.width)/2)+'px';card.style.top=Math.max(M,(vh-c.height)/2)+'px';return;}
+   const r=el.getBoundingClientRect(),top=Math.max(r.top-6,4),bottom=Math.min(r.bottom+6,vh-4),left=Math.max(r.left-6,4),right=Math.min(r.right+6,vw-4);ring.hidden=false;Object.assign(ring.style,{left:left+'px',top:top+'px',width:(right-left)+'px',height:(bottom-top)+'px'});
+   const clampX=x=>Math.min(Math.max(x,M),vw-c.width-M),clampY=y=>Math.min(Math.max(y,M),vh-c.height-M);let x,y;
+   if(bottom+M+c.height<=vh-M){x=clampX(r.left+r.width/2-c.width/2);y=bottom+M;}else if(top-M-c.height>=M){x=clampX(r.left+r.width/2-c.width/2);y=top-M-c.height;}
+   else if(right+M+c.width<=vw-M){x=right+M;y=clampY(r.top);}else if(left-M-c.width>=M){x=left-M-c.width;y=clampY(r.top);}else{x=clampX((vw-c.width)/2);y=vh-c.height-M;}
+   card.style.left=x+'px';card.style.top=y+'px';};
+  const showStep=n=>{step=n;const s=TOUR[n];closeDocks();
+   if(!sheets()){if(s.left)openLeft(s.left);if(s.right){const open=document.querySelector('[data-open-dock="'+s.right+'"]');if(open?.getAttribute('aria-expanded')!=='true')open?.click();}}
+   $('silm-tour-step').textContent='PASSO '+(n+1)+' DE '+TOUR.length;$('silm-tour-title').textContent=s.title;$('silm-tour-text').textContent=s.text;
+   $('silm-tour-dots').replaceChildren(...TOUR.map((_,i)=>{const d=document.createElement('span');if(i===n)d.className='current';return d;}));
+   $('silm-tour-back').hidden=n===0;$('silm-tour-next').textContent=n===TOUR.length-1?'Concluir':'Próximo';
+   requestAnimationFrame(()=>requestAnimationFrame(()=>{tourTarget()?.scrollIntoView({block:'nearest'});placeTour();}));$('silm-tour-next').focus({preventScroll:true});};
+  const launchTour=()=>{if(tourDialog.open)return;opener=document.activeElement;tourDialog.showModal();showStep(0);};
+  const startTour=()=>{B.closeNavigationDrawer(false);document.querySelector('dialog.silm-dialog[open]')?.close();
+   if(routeUI.session.open()){say('O tour está disponível na oficina livre. Encerre a atividade para fazê-lo.','info');return;}
+   if(B.currentRoute(location.hash)==='ambiente'){requestAnimationFrame(launchTour);return;}
+   window.addEventListener('hashchange',()=>requestAnimationFrame(()=>requestAnimationFrame(launchTour)),{once:true});location.hash='#/ambiente';};
+  document.addEventListener('click',event=>{if(event.target.closest('[data-tour-start]')){event.preventDefault();startTour();}});
+  $('silm-tour-next').addEventListener('click',()=>{if(step<TOUR.length-1)showStep(step+1);else tourDialog.close();});
+  $('silm-tour-back').addEventListener('click',()=>showStep(Math.max(0,step-1)));$('silm-tour-skip').addEventListener('click',()=>tourDialog.close());
+  tourDialog.addEventListener('close',()=>{closeDocks();storage.set('tour.seen',true);document.querySelector('.silm-welcome')?.remove();
+   requestAnimationFrame(()=>{const back=opener?.isConnected&&shown(opener)&&!opener.closest('#sidebar')?opener:opener?.closest('#sidebar')?$('nav-toggle'):document.querySelector('[data-open-dock="montagem"]');back?.focus({preventScroll:true});opener=null;});});
+  window.addEventListener('resize',placeTour);document.addEventListener('scroll',placeTour,true);
+  // Ajuda "?" das docas: o tópico do Manual que corresponde ao que o painel mostra agora (como as ajudas do SIAB).
+  const VIEWER_TOPICS=[['Estrutura','vista'],['Elétrons','eletrons-deslocalizados'],['Propriedades','propriedades-metalicas'],['Instrumentos','medir'],['Medir','medir'],['Cálculos','calcular'],['Calcular','calcular']];
+  const dockTopic=side=>{if(side==='left'){const tab=document.querySelector('[data-left-tab][aria-pressed="true"]')?.dataset.leftTab;return {resumo:'interface',preparo:'selecionar-metal',objetos:'montagem',missao:'atividades',modulo:{explorar:'explorar',medir:'medir',calcular:'calcular'}[model.state.module.active]||'interface'}[tab]||'montagem';}
+   if(document.querySelector('[data-open-dock="ver"]')?.getAttribute('aria-expanded')==='true'&&shown($('si-dock-viewer-back'))){const title=$('si-right-title').textContent;return VIEWER_TOPICS.find(([k])=>title.includes(k))?.[1]||'vista';}
+   return 'interface';};
+  const helpDialog=$('silm-help-dialog');
+  document.addEventListener('click',event=>{const trigger=event.target.closest('[data-dock-help]');if(!trigger)return;const topic=S.manual.topics.find(t=>t.id===dockTopic(trigger.dataset.dockHelp))||S.manual.topics.find(t=>t.id==='interface');
+   $('silm-help-title').textContent=topic.title;const body=$('silm-help-content');body.replaceChildren();const lead=document.createElement('p');lead.className='silm-lead';lead.textContent=topic.summary;body.append(lead);
+   if(topic.purpose||topic.content){const more=document.createElement('p');more.textContent=topic.purpose||topic.content;body.append(more);}
+   if(topic.steps?.length){const ol=document.createElement('ol');for(const s of topic.steps){const li=document.createElement('li');li.textContent=s;ol.append(li);}body.append(ol);}
+   $('silm-help-manual').href='#/manual?topico='+encodeURIComponent(topic.id);if(!helpDialog.open)helpDialog.showModal();});
+  // Visitar o Manual também conta como "já viu" (SIAB): o aviso de primeira visita não volta.
+  const manualSeen=()=>{if(B.currentRoute(location.hash)!=='manual')return;storage.set('tour.seen',true);document.querySelector('.silm-welcome')?.remove();};
+  window.addEventListener('si-route-changed',manualSeen);manualSeen();
   // Sobre: a mesma informação na janela do Menu e na página #/sobre.
   $('si-about-open').addEventListener('click',()=>openDialog(about));
   const page=$('silm-about-page');if(page){const body=about.querySelector('.silm-about-body').cloneNode(true);for(const a of body.querySelectorAll('[data-close-dialog]'))a.removeAttribute('data-close-dialog');page.append(body);}
