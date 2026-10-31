@@ -1,0 +1,113 @@
+# Verificação da construção das estruturas e da interação com o modelo
+
+**Data:** 31/10/2026 · **Versão:** SILM 0.15.5 · **Testes permanentes:** `tests/structure-audit.cjs` (em `npm run test:scientific`) e `tests/model-interaction.cjs` (em `npm run test:comparison`).
+
+## 1. O que foi verificado
+
+**No motor científico (sem a interface).** Para cada metal com estrutura de referência visualizável, a estrutura que o SILM gera foi conferida contra a cristalografia, sítio por sítio:
+
+- **vizinhança de todos os sítios da célula**, com valores analíticos:
+  - CCC: 8 vizinhos a √3·a/2; a camada seguinte fica a a;
+  - CFC: 12 vizinhos a a/√2; a camada seguinte fica a a;
+  - HC: 6 vizinhos a a e 6 a √(a²/3 + c²/4).
+- **número efetivo de átomos** calculado pela posição de cada sítio desenhado: vértice 1/8, face 1/2, corpo 1; no HC, vértice da base 1/6, centro da base 1/2, interior 1.
+- **instrumentos do Medir:** parâmetro de rede a (e c no HC), coordenação e distância entre vizinhos.
+- **fórmulas do Calcular**, comparadas com um cálculo independente: volume, raio, empacotamento e densidade teórica.
+- **proveniência:** fonte da estrutura existente, todos os parâmetros com a mesma fonte, temperatura de referência registrada.
+
+**Na interface (navegador).** Cada um dos 57 metais disponíveis foi escolhido, iniciado e organizado como o estudante faria. Depois, a estrutura foi vista em 2D e em 3D, e foram registrados os erros de página.
+
+## 2. Resultado
+
+- **48 estruturas visualizáveis** (13 CCC, 14 CFC, 21 HC): **nenhuma divergência**. As distâncias, a coordenação, os átomos efetivos, as medidas e os cálculos coincidem com os valores analíticos dentro da precisão numérica. Na interface, todas foram montadas com o tipo e o número de sítios corretos, em 2D e em 3D, sem erros.
+- **9 metais com estrutura fora de CCC, CFC e HC** continuam bloqueados para a organização cristalina, com o motivo e a estrutura registrada. A montagem livre continua disponível para eles.
+
+A tabela abaixo foi gerada pela auditoria. A densidade e o empacotamento são **calculados pelo SILM** a partir dos dados tabelados. Não são medidas.
+
+| Z | Metal | Estrutura | a (Å) | c (Å) | c/a | Vizinho mais próximo (Å) | Coordenação | Empacotamento | Densidade teórica (g/cm³) | Temperatura | Fonte |
+|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|
+| 3 | Lítio (Li) | CCC | 3,5093 |  |  | 3,0391 | 8 | 0,6802 | 0,535 | 293.0 K | cod-9008542 |
+| 4 | Berílio (Be) | HC | 2,2858 | 3,5843 | 1,568 | 2,2256 | 12 | 0,7118 | 1,845 | 298.15 K | cod-9012008 |
+| 11 | Sódio (Na) | CCC | 4,2906 |  |  | 3,7158 | 8 | 0,6802 | 0,967 | 293.0 K | cod-9008545 |
+| 12 | Magnésio (Mg) | HC | 3,2093 | 5,2103 | 1,624 | 3,1969 | 12 | 0,7362 | 1,737 | 298.15 K | cod-9012001 |
+| 13 | Alumínio (Al) | CFC | 4,0496 |  |  | 2,8635 | 12 | 0,7405 | 2,699 | 298.15 K | cod-9012002 |
+| 20 | Cálcio (Ca) | CFC | 5,6010 |  |  | 3,9605 | 12 | 0,7405 | 1,515 | 298.15 K | cod-9012731 |
+| 21 | Escândio (Sc) | HC | 3,3090 | 5,2733 | 1,594 | 3,2560 | 12 | 0,7229 | 2,986 | Ambiente | cod-9010985 |
+| 22 | Titânio (Ti) | HC | 2,9508 | 4,6855 | 1,588 | 2,8967 | 12 | 0,7204 | 4,499 | Ambiente | webelements-ti |
+| 23 | Vanádio (V) | CCC | 3,0241 |  |  | 2,6189 | 8 | 0,6802 | 6,117 | 298.15 K | cod-9012770 |
+| 24 | Cromo (Cr) | CCC | 2,8839 |  |  | 2,4975 | 8 | 0,6802 | 7,200 | Ambiente | cod-5000220 |
+| 26 | Ferro (Fe) | CCC | 2,8654 |  |  | 2,4815 | 8 | 0,6802 | 7,883 | 298.0 K | cod-9006587 |
+| 27 | Cobalto (Co) | HC | 2,5071 | 4,0695 | 1,623 | 2,4971 | 12 | 0,7361 | 8,835 | Ambiente | webelements-co |
+| 28 | Níquel (Ni) | CFC | 3,5240 |  |  | 2,4918 | 12 | 0,7405 | 8,908 | 293.0 K | cod-9013024 |
+| 29 | Cobre (Cu) | CFC | 3,6150 |  |  | 2,5562 | 12 | 0,7405 | 8,935 | 25 °C (298,15 K) | nbs-539-v1 |
+| 30 | Zinco (Zn) | HC | 2,6650 | 4,9470 | 1,856 | 2,6650 | 12 | 0,6514 | 7,136 | 25 °C (298,15 K) | nbs-539-v1 |
+| 37 | Rubídio (Rb) | CCC | 5,5850 |  |  | 4,8368 | 8 | 0,6802 | 1,629 | Ambiente | webelements-rb |
+| 38 | Estrôncio (Sr) | CFC | 6,0760 |  |  | 4,2964 | 12 | 0,7405 | 2,595 | 298.15 K | cod-9012726 |
+| 39 | Ítrio (Y) | HC | 3,6474 | 5,7306 | 1,571 | 3,5559 | 12 | 0,7132 | 4,472 | Ambiente | cod-9010984 |
+| 40 | Zircônio (Zr) | HC | 3,2320 | 5,1470 | 1,593 | 3,1788 | 12 | 0,7224 | 6,507 | Ambiente | webelements-zr |
+| 41 | Nióbio (Nb) | CCC | 3,3004 |  |  | 2,8582 | 8 | 0,6802 | 8,583 | Ambiente | webelements-nb |
+| 42 | Molibdênio (Mo) | CCC | 3,1472 |  |  | 2,7256 | 8 | 0,6802 | 10,222 | 25 °C (298,15 K) | nbs-539-v1 |
+| 44 | Rutênio (Ru) | HC | 2,7059 | 4,2815 | 1,582 | 2,6502 | 12 | 0,7180 | 12,364 | Ambiente | webelements-ru |
+| 45 | Ródio (Rh) | CFC | 3,8034 |  |  | 2,6894 | 12 | 0,7405 | 12,423 | Ambiente | webelements-rh |
+| 46 | Paládio (Pd) | CFC | 3,8898 |  |  | 2,7505 | 12 | 0,7405 | 12,010 | 25 °C (298,15 K) | nbs-539-v1 |
+| 47 | Prata (Ag) | CFC | 4,0862 |  |  | 2,8894 | 12 | 0,7405 | 10,501 | 25 °C (298,15 K) | nbs-539-v1 |
+| 48 | Cádmio (Cd) | HC | 2,9789 | 5,6177 | 1,886 | 2,9789 | 12 | 0,6412 | 8,648 | Ambiente | cod-9008490 |
+| 55 | Césio (Cs) | CCC | 6,1410 |  |  | 5,3183 | 8 | 0,6802 | 1,906 | Ambiente | webelements-cs |
+| 56 | Bário (Ba) | CCC | 5,0130 |  |  | 4,3414 | 8 | 0,6802 | 3,620 | 298.15 K | cod-9012729 |
+| 58 | Cério (Ce) | CFC | 5,1612 |  |  | 3,6495 | 12 | 0,7405 | 6,769 | Ambiente | cod-9010987 |
+| 63 | Európio (Eu) | CCC | 4,6060 |  |  | 3,9889 | 8 | 0,6802 | 5,165 | Ambiente | cod-9010990 |
+| 64 | Gadolínio (Gd) | HC | 3,6360 | 5,7826 | 1,590 | 3,5730 | 12 | 0,7215 | 7,888 | Ambiente | cod-9010991 |
+| 65 | Térbio (Tb) | HC | 3,6010 | 5,6936 | 1,581 | 3,5251 | 12 | 0,7175 | 8,255 | Ambiente | cod-9010992 |
+| 66 | Disprósio (Dy) | HC | 3,5903 | 5,6475 | 1,573 | 3,5029 | 12 | 0,7139 | 8,560 | Ambiente | cod-9010993 |
+| 67 | Hólmio (Ho) | HC | 3,5773 | 5,6158 | 1,570 | 3,4857 | 12 | 0,7126 | 8,801 | Ambiente | cod-9010994 |
+| 68 | Érbio (Er) | HC | 3,5588 | 5,5874 | 1,570 | 3,4679 | 12 | 0,7127 | 9,064 | Ambiente | cod-9010995 |
+| 69 | Túlio (Tm) | HC | 3,5375 | 5,5546 | 1,570 | 3,4474 | 12 | 0,7127 | 9,320 | Ambiente | cod-9010996 |
+| 70 | Itérbio (Yb) | CFC | 5,4862 |  |  | 3,8793 | 12 | 0,7405 | 6,961 | Ambiente | cod-9010997 |
+| 71 | Lutécio (Lu) | HC | 3,5031 | 5,5509 | 1,585 | 3,4342 | 12 | 0,7190 | 9,850 | Ambiente | cod-9010998 |
+| 72 | Háfnio (Hf) | HC | 3,1964 | 5,0511 | 1,580 | 3,1279 | 12 | 0,7171 | 13,263 | Ambiente | webelements-hf |
+| 73 | Tântalo (Ta) | CCC | 3,3058 |  |  | 2,8629 | 8 | 0,6802 | 16,634 | 25 °C (298,15 K) | nbs-539-v1 |
+| 74 | Tungstênio (W) | CCC | 3,1648 |  |  | 2,7408 | 8 | 0,6802 | 19,261 | 298.0 K | cod-9006486 |
+| 75 | Rênio (Re) | HC | 2,7610 | 4,4560 | 1,614 | 2,7395 | 12 | 0,7319 | 21,022 | Ambiente | webelements-re |
+| 76 | Ósmio (Os) | HC | 2,7344 | 4,3173 | 1,579 | 2,6743 | 12 | 0,7165 | 22,599 | Ambiente | webelements-os |
+| 77 | Irídio (Ir) | CFC | 3,8390 |  |  | 2,7146 | 12 | 0,7405 | 22,566 | Ambiente | webelements-ir |
+| 78 | Platina (Pt) | CFC | 3,9231 |  |  | 2,7741 | 12 | 0,7405 | 21,461 | 25 °C (298,15 K) | nbs-539-v1 |
+| 79 | Ouro (Au) | CFC | 4,0786 |  |  | 2,8840 | 12 | 0,7405 | 19,283 | 25 °C (298,15 K) | nbs-539-v1 |
+| 81 | Tálio (Tl) | HC | 3,4560 | 5,5250 | 1,599 | 3,4077 | 12 | 0,7251 | 11,877 | 297.0 K | cod-9008519 |
+| 82 | Chumbo (Pb) | CFC | 4,9500 |  |  | 3,5002 | 12 | 0,7405 | 11,338 | 298.15 K | cod-9012004 |
+
+
+| Metal | Estrutura registrada | Motivo |
+|---|---|---|
+| Manganês (Mn) | Cúbica complexa (α-Mn) | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
+| Estanho (Sn) | Tetragonal | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
+| Lantânio (La) | Dupla hexagonal compacta | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
+| Praseodímio (Pr) | Dupla hexagonal compacta | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
+| Neodímio (Nd) | Dupla hexagonal compacta | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
+| Samário (Sm) | Romboédrica | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
+| Bismuto (Bi) | Romboédrica | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
+| Netúnio (Np) | Ortorrômbica | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
+| Plutônio (Pu) | Monoclínica | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
+
+
+## 3. Achados de dados (exigem revisão científica)
+
+São achados para a revisão científica que está registrada como próxima etapa de "maior cuidado". Nenhum dado foi alterado nesta verificação.
+
+1. **Rubídio (Rb).** O parâmetro a = 5,585 Å (WebElements) dá densidade teórica de 1,629 g/cm³. É cerca de 6 % acima do valor normalmente citado para o rubídio à temperatura ambiente (≈ 1,53 g/cm³), o que sugere um parâmetro medido a baixa temperatura. A proposta já registrada é substituí-lo pela ficha COD 9012879, depois de conferir a fonte primária.
+2. **Fonte secundária (WebElements) em 12 metais:** titânio, cobalto, rubídio, zircônio, nióbio, rutênio, ródio, césio, háfnio, rênio, ósmio e irídio. As estruturas são coerentes com o modelo e as densidades teóricas têm ordem de grandeza plausível. Mesmo assim, a proposta é substituir cada fonte por uma ficha primária (COD/AMCSD ou NBS), conferindo os parâmetros e a temperatura.
+3. **Temperatura de referência.** Lítio, sódio e níquel têm parâmetros a 293 K; os demais, a 298 K ou com a convenção "ambiente". A diferença está registrada e é exibida, mas não é corrigida.
+
+## 4. Refinamentos da interação com o modelo (feitos nesta rodada)
+
+| Antes | Agora |
+|---|---|
+| Num metal com estrutura fora de CCC/CFC/HC, "Organizar estrutura" ficava cinza; o motivo aparecia em letra pequena embaixo da cena | O motivo fica junto do botão, na cena e em Montagem → Preparo: "Organizar indisponível para manganês: … (Cúbica complexa (α-Mn)). A montagem livre continua disponível.", com o link "Por que uma opção não aparece" |
+| Uma seleção inválida no Medir mostrava um código interno: "Seleção inválida para este instrumento: NOT_LATTICE_VECTOR" | A mensagem explica o que escolher: "Esses centros não ocupam posições equivalentes da rede (por exemplo, um vértice e um centro). Para o parâmetro de rede, escolha dois centros equivalentes ligados por uma aresta da célula" (no HC, também como medir a e c) |
+| Falhas no Calcular mostravam códigos ("Não foi possível calcular: RESULT_INVALID") | Mensagens explicam o problema e o que conferir |
+| Na densidade teórica (ou no empacotamento), o volume V só podia ser digitado, sem dizer que ele é calculado antes | "Ainda não há volume da célula calculado nesta investigação. Calcule antes “Volume da célula unitária” ou informe o valor", com o botão "Ir para “Volume da célula unitária”". Depois do volume, ele aparece como "Calculado pelo SILM" e a dica some |
+| "1 unidades", "Selecione 2 ponto(s)" | "1 unidade", "Selecione 2 pontos" |
+
+## 5. Próximos passos sugeridos
+
+- Revisão científica das fontes (itens 1 e 2 da seção 3), com conferência das fichas primárias.
+- Visualização de estruturas além de CCC/CFC/HC (α-Mn, β-Sn, dhcp, romboédricas), se houver interesse didático. Exige modelos novos e validação, e não deve ser feita por aproximação a CCC/CFC/HC.

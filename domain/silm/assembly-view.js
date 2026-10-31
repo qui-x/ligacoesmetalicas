@@ -54,7 +54,8 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  const cameraHelp=U.element('p','Vista: + e − aproximam e afastam, F enquadra a área de montagem, C centraliza, 0 restaura e Shift + setas deslocam (com a unidade selecionada em foco, Shift + seta é o passo fino). Arraste o fundo para deslocar; no celular, use dois dedos para aproximar. A vista não muda as posições.','silm-camera-help');
  const feedback=U.element('p','','silm-assembly-feedback');feedback.id='silm-assembly-feedback';
  const crystalReason=U.element('p','','silm-assembly-reason');crystalReason.id='silm-assembly-crystal-reason';
- footer.append(crystalReason,feedback);root.append(bar,area,footer);host.append(root);
+ // O motivo de "Organizar estrutura" estar indisponível fica junto do botão (na faixa da cena), não no rodapé.
+ bar.append(crystalReason);footer.append(feedback);root.append(bar,area,footer);host.append(root);
  const nodes=new Map();let selected=null,focusId=null,serial=0,drag=null,keyMove=null,suppressUntil=0,lastRegion=new Map();
  const units=()=>model.state.structure?.units||[];
  /* ---------- renderizador comum ---------- */
@@ -75,7 +76,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  if(electronControls)footer.prepend(electronControls.root);
  // 0.7.x: na montagem livre, somente a condutividade elétrica (observação básica sobre os elétrons).
  const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:layer}),propertyHost=U.element('div',null,'silm-property-host');R.layer('properties',overlay.root);
- footer.insertBefore(propertyHost,crystalReason);const propertyControls=propertyOptions?.controls?.(propertyHost,scope)||null;
+ footer.insertBefore(propertyHost,feedback);const propertyControls=propertyOptions?.controls?.(propertyHost,scope)||null;
  SILM.createSceneNotes(footer,{scope,items:[instructions,cameraHelp,electronLegend,assist,kind]});
  const known=new Set();let drawn=false;
  const freeSpacing=list=>{if(list.length<2)return .12;const nn=list.map(u=>Math.min(...list.filter(v=>v!==u).map(v=>A.distance(u.position,v.position)))).sort((a,b)=>a-b);return Math.max(.1,Math.min(.2,nn[Math.floor(nn.length/2)]));};
@@ -115,7 +116,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
   empty.hidden=n>0;assist.hidden=!s.assistance.enabled;root.dataset.status=s.status;
   if(!editable)stage.setAttribute('aria-label','Montagem de '+name+' com '+n+' '+(n===1?'unidade':'unidades')+'. Representação didática; a edição está disponível em Explorar.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica.':'')+(fieldOn?' Campo elétrico aplicado: a representação eletrônica apresenta deslocamento coletivo orientado.':''));
   add?.setAttribute('aria-disabled',String(n>=C.maxUnits));undo?.setAttribute('aria-disabled',String(!model.canUndo));if(undo){const last=describeLast();undo.title=last?'Desfazer: '+last:'Nada para desfazer';}
-  if(organize){const o=organize.state();crystalReason.textContent=o.reason||'';crystalReason.hidden=!o.reason;if(organizeButton){organizeButton.setAttribute('aria-disabled',String(o.disabled));organizeButton.title=o.reason||o.title||'';}}
+  if(organize){const o=organize.state();crystalReason.textContent=o.reason||'';if(o.reason&&o.more){const a=U.element('a',o.more.label);a.href=o.more.href;crystalReason.append(' ',a);}crystalReason.hidden=!o.reason;if(organizeButton){organizeButton.setAttribute('aria-disabled',String(o.disabled));organizeButton.title=o.reason||o.title||'';}}
  }
  /* Anel de seleção na camada própria (acima da estrutura, tamanho de tela constante). */
  function paintSelection(){const u=selected&&units().find(x=>x.id===selected);if(!u){selectionRing.update([]);return;}const p=drag?.id===u.id?drag.position:keyMove?.id===u.id?keyMove.position:u.position;selectionRing.update([{x:p.x,y:p.y,r:C.minDistance*.42}]);}
