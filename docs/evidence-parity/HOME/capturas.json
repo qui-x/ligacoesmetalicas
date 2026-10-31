@@ -1,0 +1,76 @@
+{
+ "id": "HOME",
+ "siab": "qui-x/acidobase acidosebases1.0.0@73848f0",
+ "captures": [
+  {
+   "app": "siab",
+   "viewport": "1366x768",
+   "route": "#/inicio",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "1366x768",
+   "route": "#/inicio",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "viewport": "1024x768",
+   "route": "#/inicio",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "1024x768",
+   "route": "#/inicio",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "viewport": "390x844",
+   "route": "#/inicio",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "390x844",
+   "route": "#/inicio",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "viewport": "320x640",
+   "route": "#/inicio",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "320x640",
+   "route": "#/inicio",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "viewport": "844x390",
+   "route": "#/inicio",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "844x390",
+   "route": "#/inicio",
+   "horizontalOverflow": 0,
+   "errors": []
+  }
+ ]
+}

@@ -1,3 +1,19 @@
+## Em desenvolvimento — Paridade SIAB, Etapa 1: Início
+
+- O Início segue a hierarquia do SIAB:
+  - sobretítulo com o nome completo;
+  - título curto com destaque ("A arquitetura dos metais");
+  - lema e símbolo;
+  - o mesmo recuo acima do hero.
+- Cartões: etiqueta e setas à direita; ícones desenhados no lugar de caracteres; contagens em peso normal; "Entrar na oficina".
+- Botão Acessibilidade do cabeçalho sem o fundo cinza padrão do navegador.
+- Foco como no SIAB: na abertura, o primeiro Tab é "Ir para o conteúdo". Ao trocar de tela, a página volta ao topo e o foco vai ao título.
+- A marca leva sempre ao Início. Durante uma missão ou um roteiro, o Início agora abre e mostra "Retomar atividade" (antes o cartão de retomada nunca aparecia). As outras telas voltam à atividade com um aviso.
+- Resumo da investigação no singular quando há uma unidade.
+- Novo teste de tela `npm run test:parity` (TEST-HOME) nos dois fluxos de CI.
+- Capturas SIAB × SILM em cinco tamanhos: `scripts/parity-capture.cjs` e `docs/evidence-parity/HOME/`.
+- Nenhum dado científico alterado (schema 8).
+
 ## 0.15.5 — Consolidação
 
 - Mescladas a auditoria de paridade mecânica SIAB × SILM (correção da pinça cancelada, testes e CI), os textos enxutos com a matriz de paridade de telas e os testes de acessibilidade e de mecânicas no celular.

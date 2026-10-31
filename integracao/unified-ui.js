@@ -23,7 +23,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,say})=>{
   if(c){$('si-home-resume-title').textContent=session.route().title;$('si-home-resume-meta').textContent=c.status==='completed'?'Concluído':'Investigação em andamento';$('si-home-resume-link').href='#/'+(c.type==='mission'?'missoes':'roteiros')+'?item='+c.id;}
   const e=model.state.metal,n=model.state.structure?.units.length||0;
   $('si-home-scene-summary').hidden=!e;
-  $('si-home-scene-summary').textContent=e?S.data.get(e.atomicNumber).name+' · '+n+' unidades salvas':'';
+  $('si-home-scene-summary').textContent=e?S.data.get(e.atomicNumber).name+' · '+n+' '+(n===1?'unidade salva':'unidades salvas'):'';
  }
  function notebookScene(snapshot=model.snapshot()){
   const e=snapshot?.metal?S.data.get(snapshot.metal.atomicNumber):null,id=e?'silm-metal-'+e.atomicNumber:null;

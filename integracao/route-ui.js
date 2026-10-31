@@ -9,7 +9,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  const noun=()=>isMission()?'Missão':'Roteiro';
  const canBuild=()=>isMission()&&session.allows('structure');
  const prefix=()=>isMission()?'mission':'route';
- function sync(){const c=session.context(),active=!!c;document.body.classList.toggle('silm-guided',active);const href=active?url(c.id):'#/inicio';document.querySelector('.si-global-brand').href=href;const back=$('si-return-activity');back.hidden=!active;back.href=href;back.textContent=noun()+' em andamento';B.closeNavigationDrawer(false);window.dispatchEvent(new CustomEvent('si-module-change'));schedule();}
+ function sync(){const c=session.context(),active=!!c;document.body.classList.toggle('silm-guided',active);const href=active?url(c.id):'#/inicio';const back=$('si-return-activity');back.hidden=!active;back.href=href;back.textContent=noun()+' em andamento';B.closeNavigationDrawer(false);window.dispatchEvent(new CustomEvent('si-module-change'));schedule();}
  function complete(){
   const before=session.context(),r=session.complete();let message=r.message,kind=r.ok?'success':'warning';
   if(r.ok&&before){const activity=session.report(before.id),saved=unified.recordActivity(session.route(),activity);if(saved==='added')message+=' Conclusão registrada no Caderno.';else if(saved==='error'){message+=' Não foi possível guardar a referência no Caderno; registre-a manualmente.';kind='warning';}}
@@ -58,7 +58,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  function render(){
   session.observe(B.currentRoute(location.hash)==='ambiente');
   const context=session.context();document.body.classList.toggle('silm-guided',!!context);$('si-return-activity').hidden=!context;
-  if(context){$('si-return-activity').href=url(context.id);document.querySelector('.si-global-brand').href=url(context.id);}
+  if(context)$('si-return-activity').href=url(context.id);
   if(B.currentRoute(location.hash)==='roteiros')catalogue();if(B.currentRoute(location.hash)==='missoes')catalogue(true);if(B.currentRoute(location.hash)==='relatorios')report();guidance();unified.render();
   if(context){$('si-dock-activity-status').textContent=noun()+' em andamento · '+session.route().module;if(document.querySelector('[data-left-tab="missao"]').getAttribute('aria-pressed')==='true')$('si-left-title').textContent=noun();}
   const tab=document.querySelector('[data-left-tab][aria-pressed="true"]')?.dataset.leftTab;if(tab==='objetos')$('si-left-title').textContent='Unidades';
@@ -67,7 +67,8 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   for(const [id,tool]of [['silm-electrons','electrons'],['silm-motion','electrons'],['silm-crystal-neighbors','neighbors']])if($(id))$(id).hidden=!session.allows(tool);
   const finish=$('si-activity-finish');if(finish){finish.querySelector('span').textContent=isMission()?'Concluir missão':'Concluir roteiro';finish.disabled=!!context&&(context.status==='completed'||!session.ready());}
  }
- function guard(){if(!session.open())return;const route=B.currentRoute(location.hash),id=new URLSearchParams(location.hash.split('?')[1]||'').get('item');if(!['ambiente',isMission()?'missoes':'roteiros','relatorios','manual'].includes(route)||['roteiros','missoes'].includes(route)&&id!==session.context().id)location.replace(url(session.context().id));}
+ /* Durante uma atividade, a navegação fica no Início (com a retomada), na Oficina, na própria atividade, nos relatórios e no Manual. */
+ function guard(){if(!session.open())return;const route=B.currentRoute(location.hash),id=new URLSearchParams(location.hash.split('?')[1]||'').get('item');if(!['inicio','ambiente',isMission()?'missoes':'roteiros','relatorios','manual'].includes(route)||['roteiros','missoes'].includes(route)&&id!==session.context().id){location.replace(url(session.context().id));say('Durante '+(isMission()?'a missão':'o roteiro')+', ficam disponíveis o Início, a Oficina, o Manual e os relatórios. Encerre a atividade para abrir outras telas.');}}
  function init(){unified.init();for(const b of document.querySelectorAll('[data-left-tab]'))b.addEventListener('click',schedule);$('nav-toggle').addEventListener('click',()=>requestAnimationFrame(()=>{if(session.open()){$('si-now-description').textContent='Investigação orientada · '+session.route().module;$('si-activity-context').textContent=session.route().title+' · '+(session.context().status==='completed'?'Concluído':'Em investigação');}}));document.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(session.open()&&a&&a.target!=='_blank'&&!a.getAttribute('href').startsWith('#')&&new URL(a.href).origin===location.origin){event.preventDefault();say('Encerre a atividade para abrir outra interface.','warning');}},true);const restored=session.load();if(restored){onModule(session.lockedModule());location.hash=url(session.context().id);}window.addEventListener('hashchange',guard);window.addEventListener('hashchange',schedule);window.addEventListener('si-route-changed',()=>{guard();schedule();});sync();}
  return {session,init,render,canBuild};
 };

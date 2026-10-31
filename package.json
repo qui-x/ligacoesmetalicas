@@ -22,7 +22,8 @@
     "test:learning": "node tests/learning.cjs",
     "test:backup": "node tests/notebook-backup.cjs",
     "test:comparison": "node tests/structure-comparison.cjs && node tests/electrons-3d.cjs && node tests/table-mounting.cjs",
-    "test:mobile-mechanics": "node tests/silm-mobile-mechanics.cjs"
+    "test:mobile-mechanics": "node tests/silm-mobile-mechanics.cjs",
+    "test:parity": "node tests/parity-screens.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1",
