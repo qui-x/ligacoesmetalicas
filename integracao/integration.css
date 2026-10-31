@@ -259,3 +259,5 @@ body[data-silm-route="inicio"] main{padding-top:0}
 .si-header-action:hover,.si-header-action[aria-expanded="true"]{background:var(--tint);border-color:var(--accent)}
 @media(max-width:900px){.si-home-family{padding-top:16px}}
 @media(max-width:640px){.si-home-family .si-path-icon svg{width:21px;height:21px}}
+/* Em 320–370 px, "A arquitetura" precisa caber numa linha também com fontes largas do sistema (DejaVu Sans ≈ 213 px a 29 px). */
+@media(max-width:370px){.si-home-family .si-home-hero-icon{width:60px;height:60px}.si-home-family .si-home-hero h1{font-size:clamp(26px,8.4vw,29px)}}

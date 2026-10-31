@@ -23,7 +23,9 @@ module.exports=async(browser,url)=>{
      motto:v.querySelector('.si-home-motto').textContent.trim(),icon:v.querySelector('.si-home-hero-icon')?.getAttribute('alt'),iconInLink:!!v.querySelector('.si-home-hero-icon')?.closest('a'),
      heading:v.querySelector('.si-home-heading h2').textContent.trim(),phrase:v.querySelector('.si-home-heading p').textContent.trim(),cards,
      support:[...v.querySelectorAll('.si-home-support a')].map(a=>({text:a.textContent.trim(),href:a.getAttribute('href'),h:r(a).height})),
-     jazz:v.querySelectorAll('a[href*="jazz" i]').length,overflow:document.documentElement.scrollWidth-innerWidth,h1Lines:Math.round(r(v.querySelector('h1')).height/parseFloat(getComputedStyle(v.querySelector('h1')).lineHeight))};});
+     jazz:v.querySelectorAll('a[href*="jazz" i]').length,overflow:document.documentElement.scrollWidth-innerWidth,
+     /* Linhas do título com a fonte do sistema e com uma fonte larga (DejaVu Sans, comum no Linux): o resultado não pode depender da máquina. */
+     h1Lines:(()=>{const h=v.querySelector('h1'),lines=()=>Math.round(r(h).height/parseFloat(getComputedStyle(h).lineHeight)),own=lines();h.style.fontFamily='"DejaVu Sans",Verdana,sans-serif';const wide=lines();h.style.fontFamily='';return Math.max(own,wide);})()};});
    assert.equal(home.hidden,false,where);
    assert.equal(home.eyebrow,'SIMULADOR INTERATIVO DE LIGAÇÕES METÁLICAS',where);
    assert.equal(home.h1,'A arquitetura dos metais',where);assert.equal(home.accent,'dos metais',where);
