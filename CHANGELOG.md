@@ -1,4 +1,12 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 1: Início
+## Em desenvolvimento — Paridade SIAB, Etapa 2: Aprender
+
+- Lista "Temas" na arquitetura do SIAB: uma linha por tema (o cartão inteiro é o link) com resumo curto e situação "Não revisado"/"Revisado" à direita.
+- Tema em coluna de leitura: "APRENDER · TEMA", título, ideia principal como abertura e as ações "Investigar na oficina" e "Marcar como revisado". Logo abaixo ficam o conteúdo relacionado (missões e roteiros pelo nome), "Aprofunde" e as fontes.
+- "Investigar na oficina" prepara o metal representativo na Montagem e abre a Oficina; a investigação só começa com Iniciar e nunca substitui outra.
+- Foco no título ao abrir o tema; ao voltar, o foco retorna à linha do tema aberto.
+- TEST-LEARN em `npm run test:parity`; evidências em `docs/evidence-parity/LEARN/` e `LEARN-DETAIL/`.
+
+## Paridade SIAB, Etapa 1: Início (mesclada em #20)
 
 - O Início segue a hierarquia do SIAB:
   - sobretítulo com o nome completo;

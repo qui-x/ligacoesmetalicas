@@ -1,9 +1,9 @@
 'use strict';
-SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal})=>{
+SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal,prepareMetal})=>{
  const S=SILM,registry=S.activities||S.routes,B=BaseDemoSI,$=id=>document.getElementById(id),N=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
  const button=(label,fn,id)=>{const b=N('button',label);b.type='button';b.className='button outline';if(id)b.id=id;b.addEventListener('click',fn);return b;};
  const session=S.createRouteSession({model,storage,view,onView,say});
- const unified=S.createUnifiedUI({model,storage,session,selectMetal,say});
+ const unified=S.createUnifiedUI({model,storage,session,selectMetal,prepareMetal,say});
  const url=id=>'#/'+(registry.get(id)?.type==='mission'?'missoes':'roteiros')+'?item='+encodeURIComponent(id);
  const isMission=()=>session.context()?.type==='mission';
  const noun=()=>isMission()?'Missão':'Roteiro';

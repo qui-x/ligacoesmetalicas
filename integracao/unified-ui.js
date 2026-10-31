@@ -1,5 +1,5 @@
 'use strict';
-SILM.createUnifiedUI=({model,storage,session,selectMetal,say})=>{
+SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
  const S=SILM,B=BaseDemoSI,$=id=>document.getElementById(id),N=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;},link=(text,href)=>{const a=N('a',text);a.className='button outline';a.href=href;return a;};
  const fields={name:'',date:new Date().toLocaleDateString('pt-BR'),observations:'',interpretation:'',conclusion:''};
  let progress={schemaVersion:1,completed:{}},table=null;let journal=B.createJournalStore(B.storage);let notebookFilter='todos',notebookRefresh=null;
@@ -129,14 +129,52 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,say})=>{
   if(!saved.ok)return 'error';
   home();notebookRefresh?.();return 'added';
  }
+ /* Aprender na arquitetura do SIAB: lista de linhas (título, resumo e situação) e tema em coluna de leitura (sobretítulo,
+    título, ideia principal, ações), com o aprofundamento, as conexões e as fontes do SILM logo abaixo. */
+ let themeKey='',lastTheme=null;
+ window.addEventListener('si-route-changed',event=>{if(event.detail!=='aprender'){themeKey='';lastTheme=null;}});
  function themes(){
-  const host=$('silm-themes');host.replaceChildren();const id=new URLSearchParams(location.hash.split('?')[1]||'').get('tema'),t=S.themes.get(id);
-  if(!t){for(const item of S.themes.registry){const card=N('article');card.className='edu-card';card.append(N('h2',item.title),N('p',item.subtitle),N('p',item.description));if(progress.completed[item.id])card.append(N('strong','Concluído'));const a=link('Explorar tema','#/aprender?tema='+item.id);a.id='theme-card-'+item.id;card.append(a);host.append(card);}return;}
-  const card=N('article');card.className='edu-card';card.append(N('h2',t.title),N('p',t.subtitle),N('p',t.description));
-  for(const c of t.concepts){const d=N('details');d.open=c.title==='Ideia principal';d.append(N('summary',c.title),N('p',c.text));card.append(d);}
-  const mark=N('button',progress.completed[t.id]?'Concluído — desmarcar':'Marcar como concluído');mark.type='button';mark.className='button outline';mark.id='theme-complete';mark.addEventListener('click',()=>{if(progress.completed[t.id])delete progress.completed[t.id];else progress.completed[t.id]=t.version;storage.set('learning.themes',progress);themes();document.getElementById('theme-complete').focus();});card.append(mark,N('h3','Explore no SILM'),link('Abrir laboratório','#/ambiente'));
-  card.append(N('h3','Missões relacionadas'));for(const id of t.relatedMissions)card.append(link(S.missions.get(id).title,'#/missoes?item='+id));card.append(N('h3','Roteiros relacionados'));for(const id of t.relatedRoutes)card.append(link(S.routes.get(id).title,'#/roteiros?item='+id));
-  const metals=N('p','Metais para observar: '+t.relatedMetals.map(z=>S.data.get(z).name).join(', '));card.append(metals);const sources=N('details');sources.append(N('summary','Fontes'));for(const id of t.sources){const source=S.data.source(id);const p=N('p',source.institution+' — '+source.title);if(source.url){const a=link('Consultar',source.url);a.target='_blank';a.rel='noopener noreferrer';p.append(a);}sources.append(p);}card.append(sources,link('Todos os temas','#/aprender'));host.append(card);
+  const host=$('silm-themes'),head=$('silm-themes-head'),id=new URLSearchParams(location.hash.split('?')[1]||'').get('tema'),t=S.themes.get(id);
+  const key=(t?t.id:'lista')+'|'+S.themes.registry.map(x=>progress.completed[x.id]?1:0).join('');
+  if(key===themeKey&&host.childElementCount)return;const previous=themeKey.split('|')[0];themeKey=key;host.replaceChildren();head.hidden=!!t;
+  if(id&&!t)say('Tema não encontrado. Escolha um tema da lista.','warning');
+  if(!t){
+   const list=N('div');list.className='silm-content-list';
+   for(const item of S.themes.registry){const row=N('a');row.className='silm-content-row';row.href='#/aprender?tema='+item.id;row.id='theme-card-'+item.id;
+    const text=N('span');text.append(N('strong',item.title),N('small',item.subtitle+'. '+item.description));
+    const status=N('span',progress.completed[item.id]?'Revisado':'Não revisado');status.className='silm-row-status';row.append(text,status);list.append(row);}
+   host.append(list);
+   // Retorno do tema: o foco volta para a linha do tema aberto, como quem fecha um detalhe.
+   if(lastTheme){const back=$('theme-card-'+lastTheme);lastTheme=null;if(back)requestAnimationFrame(()=>back.focus({preventScroll:false}));}
+   return;}
+  const article=N('article');article.className='silm-reading';article.setAttribute('aria-labelledby','theme-title');
+  const eyebrow=N('p','APRENDER · TEMA');eyebrow.className='eyebrow';const title=N('h1',t.title);title.id='theme-title';title.tabIndex=-1;
+  const idea=t.concepts.find(c=>c.title==='Ideia principal'),lead=N('p',idea?idea.text:t.description);lead.className='silm-lead';
+  article.append(eyebrow,title,lead,N('p',t.subtitle+'. '+t.description));
+  const actions=N('div');actions.className='silm-actions';
+  const metal=S.data.get(t.relatedMetals[0]),investigate=N('button','Investigar na oficina');investigate.type='button';investigate.className='button primary';investigate.id='theme-investigate';
+  investigate.addEventListener('click',()=>{
+   // Prepara o metal representativo na Montagem; a investigação só começa quando o estudante escolher Iniciar.
+   if(model.state.metal?.atomicNumber===metal.atomicNumber){location.hash='#/ambiente';return;}
+   if(!prepareMetal?.(metal.atomicNumber)){say('Não foi possível preparar '+metal.name+' na Montagem.','warning');return;}
+   location.hash='#/ambiente';say(metal.name+' preparado na Montagem. Escolha Iniciar para começar a investigação.','success');
+   requestAnimationFrame(()=>requestAnimationFrame(()=>{const open=document.querySelector('[data-open-dock="montagem"]');if(open&&open.getAttribute('aria-expanded')!=='true')open.click();}));
+  });
+  const mark=N('button',progress.completed[t.id]?'Revisado · desmarcar':'Marcar como revisado');mark.type='button';mark.className='button outline silm-quiet';mark.id='theme-complete';mark.setAttribute('aria-pressed',String(!!progress.completed[t.id]));
+  mark.addEventListener('click',()=>{if(progress.completed[t.id])delete progress.completed[t.id];else progress.completed[t.id]=t.version;storage.set('learning.themes',progress);themes();$('theme-complete').focus();say(progress.completed[t.id]?'Tema marcado como revisado. Ele continua disponível para revisitar.':'Marcação de revisado removida.','success');});
+  actions.append(investigate,mark);article.append(actions);
+  const related=N('section');related.className='silm-related';related.setAttribute('aria-labelledby','theme-related');const rh=N('h2','Conteúdo relacionado');rh.id='theme-related';related.append(rh);
+  const group=(label,items)=>{if(!items.length)return;const row=N('div');row.className='silm-related-row';row.append(N('span',label));for(const [text,href] of items)row.append(link(text,href));related.append(row);};
+  group(t.relatedMissions.length===1?'Missão relacionada':'Missões relacionadas',t.relatedMissions.map(m=>[S.missions.get(m).title,'#/missoes?item='+m]));
+  group(t.relatedRoutes.length===1?'Roteiro relacionado':'Roteiros relacionados',t.relatedRoutes.map(r=>[S.routes.get(r).title,'#/roteiros?item='+r]));
+  const metals=N('p');metals.className='silm-related-metals';metals.append(N('span','Metais para observar'),' '+t.relatedMetals.map(z=>S.data.get(z).name).join(', ')+'. Investigar na oficina prepara '+metal.name+'.');related.append(metals);article.append(related);
+  const deeper=N('section');deeper.setAttribute('aria-labelledby','theme-deeper');const dh=N('h2','Aprofunde');dh.id='theme-deeper';deeper.append(dh);
+  for(const c of t.concepts){if(c===idea)continue;const d=N('details');d.append(N('summary',c.title),N('p',c.text));deeper.append(d);}
+  const sources=N('details');sources.append(N('summary','Fontes'));for(const sid of t.sources){const source=S.data.source(sid);const p=N('p',source.institution+' — '+source.title);if(source.url){const a=link('Consultar',source.url);a.target='_blank';a.rel='noopener noreferrer';p.append(' ',a);}sources.append(p);}
+  deeper.append(sources);article.append(deeper);
+  const back=link('Todos os temas','#/aprender');back.id='theme-back';article.append(back);host.append(article);
+  // Ao abrir o tema (não ao remarcar), a página volta ao topo e o foco vai ao título, como no SIAB.
+  lastTheme=t.id;if(previous!==t.id)requestAnimationFrame(()=>{window.scrollTo(0,0);title.focus({preventScroll:true});});
  }
  const operation=text=>String(text).replaceAll('Montagem → Metal','Montagem → Preparo').replaceAll('Ver → Analisar → Calcular','Ver → Analisar → Cálculos cristalográficos').replaceAll('Ver → Observar → Camadas','Ver → Observar → Estrutura e representação').replaceAll('O Caderno não está ativado no SILM.','O Caderno guarda observações locais.');
  function manual(){const host=$('silm-manual');host.replaceChildren();const search=N('input');search.type='search';search.id='manual-search';const label=N('label','Buscar no manual');label.htmlFor=search.id;const list=N('div');list.className='silm-route-catalog';host.append(label,search,list);
