@@ -823,11 +823,11 @@ SILM.create = () => {
       ctx.scope.listen(window,'pagehide',flushRepresentation);ctx.scope.listen(document,'visibilitychange',()=>{if(document.hidden)flushRepresentation();});
       ctx.scope.cleanup(()=>{delete SILM.scientificState;});
       ctx.experience.configure({
-        home:{title:'A Arquitetura',titleAccent:'dos Metais',motto:'Observe. Monte. Meça. Interprete.',sectionNote:false,featured:'laboratorio',primary:[
+        home:{title:'A Arquitetura',titleAccent:'dos Metais',sectionNote:false,featured:'laboratorio',primary:[
           {id:'laboratorio',title:'Laboratório',tag:'Livre',invite:'Investigue',cta:'Abrir oficina',description:'Monte e investigue uma estrutura metálica.',icon:'lab',destination:'laboratorio',decoration:node=>{for(const c of ['#b87333','#c7a54a','#a8a9ad','#8c7853','#dcc074'])node.append(Object.assign(document.createElement('i'),{style:'background:'+c}));}},
           {id:'aprender',title:'Aprender',description:'Explore os conceitos da ligação metálica.',icon:'learn',destination:'aprender'},
-          {id:'missoes',title:'Missões',description:'Registre evidências e conclusões.',icon:'mission',destination:'missoes'},
-          {id:'roteiros',title:'Roteiros Experimentais',description:'Conheça os procedimentos em etapas.',icon:'routes',destination:'roteiros'}
+          {id:'missoes',title:'Missões',description:'Resolva desafios na Oficina.',icon:'mission',destination:'missoes'},
+          {id:'roteiros',title:'Roteiros Experimentais',description:'Acompanhe etapas de investigação.',icon:'routes',destination:'roteiros'}
         ],support:[{id:'manual',title:'Manual de uso',destination:'manual'},{id:'professor',title:'Área do Professor',destination:'professor'}]},
         accessibility:{colorNote:'Camadas, estados e medidas também são descritos em texto.'},
         feedback:{sound:{label:'Som das medições',hint:'Coordenação: tom grave para 8 (CCC), agudo para 12 (CFC e HC)',preview:.5},haptics:{label:'Vibrar ao registrar medição',hint:'Em celulares compatíveis'}},
