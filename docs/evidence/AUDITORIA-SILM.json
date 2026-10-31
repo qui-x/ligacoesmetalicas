@@ -1,207 +1,88 @@
 {
   "product": "SILM",
-  "version": "0.12.0",
+  "version": "0.15.5",
+  "architecture": "Base SI 0.9.17 + motor científico SILM",
   "checks": [
     {
-      "check": "Versão única do produto",
+      "check": "Versão única do produto (VERSION, pacote, BUILD-INFO, manifesto, rótulos, cache)",
       "status": "PASS",
-      "detail": null
+      "detail": "Versão única conferida: 0.15.5"
     },
     {
-      "check": "Núcleo herdado preservado com integrações declaradas",
+      "check": "Base SI travada por hash (integracao/base-lock.json)",
       "status": "PASS",
       "detail": {
-        "verifiedFiles": 52,
-        "approvedIntegrations": [],
-        "changedFiles": []
+        "version": "0.9.17",
+        "commit": "68ed86cb416ea31489be481fc52d86aeedce2892",
+        "divergentes": []
       }
     },
     {
-      "check": "Integração opcional por domínio (resumeFree)",
+      "check": "index.html gerado a partir de integracao/index.html (sem edição direta)",
       "status": "PASS",
       "detail": null
     },
     {
-      "check": "Recursos estáticos presentes",
+      "check": "Um único shell carregado (Base SI); núcleo antigo fora da entrada",
       "status": "PASS",
       "detail": []
     },
     {
-      "check": "Scripts locais",
+      "check": "Motor científico na ordem de dependência e adaptador por último",
       "status": "PASS",
       "detail": null
     },
     {
-      "check": "Demo removida do runtime",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Domínio automático SILM",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Dependências executáveis de domínio ácido-base",
+      "check": "Cache offline íntegro: arquivos existentes, dependências da entrada presentes, sem arquivos mortos",
       "status": "PASS",
       "detail": {
-        "count": 0,
-        "files": []
+        "recursos": 81,
+        "ausentes": [],
+        "fora_do_cache": [],
+        "mortos": []
       }
     },
     {
-      "check": "Sintaxe JavaScript",
-      "status": "PASS",
-      "detail": []
-    },
-    {
-      "check": "Identidade e ícones PWA",
+      "check": "Sintaxe JavaScript dos scripts da entrada",
       "status": "PASS",
       "detail": null
     },
     {
-      "check": "Cache independente",
+      "check": "Estado científico no schema 8; banco e estado validados",
       "status": "PASS",
       "detail": null
+    },
+    {
+      "check": "Vista cristalina sem ligações fora do contorno da célula",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Representação fora do estado científico (câmera, projeção, modo 2D/3D)",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Projeção isométrica congelada para o Organizar e o calor",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Representação 3D sobre as coordenadas científicas, sem WebGL no domínio",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "check": "Roteiros: catálogo válido, um módulo por roteiro",
+      "status": "PASS",
+      "detail": "5 roteiros"
     },
     {
       "check": "Documentação obrigatória",
       "status": "PASS",
       "detail": null
-    },
-    {
-      "check": "Roadmap integral até 1.0.0",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Montagem (0.4.x), cristalografia (0.5.x), camada eletrônica (0.6.x), propriedades (0.7.x) e Explorar (0.8.x) presentes e carregadas em ordem",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Vista cristalina sem ligações fora do contorno da célula; elétrons só pela camada eletrônica",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Montagem livre sem linhas M—M; elétrons só pela camada eletrônica",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Camada eletrônica: um canvas decorativo, sem trajetórias, setas, pares ou corrente",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Propriedades: sem valores típicos embutidos; dados só do banco com fonte",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Propriedades: sem circuito, instrumentos ou setas por elétron; fora da série",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Explorar: comparação somente leitura, sem laço extra e sem novo schema",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Medir: scripts presentes e carregados em ordem (medições antes do estado; vista depois da cena)",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Medir: schema ≥ 7, validador recalcula cada registro e só há medida com escala cristalina",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Medir: sem ± (resolução não é incerteza) e sem instrumentos sem modelo",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Medir: medições só no scientificState",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Marcadores eletrônicos não são estado científico",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Sem estados científicos paralelos",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Calcular: script presente e carregado em ordem (cristalografia → medições → cálculos → estado)",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Calcular: schema 8; o validador recalcula cada cálculo e recusa fórmula fora da estrutura",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Calcular: constantes centralizadas, sem números mágicos fora do serviço",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Calcular: fórmulas só no catálogo; expressões legíveis, sem sintaxe de programação",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Calcular: cálculos só no scientificState",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Validador do estado científico",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Identidade oficial íntegra e abertura no início do <body>",
-      "status": "PASS",
-      "detail": {
-        "mismatch": []
-      }
-    },
-    {
-      "check": "Representação 2D: renderizador comum nas três cenas, sem ligações e com a ordem central de camadas",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Representação 2D: representationState separado e versionado; câmera fora do estado científico, do Desfazer e do Histórico",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Representação 2D: projeção isométrica congelada para o Organizar e o calor (vistas não mudam o estado nem a experiência)",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Representação 3D: câmera de órbita sobre as coordenadas científicas (Å), no mesmo renderizador e com volta ao 2D científico",
-      "status": "PASS",
-      "detail": null
-    },
-    {
-      "check": "Representação 3D: eixos são referência visual fora do palco, sem linhas de ligação; Organizar e calor seguem a isométrica",
-      "status": "PASS",
-      "detail": null
     }
   ],
-  "passed": 38,
+  "passed": 14,
   "failed": 0
 }

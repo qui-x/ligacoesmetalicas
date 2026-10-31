@@ -37,6 +37,69 @@ async function main(){
   const unit=page.locator('.silm-unit').first();await unit.press('Enter');await unit.press(direction);
   await page.waitForFunction(original=>JSON.stringify(SILMIntegration.snapshot().structure.units[0].position)!==JSON.stringify(original),original);
   await page.locator('#scene-undo').click();assert.deepEqual((await state()).structure.units[0].position,original);
+  // Regressão mecânica: ao começar uma pinça sobre uma unidade, cancelar o arrasto
+  // deve restaurar a posição, preservar o modelo e suprimir o clique residual.
+  await page.evaluate(()=>{const node=document.querySelector('#silm-assembly-stage .silm-unit[data-unit-id]');if(node?.getAttribute('aria-pressed')!=='true')node.click();});
+  const beforePinch=await state();
+  const pinch=await page.evaluate(()=>{
+   const stage=document.getElementById('silm-assembly-stage'),node=stage.querySelector('.silm-unit[data-unit-id]');
+   const selectedBefore=node.getAttribute('aria-pressed'),before={left:node.style.left,top:node.style.top};
+   const b=node.getBoundingClientRect(),x=b.x+b.width/2,y=b.y+b.height/2,s=stage.getBoundingClientRect(),x2=s.x+s.width*.85,y2=s.y+s.height*.85;
+   const ev=(el,type,id,cx,cy)=>el.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',isPrimary:id===1,clientX:cx,clientY:cy,bubbles:true,cancelable:true,button:0,buttons:type==='pointerup'?0:1}));
+   ev(node,'pointerdown',1,x,y);ev(node,'pointermove',1,x+12,y+6);ev(node,'pointermove',1,x+20,y+10);
+   const began=node.hasAttribute('data-dragging');
+   ev(stage,'pointerdown',2,x2,y2);
+   const canceled=!node.hasAttribute('data-dragging');
+   for(let k=1;k<=4;k++){ev(node,'pointermove',1,x+20-k*5,y+10-k*3);ev(stage,'pointermove',2,x2+k*8,y2+k*8);}
+   ev(node,'pointerup',1,x,y);ev(stage,'pointerup',2,x2+32,y2+32);
+   node.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,detail:1}));
+   return {began,canceled,selectedBefore,selectedAfter:node.getAttribute('aria-pressed'),before,left:node.style.left,top:node.style.top,unitId:node.dataset.unitId};
+  });
+  assert.ok(pinch.began,'o arrasto inicial da unidade começou');
+  assert.ok(pinch.canceled,'início da pinça cancela o arrasto');
+  assert.equal(pinch.selectedBefore,'true','unidade selecionada antes da pinça');
+  assert.equal(pinch.selectedAfter,pinch.selectedBefore,'clique residual da pinça não alterna a seleção');
+  assert.equal(pinch.left,pinch.before.left,'cancelamento restaura left sem posição intermediária');
+  assert.equal(pinch.top,pinch.before.top,'cancelamento restaura top sem posição intermediária');
+  assert.deepEqual(await state(),beforePinch,'pinça cancelada não altera o estado científico');
+
+  // Arrasto real de mouse: uma operação é gravada e um único Desfazer restaura o snapshot.
+  const beforeMouse=await state(),withoutUpdatedAt=value=>JSON.parse(JSON.stringify(value,(key,val)=>key==='updatedAt'?undefined:val));
+  const drag=await page.evaluate(()=>{
+   const stage=document.getElementById('silm-assembly-stage'),units=SILMIntegration.snapshot().structure.units,moving=units[0];
+   const deltas=[{x:.18,y:0},{x:-.18,y:0},{x:0,y:.18},{x:0,y:-.18},{x:.18,y:.12},{x:-.18,y:-.12}];
+   const target=deltas.map(d=>({x:moving.position.x+d.x,y:moving.position.y+d.y}))
+    .find(p=>p.x>.05&&p.x<.95&&p.y>.05&&p.y<.95&&SILM.assembly.isFree(units,p,moving.id));
+   if(!target)throw new Error('Não foi encontrado destino livre para o teste de arrasto.');
+   return {id:moving.id,original:moving.position,from:stage.silmRenderer.toClient(moving.position),to:stage.silmRenderer.toClient(target)};
+  });
+  await page.mouse.move(drag.from.x,drag.from.y);await page.mouse.down();
+  await page.mouse.move((drag.from.x+drag.to.x)/2,(drag.from.y+drag.to.y)/2,{steps:5});
+  await page.mouse.move(drag.to.x,drag.to.y,{steps:6});await page.mouse.up();
+  await page.waitForFunction(({id,original})=>{const u=SILMIntegration.snapshot().structure.units.find(x=>x.id===id);return u&&(Math.abs(u.position.x-original.x)>1e-4||Math.abs(u.position.y-original.y)>1e-4);},{id:drag.id,original:drag.original});
+  const afterMouse=await state();
+  assert.notDeepEqual(afterMouse.structure.units.find(x=>x.id===drag.id).position,drag.original,'arrasto de mouse altera a posição científica por ação explícita');
+  await page.locator('#scene-undo').click();
+  await page.waitForFunction(({id,original})=>{const u=SILMIntegration.snapshot().structure.units.find(x=>x.id===id);return u&&Math.abs(u.position.x-original.x)<1e-8&&Math.abs(u.position.y-original.y)<1e-8;},{id:drag.id,original:drag.original});
+  assert.deepEqual(withoutUpdatedAt(await state()),withoutUpdatedAt(beforeMouse),'um único Desfazer reverte todo o arrasto; somente updatedAt é atualizado');
+
+  // Com a assistência habilitada por padrão, um destino ocupado deve ajustar a posição
+  // e identificá-la como assistida; o posicionamento continua sendo reversível.
+  const occupied=await page.evaluate(()=>{
+   const stage=document.getElementById('silm-assembly-stage'),units=SILMIntegration.snapshot().structure.units,moving=units[0],other=units[1];
+   return {id:moving.id,original:{...moving.position},from:stage.silmRenderer.toClient(moving.position),to:stage.silmRenderer.toClient(other.position)};
+  });
+  await page.mouse.move(occupied.from.x,occupied.from.y);await page.mouse.down();
+  await page.mouse.move((occupied.from.x+occupied.to.x)/2,(occupied.from.y+occupied.to.y)/2,{steps:5});
+  await page.mouse.move(occupied.to.x,occupied.to.y,{steps:6});await page.mouse.up();
+  await page.waitForFunction(()=>document.getElementById('silm-assembly-feedback')?.textContent.includes('Posição ajustada para evitar sobreposição'));
+  const assistedState=await state(),assistedUnit=assistedState.structure.units.find(x=>x.id===occupied.id);
+  assert.notDeepEqual(assistedUnit.position,occupied.original,'a assistência busca uma posição livre');
+  assert.equal(assistedUnit.placement,'assisted','o tipo de posicionamento identifica a assistência');
+  assert.ok(await page.evaluate(id=>{const units=SILMIntegration.snapshot().structure.units,u=units.find(x=>x.id===id);return SILM.assembly.isFree(units,u.position,id);},occupied.id),'a posição ajustada não sobrepõe outra unidade');
+  await page.locator('#scene-undo').click();
+  await page.waitForFunction(({id,original})=>{const u=SILMIntegration.snapshot().structure.units.find(x=>x.id===id);return u&&Math.abs(u.position.x-original.x)<1e-8&&Math.abs(u.position.y-original.y)<1e-8;},{id:occupied.id,original:occupied.original});
+  assert.deepEqual(withoutUpdatedAt(await state()),withoutUpdatedAt(beforeMouse),'um único Desfazer restaura o estado da investigação (os carimbos updatedAt avançam) após posicionamento assistido');
   await page.locator('#silm-assembly-organize').click();
   await page.waitForSelector('.silm-crystal');const crystal=await state();assert.equal(crystal.structure.crystallography.structureType,'FCC');
   assert.equal(await page.locator('#si-expand-structure').isDisabled(),false,'A estrutura configurada deve permitir expansão.');
@@ -51,8 +114,15 @@ async function main(){
   assert.equal(await page.locator('.si-global-header').isVisible(),false,'A barra global é retirada da área expandida.');
   assert.ok(await page.locator('.si-workspace-toolbar').isVisible(),'A barra contextual da oficina continua visível.');
   assert.ok(await page.locator('[data-open-dock="montagem"]').isVisible(),'O menu de contexto Montagem permanece disponível.');
+  // O renderizador atualiza --stage por ResizeObserver após a mudança de layout.
+  // Esperar a dimensão crescer evita medir o quadro intermediário entre a classe e o redimensionamento.
+  await page.waitForFunction(({width,height})=>{
+   const stage=document.querySelector('#silm-assembly-stage');if(!stage)return false;
+   const rect=stage.getBoundingClientRect();return rect.width>width+40&&rect.height>height+40;
+  },{width:normalCanvas.width,height:normalCanvas.height},{timeout:5000});
   const workspaceBounds=await page.locator('#si-workspace').boundingBox(),expandedBounds=await page.locator('#si-stage').boundingBox(),expandedCanvas=await page.locator('#silm-assembly-stage').boundingBox(),toolbarBounds=await page.locator('.si-workspace-toolbar').boundingBox();
-  assert.ok(expandedCanvas.width>normalCanvas.width+40&&expandedCanvas.height>normalCanvas.height+40,'O palco cristalino cresce na tela expandida.');
+  assert.ok(expandedCanvas.width>normalCanvas.width+40&&expandedCanvas.height>normalCanvas.height+40,
+   'O palco cristalino cresce na tela expandida: '+JSON.stringify({normal:normalCanvas,expanded:expandedCanvas}));
   assert.ok(workspaceBounds.x<=1&&workspaceBounds.y<=1&&workspaceBounds.width>=viewport.width-2&&workspaceBounds.height>=viewport.height-2,'A oficina ocupa o viewport: '+JSON.stringify(workspaceBounds));
   assert.ok(expandedBounds.y>=toolbarBounds.y+toolbarBounds.height-1,'A estrutura não cobre a barra contextual.');
   assert.deepEqual(await state(),beforeExpand,'Expandir não altera o estado científico');

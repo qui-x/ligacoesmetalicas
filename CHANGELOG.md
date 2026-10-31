@@ -1,3 +1,15 @@
+## 0.15.5 — Consolidação
+
+- Mescladas a auditoria de paridade mecânica SIAB × SILM (correção da pinça cancelada, testes e CI), os textos enxutos com a matriz de paridade de telas e os testes de acessibilidade e de mecânicas no celular.
+- Os textos enxutos passaram para a fonte da entrada (`integracao/index.html`); antes, um build os desfaria. Como pede o plano de paridade, a página inicial não tem atalho para o Clube de Jazz; o clube continua intacto.
+- Versão única: `VERSION` é a fonte e `scripts/check-version.cjs` confere pacote, lock, BUILD-INFO, manifesto, rótulos e cache.
+- Cache offline só com o que a página usa: 81 recursos em vez de 193.
+- Auditoria (`scripts/audit-silm.py`) reescrita para a arquitetura atual: Base SI travada, entrada gerada, um único shell, ordem do motor, cache, contratos científicos.
+- Cobertura dos roteiros gerada a partir do catálogo: 57 metais.
+- Alvos de toque de pelo menos 24 px para as esferas no palco científico (WCAG 2.5.8), sem mudar o tamanho visual; o clique de ponteiro vai para a unidade de centro mais próximo.
+- Manual e `RENDERER-3D.md` corrigidos: os elétrons continuam visíveis durante a órbita 3D.
+- Nenhum dado científico alterado (schema 8).
+
 ## 0.15.4 — Comparação, elétrons 3D e seleção de metais
 
 - Visão Geral com até seis metais recentes, geometria documental e controles comuns de propriedades qualitativas.

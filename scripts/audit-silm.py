@@ -1,103 +1,136 @@
-"""Auditoria reproduzível da distribuição e do núcleo herdado, sem rede."""
+"""Auditoria reproduzível da arquitetura atual do SILM (Base SI + motor científico), sem rede.
+
+Desde a 0.15.5 a auditoria confere a entrada que de fato roda: a Base SI travada por hash, a entrada gerada a partir
+de integracao/index.html, um único shell carregado, o motor científico na ordem de dependência, o cache offline e os
+contratos científicos (schema 8, sem ligações M—M, representação fora do estado, isométrica congelada). O núcleo
+antigo (Base Estrutural 0.3.1 em js/, css/, a11y.js) permanece no repositório como histórico e não pode ser carregado.
+"""
 from pathlib import Path
-import hashlib,json,re,subprocess
-root=Path(__file__).resolve().parents[1]
-checks=[]
-def check(name,condition,detail=None):
-    checks.append({'check':name,'status':'PASS' if condition else 'FAIL','detail':detail})
-version=(root/'VERSION').read_text().strip()
-lock=json.loads((root/'package-lock.json').read_text())
-check('Versão única do produto',json.loads((root/'package.json').read_text())['version']==version and lock['version']==version and lock['packages']['']['version']==version and json.loads((root/'BUILD-INFO.json').read_text())['versao']==version and f'data-app-version="{version}"' in (root/'index.html').read_text())
-core=json.loads((root/'docs/evidence/NUCLEO-PRESERVADO.json').read_text())
-changed=[p for p,h in core['unchanged'].items() if hashlib.sha512((root/p).read_bytes()).hexdigest()!=h]
-# Base de comparação desde a 0.10.1: núcleo da Base Estrutural 0.3.x (hoje 0.3.1), adotado sem nenhuma integração local.
-expected_integrations=set()
-check('Núcleo herdado preservado com integrações declaradas',set(changed)==expected_integrations,{'verifiedFiles':len(core['unchanged']),'approvedIntegrations':sorted(expected_integrations),'changedFiles':changed})
-activity=(root/'js/experience/activity.js').read_text()
-check('Integração opcional por domínio (resumeFree)',"resumeFree==='direct'" in activity and "resumeFree:'direct'" in (root/'domain/silm/bootstrap.js').read_text())
-html=(root/'index.html').read_text()
-assets=re.findall(r'(?:src|href)="([^"?#]+)(?:[?#][^"]*)?"',html)
-missing=[x for x in assets if ':' not in x and not (root/x).is_file()]
-check('Recursos estáticos presentes',not missing,missing)
-check('Scripts locais',not any(re.match(r'https?://',x) for x in re.findall(r'<script[^>]+src="([^"]+)"',html)))
-check('Demo removida do runtime',not (root/'domain/demo').exists() and 'DemoEstrutural' not in (root/'domain/entry.js').read_text())
-check('Domínio automático SILM', 'SimCore.registerDomain(SILM.create())' in (root/'domain/entry.js').read_text())
-runtime_files=[root/'index.html',root/'a11y.js',*list((root/'js').rglob('*.js')),*list((root/'domain').rglob('*.js'))]
-# Preferências legadas e comentários históricos não constituem motor científico.
-scientific_deps=[]
-for file in runtime_files:
-    text=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',file.read_text())
-    if re.search(r'\bSIAB\s*\.|\bDemoEstrutural\s*\(|js/simulation/|chemistry\.js|ph-engine|domain/demo/',text):scientific_deps.append(str(file.relative_to(root)))
-check('Dependências executáveis de domínio ácido-base',len(scientific_deps)==0,{'count':len(scientific_deps),'files':scientific_deps})
-errors=[]
-for file in [*runtime_files[2:],root/'a11y.js',root/'sw.js']:
-    result=subprocess.run(['node','--check',str(file)],capture_output=True,text=True)
-    if result.returncode:errors.append({'file':str(file.relative_to(root)),'error':result.stderr})
-check('Sintaxe JavaScript',not errors,errors)
-m=json.loads((root/'manifest.webmanifest').read_text());check('Identidade e ícones PWA',m['short_name']=='SILM' and all((root/icon['src']).is_file() for icon in m['icons']))
-sw=(root/'sw.js').read_text();check('Cache independente',f"const VERSION='{version}'" in sw and 'silm@${ROOT.href}' in sw)
-# Documentos históricos 0.1.1–0.3.0 não constavam do pacote recebido (ver docs/SILM-0.4.0.md).
-required=['SILM-0.4.0.md','MONTAGEM-ESTRUTURA-METALICA.md','SCIENTIFIC-STATE.md','ARQUITETURA-CIENTIFICA.md','ROADMAP-SILM.md','CONTRATO-VERSIONAMENTO.md','INVESTIGACAO.md','PARIDADE-SIAB-1.0.0.md','ESTRUTURAS-CRISTALINAS.md','CONTRATO-CRISTALOGRAFICO.md','COBERTURA-METAIS.md','MODELO-ELETRONICO.md','LIMITACOES-MODELO-ELETRONICO.md','PROPRIEDADES-METALICAS.md','CONTRATO-PROPRIEDADES.md','FONTES-E-PROVENIENCIA.md','MODULO-EXPLORAR.md','CONTRATO-EXPLORACAO.md','MODULO-MEDIR.md','CONTRATO-MEDICOES.md','INSTRUMENTOS-E-UNIDADES.md','IDENTIDADE-VISUAL.md','MODULO-CALCULAR.md','CONTRATO-CALCULOS.md','FORMULAS-CRISTALOGRAFICAS.md','CONSTANTES-CIENTIFICAS.md',f'SILM-{version}.md',f'RELATORIO-BUILD-TESTES-{version}.md','SILM-0.11.0.md','RENDERER-2D.md','CONTRATO-REPRESENTACAO-2D.md','SILM-0.12.0.md','RENDERER-3D.md','CONTRATO-REPRESENTACAO-3D.md']
-check('Documentação obrigatória',all((root/'docs'/p).is_file() for p in required))
-roadmap=(root/'docs/ROADMAP-SILM.md').read_text();check('Roadmap integral até 1.0.0',all('SILM 0.'+str(i)+'.x' in roadmap for i in range(1,19)) and '# SILM 1.0.0-rc.x' in roadmap and '# SILM 1.0.0\n' in roadmap)
-assembly=[root/'domain/silm'/n for n in ('assembly.js','assembly-view.js','assembly.css','crystal.js','crystal-view.js','electron-view.js','properties.js','property-view.js','exploration.js')]
-check('Montagem (0.4.x), cristalografia (0.5.x), camada eletrônica (0.6.x), propriedades (0.7.x) e Explorar (0.8.x) presentes e carregadas em ordem',all(p.is_file() for p in assembly) and html.index('domain/silm/assembly.js')<html.index('domain/silm/crystal.js')<html.index('domain/silm/properties.js')<html.index('domain/silm/state.js')<html.index('domain/silm/representation.js')<html.index('domain/silm/renderer-2d.js')<html.index('domain/silm/assembly-view.js')<html.index('domain/silm/crystal-view.js')<html.index('domain/silm/electron-view.js')<html.index('domain/silm/property-view.js')<html.index('domain/silm/exploration.js')<html.index('domain/silm/bootstrap.js') and 'domain/silm/assembly.css' in html)
-crystal=re.sub(r'/\*[\s\S]*?\*/','',(root/'domain/silm/crystal-view.js').read_text())
-check('Vista cristalina sem ligações fora do contorno da célula; elétrons só pela camada eletrônica',not re.search(r'bond',crystal,re.I) and crystal.count("svgEl('line'")==1 and not re.search(r'getContext|arc\(',crystal))
-view=re.sub(r'/\*[\s\S]*?\*/','',(root/'domain/silm/assembly-view.js').read_text())
-check('Montagem livre sem linhas M—M; elétrons só pela camada eletrônica',not re.search(r"createElementNS\([^)]*,'(line|path|polyline)'\)|getContext|arc\(",view))
-electron=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/electron-view.js').read_text())
-check('Camada eletrônica: um canvas decorativo, sem trajetórias, setas, pares ou corrente',electron.count("document.createElement('canvas')")==1 and "setAttribute('aria-hidden','true')" in electron and not re.search(r'lineTo|moveTo|createElementNS|bond|current|voltage|corrente|tens[aã]o',electron,re.I))
-statecode=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/state.js').read_text())
-props=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/properties.js').read_text())
-pview=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/property-view.js').read_text())
-check('Propriedades: sem valores típicos embutidos; dados só do banco com fonte',not re.search(r'\d[\d.,]*\s*(S/m|W/\(m|nΩ|µΩ|MS/m)',props) and 'e.properties' in props and 'PROPERTY_DATA_MISSING' in props)
-check('Propriedades: sem circuito, instrumentos ou setas por elétron; fora da série',not re.search(r'amper[ií]metro|volt[ií]metro|bateria|circuito|particles|magnet|dureza|corros|\bligas?\b',pview+props,re.I))
-explore=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/exploration.js').read_text())
-check('Explorar: comparação somente leitura, sem laço extra e sem novo schema',not re.search(r'startProperty|setPropertyParams|activateElectrons|organize\(|restoreFree|storage\.set|beginAssembly',explore) and 'reducedMotion:()=>true' in explore and 'exploration' not in statecode and 'schemaVersion' not in explore)   # a representação da exploração nunca entrou no schema
-# Medir (0.9.x): medidas do modelo no estado único (schema 7), sem ± e sem instrumentos sem modelo científico.
-measure=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/measurements.js').read_text())
-mview=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/measure-view.js').read_text())
-boot=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/bootstrap.js').read_text())
-check('Medir: scripts presentes e carregados em ordem (medições antes do estado; vista depois da cena)',all((root/'domain/silm'/n).is_file() for n in ('measurements.js','measure-view.js')) and html.index('domain/silm/measurements.js')<html.index('domain/silm/state.js')<html.index('domain/silm/crystal-view.js')<html.index('domain/silm/measure-view.js')<html.index('domain/silm/bootstrap.js'))
-schema=int(re.search(r'scientificSchemaVersion=(\d+)',statecode).group(1))
-check('Medir: schema ≥ 7, validador recalcula cada registro e só há medida com escala cristalina',schema>=7 and 'compute(m.type' in measure and "MEASUREMENT_WITHOUT_SCALE" in measure and "c.mode!=='crystalline'" in measure)
-check('Medir: sem ± (resolução não é incerteza) e sem instrumentos sem modelo',not re.search('±',measure+mview+boot) and not re.search(r'term[oô]metro|amper[ií]metro|mult[ií]metro|volt[ií]metro|ohm[ií]metro|pir[oô]metro',measure+mview+boot,re.I))
-check('Medir: medições só no scientificState',not any(re.search(r'measureScientificState|measurementStructure|measurementMetal',f.read_text()) for f in (root/'domain').rglob('*.js')))
-check('Marcadores eletrônicos não são estado científico',not re.search(r"particles|electronCount|countReal",statecode) and "representationType:'qualitative'" in statecode)
-check('Sem estados científicos paralelos',not any(re.search(r'routeStructure|missionStructure|routeScientificState|missionScientificState|exploreScientificState|exploreStructure|exploreElectrons|exploreProperties',f.read_text()) for f in (root/'domain').rglob('*.js')))
-# Calcular (0.10.x): catálogo único de fórmulas, constantes centralizadas com fonte e cálculos só no estado único (schema 8).
-calc=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/calculations.js').read_text())
-check('Calcular: script presente e carregado em ordem (cristalografia → medições → cálculos → estado)',(root/'domain/silm/calculations.js').is_file() and html.index('domain/silm/crystal.js')<html.index('domain/silm/measurements.js')<html.index('domain/silm/calculations.js')<html.index('domain/silm/state.js'))
-check('Calcular: schema 8; o validador recalcula cada cálculo e recusa fórmula fora da estrutura',schema==8 and 'SILM.calculation.validate' in statecode and 'compute(m.formulaId' in calc and 'FORMULA_NOT_APPLICABLE' in calc and 'CALCULATION_TABULATED_MISMATCH' in calc)
-others=''.join(re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',f.read_text()) for f in (root/'domain/silm').glob('*.js') if f.name!='calculations.js')
-check('Calcular: constantes centralizadas, sem números mágicos fora do serviço',calc.count('6.02214076e23')==1 and calc.count('1e-24')==1 and 'idealRatio' in calc and not re.search(r'6\.022|1e-24|\b1\.633|Math\.sqrt\(8/3\)',others.replace('idealRatio:Math.sqrt(8/3)','')) and 'src-bipm-si-2019' in calc)
-check('Calcular: fórmulas só no catálogo; expressões legíveis, sem sintaxe de programação',re.search(r'Math\.(sqrt|pow|cbrt)',boot) is None and not re.search(r"expression:'[^']*(Math\.|\*\*)",calc) and "spoken:'" in calc)
-check('Calcular: cálculos só no scientificState',not any(re.search(r'calculateScientificState|calculationStructure|calculationMetal',f.read_text()) for f in (root/'domain').rglob('*.js')) and 'calculations:' in statecode)
-state=subprocess.run(['node',str(root/'scripts/validate-scientific-state.cjs')],capture_output=True,text=True)
-check('Validador do estado científico',state.returncode==0 and '"schemaVersion"' in state.stdout,state.stderr[-500:] or None)
-# Identidade oficial (0.9.0): cópias íntegras do pacote do autor; o adaptador e a correção ficam em arquivos próprios.
-official={'domain/silm/abertura/silm-opening.js':'73a0c65ca0d7defe0669e8f8df891a8debea205b168336337704b63daf3d9b69','domain/silm/abertura/silm-opening.css':'c9436bf26582566e15cc1ffe13af1faf08bb68c32851fefbf0b461fb6686e6f8',
- 'assets/silm-simbolo.svg':'b9af1175e401f06b8aec2583b89a8c626a823bb6c88be8b9174ffeaf4721a766','assets/silm-logo-vertical.svg':'3569ac1a23e5d380122d7f3326ab39c5bfe99281f24518b84c144b6dcc3e0968',
- 'assets/silm-icone.svg':'15a417fbf0eaeeda13d0d5492cd44bb5157a3784afbf5b6b2e99a0e996b15ea5','favicon-dark.svg':'15a417fbf0eaeeda13d0d5492cd44bb5157a3784afbf5b6b2e99a0e996b15ea5','favicon-light.svg':'15a417fbf0eaeeda13d0d5492cd44bb5157a3784afbf5b6b2e99a0e996b15ea5'}
-mismatch=[p for p,h in official.items() if hashlib.sha256((root/p).read_bytes()).hexdigest()!=h]
-html=(root/'index.html').read_text()
-check('Identidade oficial íntegra e abertura no início do <body>',not mismatch and html.index('domain/silm/abertura/silm-opening.js')<html.index('class="app-header"') and 'id="silm-opening"' not in html and 'assets/silm-simbolo.svg' in html,{'mismatch':mismatch})
-# Representação 2D (0.11.x): renderizador comum, representationState fora do estado científico, isométrica congelada.
-renderer=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/renderer-2d.js').read_text())
-reprcode=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/representation.js').read_text())
-crystalcode=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',(root/'domain/silm/crystal.js').read_text())
-css=(root/'domain/silm/assembly.css').read_text()
-check('Representação 2D: renderizador comum nas três cenas, sem ligações e com a ordem central de camadas',all(f"createStage(" in (root/'domain/silm'/n).read_text() for n in ('crystal-view.js','assembly-view.js','exploration.js')) and not re.search(r'bond|createElementNS\([^)]*,\'(line|path|polyline)\'\)',renderer,re.I) and "LAYERS=Object.freeze(['background','lattice','unitCell','neighbors','electrons','properties','structure','measurementOverlay','calculationOverlay','labels','selection'])" in renderer and not re.search(r'\.silm-(measure|calc)-overlay[^{]*\{[^}]*z-index',css))
-check('Representação 2D: representationState separado e versionado; câmera fora do estado científico, do Desfazer e do Histórico',"'representation.view'" in boot and 'VERSION=2' in reprcode and not re.search(r'camera|zoom|projection|representation\.view',statecode) and not re.search(r'storage|model\.|logEvent|undo',reprcode+renderer))
-check('Representação 2D: projeção isométrica congelada para o Organizar e o calor (vistas não mudam o estado nem a experiência)',re.search(r'function organize\(g,freeUnits\)\{[^}]*const L=layout\(g,',crystalcode) is not None and 'P.heat(refCentres' in crystal and 'X.layout(g,' in crystal)
-# Representação 3D (0.12.x): a mesma geometria em Å, sem motor 3D paralelo, sem medições 3D e com volta ao 2D.
-viewcode=re.sub(r'/\*[\s\S]*?\*/|//[^\n]*','',crystal)
-check('Representação 3D: câmera de órbita sobre as coordenadas científicas (Å), no mesmo renderizador e com volta ao 2D científico',
- 'function layout3D(g,fit,cam' in crystalcode and 'X.layout3D(g,fitCarts,cam3)' in viewcode and 'rep2.fail3D(error)' in viewcode and 'createStage(' in crystal
- and not re.search(r'WebGL|getContext|THREE\.|measurements3D|electrons3D',viewcode+crystalcode+boot) and "VIEW_MODES=Object.freeze(['2d','3d'])" in reprcode)
-check('Representação 3D: eixos são referência visual fora do palco, sem linhas de ligação; Organizar e calor seguem a isométrica',
- "axes.setAttribute('aria-hidden','true')" in crystal and 'area.append(axes)' in crystal and crystal.count("svgEl('line'")==1 and 'P.heat(refCentres' in crystal)
-result={'product':'SILM','version':version,'checks':checks,'passed':sum(c['status']=='PASS' for c in checks),'failed':sum(c['status']=='FAIL' for c in checks)}
-(root/'docs/evidence/AUDITORIA-SILM.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
-print(json.dumps(result,ensure_ascii=False,indent=2));raise SystemExit(bool(result['failed']))
+import hashlib, json, re, subprocess
+
+root = Path(__file__).resolve().parents[1]
+checks = []
+
+
+def check(name, condition, detail=None):
+    checks.append({'check': name, 'status': 'PASS' if condition else 'FAIL', 'detail': detail})
+
+
+def read(path):
+    return (root / path).read_text(encoding='utf-8')
+
+
+def node(*args):
+    result = subprocess.run(['node', *args], cwd=root, capture_output=True, text=True)
+    return result.returncode, (result.stdout + result.stderr).strip()[-600:]
+
+
+def strip_comments(code):
+    return re.sub(r'/\*[\s\S]*?\*/|//[^\n]*', '', code)
+
+
+version = read('VERSION').strip()
+
+# 1. Versão única (a mesma verificação do build).
+code, out = node('scripts/check-version.cjs')
+check('Versão única do produto (VERSION, pacote, BUILD-INFO, manifesto, rótulos, cache)', code == 0, out)
+
+# 2. Base SI travada: cada arquivo do snapshot upstream confere com o hash do base-lock.
+lock = json.loads(read('integracao/base-lock.json'))
+mismatch = [p for p, h in lock['files'].items()
+            if not (root / 'integracao/upstream' / p).is_file()
+            or hashlib.sha256((root / 'integracao/upstream' / p).read_bytes()).hexdigest() != h]
+check('Base SI travada por hash (integracao/base-lock.json)', not mismatch,
+      {'version': lock.get('version'), 'commit': lock.get('commit'), 'divergentes': mismatch})
+
+# 3. Entrada gerada coerente: index.html é exatamente a saída de build-main-entry a partir da fonte.
+source = read('integracao/index.html')
+
+
+def forward(html):
+    def rewrite(m):
+        url = m.group(2)
+        url = url[3:] if url.startswith('../') else url if (':' in url or url.startswith('#')) else 'integracao/' + url
+        return m.group(1) + url + m.group(3)
+    html = re.sub(r'((?:src|href)=")([^"]+)(")', rewrite, html)
+    return html.replace('</head>', '<link rel="manifest" href="manifest.webmanifest"><script src="integracao/pwa.js" defer></script></head>', 1)
+
+
+html = read('index.html')
+check('index.html gerado a partir de integracao/index.html (sem edição direta)', forward(source) == html)
+
+# 4. Um único shell: a entrada não carrega o núcleo antigo nem o bootstrap antigo do domínio.
+legacy = [ref for ref in re.findall(r'(?:src|href)="([^"]+)"', html)
+          if ref.startswith(('js/', 'css/')) or ref in ('a11y.js', 'domain/entry.js', 'domain/silm/bootstrap.js', 'domain/silm/prelude.js')]
+check('Um único shell carregado (Base SI); núcleo antigo fora da entrada', not legacy and 'integracao/base-core.js' in html and 'integracao/compat.js' in html, legacy)
+
+# 5. Motor científico carregado na ordem de dependência, com o adaptador por último.
+order = ['integracao/base-core.js', 'integracao/compat.js', 'domain/silm/data/bundle.js', 'domain/silm/data-api.js', 'domain/silm/assembly.js',
+         'domain/silm/crystal.js', 'domain/silm/properties.js', 'domain/silm/measurements.js', 'domain/silm/calculations.js', 'domain/silm/state.js',
+         'domain/silm/representation.js', 'domain/silm/renderer-2d.js', 'domain/silm/assembly-view.js', 'domain/silm/crystal-view.js',
+         'domain/silm/electron-view.js', 'domain/silm/property-view.js', 'domain/silm/measure-view.js', 'domain/silm/routes.js',
+         'domain/silm/missions.js', 'domain/silm/themes.js', 'domain/silm/route-session.js', 'integracao/adapter.js']
+positions = [html.find('src="' + p + '"') for p in order]
+check('Motor científico na ordem de dependência e adaptador por último', all(p >= 0 for p in positions) and positions == sorted(positions),
+      {p: i for p, i in zip(order, positions) if i < 0} or None)
+
+# 6. Cache offline: todo arquivo existe, toda dependência da entrada está no cache e nada morto entra nele.
+sw = read('sw.js')
+files = json.loads(re.search(r'const FILES=(\[[\s\S]*?\]);\nconst local', sw).group(1))
+missing = [f for f in files if f != './' and not (root / f).is_file()]
+refs = [r for r in re.findall(r'(?:src|href)="([^"?#]+)', html) if ':' not in r and (root / r).is_file()]
+uncached = [r for r in refs if r not in files]
+dead = [f for f in files if f.startswith(('js/', 'css/')) or f in ('a11y.js', 'domain/silm/bootstrap.js', 'integracao/upstream/app.js') or f.endswith(('.ts', '.cif'))]
+check('Cache offline íntegro: arquivos existentes, dependências da entrada presentes, sem arquivos mortos',
+      not missing and not uncached and not dead, {'recursos': len(files), 'ausentes': missing, 'fora_do_cache': uncached, 'mortos': dead})
+
+# 7. Sintaxe JavaScript dos arquivos carregados.
+errors = []
+for ref in refs:
+    if ref.endswith('.js'):
+        code, out = node('--check', ref)
+        if code:
+            errors.append({ref: out})
+check('Sintaxe JavaScript dos scripts da entrada', not errors, errors or None)
+
+# 8. Estado científico: schema 8 e validadores do banco e do estado.
+state = read('domain/silm/state.js')
+code_data, out_data = node('scripts/validate-scientific-data.cjs')
+code_state, out_state = node('scripts/validate-scientific-state.cjs')
+check('Estado científico no schema 8; banco e estado validados', 'schemaVersion:8' in state and code_data == 0 and code_state == 0,
+      None if code_data == 0 and code_state == 0 else {'dados': out_data, 'estado': out_state})
+
+# 9. Contratos de representação: sem ligações M—M; câmera fora do estado; isométrica congelada para Organizar e calor.
+crystal_view = read('domain/silm/crystal-view.js')
+crystal = strip_comments(read('domain/silm/crystal.js'))
+representation = strip_comments(read('domain/silm/representation.js'))
+check('Vista cristalina sem ligações fora do contorno da célula', not re.search(r'bond', crystal_view, re.I) and crystal_view.count("svgEl('line'") == 1)
+check('Representação fora do estado científico (câmera, projeção, modo 2D/3D)',
+      'VERSION=2' in representation and not re.search(r'camera|zoom|projection|representation\.view', strip_comments(state)))
+check('Projeção isométrica congelada para o Organizar e o calor',
+      re.search(r'function organize\(g,freeUnits\)\{[^}]*const L=layout\(g,', crystal) is not None and 'P.heat(refCentres' in crystal_view)
+check('Representação 3D sobre as coordenadas científicas, sem WebGL no domínio',
+      'function layout3D(g,fit,cam' in crystal and not re.search(r'WebGL|getContext\(.webgl|THREE\.', strip_comments(crystal_view) + crystal))
+
+# 10. Roteiros: catálogo válido, um módulo por roteiro (a mesma regra do validador do domínio).
+code, out = node('-e', "const fs=require('fs'),vm=require('vm');const S=require('./scripts/validate-scientific-state.cjs').load();"
+                 "const box=vm.createContext({SILM:S,Date,JSON,Object});vm.runInContext(fs.readFileSync('domain/silm/routes.js','utf8'),box);"
+                 "const r=S.routes.registry;if(!r.length||r.some(x=>typeof x.module!=='string'))process.exit(1);console.log(r.length+' roteiros')")
+check('Roteiros: catálogo válido, um módulo por roteiro', code == 0, out)
+
+# 11. Documentação obrigatória da arquitetura atual.
+required = ['ROADMAP-SILM.md', 'SCIENTIFIC-STATE.md', 'ARQUITETURA-CIENTIFICA.md', 'CONTRATO-VERSIONAMENTO.md', 'ESTRUTURAS-CRISTALINAS.md',
+            'CONTRATO-CRISTALOGRAFICO.md', 'COBERTURA-METAIS.md', 'MODELO-ELETRONICO.md', 'PROPRIEDADES-METALICAS.md', 'CONTRATO-PROPRIEDADES.md',
+            'FONTES-E-PROVENIENCIA.md', 'MODULO-MEDIR.md', 'CONTRATO-MEDICOES.md', 'MODULO-CALCULAR.md', 'CONTRATO-CALCULOS.md',
+            'CONTRATO-REPRESENTACAO-2D.md', 'CONTRATO-REPRESENTACAO-3D.md', 'RENDERER-2D.md', 'RENDERER-3D.md', 'ROTEIROS-EXPERIMENTAIS.md',
+            'CONTRATO-ROTEIROS.md', 'COBERTURA-ROTEIROS.md', 'MISSOES.md', 'CONTRATO-MISSOES.md', 'APRENDER-TEMAS.md', 'CONTRATO-TEMAS.md',
+            'INTEGRACAO-BASE-0.9.8.md', 'PARIDADE-BASE-SI-0.15.2.md', 'PARIDADE-SIAB-SILM.md', 'PARIDADE-MECANICA-SIAB-SILM-2026-10-29.md',
+            'SILM-' + version + '.md']
+absent = [p for p in required if not (root / 'docs' / p).is_file()]
+check('Documentação obrigatória', not absent, absent or None)
+
+result = {'product': 'SILM', 'version': version, 'architecture': 'Base SI ' + str(lock.get('version')) + ' + motor científico SILM',
+          'checks': checks, 'passed': sum(c['status'] == 'PASS' for c in checks), 'failed': sum(c['status'] == 'FAIL' for c in checks)}
+(root / 'docs/evidence/AUDITORIA-SILM.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+print(json.dumps(result, ensure_ascii=False, indent=2))
+raise SystemExit(bool(result['failed']))

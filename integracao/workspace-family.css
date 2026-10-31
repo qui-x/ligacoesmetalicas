@@ -23,5 +23,29 @@
 .silm-module-card>summary:focus-visible,.silm-data-menu>*:focus-visible,#silm-data-back:focus-visible,#si-dock-viewer-back:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
 @media(max-width:900px){#si-dock-right .si-dock-header h2{flex:1;min-width:80px}#si-dock-right .si-dock-scroll{scroll-padding-block:12px}}
 @media(forced-colors:active){.silm-module-card.is-active{border:2px solid Highlight}.silm-module-badge{color:CanvasText}}
-.silm-comparison{display:block!important;overflow:auto;max-height:70vh;padding:1rem}.silm-comparison>div:first-child{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}.silm-comparison select{max-width:100%}.silm-comparison-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:1rem}.silm-comparison-cards article{border:1px solid currentColor;border-radius:.6rem;padding:.8rem;min-width:0}.silm-comparison-cards svg{display:block;width:100%;max-height:240px}.silm-comparison-cards small{overflow-wrap:anywhere}
-.silm-comparison-stage{position:relative;aspect-ratio:300/230}.silm-comparison-stage svg{height:100%;max-height:none}.silm-comparison-stage canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.silm-comparison{display:grid!important;gap:8px;min-width:0;overflow:visible;max-height:none;padding:0}
+.silm-comparison-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;min-width:0}
+.silm-comparison-field{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:.88rem;min-width:0}
+.silm-comparison-select{max-width:min(280px,100%);min-height:40px;padding:6px 9px;font:inherit;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px}
+.silm-comparison-level{min-width:72px;font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.silm-comparison input[type=range]{width:min(170px,24vw);min-width:100px;accent-color:var(--accent)}
+.silm-comparison-actions{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.silm-comparison-actions button{min-height:44px;padding:7px 12px}
+.silm-comparison-intro{margin:0;font-size:.8rem;color:var(--muted)}
+.silm-comparison-limits{font-size:.8rem;color:var(--muted)}
+.silm-comparison-limits summary,.silm-comparison-details summary{cursor:pointer;min-height:34px;display:flex;align-items:center}
+.silm-comparison-limits p,.silm-comparison-details p{margin:4px 0;line-height:1.5}
+.silm-comparison-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;align-items:stretch;min-width:0}
+.silm-comparison-cards article{display:flex;flex-direction:column;gap:7px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:12px;min-width:0;overflow-wrap:anywhere}
+.silm-comparison-card-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.silm-comparison-card-heading h3{font-size:1rem;line-height:1.25;margin:0;min-width:0}
+.silm-comparison-structure{flex:none;border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:.72rem;font-weight:700;color:var(--muted)}
+.silm-comparison-stage{position:relative;aspect-ratio:300/230;min-width:0;overflow:hidden}
+.silm-comparison-stage svg{display:block;width:100%;height:100%;max-height:none}
+.silm-comparison-stage canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.silm-comparison-card-state{font-size:.8rem;color:var(--muted);margin:0}
+.silm-comparison-details{font-size:.78rem;color:var(--muted);border-top:1px solid var(--border);padding-top:5px}
+.silm-comparison-details p{overflow-wrap:anywhere}
+@media(max-width:900px){.silm-comparison-controls{align-items:flex-start;gap:8px}.silm-comparison-field{width:100%}.silm-comparison-select{flex:1;min-width:0}.silm-comparison-actions{width:100%}.silm-comparison-actions button{flex:1;min-width:0}.silm-comparison-cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}.silm-comparison-stage{max-height:230px}}
+@media(max-width:520px){.silm-comparison-cards{grid-template-columns:minmax(0,1fr)}.silm-comparison-card-heading h3{font-size:.95rem}.silm-comparison-stage{max-height:220px}}
+@media(forced-colors:active){.silm-comparison-structure{border:1px solid CanvasText}}

@@ -61,7 +61,7 @@
 :root[data-contrast=on] .silm-unit-core{background:#000;border:2px solid #fff;color:#fff;box-shadow:none}
 :root[data-contrast=on] .silm-assembly-collective g{fill:#fff;opacity:.22}
 :root[data-contrast=on] .silm-unit[aria-pressed=true] .silm-unit-core{outline-width:4px}
-@media(forced-colors:active){.silm-unit-core{background:Canvas;border:2px solid CanvasText;color:CanvasText;forced-color-adjust:none}.silm-unit[aria-pressed=true] .silm-unit-core{outline:4px solid Highlight}.silm-crystal-unit[data-heat-source]::after{border-color:Highlight}.silm-assembly-collective g{fill:CanvasText;opacity:.15}}
+@media(forced-colors:active){.silm-unit-core{background:Canvas;border:2px solid CanvasText;color:CanvasText;forced-color-adjust:none}.silm-unit[aria-pressed=true] .silm-unit-core{outline:4px solid Highlight}.silm-crystal-unit[data-heat-source]>.silm-unit-body::after{border-color:Highlight}.silm-assembly-collective g{fill:CanvasText;opacity:.15}}
 /* Estrutura cristalina (0.5.x): esferas reduzidas, profundidade por escala e ordem; contorno geométrico tracejado. */
 .silm-crystal-stage{--unit-size:10%}
 .silm-crystal-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
@@ -70,7 +70,9 @@
 .silm-cell-edges line[data-back=true]{opacity:.4}
 .silm-cell-planes polygon{fill:var(--scientific-accent);opacity:.07;stroke:none}
 .silm-neighbor-ghosts circle{fill:none;stroke:var(--scientific-accent);stroke-width:.5;stroke-dasharray:1 .8}
-.silm-crystal-unit{width:var(--unit-size);height:var(--unit-size);transform:translate(-50%,-50%) scale(var(--depth-scale,1));opacity:var(--depth-fade,1);cursor:pointer}
+.silm-crystal-unit{box-sizing:content-box;padding:var(--hit-pad,0px);width:var(--unit-size);height:var(--unit-size);transform:translate(-50%,-50%) scale(var(--depth-scale,1));opacity:var(--depth-fade,1);cursor:pointer}
+/* Corpo visual da esfera (tamanho do modelo); o botão em volta pode ter margem transparente para o alvo de toque. */
+.silm-unit-body{position:relative;width:100%;height:100%;display:grid;place-items:center;pointer-events:none}
 .silm-crystal-unit .silm-unit-core{position:relative;width:100%;height:100%;font-size:clamp(7px,calc(var(--unit-px,24px)*.42),15px)}
 .silm-crystal[data-symbols=hidden] .silm-crystal-unit .silm-unit-core{font-size:0}
 .silm-crystal-unit[aria-pressed=true],.silm-crystal-unit[data-neighbor]{opacity:1}
@@ -78,8 +80,8 @@
 .silm-crystal-unit[data-placement=crystallographic] .silm-unit-core{filter:saturate(.7) brightness(.96)}
 /* Vizinho imediato: anel pontilhado externo + contorno, sem depender só de cor. */
 /* Região aquecida (fontes de calor): contorno tracejado em qualquer projeção; não depende só de cor. */
-.silm-crystal-unit[data-heat-source]::after{content:'';position:absolute;inset:-24%;border:1.5px dashed var(--silm-heat);border-radius:50%;pointer-events:none}
-.silm-crystal-unit[data-neighbor]::before{content:'';position:absolute;inset:-14%;border:2px dotted var(--scientific-accent);border-radius:50%;pointer-events:none}
+.silm-crystal-unit[data-heat-source]>.silm-unit-body::after{content:'';position:absolute;inset:-24%;border:1.5px dashed var(--silm-heat);border-radius:50%;pointer-events:none}
+.silm-crystal-unit[data-neighbor]>.silm-unit-body::before{content:'';position:absolute;inset:-14%;border:2px dotted var(--scientific-accent);border-radius:50%;pointer-events:none}
 .silm-crystal-unit[data-neighbor] .silm-unit-core{outline:2px solid var(--scientific-accent);outline-offset:1px}
 .silm-site-label{display:none;position:absolute;right:-6%;bottom:-6%;min-width:1.4em;padding:0 .25em;border-radius:6px;background:var(--panel);border:1px solid var(--border);color:var(--text);font-size:calc(max(9px,calc(var(--stage)*.022))/var(--camera-zoom,1));font-weight:800;line-height:1.35;text-align:center}
 .silm-crystal[data-labels=true] .silm-site-label:not(:empty){display:block}
@@ -101,7 +103,7 @@
 :root[data-contrast=on] .silm-lattice circle{fill:#fff}
 :root[data-contrast=on] .silm-cell-edges line{stroke:#ff0;opacity:1}
 :root[data-contrast=on] .silm-crystal-unit[data-layer=B] .silm-unit-core::after{border-color:#fff}
-@media(forced-colors:active){.silm-lattice circle{fill:CanvasText}.silm-cell-edges line,.silm-neighbor-ghosts circle{stroke:LinkText}.silm-crystal-unit[data-neighbor]::before{border-color:Highlight}}
+@media(forced-colors:active){.silm-lattice circle{fill:CanvasText}.silm-cell-edges line,.silm-neighbor-ghosts circle{stroke:LinkText}.silm-crystal-unit[data-neighbor]>.silm-unit-body::before{border-color:Highlight}}
 @media(max-width:600px){.silm-crystal-legend{display:none}.silm-crystal-tools{grid-template-columns:1fr 1fr}.silm-segmented{width:100%}.silm-segmented button{flex:1}}
 /* 0.6.x — elétrons de valência deslocalizados: marcadores qualitativos (ciano com contorno de contraste). */
 :root{--silm-electron:#5fe3ff;--silm-electron-edge:#06202a}

@@ -13,9 +13,17 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,say})=>{
   try{for(const k of Object.keys(localStorage)){const pre=['silm-base-integration:','simcore_domain_silm_v1_'].find(p=>k.startsWith(p));if(pre&&/^(score|points|xp|level|rank|streak|medals|badges|progressPercent)$/i.test(decodeURIComponent(k.slice(pre.length))))localStorage.removeItem(k);}}catch{}
  }
  function home(){
-  $('si-home-learning-meta').textContent=S.themes.registry.length+' temas disponíveis';$('si-home-missions-meta').textContent=S.missions.registry.length+' investigações curtas';$('si-home-scripts-meta').textContent=S.routes.registry.length+' roteiros experimentais';const noteCount=journal.snapshot().notes.length;$('si-home-notebook-meta').textContent=noteCount?(noteCount+' registro'+(noteCount===1?'':'s')+' salvo'+(noteCount===1?'':'s')):'Pronto para seus registros';
-  const c=session.context(),resume=$('si-home-resume');resume.hidden=!c;if(c){$('si-home-resume-title').textContent=session.route().title;$('si-home-resume-meta').textContent=c.status==='completed'?'Concluído':'Investigação em andamento';$('si-home-resume-link').href='#/'+(c.type==='mission'?'missoes':'roteiros')+'?item='+c.id;}
-  const e=model.state.metal,n=model.state.structure?.units.length||0;$('si-home-scene-summary').hidden=!e;$('si-home-scene-summary').textContent=e?S.data.get(e.atomicNumber).name+' · '+n+' unidades salvas':'';
+  const themeCount=S.themes.registry.length,missionCount=S.missions.registry.length,routeCount=S.routes.registry.length;
+  $('si-home-learning-meta').textContent=themeCount+' '+(themeCount===1?'tema para explorar':'temas para explorar');
+  $('si-home-missions-meta').textContent=missionCount+' '+(missionCount===1?'desafio para resolver':'desafios para resolver');
+  $('si-home-scripts-meta').textContent=routeCount+' '+(routeCount===1?'investigação guiada':'investigações guiadas');
+  const noteCount=journal.snapshot().notes.length;
+  $('si-home-notebook-meta').textContent=noteCount?(noteCount+' registro'+(noteCount===1?'':'s')+' salvo'+(noteCount===1?'':'s')):'Pronto para seus registros';
+  const c=session.context(),resume=$('si-home-resume');resume.hidden=!c;
+  if(c){$('si-home-resume-title').textContent=session.route().title;$('si-home-resume-meta').textContent=c.status==='completed'?'Concluído':'Investigação em andamento';$('si-home-resume-link').href='#/'+(c.type==='mission'?'missoes':'roteiros')+'?item='+c.id;}
+  const e=model.state.metal,n=model.state.structure?.units.length||0;
+  $('si-home-scene-summary').hidden=!e;
+  $('si-home-scene-summary').textContent=e?S.data.get(e.atomicNumber).name+' · '+n+' unidades salvas':'';
  }
  function notebookScene(snapshot=model.snapshot()){
   const e=snapshot?.metal?S.data.get(snapshot.metal.atomicNumber):null,id=e?'silm-metal-'+e.atomicNumber:null;
