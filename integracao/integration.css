@@ -364,3 +364,11 @@ body:is([data-silm-route="aprender"],[data-silm-route="missoes"],[data-silm-rout
 .silm-data-documents h3{margin:0;font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
 .silm-data-documents p{margin:0;font-size:.84rem;color:var(--muted)}
 .silm-data-documents .button{min-height:44px;width:100%;justify-content:center;display:inline-flex;align-items:center}
+
+/* Paridade SIAB — Etapa 5.5, Visão geral: o contêiner também recebe .si-overview-grid (colunas de 160 px da Base), que
+   espremia controles, aviso e cartões em colunas estreitas. Em uma coluna, a barra de controles ocupa a largura toda, como
+   as ações de "Sua bancada" no SIAB, e os cartões formam a grade logo abaixo. */
+#silm-comparison-items.silm-comparison{grid-template-columns:minmax(0,1fr);gap:12px}
+#silm-comparison-items .silm-comparison-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+#silm-comparison-items .silm-comparison-limits{margin-top:-6px}
+@media(max-width:520px){#silm-comparison-items .silm-comparison-actions button{flex:1 1 30%}}

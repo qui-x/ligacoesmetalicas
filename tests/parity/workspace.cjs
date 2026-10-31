@@ -115,6 +115,33 @@ module.exports=async(browser,url)=>{
   assert.match(records,/Calculado pelo SILM/);assert.match(records,/Parâmetro de rede/);
   await p.locator('#silm-data-back').click();await p.waitForFunction(()=>document.activeElement?.matches('[data-silm-data-open="registros"]'),'',{timeout:4000});
  }finally{await vctx.close();}
+ /* 5. 5.5 Visão geral: barra de controles em largura total (como as ações de "Sua bancada"), cartões com largura útil,
+    nada cortado no celular, propriedade aplicada por cartão com estado qualitativo ou motivo, e Restaurar. */
+ for(const [width,height] of [[1366,768],[390,844],[844,390]]){
+  const mobile=width<500||(width<900&&width<height),where=width+'×'+height;
+  const octx=await browser.newContext({viewport:{width,height},isMobile:mobile,hasTouch:mobile,reducedMotion:'reduce'});
+  try{
+   const p=await open(octx,'#/ambiente');
+   for(const z of ['29','26']){await p.locator('[data-open-dock="montagem"]').click();await p.locator('[data-left-tab="preparo"]').click();await p.locator('#silm-metal').selectOption(z);await p.locator('#silm-start').click();
+    if(await p.locator('#si-modal-confirm').isVisible().catch(()=>false))await p.locator('#si-modal-confirm').click();await p.waitForFunction(z=>SILMIntegration.snapshot().metal?.atomicNumber===Number(z),z);
+    for(let i=0;i<3;i++)await p.locator('#silm-add').click();await p.locator('#silm-organize').click();await p.waitForFunction(()=>SILMIntegration.snapshot().structure?.mode==='crystalline');await p.locator('[data-close-dock="left"]').click();}
+   await p.locator('[data-scene-view="overview"]').click();await visible(p,'.silm-comparison-cards article');
+   const o=await p.evaluate(()=>{const host=document.getElementById('silm-comparison-items'),r=el=>el.getBoundingClientRect(),controls=host.querySelector('.silm-comparison-controls');
+    return {host:r(host).width,controls:r(controls).width,cards:[...host.querySelectorAll('.silm-comparison-cards article')].map(a=>r(a).width),
+     clipped:[...host.querySelectorAll('.silm-comparison-actions button, .silm-comparison-select')].filter(b=>b.scrollWidth>b.clientWidth+1).map(b=>b.textContent.trim()||b.id),
+     targets:[...host.querySelectorAll('.silm-comparison-actions button')].map(b=>r(b).height),overflow:document.documentElement.scrollWidth-innerWidth};});
+   assert.ok(o.controls>=o.host*0.95,'Barra de controles em largura total em '+where+': '+o.controls+' de '+o.host);
+   assert.equal(o.cards.length,2,where);for(const w of o.cards)assert.ok(w>=Math.min(250,o.host-4),'Cartão com largura útil em '+where+': '+w);
+   assert.deepEqual(o.clipped,[],'Nenhum controle cortado em '+where);for(const h of o.targets)assert.ok(h>=44,'Ação com 44 px em '+where);
+   assert.ok(o.overflow<=1,'Sem rolagem lateral em '+where+': '+o.overflow+' px');
+   if(width===1366){
+    await p.locator('#silm-comparison-property').selectOption('electrical');await p.locator('#silm-comparison-level').fill('2');
+    await p.waitForFunction(()=>[...document.querySelectorAll('.silm-comparison-card-state')].length===2,'',{timeout:4000});
+    for(const t of await p.locator('.silm-comparison-card-state').allInnerTexts())assert.ok(/Qualitativa · 2\/3/.test(t)||t.length>10,'Cada cartão mostra o estado qualitativo ou o motivo: '+t);
+    await p.getByRole('button',{name:'Restaurar',exact:true}).click();await p.waitForFunction(()=>document.querySelector('.silm-comparison-level')?.textContent==='0/3','',{timeout:4000});
+   }
+  }finally{await octx.close();}
+ }
  assert.deepEqual(errors,[]);
- console.log('PASS TEST-WORKSPACE 5.1–5.4: Oficina vazia em 5 tamanhos com ações funcionais, etiqueta do módulo, adicionar/desfazer, troca de módulo sem perder a investigação; Montagem com Fechar, grupos, ação principal, resumo em pares, retorno do foco e indisponibilidade explícita; Investigar e Dados da investigação com famílias do módulo, camadas sem efeito científico, origens, registros rotulados e seção Relatório.');
+ console.log('PASS TEST-WORKSPACE 5.1–5.5: Oficina vazia em 5 tamanhos com ações funcionais, etiqueta do módulo, adicionar/desfazer, troca de módulo sem perder a investigação; Montagem com Fechar, grupos, ação principal, resumo em pares, retorno do foco e indisponibilidade explícita; Investigar e Dados da investigação com famílias do módulo, camadas sem efeito científico, origens, registros rotulados e seção Relatório; Visão geral com controles em largura total, cartões úteis, nada cortado, propriedade e Restaurar.');
 };
