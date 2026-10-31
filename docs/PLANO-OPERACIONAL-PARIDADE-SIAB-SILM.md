@@ -54,7 +54,7 @@ Desde a integração com a Base SI 0.9.17, a entrada carrega só a Base (travada
 | Caderno, Manual, Professor | `integracao/unified-ui.js` (`notebook`, `manual`, `professor`), `domain/silm/manual.js` |
 | Relatórios | `integracao/route-ui.js` `report()`, `integracao/unified-ui.js` `freeReport()` |
 | Montagens prontas e Tour | Sem tela na entrada atual (lacunas das etapas 9 e 10) |
-| Menu, preferências, PWA | Gaveta em `integracao/index.html`, `integracao/base-core.js` (gerado da Base), `integracao/pwa.js`, `sw.js` (gerado por `scripts/build-sw.cjs`) |
+| Menu, preferências, PWA | Gaveta, janelas Tela inicial e Sobre em `integracao/index.html`; `integracao/adapter.js` `shell()` (tela inicial, Sobre, "Agora", acessibilidade direta, abertura); `integracao/base-core.js` (gerado da Base: `setupMenuReview`); `integracao/pwa.js`; `sw.js` (gerado por `scripts/build-sw.cjs`) |
 
 Evidências de cada etapa: `node scripts/parity-capture.cjs <ID> <rota-SIAB> <rota-SILM> --siab <pasta do SIAB>`. Testes de tela: `npm run test:parity` (`tests/parity-screens.cjs`, um módulo por etapa em `tests/parity/`).
 
@@ -76,6 +76,7 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 5.5 | Visão geral | Oficina → Visão geral | Aceito em 31/10/2026 — registro na seção 8 |
 | 6 | Caderno | Caderno | Aceito em 31/10/2026 — registro na seção 8 |
 | 7 | Manual | Manual | Aceito em 31/10/2026 — registro na seção 8 |
+| 12 | Menu, preferências, projetor e aplicativo | Menu, preferências, projetor e aplicativo | Aceito em 31/10/2026 — registro na seção 8 (MENU-05 entra com as Etapas 9 e 10) |
 
 Depois das sete telas principais, percorrer os recursos secundários na ordem em que aparecem no menu do SIAB: **Montagens prontas → Tour da bancada → Área do Professor → apoio pedagógico e aula acessível → Preferências e Acessibilidade → Modo projetor → Aplicativo / instalação / Sobre**.
 
@@ -421,31 +422,31 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 
 ### Navegação e contexto
 
-- [ ] `MENU-01` — Comparar cabeçalho, abertura/fechamento da gaveta, backdrop, largura, foco inicial e restauração do foco.
-- [ ] `MENU-02` — Conferir ordem principal: Início → Aprender → Missões → Roteiros → Oficina → Caderno → Manual.
-- [ ] `MENU-03` — Conferir área “Agora”, contexto atual, botão Continuar e estado de atividade em andamento.
-- [ ] `MENU-04` — Conferir ações da atividade: Sobre esta atividade, Ajuda, Relatório, Finalizar e Encerrar; respeitar navegação restrita.
-- [ ] `MENU-05` — Conferir ordem de recursos secundários: Montagens prontas, Tour, Professor, apoio pedagógico e preferências.
-- [ ] `MENU-06` — Exibir acesso explícito à Área do Professor no grupo Professor.
-- [ ] `MENU-07` — Conferir estado ativo da rota, navegação por teclado, Escape e fechamento após selecionar destino.
+- [x] `MENU-01` — Comparar cabeçalho, abertura/fechamento da gaveta, backdrop, largura, foco inicial e restauração do foco.
+- [x] `MENU-02` — Conferir ordem principal: Início → Aprender → Missões → Roteiros → Oficina → Caderno → Manual.
+- [x] `MENU-03` — Conferir área “Agora”, contexto atual, botão Continuar e estado de atividade em andamento.
+- [x] `MENU-04` — Conferir ações da atividade: Sobre esta atividade, Ajuda, Relatório, Finalizar e Encerrar; respeitar navegação restrita.
+- [~] `MENU-05` — Conferir ordem de recursos secundários: Montagens prontas, Tour, Professor, apoio pedagógico e preferências.
+- [x] `MENU-06` — Exibir acesso explícito à Área do Professor no grupo Professor.
+- [x] `MENU-07` — Conferir estado ativo da rota, navegação por teclado, Escape e fechamento após selecionar destino.
 
 ### Preferências e acessibilidade
 
-- [ ] `A11Y-01` — Comparar modo escuro, alto contraste, tamanho de texto, espaçamento, redução de movimento e leitura simples.
-- [ ] `A11Y-02` — Verificar visão de cores e manter descrições textuais independentes de cor.
-- [ ] `A11Y-03` — Registrar recursos sem implementação como indisponíveis, não como controles falsos.
-- [ ] `A11Y-04` — Verificar persistência das preferências, restauração de padrões e estados em drawer/painéis.
-- [ ] `A11Y-05` — Comparar botão de acessibilidade no cabeçalho e abertura direta do grupo de controles.
-- [ ] `A11Y-06` — Executar axe e revisão manual de foco, nomes acessíveis, contraste e navegação sem mouse.
+- [x] `A11Y-01` — Comparar modo escuro, alto contraste, tamanho de texto, espaçamento, redução de movimento e leitura simples.
+- [x] `A11Y-02` — Verificar visão de cores e manter descrições textuais independentes de cor.
+- [x] `A11Y-03` — Registrar recursos sem implementação como indisponíveis, não como controles falsos.
+- [x] `A11Y-04` — Verificar persistência das preferências, restauração de padrões e estados em drawer/painéis.
+- [x] `A11Y-05` — Comparar botão de acessibilidade no cabeçalho e abertura direta do grupo de controles.
+- [x] `A11Y-06` — Executar axe e revisão manual de foco, nomes acessíveis, contraste e navegação sem mouse.
 
 ### Projetor, inicialização e aplicativo
 
-- [ ] `APP-01` — Comparar Modo projetor: ligar/desligar, persistência, efeito nos painéis e retorno ao layout normal.
-- [ ] `APP-02` — Comparar escolha de tela inicial, redefinir preferência e comportamento na primeira execução.
-- [ ] `APP-03` — Comparar instalação PWA, indicação de instalável, estado offline e recuperação de atualização.
-- [ ] `APP-04` — Comparar Sobre, versão, referências/créditos e atalhos para Manual.
-- [ ] `APP-05` — Conferir que a animação de abertura seja opcional, pule corretamente e respeite movimento reduzido.
-- [ ] `APP-06` — Conferir avisos de armazenamento, conflito entre abas, backup e recuperação.
+- [x] `APP-01` — Comparar Modo projetor: ligar/desligar, persistência, efeito nos painéis e retorno ao layout normal.
+- [x] `APP-02` — Comparar escolha de tela inicial, redefinir preferência e comportamento na primeira execução.
+- [x] `APP-03` — Comparar instalação PWA, indicação de instalável, estado offline e recuperação de atualização.
+- [x] `APP-04` — Comparar Sobre, versão, referências/créditos e atalhos para Manual.
+- [x] `APP-05` — Conferir que a animação de abertura seja opcional, pule corretamente e respeite movimento reduzido.
+- [x] `APP-06` — Conferir avisos de armazenamento, conflito entre abas, backup e recuperação.
 
 ## 5. Requisitos científicos que acompanham todas as telas
 
@@ -483,7 +484,7 @@ O comando `npm test` já reúne os testes científicos, de rotas, aprendizagem e
 - [x] `TEST-MANUAL` — busca, índice, artigo, links, ajuda contextual e impressão: `tests/parity/manual.cjs`.
 - [ ] `TEST-REPORT` — sessões, captura de dados, edição, impressão e acesso restrito.
 - [ ] `TEST-TEACHER` — CRUD de biblioteca, prévia, permissões e import/export.
-- [ ] `TEST-SHELL` — navegação, drawer, foco, preferências, projetor e startup.
+- [x] `TEST-SHELL` — navegação, drawer, foco, preferências, projetor e startup: `tests/parity/shell.cjs`.
 - [ ] `TEST-PWA` — instalação, cache, atualização e uso offline sem falha de dados.
 - [ ] `TEST-RESPONSIVE` — 320×640, 390×844, 844×390, tablet e desktop, sem overflow.
 - [ ] `TEST-PRINT` — Caderno, Relatório, Manual e guia do Professor.
@@ -729,6 +730,29 @@ Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (ro
 Evidências: docs/evidence-parity/MANUAL/
 Pendências: MANUAL-CONTENT-11 parcial (Tour, Montagens prontas, Projetor); Firefox, Safari e aparelhos físicos
 Estado: [x]
+```
+
+### Registro — Etapa 12, Menu, preferências, projetor e aplicativo
+
+```text
+ID da etapa: MENU (01 a 07), A11Y (01 a 06), APP (01 a 06)
+Tela SIAB: #app-drawer (js/ui/gaveta.js), #startup-dialog (js/init/integracao.js), #about-dialog, js/init/pwa.js
+  (acidosebases1.0.0@73848f0)
+Tela SILM: #sidebar e janelas #silm-startup-dialog e #silm-about-dialog (integracao/index.html), shell() em
+  integracao/adapter.js, integracao/pwa.js, setupMenuReview da Base SI 0.9.17
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 12, Menu, preferências e aplicativo" (PR da etapa)
+Viewport(s): 1366×768, 1024×768, 390×844, 320×640, 844×390 (Menu); acessibilidade, convite e Sobre em 1366×768 e 390×844
+Arquivos alterados: integracao/index.html (+ index.html gerado), integracao/adapter.js, integracao/pwa.js,
+  integracao/integration.css, domain/silm/manual.js (tópicos "professor" e "abertura" corrigidos),
+  tests/parity/shell.cjs, tests/parity-screens.cjs
+Diferenças de domínio / N/A: sem tópico único "Referências e créditos" (as fontes ficam por dado); duas opções de tela
+  inicial, como no SIAB; projetor bloqueado durante qualquer atividade (o SIAB bloqueia só nas restritas, Etapa 11)
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
+Evidências: docs/evidence-parity/SHELL/
+Pendências: MENU-05 ("Recursos": Montagens prontas e Tour) com as Etapas 9 e 10; botão "Recarregar" no aviso de nova
+  versão; Firefox, Safari e aparelhos físicos
+Estado: [x] (MENU-05 [~])
 ```
 
 ## 9. Restrições de escopo

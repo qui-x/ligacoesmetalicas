@@ -1,0 +1,152 @@
+{
+ "id": "SHELL",
+ "siab": "qui-x/acidobase acidosebases1.0.0@73848f0",
+ "captures": [
+  {
+   "app": "siab",
+   "shot": "menu",
+   "viewport": "1366x768",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "menu",
+   "viewport": "1366x768",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "menu",
+   "viewport": "1024x768",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "menu",
+   "viewport": "1024x768",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "menu",
+   "viewport": "390x844",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "menu",
+   "viewport": "390x844",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "menu",
+   "viewport": "320x640",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "menu",
+   "viewport": "320x640",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "menu",
+   "viewport": "844x390",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "menu",
+   "viewport": "844x390",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "acessibilidade",
+   "viewport": "1366x768",
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "inicializacao (primeira visita)",
+   "viewport": "1366x768",
+   "inviteOpen": true,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "sobre",
+   "viewport": "1366x768",
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "acessibilidade",
+   "viewport": "1366x768",
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "inicializacao (primeira visita)",
+   "viewport": "1366x768",
+   "inviteOpen": true,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "sobre",
+   "viewport": "1366x768",
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "acessibilidade",
+   "viewport": "390x844",
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "inicializacao (primeira visita)",
+   "viewport": "390x844",
+   "inviteOpen": true,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "shot": "sobre",
+   "viewport": "390x844",
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "acessibilidade",
+   "viewport": "390x844",
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "inicializacao (primeira visita)",
+   "viewport": "390x844",
+   "inviteOpen": true,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "shot": "sobre",
+   "viewport": "390x844",
+   "errors": []
+  }
+ ]
+}
