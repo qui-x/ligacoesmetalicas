@@ -239,3 +239,25 @@ body.si-structure-expanded .silm-camera-toggle{display:none!important}
  body.si-structure-expanded .silm-assembly-identity h1{font-size:.95rem}
 }
 @media(prefers-reduced-motion:reduce){body.si-structure-expanded #si-workspace{scroll-behavior:auto}}
+
+/* Paridade SIAB — Etapa 1, Início (HOME-01 a HOME-08). A Base SI fica intacta em upstream/; os ajustes do SILM moram aqui. */
+/* O cartão é coluna flexível com align-items:flex-start; o topo precisa ocupar a largura para a seta e a etiqueta ficarem à direita. */
+.si-home-family .si-path-top,.si-home-family .si-home-path-primary .si-path-upper{align-self:stretch}
+.si-home-family .si-path-icon{display:grid;place-items:center;flex:none;color:var(--accent)}
+.si-home-family .si-path-icon svg{width:23px;height:23px}
+.si-home-family .si-path-arrow{display:inline-flex;color:var(--muted)}
+.si-home-family .si-path-arrow svg{width:19px;height:19px}
+.si-home-family .si-home-path:hover .si-path-arrow{transform:translateX(3px)}
+.si-home-family .si-home-path-primary .si-path-action svg{width:20px;height:20px;flex:none}
+/* Mesmo respiro do SIAB acima do hero: a seção começa colada ao cabeçalho e tem 34 px (16 px até 900 px de largura) de recuo próprio. */
+body[data-silm-route="inicio"] main{padding-top:0}
+.si-home-family{padding-top:34px}
+/* Metadados dos cartões no peso do SIAB: informação de apoio, não ação. */
+.si-home-family .si-home-path:not(.si-home-path-primary) .si-path-action{font-weight:500}
+/* Botão de acessibilidade do cabeçalho: sem o fundo padrão de botão do navegador (cinza no esquema escuro). */
+.si-header-action{background:transparent;color:var(--text);font:inherit;font-size:12px}
+.si-header-action:hover,.si-header-action[aria-expanded="true"]{background:var(--tint);border-color:var(--accent)}
+@media(max-width:900px){.si-home-family{padding-top:16px}}
+@media(max-width:640px){.si-home-family .si-path-icon svg{width:21px;height:21px}}
+/* Em 320–370 px, "A arquitetura" precisa caber numa linha também com fontes largas do sistema (DejaVu Sans ≈ 213 px a 29 px). */
+@media(max-width:370px){.si-home-family .si-home-hero-icon{width:60px;height:60px}.si-home-family .si-home-hero h1{font-size:clamp(26px,8.4vw,29px)}}

@@ -12,9 +12,14 @@
   for(const page of document.querySelectorAll('#conteudo > [data-view]'))page.hidden=page.dataset.view!==selected;
   for(const link of document.querySelectorAll('a[data-route]')){if(link.dataset.route===selected)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');}
   const route=B.manifest.routes.find(r=>r.id===selected);document.title=route.title+' · SILM';$('current-section').textContent=route.subtitle;
-  document.body.classList.toggle('route-ambiente',selected==='ambiente');window.dispatchEvent(new CustomEvent('si-route-changed',{detail:selected}));B.closeNavigationDrawer(false);
+  document.body.classList.toggle('route-ambiente',selected==='ambiente');document.body.dataset.silmRoute=selected;window.dispatchEvent(new CustomEvent('si-route-changed',{detail:selected}));B.closeNavigationDrawer(false);
+  // Como no SIAB: na primeira abertura o foco fica no início do documento (o link "Ir para o conteúdo" é o primeiro Tab);
+  // ao trocar de tela, a página volta ao topo e o foco vai para o título da nova tela.
+  const previous=lastRoute;lastRoute=selected;if(previous===null)return;
+  if(previous!==selected)window.scrollTo(0,0);
   requestAnimationFrame(()=>{const page=document.querySelector('#conteudo > [data-view="'+selected+'"]');const heading=page?.querySelector('h1,h2');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}});
  };
+ let lastRoute=null;
  let view=null,scope=null,viewKey='',pending=false,ready=false,selected=null,focusAfterRender=null;
  let routeUI=null;
  const allows=tool=>!routeUI||routeUI.session.allows(tool);

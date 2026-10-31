@@ -31,14 +31,32 @@ Estes números descrevem os registros consultados nesta auditoria, não metas de
 | Recurso | SIAB 1.0.0 | SILM na branch auditada | Implicação para a paridade |
 |---|---|---|---|
 | Telas principais | Início, Aprender, Missões, Roteiros Experimentais, Laboratório, Caderno e Manual | Início, Aprender, Missões, Roteiros Experimentais, Oficina dos Metais, Caderno e Manual previstos na navegação | Comparar na mesma ordem |
-| Temas de Aprender | 14 temas registrados em `js/data/temas.js` | 4 temas configurados no bootstrap | Comparar cobertura pedagógica; não igualar contagem automaticamente |
+| Temas de Aprender | 14 temas registrados em `js/data/temas.js` | 7 temas em `domain/silm/themes.js` (correção de 31/10/2026: os 4 temas eram do bootstrap antigo) | Comparar cobertura pedagógica; não igualar contagem automaticamente |
 | Missões | Catálogo distribuído por `js/data/missoes.js` e registros complementares em `js/data/temas.js` | 6 missões em `domain/silm/missions.js` | Conferir cobertura, progressão, evidências e conclusão |
 | Roteiros | 10 percursos montados a partir das montagens com narrativa em `js/data/experimentos.js` | 5 roteiros em `domain/silm/routes.js` | Conferir cobertura e qualidade do percurso; não copiar experimentos |
-| Montagens prontas | 11 registros em `js/data/montagens.js` | 3 presets em `domain/silm/bootstrap.js` | Comparar organização e variedade útil; não criar presets cientificamente inválidos |
+| Montagens prontas | 11 registros em `js/data/montagens.js` | Nenhuma tela ativa na entrada atual: os 3 presets ficaram em `domain/silm/bootstrap.js`, que não é carregado; só a chave `mounting.presets` está reservada em `integracao/durable-storage.js` | Comparar organização e variedade útil; não criar presets cientificamente inválidos |
 | Manual | 13 categorias e 52 tópicos registrados | 3 categorias e 21 tópicos registrados | Lacuna de cobertura e aprofundamento do Manual do SILM |
-| Caderno | Ativo: notas, práticas, filtros, CSV, impressão e exclusão | A integração está explicitamente desabilitada: `notebook: { enabled: false }` | Lacuna funcional prioritária quando chegarmos à tela Caderno |
+| Caderno | Ativo: notas, práticas, filtros, CSV, impressão e exclusão | Ativo em `integracao/unified-ui.js`: registros por tipo, filtros, backup e restauração, exclusão (correção de 31/10/2026: `notebook.enabled:false` era do bootstrap antigo) | Lacuna funcional prioritária quando chegarmos à tela Caderno |
 | Relatórios | Relatório completo, para preencher à mão e atividade de análise; configuração de seções e dados | Relatório contextual com dados de sessão e campos textuais básicos | Paridade parcial; expandir após comparar o fluxo contextual |
 | Área do Professor | Configuração detalhada, atividades recentes, copiar, editar, duplicar, excluir e guia do professor | Formulário básico, prévia, abrir como aluno e importar/exportar JSON | Paridade parcial; falta gestão de biblioteca e aprofundamento pedagógico |
+
+### Mapa dos arquivos vivos (atualizado em 31/10/2026)
+
+Desde a integração com a Base SI 0.9.17, a entrada carrega só a Base (travada por hash em `integracao/upstream/`) e o motor científico. Vários ponteiros deste plano foram escritos para a arquitetura anterior: `domain/silm/bootstrap.js`, `domain/silm/presentation.js` e `js/experience/*` não são carregados. Ao executar cada etapa, use estes arquivos e corrija o ponteiro da etapa:
+
+| Tela | Arquivos vivos |
+|---|---|
+| Todas | `integracao/index.html` (fonte; o `index.html` da raiz é gerado por `scripts/build-main-entry.cjs`), `integracao/adapter.js` (rotas, foco, montagem do produto), `integracao/integration.css` e `integracao/silm-theme.css` (ajustes do SILM; `integracao/upstream/*.css` não se edita) |
+| Início | `integracao/index.html` `data-view="inicio"`, `integracao/unified-ui.js` `home()` |
+| Aprender | `integracao/unified-ui.js` `themes()`, `domain/silm/themes.js` |
+| Missões e Roteiros | `integracao/route-ui.js` (`catalogue`, `guidance`, `guard`, `report`), `domain/silm/missions.js`, `domain/silm/routes.js`, `domain/silm/route-session.js` |
+| Oficina | `integracao/workspace-family.js`, `integracao/scientific-tools.js`, `integracao/metallic-experience.js`, `integracao/structure-comparison.js`, `integracao/workspace-family.css`, vistas em `domain/silm/*-view.js` |
+| Caderno, Manual, Professor | `integracao/unified-ui.js` (`notebook`, `manual`, `professor`), `domain/silm/manual.js` |
+| Relatórios | `integracao/route-ui.js` `report()`, `integracao/unified-ui.js` `freeReport()` |
+| Montagens prontas e Tour | Sem tela na entrada atual (lacunas das etapas 9 e 10) |
+| Menu, preferências, PWA | Gaveta em `integracao/index.html`, `integracao/base-core.js` (gerado da Base), `integracao/pwa.js`, `sw.js` (gerado por `scripts/build-sw.cjs`) |
+
+Evidências de cada etapa: `node scripts/parity-capture.cjs <ID> <rota-SIAB> <rota-SILM> --siab <pasta do SIAB>`. Testes de tela: `npm run test:parity` (`tests/parity-screens.cjs`, um módulo por etapa em `tests/parity/`).
 
 ## 2. Ordem obrigatória de execução
 
@@ -46,7 +64,7 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 
 | Ordem | Tela de referência | Tela do SILM | Estado da etapa |
 |---:|---|---|---|
-| 1 | Início | Início | Em revisão: primeira rodada aplicada, falta homologar |
+| 1 | Início | Início | Aceito em 31/10/2026 — registro na seção 8 |
 | 2 | Aprender | Aprender / Temas | Não iniciado |
 | 3 | Missões | Missões | Não iniciado |
 | 4 | Roteiros Experimentais | Roteiros Experimentais | Não iniciado |
@@ -56,7 +74,7 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 5.3 | Ver / investigação | Oficina → Ver | Não iniciado |
 | 5.4 | Dados | Oficina → Dados | Não iniciado |
 | 5.5 | Visão geral | Oficina → Visão geral | Rodada preliminar aplicada; revisar e homologar nesta posição |
-| 6 | Caderno | Caderno | Não iniciado; atualmente desabilitado no bootstrap |
+| 6 | Caderno | Caderno | Não iniciado; a tela está ativa em `integracao/unified-ui.js` |
 | 7 | Manual | Manual | Não iniciado |
 
 Depois das sete telas principais, percorrer os recursos secundários na ordem em que aparecem no menu do SIAB: **Montagens prontas → Tour da bancada → Área do Professor → apoio pedagógico e aula acessível → Preferências e Acessibilidade → Modo projetor → Aplicativo / instalação / Sobre**.
@@ -108,21 +126,21 @@ Não marcar uma tela como concluída apenas porque o texto foi encurtado ou o HT
 
 **Referência SIAB:** `index.html` seção `data-tela="inicio"`, `js/telas/inicio.js`, `css/stylesiab.css`.
 
-**SILM:** `index.html` seção `data-view="inicio"`, `integracao/unified-ui.js` função `home()`, `integracao/upstream/home-fidelity.css`, `integracao/upstream/home-context.css`.
+**SILM:** `integracao/index.html` seção `data-view="inicio"` (fonte do `index.html` gerado), `integracao/unified-ui.js` função `home()`, `integracao/integration.css` (bloco "Etapa 1, Início"), sobre `integracao/upstream/home-fidelity.css` e `integracao/upstream/home-context.css` (Base, travados).
 
 **O que comparar:** sobretítulo, título com destaque, lema, símbolo institucional, frase da seção, cartão principal, cartões secundários, contagens vivas, atalhos de apoio, retomada e resumo da investigação.
 
 ### Tarefas
 
-- [~] `HOME-01` — Reorganizar o hero para corresponder à hierarquia SIAB. Primeira rodada: símbolo institucional estático no hero e lema “Monte. Observe. Meça. Calcule.”; falta validação visual.
-- [~] `HOME-02` — Reproduzir título da seção e frase curta “Da curiosidade à descoberta”; falta verificar proporção, espaçamento e quebra em mobile.
-- [~] `HOME-03` — Manter um cartão em destaque para a Oficina dos Metais e cartões secundários para Aprender, Missões, Roteiros e Caderno; revisar distribuição e ordem nos breakpoints.
-- [~] `HOME-04` — Corrigir contagens e concordância dos metadados dos cartões; a lógica dinâmica já foi ajustada em `integracao/unified-ui.js`.
-- [ ] `HOME-05` — Comparar o comportamento dos metadados sem registros e com registros existentes. O cartão Caderno não pode prometer registros funcionais enquanto a tela estiver desabilitada.
-- [ ] `HOME-06` — Comparar os atalhos de apoio no rodapé. Manter Manual, Professor e Preferências; não adicionar link de relatório sem equivalente no Início do SIAB.
-- [ ] `HOME-07` — Validar os recursos SILM de retomada de atividade e resumo da investigação, preservando-os como extensão própria do domínio.
-- [ ] `HOME-08` — Verificar destino do símbolo/identidade, navegação por teclado, foco inicial, leitores de tela e layout mobile.
-- [ ] `HOME-09` — Criar teste de regressão de Início: renderização, links, contagens, retomada e ausência de overflow.
+- [x] `HOME-01` — Hero na hierarquia do SIAB: sobretítulo com o nome completo ("SIMULADOR INTERATIVO DE LIGAÇÕES METÁLICAS"), título curto com destaque ("A arquitetura *dos metais*", frase do sobretítulo anterior), lema "Monte. Observe. Meça. Calcule." e símbolo estático. Recuo acima do hero igual ao do SIAB (34 px; 16 px até 900 px).
+- [x] `HOME-02` — "Escolha seu próximo passo" e "Da curiosidade à descoberta" conferidos nos 5 tamanhos; no celular a frase quebra abaixo do título, como no SIAB.
+- [x] `HOME-03` — Cartão em destaque da Oficina (etiqueta à direita, botão "Entrar na oficina →") e cartões secundários na ordem do SIAB, com ícones desenhados (os mesmos do menu lateral) e seta à direita; distribuição conferida nos 5 tamanhos.
+- [x] `HOME-04` — Contagens dinâmicas com singular/plural; contagem em peso normal, como no SIAB; resumo da investigação no singular ("1 unidade salva").
+- [x] `HOME-05` — Caderno vazio ("Pronto para seus registros"), com 1 ("1 registro salvo") e com 2 registros ("2 registros salvos"). O Caderno está ativo, então o cartão pode prometer registros.
+- [x] `HOME-06` — Rodapé: Manual de uso, Área do Professor e Preferências, todos com destino conferido e alvo de 44 px; sem link de relatório. `N/A`: o botão "Configurações de inicialização" do SIAB fica no menu lateral do SILM (Etapa 12).
+- [x] `HOME-07` — Retomada e resumo preservados e agora alcançáveis: durante uma atividade o Início passou a ser permitido (antes redirecionava para a atividade, e o cartão de retomada nunca aparecia). As telas fora do contexto continuam voltando à atividade, com aviso.
+- [x] `HOME-08` — A marca leva sempre ao Início (durante a atividade levava à atividade, apesar do nome "SILM, início"); o símbolo do hero não tem link; foco como no SIAB (documento na abertura, título e topo da página na troca de tela); ordem do Tab conferida; botão Acessibilidade sem o fundo cinza do navegador.
+- [x] `HOME-09` — `tests/parity/home.cjs` (TEST-HOME), executado por `npm run test:parity` e pelos dois fluxos de CI.
 
 **Aceite da etapa:** o Início deve ter a mesma hierarquia e simplicidade do SIAB, mas apresentar a identidade e os caminhos do SILM. Retomada científica não pode ser removida para obter semelhança.
 
@@ -456,7 +474,7 @@ O comando `npm test` já reúne os testes científicos, de rotas, aprendizagem e
 
 ### Testes de tela que ainda precisam ser criados ou ampliados
 
-- [ ] `TEST-HOME` — teste do Início (hero, caminhos, contagem, retomada, links).
+- [x] `TEST-HOME` — teste do Início (hero, caminhos, contagem, retomada, links): `tests/parity/home.cjs`.
 - [ ] `TEST-LEARN` — lista/detalhe/retorno e conexão com investigação.
 - [ ] `TEST-MISSION` — lista/detalhe/evidência/conclusão/refazer/restrições.
 - [ ] `TEST-ROUTE` — lista/detalhe/identificação/módulo único/preparação/retomada.
@@ -514,6 +532,28 @@ Testes executados:
 Evidências:
 Pendências:
 Estado: [ ] / [~] / [x] / [!] / [N/A]
+```
+
+### Registro — Etapa 1, Início
+
+```text
+ID da etapa: HOME (HOME-01 a HOME-09)
+Tela SIAB: Início — index.html data-tela="inicio", js/telas/inicio.js (acidosebases1.0.0@73848f0)
+Tela SILM: Início — integracao/index.html data-view="inicio", integracao/unified-ui.js home()
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 1, Início" (PR da etapa)
+Viewport(s): 1366×768, 1024×768, 390×844, 320×640, 844×390
+Arquivos alterados: integracao/index.html (+ index.html gerado), integracao/integration.css, integracao/adapter.js,
+  integracao/route-ui.js, integracao/unified-ui.js, tests/parity/home.cjs, tests/parity-screens.cjs,
+  tests/routes-browser.cjs, scripts/parity-capture.cjs, package.json, dois fluxos de CI
+Diferenças de domínio / N/A: contagens (7 temas, 6 missões, 5 roteiros × 14/19/35 do SIAB); botão
+  "Configurações de inicialização" do rodapé do SIAB (no SILM a escolha fica no menu lateral, Etapa 12)
+Testes executados: npm test; test:a11y (84 cenários, 0 violações); test:comparison; test:routes:browser
+  (roteiros e workspace-family); test:backup; test:mobile-mechanics; test:parity (TEST-HOME);
+  scripts/audit-silm.py (14/14) — todos aprovados no Chromium
+Evidências: docs/evidence-parity/HOME/ (10 capturas, capturas.json, README com a comparação)
+Pendências: cabeçalho 10 px mais alto, pílula de versão, barra inferior com caracteres e ícone de tubo de
+  ensaio da Oficina no menu lateral (Etapa 12); Firefox, Safari e aparelhos físicos não testados
+Estado: [x]
 ```
 
 ## 9. Restrições de escopo
