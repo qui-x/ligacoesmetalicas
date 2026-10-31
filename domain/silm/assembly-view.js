@@ -154,7 +154,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  }
  /* Pinça começou: o arrasto em curso é desfeito sem escrever nada (a unidade volta ao lugar). */
  function cancelDrag(){
-  if(!drag)return;const current=drag;drag=null;delete current.node.dataset.dragging;delete current.node.dataset.conflict;
+  if(!drag)return;const current=drag;drag=null;suppressUntil=performance.now()+500;delete current.node.dataset.dragging;delete current.node.dataset.conflict;
   try{current.node.releasePointerCapture(current.pointerId);}catch(_){}
   const u=units().find(x=>x.id===current.id);if(u)place(current.node,u.position);paintSelection();
  }
