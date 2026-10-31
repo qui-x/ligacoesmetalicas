@@ -1,4 +1,18 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 8: Relatórios
+## Em desenvolvimento — Paridade SIAB, Etapa 10: Tour e ajuda contextual
+
+- Tour da oficina em 5 passos, no estilo do SIAB:
+  - cada passo contorna um controle real (Montagem → Preparo, Módulo, a estrutura, a cena, Ver e Dados);
+  - o cartão tem "PASSO n DE 5", pontos de progresso, "Pular tour", "Voltar" e "Próximo"/"Concluir";
+  - Escape encerra o tour e o foco volta para onde estava;
+  - no computador abre os painéis; no celular contorna os botões;
+  - funciona só na oficina livre.
+- Aviso "Primeira vez na Oficina?", com "Fazer o tour", "Abrir o manual" e "Agora não". Não volta depois do tour, de "Agora não" ou de uma visita ao Manual.
+- Botão "?" nas docas: abre a ajuda do que o painel mostra naquele momento, com o tópico certo do Manual e "Abrir no Manual".
+- Menu → Recursos → "Tour da oficina"; Manual → "Iniciar tour da oficina"; novo tópico "Tour da oficina e ajuda dos painéis".
+- Corrigido: com um painel aberto, Escape fechava o painel em vez da janela por cima dele (tour, ajuda, tela inicial, Sobre).
+- TEST-TOUR em `npm run test:parity`; evidências em `docs/evidence-parity/TOUR/`.
+
+## Paridade SIAB, Etapa 8: Relatórios (mesclada em #31)
 
 - O Relatório ganhou a organização do SIAB:
   - ações no topo ("Atualizar dados da investigação", "Registrar no Caderno", "Imprimir / salvar em PDF", "Imprimir para preencher à mão", "Voltar" para a origem e "Encerrar atividade");

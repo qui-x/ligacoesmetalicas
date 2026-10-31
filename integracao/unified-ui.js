@@ -183,7 +183,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
  const operation=text=>String(text).replaceAll('Montagem → Metal','Montagem → Preparo').replaceAll('Ver → Analisar → Calcular','Ver → Analisar → Cálculos cristalográficos').replaceAll('Ver → Observar → Camadas','Ver → Observar → Estrutura e representação').replaceAll('O Caderno não está ativado no SILM.','O Caderno guarda observações locais.');
  /* Manual na arquitetura do SIAB: barra com busca, "Voltar à oficina" e impressão; início com apresentação, "Quero saber" e
     grupos de tópicos; tópico com caminho, artigo, detalhes recolhíveis, "Veja também" e retorno; resultados de busca. */
- const MANUAL_GROUPS=[['Investigue',['interface','selecionar-metal','montagem','estruturas-cristalinas','eletrons-deslocalizados','propriedades-metalicas','explorar','medir','calcular','vista','vista-3d']],['Prepare e registre',['atividades','caderno','relatorio']],['Orientação',['navegacao','problemas','manual','preferencias','abertura','reiniciar','offline','sobre-silm']],['Para ensinar',['professor']]];
+ const MANUAL_GROUPS=[['Investigue',['interface','selecionar-metal','montagem','estruturas-cristalinas','eletrons-deslocalizados','propriedades-metalicas','explorar','medir','calcular','vista','vista-3d']],['Prepare e registre',['atividades','caderno','relatorio']],['Orientação',['navegacao','tour','problemas','manual','preferencias','abertura','reiniciar','offline','sobre-silm']],['Para ensinar',['professor']]];
  const MANUAL_QUICK=[['selecionar-metal','Como escolher um metal'],['medir','Como medir o parâmetro de rede'],['problemas','Por que uma opção não aparece']];
  const arrowSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
  let manualKey='';
@@ -228,7 +228,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   }else{
    // Início do Manual: apresentação, "Quero saber" e grupos.
    const hero=N('header');hero.className='silm-manual-hero';const eyebrow=N('p','MANUAL DO USUÁRIO');eyebrow.className='eyebrow';const h1=N('h1','Encontre seu próximo passo.');h1.id='manual-title';h1.tabIndex=-1;
-   const actions=N('div');actions.className='silm-actions';const start=arrowLink('Começar a usar',href('interface'),'button primary');start.id='manual-start';actions.append(start);
+   const actions=N('div');actions.className='silm-actions';const start=arrowLink('Começar a usar',href('interface'),'button primary');start.id='manual-start';const tour=N('button','Iniciar tour da oficina');tour.type='button';tour.className='button outline';tour.id='manual-tour';tour.dataset.tourStart='';actions.append(start,tour);
    hero.append(eyebrow,h1,N('p','Uma dúvida na Oficina? Consulte uma ferramenta, entenda um resultado ou descubra por onde começar.'),actions);
    const quick=N('nav');quick.className='silm-manual-quick';quick.setAttribute('aria-label','Quero saber');const qt=N('p','QUERO SABER');qt.className='eyebrow';quick.append(qt);for(const [x,text] of MANUAL_QUICK)if(find(x))quick.append(arrowLink(text,href(x)));
    host.append(hero,quick);

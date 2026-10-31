@@ -28,7 +28,7 @@ module.exports=async(browser,url)=>{
      present:[...dr.querySelectorAll('a')].find(a=>/Como apresentar/.test(a.textContent))?.getAttribute('href'),
      oficinaIcon:dr.querySelector('a[data-route="ambiente"] path')?.getAttribute('d'),
      targets:[...dr.querySelectorAll('a,button,select')].filter(vis).map(x=>r(x).height),width:r(dr).width,overflow:document.documentElement.scrollWidth-innerWidth};});
-   assert.deepEqual(d.sections,['Agora','Seções principais','Professor','Preferências','Aplicativo'],'Ordem do Menu em '+where);
+   assert.deepEqual(d.sections,['Agora','Seções principais','Recursos','Professor','Preferências','Aplicativo'],'Ordem do Menu em '+where);
    assert.deepEqual(d.professor,[['Área do Professor','#/professor'],['Apoio pedagógico','#/manual?topico=professor'],['Ideias para uma aula acessível',null]]);
    assert.equal(d.startup,true,'"Tela inicial" no Menu');assert.equal(d.about,'BUTTON','"Sobre o SILM" abre a janela Sobre');
    assert.equal(d.present,'#/manual?topico=professor','"Como apresentar à turma" leva ao tópico do Manual');
