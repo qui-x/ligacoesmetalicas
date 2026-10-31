@@ -44,6 +44,6 @@ for(const e of D.elements.filter(e=>e.silmEligibility.status==='available')){
  if(m.id!=='HCP')assert.ok(rel(fp,m.id==='BCC'?PI*SQ3/8:PI/(3*SQ2))<1e-9,who+'empacotamento cúbico');else assert.ok(fp<=PI/(3*SQ2)+1e-9&&fp>0.6,who+'empacotamento do HC');
  assert.ok(rho>0.4&&rho<23,who+'densidade teórica fora da faixa dos metais: '+rho);
 }
-assert.deepEqual(counts,{BCC:13,FCC:14,HCP:21});
+assert.deepEqual(counts,{BCC:15,FCC:16,HCP:22});
 assert.deepEqual(blocked.sort(),['Bi','La','Mn','Nd','Np','Pr','Pu','Sm','Sn']);
-console.log('PASS structure-audit: 48 estruturas (13 CCC, 14 CFC, 21 HC) conferidas sítio a sítio contra a cristalografia, os instrumentos do Medir e as fórmulas do Calcular; 9 estruturas fora de CCC/CFC/HC bloqueadas com motivo.');
+console.log('PASS structure-audit: 53 estruturas (15 CCC, 16 CFC, 22 HC) conferidas sítio a sítio contra a cristalografia, os instrumentos do Medir e as fórmulas do Calcular; 9 estruturas fora de CCC/CFC/HC bloqueadas com motivo.');

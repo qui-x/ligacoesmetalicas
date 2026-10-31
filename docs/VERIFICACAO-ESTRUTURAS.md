@@ -1,6 +1,6 @@
 # Verificação da construção das estruturas e da interação com o modelo
 
-**Data:** 31/10/2026 · **Versão:** SILM 0.15.5 · **Testes permanentes:** `tests/structure-audit.cjs` (em `npm run test:scientific`) e `tests/model-interaction.cjs` (em `npm run test:comparison`).
+**Data:** 31/10/2026 (atualizado depois da revisão científica, ver `docs/REVISAO-CIENTIFICA-FONTES.md`) · **Versão:** SILM 0.15.5 · **Testes permanentes:** `tests/structure-audit.cjs` (em `npm run test:scientific`) e `tests/model-interaction.cjs` (em `npm run test:comparison`).
 
 ## 1. O que foi verificado
 
@@ -19,7 +19,7 @@
 
 ## 2. Resultado
 
-- **48 estruturas visualizáveis** (13 CCC, 14 CFC, 21 HC): **nenhuma divergência**. As distâncias, a coordenação, os átomos efetivos, as medidas e os cálculos coincidem com os valores analíticos dentro da precisão numérica. Na interface, todas foram montadas com o tipo e o número de sítios corretos, em 2D e em 3D, sem erros.
+- **53 estruturas visualizáveis** (15 CCC, 16 CFC, 22 HC; 48 da verificação inicial e 5 metais homologados na revisão científica: K, Ra, Th, Ac, Tc): **nenhuma divergência**. As distâncias, a coordenação, os átomos efetivos, as medidas e os cálculos coincidem com os valores analíticos dentro da precisão numérica. Na interface, todas foram montadas com o tipo e o número de sítios corretos, em 2D e em 3D, sem erros.
 - **9 metais com estrutura fora de CCC, CFC e HC** continuam bloqueados para a organização cristalina, com o motivo e a estrutura registrada. A montagem livre continua disponível para eles.
 
 A tabela abaixo foi gerada pela auditoria. A densidade e o empacotamento são **calculados pelo SILM** a partir dos dados tabelados. Não são medidas.
@@ -31,9 +31,10 @@ A tabela abaixo foi gerada pela auditoria. A densidade e o empacotamento são **
 | 11 | Sódio (Na) | CCC | 4,2906 |  |  | 3,7158 | 8 | 0,6802 | 0,967 | 293.0 K | cod-9008545 |
 | 12 | Magnésio (Mg) | HC | 3,2093 | 5,2103 | 1,624 | 3,1969 | 12 | 0,7362 | 1,737 | 298.15 K | cod-9012001 |
 | 13 | Alumínio (Al) | CFC | 4,0496 |  |  | 2,8635 | 12 | 0,7405 | 2,699 | 298.15 K | cod-9012002 |
+| 19 | Potássio (K) | CCC | 5,3280 |  |  | 4,6142 | 8 | 0,6802 | 0,859 | Ambiente | cod-9011970 |
 | 20 | Cálcio (Ca) | CFC | 5,6010 |  |  | 3,9605 | 12 | 0,7405 | 1,515 | 298.15 K | cod-9012731 |
 | 21 | Escândio (Sc) | HC | 3,3090 | 5,2733 | 1,594 | 3,2560 | 12 | 0,7229 | 2,986 | Ambiente | cod-9010985 |
-| 22 | Titânio (Ti) | HC | 2,9508 | 4,6855 | 1,588 | 2,8967 | 12 | 0,7204 | 4,499 | Ambiente | webelements-ti |
+| 22 | Titânio (Ti) | HC | 2,9500 | 4,6860 | 1,588 | 2,8966 | 12 | 0,7207 | 4,501 | Ambiente | cod-9008517 |
 | 23 | Vanádio (V) | CCC | 3,0241 |  |  | 2,6189 | 8 | 0,6802 | 6,117 | 298.15 K | cod-9012770 |
 | 24 | Cromo (Cr) | CCC | 2,8839 |  |  | 2,4975 | 8 | 0,6802 | 7,200 | Ambiente | cod-5000220 |
 | 26 | Ferro (Fe) | CCC | 2,8654 |  |  | 2,4815 | 8 | 0,6802 | 7,883 | 298.0 K | cod-9006587 |
@@ -41,14 +42,15 @@ A tabela abaixo foi gerada pela auditoria. A densidade e o empacotamento são **
 | 28 | Níquel (Ni) | CFC | 3,5240 |  |  | 2,4918 | 12 | 0,7405 | 8,908 | 293.0 K | cod-9013024 |
 | 29 | Cobre (Cu) | CFC | 3,6150 |  |  | 2,5562 | 12 | 0,7405 | 8,935 | 25 °C (298,15 K) | nbs-539-v1 |
 | 30 | Zinco (Zn) | HC | 2,6650 | 4,9470 | 1,856 | 2,6650 | 12 | 0,6514 | 7,136 | 25 °C (298,15 K) | nbs-539-v1 |
-| 37 | Rubídio (Rb) | CCC | 5,5850 |  |  | 4,8368 | 8 | 0,6802 | 1,629 | Ambiente | webelements-rb |
+| 37 | Rubídio (Rb) | CCC | 5,6970 |  |  | 4,9337 | 8 | 0,6802 | 1,535 | 297 K | cod-9012879 |
 | 38 | Estrôncio (Sr) | CFC | 6,0760 |  |  | 4,2964 | 12 | 0,7405 | 2,595 | 298.15 K | cod-9012726 |
 | 39 | Ítrio (Y) | HC | 3,6474 | 5,7306 | 1,571 | 3,5559 | 12 | 0,7132 | 4,472 | Ambiente | cod-9010984 |
 | 40 | Zircônio (Zr) | HC | 3,2320 | 5,1470 | 1,593 | 3,1788 | 12 | 0,7224 | 6,507 | Ambiente | webelements-zr |
-| 41 | Nióbio (Nb) | CCC | 3,3004 |  |  | 2,8582 | 8 | 0,6802 | 8,583 | Ambiente | webelements-nb |
+| 41 | Nióbio (Nb) | CCC | 3,3004 |  |  | 2,8582 | 8 | 0,6802 | 8,583 | Ambiente | cod-9008546 |
 | 42 | Molibdênio (Mo) | CCC | 3,1472 |  |  | 2,7256 | 8 | 0,6802 | 10,222 | 25 °C (298,15 K) | nbs-539-v1 |
-| 44 | Rutênio (Ru) | HC | 2,7059 | 4,2815 | 1,582 | 2,6502 | 12 | 0,7180 | 12,364 | Ambiente | webelements-ru |
-| 45 | Ródio (Rh) | CFC | 3,8034 |  |  | 2,6894 | 12 | 0,7405 | 12,423 | Ambiente | webelements-rh |
+| 43 | Tecnécio (Tc) | HC | 2,7400 | 4,3980 | 1,605 | 2,7089 | 12 | 0,7280 | — (sem peso atômico padrão) | Ambiente | cod-1541062 |
+| 44 | Rutênio (Ru) | HC | 2,7039 | 4,2817 | 1,584 | 2,6496 | 12 | 0,7185 | 12,382 | Ambiente | cod-9008513 |
+| 45 | Ródio (Rh) | CFC | 3,8031 |  |  | 2,6892 | 12 | 0,7405 | 12,426 | Ambiente | cod-9008482 |
 | 46 | Paládio (Pd) | CFC | 3,8898 |  |  | 2,7505 | 12 | 0,7405 | 12,010 | 25 °C (298,15 K) | nbs-539-v1 |
 | 47 | Prata (Ag) | CFC | 4,0862 |  |  | 2,8894 | 12 | 0,7405 | 10,501 | 25 °C (298,15 K) | nbs-539-v1 |
 | 48 | Cádmio (Cd) | HC | 2,9789 | 5,6177 | 1,886 | 2,9789 | 12 | 0,6412 | 8,648 | Ambiente | cod-9008490 |
@@ -64,16 +66,19 @@ A tabela abaixo foi gerada pela auditoria. A densidade e o empacotamento são **
 | 69 | Túlio (Tm) | HC | 3,5375 | 5,5546 | 1,570 | 3,4474 | 12 | 0,7127 | 9,320 | Ambiente | cod-9010996 |
 | 70 | Itérbio (Yb) | CFC | 5,4862 |  |  | 3,8793 | 12 | 0,7405 | 6,961 | Ambiente | cod-9010997 |
 | 71 | Lutécio (Lu) | HC | 3,5031 | 5,5509 | 1,585 | 3,4342 | 12 | 0,7190 | 9,850 | Ambiente | cod-9010998 |
-| 72 | Háfnio (Hf) | HC | 3,1964 | 5,0511 | 1,580 | 3,1279 | 12 | 0,7171 | 13,263 | Ambiente | webelements-hf |
+| 72 | Háfnio (Hf) | HC | 3,1964 | 5,0511 | 1,580 | 3,1279 | 12 | 0,7171 | 13,263 | Ambiente | cod-1539076 |
 | 73 | Tântalo (Ta) | CCC | 3,3058 |  |  | 2,8629 | 8 | 0,6802 | 16,634 | 25 °C (298,15 K) | nbs-539-v1 |
 | 74 | Tungstênio (W) | CCC | 3,1648 |  |  | 2,7408 | 8 | 0,6802 | 19,261 | 298.0 K | cod-9006486 |
-| 75 | Rênio (Re) | HC | 2,7610 | 4,4560 | 1,614 | 2,7395 | 12 | 0,7319 | 21,022 | Ambiente | webelements-re |
-| 76 | Ósmio (Os) | HC | 2,7344 | 4,3173 | 1,579 | 2,6743 | 12 | 0,7165 | 22,599 | Ambiente | webelements-os |
-| 77 | Irídio (Ir) | CFC | 3,8390 |  |  | 2,7146 | 12 | 0,7405 | 22,566 | Ambiente | webelements-ir |
+| 75 | Rênio (Re) | HC | 2,7608 | 4,4582 | 1,615 | 2,7404 | 12 | 0,7323 | 21,014 | Ambiente | cod-9008512 |
+| 76 | Ósmio (Os) | HC | 2,7352 | 4,3190 | 1,579 | 2,6753 | 12 | 0,7166 | 22,577 | Ambiente | cod-9008510 |
+| 77 | Irídio (Ir) | CFC | 3,8394 |  |  | 2,7149 | 12 | 0,7405 | 22,559 | Ambiente | cod-9008470 |
 | 78 | Platina (Pt) | CFC | 3,9231 |  |  | 2,7741 | 12 | 0,7405 | 21,461 | 25 °C (298,15 K) | nbs-539-v1 |
 | 79 | Ouro (Au) | CFC | 4,0786 |  |  | 2,8840 | 12 | 0,7405 | 19,283 | 25 °C (298,15 K) | nbs-539-v1 |
 | 81 | Tálio (Tl) | HC | 3,4560 | 5,5250 | 1,599 | 3,4077 | 12 | 0,7251 | 11,877 | 297.0 K | cod-9008519 |
 | 82 | Chumbo (Pb) | CFC | 4,9500 |  |  | 3,5002 | 12 | 0,7405 | 11,338 | 298.15 K | cod-9012004 |
+| 88 | Rádio (Ra) | CCC | 5,1480 |  |  | 4,4583 | 8 | 0,6802 | — (sem peso atômico padrão) | Ambiente | cod-1509139 |
+| 89 | Actínio (Ac) | CFC | 5,3110 |  |  | 3,7554 | 12 | 0,7405 | — (sem peso atômico padrão) | Ambiente | cod-9008458 |
+| 90 | Tório (Th) | CFC | 5,0843 |  |  | 3,5951 | 12 | 0,7405 | 11,727 | Ambiente | cod-9008485 |
 
 
 | Metal | Estrutura registrada | Motivo |
@@ -89,12 +94,14 @@ A tabela abaixo foi gerada pela auditoria. A densidade e o empacotamento são **
 | Plutônio (Pu) | Monoclínica | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
 
 
-## 3. Achados de dados (exigem revisão científica)
+## 3. Achados de dados e o que a revisão científica resolveu
 
-São achados para a revisão científica que está registrada como próxima etapa de "maior cuidado". Nenhum dado foi alterado nesta verificação.
+Os achados desta verificação foram tratados na revisão científica (`docs/REVISAO-CIENTIFICA-FONTES.md`):
 
-1. **Rubídio (Rb).** O parâmetro a = 5,585 Å (WebElements) dá densidade teórica de 1,629 g/cm³. É cerca de 6 % acima do valor normalmente citado para o rubídio à temperatura ambiente (≈ 1,53 g/cm³), o que sugere um parâmetro medido a baixa temperatura. A proposta já registrada é substituí-lo pela ficha COD 9012879, depois de conferir a fonte primária.
-2. **Fonte secundária (WebElements) em 12 metais:** titânio, cobalto, rubídio, zircônio, nióbio, rutênio, ródio, césio, háfnio, rênio, ósmio e irídio. As estruturas são coerentes com o modelo e as densidades teóricas têm ordem de grandeza plausível. Mesmo assim, a proposta é substituir cada fonte por uma ficha primária (COD/AMCSD ou NBS), conferindo os parâmetros e a temperatura.
+1. **Rubídio (Rb): corrigido.** O parâmetro a = 5,585 Å (WebElements) dava densidade teórica de 1,629 g/cm³, cerca de 6 % acima do valor normalmente citado à temperatura ambiente. A referência passou a ser a ficha primária COD 9012879 (Kelly e Pearson, 1955): a = 5,697 Å a 297 K, densidade teórica 1,535 g/cm³. A nota da ficha de que o parâmetro é estimado para essa temperatura foi preservada.
+2. **Fonte secundária (WebElements):**
+   - **9 de 12 metais passaram para a ficha primária local do COD**, com diferença máxima de 0,07 % no parâmetro: titânio, nióbio, ródio, rutênio, háfnio, rênio, ósmio, irídio e rubídio.
+   - **Cobalto, césio e zircônio mantêm a referência atual, com motivo registrado:** a ficha local do cobalto (1936) diverge 0,5 % dos valores modernos; a do césio foi medida a 5 K; não há ficha local do zircônio.
 3. **Temperatura de referência.** Lítio, sódio e níquel têm parâmetros a 293 K; os demais, a 298 K ou com a convenção "ambiente". A diferença está registrada e é exibida, mas não é corrigida.
 
 ## 4. Refinamentos da interação com o modelo (feitos nesta rodada)
