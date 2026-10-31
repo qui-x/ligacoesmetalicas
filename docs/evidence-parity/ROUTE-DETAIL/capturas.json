@@ -1,0 +1,76 @@
+{
+ "id": "ROUTE-DETAIL",
+ "siab": "qui-x/acidobase acidosebases1.0.0@73848f0",
+ "captures": [
+  {
+   "app": "siab",
+   "viewport": "1366x768",
+   "route": "#/roteiro/titulacao-forte",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "1366x768",
+   "route": "#/roteiros?item=ordem-metal",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "viewport": "1024x768",
+   "route": "#/roteiro/titulacao-forte",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "1024x768",
+   "route": "#/roteiros?item=ordem-metal",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "viewport": "390x844",
+   "route": "#/roteiro/titulacao-forte",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "390x844",
+   "route": "#/roteiros?item=ordem-metal",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "viewport": "320x640",
+   "route": "#/roteiro/titulacao-forte",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "320x640",
+   "route": "#/roteiros?item=ordem-metal",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "siab",
+   "viewport": "844x390",
+   "route": "#/roteiro/titulacao-forte",
+   "horizontalOverflow": 0,
+   "errors": []
+  },
+  {
+   "app": "silm",
+   "viewport": "844x390",
+   "route": "#/roteiros?item=ordem-metal",
+   "horizontalOverflow": 0,
+   "errors": []
+  }
+ ]
+}

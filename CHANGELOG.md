@@ -1,4 +1,15 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 3: Missões
+## Em desenvolvimento — Paridade SIAB, Etapa 4: Roteiros Experimentais
+
+- Lista de roteiros em linhas, com o módulo e uma seta à direita.
+- Roteiro em coluna de leitura, na ordem do SIAB: "O problema", "Objetivo", "O que você vai fazer", "Na oficina", "O que observar" e "Critério de conclusão".
+- Identificação (Nome, Turma, Data, Professor, Grupo) antes de "Montar na oficina":
+  - fica guardada para a próxima montagem;
+  - é copiada para o relatório da sessão;
+  - aparece no relatório e no registro do Caderno.
+- Painel do roteiro na Oficina: evidência ao vivo, retorno em `role="status"` e o botão "Relatório".
+- TEST-ROUTE em `npm run test:parity`; evidências em `docs/evidence-parity/ROUTE/`, `ROUTE-DETAIL/` e `ROUTE-PANEL/`.
+
+## Paridade SIAB, Etapa 3: Missões (mesclada em #22)
 
 - Lista de missões em linhas, com situação à direita ("Não realizado", "Em andamento", "Concluído").
 - Especificação em coluna de leitura: "MISSÃO · situação", "O problema", "Objetivo e regras", metal da investigação, temas relacionados e fontes.
