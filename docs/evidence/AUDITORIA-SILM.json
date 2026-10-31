@@ -79,12 +79,10 @@
     },
     {
       "check": "Documentação obrigatória",
-      "status": "FAIL",
-      "detail": [
-        "SILM-0.15.5.md"
-      ]
+      "status": "PASS",
+      "detail": null
     }
   ],
-  "passed": 13,
-  "failed": 1
+  "passed": 14,
+  "failed": 0
 }
