@@ -1,4 +1,13 @@
-## Em desenvolvimento — Verificação das estruturas e interação com o modelo
+## Em desenvolvimento — Revisão científica das fontes e 5 metais novos
+
+- Fontes primárias no lugar do WebElements, com o CIF do COD guardado no repositório: rubídio, titânio, nióbio, ródio, rutênio, háfnio, rênio, ósmio e irídio.
+- **Rubídio corrigido:** a = 5,697 Å a 297 K (COD 9012879); antes, 5,585 Å, valor de baixa temperatura. A densidade teórica passa a 1,535 g/cm³, igual à da ficha. Nos outros oito metais, a diferença máxima é de 0,07 %.
+- Cobalto, césio e zircônio mantêm a referência atual, com o motivo registrado no banco: ficha de 1936 imprecisa, ficha a 5 K e nenhuma ficha local, respectivamente.
+- Cinco metais novos, homologados a partir de CIF local: potássio (CCC), rádio (CCC), tório (CFC), actínio (CFC) e tecnécio (HC). São agora 62 metais investigáveis e 53 estruturas visualizáveis.
+- `scripts/structure-from-cif.py`: monta o registro da estrutura a partir do CIF, sem extrapolar temperatura nem aceitar pressão diferente da ambiente.
+- Relatório em `docs/REVISAO-CIENTIFICA-FONTES.md`; `docs/VERIFICACAO-ESTRUTURAS.md` atualizado.
+
+## Verificação das estruturas e interação com o modelo (mesclada em #33)
 
 - Auditoria da construção das 48 estruturas visualizáveis (13 CCC, 14 CFC, 21 HC), sítio por sítio. Ela compara a vizinhança, os átomos efetivos, os instrumentos do Medir e as fórmulas do Calcular com a cristalografia e com um cálculo independente: nenhuma divergência. Os 9 metais com estrutura fora de CCC/CFC/HC continuam bloqueados, com motivo.
 - Construção de todos os 57 metais pela interface (2D e 3D), sem erros.

@@ -2,17 +2,17 @@
 
 > Gerado por `scripts/build-route-coverage.cjs` a partir do catálogo de roteiros e do banco científico. Não edite à mão.
 
-Metais investigáveis: **57**. Roteiros: **5**. Com todos os roteiros: **48** metais. Só com os roteiros que não dependem da geometria cristalina: **9** metais.
+Metais investigáveis: **62**. Roteiros: **5**. Com todos os roteiros: **53** metais. Só com os roteiros que não dependem da geometria cristalina: **9** metais.
 
 ## Roteiros
 
 | ID | Título | Módulo | Metais |
 |---|---|---|---|
-| ordem-metal | A Ordem por Trás do Metal | explorar | 48 |
-| eletrons-metal | Elétrons sem Endereço Fixo | explorar | 57 |
-| deformacao-metal | Quando o Metal se Deforma | explorar | 48 |
-| medindo-ordem | Medindo a Ordem | medir | 48 |
-| volume-celula | Quanto Cabe em uma Célula? | calcular | 48 |
+| ordem-metal | A Ordem por Trás do Metal | explorar | 53 |
+| eletrons-metal | Elétrons sem Endereço Fixo | explorar | 62 |
+| deformacao-metal | Quando o Metal se Deforma | explorar | 53 |
+| medindo-ordem | Medindo a Ordem | medir | 53 |
+| volume-celula | Quanto Cabe em uma Célula? | calcular | 53 |
 
 ## Metal → roteiros
 
@@ -23,6 +23,7 @@ Metais investigáveis: **57**. Roteiros: **5**. Com todos os roteiros: **48** me
 | Sódio (Na) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Magnésio (Mg) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Alumínio (Al) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
+| Potássio (K) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Cálcio (Ca) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Escândio (Sc) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Titânio (Ti) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
@@ -40,6 +41,7 @@ Metais investigáveis: **57**. Roteiros: **5**. Com todos os roteiros: **48** me
 | Zircônio (Zr) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Nióbio (Nb) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Molibdênio (Mo) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
+| Tecnécio (Tc) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Rutênio (Ru) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Ródio (Rh) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Paládio (Pd) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
@@ -73,6 +75,9 @@ Metais investigáveis: **57**. Roteiros: **5**. Com todos os roteiros: **48** me
 | Tálio (Tl) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Chumbo (Pb) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Bismuto (Bi) | eletrons-metal |
+| Rádio (Ra) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
+| Actínio (Ac) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
+| Tório (Th) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Netúnio (Np) | eletrons-metal |
 | Plutônio (Pu) | eletrons-metal |
 

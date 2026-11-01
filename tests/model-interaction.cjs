@@ -17,7 +17,7 @@ const assert=require('node:assert/strict');const {serve,launch}=require('./suppo
   const choose=async z=>{await preparo();await p.locator('#silm-metal').selectOption(String(z));await p.locator('#silm-start').click();
    if(await p.locator('#si-modal-confirm').isVisible().catch(()=>false))await p.locator('#si-modal-confirm').click();await p.waitForFunction(z=>SILMIntegration.snapshot().metal?.atomicNumber===z,z);await preparo();};
   const metals=await p.evaluate(()=>SILM.data.elements.filter(e=>e.silmEligibility.status==='available').map(e=>{const el=SILM.crystal.eligibility(e);return {z:e.atomicNumber,sym:e.symbol,name:e.name,type:el.structureType||null,sites:el.structureType?SILM.crystal.models[el.structureType].cellSites:null};}));
-  assert.equal(metals.length,57);
+  assert.equal(metals.length,62);
   /* 1 e 2. Construção de cada metal. */
   for(const m of metals){
    await choose(m.z);
@@ -60,6 +60,6 @@ const assert=require('node:assert/strict');const {serve,launch}=require('./suppo
   await nav.moduleChoice(p,'explorar');await choose(29);await p.locator('#silm-add').click();assert.equal((await p.locator('#scene-count').textContent()).trim(),'1 unidade');
   await p.locator('#silm-add').click();assert.equal((await p.locator('#scene-count').textContent()).trim(),'2 unidades');
   assert.deepEqual(errors,[]);await ctx.close();
-  console.log('PASS model-interaction: 48 estruturas construídas pela interface (2D e 3D), 9 bloqueadas com motivo junto do botão, medida inválida explicada, dependência entre fórmulas guiada e contagem de unidades correta.');
+  console.log('PASS model-interaction: 53 estruturas construídas pela interface (2D e 3D), 9 bloqueadas com motivo junto do botão, medida inválida explicada, dependência entre fórmulas guiada e contagem de unidades correta.');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
