@@ -86,7 +86,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   const key=String(route.id+'-'+(state.investigation?.id||Date.now().toString(36))).toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-|-+$/g,'').slice(0,40);
   const attemptId='attempt-silm-complete-'+key;
   if(journal.snapshot().notes.some(n=>n.attemptId===attemptId))return 'duplicate';
-  const structure=state.structure?.crystallography?.structureType||(state.structure?.mode==='crystalline'?'Estrutura cristalina':'Montagem livre');
+  const structure=(t=>t&&S.crystal.isGeneral(t)?S.crystal.label(t,e):t)(state.structure?.crystallography?.structureType)||(state.structure?.mode==='crystalline'?'Estrutura cristalina':'Montagem livre');
   const lines=[
    'Título: '+type+' '+participle+': '+route.title,
    'Atividade: '+route.title,
@@ -109,7 +109,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   const attemptId='attempt-silm-report-'+token;
   if(journal.snapshot().notes.some(n=>n.attemptId===attemptId))return 'duplicate';
   const e=state.metal?S.data.get(state.metal.atomicNumber):null;
-  const structure=state.structure?.crystallography?.structureType||(state.structure?.mode==='crystalline'?'Estrutura cristalina':'Montagem livre');
+  const structure=(t=>t&&S.crystal.isGeneral(t)?S.crystal.label(t,e):t)(state.structure?.crystallography?.structureType)||(state.structure?.mode==='crystalline'?'Estrutura cristalina':'Montagem livre');
   const short=(value,max=220)=>String(value||'').trim().slice(0,max);
   const lines=[
    'Título: Relatório registrado: '+(route.title||'Investigação livre'),

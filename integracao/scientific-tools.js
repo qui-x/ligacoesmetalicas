@@ -9,6 +9,8 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
  const field=(parent,text,input)=>{const l=node('label',text);l.htmlFor=input.id;parent.append(l,input);};
  const available=()=>model.measurementAvailability().ok;
  const type=()=>model.state.structure?.crystallography?.structureType;
+ const general=()=>!!type()&&S.crystal.isGeneral(type());
+ const element=()=>model.state.metal?S.data.get(model.state.metal.atomicNumber):null;
  const reset=()=>{tool=null;picks=[];review=null;formula=null;choice={};user={};};
  const change=()=>onChange();
  const allowed=t=>!activity()||activity().allows(t);
@@ -16,9 +18,9 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
  const points=n=>n+(n===1?' ponto':' pontos');
  /* O que fazer quando a seleção não serve ao instrumento: explicação em linguagem do estudante, sem códigos internos. */
  function measureHelp(reason){
-  const hex=type()==='HCP';
-  return {NOT_LATTICE_VECTOR:'Esses centros não ocupam posições equivalentes da rede (por exemplo, um vértice e um centro). Para o parâmetro de rede, escolha dois centros equivalentes ligados por uma aresta da célula'+(hex?' (aresta da base para a; aresta vertical para c).':'.'),
-   NOT_CELL_EDGE:'Esses centros são equivalentes, mas a linha entre eles não é uma aresta da célula. Escolha dois vértices vizinhos na mesma aresta'+(hex?' (aresta da base para a; aresta vertical para c).':'.'),
+  const hex=type()==='HCP',axes=general()?' (cada aresta corresponde a um eixo: a, b ou c).':hex?' (aresta da base para a; aresta vertical para c).':'.';
+  return {NOT_LATTICE_VECTOR:'Esses centros não ocupam posições equivalentes da rede (por exemplo, um vértice e um centro). Para o parâmetro de rede, escolha dois centros equivalentes ligados por uma aresta da célula'+axes,
+   NOT_CELL_EDGE:'Esses centros são equivalentes, mas a linha entre eles não é uma aresta da célula. Escolha dois vértices vizinhos na mesma aresta'+axes,
    SAME_POINT:'Os pontos precisam ser diferentes. Escolha outro centro.',POINTS_INVALID:'A seleção não foi reconhecida. Selecione os pontos de novo.',
    MEASUREMENTS_LIMIT:'Esta investigação já tem o máximo de 200 medidas. Use Dados para consultar as anteriores.',DEFORMED:'Restaure a experiência de deformação em Explorar para medir a estrutura de referência.',
    NO_SCALE:'Organize a estrutura cristalina em Explorar para medir: a montagem livre não tem escala física.'}[reason]||'Essa seleção não serve para este instrumento. Tente outros pontos.';
@@ -36,7 +38,7 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
   if(spec.origins.includes('TABULATED')){const t=CA.tabulated(e,spec.key);if(t)out.push({id:'tab',origin:'TABULATED',value:t.value,ref:t.ref,label:'Dado tabelado: '+t.display});}
   if(spec.origins.includes('MODEL_MEASUREMENT'))for(const m of state.measurements.filter(m=>m.type==='latticeParameter'&&m.parameter===spec.key&&MS.current(m,state.structure)))out.push({id:m.id,origin:'MODEL_MEASUREMENT',value:m.value,ref:{measurementId:m.id},label:'Medida do modelo: '+U.format(m.value,'Å')});
   if(spec.origins.includes('CALCULATED')){
-   if(spec.key==='n')out.push({id:'n',origin:'CALCULATED',value:CA.effective(type()),ref:{formulaId:'effective-atoms-'+type().toLowerCase()},label:'Calculado pelo SILM: contagem geométrica'});
+   if(spec.key==='n')out.push({id:'n',origin:'CALCULATED',value:CA.effective(type(),e),ref:{formulaId:CA.effectiveFormula(type())},label:'Calculado pelo SILM: contagem geométrica'});
    else for(const c of state.calculations.filter(c=>c.type===spec.quantity&&c.result.value!==null&&CA.current(c,state.structure)))out.push({id:c.id,origin:'CALCULATED',value:c.result.value,ref:{calculationId:c.id},label:'Calculado pelo SILM: '+result(c)});
   }
   if(spec.origins.includes('USER'))out.push({id:'user',origin:'USER',value:null,ref:null,label:'Valor informado pelo usuário'});
@@ -65,10 +67,18 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
   picks.push(id);
   if(picks.length===MS.types[tool].points){
    const r=model.addMeasurement(tool,picks);picks=[];
-   if(r.ok){review=r.measurement.id;say('Medida do modelo: '+value(r.measurement));if(tool==='coordination')model.setCrystalRepresentation({neighbors:true,selectedUnitId:id});}
+   if(r.ok){review=r.measurement.id;say('Medida do modelo: '+value(r.measurement)+(tool==='coordination'&&general()?' '+shellText(id):''));if(tool==='coordination')model.setCrystalRepresentation({neighbors:true,selectedUnitId:id});}
    else say(measureHelp(r.reason),'warning');
   }else say('Ponto '+picks.length+' selecionado. Selecione o próximo ponto da medida.');
   change();
+ }
+ /* Estrutura geral: o número de vizinhos depende do critério de distância, então a medida diz qual é a primeira camada e
+    quais são as seguintes. */
+ function shellText(unitId){
+  const u=model.state.structure?.units.find(x=>x.id===unitId),g=S.crystal.geometry(element());if(!u||!g)return '';
+  const n=g.neighbors(u.site),f=d=>U.format(d,unit);
+  const lo=n.distances[0],hi=n.distances[n.distances.length-1],next=n.shells.filter(s=>s.distance>hi+5e-4);
+  return 'vizinhos na primeira camada, '+(hi-lo>5e-4?'entre '+f(lo)+' e '+f(hi):'a '+f(lo))+'.'+(next.length?' Camadas seguintes: '+next.map(s=>s.count+' a '+f(s.distance)).join('; ')+'.':'')+' Nesta estrutura, o número de coordenação depende da distância considerada.';
  }
  function marks(){
   if(model.state.module.active!=='medir')return null;
@@ -94,7 +104,7 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
     const formulas=CA.applicable(type()).filter(f=>allowed(f.quantity));if(!formulas.some(f=>f.id===formula))formula=formulas[0]?.id;
     field(host,'Fórmula',select('silm-formula',formulas.map(f=>[f.id,f.name]),formula,id=>{formula=id;choice={};user={};change();}));
     const f=S.formulas[formula];if(f){
-     host.append(node('p',f.expression),node('p',f.notes));
+     host.append(node('p',f.expression),node('p',f.notes));{const d=f.describe?.(S.crystal.geometry(element()));if(d){const n=node('p',d);n.id='silm-formula-detail';host.append(n);}}
      for(const spec of f.requiredInputs){
       const opts=options(spec);if(!opts.some(o=>o.id===choice[spec.key]))choice[spec.key]=opts[0]?.id;
       field(host,spec.symbol+' — '+spec.name+' ('+spec.unit+')',select('silm-origin-'+spec.key,opts.map(o=>[o.id,o.label]),choice[spec.key],v=>{choice[spec.key]=v;change();}));

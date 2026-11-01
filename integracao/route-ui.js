@@ -226,7 +226,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const note=N('p','Dados do modelo SILM: dado tabelado, medida do modelo e cálculo do SILM aparecem identificados separadamente.');note.className='silm-report-note';proposal.append(note);
   // 3. Condições de referência: metal e estrutura como dados tabelados, montagem como representação didática.
   if(inc('conditions')){const sec=section(3,'Condições de referência','condicoes'),structure=S.data.structure(e),crystalline=s.structure?.mode==='crystalline';
-   const rows=[['Metal',e.name+' ('+e.symbol+'), Z = '+e.atomicNumber,'Dado tabelado'],['Estrutura',crystalline?S.crystal.label(s.structure.crystallography?.structureType):'Montagem livre, sem organização cristalina',crystalline?'Dado tabelado':'Representação didática'],['Montagem',(s.structure?.units.length||0)+' unidades','Representação didática']];
+   const rows=[['Metal',e.name+' ('+e.symbol+'), Z = '+e.atomicNumber,'Dado tabelado'],['Estrutura',crystalline?S.crystal.label(s.structure.crystallography?.structureType,e):'Montagem livre, sem organização cristalina',crystalline?'Dado tabelado':'Representação didática'],['Montagem',(s.structure?.units.length||0)+' unidades','Representação didática']];
    for(const [k,label] of [['temperature','Temperatura'],['pressure','Pressão'],['phase','Fase']]){const d=structure?.conditions?.[k];if(d)rows.push([label,d.display||String(d.value),'Condição de referência']);}
    sec.append(reportTable('Metal, estrutura e condições',['Item','Valor','Origem'],rows));}
   // 4. Medições do modelo.

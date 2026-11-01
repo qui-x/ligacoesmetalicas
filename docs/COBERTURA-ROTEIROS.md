@@ -2,17 +2,17 @@
 
 > Gerado por `scripts/build-route-coverage.cjs` a partir do catálogo de roteiros e do banco científico. Não edite à mão.
 
-Metais investigáveis: **62**. Roteiros: **5**. Com todos os roteiros: **53** metais. Só com os roteiros que não dependem da geometria cristalina: **9** metais.
+Metais investigáveis: **65**. Roteiros: **5**. Com todos os roteiros: **53** metais. Só com os roteiros que não dependem da geometria cristalina: **12** metais.
 
 ## Roteiros
 
 | ID | Título | Módulo | Metais |
 |---|---|---|---|
-| ordem-metal | A Ordem por Trás do Metal | explorar | 53 |
-| eletrons-metal | Elétrons sem Endereço Fixo | explorar | 62 |
+| ordem-metal | A Ordem por Trás do Metal | explorar | 62 |
+| eletrons-metal | Elétrons sem Endereço Fixo | explorar | 65 |
 | deformacao-metal | Quando o Metal se Deforma | explorar | 53 |
-| medindo-ordem | Medindo a Ordem | medir | 53 |
-| volume-celula | Quanto Cabe em uma Célula? | calcular | 53 |
+| medindo-ordem | Medindo a Ordem | medir | 62 |
+| volume-celula | Quanto Cabe em uma Célula? | calcular | 62 |
 
 ## Metal → roteiros
 
@@ -29,7 +29,7 @@ Metais investigáveis: **62**. Roteiros: **5**. Com todos os roteiros: **53** me
 | Titânio (Ti) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Vanádio (V) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Cromo (Cr) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
-| Manganês (Mn) | eletrons-metal |
+| Manganês (Mn) | ordem-metal, eletrons-metal, medindo-ordem, volume-celula |
 | Ferro (Fe) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Cobalto (Co) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Níquel (Ni) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
@@ -47,14 +47,14 @@ Metais investigáveis: **62**. Roteiros: **5**. Com todos os roteiros: **53** me
 | Paládio (Pd) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Prata (Ag) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Cádmio (Cd) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
-| Estanho (Sn) | eletrons-metal |
+| Estanho (Sn) | ordem-metal, eletrons-metal, medindo-ordem, volume-celula |
 | Césio (Cs) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Bário (Ba) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Lantânio (La) | eletrons-metal |
 | Cério (Ce) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Praseodímio (Pr) | eletrons-metal |
 | Neodímio (Nd) | eletrons-metal |
-| Samário (Sm) | eletrons-metal |
+| Samário (Sm) | ordem-metal, eletrons-metal, medindo-ordem, volume-celula |
 | Európio (Eu) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Gadolínio (Gd) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Térbio (Tb) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
@@ -74,12 +74,15 @@ Metais investigáveis: **62**. Roteiros: **5**. Com todos os roteiros: **53** me
 | Ouro (Au) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Tálio (Tl) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Chumbo (Pb) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
-| Bismuto (Bi) | eletrons-metal |
+| Bismuto (Bi) | ordem-metal, eletrons-metal, medindo-ordem, volume-celula |
+| Polônio (Po) | ordem-metal, eletrons-metal, medindo-ordem, volume-celula |
 | Rádio (Ra) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Actínio (Ac) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
 | Tório (Th) | ordem-metal, eletrons-metal, deformacao-metal, medindo-ordem, volume-celula |
-| Netúnio (Np) | eletrons-metal |
-| Plutônio (Pu) | eletrons-metal |
+| Protactínio (Pa) | ordem-metal, eletrons-metal, medindo-ordem, volume-celula |
+| Netúnio (Np) | ordem-metal, eletrons-metal, medindo-ordem, volume-celula |
+| Plutônio (Pu) | ordem-metal, eletrons-metal, medindo-ordem, volume-celula |
+| Amerício (Am) | ordem-metal, eletrons-metal, medindo-ordem, volume-celula |
 
 ## Metais com cobertura parcial
 
@@ -92,5 +95,8 @@ A estrutura de referência destes metais está registrada no banco, mas não é 
 - Neodímio (Nd): Dupla hexagonal compacta.
 - Samário (Sm): Romboédrica.
 - Bismuto (Bi): Romboédrica.
+- Polônio (Po): Cúbica simples (α-Po).
+- Protactínio (Pa): Tetragonal de corpo centrado.
 - Netúnio (Np): Ortorrômbica.
 - Plutônio (Pu): Monoclínica.
+- Amerício (Am): Dupla hexagonal compacta (α-Am).

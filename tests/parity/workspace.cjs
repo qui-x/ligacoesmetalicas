@@ -69,12 +69,12 @@ module.exports=async(browser,url)=>{
   assert.deepEqual(await pairs(),{Metal:'Cobre (Cu)',Estrutura:'Montagem livre',Unidades:'2',Módulo:'Explorar',Medições:'0',Cálculos:'0'});
   await p.locator('[data-left-tab="preparo"]').click();await p.locator('#silm-organize').click();await p.waitForFunction(()=>SILMIntegration.snapshot().structure?.mode==='crystalline');
   await p.locator('[data-left-tab="resumo"]').click();await p.waitForFunction(()=>/CFC/.test([...document.querySelectorAll('#silm-summary-list dd')][1]?.textContent||''),'',{timeout:4000});
-  // Metal sem geometria validada: organizar fica bloqueado, com o motivo escrito, e a estrutura nunca vira cristalina.
-  await p.locator('[data-left-tab="preparo"]').click();await p.locator('#silm-metal').selectOption('25');await p.locator('#silm-start').click();
+  // Metal sem geometria validada (lantânio: ficha da dupla hexagonal incompleta): organizar fica bloqueado, com o motivo escrito, e a estrutura nunca vira cristalina.
+  await p.locator('[data-left-tab="preparo"]').click();await p.locator('#silm-metal').selectOption('57');await p.locator('#silm-start').click();
   if(await p.locator('#si-modal-confirm').isVisible().catch(()=>false))await p.locator('#si-modal-confirm').click();
-  await p.waitForFunction(()=>SILMIntegration.snapshot().metal?.atomicNumber===25);await p.locator('#silm-add').click();await p.locator('#silm-add').click();
+  await p.waitForFunction(()=>SILMIntegration.snapshot().metal?.atomicNumber===57);await p.locator('#silm-add').click();await p.locator('#silm-add').click();
   assert.equal(await p.locator('#silm-organize').isDisabled(),true,'Organizar bloqueado sem geometria validada');
-  assert.match(await p.locator('#silm-assembly-crystal-reason').innerText(),/não disponível para visualização/);
+  assert.match(await p.locator('#silm-assembly-crystal-reason').innerText(),/não descreve a estrutura completa.*visualização fica bloqueada/);
   assert.notEqual(await p.evaluate(()=>SILMIntegration.snapshot().structure.mode),'crystalline');
  }finally{await mctx.close();}
  /* 4. 5.3 Ver e 5.4 Dados: títulos do SIAB, famílias do módulo, camadas sem efeito científico, origem das entradas,

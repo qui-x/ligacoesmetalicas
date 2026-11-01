@@ -85,12 +85,12 @@ SILM.validateStructure=(s,metal,data=SILM.data)=>{
  if(!plain(cr)||!keys(cr,['structureType','sourceId','coordination','representation','freeUnits','organizedAt']))return fail('CRYSTALLOGRAPHY_INVALID');
  if(!X.structureTypes.includes(cr.structureType))return fail('CRYSTAL_TYPE_INVALID');
  if(cr.structureType!==el.structureType||s.referenceStructureId!==el.referenceStructureId||cr.sourceId!==el.sourceId)return fail('CRYSTAL_REFERENCE_MISMATCH');
- if(cr.coordination!==X.models[cr.structureType].coordination)return fail('COORDINATION_INVALID');
+ if(cr.coordination!==el.coordination)return fail('COORDINATION_INVALID');
  if(!date(cr.organizedAt)||s.status==='empty')return fail('CRYSTALLOGRAPHY_INVALID');
  const r=cr.representation;
  if(!plain(r)||!keys(r,['view','unitCell','neighbors','labels','selectedUnitId'])||!SILM.crystalRepresentation.views.includes(r.view)||['unitCell','neighbors','labels'].some(k=>typeof r[k]!=='boolean'))return fail('REPRESENTATION_INVALID');
  const free=freeUnits(cr.freeUnits,{allowEmpty:false});if(!free.ok)return free;
- const g=X.geometry(e),m=X.models[cr.structureType],ids=new Set(),sites=new Set(),byId=new Map(cr.freeUnits.map(u=>[u.id,u]));
+ const g=X.geometry(e),m=g.model,ids=new Set(),sites=new Set(),byId=new Map(cr.freeUnits.map(u=>[u.id,u]));
  for(const u of s.units){
   if(mixed(u))return fail('STRUCTURE_MIXED_ELEMENTS');
   if(!plain(u)||!keys(u,['createdAt','id','placement','site'])||typeof u.id!=='string'||!/^unit-[a-zA-Z0-9-]{8,80}$/.test(u.id)||ids.has(u.id)||!date(u.createdAt))return fail('UNIT_INVALID');
@@ -324,8 +324,8 @@ SILM.createScientificState=()=>{
   if(state.calculations.length>=CA.limit)return {ok:false,reason:'CALCULATIONS_LIMIT'};
   const constants=(f.constants||[]).map(k=>{const c=SILM.constants[k];return {key:c.key,symbol:c.symbol,name:c.name,value:c.value,unit:c.unit,origin:'CONSTANT',ref:c.sourceId?{sourceId:c.sourceId}:null};});
   const clean=inputs.map(x=>({key:x.key,symbol:x.symbol,name:x.name,value:Array.isArray(x.value)?[...x.value]:x.value,unit:x.unit,origin:x.origin,ref:x.ref?{...x.ref}:null}));
-  const all=[...clean,...constants],r=CA.compute(formulaId,all);if(!r.ok)return r;
-  const previous=snapshot(),date=now(),e=SILM.data.get(state.metal.atomicNumber),g=SILM.crystal.geometry(e);
+  const e=SILM.data.get(state.metal.atomicNumber),g=SILM.crystal.geometry(e),all=[...clean,...constants],r=CA.compute(formulaId,all,{geometry:g});if(!r.ok)return r;
+  const previous=snapshot(),date=now();
   const references=[...new Set([...all.map(x=>x.ref?.sourceId).filter(Boolean),...(f.references||[])])],dependsOn=all.map(x=>x.ref?.calculationId||x.ref?.measurementId).filter(Boolean);
   const c={id:random('calc-'),type:f.quantity,formulaId,structureType:type,inputs:all,result:r.result,unit:f.outputUnit,
    provenance:{kind:'CALCULATED',model:f.model,references,dependsOn},structureContext:SILM.measurement.context(s),metalAtomicNumber:state.metal.atomicNumber,createdAt:date};

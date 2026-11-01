@@ -24,7 +24,8 @@ window.SILM=window.SILM||{};
   REFERENCE_PHASE_UNSUPPORTED:'Não há fase sólida de referência homologada para a condição adotada.',
   INSUFFICIENT_VALIDATION:'O comportamento mecânico real deste metal não está homologado no banco: a experiência mostra o mecanismo didático, não a resposta específica do metal.',
   LIQUID_AT_REFERENCE_CONDITION:'Líquido na condição de referência registrada: deformação de rede sólida, condução pela rede e superfície sólida não se aplicam.',
-  METAL_NOT_INVESTIGABLE:'Metal não habilitado para investigação no SILM.'
+  METAL_NOT_INVESTIGABLE:'Metal não habilitado para investigação no SILM.',
+  DEFORMATION_MODEL_NOT_APPLICABLE:'A representação de deformação do SILM (deslizamento coletivo de planos) foi construída para as estruturas CCC, CFC e HC. Nesta estrutura complexa ela não foi homologada, e vários desses metais são frágeis à temperatura ambiente; a experiência fica indisponível.'
  });
  /* Fase na condição de referência: da estrutura de referência (sólida) ou do dado de fase registrado no banco. */
  function phase(e){
@@ -59,6 +60,8 @@ window.SILM=window.SILM||{};
    else if(solidOnly&&ph.value!=='solid'){status='unavailable';reasonCode='REFERENCE_PHASE_UNSUPPORTED';}
    else if(!investigable){status='unavailable';reasonCode='METAL_NOT_INVESTIGABLE';}
    else if(c.requires==='crystalline'&&crystal.status!=='available'){status='unavailable';reasonCode='MODEL_NOT_APPLICABLE';}
+   // 0.16.x: no modelo geral, condução térmica e brilho continuam qualitativos; a deformação didática não se aplica.
+   else if(crystal?.general&&['malleability','ductility'].includes(id)){status='unavailable';reasonCode='DEFORMATION_MODEL_NOT_APPLICABLE';}
    else if(d)status='available';
    const note=status!=='unavailable'&&['malleability','ductility'].includes(id)?reasons.INSUFFICIENT_VALIDATION:null;
    out[id]={id,title:c.title,status,reasonCode,message:reasonCode?reasons[reasonCode]:null,requires:c.requires,data:d,dataReason:needsNumber&&!d?'PROPERTY_DATA_MISSING':null,note};

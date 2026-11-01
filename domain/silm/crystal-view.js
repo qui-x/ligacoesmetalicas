@@ -47,7 +47,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const instructions=U.element('p','Selecione uma unidade (clique, toque ou Enter) e use Mostrar vizinhos. Setas percorrem as unidades; Esc limpa a seleção.'+(note?' '+note:''),'silm-assembly-help');instructions.id='silm-assembly-help';
  const cameraHelp=U.element('p',mode3d?'Vista 3D: arraste para girar (no celular, um dedo); J e L giram na horizontal, I e K na vertical, P alterna perspectiva e ortográfica. Shift + arrastar desloca; + e − aproximam; F enquadra; 0 restaura. Os eixos no canto são só referência. A vista não muda a estrutura nem as medidas.':
   'Vista: + e − aproximam e afastam, F enquadra, C centraliza, 0 restaura e Shift + setas deslocam. Arraste o fundo para deslocar; no celular, use dois dedos para aproximar. A vista não muda a estrutura nem as medidas.','silm-camera-help');
- const legend=U.element('p',m.id==='HCP'?'Camadas A e B: empilhamento ABAB. Unidades da camada B têm anel interno tracejado. Na projeção Superior, a camada B aparece nos espaços entre os centros da camada A.':'O sólido continua em todas as direções: a célula é a unidade que se repete.','silm-crystal-legend');
+ const legend=U.element('p',m.id==='HCP'?'Camadas A e B: empilhamento ABAB. Unidades da camada B têm anel interno tracejado. Na projeção Superior, a camada B aparece nos espaços entre os centros da camada A.':m.general?'Célula da ficha cristalográfica (grupo espacial '+m.spaceGroup+'), com as posições geradas pelas operações de simetria registradas. O sólido continua em todas as direções: a célula é a unidade que se repete.':'O sólido continua em todas as direções: a célula é a unidade que se repete.','silm-crystal-legend');
  const feedback=U.element('p','','silm-assembly-feedback');feedback.id='silm-assembly-feedback';
  footer.append(feedback);root.append(bar,area,footer);host.append(root);
  const say=(text,{announce=true}={})=>{feedback.textContent=text;if(announce)SimCore.notifications.announce(text);};
@@ -98,9 +98,10 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const sizeSymbols=()=>{const px=(R.size||300)*unitFraction*R.camera.zoom;stage.style.setProperty('--unit-px',px.toFixed(1)+'px');root.dataset.symbols=px<16?'hidden':'shown';root.dataset.labelsFit=px<20?'no':'yes';
   // Alvo mínimo de 24 px na tela (com folga): margem transparente em coordenadas do palco, descontando zoom e profundidade.
   const visual=(R.size||300)*unitFraction,zoom=R.camera.zoom||1;for(const node of nodes.values()){const ds=parseFloat(node.style.getPropertyValue('--depth-scale'))||1;node.style.setProperty('--hit-pad',Math.max(0,(25/(zoom*ds)-visual)/2).toFixed(2)+'px');}};
- const shortRole={corner:'V',face:'F',body:'C','base-vertex':'A','base-center':'A',interior:'B',outside:''};
+ const shortRole=m.general?{corner:'V',edge:'Ar',face:'F',interior:'I',outside:''}:{corner:'V',face:'F',body:'C','base-vertex':'A','base-center':'A',interior:'B',outside:''};
  /* 0.10.x: fração de cada centro que pertence à célula (contagem do número efetivo). */
- const SHARE={BCC:{corner:'1/8',body:'1'},FCC:{corner:'1/8',face:'1/2'},HCP:{'base-vertex':'1/6','base-center':'1/2',interior:'1'}};
+ const SHARE={BCC:{corner:'1/8',body:'1'},FCC:{corner:'1/8',face:'1/2'},HCP:{'base-vertex':'1/6','base-center':'1/2',interior:'1'},general:{corner:'1/8',edge:'1/4',face:'1/2',interior:'1'}};
+ const shares=SHARE[m.general?'general':m.id];
  /* Par de centros em contato (vizinhos mais próximos), para o destaque de raio e empacotamento. */
  function contactPair(list){const byKey=new Map(list.map(u=>[X.key(u.site),u])),corner=list.find(u=>g.role(u.site).role==='corner'||g.role(u.site).role==='base-vertex')||list[0];if(!corner)return null;
   const near=g.neighbors(corner.site).list.find(n=>byKey.has(n.key));return near?[corner,byKey.get(near.key)]:null;}
@@ -154,7 +155,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   for(const [id,node]of nodes)if(!list.some(u=>u.id===id)){node.remove();nodes.delete(id);}
   const selected=r.selectedUnitId,selectedUnit=selected?list.find(u=>u.id===selected):null,neighbors=r.neighbors&&selectedUnit?g.neighbors(selectedUnit.site):null,neighborKeys=new Set(neighbors?.list.map(x=>x.key)||[]);
   // Cena estável (sem vizinhos nem margem de rede): a câmera, e não o layout, enquadra o que estiver visível.
-  const fitCarts=[...g.cell.map(c=>c.cart),...list.map(u=>g.site(u.site).cart)];
+  const fitCarts=[...g.cell.map(c=>c.cart),...(g.corners||[]),...list.map(u=>g.site(u.site).cart)];
   if(mode3d){try{layout=X.layout3D(g,fitCarts,cam3);}catch(error){rep2.fail3D(error);layout=X.layoutFor(g,fitCarts,{margin:.12,projection:proj});}}
   else layout=X.layoutFor(g,fitCarts,{margin:.12,projection:proj});
   const d=g.neighbors(g.cell[0]).distances[0];unitFraction=Math.min(.11,Math.max(.045,d*layout.scale*.3));stage.style.setProperty('--unit-size',(unitFraction*100).toFixed(3)+'%');
@@ -166,7 +167,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    if(!node.dataset.animating){node.style.left=(p.x*100)+'%';node.style.top=(p.y*100)+'%';}
    // Ordem dentro da camada da estrutura: profundidade; a selecionada fica por cima (o anel de seleção vem da camada própria).
    node.style.zIndex=String(selected===u.id?200:10+Math.round((1-p.depth)*100));node.style.setProperty('--depth-scale',dscale(p).toFixed(3));node.style.setProperty('--depth-fade',(1-.22*p.depth).toFixed(3));
-   node.dataset.role=info.role;node.dataset.layer=info.layer||'';node.dataset.placement=u.placement;node.querySelector('.silm-site-label').textContent=calcMark?.mode==='fractions'?(SHARE[m.id][info.role]||''):(shortRole[info.role]||'');
+   node.dataset.role=info.role;node.dataset.layer=info.layer||'';node.dataset.placement=u.placement;node.querySelector('.silm-site-label').textContent=calcMark?.mode==='fractions'?(shares[info.role]||''):(shortRole[info.role]||'');
    const flag=neighborKeys.has(X.key(u.site));if(flag)node.dataset.neighbor='';else delete node.dataset.neighbor;
    node.setAttribute('aria-pressed',String(selected===u.id));
    node.setAttribute('aria-label','Unidade de '+name+' '+(i+1)+' de '+list.length+': '+info.label+(u.placement==='crystallographic'?', completada pelo SILM':'')+(flag?', vizinha imediata da unidade selecionada':''));
@@ -178,7 +179,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   ghostLayer.replaceChildren();const ghosts=[];
   if(neighbors){const occupied=new Set(list.map(u=>X.key(u.site)));for(const n of neighbors.list)if(!occupied.has(n.key)){const q=layout.project(D(n.cart));ghosts.push(q);ghostLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*50*dscale(q)}));}}
   // Caixa de interesse da câmera: estrutura desenhada (com a deformação da propriedade e os vizinhos visíveis).
-  const cellDrawn=g.cell.map(c=>layout.project(D(c.cart)));
+  const cellDrawn=[...g.cell.map(c=>c.cart),...(g.corners||[])].map(p=>layout.project(D(p)));
   // Trocar a projeção ou a vista (Célula/Rede) reenquadra; mostrar vizinhos ou deformar mantém a câmera do usuário.
   const presetKey=mode3d?(cam3.preset||lastPreset||'3d'):'',key=(mode3d?'3d:'+presetKey:proj)+'|'+r.view,refit=fitKey!==null&&fitKey!==key&&R.camera.mode!=='fit';fitKey=key;if(mode3d&&cam3.preset)lastPreset=cam3.preset;
   if(refit)R.setCamera({...R.camera,mode:'fit'},{settled:false});
@@ -186,7 +187,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   R.setInterest(box,{margin:boxMargin});if(refit)rep2.saveCamera(cameraKey,R.camera);
   sizeSymbols();
   // Calor e níveis: sempre sobre a projeção de referência (isométrica, congelada), para que a vista nunca mude a experiência.
-  const refLayout=X.layout(g,[...g.cell.map(c=>c.cart),...list.map(u=>g.site(u.site).cart)].map(D),{margin:.12});
+  const refLayout=X.layout(g,[...g.cell.map(c=>c.cart),...(g.corners||[]),...list.map(u=>g.site(u.site).cart)].map(D),{margin:.12});
   const refCentres=list.map(u=>refLayout.project(D(g.site(u.site).cart))),refSpacing=d*refLayout.scale;
   const heated=active==='thermal'&&(pr.thermal.heating||pr.thermal.stage>0),levels=heated?P.heat(refCentres,refSpacing,pr.thermal.stage):[],sources=heated?P.heatSources(refCentres):[];
   const lit=new Set();if(active==='luster'&&pr.luster.light){const zs=list.map(u=>g.site(u.site).cart[2]),top=Math.max(...zs);list.forEach((u,i)=>{if(zs[i]>=top-.05)lit.add(u.id);});}
@@ -210,7 +211,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;electronControls?.update();
   const inCell=list.filter(u=>g.cellKeys.has(X.key(u.site))).length,added=list.filter(u=>u.placement==='crystallographic').length;
   // Indicador compacto (0.8.x): estrutura e, quando houver, a propriedade em estudo.
-  meta.textContent=m.code+' · '+m.name+' · '+list.length+' unidades'+(added?' ('+added+' completadas pelo SILM)':'')+(active?' · '+P.catalog[active].title+' em estudo':'');
+  meta.textContent=(m.general?m.label+' · '+m.spaceGroup:m.code+' · '+m.name)+' · '+list.length+' unidades'+(added?' ('+added+' completadas pelo SILM)':'')+(active?' · '+P.catalog[active].title+' em estudo':'');
   meta.title=meta.textContent;   // 0.9.1: texto integral quando o celular limita a duas linhas
   paint();
   stage.setAttribute('aria-label',structureName+'. '+(r.view==='lattice'?'Vista da rede extensa':'Vista da célula')+'; célula unitária '+(r.unitCell?'visível':'oculta')+'. '+inCell+' unidades na célula desenhada.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica; '+(moving?'movimento visual ativo.':'representação estática.'):'')+(narrative&&JSON.stringify(pr[active])!==JSON.stringify(P.defaults[active])?' '+P.catalog[active].title+': '+narrative.action+' '+narrative.observation:'')+(scene.measureText?' '+scene.measureText:''));

@@ -47,7 +47,8 @@ def structure(code, symbol, kind, label, extra_notes=''):
     params = {}
     for key, cif, unit in [('a', '_cell_length_a', 'Å'), ('b', '_cell_length_b', 'Å'), ('c', '_cell_length_c', 'Å'), ('alpha', '_cell_angle_alpha', '°'), ('beta', '_cell_angle_beta', '°'), ('gamma', '_cell_angle_gamma', '°')]:
         raw = cell(cif)
-        params[key] = {'value': float(raw) if '.' in raw else int(raw), 'unit': unit, 'kind': 'TABULATED', 'sourceId': src, 'display': raw}
+        # "90." (ponto final sem casas) é a mesma grafia de 90: a exibição omite o ponto solto; o valor não muda.
+        params[key] = {'value': float(raw) if '.' in raw else int(raw), 'unit': unit, 'kind': 'TABULATED', 'sourceId': src, 'display': raw[:-1] if raw.endswith('.') else raw}
     sample = next((l for l in c['title'] if l.lower().startswith('sample')), '')
     notes = [l for l in c['title'] if l.lower().startswith('note')]
     if c['T']:
@@ -82,7 +83,9 @@ def structure(code, symbol, kind, label, extra_notes=''):
         },
         'latticeParameters': params,
         'fractionalSites': {'representation': 'asymmetric-unit', 'symmetryOperations': c['ops'],
-                            'values': [{'x': s['x'], 'y': s['y'], 'z': s['z']} for s in c['sites']], 'sourceId': src, 'kind': 'TABULATED'},
+                            'values': [{'x': s['x'], 'y': s['y'], 'z': s['z']} for s in c['sites']],
+                            # Z declarado na ficha: o modelo geral exige que a simetria gere exatamente esse número de átomos.
+                            'cellFormulaUnitsZ': int(v('_cell_formula_units_Z')), 'sourceId': src, 'kind': 'TABULATED'},
         'notes': 'Parâmetros, grupo espacial, simetria e sítios copiados do CIF local (COD ' + code + '), conferidos contra o modelo cristalográfico.',
     }
 

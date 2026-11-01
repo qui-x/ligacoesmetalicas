@@ -4490,6 +4490,7 @@
               "z": "0.28200"
             }
           ],
+          "cellFormulaUnitsZ": 58,
           "sourceId": "src-cod-9011068",
           "kind": "TABULATED"
         },
@@ -9468,8 +9469,8 @@
     },
     "silmEligibility": {
       "status": "unavailable",
-      "reasonCode": "DATA_CONFLICT",
-      "note": "Registros usam convenções de célula diferentes; o registro corrigido não explicita a temperatura. Homologação pendente.",
+      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
+      "note": "A única ficha local (COD 9017521) vem de um estudo de dilatação térmica, com medidas em várias temperaturas, e não informa a que temperatura corresponde a célula registrada. Homologação pendente até conferir o artigo original.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -9508,7 +9509,7 @@
         "sourceId": "src-cod-9017521",
         "decision": "not-homologated",
         "evidenceType": "experimental",
-        "note": "Consulta de auditoria; não usado como referência de investigação."
+        "note": "Estudo de dilatação térmica (Smith e Schneider, 1964); o CIF não informa a temperatura da célula. Não homologado como condição ambiente."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -9722,6 +9723,7 @@
               "z": "0.00000"
             }
           ],
+          "cellFormulaUnitsZ": 4,
           "sourceId": "src-cod-9012005",
           "kind": "TABULATED"
         },
@@ -10873,6 +10875,7 @@
               "z": "0.25000"
             }
           ],
+          "cellFormulaUnitsZ": 2,
           "sourceId": "src-cod-9010986",
           "kind": "TABULATED"
         },
@@ -11479,6 +11482,7 @@
               "z": "0.25000"
             }
           ],
+          "cellFormulaUnitsZ": 2,
           "sourceId": "src-cod-9010988",
           "kind": "TABULATED"
         },
@@ -11698,6 +11702,7 @@
               "z": "0.25000"
             }
           ],
+          "cellFormulaUnitsZ": 2,
           "sourceId": "src-cod-9010989",
           "kind": "TABULATED"
         },
@@ -11995,6 +12000,7 @@
               "z": "0.22222"
             }
           ],
+          "cellFormulaUnitsZ": 3,
           "sourceId": "src-cod-9014498",
           "kind": "TABULATED"
         },
@@ -17103,6 +17109,7 @@
               "z": "0.23389"
             }
           ],
+          "cellFormulaUnitsZ": 6,
           "sourceId": "src-cod-9009658",
           "kind": "TABULATED"
         },
@@ -17169,9 +17176,9 @@
       "supportingSourceId": "src-rsc-periodic"
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Conjunto documental de referência validado; não autoriza simulação ou extrapolação das condições.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -17201,15 +17208,166 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "po-reference",
+        "type": "SC",
+        "label": "Cúbica simples (α-Po)",
+        "spaceGroup": "P m -3 m",
+        "spaceGroupNumber": 221,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-1509138",
+        "conditions": {
+          "temperature": {
+            "value": 283.0,
+            "unit": "K",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-1509138",
+            "display": "283 K",
+            "qualifier": "reported"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente (convenção; valor medido não reportado)"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-1509138"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica",
+            "sourceId": "src-cod-1509138",
+            "kind": "TABULATED"
+          },
+          "notes": "A pressão ambiente é a condição de referência adotada, não uma medida de 101325 Pa. A precisão dos parâmetros é a publicada; não autoriza extrapolação térmica. A ficha informa 283 K, dentro do intervalo da fase α (cúbica simples) à pressão ambiente."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 3.345,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-1509138",
+            "display": "3.345"
+          },
+          "b": {
+            "value": 3.345,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-1509138",
+            "display": "3.345"
+          },
+          "c": {
+            "value": 3.345,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-1509138",
+            "display": "3.345"
+          },
+          "alpha": {
+            "value": 90.0,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-1509138",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90.0,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-1509138",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 90.0,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-1509138",
+            "display": "90"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "-y,x,z",
+            "-x,-y,z",
+            "y,-x,z",
+            "x,-z,y",
+            "x,-y,-z",
+            "x,z,-y",
+            "z,y,-x",
+            "-x,y,-z",
+            "-z,y,x",
+            "z,x,y",
+            "y,z,x",
+            "-y,-z,x",
+            "z,-x,-y",
+            "-y,z,-x",
+            "-z,-x,y",
+            "-z,x,-y",
+            "y,-z,-x",
+            "y,x,-z",
+            "-y,-x,-z",
+            "-x,z,y",
+            "-x,-z,-y",
+            "z,-y,x",
+            "-z,-y,-x",
+            "-x,-y,-z",
+            "y,-x,-z",
+            "x,y,-z",
+            "-y,x,-z",
+            "-x,z,-y",
+            "-x,y,z",
+            "-x,-z,y",
+            "-z,-y,x",
+            "x,-y,z",
+            "z,-y,-x",
+            "-z,-x,-y",
+            "-y,-z,-x",
+            "y,z,-x",
+            "-z,x,y",
+            "y,-z,x",
+            "z,x,-y",
+            "z,-x,y",
+            "-y,z,x",
+            "-y,-x,z",
+            "y,x,z",
+            "x,-z,-y",
+            "x,z,y",
+            "-z,y,-x",
+            "z,y,x"
+          ],
+          "values": [
+            {
+              "x": "0",
+              "y": "0",
+              "z": "0"
+            }
+          ],
+          "cellFormulaUnitsZ": 1,
+          "sourceId": "src-cod-1509138",
+          "kind": "TABULATED"
+        },
+        "notes": "Parâmetros, grupo espacial, simetria e sítios copiados do CIF local (COD 1509138), conferidos contra o modelo cristalográfico."
+      }
+    ],
+    "referenceStructure": "po-reference",
     "properties": {},
     "reviewedCandidates": [
       {
         "sourceId": "src-cod-1509138",
-        "decision": "not-homologated",
+        "decision": "accepted",
         "evidenceType": "experimental",
-        "note": "Consulta de auditoria; não usado como referência de investigação."
+        "note": "Referência experimental homologada a partir do CIF local; validada pelo modelo cristalográfico geral (célula, sítios gerados pela simetria, distância mínima e volume por átomo)."
       }
     ],
     "notes": "Nome localizado em português brasileiro."
@@ -17617,21 +17775,21 @@
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-1509139",
-            "display": "90."
+            "display": "90"
           },
           "beta": {
             "value": 90.0,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-1509139",
-            "display": "90."
+            "display": "90"
           },
           "gamma": {
             "value": 90.0,
             "unit": "°",
             "kind": "TABULATED",
             "sourceId": "src-cod-1509139",
-            "display": "90."
+            "display": "90"
           }
         },
         "fractionalSites": {
@@ -18579,9 +18737,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Conjunto documental de referência validado; não autoriza simulação ou extrapolação das condições.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -18612,15 +18770,150 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "pa-reference",
+        "type": "TETRAGONAL",
+        "label": "Tetragonal de corpo centrado",
+        "spaceGroup": "I 4/m m m",
+        "spaceGroupNumber": 139,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-2310022",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada no CIF"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente (convenção; valor medido não reportado)"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-2310022"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica",
+            "sourceId": "src-cod-2310022",
+            "kind": "TABULATED"
+          },
+          "notes": "A pressão ambiente é a condição de referência adotada, não uma medida de 101325 Pa. A precisão dos parâmetros é a publicada; não autoriza extrapolação térmica. Temperatura exata de aquisição não reportada no CIF."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 3.925,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-2310022",
+            "display": "3.925"
+          },
+          "b": {
+            "value": 3.925,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-2310022",
+            "display": "3.925"
+          },
+          "c": {
+            "value": 3.238,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-2310022",
+            "display": "3.238"
+          },
+          "alpha": {
+            "value": 90.0,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-2310022",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90.0,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-2310022",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 90.0,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-2310022",
+            "display": "90"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "-y,x,z",
+            "-x,-y,z",
+            "y,-x,z",
+            "x,-y,-z",
+            "-x,y,-z",
+            "y,x,-z",
+            "-y,-x,-z",
+            "-x,-y,-z",
+            "y,-x,-z",
+            "x,y,-z",
+            "-y,x,-z",
+            "-x,y,z",
+            "x,-y,z",
+            "-y,-x,z",
+            "y,x,z",
+            "x+1/2,y+1/2,z+1/2",
+            "-y+1/2,x+1/2,z+1/2",
+            "-x+1/2,-y+1/2,z+1/2",
+            "y+1/2,-x+1/2,z+1/2",
+            "x+1/2,-y+1/2,-z+1/2",
+            "-x+1/2,y+1/2,-z+1/2",
+            "y+1/2,x+1/2,-z+1/2",
+            "-y+1/2,-x+1/2,-z+1/2",
+            "-x+1/2,-y+1/2,-z+1/2",
+            "y+1/2,-x+1/2,-z+1/2",
+            "x+1/2,y+1/2,-z+1/2",
+            "-y+1/2,x+1/2,-z+1/2",
+            "-x+1/2,y+1/2,z+1/2",
+            "x+1/2,-y+1/2,z+1/2",
+            "-y+1/2,-x+1/2,z+1/2",
+            "y+1/2,x+1/2,z+1/2"
+          ],
+          "values": [
+            {
+              "x": "0",
+              "y": "0",
+              "z": "0"
+            }
+          ],
+          "cellFormulaUnitsZ": 2,
+          "sourceId": "src-cod-2310022",
+          "kind": "TABULATED"
+        },
+        "notes": "Parâmetros, grupo espacial, simetria e sítios copiados do CIF local (COD 2310022), conferidos contra o modelo cristalográfico."
+      }
+    ],
+    "referenceStructure": "pa-reference",
     "properties": {},
     "reviewedCandidates": [
       {
         "sourceId": "src-cod-2310022",
-        "decision": "not-homologated",
+        "decision": "accepted",
         "evidenceType": "experimental",
-        "note": "Consulta de auditoria; não usado como referência de investigação."
+        "note": "Referência experimental homologada a partir do CIF local; validada pelo modelo cristalográfico geral (célula, sítios gerados pela simetria, distância mínima e volume por átomo)."
       }
     ],
     "notes": "Grupo não atribuído nesta convenção de linhas destacadas; bloco f é uma convenção de organização, não a afirmação do orbital do último elétron."
@@ -18907,6 +19200,7 @@
               "z": "0.31900"
             }
           ],
+          "cellFormulaUnitsZ": 8,
           "sourceId": "src-cod-9008585",
           "kind": "TABULATED"
         },
@@ -19140,6 +19434,7 @@
               "z": "0.89700"
             }
           ],
+          "cellFormulaUnitsZ": 16,
           "sourceId": "src-cod-9008587",
           "kind": "TABULATED"
         },
@@ -19205,9 +19500,9 @@
       "note": ""
     },
     "silmEligibility": {
-      "status": "unavailable",
-      "reasonCode": "INSUFFICIENT_VALIDATED_DATA",
-      "note": "Os registros examinados não fecharam, em conjunto, fase ambiente, condições e parâmetros de referência. Isso não significa inexistência de dados na literatura.",
+      "status": "available",
+      "reasonCode": null,
+      "note": "Conjunto documental de referência validado; não autoriza simulação ou extrapolação das condições.",
       "policySourceId": "src-silm-conventions"
     },
     "atomicWeight": {
@@ -19237,15 +19532,147 @@
       "configurationSourceId": "src-nist-asd-2024",
       "kind": "QUALITATIVE"
     },
-    "structures": [],
-    "referenceStructure": null,
+    "structures": [
+      {
+        "id": "am-reference",
+        "type": "DHCP",
+        "label": "Dupla hexagonal compacta (α-Am)",
+        "spaceGroup": "P 63/m m c",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "kind": "TABULATED",
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008524",
+        "conditions": {
+          "temperature": {
+            "value": null,
+            "unit": "K",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente; temperatura numérica não reportada no CIF"
+          },
+          "pressure": {
+            "value": null,
+            "unit": "Pa",
+            "qualifier": "ambient-reference",
+            "kind": "QUALITATIVE",
+            "sourceId": "src-silm-conventions",
+            "display": "Ambiente (convenção; valor medido não reportado)"
+          },
+          "phase": {
+            "value": "solid",
+            "display": "Sólida",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008524"
+          },
+          "direction": null,
+          "purity": {
+            "description": "Pureza da amostra não explicitada na ficha cristalográfica",
+            "sourceId": "src-cod-9008524",
+            "kind": "TABULATED"
+          },
+          "notes": "A pressão ambiente é a condição de referência adotada, não uma medida de 101325 Pa. A precisão dos parâmetros é a publicada; não autoriza extrapolação térmica. Temperatura exata de aquisição não reportada no CIF."
+        },
+        "latticeParameters": {
+          "a": {
+            "value": 3.474,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008524",
+            "display": "3.474"
+          },
+          "b": {
+            "value": 3.474,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008524",
+            "display": "3.474"
+          },
+          "c": {
+            "value": 11.25,
+            "unit": "Å",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008524",
+            "display": "11.25"
+          },
+          "alpha": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008524",
+            "display": "90"
+          },
+          "beta": {
+            "value": 90,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008524",
+            "display": "90"
+          },
+          "gamma": {
+            "value": 120,
+            "unit": "°",
+            "kind": "TABULATED",
+            "sourceId": "src-cod-9008524",
+            "display": "120"
+          }
+        },
+        "fractionalSites": {
+          "representation": "asymmetric-unit",
+          "symmetryOperations": [
+            "x,y,z",
+            "-x,-x+y,1/2+z",
+            "x,x-y,1/2-z",
+            "-x+y,-x,1/2-z",
+            "x-y,x,1/2+z",
+            "-y,-x,z",
+            "y,x,-z",
+            "y,-x+y,-z",
+            "-y,x-y,z",
+            "x-y,-y,1/2+z",
+            "-x+y,y,1/2-z",
+            "x,y,1/2-z",
+            "-x,-y,1/2+z",
+            "x,x-y,z",
+            "-x,-x+y,-z",
+            "x-y,x,-z",
+            "-x+y,-x,z",
+            "y,x,1/2+z",
+            "-y,-x,1/2-z",
+            "-y,x-y,1/2-z",
+            "y,-x+y,1/2+z",
+            "-x+y,y,z",
+            "x-y,-y,-z",
+            "-x,-y,-z"
+          ],
+          "values": [
+            {
+              "x": "0.00000",
+              "y": "0.00000",
+              "z": "0.00000"
+            },
+            {
+              "x": "0.33333",
+              "y": "0.66667",
+              "z": "0.75000"
+            }
+          ],
+          "cellFormulaUnitsZ": 4,
+          "sourceId": "src-cod-9008524",
+          "kind": "TABULATED"
+        },
+        "notes": "Parâmetros, grupo espacial, simetria e sítios copiados do CIF local (COD 9008524), conferidos contra o modelo cristalográfico."
+      }
+    ],
+    "referenceStructure": "am-reference",
     "properties": {},
     "reviewedCandidates": [
       {
         "sourceId": "src-cod-9008524",
-        "decision": "not-homologated",
+        "decision": "accepted",
         "evidenceType": "experimental",
-        "note": "Consulta de auditoria; não usado como referência de investigação."
+        "note": "Referência experimental homologada a partir do CIF local; validada pelo modelo cristalográfico geral (célula, sítios gerados pela simetria, distância mínima e volume por átomo)."
       }
     ],
     "notes": "Grupo não atribuído nesta convenção de linhas destacadas; bloco f é uma convenção de organização, não a afirmação do orbital do último elétron."

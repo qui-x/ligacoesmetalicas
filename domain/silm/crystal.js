@@ -17,11 +17,24 @@ SILM.crystal=(()=>{
    basis:Object.freeze([[0,0,0],[1/3,2/3,.5]]),cellSites:17,idealRatio:Math.sqrt(8/3),effective:Object.freeze({value:6,explanation:'12 vértices × 1/6 + 2 centros de base × 1/2 + 3 internos = 6 (prisma hexagonal)'})})
  });
  const TYPE_BY_DB=Object.freeze({CCC:'BCC',CFC:'FCC',HC:'HCP'});
+ /* 0.16.x — estruturas de referência fora de CCC/CFC/HC: modelo GERAL construído só com os dados do banco (rede a partir de
+    a, b, c, α, β, γ; átomos gerados pelas operações de simetria registradas). Não há modelo canônico com que comparar: a
+    validação é física (célula, distância mínima entre átomos, volume por átomo) e a vizinhança é descrita por camadas,
+    porque em estruturas complexas o número de coordenação depende do critério de distância. */
+ const GENERAL=Object.freeze(Object.fromEntries([
+  ['SC','cúbica simples'],['TETRAGONAL','tetragonal'],['COMPLEX_CUBIC','cúbica complexa'],['DHCP','dupla hexagonal compacta'],
+  ['RHOMBOHEDRAL','romboédrica'],['ORTHORHOMBIC','ortorrômbica'],['MONOCLINIC','monoclínica']
+ ].map(([id,name])=>[id,Object.freeze({id,code:name,international:null,name,general:true,coordination:null})])));
+ const SHELL_TOL=.03,MIN_DISTANCE=1.8,MAX_VOLUME_RATIO=1.3;
+ /* Coerência tipo × grupo espacial (Tabelas Internacionais: faixas de números por sistema cristalino) e métrica da célula
+    exigida pelo sistema. Um tipo registrado que contradiz o grupo ou os parâmetros bloqueia a visualização. */
+ const GENERAL_GROUPS=Object.freeze({SC:n=>n===221,COMPLEX_CUBIC:n=>n>=195&&n<=230,TETRAGONAL:n=>n>=75&&n<=142,DHCP:n=>n===194,RHOMBOHEDRAL:n=>[146,148,155,160,161,166,167].includes(n),ORTHORHOMBIC:n=>n>=16&&n<=74,MONOCLINIC:n=>n>=3&&n<=15});
  const REASONS=Object.freeze({
   REFERENCE_STRUCTURE_MISSING:'Não há estrutura cristalina de referência registrada para este metal.',
   CRYSTAL_STRUCTURE_UNSUPPORTED:'Estrutura cristalina de referência registrada, mas ainda não disponível para visualização no SILM.',
   REFERENCE_CONDITION_UNSUPPORTED:'A condição de referência registrada não corresponde a uma fase sólida cristalina.',
-  DATA_CONFLICT:'Os dados cristalográficos registrados não são consistentes com o modelo; a visualização foi bloqueada para revisão.'
+  DATA_CONFLICT:'Os dados cristalográficos registrados não são consistentes com o modelo; a visualização foi bloqueada para revisão.',
+  STRUCTURE_DATA_INCOMPLETE:'A ficha cristalográfica registrada não descreve a estrutura completa (faltam sítios atômicos); a visualização fica bloqueada até a revisão da fonte.'
  });
  /* ---------- sítios fracionários do banco ---------- */
  const number=text=>{const t=String(text).trim();if(/^[-+]?\d+\/\d+$/.test(t)){const [n,d]=t.split('/').map(Number);return n/d;}const v=Number(t);if(!Number.isFinite(v))throw new TypeError('Coordenada inválida: '+text);return v;};
@@ -55,7 +68,7 @@ SILM.crystal=(()=>{
   const ref=e?.structures?.find(s=>s.id===e.referenceStructure)||null;
   if(!ref)return fail('REFERENCE_STRUCTURE_MISSING');
   const id=TYPE_BY_DB[ref.type];
-  if(!id)return fail('CRYSTAL_STRUCTURE_UNSUPPORTED',{referenceStructureId:ref.id,registeredType:ref.type,registeredLabel:ref.label});
+  if(!id)return GENERAL[ref.type]?analyseGeneral(ref):fail('CRYSTAL_STRUCTURE_UNSUPPORTED',{referenceStructureId:ref.id,registeredType:ref.type,registeredLabel:ref.label});
   if(ref.conditions?.phase?.value!=='solid')return fail('REFERENCE_CONDITION_UNSUPPORTED',{referenceStructureId:ref.id});
   const m=MODELS[id],lp=ref.latticeParameters,v=k=>lp?.[k]?.value;
   const conflicts=[];
@@ -66,6 +79,39 @@ SILM.crystal=(()=>{
   let sites=[];try{sites=expandSites(ref.fractionalSites);if(!matchesBasis(sites,m.basis))conflicts.push('sítios fracionários');}catch(error){conflicts.push('sítios fracionários');}
   if(conflicts.length)return fail('DATA_CONFLICT',{referenceStructureId:ref.id,conflicts});
   return {status:'available',reasonCode:null,structureType:id,referenceStructureId:ref.id,sourceId:ref.sourceId,coordination:m.coordination,databaseSites:sites,reference:ref};
+ }
+ /* Vetores de rede de uma célula qualquer (a ao longo de x; b no plano xy). */
+ function generalVectors(ref){
+  const p=ref.latticeParameters,v=k=>p?.[k]?.value,a=v('a'),b=v('b'),c=v('c'),al=v('alpha')*deg,be=v('beta')*deg,ga=v('gamma')*deg;
+  if(![a,b,c,al,be,ga].every(Number.isFinite)||Math.min(a,b,c)<=0||Math.abs(Math.sin(ga))<1e-8)return null;
+  const cx=c*Math.cos(be),cy=c*(Math.cos(al)-Math.cos(be)*Math.cos(ga))/Math.sin(ga),cz2=c*c-cx*cx-cy*cy;if(cz2<=1e-9)return null;
+  return [[a,0,0],[b*Math.cos(ga),b*Math.sin(ga),0],[cx,cy,Math.sqrt(cz2)]];
+ }
+ const volumeOf=L=>Math.abs(L[0][0]*(L[1][1]*L[2][2]-L[1][2]*L[2][1])-L[0][1]*(L[1][0]*L[2][2]-L[1][2]*L[2][0])+L[0][2]*(L[1][0]*L[2][1]-L[1][1]*L[2][0]));
+ function metricOk(ref){
+  const v=k=>ref.latticeParameters?.[k]?.value,eq=(x,y)=>Number.isFinite(x)&&Number.isFinite(y)&&Math.abs(x-y)<=1e-6*Math.max(1,Math.abs(y));
+  const [a,b,c,al,be,ga]=['a','b','c','alpha','beta','gamma'].map(v),right=[al,be,ga].every(x=>eq(x,90)),hexAxes=eq(a,b)&&eq(al,90)&&eq(be,90)&&eq(ga,120);
+  return {SC:eq(a,b)&&eq(b,c)&&right,COMPLEX_CUBIC:eq(a,b)&&eq(b,c)&&right,TETRAGONAL:eq(a,b)&&right,DHCP:hexAxes,ORTHORHOMBIC:right,MONOCLINIC:eq(al,90)&&eq(ga,90),
+   RHOMBOHEDRAL:hexAxes||(eq(a,b)&&eq(b,c)&&eq(al,be)&&eq(be,ga))}[ref.type];
+ }
+ function analyseGeneral(ref){
+  const meta={referenceStructureId:ref.id,registeredType:ref.type,registeredLabel:ref.label};
+  const fail=(reasonCode,extra={})=>({status:'unavailable',reasonCode,message:REASONS[reasonCode],...meta,...extra});
+  if(ref.conditions?.phase?.value!=='solid')return fail('REFERENCE_CONDITION_UNSUPPORTED');
+  if(!GENERAL_GROUPS[ref.type](ref.spaceGroupNumber))return fail('DATA_CONFLICT',{conflicts:['grupo espacial × tipo registrado']});
+  if(!metricOk(ref))return fail('DATA_CONFLICT',{conflicts:['parâmetros de rede × sistema cristalino']});
+  const L=generalVectors(ref);let sites=[];try{sites=expandSites(ref.fractionalSites);}catch(error){return fail('DATA_CONFLICT',{conflicts:['sítios fracionários']});}
+  if(!L||!sites.length)return fail('DATA_CONFLICT',{conflicts:['parâmetros de rede']});
+  let dmin=Infinity;for(const p of sites){const pc=cart(L,p);for(const q of sites)for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++)for(let k=-1;k<=1;k++){const d=dist(pc,cart(L,[q[0]+i,q[1]+j,q[2]+k]));if(d>1e-6&&d<dmin)dmin=d;}}
+  // Átomos gerados pela simetria × Z declarado na ficha: menos átomos = sítio faltando; mais = simetria ou sítios incoerentes.
+  const Z=ref.fractionalSites?.cellFormulaUnitsZ;if(!Number.isInteger(Z)||sites.length<Z)return fail('STRUCTURE_DATA_INCOMPLETE',{atoms:sites.length,declaredZ:Z??null});
+  if(sites.length>Z)return fail('DATA_CONFLICT',{conflicts:['átomos gerados × Z da ficha']});
+  if(dmin<MIN_DISTANCE)return fail('DATA_CONFLICT',{conflicts:['distância mínima entre átomos']});
+  // Volume por átomo ÷ (menor distância)³: ≈ 0,71 nas compactas, 1,0 na cúbica simples, até ~1,25 com ligações curtas (Bi, α-Pu).
+  // Acima de 1,3 a ficha deixa vazios incompatíveis com um sólido metálico (ex.: DHC registrada com 2 átomos em vez de 4).
+  const ratio=volumeOf(L)/sites.length/dmin**3;
+  if((ref.type==='DHCP'&&sites.length!==4)||ratio>MAX_VOLUME_RATIO)return fail('STRUCTURE_DATA_INCOMPLETE',{atoms:sites.length,volumeRatio:ratio});
+  return {status:'available',reasonCode:null,structureType:ref.type,general:true,referenceStructureId:ref.id,sourceId:ref.sourceId,coordination:null,databaseSites:sites,reference:ref,atomsPerCell:sites.length};
  }
  function eligibility(e){if(!e)return {status:'unavailable',reasonCode:'REFERENCE_STRUCTURE_MISSING',message:REASONS.REFERENCE_STRUCTURE_MISSING};if(!cache.has(e.atomicNumber))cache.set(e.atomicNumber,analyse(e));return cache.get(e.atomicNumber);}
  /* ---------- geometria ---------- */
@@ -92,6 +138,7 @@ SILM.crystal=(()=>{
  function geometry(e){
   const el=eligibility(e);if(el.status!=='available')return null;
   if(geometryCache.has(e.atomicNumber))return geometryCache.get(e.atomicNumber);
+  if(el.general){const g=generalGeometry(e,el);geometryCache.set(e.atomicNumber,g);return g;}
   const m=MODELS[el.structureType],ref=el.reference,L=vectors(m,ref);
   const hexRange=[[-3,3],[-3,3],[-1,2]],cubicRange=[[-1,2],[-1,2],[-1,2]];
   const all=enumerate(m,L,m.system==='cubic'?cubicRange:hexRange);
@@ -122,11 +169,49 @@ SILM.crystal=(()=>{
   };
   geometryCache.set(e.atomicNumber,g);return g;
  }
+ /* Célula convencional (paralelepípedo) de uma estrutura geral: sítios desenhados com frações em [0, 1], papel de cada sítio
+    pela posição (vértice 1/8, aresta 1/4, face 1/2, interior 1) e vizinhança por camadas de distância. */
+ const SYSTEM=n=>n<=2?'triclinic':n<=15?'monoclinic':n<=74?'orthorhombic':n<=142?'tetragonal':n<=167?'trigonal':n<=194?'hexagonal':'cubic';
+ const GENERAL_ROLES=Object.freeze({corner:{label:'vértice da célula',one:'vértice',many:'vértices',share:1/8,text:'1/8'},edge:{label:'aresta da célula',one:'na aresta',many:'nas arestas',share:1/4,text:'1/4'},face:{label:'face da célula',one:'na face',many:'nas faces',share:1/2,text:'1/2'},interior:{label:'interior da célula',one:'interno',many:'internos',share:1,text:'1'}});
+ function generalGeometry(e,el){
+  const ref=el.reference,L=generalVectors(ref),basis=Object.freeze(el.databaseSites.map(s=>Object.freeze(s.map(wrap)))),Z=basis.length;
+  const proto={...GENERAL[el.structureType],system:SYSTEM(ref.spaceGroupNumber),spaceGroup:ref.spaceGroup,spaceGroupNumber:ref.spaceGroupNumber,label:ref.label,basis};
+  const edgeOf=f=>f.filter(v=>near(v,0)||near(v,1)).length,roleOf=f=>['interior','face','edge','corner'][edgeOf(f)];
+  const all=enumerate(proto,L,[[-1,2],[-1,2],[-1,2]]),inside=s=>s.frac.every(v=>v>-1e-9&&v<1+1e-9);
+  const cell=all.filter(inside),cellKeys=new Set(cell.map(s=>s.key)),center=cart(L,[.5,.5,.5]);
+  const counts={};for(const s of cell){const r=roleOf(s.frac);counts[r]=(counts[r]||0)+1;}
+  const parts=['corner','edge','face','interior'].filter(r=>counts[r]).map(r=>({role:r,count:counts[r],...GENERAL_ROLES[r]}));
+  const effective=parts.reduce((t,p)=>t+p.count*p.share,0);
+  if(Math.abs(effective-Z)>1e-6)throw new Error('Contagem da célula incompatível com os átomos gerados: '+e.symbol);
+  const m=Object.freeze({...proto,cellSites:cell.length,effective:Object.freeze({value:Z,parts:Object.freeze(parts),explanation:parts.map(p=>p.count+' '+(p.count===1?p.one:p.many)+' × '+p.text).join(' + ')+' = '+Z})});
+  const byDistance=(a,b)=>dist(a.cart,center)-dist(b.cart,center)||a.key.localeCompare(b.key);
+  const ordered=[...cell].sort(byDistance),extra=all.filter(s=>!cellKeys.has(s.key)).sort(byDistance),index=new Map(all.map(s=>[s.key,s]));
+  // Vértices da célula: entram no enquadramento porque, no modelo geral, a célula pode não ter átomos nos vértices (ex.: Bi).
+  const corners=[0,1].flatMap(x=>[0,1].flatMap(y=>[0,1].map(z=>cart(L,[x,y,z])))),shellCache=new Map();
+  return {element:e,model:m,eligibility:el,reference:ref,vectors:L,center,cell:ordered,extra,index,cellKeys,ratio:1,general:true,corners,
+   site(siteRef){const k=key(siteRef);return index.get(k)||makeSite(m,L,siteRef.cell,siteRef.basis);},
+   role(siteRef){const s=this.site(siteRef);if(!cellKeys.has(s.key))return {role:'outside',label:'em célula vizinha',layer:null};const r=roleOf(s.frac);return {role:r,label:GENERAL_ROLES[r].label,layer:null};},
+   /* Primeira camada: centros até 3 % além do mais próximo (é a que a cena destaca e o instrumento de coordenação conta).
+      As camadas seguintes (até 1,3 × a menor distância) acompanham, porque o número depende do critério em estruturas complexas. */
+   neighbors(siteRef){
+    // Memorizado por sítio: no α-Mn (58 átomos por célula), cada busca percorre ~7 000 posições e a cena a repete a cada desenho.
+    const s=this.site(siteRef);if(shellCache.has(s.key))return shellCache.get(s.key);
+    const around=enumerate(m,L,[[s.cell[0]-2,s.cell[0]+2],[s.cell[1]-2,s.cell[1]+2],[s.cell[2]-2,s.cell[2]+2]]).filter(x=>x.key!==s.key).map(x=>({x,d:dist(x.cart,s.cart)}));
+    around.sort((a,b)=>a.d-b.d||a.x.key.localeCompare(b.x.key));
+    const d0=around[0].d,first=around.filter(o=>o.d<=d0*(1+SHELL_TOL)),next=around.find(o=>o.d>d0*(1+SHELL_TOL));
+    const shells=[];for(const o of around){if(o.d>d0*1.3)break;const last=shells[shells.length-1];if(last&&o.d<=last.distance*1.01)last.count++;else if(shells.length<6)shells.push({distance:o.d,count:1});else break;}
+    const result=Object.freeze({site:s,list:first.map(o=>o.x),distances:first.map(o=>o.d),next:next?next.d:null,shells:Object.freeze(shells.map(Object.freeze))});shellCache.set(s.key,result);return result;
+   },
+   /* Rede extensa: 2 × 2 × 2 células quando a célula tem até 8 átomos; 2 × 1 × 1 até 16; só a célula acima disso (legibilidade). */
+   lattice(){const r=Z<=8?[[0,1],[0,1],[0,1]]:Z<=16?[[0,1],[0,0],[0,0]]:[[0,0],[0,0],[0,0]];return enumerate(m,L,[[r[0][0]-1,r[0][1]+1],[r[1][0]-1,r[1][1]+1],[r[2][0]-1,r[2][1]+1]]).filter(x=>x.frac.every((v,i)=>v>r[i][0]-1e-9&&v<r[i][1]+1+1e-9));},
+   edges(){const c=[0,1].flatMap(x=>[0,1].flatMap(y=>[0,1].map(z=>[x,y,z])));const out=[];for(let i=0;i<8;i++)for(let j=i+1;j<8;j++)if(c[i].reduce((n,v,k)=>n+(v!==c[j][k]),0)===1)out.push([cart(L,c[i]),cart(L,c[j])]);return out;}
+  };
+ }
  /* ---------- projeção pseudo-3D (ortográfica, com profundidade para oclusão) ---------- */
  function projector(m){
   // Ângulos escolhidos por busca numérica: maximizam a menor separação projetada entre os sítios da célula
   // (inclinação mínima de 16° para manter a leitura 3D). CCC −20°/16°, CFC −11°/17°, HC −10°/16°.
-  const view={BCC:[-20,16],FCC:[-11,17],HCP:[-10,16]}[m.id],yaw=view[0]*deg,pitch=view[1]*deg,cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  const view={BCC:[-20,16],FCC:[-11,17],HCP:[-10,16]}[m.id]||[-20,16],yaw=view[0]*deg,pitch=view[1]*deg,cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
   return p=>{const x1=p[0]*cy-p[1]*sy,y1=p[0]*sy+p[1]*cy,z=p[2];const y2=y1*cp-z*sp,z2=y1*sp+z*cp;return {x:x1,y:-z2,depth:y2};};
  }
  /* Ajusta pontos 3D à cena normalizada (0..1). fit = pontos que devem caber; os demais podem ficar fora (rede). */
@@ -147,15 +232,16 @@ SILM.crystal=(()=>{
   side:Object.freeze({BCC:[80,14],FCC:[103,5],HCP:[109,6]}),
   top:Object.freeze({BCC:[0,72],FCC:[0,76],HCP:[0,77]})
  });
+ const GENERAL_VIEWS=Object.freeze({front:[10,12],side:[80,12],top:[0,75]});
  const PROJECTIONS=Object.freeze(['isometric','front','top','side']);
  function projectorFor(m,projection='isometric'){
-  const view=VIEWS[projection]?.[m.id];if(!view)return projector(m);
+  const view=VIEWS[projection]?.[m.id]||(m.general&&GENERAL_VIEWS[projection]);if(!view)return projector(m);
   const yaw=view[0]*deg,pitch=view[1]*deg,cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
   return p=>{const x1=p[0]*cy-p[1]*sy,y1=p[0]*sy+p[1]*cy,z=p[2];const y2=y1*cp-z*sp,z2=y1*sp+z*cp;return {x:x1,y:-z2,depth:y2};};
  }
  /* Mesmo ajuste de layout(), para qualquer projeção (a cena da 0.11.x: estável, sem depender da câmera). */
  function layoutFor(g,fit,{margin=.12,projection='isometric'}={}){
-  if(!VIEWS[projection])return layout(g,fit,{margin});
+  if(!VIEWS[projection]||(!VIEWS[projection][g.model.id]&&!g.model.general))return layout(g,fit,{margin});
   const P=projectorFor(g.model,projection),pts=fit.map(p=>P(p));
   const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y),w=Math.max(...xs)-Math.min(...xs),h=Math.max(...ys)-Math.min(...ys);
   const scale=(1-2*margin)/Math.max(w,h,1e-9),cx=(Math.max(...xs)+Math.min(...xs))/2,cyy=(Math.max(...ys)+Math.min(...ys))/2;
@@ -172,7 +258,7 @@ SILM.crystal=(()=>{
  function orientation3D(m,cam={}){
   if(typeof cam.yaw==='number'&&typeof cam.pitch==='number')return [cam.yaw,Math.max(-90,Math.min(90,cam.pitch))];
   const preset=PRESETS3D[cam.preset];if(preset)return [...preset];
-  return {BCC:[-20,16],FCC:[-11,17],HCP:[-10,16]}[m.id].slice();   // a mesma vista da isométrica de referência
+  return ({BCC:[-20,16],FCC:[-11,17],HCP:[-10,16]}[m.id]||[-20,16]).slice();   // a mesma vista da isométrica de referência
  }
  function layout3D(g,fit,cam={}){
   if(SILM.debug?.fail3D)throw new Error('3D indisponível (diagnóstico)');
@@ -186,14 +272,14 @@ SILM.crystal=(()=>{
  /* Organização: reaproveita as unidades livres (pareamento guloso pela proximidade na cena) e completa a célula. */
  function organize(g,freeUnits){
   const need=Math.max(freeUnits.length,g.model.cellSites),targets=[...g.cell,...g.extra].slice(0,need);
-  const L=layout(g,g.cell.map(s=>s.cart)),pos=targets.map(s=>L.project(s.cart));
+  const L=layout(g,[...g.cell.map(s=>s.cart),...(g.corners||[])]),pos=targets.map(s=>L.project(s.cart));
   const pairs=[];freeUnits.forEach((u,i)=>pos.forEach((p,j)=>pairs.push([Math.hypot(u.position.x-p.x,u.position.y-p.y),i,j])));
   pairs.sort((a,b)=>a[0]-b[0]||a[1]-b[1]||a[2]-b[2]);
   const unitTaken=new Set(),siteTaken=new Set(),assigned=new Array(freeUnits.length);
   for(const [,i,j]of pairs){if(unitTaken.has(i)||siteTaken.has(j))continue;unitTaken.add(i);siteTaken.add(j);assigned[i]=targets[j];}
   return {assigned,missing:targets.filter((_,j)=>!siteTaken.has(j))};
  }
- const label=id=>{const m=MODELS[id];return m?m.code+' ('+m.international+') · '+m.name:id;};
- return Object.freeze({models:MODELS,typeByDatabase:TYPE_BY_DB,reasons:REASONS,structureTypes:Object.freeze(Object.keys(MODELS)),
+ const label=(id,e)=>{const m=MODELS[id];if(m)return m.code+' ('+m.international+') · '+m.name;const ref=e&&eligibility(e).reference;if(GENERAL[id])return ref?ref.label+' · grupo espacial '+ref.spaceGroup:GENERAL[id].name;return id;};
+ return Object.freeze({models:Object.freeze({...MODELS,...GENERAL}),canonicalModels:MODELS,generalTypes:GENERAL,isGeneral:id=>!!GENERAL[id],typeByDatabase:TYPE_BY_DB,reasons:REASONS,structureTypes:Object.freeze([...Object.keys(MODELS),...Object.keys(GENERAL)]),
   eligibility,geometry,projector,layout,organize,expandSites,matchesBasis,parseOperation,key,label,projections:PROJECTIONS,views:VIEWS,projectorFor,layoutFor,presets3D:PRESETS3D,orientation3D,layout3D});
 })();
