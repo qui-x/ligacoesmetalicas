@@ -43,7 +43,7 @@ module.exports=async(browser,url)=>{
  const ctx=await browser.newContext({viewport:{width:1366,height:900},reducedMotion:'reduce'});
  try{
   const p=await open(ctx,'#/inicio');
-  await p.locator('#nav-toggle').click();assert.deepEqual(await p.locator('#si-resources-title + .si-drawer-links .si-drawer-item').allTextContents(),['Tour da oficina']);
+  await p.locator('#nav-toggle').click();assert.deepEqual(await p.locator('#si-resources-title + .si-drawer-links .si-drawer-item').allTextContents(),['Montagens prontas','Tour da oficina']);
   await p.locator('#silm-tour-open').click();await p.waitForFunction(()=>location.hash==='#/ambiente');await tourOpen(p);
   const tab=t=>p.waitForFunction(t=>!document.getElementById('si-dock-left').hidden&&document.querySelector('[data-left-tab="'+t+'"]')?.getAttribute('aria-pressed')==='true',t,{timeout:4000});
   await tab('preparo');// Passo 1 abre Montagem → Preparo.

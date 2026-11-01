@@ -59,6 +59,7 @@ const FILES=[
   "integracao/scientific-tools.js",
   "domain/silm/routes.js",
   "domain/silm/missions.js",
+  "domain/silm/ready-assemblies.js",
   "domain/silm/themes.js",
   "domain/silm/manual.js",
   "integracao/unified-ui.js",

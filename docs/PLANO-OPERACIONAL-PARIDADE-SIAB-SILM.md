@@ -78,8 +78,9 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 6 | Caderno | Caderno | Aceito em 31/10/2026 — registro na seção 8 |
 | 7 | Manual | Manual | Aceito em 31/10/2026 — registro na seção 8 |
 | 8 | Relatório | Relatório | Aceito em 31/10/2026 — registro na seção 8 |
+| 9 | Montagens prontas | Montagens prontas | Aceito em 01/11/2026 — registro na seção 8 |
 | 10 | Tour e ajuda contextual | Tour da oficina e ajuda dos painéis | Aceito em 31/10/2026 — registro na seção 8 |
-| 12 | Menu, preferências, projetor e aplicativo | Menu, preferências, projetor e aplicativo | Aceito em 31/10/2026 — registro na seção 8 (MENU-05 entra com as Etapas 9 e 10) |
+| 12 | Menu, preferências, projetor e aplicativo | Menu, preferências, projetor e aplicativo | Aceito em 31/10/2026 — registro na seção 8 (MENU-05 fechado com as Etapas 9 e 10) |
 
 Depois das sete telas principais, percorrer os recursos secundários na ordem em que aparecem no menu do SIAB: **Montagens prontas → Tour da bancada → Área do Professor → apoio pedagógico e aula acessível → Preferências e Acessibilidade → Modo projetor → Aplicativo / instalação / Sobre**.
 
@@ -380,11 +381,11 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 
 **SILM:** tela/rota `montagens`, configuração `presets` de `domain/silm/bootstrap.js`, `js/experience/experience.js` função `presetsScreen()`.
 
-- [ ] `PRESET-01` — Comparar catálogo, cartão, título, objetivo, recursos, etapas e botão de aplicar.
-- [ ] `PRESET-02` — Conferir os três presets atuais do SILM e sua cobertura de CCC, CFC e HC.
-- [ ] `PRESET-03` — Garantir que a pré-configuração respeite elegibilidade, condições de referência e confirmação destrutiva.
-- [ ] `PRESET-04` — Expandir apenas quando existir sequência didática válida, sem fabricar estrutura ou dado.
-- [ ] `PRESET-05` — Conferir retorno ao laboratório e persistência da investigação preparada.
+- [x] `PRESET-01` — Comparar catálogo, cartão, título, objetivo, recursos, etapas e botão de aplicar.
+- [x] `PRESET-02` — Conferir os três presets atuais do SILM e sua cobertura de CCC, CFC e HC.
+- [x] `PRESET-03` — Garantir que a pré-configuração respeite elegibilidade, condições de referência e confirmação destrutiva.
+- [x] `PRESET-04` — Expandir apenas quando existir sequência didática válida, sem fabricar estrutura ou dado. *(Não expandido: as três montagens são as que o SILM já tinha; nenhuma sequência nova foi criada.)*
+- [x] `PRESET-05` — Conferir retorno ao laboratório e persistência da investigação preparada.
 
 ## ETAPA 10 — Tour e ajuda contextual
 
@@ -429,7 +430,7 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 - [x] `MENU-02` — Conferir ordem principal: Início → Aprender → Missões → Roteiros → Oficina → Caderno → Manual.
 - [x] `MENU-03` — Conferir área “Agora”, contexto atual, botão Continuar e estado de atividade em andamento.
 - [x] `MENU-04` — Conferir ações da atividade: Sobre esta atividade, Ajuda, Relatório, Finalizar e Encerrar; respeitar navegação restrita.
-- [~] `MENU-05` — Conferir ordem de recursos secundários: Montagens prontas, Tour, Professor, apoio pedagógico e preferências.
+- [x] `MENU-05` — Conferir ordem de recursos secundários: Montagens prontas, Tour, Professor, apoio pedagógico e preferências.
 - [x] `MENU-06` — Exibir acesso explícito à Área do Professor no grupo Professor.
 - [x] `MENU-07` — Conferir estado ativo da rota, navegação por teclado, Escape e fechamento após selecionar destino.
 
@@ -755,6 +756,30 @@ Pendências: guia do Professor imprimível (TEST-PRINT) na Etapa 11; Firefox, Sa
 Estado: [x]
 ```
 
+### Registro — Etapa 9, Montagens prontas
+
+```text
+ID da etapa: PRESET (01 a 05)
+Tela SIAB: Montagens prontas — data-tela="montagens", js/telas/roteiros.js SIAB.telas.montagens e js/data/montagens.js
+  (acidosebases1.0.0@73848f0)
+Tela SILM: Montagens prontas — rota #/montagens (integracao/index.html data-view="montagens"), readyAssemblies() em
+  integracao/unified-ui.js, catálogo domain/silm/ready-assemblies.js
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 9, Montagens prontas" (PR da etapa)
+Viewport(s): 1366×768, 1024×768, 390×844, 320×640, 844×390
+Arquivos alterados: domain/silm/ready-assemblies.js (novo), integracao/unified-ui.js, integracao/adapter.js (rota e ação
+  no estado vazio), integracao/index.html (+ index.html gerado), integracao/integration.css, tests/parity/presets.cjs,
+  tests/parity/workspace.cjs, tests/parity/tour.cjs, tests/parity-screens.cjs
+Diferenças de domínio / N/A: três montagens (as do SILM 0.x), uma por modelo canônico, em vez das montagens de
+  titulação; sem "visualização inicial" escolhida pela montagem (a Oficina abre na célula unitária, isométrica);
+  metal, estrutura, condição e fonte vêm do banco ao mostrar e ao aplicar, e a montagem fica indisponível com motivo
+  se o metal ou a estrutura mudar
+Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
+  test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
+Evidências: docs/evidence-parity/PRESET/
+Pendências: montagem pronta como tipo de atividade do Professor (Etapa 11); Firefox, Safari e aparelhos físicos
+Estado: [x]
+```
+
 ### Registro — Etapa 10, Tour e ajuda contextual
 
 ```text
@@ -792,9 +817,9 @@ Diferenças de domínio / N/A: sem tópico único "Referências e créditos" (as
 Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
   test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
 Evidências: docs/evidence-parity/SHELL/
-Pendências: MENU-05 ("Recursos": Montagens prontas e Tour) com as Etapas 9 e 10; botão "Recarregar" no aviso de nova
-  versão; Firefox, Safari e aparelhos físicos
-Estado: [x] (MENU-05 [~])
+Pendências: botão "Recarregar" no aviso de nova versão; Firefox, Safari e aparelhos físicos
+  (MENU-05, "Recursos" com Montagens prontas e Tour, fechado com as Etapas 9 e 10)
+Estado: [x]
 ```
 
 ## 9. Restrições de escopo

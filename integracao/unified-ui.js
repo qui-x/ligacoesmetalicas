@@ -339,8 +339,38 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   backup.append(intro,backupActions);
   host.append(actions,filterLabel,composer,entries,backup,importInput);renderEntries();
  }
+ /* Etapa 9 — Montagens prontas, no padrão do SIAB: objetivo, o que vai para a oficina, passos e recursos, com "Montar na
+    oficina". Tudo o que é dado (metal, estrutura, condição, fonte, sítios da célula) vem do banco no momento de mostrar. */
+ let presetsKey='';
+ function readyAssemblies(){
+  const host=$('silm-presets-list');if(!host)return;const locked=session.open(),items=S.readyAssemblies.list();
+  const key=(locked?'atividade':'livre')+'|'+items.map(x=>x.id+':'+x.available).join(',');if(key===presetsKey&&host.childElementCount)return;presetsKey=key;host.replaceChildren();
+  if(locked){const note=N('p','As montagens prontas preparam a oficina livre. Encerre a atividade em curso para usá-las.');note.className='silm-setup-locked';note.id='silm-presets-locked';note.setAttribute('role','note');host.append(note);}
+  for(const x of items){
+   const card=N('article');card.className='silm-setup-card';card.id='preset-'+x.id;card.setAttribute('aria-labelledby','preset-title-'+x.id);
+   const title=N('h2',x.title);title.id='preset-title-'+x.id;const eyebrow=N('p',({explorar:'Explorar',medir:'Medir',calcular:'Calcular'})[x.module]+' · Estrutura cristalina');eyebrow.className='eyebrow';
+   card.append(title,N('p',x.objective),eyebrow);
+   if(!x.available){const why=N('p',x.reason);why.className='silm-setup-reason';card.append(why);host.append(card);continue;}
+   const fact=(label,text)=>{const p=N('p');p.append(N('strong',label+': '),document.createTextNode(text));return p;};
+   card.append(fact('Na oficina',x.element.name+' ('+x.element.symbol+'), Z = '+x.element.atomicNumber+' · '+x.structureLabel+' · célula unitária completa com '+x.cellSites+' unidades'),
+    fact('Condição de referência',x.temperature),fact('Fonte da estrutura',x.sourceTitle),N('h3','Investigue'));
+   const steps=N('ol');for(const step of x.steps)steps.append(N('li',step));card.append(steps,fact('Recursos recomendados',x.resources.join(' · ')));
+   const go=N('button','Montar na oficina');go.type='button';go.className='button primary';go.dataset.readyAssembly=x.id;go.disabled=locked;if(locked)go.setAttribute('aria-describedby','silm-presets-locked');
+   go.addEventListener('click',()=>applyReadyAssembly(x.id));card.append(go);host.append(card);
+  }
+ }
+ /* Aplicar: mesma confirmação de "Iniciar investigação" (substitui a investigação atual), depois montar e organizar segundo a
+    estrutura de referência do banco. Em atividade, nada muda. */
+ async function applyReadyAssembly(id){
+  if(session.open()){say('As montagens prontas preparam a oficina livre. Encerre a atividade em curso para usá-las.','info');return false;}
+  const x=S.readyAssemblies.list().find(y=>y.id===id);if(!x?.available){say(x?.reason||'Montagem não encontrada.','warning');return false;}
+  if(!await selectMetal(x.atomicNumber))return false;
+  if(!model.state.structure)model.beginAssembly();if(!model.state.structure.units.length&&!model.addUnit().ok)return false;
+  const r=model.organize();if(!r.ok){say('Não foi possível organizar a estrutura de referência.','warning');return false;}
+  location.hash='#/ambiente';say('Montagem pronta: '+x.title+'. Célula unitária completa com '+x.cellSites+' unidades.','success');return true;
+ }
  function professor(){if(table)return;const scope=SimCore.createScope();table=S.createPeriodicTable($('silm-professor-table'),{scope,state:{selection:model.state.metal?.atomicNumber||29,query:''},teacher:true,canInvestigate:()=>!session.open(),onInvestigate:async e=>{if(await selectMetal(e.atomicNumber))location.hash='#/ambiente';},onSources:e=>{$('silm-professor-sources').textContent=S.data.sourceIds(e).map(id=>{const s=S.data.source(id);return s.institution+' — '+s.title;}).join('\n');}});}
  function freeReport(){if(!model.state.investigation)return null;const saved=storage.get('report.free:'+model.state.investigation.id,{}),report={...fields};for(const k of Object.keys(report))if(typeof saved[k]==='string')report[k]=saved[k].slice(0,10000);return {activityContext:{id:'laboratorio',type:'free'},checkpoint:model.snapshot(),evidence:{cell:false,lattice:false,deformation:false},report};}
  function editReport(key,value){if(!Object.hasOwn(fields,key)||value.length>10000)return false;const r=freeReport()?.report||{...fields};r[key]=value;return storage.set('report.free:'+model.state.investigation.id,r);}
- return {init,freeReport,editReport,recordActivity,recordReport,archivedReport,render(){home();const page=B.currentRoute(location.hash);if(page==='aprender')themes();if(page==='manual')manual();if(page==='caderno'&&!$('notebook-text'))notebook();if(page==='professor')professor();}};
+ return {init,freeReport,editReport,recordActivity,recordReport,archivedReport,render(){home();const page=B.currentRoute(location.hash);if(page==='aprender')themes();if(page==='manual')manual();if(page==='caderno'&&!$('notebook-text'))notebook();if(page==='professor')professor();if(page==='montagens')readyAssemblies();},applyReadyAssembly};
 };
