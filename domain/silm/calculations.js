@@ -24,7 +24,11 @@ SILM.constants=Object.freeze({
  const ORIGINS=Object.freeze({TABULATED:'Dado tabelado',MODEL_MEASUREMENT:'Medida do modelo',USER:'Valor informado pelo usuário',CALCULATED:'Calculado pelo SILM',CONSTANT:'Constante definida'});
  const IN={
   a:{key:'a',symbol:'a',name:'parâmetro de rede a',unit:'Å',origins:['TABULATED','MODEL_MEASUREMENT','USER','CALCULATED'],quantity:'latticeParameter'},
+  b:{key:'b',symbol:'b',name:'parâmetro de rede b',unit:'Å',origins:['TABULATED','MODEL_MEASUREMENT','USER'],quantity:null},
   c:{key:'c',symbol:'c',name:'parâmetro de rede c',unit:'Å',origins:['TABULATED','MODEL_MEASUREMENT','USER'],quantity:null},
+  alpha:{key:'alpha',symbol:'α',name:'ângulo α da célula (entre os eixos b e c)',unit:'°',origins:['TABULATED','USER'],quantity:null},
+  beta:{key:'beta',symbol:'β',name:'ângulo β da célula (entre os eixos a e c)',unit:'°',origins:['TABULATED','USER'],quantity:null},
+  gamma:{key:'gamma',symbol:'γ',name:'ângulo γ da célula (entre os eixos a e b)',unit:'°',origins:['TABULATED','USER'],quantity:null},
   r:{key:'r',symbol:'r',name:'raio metálico (esferas rígidas)',unit:'Å',origins:['CALCULATED','USER'],quantity:'radius'},
   n:{key:'n',symbol:'n',name:'número efetivo de átomos por célula',unit:'1',origins:['CALCULATED'],quantity:'effectiveAtoms'},
   V:{key:'V',symbol:'V',name:'volume da célula',unit:'Å³',origins:['CALCULATED','USER'],quantity:'cellVolume'},
@@ -41,8 +45,24 @@ SILM.constants=Object.freeze({
    expression:expr,spoken:'n é a soma das frações de cada centro que pertencem à célula: '+k.parts.map(p=>p.count+' '+p.label+' vezes '+p.shareText.replace('1/','um sobre ')).join(', mais ')+'.',
    model:'contagem geométrica',notes:'Cada centro na fronteira da célula é compartilhado com as células vizinhas; só a fração interna conta. Célula: '+k.cell+'.',
    compute:()=>{const steps=k.parts.map(p=>step(p.count+' × '+p.shareText,p.label,p.count*p.share,'1'));return {value:Math.round(steps.reduce((s,x)=>s+x.value,0)),intermediates:steps};}};};
+ /* 0.16.x — estruturas gerais (fora de CCC/CFC/HC). Só relações exatas da geometria da célula: o número efetivo vem da
+    contagem das posições desenhadas (cada uma com a fração que fica dentro da célula) e o volume, dos seis parâmetros.
+    Raio e empacotamento de esferas rígidas NÃO são oferecidos: nessas estruturas há distâncias de contato diferentes e
+    a esfera rígida única não descreve o sólido. */
+ const GENERAL=Object.freeze(Object.keys(SILM.crystal.generalTypes)),rad=Math.PI/180;
  const list=[
   nFormula('BCC'),nFormula('FCC'),nFormula('HCP'),
+  {id:'effective-atoms-general',quantity:'effectiveAtoms',name:'Número efetivo de átomos por célula',applicability:GENERAL,requiredInputs:[],outputUnit:'1',outputSymbol:'n',
+   expression:'n = Σ (centros em cada posição × fração dentro da célula)',spoken:'n é a soma, para cada posição da célula, do número de centros vezes a fração de cada um que fica dentro da célula.',
+   model:'contagem geométrica',notes:'Vértice conta 1/8, aresta 1/4, face 1/2 e interior 1. As posições vêm dos sítios e das operações de simetria da ficha cristalográfica; o total é o número de átomos da célula (Z).',
+   describe:g=>g?.model?.general?'Nesta estrutura: n = '+g.model.effective.explanation+'.':'',
+   compute:(i,ctx)=>{const parts=ctx?.geometry?.model?.general?ctx.geometry.model.effective.parts:null;if(!parts)return {value:NaN,intermediates:[]};
+    const steps=parts.map(p=>step(p.count+' × '+p.text,p.count===1?p.label:p.many,p.count*p.share,'1'));return {value:Math.round(steps.reduce((s,x)=>s+x.value,0)),intermediates:steps};}},
+  {id:'cell-volume-general',quantity:'cellVolume',name:'Volume da célula unitária',applicability:GENERAL,requiredInputs:[IN.a,IN.b,IN.c,IN.alpha,IN.beta,IN.gamma],outputUnit:'Å³',outputSymbol:'V',
+   expression:'V = a · b · c · √(1 − cos²α − cos²β − cos²γ + 2 · cos α · cos β · cos γ)',spoken:'V é igual a a vezes b vezes c, vezes a raiz de um menos cosseno quadrado de alfa, menos cosseno quadrado de beta, menos cosseno quadrado de gama, mais duas vezes o produto dos três cossenos.',
+   model:'geometria da célula (paralelepípedo)',notes:'Volume do paralelepípedo definido pelos três eixos da célula. Com os três ângulos retos, reduz-se a a · b · c; é a mesma célula desenhada na cena.',
+   compute:i=>{const [ca,cb,cg]=[i.alpha,i.beta,i.gamma].map(x=>Math.cos(x*rad)),f2=1-ca*ca-cb*cb-cg*cg+2*ca*cb*cg;if(!(f2>0)||[i.alpha,i.beta,i.gamma].some(x=>x>=180))return {value:NaN,intermediates:[]};
+    const f=Math.sqrt(f2);return {value:i.a*i.b*i.c*f,intermediates:[step('a · b · c','produto dos eixos',i.a*i.b*i.c,'Å³'),step('√(1 − cos²α − cos²β − cos²γ + 2 cos α cos β cos γ)','fator dos ângulos',f,'1')]};}},
   {id:'cell-volume-cubic',quantity:'cellVolume',name:'Volume da célula unitária',applicability:['BCC','FCC'],requiredInputs:[IN.a],outputUnit:'Å³',outputSymbol:'V',
    expression:'V = a³',spoken:'V é igual a a ao cubo.',model:'geometria da célula cúbica',notes:'Célula cúbica convencional.',
    compute:i=>({value:i.a**3,intermediates:[]})},
@@ -69,7 +89,7 @@ SILM.constants=Object.freeze({
    expression:'FE = n · (4/3)πr³ / V',spoken:'FE é igual a n vezes quatro terços de pi r ao cubo, dividido pelo volume da célula.',model:'esferas rígidas',notes:'Fração do volume da célula ocupada por esferas rígidas de raio r. Não é a fração ocupada pela densidade eletrônica real.',
    compute:i=>{const sphere=4/3*PI*i.r**3,filled=i.n*sphere;return {value:filled/i.V,intermediates:[step('v = (4/3)πr³','volume de uma esfera',sphere,'Å³'),step('n · v','volume ocupado pelas esferas',filled,'Å³'),step('V','volume da célula',i.V,'Å³')]};},
    check:value=>value<=1+1e-9?null:'PHYSICALLY_INVALID'},
-  {id:'theoretical-density',quantity:'density',name:'Densidade teórica',applicability:['BCC','FCC','HCP'],requiredInputs:[IN.n,IN.M,IN.V],constants:['avogadro','angstrom3ToCm3'],outputUnit:'g/cm³',outputSymbol:'ρ',
+  {id:'theoretical-density',quantity:'density',name:'Densidade teórica',applicability:['BCC','FCC','HCP',...GENERAL],requiredInputs:[IN.n,IN.M,IN.V],constants:['avogadro','angstrom3ToCm3'],outputUnit:'g/cm³',outputSymbol:'ρ',
    expression:'ρ = n · M / (N_A · V)',spoken:'rô é igual a n vezes a massa molar, dividido pela constante de Avogadro vezes o volume da célula.',model:'célula ideal sem defeitos, na condição de referência dos parâmetros',notes:'Massa da célula = n·M/N_A; o volume em Å³ é convertido para cm³ (1 Å³ = 10⁻²⁴ cm³). A densidade é calculada, não medida.',
    compute:i=>{const one=M=>{const mass=i.n*M/C.avogadro.value,vol=i.V*C.angstrom3ToCm3.value;return {mass,vol,rho:mass/vol};};
     if(Array.isArray(i.M)){const lo=one(i.M[0]),hi=one(i.M[1]);return {value:null,interval:[lo.rho,hi.rho],intermediates:[step('m = n · M / N_A','massa da célula (intervalo)',null,'g',[lo.mass,hi.mass]),step('V','volume da célula em cm³',lo.vol,'cm³')]};}
@@ -86,11 +106,13 @@ SILM.constants=Object.freeze({
  const QUANTITY=Object.freeze({effectiveAtoms:'Número efetivo',cellVolume:'Volume da célula',radius:'Raio metálico',latticeParameter:'Parâmetro de rede',packingFactor:'Fator de empacotamento',density:'Densidade teórica',caRatio:'Razão c/a'});
  const LIMIT=200;
  const applicable=type=>list.filter(f=>f.applicability.includes(type));
- const effective=type=>Math.round(counting[type].parts.reduce((s,p)=>s+p.count*p.share,0));
+ /* Número efetivo: tabela fixa nos modelos canônicos; nas estruturas gerais, a contagem da célula construída para o metal. */
+ const effective=(type,element)=>counting[type]?Math.round(counting[type].parts.reduce((s,p)=>s+p.count*p.share,0)):(g=>g?.model.id===type?g.model.effective.value:null)(element&&SILM.crystal.geometry(element));
+ const effectiveFormula=type=>counting[type]?'effective-atoms-'+type.toLowerCase():'effective-atoms-general';
  /* Valores que o SILM conhece (modo assistido), sempre com origem. */
  function tabulated(element,key){
   const st=SILM.data.structure(element);
-  if(key==='a'||key==='c'){const p=st?.latticeParameters?.[key];return p?{value:p.value,unit:'Å',origin:'TABULATED',ref:{sourceId:p.sourceId},display:String(p.display).replace('.',',')+' Å'}:null;}
+  if(['a','b','c','alpha','beta','gamma'].includes(key)){const p=st?.latticeParameters?.[key],unit=key.length===1?'Å':'°';return p?{value:p.value,unit,origin:'TABULATED',ref:{sourceId:p.sourceId},display:String(p.display).replace('.',',')+(unit==='Å'?' Å':'°')}:null;}
   if(key==='M'){const w=element.atomicWeight;if(!w||!['standard','interval'].includes(w.form))return null;return {value:w.form==='interval'?[...w.interval]:w.value,unit:'g/mol',origin:'TABULATED',ref:{sourceId:w.sourceId},display:w.display.replace(/\./g,',')+' g/mol',note:w.form==='interval'?'Peso atômico padrão em intervalo (variação isotópica natural): o resultado será um intervalo.':'Massa molar numericamente igual ao peso atômico padrão, em g/mol.'};}
   return null;
  }
@@ -107,12 +129,12 @@ SILM.constants=Object.freeze({
  const current=(c,s)=>SILM.measurement.current({structureContext:c.structureContext},s);
  const same=(x,y)=>Math.abs(x-y)<=1e-9*Math.max(1,Math.abs(x),Math.abs(y));
  const valuesOf=inputs=>Object.fromEntries(inputs.map(x=>[x.key,x.value]));
- function compute(formulaId,inputs){
+ function compute(formulaId,inputs,ctx={}){
   const f=FORMULAS[formulaId];if(!f)return {ok:false,reason:'FORMULA_UNKNOWN'};
   const given=new Map(inputs.map(x=>[x.key,x]));
   for(const r of f.requiredInputs){const x=given.get(r.key);if(!x)return {ok:false,reason:'INPUT_MISSING',input:r.key};
    const ok=v=>typeof v==='number'&&Number.isFinite(v)&&v>0;if(!(Array.isArray(x.value)?x.value.length===2&&x.value.every(ok)&&x.value[0]<=x.value[1]:ok(x.value)))return {ok:false,reason:'INPUT_INVALID',input:r.key};}
-  const out=f.compute(valuesOf(inputs));const vals=out.interval||[out.value];
+  const out=f.compute(valuesOf(inputs),ctx);const vals=out.interval||[out.value];
   if(!vals.every(v=>Number.isFinite(v)&&v>0))return {ok:false,reason:'RESULT_INVALID'};
   const problem=f.check?.(out.interval?out.interval[1]:out.value);if(problem)return {ok:false,reason:problem};
   return {ok:true,result:{value:out.value,interval:out.interval||null},intermediates:out.intermediates};
@@ -144,10 +166,10 @@ SILM.constants=Object.freeze({
     if(x.origin==='MODEL_MEASUREMENT'&&!(plain(x.ref)&&/^meas-[a-zA-Z0-9-]{8,80}$/.test(x.ref.measurementId||'')))return fail('CALCULATION_ORIGIN_INVALID');
     if(x.origin==='USER'&&x.ref!==null)return fail('CALCULATION_ORIGIN_INVALID');
     if(x.origin==='CALCULATED'){if(!plain(x.ref)||!(/^calc-[a-zA-Z0-9-]{8,80}$/.test(x.ref.calculationId||'')||(FORMULAS[x.ref.formulaId]?.applicability.includes(m.structureType))))return fail('CALCULATION_ORIGIN_INVALID');
-     if(x.key==='n'&&x.value!==effective(m.structureType))return fail('CALCULATION_VALUE_INVALID');}
+     if(x.key==='n'&&x.value!==effective(m.structureType,e))return fail('CALCULATION_VALUE_INVALID');}
    }
    if(!keys(m.result,['value','interval']))return fail('CALCULATION_RESULT_INVALID');
-   const r=compute(m.formulaId,m.inputs);if(!r.ok)return fail('CALCULATION_RESULT_INVALID');
+   const r=compute(m.formulaId,m.inputs,{geometry:g});if(!r.ok)return fail('CALCULATION_RESULT_INVALID');
    const okValue=m.result.value===null?r.result.value===null:typeof m.result.value==='number'&&same(m.result.value,r.result.value);
    const okInterval=m.result.interval===null?r.result.interval===null:Array.isArray(m.result.interval)&&r.result.interval&&m.result.interval.every((v,k)=>same(v,r.result.interval[k]));
    if(!okValue||!okInterval)return fail('CALCULATION_RESULT_INVALID');
@@ -157,5 +179,5 @@ SILM.constants=Object.freeze({
   return {ok:true};
  }
  SILM.formulas=FORMULAS;
- SILM.calculation=Object.freeze({origins:ORIGINS,quantities:QUANTITY,inputs:IN,counting,limit:LIMIT,conversions:CONVERT,convert,applicable,effective,tabulated,compute,validate,format,percent,sig,context,current});
+ SILM.calculation=Object.freeze({origins:ORIGINS,quantities:QUANTITY,inputs:IN,counting,limit:LIMIT,conversions:CONVERT,convert,applicable,effective,effectiveFormula,tabulated,compute,validate,format,percent,sig,context,current});
 })();

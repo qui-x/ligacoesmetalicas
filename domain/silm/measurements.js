@@ -47,7 +47,9 @@ SILM.units=Object.freeze({
    // ao longo do eixo vertical, uma translação unitária (c no HC; a nos cúbicos).
    const n=f.map(Math.round),len=norm(sub(S[1].cart,S[0].cart)),hex=g.model.system==='hexagonal';
    let parameter=null;
-   if(n[2]===0&&Math.abs(len-norm(g.vectors[0]))<1e-6)parameter='a';
+   // Estrutura geral (0.16.x): aresta = translação unitária ao longo de um eixo da célula; o parâmetro é o do eixo (a, b ou c).
+   if(g.model.general){const axis=[0,1,2].filter(i=>n[i]!==0);if(axis.length===1&&Math.abs(n[axis[0]])===1)parameter=['a','b','c'][axis[0]];}
+   else if(n[2]===0&&Math.abs(len-norm(g.vectors[0]))<1e-6)parameter='a';
    else if(n[0]===0&&n[1]===0&&Math.abs(n[2])===1)parameter=hex?'c':'a';
    if(!parameter)return {ok:false,reason:'NOT_CELL_EDGE'};
    return {ok:true,value:round(len,T.resolution),parameter};

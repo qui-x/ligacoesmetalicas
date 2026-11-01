@@ -1,4 +1,26 @@
-## Em desenvolvimento — Revisão científica das fontes e 5 metais novos
+## Em desenvolvimento — Estruturas fora de CCC/CFC/HC (modelo geral) e 3 metais novos
+
+- **Modelo cristalográfico geral:** a célula vem da própria ficha (a, b, c, α, β, γ) e os átomos, das operações de simetria registradas. A visualização só é liberada quando a ficha passa nas conferências abaixo; se uma falha, a estrutura fica bloqueada com o motivo:
+  - tipo registrado × grupo espacial;
+  - métrica da célula exigida pelo sistema cristalino;
+  - átomos gerados = Z declarado no CIF (guardado no banco com a fonte);
+  - distância mínima entre átomos;
+  - volume por átomo.
+- **Agora visualizáveis:** manganês (cúbica complexa), estanho (tetragonal), samário e bismuto (romboédricas), netúnio (ortorrômbica) e plutônio (monoclínica).
+- **Três metais novos, homologados a partir de CIF local:** amerício (dupla hexagonal), polônio (cúbica simples, 283 K) e protactínio (tetragonal de corpo centrado). São agora 65 metais investigáveis e 62 estruturas visualizáveis.
+- **Vizinhança por camadas de distância:** a primeira camada vai até 3 % além do vizinho mais próximo, e as camadas seguintes são informadas. Nessas estruturas, o número de coordenação depende da distância considerada.
+- **Medir:** o parâmetro de rede é medido ao longo de cada eixo da célula (a, b ou c).
+- **Calcular:** número efetivo pela contagem das posições, volume com os seis parâmetros e densidade teórica. Sem raio nem empacotamento de esferas rígidas no modelo geral.
+- **Maleabilidade e ductilidade indisponíveis no modelo geral:** a deformação didática foi construída para CCC, CFC e HC. O roteiro de deformação e a missão de empacotamento listam só metais de modelo canônico.
+- **Continuam bloqueados:**
+  - lantânio, praseodímio e neodímio: a ficha da dupla hexagonal registra só 2 dos 4 átomos por célula;
+  - índio: a ficha local é de um estudo de dilatação térmica e não informa a temperatura da célula.
+- **Correção de enquadramento:** a câmera inclui os vértices da célula mesmo quando eles não têm átomos (bismuto).
+- **Documentação e testes:**
+  - relatório em `docs/REVISAO-CIENTIFICA-FONTES.md` (seção 3); `docs/VERIFICACAO-ESTRUTURAS.md` e `docs/FORMULAS-CRISTALOGRAFICAS.md` atualizados; Manual atualizado;
+  - `tests/structure-audit.cjs` confere as estruturas gerais contra o próprio CIF (Z e volume) e contra uma busca exaustiva de vizinhos.
+
+## Revisão científica das fontes e 5 metais novos (mesclada em #34)
 
 - Fontes primárias no lugar do WebElements, com o CIF do COD guardado no repositório: rubídio, titânio, nióbio, ródio, rutênio, háfnio, rênio, ósmio e irídio.
 - **Rubídio corrigido:** a = 5,697 Å a 297 K (COD 9012879); antes, 5,585 Å, valor de baixa temperatura. A densidade teórica passa a 1,535 g/cm³, igual à da ficha. Nos outros oito metais, a diferença máxima é de 0,07 %.

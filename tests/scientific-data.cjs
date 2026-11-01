@@ -8,7 +8,7 @@ const data=load(),errors=validate(data,{checkFiles:true});
 assert.deepEqual(errors,[],errors.join('\n'));
 assert.equal(data.elements.length,118);
 const available=data.elements.filter(e=>e.silmEligibility.status==='available');
-assert.equal(available.length,62,'Quantidade de metais homologados (0.15.0 + K, Th, Ac, Ra e Tc a partir de CIF local)');
+assert.equal(available.length,65,'Quantidade de metais homologados (0.15.0 + K, Th, Ac, Ra e Tc; + Am, Po e Pa no modelo geral, a partir de CIF local)');
 assert.ok(available.every(e=>e.classification.metallic&&e.atomicNumber<104));
 assert.ok(data.elements.filter(e=>e.atomicNumber>=104).every(e=>e.silmEligibility.reasonCode==='SUPERHEAVY_LIMITATION'));
 // Testes negativos do validador.

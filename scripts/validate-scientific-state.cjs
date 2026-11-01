@@ -6,11 +6,18 @@ function load(){const box={window:{},console,Math,Date,Uint8Array,crypto:globalT
 const plain=value=>JSON.parse(JSON.stringify(value));
 /* Geometria cristalográfica (§115–119): todos os metais suportados, a partir do banco. */
 function validateGeometry(S){
- const X=S.crystal,report={BCC:[],FCC:[],HCP:[]},unsupported=[];
+ const X=S.crystal,report={BCC:[],FCC:[],HCP:[]},general={},unsupported=[];
  const expectRoles={BCC:{corner:8,body:1},FCC:{corner:8,face:6},HCP:{'base-vertex':12,'base-center':2,interior:3}};
  for(const e of S.data.elements.filter(x=>x.silmEligibility.status==='available')){
   const el=X.eligibility(e);
   if(el.status!=='available'){assert.ok(Object.keys(X.reasons).includes(el.reasonCode),e.symbol);assert.ok(!['CCC','CFC','HC'].includes(D(e).type),e.symbol+' suportado recusado');unsupported.push(e.symbol+':'+el.reasonCode);continue;}
+  if(el.general){
+   // 0.16.x — modelo geral: o tipo é o do banco; Σ frações das posições = átomos gerados; sítios sem duplicata; primeira camada não vazia.
+   assert.equal(D(e).type,el.structureType,e.symbol+': tipo vem do banco');const g=X.geometry(e),m=g.model,share={corner:1/8,edge:1/4,face:1/2,interior:1};
+   assert.ok(Math.abs(g.cell.reduce((t,s)=>t+share[g.role(s).role],0)-el.databaseSites.length)<1e-9,e.symbol+': contagem da célula');
+   const carts=g.cell.map(s=>s.cart.map(v=>v.toFixed(6)).join());assert.equal(new Set(carts).size,carts.length,e.symbol+': sítios duplicados');
+   for(const s of g.cell){const n=g.neighbors(s);assert.ok(n.list.length>0&&n.distances[0]>=1.8,e.symbol+': vizinhança');}
+   general[el.structureType]=(general[el.structureType]||0)+1;continue;}
   assert.equal(X.typeByDatabase[D(e).type],el.structureType,e.symbol+': tipo vem do banco');
   const g=X.geometry(e),m=g.model;assert.equal(g.cell.length,m.cellSites,e.symbol);
   const roles={};for(const s of g.cell){const r=g.role(s).role;roles[r]=(roles[r]||0)+1;}assert.deepEqual(roles,expectRoles[m.id],e.symbol+' papéis dos sítios');
@@ -25,14 +32,24 @@ function validateGeometry(S){
  }
  function D(e){return e.structures.find(s=>s.id===e.referenceStructure);}
  // Entradas adulteradas do banco não podem gerar estrutura falsa.
- const cu=S.data.get(29),tamper=mut=>{const copy=JSON.parse(JSON.stringify(cu));copy.atomicNumber=9000+Math.floor(Math.random()*999);mut(copy.structures.find(s=>s.id===copy.referenceStructure));return X.eligibility(copy);};
+ // Cada cópia adulterada recebe um número atômico fictício ÚNICO: a elegibilidade fica em cache por número atômico, e um sorteio
+ // repetido devolveria o resultado de outra cópia.
+ let fakeZ=9000;
+ const cu=S.data.get(29),tamper=mut=>{const copy=JSON.parse(JSON.stringify(cu));copy.atomicNumber=++fakeZ;mut(copy.structures.find(s=>s.id===copy.referenceStructure));return X.eligibility(copy);};
  assert.equal(tamper(s=>s.spaceGroupNumber=229).reasonCode,'DATA_CONFLICT');
  assert.equal(tamper(s=>s.fractionalSites.values=s.fractionalSites.values.slice(0,2)).reasonCode,'DATA_CONFLICT');
  assert.equal(tamper(s=>s.latticeParameters.c.value=4).reasonCode,'DATA_CONFLICT');
  assert.equal(tamper(s=>s.conditions.phase.value='liquid').reasonCode,'REFERENCE_CONDITION_UNSUPPORTED');
- assert.equal(tamper(s=>s.type='TETRAGONAL').reasonCode,'CRYSTAL_STRUCTURE_UNSUPPORTED');
+ assert.equal(tamper(s=>s.type='HEXAGONAL_X').reasonCode,'CRYSTAL_STRUCTURE_UNSUPPORTED');
+ // Modelo geral: tipo que contradiz o grupo espacial ou a métrica, e ficha sem os sítios completos, não geram estrutura.
+ assert.equal(tamper(s=>s.type='TETRAGONAL').reasonCode,'DATA_CONFLICT','CFC rotulada como tetragonal');
+ const mn=S.data.get(25),tamperMn=mut=>{const copy=JSON.parse(JSON.stringify(mn));copy.atomicNumber=++fakeZ;mut(copy.structures.find(s=>s.id===copy.referenceStructure));return X.eligibility(copy);};
+ assert.equal(tamperMn(s=>{s.latticeParameters.c.value=9.5;}).reasonCode,'DATA_CONFLICT','cúbica com c diferente de a');
+ for(let i=0;i<4;i++)assert.equal(tamperMn(s=>{s.fractionalSites.values=s.fractionalSites.values.filter((_,j)=>j!==i);}).reasonCode,'STRUCTURE_DATA_INCOMPLETE','α-Mn sem o sítio '+i);
+ assert.equal(tamperMn(s=>{delete s.fractionalSites.cellFormulaUnitsZ;}).reasonCode,'STRUCTURE_DATA_INCOMPLETE','estrutura geral sem o Z da ficha');
+ assert.equal(tamperMn(s=>{s.fractionalSites.cellFormulaUnitsZ=29;}).reasonCode,'DATA_CONFLICT','mais átomos gerados que o Z da ficha');
  assert.deepEqual(plain(X.parseOperation('1/2+x,-y+1/2,z-1/4')),[[1,0,0,.5],[0,-1,0,.5],[0,0,1,-.25]]);
- return {supported:{BCC:report.BCC.length,FCC:report.FCC.length,HCP:report.HCP.length},unsupported};
+ return {supported:{BCC:report.BCC.length,FCC:report.FCC.length,HCP:report.HCP.length},general,unsupported};
 }
 function validate(){const S=load(),A=S.assembly,C=A.contract,storage=new Map(),events=[];
  const adapter={get:(key,fallback)=>storage.has(key)?structuredClone(storage.get(key)):fallback,set:(key,value)=>{storage.set(key,structuredClone(value));return true;}};
@@ -97,9 +114,23 @@ function validate(){const S=load(),A=S.assembly,C=A.contract,storage=new Map(),e
  assert.equal(fe.state.structure.crystallography.structureType,'BCC');assert.equal(fe.state.structure.units.length,9);assert.equal(fe.state.structure.crystallography.coordination,8);
  const mg=fresh();mg.begin(12);mg.beginAssembly();for(let i=0;i<20;i++)mg.addUnit();assert.equal(mg.organize().structureType,'HCP');
  assert.equal(mg.state.structure.units.length,20);assert.equal(mg.state.structure.units.filter(u=>u.placement==='crystallographic').length,0);assert.equal(S.validateScientificState(mg.state).ok,true);
- // Metal sem estrutura suportada: investigação e montagem livre continuam; organização indisponível com motivo.
- const mn=fresh();assert.equal(mn.begin(25),true);mn.beginAssembly();assert.equal(mn.addUnit().ok,true);assert.equal(mn.organize().reason,'CRYSTAL_STRUCTURE_UNSUPPORTED');
- assert.equal(mn.state.structure.mode,'free');assert.equal(mn.addUnit().ok,true);assert.equal(S.validateScientificState(mn.state).ok,true);
+ // Metal com ficha incompleta (DHC do lantânio com 2 átomos por célula): investigação e montagem livre continuam; organização indisponível com motivo.
+ const la=fresh();assert.equal(la.begin(57),true);la.beginAssembly();assert.equal(la.addUnit().ok,true);assert.equal(la.organize().reason,'STRUCTURE_DATA_INCOMPLETE');
+ assert.equal(la.state.structure.mode,'free');assert.equal(la.addUnit().ok,true);assert.equal(S.validateScientificState(la.state).ok,true);
+ // 0.16.x — modelo geral (α-Mn): organiza a célula da ficha, sem coordenação fixa; medidas e cálculos gerais validam.
+ {const mn=fresh();assert.equal(mn.begin(25),true);mn.beginAssembly();mn.addUnit();mn.addUnit();const om=mn.organize();
+ assert.equal(om.ok,true);assert.equal(om.structureType,'COMPLEX_CUBIC');const gm=S.crystal.geometry(S.data.get(25));
+ assert.equal(mn.state.structure.units.length,gm.model.cellSites);assert.equal(mn.state.structure.crystallography.coordination,null);assert.equal(S.validateScientificState(mn.state).ok,true);
+ mn.setModule('medir');const mu=mn.state.structure.units,mo=mu.find(u=>u.site.basis===0&&u.site.cell.join()==='0,0,0'),me=mu.find(u=>u.site.basis===0&&u.site.cell.join()==='0,0,1');
+ const mc=mn.addMeasurement('latticeParameter',[mo.id,me.id]);assert.equal(mc.ok,true);assert.equal(mc.measurement.parameter,'c');assert.ok(Math.abs(mc.measurement.value-8.9125)<=5e-4+1e-9);
+ mn.setModule('calcular');const tab=k=>{const t=S.calculation.tabulated(S.data.get(25),k);return {key:k,symbol:k,name:k,value:t.value,unit:t.unit,origin:'TABULATED',ref:t.ref};};
+ const vol=mn.addCalculation('cell-volume-general',['a','b','c','alpha','beta','gamma'].map(tab));assert.equal(vol.ok,true);assert.ok(Math.abs(vol.calculation.result.value-8.9125**3)<1e-6);
+ const nIn={key:'n',symbol:'n',name:'n',value:S.calculation.effective('COMPLEX_CUBIC',S.data.get(25)),unit:'1',origin:'CALCULATED',ref:{formulaId:'effective-atoms-general'}};assert.equal(nIn.value,58);
+ const rho=mn.addCalculation('theoretical-density',[nIn,tab('M'),{key:'V',symbol:'V',name:'V',value:vol.calculation.result.value,unit:'Å³',origin:'CALCULATED',ref:{calculationId:vol.calculation.id}}]);
+ assert.equal(rho.ok,true);assert.ok(rho.calculation.result.value>7.4&&rho.calculation.result.value<7.5,'densidade teórica do α-Mn');
+ assert.equal(mn.addCalculation('packing-factor',[]).reason,'FORMULA_NOT_APPLICABLE','sem empacotamento de esferas rígidas no modelo geral');
+ assert.equal(S.validateScientificState(mn.state).ok,true);
+ const forged=JSON.parse(JSON.stringify(mn.state));forged.calculations[1].inputs.find(x=>x.key==='n').value=57;assert.equal(S.validateScientificState(forged).ok,false,'n adulterado no modelo geral');}
 
  // 0.6.x: modelo eletrônico qualitativo associado à estrutura inteira.
  const E=S.electronModel,el=fresh(collect);el.begin(29);
@@ -166,7 +197,8 @@ function validate(){const S=load(),A=S.assembly,C=A.contract,storage=new Map(),e
  // Elegibilidade por propriedade a partir do banco (nunca "todo metal igual").
  const elig=z=>Object.fromEntries(Object.entries(P.eligibility(S.data.get(z))).map(([k,v])=>[k,v.status==='unavailable'?v.reasonCode:v.status]));
  assert.deepEqual(elig(29),{electrical:'qualitative',thermal:'qualitative',malleability:'qualitative',ductility:'qualitative',luster:'qualitative'});
- assert.deepEqual(elig(25),{electrical:'qualitative',thermal:'MODEL_NOT_APPLICABLE',malleability:'MODEL_NOT_APPLICABLE',ductility:'MODEL_NOT_APPLICABLE',luster:'MODEL_NOT_APPLICABLE'},'Mn: sem visualização cristalina');
+ assert.deepEqual(elig(57),{electrical:'qualitative',thermal:'MODEL_NOT_APPLICABLE',malleability:'MODEL_NOT_APPLICABLE',ductility:'MODEL_NOT_APPLICABLE',luster:'MODEL_NOT_APPLICABLE'},'La: sem visualização cristalina (ficha incompleta)');
+ assert.deepEqual(elig(25),{electrical:'qualitative',thermal:'qualitative',malleability:'DEFORMATION_MODEL_NOT_APPLICABLE',ductility:'DEFORMATION_MODEL_NOT_APPLICABLE',luster:'qualitative'},'Mn (modelo geral): sem deformação didática');
  assert.deepEqual(elig(80),{electrical:'METAL_NOT_INVESTIGABLE',thermal:'REFERENCE_PHASE_UNSUPPORTED',malleability:'REFERENCE_PHASE_UNSUPPORTED',ductility:'REFERENCE_PHASE_UNSUPPORTED',luster:'REFERENCE_PHASE_UNSUPPORTED'},'Hg: sem fase sólida de referência');
  const liquid={...S.data.get(29),silmEligibility:{status:'unavailable',reasonCode:'STRUCTURE_NOT_HOMOLOGATED'},referenceStructure:null,structures:[],phaseAtReference:{value:'liquid',display:'Líquida'}};
  assert.ok(['thermal','malleability','ductility','luster'].every(id=>P.eligibility(liquid)[id].reasonCode==='LIQUID_AT_REFERENCE_CONDITION'),'Regra de fase líquida (dado de fase homologado)');
@@ -174,7 +206,8 @@ function validate(){const S=load(),A=S.assembly,C=A.contract,storage=new Map(),e
  const withRho={...S.data.get(29),properties:{electricalResistivity:{value:16.78,unit:'nΩ·m',conditions:{temperature:{value:293.15,unit:'K'}},sourceId:'src-silm-conventions'}}};
  const calc=P.eligibility(withRho).electrical;assert.equal(calc.status,'available');assert.equal(calc.data.kind,'CALCULATED','σ = 1/ρ classificado como calculado');assert.equal(calc.data.from.kind,'TABULATED');
  const noProvenance={...S.data.get(29),properties:{thermalConductivity:{value:401,unit:'W/(m·K)'}}};assert.equal(P.eligibility(noProvenance).thermal.data,null,'Dado sem condição/fonte é recusado');
- const mnState=fresh();mnState.begin(25);mnState.beginAssembly();mnState.addUnit();mnState.addUnit();assert.equal(mnState.startProperty('electrical').ok,true);assert.equal(mnState.startProperty('malleability').reason,'MODEL_NOT_APPLICABLE');
+ const laState=fresh();laState.begin(57);laState.beginAssembly();laState.addUnit();laState.addUnit();assert.equal(laState.startProperty('electrical').ok,true);assert.equal(laState.startProperty('malleability').reason,'MODEL_NOT_APPLICABLE');
+ const mnState=fresh();mnState.begin(25);mnState.beginAssembly();mnState.addUnit();mnState.addUnit();assert.equal(mnState.startProperty('malleability').reason,'DEFORMATION_MODEL_NOT_APPLICABLE');
 
  // 0.9.x: medições do modelo — pontos em sítios científicos, valor recalculado das coordenadas em Å.
  const MS=S.measurement,me=fresh(collect);me.begin(29);me.beginAssembly();me.addUnit();me.addUnit();

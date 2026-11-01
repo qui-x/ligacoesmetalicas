@@ -180,7 +180,7 @@
   tools.render();experience.update();renderScene();if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
   text('silm-summary',e?e.name+' · '+units(n)+' · '+(s?.mode==='crystalline'?'estrutura cristalina':'montagem livre'):'Nenhuma investigação iniciada.');
   // Resumo em pares rótulo/valor, como o resumo da bancada do SIAB (só leitura do estado; nada é recalculado aqui).
-  const list=$('silm-summary-list');if(list){const rows=e?[['Metal',e.name+' ('+e.symbol+')'],['Estrutura',s?.mode==='crystalline'?S.crystal.label(s.crystallography?.structureType):'Montagem livre'],['Unidades',String(n)],['Módulo',{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active]],['Medições',String(state.measurements?.length||0)],['Cálculos',String(state.calculations?.length||0)]]:[];
+  const list=$('silm-summary-list');if(list){const rows=e?[['Metal',e.name+' ('+e.symbol+')'],['Estrutura',s?.mode==='crystalline'?S.crystal.label(s.crystallography?.structureType,e):'Montagem livre'],['Unidades',String(n)],['Módulo',{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active]],['Medições',String(state.measurements?.length||0)],['Cálculos',String(state.calculations?.length||0)]]:[];
    const c=routeUI.session.context();if(c)rows.unshift([c.type==='mission'?'Missão':'Roteiro',routeUI.session.route().title]);
    const key=JSON.stringify(rows);if(list.dataset.key!==key){list.dataset.key=key;list.replaceChildren(...rows.flatMap(([k,v])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;return [dt,dd];}));}}
   text('scene-count',units(n));text('silm-metal-information',selected?S.data.get(Number(selected)).name:'');

@@ -1,6 +1,6 @@
 # Verificação da construção das estruturas e da interação com o modelo
 
-**Data:** 31/10/2026 (atualizado depois da revisão científica, ver `docs/REVISAO-CIENTIFICA-FONTES.md`) · **Versão:** SILM 0.15.5 · **Testes permanentes:** `tests/structure-audit.cjs` (em `npm run test:scientific`) e `tests/model-interaction.cjs` (em `npm run test:comparison`).
+**Data:** 31/10/2026, atualizado em 01/11/2026 com o modelo cristalográfico geral (ver `docs/REVISAO-CIENTIFICA-FONTES.md`) · **Versão:** SILM 0.15.5 · **Testes permanentes:** `tests/structure-audit.cjs` (em `npm run test:scientific`) e `tests/model-interaction.cjs` (em `npm run test:comparison`).
 
 ## 1. O que foi verificado
 
@@ -15,12 +15,21 @@
 - **fórmulas do Calcular**, comparadas com um cálculo independente: volume, raio, empacotamento e densidade teórica.
 - **proveniência:** fonte da estrutura existente, todos os parâmetros com a mesma fonte, temperatura de referência registrada.
 
-**Na interface (navegador).** Cada um dos 57 metais disponíveis foi escolhido, iniciado e organizado como o estudante faria. Depois, a estrutura foi vista em 2D e em 3D, e foram registrados os erros de página.
+**No modelo geral (estruturas fora de CCC/CFC/HC).** Não há fórmula analítica única para comparar; a conferência usa o próprio CIF guardado no repositório:
+
+- **átomos por célula:** os gerados pela simetria precisam ser o Z declarado no CIF (`_cell_formula_units_Z`), e a contagem das posições desenhadas (vértice 1/8, aresta 1/4, face 1/2, interior 1) precisa dar o mesmo Z;
+- **volume:** a fórmula do Calcular é comparada com o produto misto dos vetores de rede e com o `_cell_volume` do CIF;
+- **vizinhança de todos os sítios:** a primeira camada e a menor distância são recalculadas por busca exaustiva (todas as imagens até duas células de distância);
+- **Medir:** as arestas ao longo de cada eixo dão a, b e c tabelados; a coordenação é a primeira camada;
+- **Calcular:** só número efetivo, volume e densidade teórica; raio e empacotamento de esferas rígidas não são oferecidos.
+
+**Na interface (navegador).** Cada um dos 65 metais disponíveis foi escolhido, iniciado e organizado como o estudante faria. Depois, a estrutura foi vista em 2D e em 3D, e foram registrados os erros de página.
 
 ## 2. Resultado
 
 - **53 estruturas visualizáveis** (15 CCC, 16 CFC, 22 HC; 48 da verificação inicial e 5 metais homologados na revisão científica: K, Ra, Th, Ac, Tc): **nenhuma divergência**. As distâncias, a coordenação, os átomos efetivos, as medidas e os cálculos coincidem com os valores analíticos dentro da precisão numérica. Na interface, todas foram montadas com o tipo e o número de sítios corretos, em 2D e em 3D, sem erros.
-- **9 metais com estrutura fora de CCC, CFC e HC** continuam bloqueados para a organização cristalina, com o motivo e a estrutura registrada. A montagem livre continua disponível para eles.
+- **9 estruturas no modelo geral** (α-Mn, β-Sn, Sm, Bi, Np, α-Pu e os novos Am, Po e Pa): **nenhuma divergência** contra o CIF (Z e volume) e contra a busca exaustiva de vizinhos. Na interface, todas foram montadas e desenhadas em 2D e em 3D, sem erros.
+- **3 fichas incompletas** (dupla hexagonal de La, Pr e Nd, com 2 átomos por célula em vez de 4) continuam bloqueadas para a organização cristalina, com o motivo. A montagem livre continua disponível para elas.
 
 A tabela abaixo foi gerada pela auditoria. A densidade e o empacotamento são **calculados pelo SILM** a partir dos dados tabelados. Não são medidas.
 
@@ -81,18 +90,29 @@ A tabela abaixo foi gerada pela auditoria. A densidade e o empacotamento são **
 | 90 | Tório (Th) | CFC | 5,0843 |  |  | 3,5951 | 12 | 0,7405 | 11,727 | Ambiente | cod-9008485 |
 
 
+### Modelo geral
+
+A coordenação aparece como primeira camada (até 3 % além da menor distância): nessas estruturas, o número depende da distância considerada. O volume e a densidade são **calculados pelo SILM**.
+
+| Z | Metal | Estrutura | a / b / c (Å) | α / β / γ (°) | Átomos por célula | Primeira camada | Volume (Å³) | Densidade teórica (g/cm³) | Temperatura | Fonte |
+|---:|---|---|---|---|---:|---|---:|---:|---|---|
+| 25 | Manganês (Mn) | Cúbica complexa (α-Mn) · I -4 3 m | 8,9125 / 8,9125 / 8,9125 | 90 / 90 / 90 | 58 | 12 a 2,752 Å | 707,94 | 7,474 | 298.0 K | cod-9011068 |
+| 50 | Estanho (Sn) | Tetragonal · I 41/a m d :1 | 5,8315 / 5,8315 / 3,1813 | 90 / 90 / 90 | 4 | 4 a 3,022 Å | 108,18 | 7,289 | 298.15 K | cod-9012005 |
+| 62 | Samário (Sm) | Romboédrica · R -3 m :R | 8,9960 / 8,9960 / 8,9960 | 23,22 / 23,22 / 23,22 | 3 | 12 a 3,588–3,621 Å | 99,35 | 7,540 | Ambiente | cod-9014498 |
+| 83 | Bismuto (Bi) | Romboédrica · R -3 m :H | 4,5460 / 4,5460 / 11,8620 | 90 / 90 / 120 | 6 | 3 a 3,071 Å | 212,30 | 9,808 | 298.0 K | cod-9009658 |
+| 84 | Polônio (Po) | Cúbica simples (α-Po) · P m -3 m | 3,3450 / 3,3450 / 3,3450 | 90 / 90 / 90 | 1 | 6 a 3,345 Å | 37,43 | — (sem peso atômico padrão) | 283 K | cod-1509138 |
+| 91 | Protactínio (Pa) | Tetragonal de corpo centrado · I 4/m m m | 3,9250 / 3,9250 / 3,2380 | 90 / 90 / 90 | 2 | 10 a 3,213–3,238 Å | 49,88 | 15,382 | Ambiente | cod-2310022 |
+| 93 | Netúnio (Np) | Ortorrômbica · P m c n | 4,7230 / 4,8870 / 6,6630 | 90 / 90 / 90 | 8 | 4 a 2,599–2,634 Å | 153,79 | — (sem peso atômico padrão) | Ambiente | cod-9008585 |
+| 94 | Plutônio (Pu) | Monoclínica · P 1 21/m 1 | 6,1835 / 4,8244 / 10,9730 | 90 / 101,8 / 90 | 16 | 2 a 2,519–2,547 Å | 320,43 | — (sem peso atômico padrão) | Ambiente | cod-9008587 |
+| 95 | Amerício (Am) | Dupla hexagonal compacta (α-Am) · P 63/m m c | 3,4740 / 3,4740 / 11,2500 | 90 / 90 / 120 | 4 | 12 a 3,454–3,474 Å | 117,58 | — (sem peso atômico padrão) | Ambiente | cod-9008524 |
+
+### Bloqueados
+
 | Metal | Estrutura registrada | Motivo |
 |---|---|---|
-| Manganês (Mn) | Cúbica complexa (α-Mn) | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
-| Estanho (Sn) | Tetragonal | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
-| Lantânio (La) | Dupla hexagonal compacta | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
-| Praseodímio (Pr) | Dupla hexagonal compacta | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
-| Neodímio (Nd) | Dupla hexagonal compacta | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
-| Samário (Sm) | Romboédrica | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
-| Bismuto (Bi) | Romboédrica | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
-| Netúnio (Np) | Ortorrômbica | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
-| Plutônio (Pu) | Monoclínica | Estrutura fora de CCC, CFC e HC: ainda não visualizável; a montagem livre continua disponível |
-
+| Lantânio (La) | Dupla hexagonal compacta | Ficha incompleta: COD 9010986 registra um só sítio (Z = 2; a dupla hexagonal tem 4 átomos por célula). A montagem livre continua disponível |
+| Praseodímio (Pr) | Dupla hexagonal compacta | Ficha incompleta: COD 9010988, mesmo caso |
+| Neodímio (Nd) | Dupla hexagonal compacta | Ficha incompleta: COD 9010989, mesmo caso |
 
 ## 3. Achados de dados e o que a revisão científica resolveu
 
@@ -108,7 +128,7 @@ Os achados desta verificação foram tratados na revisão científica (`docs/REV
 
 | Antes | Agora |
 |---|---|
-| Num metal com estrutura fora de CCC/CFC/HC, "Organizar estrutura" ficava cinza; o motivo aparecia em letra pequena embaixo da cena | O motivo fica junto do botão, na cena e em Montagem → Preparo: "Organizar indisponível para manganês: … (Cúbica complexa (α-Mn)). A montagem livre continua disponível.", com o link "Por que uma opção não aparece" |
+| Num metal com estrutura bloqueada, "Organizar estrutura" ficava cinza; o motivo aparecia em letra pequena embaixo da cena | O motivo fica junto do botão, na cena e em Montagem → Preparo: "Organizar indisponível para manganês: … (Cúbica complexa (α-Mn)). A montagem livre continua disponível.", com o link "Por que uma opção não aparece" |
 | Uma seleção inválida no Medir mostrava um código interno: "Seleção inválida para este instrumento: NOT_LATTICE_VECTOR" | A mensagem explica o que escolher: "Esses centros não ocupam posições equivalentes da rede (por exemplo, um vértice e um centro). Para o parâmetro de rede, escolha dois centros equivalentes ligados por uma aresta da célula" (no HC, também como medir a e c) |
 | Falhas no Calcular mostravam códigos ("Não foi possível calcular: RESULT_INVALID") | Mensagens explicam o problema e o que conferir |
 | Na densidade teórica (ou no empacotamento), o volume V só podia ser digitado, sem dizer que ele é calculado antes | "Ainda não há volume da célula calculado nesta investigação. Calcule antes “Volume da célula unitária” ou informe o valor", com o botão "Ir para “Volume da célula unitária”". Depois do volume, ele aparece como "Calculado pelo SILM" e a dica some |
@@ -116,5 +136,5 @@ Os achados desta verificação foram tratados na revisão científica (`docs/REV
 
 ## 5. Próximos passos sugeridos
 
-- Revisão científica das fontes (itens 1 e 2 da seção 3), com conferência das fichas primárias.
-- Visualização de estruturas além de CCC/CFC/HC (α-Mn, β-Sn, dhcp, romboédricas), se houver interesse didático. Exige modelos novos e validação, e não deve ser feita por aproximação a CCC/CFC/HC.
+- Fichas novas, com acesso ao COD: dupla hexagonal completa de La, Pr e Nd; índio com temperatura da célula; gálio e urânio na condição ambiente; fichas primárias modernas de zircônio, césio e cobalto.
+- A coordenação no modelo geral usa um critério de distância declarado (primeira camada até 3 % além da menor distância). Se o autor preferir outro critério didático (por exemplo, poliedros de Voronoi), isso pede uma decisão de conteúdo antes de ser implementado.

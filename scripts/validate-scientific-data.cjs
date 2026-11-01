@@ -44,6 +44,8 @@ function validate({elements,sources,metadata},{checkFiles=false}={}){
    check(c?.phase?.value==='solid',name+': estrutura não sólida');
    for(const k of ['a','b','c','alpha','beta','gamma']){const v=s.latticeParameters?.[k];check(Number.isFinite(v?.value)&&v.value>0&&v.unit===(k.length===1?'Å':'°')&&ids.has(v.sourceId),name+': parâmetro '+k+' inválido');}
    check(s.fractionalSites?.values?.length>0&&ids.has(s.fractionalSites?.sourceId),name+': base cristalográfica ausente');
+   // Estruturas fora de CCC/CFC/HC (modelo geral, 0.16.x): o Z declarado na ficha é obrigatório para conferir os átomos gerados.
+   if(!['CCC','CFC','HC'].includes(s.type))check(Number.isInteger(s.fractionalSites?.cellFormulaUnitsZ)&&s.fractionalSites.cellFormulaUnitsZ>0,name+': Z da ficha ausente na estrutura geral');
   }
   for(const [key,p]of Object.entries(e.properties||{})){check(typeof p==='object'&&!!p.unit&&!!p.conditions&&ids.has(p.sourceId),name+': propriedade '+key+' sem unidade/condição/fonte');}
  }

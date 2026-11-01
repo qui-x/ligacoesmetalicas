@@ -1,4 +1,4 @@
-# Fórmulas cristalográficas do SILM (0.10.x)
+# Fórmulas cristalográficas do SILM (0.10.x; modelo geral na 0.16.x)
 
 Este documento registra cada relação do catálogo central (`SILM.formulas`, `domain/silm/calculations.js`), a geometria de onde ela vem e o domínio em que vale. Todas usam o **modelo de esferas rígidas**, em que cada centro metálico é uma esfera de raio `r` e vizinhos mais próximos se tocam, ou a geometria da célula unitária, que não depende desse modelo.
 
@@ -99,6 +99,20 @@ c/a  (dos parâmetros tabelados ou medidos do metal)
 ```
 
 O valor ideal vem de quatro esferas em contato, que formam um tetraedro regular de aresta `a` com altura a·√(2/3). Assim, c = 2·a·√(2/3) e c/a = √(8/3). Ele é uma **referência geométrica**, não dado do metal. A diferença entre o c/a do metal e o ideal não é erro experimental.
+
+## 7a. Estruturas fora de CCC, CFC e HC (modelo geral, 0.16.x)
+
+Nas estruturas registradas fora de CCC, CFC e HC (α-Mn, β-Sn, Sm, Bi, Np, α-Pu, Am, Po e Pa), a célula é o **paralelepípedo da ficha cristalográfica**: a, b, c, α, β e γ como publicados, com os átomos gerados pelas operações de simetria registradas. O catálogo oferece só as relações exatas dessa célula.
+
+| Fórmula | Expressão | Origem |
+|---|---|---|
+| `effective-atoms-general` | `n = Σ (centros em cada posição × fração dentro da célula)`: vértice 1/8, aresta 1/4, face 1/2, interior 1 | Cada posição na fronteira é compartilhada com as células vizinhas. O total é o Z da ficha, conferido pelo modelo |
+| `cell-volume-general` | `V = a · b · c · √(1 − cos²α − cos²β − cos²γ + 2 · cos α · cos β · cos γ)` | Volume do paralelepípedo (produto misto dos vetores de rede). Com os três ângulos retos, reduz-se a `a · b · c`; nos eixos hexagonais (γ = 120°), a `(√3/2) · a² · c` |
+| `theoretical-density` | `ρ = n · M / (N_A · V)` | A mesma da seção 6, com o `n` e o `V` acima |
+
+**Raio e empacotamento de esferas rígidas não são oferecidos.** Nessas estruturas, as distâncias até os vizinhos variam (por exemplo, no bismuto há 3 vizinhos a 3,07 Å e mais 3 a 3,53 Å). Uma esfera de raio único não descreve o sólido, e as fórmulas das seções 4 e 5 não se aplicam.
+
+**Conferência nos testes** (`tests/structure-audit.cjs`): o volume calculado é comparado com o produto misto dos vetores de rede e com o `_cell_volume` do CIF; `n` é comparado com o `_cell_formula_units_Z` do CIF. Exemplos (volume SILM × CIF, em Å³): α-Mn 707,94 × 707,944; Bi 212,30 × 212,299; α-Pu 320,43 × 320,425; Sm, em eixos romboédricos com α = 23,22°, 99,35 × 99,346.
 
 ## 8. Exemplos verificados pelos testes
 
