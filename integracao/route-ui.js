@@ -4,6 +4,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  const button=(label,fn,id)=>{const b=N('button',label);b.type='button';b.className='button outline';if(id)b.id=id;b.addEventListener('click',fn);return b;};
  const session=S.createRouteSession({model,storage,view,onView,say});
  const unified=S.createUnifiedUI({model,storage,session,selectMetal,prepareMetal,say});
+ const teacherUI=S.createTeacherUI({model,storage,session,say,start:(config,z)=>enterTeacher(config,z),applyPreset:id=>unified.applyReadyAssembly(id)});
  const url=id=>'#/'+(registry.get(id)?.type==='mission'?'missoes':'roteiros')+'?item='+encodeURIComponent(id);
  const isMission=()=>session.context()?.type==='mission';
  const noun=()=>isMission()?'Missão':'Roteiro';
@@ -16,10 +17,13 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   say(message,kind);sync();return r;
  }
  function close(){const destination=isMission()?'#/missoes':'#/roteiros';if(!session.close())return false;onModule(model.state.module.active);location.hash=destination;say('Atividade encerrada. Sua investigação livre foi restaurada.');sync();}
- B.guidedActivityContext=()=>{const c=session.context(),r=session.route();return c?{url:url(c.id),title:r.title,kind:isMission()?'mission':'script',progress:c.status==='completed'?1:0,total:1}:null;};
- B.menuActivity=(kind,id)=>{const c=session.context(),r=session.route();return kind===(isMission()?'mission':'script')&&c?.id===id?{id:r.id,kind,title:r.title,module:r.module,steps:[{label:r.guidance.criterion,requirement:'manual',minimum:1}]}:undefined;};
+ B.guidedActivityContext=()=>{const c=session.context(),r=session.route();return c?{url:url(c.id),title:session.title(),kind:isMission()?'mission':'script',progress:c.status==='completed'?1:0,total:1}:null;};
+ B.menuActivity=(kind,id)=>{const c=session.context(),r=session.route();return kind===(isMission()?'mission':'script')&&c?.id===id?{id:r.id,kind,title:session.title(),module:r.module,steps:[{label:r.guidance.criterion,requirement:'manual',minimum:1}]}:undefined;};
  B.menuActivityProgress=id=>session.context()?.id===id&&session.context().status==='completed'?1:0;
  B.advanceActivityFromMenu=()=>complete();B.clearGuidedReturn=()=>close();B.endGuidedActivity=()=>close();
+ /* Etapa 11: atividade preparada pelo professor (roteiro ou missão do catálogo com restrições). */
+ function enterTeacher(config,z){if(session.open()){say('Encerre a atividade em curso antes de abrir outra.','warning');return false;}const r=registry.get(config.item);if(!r)return false;
+  if(!session.start(r.id,z,{teacher:config})){say('Não foi possível preparar esta atividade.','warning');return false;}onModule(r.module);location.hash='#/ambiente';sync();say('Atividade do professor: '+config.title+'. Módulo '+r.module+' fixo.');return true;}
  function enter(r,z,resume,identity){if(session.open()){location.hash='#/ambiente';return;}if(!session.start(r.id,z,{resume})){say('Não foi possível preparar esta investigação.','warning');return;}if(identity&&!resume)for(const [k,v] of Object.entries(identity))if(v)session.edit(k,v);onModule(r.module);location.hash='#/ambiente';sync();say('Contexto restrito: '+r.title+'. Módulo '+r.module+' fixo.');}
 
  /* Missões na arquitetura do SIAB (Etapa 3 do plano de paridade): lista de linhas com situação, especificação em coluna de
@@ -64,8 +68,8 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  let conclusionField=null,conclusionFor='';
  function missionPanel(host,c,r){
   const done=c.status==='completed',ready=session.ready();
-  const eyebrow=N('p','MISSÃO · '+(done?'Concluído':'Em andamento'));eyebrow.className='eyebrow';
-  host.append(eyebrow,N('h3',r.title),N('h4','O problema'),N('p',r.description),N('h4','Objetivo e regras'),N('p','Módulo fixo: '+moduleName(r.module)+'. Recursos liberados: '+toolNames(r.allowedTools)+'. Registre a evidência na Oficina e escreva uma conclusão.'));
+  const eyebrow=N('p',(session.teacher()?'ATIVIDADE DO PROFESSOR · ':'')+'MISSÃO · '+(done?'Concluído':'Em andamento'));eyebrow.className='eyebrow';
+  host.append(eyebrow,N('h3',session.title()),N('h4','O problema'),N('p',r.description),N('h4','Objetivo e regras'),N('p','Módulo fixo: '+moduleName(r.module)+'. Recursos liberados: '+toolNames(session.teacher()?.tools||r.allowedTools)+'. Registre a evidência na Oficina e escreva uma conclusão.'));
   const evidence=N('ul');evidence.className='silm-evidence';const item=N('li');item.dataset.objective=r.completionCriteria;item.dataset.met=String(done||ready);
   const state=N('strong',done||ready?'Atendida':'Pendente');item.append(N('span',evidenceLabels[r.completionCriteria]||r.guidance.criterion),state);evidence.append(item);host.append(N('h4','Evidência'),evidence);
   const hint=N('details');hint.append(N('summary','Dica para investigar'),N('p',r.guidance.hint));host.append(hint);
@@ -133,8 +137,8 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  }
  function routePanel(host,c,r){
   const done=c.status==='completed',ready=session.ready();
-  const eyebrow=N('p','ROTEIRO · '+(done?'Concluído':'Em andamento'));eyebrow.className='eyebrow';
-  host.append(eyebrow,N('h3',r.title),N('h4','Objetivo'),N('p',r.objectives.join(' ')),N('h4','O que você vai fazer'),N('p',r.guidance.action),N('p','Módulo único: '+moduleName(r.module)+'. Recursos liberados: '+toolNames(r.allowedTools)+'.'));
+  const eyebrow=N('p',(session.teacher()?'ATIVIDADE DO PROFESSOR · ':'')+'ROTEIRO · '+(done?'Concluído':'Em andamento'));eyebrow.className='eyebrow';
+  host.append(eyebrow,N('h3',session.title()),N('h4','Objetivo'),N('p',r.objectives.join(' ')),N('h4','O que você vai fazer'),N('p',r.guidance.action),N('p','Módulo único: '+moduleName(r.module)+'. Recursos liberados: '+toolNames(session.teacher()?.tools||r.allowedTools)+'.'));
   const hint=N('details');hint.append(N('summary','O que observar'),N('p',r.guidance.hint));host.append(hint);
   const evidence=N('ul');evidence.className='silm-evidence';const item=N('li');item.dataset.objective=r.completionCriteria;item.dataset.met=String(done||ready);
   item.append(N('span',evidenceLabels[r.completionCriteria]||r.guidance.criterion),N('strong',done||ready?'Atendida':'Pendente'));evidence.append(item);host.append(N('h4','Evidência'),evidence);
@@ -210,7 +214,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const doc=N('article');doc.className='silm-report-doc';doc.dataset.reportMode=mode;
   const head=N('header');head.className='silm-report-doc-head';const brand=N('div');brand.className='silm-report-brand';const logo=N('img');logo.src=document.querySelector('.si-global-brand img')?.getAttribute('src')||'';logo.alt='';logo.width=36;logo.height=36;brand.append(logo,N('strong','SILM'));
   const eyebrow=N('p',REPORT_MODES[mode].replace(' · Professor',''));eyebrow.className='eyebrow';
-  head.append(brand,eyebrow,N('h1','Relatório — '+r.title),N('p',r.subtitle+' · Módulo '+(MODULE_NAMES[r.module]||r.module)+' · SILM '+B.manifest.version));doc.append(head);
+  head.append(brand,eyebrow,N('h1','Relatório — '+(record.activityContext.teacher?.title||r.title)),N('p',r.subtitle+' · Módulo '+(MODULE_NAMES[r.module]||r.module)+' · SILM '+B.manifest.version));doc.append(head);
   const section=(n,title,name)=>{const sec=N('section');sec.dataset.reportSection=name;sec.append(N('h2',(n?n+'. ':'')+title));doc.append(sec);return sec;};
   // 1. Identificação.
   const ident=section(1,'Identificação','identificacao'),idFields=[['name','Nome'],['className','Turma'],['date','Data'],['teacher','Professor'],['group','Grupo']];
@@ -261,17 +265,17 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   session.observe(B.currentRoute(location.hash)==='ambiente');
   const context=session.context();document.body.classList.toggle('silm-guided',!!context);$('si-return-activity').hidden=!context;
   if(context)$('si-return-activity').href=url(context.id);
-  if(B.currentRoute(location.hash)==='roteiros')routeCatalogue();if(B.currentRoute(location.hash)==='missoes')missionCatalogue();if(B.currentRoute(location.hash)==='relatorios')report();guidance();unified.render();
+  if(B.currentRoute(location.hash)==='roteiros')routeCatalogue();if(B.currentRoute(location.hash)==='missoes')missionCatalogue();if(B.currentRoute(location.hash)==='relatorios')report();guidance();unified.render();teacherUI.render(B.currentRoute(location.hash));
   const activityTab=document.querySelector('[data-left-tab="missao"]');if(activityTab)activityTab.textContent=context?noun():'Roteiro';
   if(context){$('si-dock-activity-status').textContent=noun()+' em andamento · '+session.route().module;if(document.querySelector('[data-left-tab="missao"]').getAttribute('aria-pressed')==='true')$('si-left-title').textContent=noun();}
   const tab=document.querySelector('[data-left-tab][aria-pressed="true"]')?.dataset.leftTab;if(tab==='objetos')$('si-left-title').textContent='Unidades';
-  const menu=$('si-activity-context');if(context&&menu)menu.textContent=session.route().title+' · '+(context.status==='completed'?'Concluído':'Em investigação');
+  const menu=$('si-activity-context');if(context&&menu)menu.textContent=session.title()+' · '+(context.status==='completed'?'Concluído':'Em investigação');
   $('silm-report-link').hidden=!!context;$('silm-export-legacy').disabled=!!context;$('silm-import').disabled=!!context;$('silm-metal').disabled=!!context;for(const id of ['silm-start','silm-open-periodic',...(canBuild()?[]:['silm-add','silm-organize','silm-free','scene-clear','si-compact-clear','scene-undo'])])if(context)$(id).disabled=true;
   for(const [id,tool]of [['silm-electrons','electrons'],['silm-motion','electrons'],['silm-crystal-neighbors','neighbors']])if($(id))$(id).hidden=!session.allows(tool);
   const finish=$('si-activity-finish');if(finish){finish.querySelector('span').textContent=isMission()?'Concluir missão':'Concluir roteiro';finish.disabled=!!context&&(context.status==='completed'||!session.ready());}
  }
  /* Durante uma atividade, a navegação fica no Início (com a retomada), na Oficina, na própria atividade, nos relatórios e no Manual. */
- function guard(){if(!session.open())return;const route=B.currentRoute(location.hash),id=new URLSearchParams(location.hash.split('?')[1]||'').get('item');if(!['inicio','ambiente',isMission()?'missoes':'roteiros','relatorios','manual'].includes(route)||['roteiros','missoes'].includes(route)&&id!==session.context().id){location.replace(url(session.context().id));say('Durante '+(isMission()?'a missão':'o roteiro')+', ficam disponíveis o Início, a Oficina, o Manual e os relatórios. Encerre a atividade para abrir outras telas.');}}
- function init(){unified.init();for(const b of document.querySelectorAll('[data-left-tab]'))b.addEventListener('click',schedule);$('nav-toggle').addEventListener('click',()=>requestAnimationFrame(()=>{if(session.open()){$('si-now-description').textContent='Investigação orientada · '+session.route().module;$('si-activity-context').textContent=session.route().title+' · '+(session.context().status==='completed'?'Concluído':'Em investigação');}}));document.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(session.open()&&a&&a.target!=='_blank'&&!a.getAttribute('href').startsWith('#')&&new URL(a.href).origin===location.origin){event.preventDefault();say('Encerre a atividade para abrir outra interface.','warning');}},true);const restored=session.load();if(restored){onModule(session.lockedModule());location.hash=url(session.context().id);}window.addEventListener('hashchange',guard);window.addEventListener('hashchange',schedule);window.addEventListener('si-route-changed',()=>{guard();schedule();});sync();}
+ function guard(){if(!session.open()||session.teacher()?.navigation==='livre')return;const route=B.currentRoute(location.hash),id=new URLSearchParams(location.hash.split('?')[1]||'').get('item');if(!['inicio','ambiente',isMission()?'missoes':'roteiros','relatorios','manual'].includes(route)||['roteiros','missoes'].includes(route)&&id!==session.context().id){location.replace(url(session.context().id));say('Durante '+(isMission()?'a missão':'o roteiro')+', ficam disponíveis o Início, a Oficina, o Manual e os relatórios. Encerre a atividade para abrir outras telas.');}}
+ function init(){unified.init();for(const b of document.querySelectorAll('[data-left-tab]'))b.addEventListener('click',schedule);$('nav-toggle').addEventListener('click',()=>requestAnimationFrame(()=>{if(session.open()){$('si-now-description').textContent='Investigação orientada · '+session.route().module;$('si-activity-context').textContent=session.title()+' · '+(session.context().status==='completed'?'Concluído':'Em investigação');}}));document.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(session.open()&&a&&a.target!=='_blank'&&!a.getAttribute('href').startsWith('#')&&new URL(a.href).origin===location.origin){event.preventDefault();say('Encerre a atividade para abrir outra interface.','warning');}},true);const restored=session.load();if(restored){onModule(session.lockedModule());location.hash=url(session.context().id);}window.addEventListener('hashchange',guard);window.addEventListener('hashchange',schedule);window.addEventListener('si-route-changed',()=>{guard();schedule();});sync();}
  return {session,init,render,canBuild};
 };

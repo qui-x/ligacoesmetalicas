@@ -79,6 +79,7 @@ A ordem foi conferida nos menus principais do SIAB e do SILM:
 | 7 | Manual | Manual | Aceito em 31/10/2026 — registro na seção 8 |
 | 8 | Relatório | Relatório | Aceito em 31/10/2026 — registro na seção 8 |
 | 9 | Montagens prontas | Montagens prontas | Aceito em 01/11/2026 — registro na seção 8 |
+| 11 | Área do Professor e apoio pedagógico | Área do Professor | Aceito em 01/11/2026 — registro na seção 8 |
 | 10 | Tour e ajuda contextual | Tour da oficina e ajuda dos painéis | Aceito em 31/10/2026 — registro na seção 8 |
 | 12 | Menu, preferências, projetor e aplicativo | Menu, preferências, projetor e aplicativo | Aceito em 31/10/2026 — registro na seção 8 (MENU-05 fechado com as Etapas 9 e 10) |
 
@@ -406,17 +407,17 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 
 **SILM:** `data-view="professor"`, `js/experience/teacher.js`, `domain/silm/bootstrap.js` configuração `teacherResources`, `domain/silm/presentation.js`.
 
-- [ ] `TEACHER-01` — Comparar criação guiada por etapas, identificação e seleção do tipo de atividade.
-- [ ] `TEACHER-02` — Definir campos próprios do SILM: objetivo, instruções, módulo único, metal elegível/seleção pelo estudante, estrutura/requisitos, ferramentas e navegação.
-- [ ] `TEACHER-03` — Comparar permissões de recursos e estados de controles disponíveis.
-- [ ] `TEACHER-04` — Implementar prévia como aluno e conferência dos recursos permitidos.
-- [ ] `TEACHER-05` — Implementar biblioteca de atividades criadas: abrir, copiar/exportar, editar, duplicar e excluir.
-- [ ] `TEACHER-06` — Manter importação JSON com validação de schema, tamanho e conteúdo; não sobrescrever uma atividade válida quando o arquivo for inválido.
-- [ ] `TEACHER-07` — Implementar persistência de várias atividades, não apenas um rascunho sobrescrito.
-- [ ] `TEACHER-08` — Implementar guia do professor específico do SILM: objetivos, conceitos, preparação, interpretação, limitações, perguntas e fontes.
-- [ ] `TEACHER-09` — Comparar impressão do guia e acesso ao modo projetor.
-- [ ] `TEACHER-10` — Corrigir navegação: o item “Área do Professor” deve estar acessível no menu secundário como no SIAB, não apenas por atalho na página inicial.
-- [ ] `TEACHER-11` — Testar atividades restritas, permissões, abertura como aluno, import/export e edição sem afetar links/sessões já criados.
+- [x] `TEACHER-01` — Comparar criação guiada por etapas, identificação e seleção do tipo de atividade.
+- [x] `TEACHER-02` — Definir campos próprios do SILM: objetivo, instruções, módulo único, metal elegível/seleção pelo estudante, estrutura/requisitos, ferramentas e navegação.
+- [x] `TEACHER-03` — Comparar permissões de recursos e estados de controles disponíveis.
+- [x] `TEACHER-04` — Implementar prévia como aluno e conferência dos recursos permitidos.
+- [x] `TEACHER-05` — Implementar biblioteca de atividades criadas: abrir, copiar/exportar, editar, duplicar e excluir.
+- [x] `TEACHER-06` — Manter importação JSON com validação de schema, tamanho e conteúdo; não sobrescrever uma atividade válida quando o arquivo for inválido.
+- [x] `TEACHER-07` — Implementar persistência de várias atividades, não apenas um rascunho sobrescrito.
+- [x] `TEACHER-08` — Implementar guia do professor específico do SILM: objetivos, conceitos, preparação, interpretação, limitações, perguntas e fontes. *(Composto com textos já existentes no SILM; "perguntas" = o problema do roteiro; sem BNCC nem "erros comuns", que pedem conteúdo do autor.)*
+- [x] `TEACHER-09` — Comparar impressão do guia e acesso ao modo projetor.
+- [x] `TEACHER-10` — Corrigir navegação: o item “Área do Professor” deve estar acessível no menu secundário como no SIAB, não apenas por atalho na página inicial.
+- [x] `TEACHER-11` — Testar atividades restritas, permissões, abertura como aluno, import/export e edição sem afetar links/sessões já criados.
 
 ## ETAPA 12 — Menu lateral, preferências, acessibilidade, projetor e aplicativo
 
@@ -752,7 +753,7 @@ Diferenças de domínio / N/A: sem dados hipotéticos (a análise usa os dados d
 Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
   test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
 Evidências: docs/evidence-parity/REPORT/
-Pendências: guia do Professor imprimível (TEST-PRINT) na Etapa 11; Firefox, Safari e aparelhos físicos
+Pendências: Firefox, Safari e aparelhos físicos (guia do Professor imprimível entrou com a Etapa 11, em TEST-TEACHER)
 Estado: [x]
 ```
 
@@ -776,7 +777,7 @@ Diferenças de domínio / N/A: três montagens (as do SILM 0.x), uma por modelo 
 Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
   test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
 Evidências: docs/evidence-parity/PRESET/
-Pendências: montagem pronta como tipo de atividade do Professor (Etapa 11); Firefox, Safari e aparelhos físicos
+Pendências: Firefox, Safari e aparelhos físicos (montagem pronta como atividade do Professor entrou com a Etapa 11)
 Estado: [x]
 ```
 
@@ -796,6 +797,32 @@ Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (ro
   test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
 Evidências: docs/evidence-parity/TOUR/
 Pendências: Firefox, Safari e aparelhos físicos
+Estado: [x]
+```
+
+### Registro — Etapa 11, Área do Professor e apoio pedagógico
+
+```text
+ID da etapa: TEACHER (01 a 11)
+Tela SIAB: Preparar atividade — data-tela="professor", js/telas/professor.js; link do aluno e tela data-tela="atividade",
+  js/core/atividades.js; guia #teacher-guide-dialog (acidosebases1.0.0@73848f0)
+Tela SILM: Área do Professor — integracao/index.html data-view="professor" e data-view="atividade", integracao/teacher-ui.js,
+  domain/silm/teacher-activities.js; sobreposição do professor em domain/silm/route-session.js
+Commit: branch claude/optimistic-cerf-167d72, commit "Paridade SIAB — Etapa 11, Área do Professor" (PR da etapa)
+Viewport(s): 1366×768, 1024×768, 390×844, 320×640, 844×390 (Área do Professor); fluxos em 1366×900
+Arquivos alterados: domain/silm/teacher-activities.js (novo), integracao/teacher-ui.js (novo), domain/silm/route-session.js,
+  integracao/route-ui.js, integracao/adapter.js (rota "atividade"), integracao/index.html (+ index.html gerado),
+  integracao/integration.css, domain/silm/manual.js (tópico "professor"), package.json (test:routes),
+  tests/teacher-activities.cjs, tests/parity/teacher.cjs, tests/parity-screens.cjs
+Diferenças de domínio / N/A: sem temperatura nem cidade (a condição de referência é a do banco); recursos do aluno =
+  recursos liberados pela atividade do SILM, e os de que o critério depende ficam travados; metal escolhido pelo
+  professor ou pelo aluno entre os elegíveis; link em base64url de JSON (o do SIAB é cifrado com a chave no próprio
+  link: nos dois casos organiza a aula, não protege); guia sem BNCC nem "erros comuns" (pedem conteúdo do autor);
+  montagem pronta como atividade abre a oficina livre
+Testes executados: npm test (inclui tests/teacher-activities.cjs); test:a11y; test:comparison; test:routes:browser
+  (roteiros e workspace-family); test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
+Evidências: docs/evidence-parity/TEACHER/
+Pendências: BNCC, erros comuns e questões de discussão do guia (conteúdo do autor); Firefox, Safari e aparelhos físicos
 Estado: [x]
 ```
 

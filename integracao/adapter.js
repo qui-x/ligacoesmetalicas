@@ -10,9 +10,9 @@
  const startupChoice=()=>{const v=B.storage.read('startup.choice');return v==='inicio'||v==='ambiente'?v:null;};
  B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.15.5',
   routes:[...B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios','aprender','missoes','caderno','professor'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'Oficina dos Metais':route.title})),
-   {id:'montagens',title:'Montagens prontas',subtitle:'Montagens prontas'}]});
- // Etapa 9: "Montagens prontas" é uma tela do SILM que a lista fixa de rotas da Base não conhece.
- const baseRoute=B.currentRoute;B.currentRoute=hash=>String(hash||'').replace(/^#\/?/,'').split(/[?&]/,1)[0]==='montagens'?'montagens':baseRoute(hash);
+   {id:'montagens',title:'Montagens prontas',subtitle:'Montagens prontas'},{id:'atividade',title:'Atividade',subtitle:'Atividade do professor'}]});
+ // Etapas 9 e 11: "Montagens prontas" e "Atividade" (link do aluno) são telas do SILM que a lista fixa de rotas da Base não conhece.
+ const extraRoutes=new Set(['montagens','atividade']),baseRoute=B.currentRoute;B.currentRoute=hash=>{const slug=String(hash||'').replace(/^#\/?/,'').split(/[?&]/,1)[0];return extraRoutes.has(slug)?slug:baseRoute(hash);};
  // A cena cristalina também usa data-view; o roteamento só pode atingir páginas do produto.
  B.updateRoute=()=>{
   if(location.hash.startsWith('#/manual/')){location.replace('#/manual?topico='+encodeURIComponent(location.hash.slice(9)));return;}

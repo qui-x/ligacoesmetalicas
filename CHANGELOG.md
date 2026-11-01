@@ -1,4 +1,18 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 9: Montagens prontas
+## Em desenvolvimento — Paridade SIAB, Etapa 11: Área do Professor
+
+- A Área do Professor ganhou "Preparar atividade" em três etapas, como no SIAB:
+  - atividade e identificação: roteiro, missão ou montagem pronta do catálogo, título, turma, professor e data;
+  - recursos do aluno: metal fixo ou escolhido pelo aluno entre os elegíveis, recursos liberados e navegação;
+  - gerar e conferir: resumo, link, "Copiar link", "Abrir como aluno", "Exportar atividade" e "Ver orientações".
+- O professor só restringe. Os recursos de que o critério da atividade depende ficam marcados e travados, e o critério continua o do SILM.
+- Link do aluno (`#/atividade?c=…`): a tela "Atividade" mostra título, objetivo, metal, recursos, navegação e identificação, com "Começar atividade". Um link alterado mostra uma mensagem e não inicia nada.
+- A atividade do professor roda sobre a sessão de roteiros e missões: título próprio, metal e recursos restritos, navegação restrita ou livre, e identificação já preenchida no relatório. Ela não se mistura com a tentativa livre do mesmo roteiro.
+- Biblioteca de várias atividades neste navegador: abrir, copiar link, exportar, editar, duplicar e excluir. A importação JSON é tudo ou nada: um arquivo inválido não altera a lista.
+- Guia do Professor composto com os textos do próprio SILM: objetivo, problema, conceitos e "como interpretar" dos temas relacionados, preparação, desenvolvimento, critério, limites do modelo e fontes. "Imprimir Guia do Professor" imprime só o guia. BNCC e "erros comuns" ficam para conteúdo do autor.
+- Modo projetor também na Área do Professor. A Tabela Periódica com fontes continua em "Consultar elementos e fontes".
+- Testes: `tests/teacher-activities.cjs` (em `npm test`) e TEST-TEACHER em `npm run test:parity`; evidências em `docs/evidence-parity/TEACHER/`.
+
+## Paridade SIAB, Etapa 9: Montagens prontas (mesclada em #36)
 
 - Nova tela "Montagens prontas" (`#/montagens`), no padrão do SIAB. Cada cartão traz título, objetivo, módulo, o que vai para a oficina (metal, estrutura e número de unidades da célula), condição de referência, fonte da estrutura, passos "Investigue", recursos recomendados e "Montar na oficina".
 - As três montagens são as que o SILM já tinha: cobre (CFC), ferro (CCC) e magnésio (HC). Nenhuma montagem nova foi criada.

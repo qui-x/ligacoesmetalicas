@@ -36,7 +36,7 @@
       "check": "Cache offline íntegro: arquivos existentes, dependências da entrada presentes, sem arquivos mortos",
       "status": "PASS",
       "detail": {
-        "recursos": 82,
+        "recursos": 84,
         "ausentes": [],
         "fora_do_cache": [],
         "mortos": []
