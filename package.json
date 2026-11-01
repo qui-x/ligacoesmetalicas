@@ -17,7 +17,7 @@
     "test:a11y": "node tests/workspace-a11y.cjs",
     "build:integration": "node scripts/build-base-integration.cjs && node scripts/build-main-entry.cjs && node scripts/build-sw.cjs",
     "test:integration": "npm run build:integration && node tests/base-integration.cjs",
-    "test:routes": "node tests/routes.cjs && node tests/durable-storage.cjs",
+    "test:routes": "node tests/routes.cjs && node tests/durable-storage.cjs && node tests/teacher-activities.cjs",
     "test:routes:browser": "node tests/integration-runner.cjs",
     "test:learning": "node tests/learning.cjs",
     "test:backup": "node tests/notebook-backup.cjs",
