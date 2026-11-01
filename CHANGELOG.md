@@ -1,4 +1,13 @@
-## Em desenvolvimento — Estruturas fora de CCC/CFC/HC (modelo geral) e 3 metais novos
+## Em desenvolvimento — Paridade SIAB, Etapa 9: Montagens prontas
+
+- Nova tela "Montagens prontas" (`#/montagens`), no padrão do SIAB. Cada cartão traz título, objetivo, módulo, o que vai para a oficina (metal, estrutura e número de unidades da célula), condição de referência, fonte da estrutura, passos "Investigue", recursos recomendados e "Montar na oficina".
+- As três montagens são as que o SILM já tinha: cobre (CFC), ferro (CCC) e magnésio (HC). Nenhuma montagem nova foi criada.
+- Metal, estrutura, condição e fonte vêm do banco ao mostrar e ao aplicar. Se o metal ou a estrutura registrada mudar, a montagem fica indisponível com o motivo, em vez de trocar de metal ou de estrutura.
+- "Montar na oficina" inicia a investigação, monta e organiza a estrutura de referência, e volta para a Oficina. Quando já existe uma investigação, pede a mesma confirmação de "Iniciar investigação".
+- Entradas: Menu → Recursos (antes do Tour), Oficina vazia e Montagem → Preparo. Durante uma atividade, a tela não abre.
+- TEST-PRESET em `npm run test:parity`; evidências em `docs/evidence-parity/PRESET/`.
+
+## Estruturas fora de CCC/CFC/HC (modelo geral) e 3 metais novos (mesclada em #35)
 
 - **Modelo cristalográfico geral:** a célula vem da própria ficha (a, b, c, α, β, γ) e os átomos, das operações de simetria registradas. A visualização só é liberada quando a ficha passa nas conferências abaixo; se uma falha, a estrutura fica bloqueada com o motivo:
   - tipo registrado × grupo espacial;

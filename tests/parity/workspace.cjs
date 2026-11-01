@@ -1,7 +1,8 @@
 'use strict';
 /* TEST-WORKSPACE — Etapa 5 do plano de paridade SIAB × SILM (docs/PLANO-OPERACIONAL-PARIDADE-SIAB-SILM.md).
    5.2 Montagem: doca com "Fechar", grupos na aba Preparo, resumo em pares e indisponibilidade científica explícita.
-   5.1 Foco: a Oficina vazia segue a "Bancada vazia" do SIAB (ilustração, título, o que fazer e três ações que funcionam);
+   5.1 Foco: a Oficina vazia segue a "Bancada vazia" do SIAB (ilustração, título, o que fazer e ações que funcionam, com
+   "Montagens prontas" desde a Etapa 9);
    a barra mostra o módulo ativo; adicionar, desfazer e trocar de módulo preservam a investigação. */
 const assert=require('node:assert/strict');
 const SIZES=[[1366,768],[1024,768],[390,844],[320,640],[844,390]];
@@ -20,7 +21,7 @@ module.exports=async(browser,url)=>{
      actions:[...box.querySelectorAll('.si-empty-actions .button')].map(b=>({text:b.textContent.trim(),h:r(b).height,inside:r(b).right<=r(scene).right+1&&r(b).left>=r(scene).left-1})),
      tag:document.getElementById('si-module-tag')?.textContent.trim(),overflow:document.documentElement.scrollWidth-innerWidth};});
    assert.equal(s.title,'Oficina vazia',where);assert.match(s.text,/Montagem → Preparo/);assert.equal(s.art,true,'Ilustração decorativa');
-   assert.deepEqual(s.actions.map(a=>a.text),['Abrir Montagem','Começar com o cobre','Tabela periódica'],where);
+   assert.deepEqual(s.actions.map(a=>a.text),['Abrir Montagem','Começar com o cobre','Montagens prontas','Tabela periódica'],where);
    for(const a of s.actions){assert.ok(a.h>=44,'Ação com alvo de 44 px em '+where);assert.ok(a.inside,'Ação dentro da cena em '+where);}
    assert.equal(s.tag,'Módulo · Explorar');assert.ok(s.overflow<=1,'Sem rolagem lateral em '+where+': '+s.overflow+' px');
   }finally{await ctx.close();}
