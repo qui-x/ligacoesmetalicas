@@ -32,7 +32,10 @@ function validateGeometry(S){
  }
  function D(e){return e.structures.find(s=>s.id===e.referenceStructure);}
  // Entradas adulteradas do banco não podem gerar estrutura falsa.
- const cu=S.data.get(29),tamper=mut=>{const copy=JSON.parse(JSON.stringify(cu));copy.atomicNumber=9000+Math.floor(Math.random()*999);mut(copy.structures.find(s=>s.id===copy.referenceStructure));return X.eligibility(copy);};
+ // Cada cópia adulterada recebe um número atômico fictício ÚNICO: a elegibilidade fica em cache por número atômico, e um sorteio
+ // repetido devolveria o resultado de outra cópia.
+ let fakeZ=9000;
+ const cu=S.data.get(29),tamper=mut=>{const copy=JSON.parse(JSON.stringify(cu));copy.atomicNumber=++fakeZ;mut(copy.structures.find(s=>s.id===copy.referenceStructure));return X.eligibility(copy);};
  assert.equal(tamper(s=>s.spaceGroupNumber=229).reasonCode,'DATA_CONFLICT');
  assert.equal(tamper(s=>s.fractionalSites.values=s.fractionalSites.values.slice(0,2)).reasonCode,'DATA_CONFLICT');
  assert.equal(tamper(s=>s.latticeParameters.c.value=4).reasonCode,'DATA_CONFLICT');
@@ -40,7 +43,7 @@ function validateGeometry(S){
  assert.equal(tamper(s=>s.type='HEXAGONAL_X').reasonCode,'CRYSTAL_STRUCTURE_UNSUPPORTED');
  // Modelo geral: tipo que contradiz o grupo espacial ou a métrica, e ficha sem os sítios completos, não geram estrutura.
  assert.equal(tamper(s=>s.type='TETRAGONAL').reasonCode,'DATA_CONFLICT','CFC rotulada como tetragonal');
- const mn=S.data.get(25),tamperMn=mut=>{const copy=JSON.parse(JSON.stringify(mn));copy.atomicNumber=9000+Math.floor(Math.random()*999);mut(copy.structures.find(s=>s.id===copy.referenceStructure));return X.eligibility(copy);};
+ const mn=S.data.get(25),tamperMn=mut=>{const copy=JSON.parse(JSON.stringify(mn));copy.atomicNumber=++fakeZ;mut(copy.structures.find(s=>s.id===copy.referenceStructure));return X.eligibility(copy);};
  assert.equal(tamperMn(s=>{s.latticeParameters.c.value=9.5;}).reasonCode,'DATA_CONFLICT','cúbica com c diferente de a');
  for(let i=0;i<4;i++)assert.equal(tamperMn(s=>{s.fractionalSites.values=s.fractionalSites.values.filter((_,j)=>j!==i);}).reasonCode,'STRUCTURE_DATA_INCOMPLETE','α-Mn sem o sítio '+i);
  assert.equal(tamperMn(s=>{delete s.fractionalSites.cellFormulaUnitsZ;}).reasonCode,'STRUCTURE_DATA_INCOMPLETE','estrutura geral sem o Z da ficha');
