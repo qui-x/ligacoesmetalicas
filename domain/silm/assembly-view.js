@@ -14,7 +14,9 @@ SILM.createSceneNotes=(parent,{scope,items=[]})=>{
  const U=SimCore.ExperienceUI,store=SimCore.storage.domain('silm'),KEY='scene.notes';
  const box=U.element('details',null,'silm-scene-notes'),summary=U.element('summary','Como ler esta cena'),body=U.element('div',null,'silm-scene-notes-body');
  box.id='silm-scene-notes';box.append(summary,body);body.append(...items.filter(Boolean));
- const saved=store.get(KEY,null);box.open=typeof saved==='boolean'?saved:!matchMedia('(max-width:900px)').matches;
+ // Fechado por padrão (uma linha): o texto continua disponível — descreve as unidades para leitores de tela
+ // (aria-describedby) e traz o aviso de representação didática —, sem ocupar a área da cena. A escolha é lembrada.
+ const saved=store.get(KEY,null);box.open=saved===true;
  scope.listen(summary,'click',()=>store.set(KEY,!box.open));   // o clique (ou Enter/Espaço no resumo) alterna depois deste evento
  parent.append(box);return box;
 };

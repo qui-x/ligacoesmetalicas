@@ -47,7 +47,10 @@ module.exports=async(browser,url)=>{
    }
    await p.keyboard.press('Escape');
    const bounds=await p.locator('#silm-assembly-stage').boundingBox();await nav.viewer(p,'calculos');
-   const after=await p.locator('#silm-assembly-stage').boundingBox();assert.ok(Math.abs(bounds.width-after.width)<=2&&Math.abs(bounds.height-after.height)<=2,'Abrir Ver preserva a cena em '+width);
+   // Celular (folha): a cena fica como está. Telas largas (02/11/2026): a doca fica ao lado da cena e não a cobre;
+   // a cena se ajusta ao espaço restante (o renderizador mede de novo).
+   if(width<=900){const after=await p.locator('#silm-assembly-stage').boundingBox();assert.ok(Math.abs(bounds.width-after.width)<=2&&Math.abs(bounds.height-after.height)<=2,'Abrir Ver preserva a cena (folha) em '+width);}
+   else await p.waitForFunction(()=>{const s=document.getElementById('silm-assembly-stage').getBoundingClientRect(),d=document.getElementById('si-dock-right').getBoundingClientRect();return s.right<=d.left+1&&s.width>=300;},'',{timeout:4000});
    await p.keyboard.press('Escape');assert.deepEqual(await state(),stable,'Navegar nas docas preserva a investigação em '+width);
   }
   await p.setViewportSize({width:1440,height:1000});await nav.viewer(p,'calculos');await p.locator('#si-expand').click();

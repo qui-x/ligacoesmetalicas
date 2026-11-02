@@ -660,3 +660,71 @@ dialog.silm-dialog::backdrop{background:rgba(6,9,14,.72);backdrop-filter:blur(6p
 .silm-crystal-unit[data-block=odd] .silm-unit-body{filter:brightness(1.3) saturate(.75)}
 .silm-cell-planes line.silm-slip-plane{stroke:var(--scientific-accent);stroke-width:1.6;stroke-dasharray:6 4;opacity:.9;vector-effect:non-scaling-stroke}
 @media(forced-colors:active){.silm-cell-planes line.silm-slip-plane{stroke:LinkText}}
+/* Oficina ampla (remodelação de 02/11/2026, pedido do autor: "docas" e área da estrutura maior e melhor aproveitada).
+   1. Docas ao lado da cena: abrir Montagem, Ver ou Dados empurra o conteúdo em vez de cobri-lo (a regra
+      #workspace-focus{padding:8px} anulava o empurrão da Base).
+   2. Contêiner largo: a cena ocupa toda a altura à esquerda; identificação, ferramentas, controles da experiência e
+      notas ficam numa coluna lateral rolável. A cena continua quadrada (renderizador), só que muito maior.
+   3. Sem rolagem lateral no rodapé da cena em telas médias. */
+@media(min-width:901px){
+ .si-workspace[data-left-open=true] #workspace-focus{padding-left:calc(var(--si-dock-left) + 20px)}
+ .si-workspace[data-right-open=true] #workspace-focus{padding-right:calc(var(--si-dock-right) + 20px)}
+}
+.silm-laboratory .silm-assembly-footer{flex-wrap:wrap;overflow-x:hidden}
+.silm-laboratory .silm-assembly-footer>*{min-width:0;max-width:100%}
+.silm-laboratory .silm-scene-notes{flex:1 1 100%}
+@container (min-width:900px){
+ .silm-laboratory>.silm-assembly{display:grid;grid-template-columns:minmax(0,1fr) clamp(260px,26%,340px);grid-template-rows:auto minmax(0,1fr);gap:10px 16px;height:100%;min-height:0}
+ .silm-laboratory .silm-assembly-area{grid-column:1;grid-row:1/-1;min-height:0;height:100%}
+ .silm-laboratory .silm-assembly-bar{grid-column:2;grid-row:1;flex-direction:column;flex-wrap:nowrap;align-items:stretch;justify-content:flex-start;gap:10px}
+ .silm-laboratory .silm-assembly-tools{display:flex;flex-direction:column;align-items:stretch;width:100%;gap:8px}
+ .silm-laboratory .silm-assembly-tools>*{width:100%;min-width:0}
+ .silm-laboratory .silm-assembly-tools .silm-segmented{display:flex}.silm-laboratory .silm-assembly-tools .silm-segmented button{flex:1}
+ .silm-laboratory .silm-assembly-tools .silm-projection{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px}
+ .silm-laboratory .silm-assembly-tools select{width:100%;min-width:0}
+ .silm-laboratory .silm-assembly-footer{grid-column:2;grid-row:2;flex-direction:column;flex-wrap:nowrap;align-items:stretch;align-self:stretch;max-height:none;min-height:0;overflow:auto;gap:10px;padding-right:2px}
+ .silm-laboratory .silm-assembly-footer>*{flex:none}
+ .silm-laboratory .silm-scene-notes{max-height:none}
+}
+/* Título das docas: quebra entre palavras (ou vai para a linha de baixo), nunca no meio da palavra. */
+.si-dock-header h2{overflow-wrap:break-word;hyphens:manual;-webkit-hyphens:manual}
+#si-dock-right .si-dock-header h2{flex:1 1 150px}
+/* Celular (remodelação de 02/11/2026, pedido do autor): cabeçalho da cena compacto (nome numa linha, ferramentas numa
+   faixa rolável), controles da experiência visíveis embaixo da cena (antes ficavam escondidos, e o painel — modal na
+   Base — bloqueava a cena a cada ação) e painel mais baixo, para a estrutura continuar visível como referência. */
+@media(max-width:600px){
+ .silm-laboratory .silm-assembly-bar{flex-direction:column;flex-wrap:nowrap;align-items:stretch;padding:6px 8px;gap:6px}
+ .silm-laboratory .silm-assembly-meta{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+ .silm-laboratory .silm-assembly-identity,.silm-laboratory .silm-assembly-identity>div{min-width:0}
+ .silm-laboratory .silm-assembly-tools{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;padding:1px;margin:0 -2px;width:auto}
+ .silm-laboratory .silm-assembly-tools::-webkit-scrollbar{display:none}
+ .silm-laboratory .silm-assembly-tools>*{flex:none;width:auto}
+ .silm-laboratory .silm-assembly-tools button{min-height:44px;white-space:nowrap;overflow-wrap:normal;font-size:.78rem}
+ .silm-laboratory .silm-assembly-tools .silm-segmented{width:auto}
+ .silm-laboratory .silm-assembly-tools select{min-height:44px;font-size:.78rem;max-width:150px}
+ .silm-laboratory .silm-assembly-footer{max-height:none;overflow:visible;flex-direction:column;align-items:stretch;flex-wrap:nowrap}
+ .silm-laboratory .silm-property-host{display:block}
+ .silm-laboratory .silm-property-compact .silm-property-status{position:static;width:auto;height:auto;margin:0;clip:auto;overflow:visible;white-space:normal;font-size:.76rem;line-height:1.35}
+ .silm-laboratory .silm-property-compact .silm-property-actions{display:flex;flex-wrap:wrap;gap:6px}
+ .silm-laboratory .silm-property-compact .silm-property-actions button{min-height:44px;flex:1 1 auto}
+ #workspace-focus{overflow-y:auto}
+ /* A cena mantém a largura útil (quadrado) mesmo com os controles da experiência abertos; a página rola até eles. */
+ .silm-laboratory .silm-assembly-area{flex:none;min-height:min(calc(100vw - 30px),62dvh)}
+ .silm-laboratory>.silm-assembly{height:auto;min-height:100%}
+ body.route-ambiente .si-dock.si-dock-left.si-bottom-sheet,body.route-ambiente .si-dock.si-dock-right.si-bottom-sheet{height:min(62dvh,540px)}
+}
+.silm-assembly-tools #si-expand-structure.si-structure-expand-in-tools{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;font-size:.78rem;white-space:nowrap}
+.silm-assembly-tools #si-expand-structure.si-structure-expand-in-tools svg{width:16px;height:16px;flex:none}
+/* Tela expandida. Larga: cena em toda a altura e cabeçalho na coluna lateral (como na Oficina normal, sem notas).
+   Estreita: cabeçalho numa linha acima da cena. (Mesma força dos seletores de body.si-structure-expanded.) */
+@container (min-width:900px){
+ body.si-structure-expanded #silm-integration-scene .silm-assembly,body.si-structure-expanded #silm-integration-scene .silm-crystal{grid-template-columns:minmax(0,1fr) clamp(240px,22%,320px)!important;grid-template-rows:auto minmax(0,1fr)!important;gap:8px 14px!important}
+ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{grid-column:1!important;grid-row:1/-1!important}
+ body.si-structure-expanded #silm-integration-scene .silm-assembly-bar{grid-column:2!important;grid-row:1!important}
+}
+@container (max-width:899px){
+ body.si-structure-expanded #silm-integration-scene .silm-assembly-bar{flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important;justify-content:space-between!important;gap:8px 16px!important}
+ body.si-structure-expanded #silm-integration-scene .silm-assembly-tools{flex-direction:row!important;flex-wrap:wrap!important;width:auto!important;overflow:visible!important}
+ body.si-structure-expanded #silm-integration-scene .silm-assembly-tools>*{width:auto!important}
+}
+body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-height:0!important;flex:1 1 auto!important}

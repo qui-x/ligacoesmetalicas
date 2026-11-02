@@ -6,7 +6,15 @@ const assert=require('node:assert/strict');
 const SIZES=[[1366,768],[1024,768],[390,844],[320,640],[844,390]];
 module.exports=async(browser,url)=>{
  const base=url.split('#')[0]+'index.html';const errors=[];
- const open=async(ctx,hash)=>{const p=await ctx.newPage();p.setDefaultTimeout(12000);p.on('pageerror',e=>errors.push(e.message));await p.goto(base+hash);await p.waitForFunction(()=>window.SILMIntegration);return p;};
+ // Diagnóstico: se o SILM não iniciar, a falha diz por quê (erros da página, requisições que falharam, estado do carregamento).
+ const open=async(ctx,hash)=>{const p=await ctx.newPage();p.setDefaultTimeout(12000);const log=[];
+  p.on('pageerror',e=>{errors.push(e.message);log.push('pageerror: '+e.message);});p.on('console',m=>{if(m.type()==='error')log.push('console: '+m.text());});
+  p.on('requestfailed',r=>log.push('requestfailed: '+r.url().replace(/^.*?\/\/[^/]+/,'')+' '+(r.failure()?.errorText||'')));
+  await p.goto(base+hash);
+  try{await p.waitForFunction(()=>window.SILMIntegration);}
+  catch(error){const info=await p.evaluate(()=>({hash:location.hash,ready:document.readyState,silm:!!window.SILM,base:!!window.BaseDemoSI,sw:!!navigator.serviceWorker?.controller})).catch(()=>null);
+   throw new Error('SILM não iniciou em '+hash+': '+JSON.stringify(info)+(log.length?' — '+log.slice(0,8).join(' | '):' — sem erros registrados'));}
+  return p;};
  const visible=(p,sel)=>p.locator(sel).first().waitFor({state:'visible',timeout:4000});
  /* 1. Início do Manual nos cinco tamanhos. */
  for(const [width,height] of SIZES){

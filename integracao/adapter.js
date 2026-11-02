@@ -86,18 +86,19 @@
   select:id=>model.setCrystalRepresentation({selectedUnitId:id}),
   toggleNeighbors(){if(!allows('neighbors'))return;const r=model.state.structure?.crystallography?.representation;if(r)model.setCrystalRepresentation({neighbors:!r.neighbors});}
  };
+ // Celular (≤ 600 px): "Expandir" vai para a faixa de ferramentas da cena; dentro da cena, no canto, cobria um centro.
+ const phone=window.matchMedia('(max-width:600px)');let expansionInScene=false;
  function placeExpansionButton(inCameraBar){
-  const button=$('si-expand-structure'),toolbar=document.querySelector('.si-workspace-toolbar'),bar=$('silm-camera-bar');
+  expansionInScene=!!inCameraBar;
+  const button=$('si-expand-structure'),toolbar=document.querySelector('.si-workspace-toolbar'),bar=$('silm-camera-bar'),tools=document.querySelector('#silm-integration-scene .silm-assembly-tools');
   if(!button||!toolbar)return;
-  if(inCameraBar&&bar){
-   button.classList.remove('si-tab');button.classList.add('secondary-btn','silm-camera-btn','si-structure-expand-in-camera');
-   bar.classList.add('silm-camera-bar-has-expand');bar.append(button);
-  }else{
-   button.closest('.silm-camera-bar')?.classList.remove('silm-camera-bar-has-expand');
-   button.classList.remove('secondary-btn','silm-camera-btn','si-structure-expand-in-camera');button.classList.add('si-tab');
-   if(button.parentElement!==toolbar)toolbar.append(button);
-  }
+  button.closest('.silm-camera-bar')?.classList.remove('silm-camera-bar-has-expand');
+  button.classList.remove('si-tab','secondary-btn','silm-camera-btn','si-structure-expand-in-camera','si-structure-expand-in-tools');
+  if(inCameraBar&&phone.matches&&tools){button.classList.add('secondary-btn','si-structure-expand-in-tools');tools.append(button);}
+  else if(inCameraBar&&bar){button.classList.add('secondary-btn','silm-camera-btn','si-structure-expand-in-camera');bar.classList.add('silm-camera-bar-has-expand');bar.append(button);}
+  else{button.classList.add('si-tab');if(button.parentElement!==toolbar)toolbar.append(button);}
  }
+ phone.addEventListener?.('change',()=>placeExpansionButton(expansionInScene));
  /* Estado vazio no padrão do SIAB ("Bancada vazia"): ilustração, título, o que fazer e ações que funcionam. */
  function emptyState({title,text,actions}){
   const box=document.createElement('div');box.className='si-empty-state';box.setAttribute('role','region');box.setAttribute('aria-label',title);
