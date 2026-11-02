@@ -174,8 +174,12 @@ SILM.crystal=(()=>{
  const SYSTEM=n=>n<=2?'triclinic':n<=15?'monoclinic':n<=74?'orthorhombic':n<=142?'tetragonal':n<=167?'trigonal':n<=194?'hexagonal':'cubic';
  const GENERAL_ROLES=Object.freeze({corner:{label:'vértice da célula',one:'vértice',many:'vértices',share:1/8,text:'1/8'},edge:{label:'aresta da célula',one:'na aresta',many:'nas arestas',share:1/4,text:'1/4'},face:{label:'face da célula',one:'na face',many:'nas faces',share:1/2,text:'1/2'},interior:{label:'interior da célula',one:'interno',many:'internos',share:1,text:'1'}});
  function generalGeometry(e,el){
-  const ref=el.reference,L=generalVectors(ref),basis=Object.freeze(el.databaseSites.map(s=>Object.freeze(s.map(wrap)))),Z=basis.length;
-  const proto={...GENERAL[el.structureType],system:SYSTEM(ref.spaceGroupNumber),spaceGroup:ref.spaceGroup,spaceGroupNumber:ref.spaceGroupNumber,label:ref.label,basis};
+  /* Origem num centro metálico (decisão do autor, 02/11/2026): quando a ficha não tem centro na origem (α-Np, α-Pu, Bi na
+     cela hexagonal), a célula desenhada começa no primeiro centro da ficha, e os vértices passam a ter centros, como no CCC e
+     no CFC. É só a escolha da origem (convenção): vetores, Z, simetria, distâncias, ângulos e contagem são os mesmos. */
+  const ref=el.reference,L=generalVectors(ref),raw=el.databaseSites.map(s=>s.map(wrap)),atOrigin=raw.some(s=>s.every(v=>near(v,0)||near(v,1)));
+  const originShift=Object.freeze(atOrigin?[0,0,0]:[...raw[0]]),basis=Object.freeze(raw.map(s=>Object.freeze(s.map((v,i)=>wrap(v-originShift[i]))))),Z=basis.length;
+  const proto={...GENERAL[el.structureType],system:SYSTEM(ref.spaceGroupNumber),spaceGroup:ref.spaceGroup,spaceGroupNumber:ref.spaceGroupNumber,label:ref.label,basis,originShift};
   const edgeOf=f=>f.filter(v=>near(v,0)||near(v,1)).length,roleOf=f=>['interior','face','edge','corner'][edgeOf(f)];
   const all=enumerate(proto,L,[[-1,2],[-1,2],[-1,2]]),inside=s=>s.frac.every(v=>v>-1e-9&&v<1+1e-9);
   const cell=all.filter(inside),cellKeys=new Set(cell.map(s=>s.key)),center=cart(L,[.5,.5,.5]);

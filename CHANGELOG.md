@@ -1,3 +1,17 @@
+## Em desenvolvimento — Origem da célula num centro metálico (Np, Pu e Bi)
+
+- Pedido e decisão do autor: no netúnio (ortorrômbica, Pmcn), no plutônio (monoclínica, P2₁/m) e no bismuto (cela hexagonal), a célula desenhada não tinha centros nos vértices. O banco segue a origem padrão do grupo espacial, como na ficha cristalográfica, e nessas estruturas essa origem não cai sobre um átomo.
+  - Agora a célula começa no primeiro centro da ficha, e os vértices passam a ter centros, como no CCC e no CFC.
+  - É só a escolha da origem, que é convenção: vetores, Z, simetria, distâncias, ângulos e contagem são os mesmos.
+  - Contagem geométrica, conferindo com Z:
+    - Np: 8 × 1/8 + 6 × 1/2 + 4 = 8;
+    - Pu: 8 × 1/8 + 14 × 1/2 + 8 = 16;
+    - Bi: 8 × 1/8 + 4 × 1/4 + 4 = 6.
+  - A legenda da cena informa o deslocamento em frações da célula.
+- As estruturas que já tinham um centro na origem (Mn, Sn, Sm, Am, Pa e Po) não mudam.
+- Uma investigação com Np, Pu ou Bi organizada e salva antes desta versão não é restaurada. O SILM avisa e preserva o arquivo original. Basta organizar de novo.
+- `tests/structure-audit.cjs` confere que há um centro na origem da célula desenhada e calcula a vizinhança exaustiva com a mesma origem.
+
 ## Em desenvolvimento — Oficina remodelada: docas e cena maior (computador e celular)
 
 - **Computador:**

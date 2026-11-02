@@ -62,7 +62,9 @@ function auditGeneral(e,ref,el,who){
  const share={corner:1/8,edge:1/4,face:1/2,interior:1};assert.ok(Math.abs(g.cell.reduce((t,x)=>t+share[g.role(x).role],0)-Z)<1e-9,who+'átomos efetivos pelas posições');
  // Vizinhança por busca exaustiva (independente de neighbors()): todas as imagens em ±2 células.
  const cart=f=>[0,1,2].map(i=>f[0]*g.vectors[0][i]+f[1]*g.vectors[1][i]+f[2]*g.vectors[2][i]);
- for(const s of g.cell){const ds=[];for(const b of el.databaseSites)for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++)for(let k=-2;k<=2;k++){const q=cart([b[0]+i,b[1]+j,b[2]+k]),d=Math.hypot(q[0]-s.cart[0],q[1]-s.cart[1],q[2]-s.cart[2]);if(d>1e-6)ds.push(d);}
+ // Origem num centro (02/11/2026): as posições da ficha entram deslocadas da mesma origem (translação não muda distâncias).
+ const shift=m.originShift||[0,0,0];assert.ok(el.databaseSites.some(b=>b.every((v,i)=>Math.abs(((v-shift[i])%1+1)%1)<1e-6||Math.abs(((v-shift[i])%1+1)%1-1)<1e-6)),who+'um centro na origem da célula desenhada');
+ for(const s of g.cell){const ds=[];for(const b0 of el.databaseSites){const b=b0.map((v,i)=>v-shift[i]);for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++)for(let k=-2;k<=2;k++){const q=cart([b[0]+i,b[1]+j,b[2]+k]),d=Math.hypot(q[0]-s.cart[0],q[1]-s.cart[1],q[2]-s.cart[2]);if(d>1e-6)ds.push(d);}}
   ds.sort((x,y)=>x-y);const n=g.neighbors(s),first=ds.filter(d=>d<=ds[0]*1.03);
   assert.equal(n.list.length,first.length,who+'primeira camada no sítio '+s.key);assert.ok(rel(n.distances[0],ds[0])<1e-9,who+'menor distância no sítio '+s.key);
   assert.ok(ds[0]>=1.8,who+'distância mínima fisicamente plausível');if(n.next!==null)assert.ok(n.next>Math.max(...n.distances),who+'camadas separadas no sítio '+s.key);
