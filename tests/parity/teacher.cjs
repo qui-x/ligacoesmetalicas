@@ -24,6 +24,9 @@ module.exports=async(browser,url)=>{
    assert.deepEqual(s.steps,['1 Escolha a atividade','2 Defina os recursos','3 Gere e confira como aluno']);
    assert.deepEqual(s.sections,['1. Atividade e identificação','2. Recursos do aluno']);assert.deepEqual(s.types,['Roteiro Experimental','Missão','Montagem pronta']);
    assert.equal(s.table,118,'Tabela de elementos com fontes');assert.deepEqual(s.small,[],'Controles com 44 px em '+where);assert.ok(s.overflow<=1,'Sem rolagem lateral em '+where+': '+s.overflow);
+   // A tabela ajusta a célula depois de medir o espaço: mesmo com a célula grande (antes do ajuste), a página não alarga.
+   const forced=await p.evaluate(()=>{const t=document.querySelector('#silm-professor-table .silm-periodic');t.style.setProperty('--periodic-cell','60px');const o=document.documentElement.scrollWidth-innerWidth;t.style.removeProperty('--periodic-cell');return o;});
+   assert.ok(forced<=1,'Tabela antes do ajuste não alarga a página em '+where+': '+forced);
   }finally{await ctx.close();}
  }
  /* 2. Preparar, gerar, abrir como aluno (outro navegador) e conferir as restrições. */
