@@ -634,3 +634,15 @@ dialog.silm-dialog::backdrop{background:rgba(6,9,14,.72);backdrop-filter:blur(6p
 @media print{body.silm-printing-guide>*:not(#silm-guide-print){display:none!important}body.silm-printing-guide #silm-guide-print{display:block!important;color:#000;background:#fff}body.silm-printing-guide .silm-teacher-guide .eyebrow{color:#444}}
 /* Aviso de nova versão com "Recarregar" (pendência da Etapa 12): fica na tela até a pessoa decidir. */
 .silm-update-notice{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}.silm-update-notice>span{flex:1 1 220px}.silm-update-notice .button{min-height:40px}
+/* Revisão da jornada: blocos recolhíveis com "display:flex" no título perdem a seta padrão do navegador e pareciam
+   títulos vazios ("Fontes" do roteiro, "O que observar" no painel). Seta própria, que gira quando o bloco abre. */
+.silm-reading summary,#silm-route-guidance summary,.silm-comparison-limits summary,.silm-comparison-details summary,.silm-notebook-compose>summary{list-style:none;gap:8px}
+.silm-reading summary::-webkit-details-marker,#silm-route-guidance summary::-webkit-details-marker,.silm-comparison-limits summary::-webkit-details-marker,.silm-comparison-details summary::-webkit-details-marker,.silm-notebook-compose>summary::-webkit-details-marker{display:none}
+.silm-reading summary::before,#silm-route-guidance summary::before,.silm-comparison-limits summary::before,.silm-comparison-details summary::before,.silm-notebook-compose>summary::before{content:'';flex:none;width:0;height:0;border-style:solid;border-width:5px 0 5px 7px;border-color:transparent transparent transparent currentColor;transition:transform .15s ease}
+.silm-reading details[open]>summary::before,#silm-route-guidance details[open]>summary::before,.silm-comparison-limits[open]>summary::before,.silm-comparison-details[open]>summary::before,.silm-notebook-compose[open]>summary::before{transform:rotate(90deg)}
+@media (prefers-reduced-motion:reduce){.silm-reading summary::before,#silm-route-guidance summary::before{transition:none}}
+/* Impressão: o atalho "Ir para o conteúdo" nunca vai para o papel. */
+@media print{.skip{display:none!important}}
+/* Títulos longos no cabeçalho das docas ("Cálculos cristalográficos", "Instrumentos de medição") quebram com hífen em
+   vez de serem cortados entre os botões. */
+.si-dock-header h2{overflow-wrap:anywhere;hyphens:auto;-webkit-hyphens:auto;line-height:1.2}

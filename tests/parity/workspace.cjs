@@ -108,7 +108,7 @@ module.exports=async(browser,url)=>{
   // Dados: título do SIAB, três consultas, registros rotulados e seção Relatório.
   await p.locator('[data-open-dock="dados"]').click();await p.waitForFunction(()=>document.getElementById('si-right-title')?.textContent==='Dados da investigação','',{timeout:4000});
   assert.deepEqual(await p.evaluate(()=>[...document.querySelectorAll('[data-silm-data-open] strong')].map(x=>x.textContent)),['Dados do metal','Medições e cálculos','Arquivos da investigação']);
-  assert.equal(await p.locator('#silm-record-count').innerText(),'1 medições · 1 cálculos');
+  assert.equal(await p.locator('#silm-record-count').innerText(),'1 medição · 1 cálculo');
   const docs=await p.evaluate(()=>{const box=document.querySelector('#silm-data-catalog .silm-data-documents');return {title:box.querySelector('h3').textContent,links:[...box.querySelectorAll('a')].map(a=>({text:a.textContent,href:a.getAttribute('href'),h:a.getBoundingClientRect().height,w:a.getBoundingClientRect().width,box:box.getBoundingClientRect().width}))};});
   assert.equal(docs.title,'Relatório');assert.deepEqual(docs.links.map(l=>[l.text,l.href]),[['Abrir relatório','#/relatorios'],['Abrir Caderno','#/caderno']]);
   for(const l of docs.links){assert.ok(l.h>=44,'Ação de documento com 44 px');assert.ok(l.w>=l.box-2,'Ação de documento em largura total, como no SIAB');}

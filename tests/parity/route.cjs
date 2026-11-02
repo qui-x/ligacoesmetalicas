@@ -1,11 +1,11 @@
 'use strict';
 /* TEST-ROUTE — Etapa 4 do plano de paridade SIAB × SILM (docs/PLANO-OPERACIONAL-PARIDADE-SIAB-SILM.md).
    Roteiros como o SIAB 1.0.0 organiza: lista com o módulo à direita; roteiro em coluna de leitura (problema, objetivo,
-   o que você vai fazer, na oficina/bancada, o que observar) com identificação antes de montar; painel do roteiro na
-   Oficina com evidência e relatório. Confere módulo único, identificação na sessão e no relatório, restrição e sessão. */
+   o que você vai fazer, na oficina/bancada, o que observar) com identificação antes de montar. Montar prepara a oficina
+   livre, sem trava, e o estudante termina no relatório, que traz o roteiro e a identificação. */
 const assert=require('node:assert/strict');
 const SIZES=[[1366,768],[1024,768],[390,844],[320,640],[844,390]];
-const SECTIONS=['O problema','Objetivo','O que você vai fazer','Na oficina','O que observar','Critério de conclusão'];
+const SECTIONS=['O problema','Objetivo','O que você vai fazer','Na oficina','O que observar','Evidência esperada'];
 module.exports=async(browser,url)=>{
  const base=url.split('#')[0]+'index.html';const errors=[];
  const open=async(ctx,hash)=>{const p=await ctx.newPage();p.setDefaultTimeout(12000);p.on('pageerror',e=>errors.push(e.message));await p.goto(base+hash);await p.waitForFunction(()=>window.SILMIntegration);return p;};
@@ -37,39 +37,31 @@ module.exports=async(browser,url)=>{
    assert.ok(d.overflow<=1,'Roteiro sem rolagem lateral em '+where+': '+d.overflow+' px');
   }finally{await ctx.close();}
  }
- /* 2. Módulo único, identificação, montagem, painel, restrição, relatório e conclusão. */
+ /* 2. Como no SIAB: montar prepara a oficina livre (módulo inicial do roteiro, sem trava), a identificação vai para o relatório e a lista mostra o roteiro montado. */
  const ctx=await browser.newContext({viewport:{width:1366,height:900},reducedMotion:'reduce'});
  try{
   const p=await open(ctx,'#/roteiros');
-  assert.ok(await p.evaluate(()=>SILM.routes.registry.every(r=>['explorar','medir','calcular'].includes(r.module)&&r.secondaryModule===undefined)),'Cada roteiro tem exatamente um módulo');
+  assert.ok(await p.evaluate(()=>SILM.routes.registry.every(r=>['explorar','medir','calcular'].includes(r.module)&&r.secondaryModule===undefined)),'Cada roteiro indica exatamente um módulo inicial');
   await p.locator('#route-card-ordem-metal').click();await p.waitForFunction(()=>document.activeElement?.id==='route-title','',{timeout:4000});
   await p.goto(base+'#/roteiros?item=nao-existe');await visible(p,'#silm-route-catalog .silm-content-row');assert.equal(await p.locator('#silm-routes-head').isVisible(),true,'Roteiro inexistente volta à lista');
   await p.goto(base+'#/roteiros?item=ordem-metal');await visible(p,'#route-mount');
   const id={name:'Ana Souza',className:'2º A',teacher:'Prof. Lima',group:'3'};
   for(const [k,v] of Object.entries(id))await p.locator('#route-id-'+k).fill(v);await p.locator('#route-id-date').fill('2026-10-31');await p.locator('#route-metal').selectOption('29');
-  await p.locator('#route-mount').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>location.hash==='#/ambiente');
-  const report=await p.evaluate(()=>SILMIntegration.activity().current.report);
-  for(const [k,v] of Object.entries(id))assert.equal(report[k],v,'Identificação na sessão: '+k);assert.equal(report.date,'31/10/2026','Data no formato do relatório');
-  assert.equal(await p.evaluate(()=>SILMIntegration.snapshot().module.active),'explorar','Módulo do roteiro fixado');
-  const panel=async()=>{if(await p.locator('#si-dock-left').isHidden())await p.locator('[data-open-dock="montagem"]').click();const tab=p.locator('[data-left-tab="missao"]');if(await tab.getAttribute('aria-pressed')!=='true')await tab.click();await visible(p,'#route-feedback');};
-  await panel();assert.equal(await p.locator('[data-left-tab="missao"]').innerText(),'Roteiro');assert.match(await p.locator('#silm-route-guidance .eyebrow').innerText(),/ROTEIRO · EM ANDAMENTO/i);
-  assert.equal(await p.locator('#silm-route-guidance .silm-evidence li strong').innerText(),'Pendente');assert.equal(await p.locator('#route-complete').isDisabled(),true);
-  // Restrição: fora do contexto, outra tela volta para o roteiro.
-  await p.evaluate(()=>{location.hash='#/missoes';});await p.waitForFunction(()=>location.hash==='#/roteiros?item=ordem-metal');await visible(p,'#route-resume');await p.locator('#route-resume').click();await p.waitForFunction(()=>location.hash==='#/ambiente');
-  await p.locator('#silm-crystal-view-lattice').click();await panel();
-  await p.waitForFunction(()=>document.querySelector('#silm-route-guidance .silm-evidence li')?.dataset.met==='true','',{timeout:4000});assert.equal(await p.locator('#route-complete').isEnabled(),true);
-  // Relatório: a identificação aparece no relatório da sessão.
-  await p.locator('#route-report').click();await p.waitForFunction(()=>location.hash.startsWith('#/relatorios'));await visible(p,'#report-name');
-  assert.equal(await p.locator('#report-name').inputValue(),id.name);assert.equal(await p.locator('#report-className').inputValue(),id.className);assert.equal(await p.locator('#report-teacher').inputValue(),id.teacher);assert.equal(await p.locator('#report-group').inputValue(),id.group);
+  await p.locator('#route-mount').click();await p.waitForFunction(()=>location.hash==='#/ambiente');// Sem investigação: monta direto.
+  assert.equal(await p.evaluate(()=>SILMIntegration.activity().current),null,'Sem atividade restrita');assert.equal(await p.evaluate(()=>SILMIntegration.snapshot().module.active),'explorar','Módulo inicial do roteiro');
+  // Sem painel de atividade nem trava: a aba da atividade não aparece e as outras telas abrem.
+  assert.equal(await p.locator('[data-left-tab="missao"]').isVisible(),false,'Sem painel de atividade');
+  await p.evaluate(()=>{location.hash='#/missoes';});await visible(p,'#silm-mission-catalog .silm-content-row');assert.equal(await p.evaluate(()=>location.hash),'#/missoes');
+  // Relatório: a identificação e o título do roteiro.
+  await p.evaluate(()=>{location.hash='#/relatorios';});await visible(p,'#report-name');
+  assert.equal(await p.locator('#silm-route-report h1').innerText(),'Relatório — '+await p.evaluate(()=>SILM.routes.get('ordem-metal').title));
+  assert.equal(await p.locator('#report-name').inputValue(),id.name);assert.equal(await p.locator('#report-className').inputValue(),id.className);assert.equal(await p.locator('#report-teacher').inputValue(),id.teacher);assert.equal(await p.locator('#report-group').inputValue(),id.group);assert.equal(await p.locator('#report-date').inputValue(),'31/10/2026','Data no formato do relatório');
   assert.equal(await p.locator('#silm-route-report .silm-identity legend').textContent(),'Identificação','Relatório com o bloco de identificação');
-  await p.goto(base+'#/ambiente');await panel();await p.locator('#route-complete').click();await p.waitForFunction(()=>SILMIntegration.activity().current?.activityContext.status==='completed');
-  await visible(p,'#route-feedback');assert.match(await p.locator('#route-feedback').innerText(),/Concluído/);
-  await p.locator('#route-close').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>!SILMIntegration.activity().current);
-  // A identificação fica guardada para a próxima montagem (preservada durante o uso); a lista mostra a conclusão.
-  await p.goto(base+'#/roteiros');await visible(p,'#route-card-ordem-metal');assert.match(await p.locator('#route-card-ordem-metal .silm-row-status').innerText(),/Explorar · Concluído/);
+  // A lista mostra o roteiro montado; a identificação fica guardada para a próxima montagem.
+  await p.goto(base+'#/roteiros');await visible(p,'#route-card-ordem-metal');assert.equal(await p.locator('#route-card-ordem-metal .silm-row-status').innerText(),'Explorar · Montado na oficina');
   await p.goto(base+'#/roteiros?item=volume-celula');await visible(p,'#route-id-name');assert.equal(await p.locator('#route-id-name').inputValue(),id.name);assert.equal(await p.locator('#route-id-date').inputValue(),'2026-10-31');
   await p.locator('#route-back').click();await p.waitForFunction(()=>document.activeElement?.id==='route-card-volume-celula','',{timeout:4000});
  }finally{await ctx.close();}
  assert.deepEqual(errors,[]);
- console.log('PASS TEST-ROUTE: lista e roteiro em 5 tamanhos, módulo único, identificação na sessão e no relatório, painel com evidência, restrição, conclusão e retorno com foco.');
+ console.log('PASS TEST-ROUTE: lista e roteiro em 5 tamanhos, módulo inicial, montagem na oficina livre sem trava, identificação e título do roteiro no relatório, roteiro montado na lista e retorno com foco.');
 };

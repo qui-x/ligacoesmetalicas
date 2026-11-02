@@ -61,11 +61,11 @@ module.exports=async(browser,url)=>{
   const why=await p.evaluate(()=>{const R=SILM.readyAssemblies,item=R.get('cobre-cfc');return {changed:R.describe({...item,expectedType:'HCP'}),gone:R.describe({...item,atomicNumber:1})};});
   assert.deepEqual([why.changed.available,why.changed.reasonCode,why.gone.available,why.gone.reasonCode],[false,'STRUCTURE_CHANGED',false,'METAL_UNAVAILABLE']);
  }finally{await ctx.close();}
- /* 3. Em atividade, a tela não abre (como no SIAB, a montagem pronta é da bancada livre). */
+ /* 3. Numa missão (atividade restrita), a tela não abre (como no SIAB, a montagem pronta é da bancada livre). */
  const act=await browser.newContext({viewport:{width:1366,height:900},reducedMotion:'reduce'});
  try{
-  const p=await open(act,'#/roteiros?item=ordem-metal');await p.locator('#route-mount').waitFor();await p.locator('#route-metal').selectOption('29');await p.locator('#route-mount').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>location.hash==='#/ambiente');
-  await p.evaluate(()=>{location.hash='#/montagens';});await p.waitForFunction(()=>location.hash.startsWith('#/roteiros'));
+  const p=await open(act,'#/missoes?item=vizinhos-metal');await p.locator('#mission-mount').waitFor();await p.locator('#mission-metal').selectOption('29');await p.locator('#mission-mount').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>location.hash==='#/ambiente');
+  await p.evaluate(()=>{location.hash='#/montagens';});await p.waitForFunction(()=>location.hash.startsWith('#/missoes'));
   assert.match(await p.locator('#si-notifications').innerText(),/Encerre a atividade para abrir outras telas/);
  }finally{await act.close();}
  assert.deepEqual(errors,[]);

@@ -58,8 +58,8 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
    inputs.push({key:spec.key,symbol:spec.symbol,name:spec.name,value:v,unit:spec.unit,origin:o.origin,ref:o.ref});
   }
   const r=model.addCalculation(f.id,inputs);
-  if(r.ok)say('Calculado pelo SILM: '+f.outputSymbol+' = '+result(r.calculation));
-  else say(calcHelp(r.reason),'warning');
+  if(r.ok)say('Calculado pelo SILM: '+f.outputSymbol+' = '+result(r.calculation),'info',{group:'calcular'});
+  else say(calcHelp(r.reason),'warning',{group:'calcular'});
   change();
  }
  function pick(id){
@@ -67,9 +67,9 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
   picks.push(id);
   if(picks.length===MS.types[tool].points){
    const r=model.addMeasurement(tool,picks);picks=[];
-   if(r.ok){review=r.measurement.id;say('Medida do modelo: '+value(r.measurement)+(tool==='coordination'&&general()?' '+shellText(id):''));if(tool==='coordination')model.setCrystalRepresentation({neighbors:true,selectedUnitId:id});}
-   else say(measureHelp(r.reason),'warning');
-  }else say('Ponto '+picks.length+' selecionado. Selecione o próximo ponto da medida.');
+   if(r.ok){review=r.measurement.id;say('Medida do modelo: '+value(r.measurement)+(tool==='coordination'&&general()?' '+shellText(id):''),'info',{group:'medir'});if(tool==='coordination')model.setCrystalRepresentation({neighbors:true,selectedUnitId:id});}
+   else say(measureHelp(r.reason),'warning',{group:'medir'});
+  }else say('Ponto '+picks.length+' selecionado. Selecione o próximo ponto da medida.','info',{group:'medir'});
   change();
  }
  /* Estrutura geral: o número de vizinhos depende do critério de distância, então a medida diz qual é a primeira camada e
@@ -96,7 +96,7 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
    host.append(node('p','Medições e cálculos usam o modelo cristalográfico em escala física. Zoom e projeção não alteram os valores.'));
    if(!available())host.append(node('p',model.measurementAvailability().reason==='DEFORMED'?'Restaure a experiência de deformação em Explorar para medir ou calcular a estrutura de referência.':'Organize uma estrutura cristalina em Explorar para usar este módulo. A montagem livre não tem escala física.'));
    else if(state.module.active==='medir'){
-    field(host,'Instrumento',select('silm-instrument',[['','Escolha um instrumento'],...Object.entries(MS.types).filter(([k])=>allowed(k)).map(([k,t])=>[k,t.label])],tool||'',v=>{tool=v||null;picks=[];review=null;change();say(v?'Selecione '+points(MS.types[v].points)+' na cena.':'Instrumento desligado.');}));
+    field(host,'Instrumento',select('silm-instrument',[['','Escolha um instrumento'],...Object.entries(MS.types).filter(([k])=>allowed(k)).map(([k,t])=>[k,t.label])],tool||'',v=>{tool=v||null;picks=[];review=null;change();say(v?'Selecione '+points(MS.types[v].points)+' na cena.':'Instrumento desligado.','info',{group:'medir'});}));
     field(host,'Unidade de comprimento',select('silm-measure-unit',Object.keys(U.length).map(k=>[k,k]),unit,v=>{unit=v;change();}));
     host.append(node('p',tool?'Selecionados: '+picks.length+' de '+MS.types[tool].points+'. Para ângulos, B é o vértice.':'Selecione um instrumento para medir na cena.'));
     host.append(button('Cancelar seleção',()=>{tool=null;picks=[];change();}));

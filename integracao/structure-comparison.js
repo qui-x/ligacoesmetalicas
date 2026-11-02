@@ -38,7 +38,7 @@ SILM.createStructureComparison=({storage,host})=>{
  const note=N('p','Até seis estruturas recentes. Cada uma usa sua referência; não há escala comum.');note.className='silm-comparison-intro';
  const limits=document.createElement('details');limits.className='silm-comparison-limits';
  const limitsTitle=N('summary','Limites da comparação');
- const limitsText=N('p','A intensidade é didática. As cenas não permitem classificar qual metal conduz ou deforma mais. Algumas estruturas são apenas visualizações de referência e ainda não dispõem de medições e cálculos na bancada.');
+ const limitsText=N('p','A intensidade é didática. As cenas não permitem classificar qual metal conduz ou deforma mais.');
  limits.append(limitsTitle,limitsText);
  const cards=N('div');cards.className='silm-comparison-cards';host.append(controls,note,limits,cards);
  select.onchange=()=>{property=select.value;render();};
@@ -71,7 +71,7 @@ SILM.createStructureComparison=({storage,host})=>{
     const details=document.createElement('details');details.className='silm-comparison-details';details.append(N('summary','Fonte e limites'));
     const detailBody=N('div');let sourceTitle=g.source;try{sourceTitle=S.data.source(g.source)?.title||g.source;}catch(_){}
     detailBody.append(N('p','Fonte: '+(sourceTitle||'Não informada')+'.'));
-    if(!g.canonical)detailBody.append(N('p','Célula de referência construída a partir dos sítios e das operações de simetria registrados. Medições e cálculos desta estrutura ainda não estão disponíveis na bancada.'));
+    if(!g.canonical)detailBody.append(N('p','Célula de referência construída a partir dos sítios e das operações de simetria registrados. Medições e cálculos desta estrutura ainda não estão disponíveis na oficina.'));
     details.append(detailBody);card.append(details);
    }else{
     card.append(N('h3',e.name+' ('+e.symbol+')'),N('p','Geometria de referência indisponível.'));

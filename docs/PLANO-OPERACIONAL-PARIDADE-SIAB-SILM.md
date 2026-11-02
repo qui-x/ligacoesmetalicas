@@ -209,6 +209,7 @@ Não marcar uma tela como concluída apenas porque o texto foi encurtado ou o HT
 - [x] `ROUTE-08` — 5 roteiros: 3 Explorar, 1 Medir, 1 Calcular; 48 metais nos cristalinos e 57 no de elétrons (`docs/COBERTURA-ROTEIROS.md`).
 - [x] `ROUTE-09` — Roteiro inexistente volta à lista; metais sem estrutura fora dos roteiros cristalinos; instrumentos fora do roteiro ocultos ou desativados; conclusão bloqueada até a evidência.
 - [x] `ROUTE-10` — `tests/parity/route.cjs` (TEST-ROUTE) em `npm run test:parity`.
+- Revisão de 02/11/2026 (decisão do autor, "Como no SIAB"): o roteiro passou a montar a oficina livre, como `montarExperimento` do SIAB. ROUTE-05 e ROUTE-06 valem agora como "módulo inicial", sem restrição nem conclusão; o painel e a conclusão com evidência ficam nas Missões e nas atividades do professor. ROUTE-02 usa "Evidência esperada" no lugar de "Critério de conclusão" e ROUTE-07 abre o relatório pela Oficina (Dados → Relatório), com o título e a proposta do roteiro. Testes: `tests/routes-browser.cjs` e TEST-ROUTE.
 
 **Aceite da etapa:** os roteiros têm navegação, identificação, preparação e detalhe comparáveis ao SIAB, mas descrevem procedimentos próprios de investigação de metais.
 
