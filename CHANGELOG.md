@@ -1,3 +1,24 @@
+## Em desenvolvimento — Oficina remodelada: docas e cena maior (computador e celular)
+
+- **Computador:**
+  - A cena ocupa toda a altura da Oficina. Em 1920×1080, o quadrado passou de 679 para 859 px.
+  - O nome do metal, as ferramentas da vista (Célula, Rede, vizinhos e projeção), os controles da experiência e as notas ficam numa coluna lateral.
+  - As docas Montagem, Ver e Dados abrem ao lado da cena e empurram o conteúdo, em vez de cobrir as ferramentas. Uma regra do SILM anulava o empurrão da Base.
+  - Corrigida a barra de rolagem horizontal no rodapé da cena: as notas "Como ler esta cena" começavam fora da tela.
+  - O título das docas quebra entre palavras, nunca no meio ("Propriedad es").
+- **Celular:**
+  - Cabeçalho compacto: o nome fica numa linha, e as ferramentas numa faixa que desliza para o lado.
+  - A cena mantém a largura útil.
+  - Os **controles da experiência aparecem embaixo da cena.** Antes ficavam escondidos, e o painel, que é modal na Base, bloqueava a cena a cada ação.
+  - O painel de baixo ficou mais baixo, e a estrutura continua visível como referência.
+- **"Como ler esta cena"** fica fechado numa linha, no fim da coluna lateral ou abaixo dos controles no celular, e o programa lembra a escolha do aluno. O texto continua necessário:
+  - descreve os comandos de teclado e de toque para leitores de tela, porque cada unidade aponta para ele;
+  - traz o aviso de representação didática, sem escala física.
+- **Expandir (tela cheia):**
+  - em telas largas, também usa a cena em toda a altura, com o cabeçalho ao lado;
+  - no celular, o botão saiu de cima da cena, onde cobria um átomo do canto, e foi para a faixa de ferramentas.
+- Manual (Interface → Painéis e telas menores) atualizado. O teste de docas passou a conferir que a doca fica ao lado da cena, sem cobri-la. No celular, o painel de baixo continua sem alterar a cena.
+
 ## Em desenvolvimento — Pendências da paridade, revisão da jornada do estudante e roteiros como no SIAB
 
 - **Roteiros Experimentais como no SIAB.** "Montar na oficina" prepara a oficina livre com o metal, a estrutura inicial e o módulo do roteiro. Não há trava de navegação, de recursos ou de módulo, nem "Concluir roteiro" ou "Encerrar atividade": o estudante usa todos os painéis e termina no relatório (Dados → Relatório), que traz o título, o problema, os objetivos, as fontes do roteiro e a identificação preenchida antes de montar.
