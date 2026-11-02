@@ -59,8 +59,13 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
    return;}
   const p=pr[active],L=P.limits;head.textContent=P.catalog[active].title;
   const show=(...ids)=>{for(const [k,b]of Object.entries(B))b.hidden=!ids.includes(k);};
-  if(active==='electrical'){show('field','restore','end');B.field.textContent=p.field?'Remover campo':'Aplicar campo elétrico';B.field.setAttribute('aria-pressed',String(p.field));}
-  if(active==='thermal'){show('heat','advance','restore','end');B.heat.textContent=p.heating?'Desligar fonte de calor':'Aquecer região';B.heat.setAttribute('aria-pressed',String(p.heating));B.advance.setAttribute('aria-disabled',String(!p.heating||p.stage>=L.heatStages||!editable));}
+  // Calor + corrente (0.17.x): na estrutura cristalina, a condutividade elétrica também tem a fonte de calor.
+  const combined=active==='electrical'&&!!info().thermal?.combined;
+  if(combined){B.heat.textContent=info().thermal.on?'Desligar fonte de calor':'Ligar fonte de calor';B.heat.setAttribute('aria-pressed',String(!!info().thermal.on));}
+  if(active==='electrical'){show('field',...(combined?['heat']:[]),'restore','end');B.field.textContent=p.field?'Remover campo':'Aplicar campo elétrico';B.field.setAttribute('aria-pressed',String(p.field));}
+  // 0.17.x: no modo contínuo, o calor avança sozinho no tempo; não há "Avançar propagação".
+  if(active==='thermal'&&info().thermal){show('heat','restore','end');B.heat.textContent=p.heating?'Desligar fonte de calor':'Ligar fonte de calor';B.heat.setAttribute('aria-pressed',String(p.heating));}
+  else if(active==='thermal'){show('heat','advance','restore','end');B.heat.textContent=p.heating?'Desligar fonte de calor':'Aquecer região';B.heat.setAttribute('aria-pressed',String(p.heating));B.advance.setAttribute('aria-disabled',String(!p.heating||p.stage>=L.heatStages||!editable));}
   // 0.17.x: na deformação contínua, a força vem da prensa ou da garra na cena (arraste ou teclado); o botão faz um pulso completo.
   const r=info().deformation||null;
   if(active==='malleability'){show('compress','restore','end');B.compress.setAttribute('aria-disabled',String(p.compression>=L.compression||!editable));B.compress.textContent=r?'Comprimir até deslizar ('+p.compression+'/'+L.compression+')':p.compression?'Comprimir mais ('+p.compression+'/'+L.compression+')':'Aplicar compressão';}
@@ -68,7 +73,7 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   if(active==='luster'){show('light','restore','end');B.light.textContent=p.light?'Apagar luz':'Incidir luz';B.light.setAttribute('aria-pressed',String(p.light));}
   for(const k of ['field','heat','light','restore','end'])if(!B[k].hidden&&k!=='end')B[k].setAttribute('aria-disabled',String(!editable));
   B.end.setAttribute('aria-disabled','false');
-  const n=P.narrative(active,p,{reduced,electronsVisible:!!state.electrons?.representation.visible,deformation:info().deformation||null});if(status.textContent!==n.observation)status.textContent=n.observation;
+  const n=P.narrative(active,p,{reduced,electronsVisible:!!state.electrons?.representation.visible,deformation:info().deformation||null,thermal:info().thermal||null});if(status.textContent!==n.observation)status.textContent=n.observation;
  }
  for(const b of Object.values(B))row.append(b);update();return Object.freeze({root:box,update});
 };

@@ -1674,7 +1674,7 @@
     "doi": null,
     "accessedAt": "2026-11-02",
     "license": "Direitos da publicação original; fatos transcritos com atribuição.",
-    "notes": "Sistemas de deslizamento usados pela experiência de deformação do SILM (P1 do plano de propriedades): CFC {111}⟨110⟩ (12 sistemas), CCC {110}⟨111⟩ (12) e HC basal {0001}⟨1 1 −2 0⟩ (3). O SILM usa um sistema representativo de cada família, com b e a distância entre planos calculados dos parâmetros de rede do banco. Fonte escolhida pelo autor em 02/11/2026. PENDENTE: edição, número da tabela e página a conferir pelo autor no livro; a URL é a página geral da editora, porque a rede deste ambiente bloqueou o acesso à página do livro.",
+    "notes": "Sistemas de deslizamento usados pela experiência de deformação do SILM (P1 do plano de propriedades): CFC {111}⟨110⟩ (12 sistemas), CCC {110}⟨111⟩ (12) e HC basal {0001}⟨1 1 −2 0⟩ (3). O SILM usa um sistema representativo de cada família, com b e a distância entre planos calculados dos parâmetros de rede do banco. Também usado, de forma qualitativa, para o efeito da temperatura na condução elétrica (regra de Matthiessen: a resistividade de um metal soma contribuições térmica, de impurezas e de deformação; a térmica cresce com a temperatura), no capítulo de propriedades elétricas. Fonte escolhida pelo autor em 02/11/2026. PENDENTE: edição, número da tabela e página a conferir pelo autor no livro; a URL é a página geral da editora, porque a rede deste ambiente bloqueou o acesso à página do livro.",
     "type": "conceitual"
   }
 ]

@@ -1,3 +1,39 @@
+## Em desenvolvimento — Propriedades juntas: calor + corrente
+
+- Pedido do autor: demonstrar propriedades metálicas acontecendo juntas. Ele escolheu começar por **calor + corrente**.
+- Na **condutividade elétrica**, com a estrutura cristalina, a mesma **fonte de calor** da condução térmica fica disponível: na cena (toque, arraste e teclado) e no botão "Ligar fonte de calor".
+- **Efeito cruzado** (regra de Matthiessen, Callister & Rethwisch): nas regiões quentes, os elétrons mudam de direção com mais frequência e a deriva média sob o campo fica menor. É a resistividade aumentando com a temperatura.
+  - A rapidez de cada elétron não muda, porque nos metais ela praticamente não depende da temperatura. O que muda é a frequência do espalhamento.
+  - Os fatores são didáticos e iguais para todos os metais. O texto e os limites da experiência dizem isso.
+- A fonte, nessa combinação, é transitória e não altera o formato do estado salvo. Restaurar a desliga e volta ao ambiente.
+- Testes:
+  - `tests/thermal.cjs`: o espalhamento cresce e a deriva diminui com a temperatura, sem mudança quando não há calor;
+  - TEST-THERMAL: a fonte aparece na condutividade elétrica, não é gravada, a camada de elétrons recebe a temperatura, o texto explica a resistividade e Restaurar desliga.
+
+## Em desenvolvimento — Condução térmica contínua (P2)
+
+- **Fonte de calor na cena.** O aluno arrasta a fonte até qualquer ponto da estrutura e toca nela para ligar ou desligar. Com a fonte em foco, Enter liga e desliga, e as setas a movem.
+- **O calor avança sozinho, sem etapas.** A energia passa de cada centro para os vizinhos imediatos mais frios, pela equação do calor discreta no grafo de vizinhos da geometria do banco. A região perto da fonte esquenta primeiro.
+  - Sem fonte, a temperatura fica uniforme (equilíbrio térmico), e a energia que entrou continua na estrutura.
+  - Os níveis aparecem em anéis, brilho e vibração nas unidades, e em cor na rede extensa.
+- "Avançar propagação" saiu, e Restaurar volta à temperatura ambiente.
+- Limites declarados: o coeficiente é didático e igual para todos os metais (o banco não tem condutividade térmica com fonte), a escala de tempo é a da animação e não há perdas para o ambiente.
+- Testes: `tests/thermal.cjs` (invariantes físicos, em `test:scientific`) e TEST-THERMAL (navegador).
+
+## Em desenvolvimento — Origem da célula num centro metálico (Np, Pu e Bi)
+
+- Pedido e decisão do autor: no netúnio (ortorrômbica, Pmcn), no plutônio (monoclínica, P2₁/m) e no bismuto (cela hexagonal), a célula desenhada não tinha centros nos vértices. O banco segue a origem padrão do grupo espacial, como na ficha cristalográfica, e nessas estruturas essa origem não cai sobre um átomo.
+  - Agora a célula começa no primeiro centro da ficha, e os vértices passam a ter centros, como no CCC e no CFC.
+  - É só a escolha da origem, que é convenção: vetores, Z, simetria, distâncias, ângulos e contagem são os mesmos.
+  - Contagem geométrica, conferindo com Z:
+    - Np: 8 × 1/8 + 6 × 1/2 + 4 = 8;
+    - Pu: 8 × 1/8 + 14 × 1/2 + 8 = 16;
+    - Bi: 8 × 1/8 + 4 × 1/4 + 4 = 6.
+  - A legenda da cena informa o deslocamento em frações da célula.
+- As estruturas que já tinham um centro na origem (Mn, Sn, Sm, Am, Pa e Po) não mudam.
+- Uma investigação com Np, Pu ou Bi organizada e salva antes desta versão não é restaurada. O SILM avisa e preserva o arquivo original. Basta organizar de novo.
+- `tests/structure-audit.cjs` confere que há um centro na origem da célula desenhada e calcula a vizinhança exaustiva com a mesma origem.
+
 ## Em desenvolvimento — Oficina remodelada: docas e cena maior (computador e celular)
 
 - **Computador:**
