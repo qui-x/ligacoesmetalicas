@@ -197,3 +197,15 @@ Cada etapa traz os testes da seção 5, a atualização do Manual ("Propriedades
 - **Testes:**
   - `tests/thermal.cjs` (Cu, Fe, Mg e Np): grafo simétrico de vizinhos imediatos, energia conservada sem fonte, equilíbrio uniforme, a fonte aquece primeiro os vizinhos e as temperaturas ficam em [0, 1];
   - TEST-THERMAL, no navegador.
+
+## 9. Propriedades juntas (P7, iniciada com calor + corrente)
+
+- **Pedido do autor (02/11/2026):** demonstrar o que acontece quando várias propriedades ocorrem juntas. Ele escolheu começar por calor + corrente.
+- **Ciência (qualitativa):** a regra de Matthiessen diz que a resistividade de um metal é a soma de contribuições térmica, de impurezas e de deformação, e a térmica cresce com a temperatura (Callister & Rethwisch, capítulo de propriedades elétricas; edição e página a conferir pelo autor). A rapidez dos elétrons de condução praticamente não depende da temperatura; o que muda é a frequência do espalhamento.
+- **Implementação:**
+  - na condutividade elétrica (estrutura cristalina), a fonte de calor da P2 aquece a estrutura de forma transitória;
+  - a camada de elétrons usa a temperatura do centro mais próximo: o espalhamento é 1 + 3·T e a deriva é 1/(1 + 2·T);
+  - os fatores são didáticos, e T vai de 0 (ambiente) a 1 (fonte).
+- **Próximas combinações possíveis**, a decidir pelo autor:
+  - deformação + corrente (contribuição da deformação na regra de Matthiessen; efeito pequeno);
+  - corrente + calor como um só transporte (lei de Wiedemann–Franz: os mesmos elétrons levam carga e calor).

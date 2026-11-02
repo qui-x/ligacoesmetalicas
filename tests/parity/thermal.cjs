@@ -35,6 +35,23 @@ module.exports=async(browser,url)=>{
   await p.waitForFunction(()=>[...document.querySelectorAll('.silm-crystal-unit')].every(n=>!n.dataset.heat||n.dataset.heat==='0'),'',{timeout:4000});
   assert.equal((await p.evaluate(()=>SILMIntegration.snapshot().properties.thermal.heating)),false,'Restaurar desliga a fonte');
  }finally{await ctx.close();}
+ /* Calor + corrente (regra de Matthiessen): na condutividade elétrica, a mesma fonte aquece (transitória, sem gravar) e a
+    camada de elétrons recebe a temperatura local; o texto explica o aumento da resistividade; Restaurar volta ao ambiente. */
+ const combo=await browser.newContext({viewport:{width:1366,height:900},reducedMotion:'no-preference'});
+ try{
+  const p=await open(combo);await p.locator('#preset-cobre-cfc button').click();await p.waitForFunction(()=>SILMIntegration.snapshot().structure?.mode==='crystalline'&&location.hash==='#/ambiente');
+  await nav.viewer(p,'eletrons');await p.locator('#silm-electrons').click();
+  await nav.viewer(p,'propriedades');await p.locator('#silm-panel-property-start-electrical').click();await p.locator('#silm-panel-property-field').click();
+  assert.equal(await p.locator('#silm-panel-property-heat').innerText(),'Ligar fonte de calor','Fonte de calor na condutividade elétrica');
+  await p.locator('#silm-panel-property-heat').click();await p.locator('[data-close-dock="right"]').click();
+  assert.equal(await p.locator('.silm-heat-handle').getAttribute('aria-pressed'),'true');
+  assert.equal(await p.evaluate(()=>SILMIntegration.snapshot().properties.thermal.heating),false,'Calor da combinação é transitório (não gravado)');
+  await p.waitForFunction(()=>document.querySelector('.silm-electron-canvas')?.silmElectrons.snapshot().heat===true,'',{timeout:4000});
+  assert.match(await p.locator('#silm-scene-property-status').innerText(),/deriva média .* fica menor: a resistividade aumenta com a temperatura/);
+  await nav.viewer(p,'propriedades');await p.locator('#silm-panel-property-restore').click();
+  await p.waitForFunction(()=>document.querySelector('.silm-electron-canvas')?.silmElectrons.snapshot().heat===false,'',{timeout:4000});
+  assert.equal(await p.locator('#silm-panel-property-heat').innerText(),'Ligar fonte de calor','Restaurar desliga a fonte');
+ }finally{await combo.close();}
  /* Celular com movimento reduzido: sem animação, cada ação mostra o estado depois de 2 s de propagação. */
  const mob=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'reduce'});
  try{
@@ -43,5 +60,5 @@ module.exports=async(browser,url)=>{
   await p.waitForFunction(()=>[...document.querySelectorAll('.silm-crystal-unit')].some(n=>Number(n.dataset.heat)>=2),'',{timeout:4000});
  }finally{await mob.close();}
  assert.deepEqual(errors,[]);
- console.log('PASS TEST-THERMAL: fonte de calor na cena (toque, arraste e teclado), calor que avança sozinho a partir da fonte, equilíbrio uniforme depois de desligar, recarga, Restaurar, sem "Avançar propagação", celular e movimento reduzido.');
+ console.log('PASS TEST-THERMAL: fonte de calor na cena (toque, arraste e teclado), calor que avança sozinho a partir da fonte, equilíbrio uniforme depois de desligar, recarga, Restaurar, sem "Avançar propagação", celular e movimento reduzido; calor + corrente (fonte transitória, temperatura nos elétrons, resistividade maior, Restaurar).');
 };

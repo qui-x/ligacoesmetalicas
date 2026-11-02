@@ -1,3 +1,15 @@
+## Em desenvolvimento — Propriedades juntas: calor + corrente
+
+- Pedido do autor: demonstrar propriedades metálicas acontecendo juntas. Ele escolheu começar por **calor + corrente**.
+- Na **condutividade elétrica**, com a estrutura cristalina, a mesma **fonte de calor** da condução térmica fica disponível: na cena (toque, arraste e teclado) e no botão "Ligar fonte de calor".
+- **Efeito cruzado** (regra de Matthiessen, Callister & Rethwisch): nas regiões quentes, os elétrons mudam de direção com mais frequência e a deriva média sob o campo fica menor. É a resistividade aumentando com a temperatura.
+  - A rapidez de cada elétron não muda, porque nos metais ela praticamente não depende da temperatura. O que muda é a frequência do espalhamento.
+  - Os fatores são didáticos e iguais para todos os metais. O texto e os limites da experiência dizem isso.
+- A fonte, nessa combinação, é transitória e não altera o formato do estado salvo. Restaurar a desliga e volta ao ambiente.
+- Testes:
+  - `tests/thermal.cjs`: o espalhamento cresce e a deriva diminui com a temperatura, sem mudança quando não há calor;
+  - TEST-THERMAL: a fonte aparece na condutividade elétrica, não é gravada, a camada de elétrons recebe a temperatura, o texto explica a resistividade e Restaurar desliga.
+
 ## Em desenvolvimento — Condução térmica contínua (P2)
 
 - **Fonte de calor na cena.** O aluno arrasta a fonte até qualquer ponto da estrutura e toca nela para ligar ou desligar. Com a fonte em foco, Enter liga e desliga, e as setas a movem.

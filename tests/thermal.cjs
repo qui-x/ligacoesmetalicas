@@ -27,4 +27,10 @@ for(const symbol of ['Cu','Fe','Mg','Np']){
  assert.ok([...H].every(v=>v>=0&&v<=1),'Temperaturas em [0, 1] com fonte: '+symbol);
  checked++;
 }
-console.log('PASS thermal: '+checked+' estruturas (CFC, CCC, HC e ortorrômbica) — grafo simétrico de vizinhos imediatos, energia conservada sem fonte, equilíbrio uniforme, fonte aquece primeiro os vizinhos e temperaturas em [0, 1].');
+// Calor + corrente (regra de Matthiessen, qualitativa): mais espalhamento e menos deriva onde a rede está mais quente.
+{const vm=require('node:vm'),fs=require('node:fs');const box={window:{SILM:S},SILM:S,Math};vm.createContext(box);vm.runInContext(fs.readFileSync(__dirname+'/../domain/silm/electron-view.js','utf8'),box);
+ const ET=S.electronTransport;assert.ok(ET,'Transporte eletrônico exportado');let ps=0,pd=Infinity;
+ for(let t=0;t<=1.0001;t+=.1){const sc=ET.scatter(t),dr=ET.drift(t);assert.ok(sc>=ps&&dr<=pd,'Espalhamento cresce e deriva diminui com a temperatura');ps=sc;pd=dr;}
+ assert.equal(ET.scatter(0),1);assert.equal(ET.drift(0),1,'Sem calor, o movimento é o de antes');assert.ok(ET.drift(1)<1&&ET.drift(1)>0,'Com calor, a deriva diminui mas não some');
+ assert.equal(ET.scatter(-1),1);assert.equal(ET.drift(2),ET.drift(1),'Temperatura limitada a [0, 1]');}
+console.log('PASS thermal: '+checked+' estruturas (CFC, CCC, HC e ortorrômbica) — grafo simétrico de vizinhos imediatos, energia conservada sem fonte, equilíbrio uniforme, fonte aquece primeiro os vizinhos e temperaturas em [0, 1]; calor + corrente: espalhamento cresce e deriva diminui com a temperatura.');

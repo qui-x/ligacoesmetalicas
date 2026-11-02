@@ -10,13 +10,14 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
  const actions={
   start(id){if(!allows(id)||!editable())return;const r=model.startProperty(id);if(!r.ok)say(P.reasons[r.reason]||'Organize uma estrutura cristalina para esta experiência.','warning');schedule();},
   field:()=>change({field:!model.state.properties.electrical.field}),
-  heat:()=>change({heating:!model.state.properties.thermal.heating}),
+  // Calor + corrente: na condutividade elétrica, a fonte de calor é transitória (controlador térmico, sem gravar).
+  heat(){if(model.state.properties.active==='electrical'){const t=thermal();if(t&&editable()){t.setHeating(!t.reading().on);schedule();}return;}return change({heating:!model.state.properties.thermal.heating});},
   advance(){const p=model.state.properties.thermal;if(p.heating&&p.stage<P.limits.heatStages)return change({stage:p.stage+1});},
   compress(){if(!editable())return;const c=deform();if(c){const ok=c.pulse();schedule();return ok;}const p=model.state.properties.malleability;if(p.compression<P.limits.compression)return change({compression:p.compression+1});},
   stretch(){if(!editable())return;const c=deform();if(c){const ok=c.pulse();schedule();return ok;}const p=model.state.properties.ductility;if(p.elongation<P.limits.elongation)return change({elongation:p.elongation+1});},
 
   light:()=>change({light:!model.state.properties.luster.light}),
-  restore(){deform()?.setLoad(0);model.restoreProperty();thermal()?.reset();schedule();},end(){deform()?.setLoad(0);model.endProperty();schedule();}
+  restore(){deform()?.setLoad(0);model.restoreProperty();const t=thermal();if(t){t.setHeating(false);t.reset();}schedule();},end(){deform()?.setLoad(0);model.endProperty();schedule();}
  };
  // Uma leitura do estado por atualização (model.state devolve uma cópia completa).
  const info=()=>{const st=model.state;return {deformation:deform()?.reading()||null,thermal:thermal()?.reading()||null,state:st,eligibility:P.eligibility(st.metal?S.data.get(st.metal.atomicNumber):null),editable:st.module.active==='explorar',reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}};};

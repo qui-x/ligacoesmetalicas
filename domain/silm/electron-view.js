@@ -15,12 +15,17 @@ window.SILM=window.SILM||{};
    - 0.11.x: marcadores e centros ficam em coordenadas da cena; a câmera (setCamera) entra só no desenho. Aproximar,
      afastar ou deslocar não refaz a distribuição. Os limites seguem a estrutura (rede além da cena incluída). */
 SILM.electronLayerLimits=Object.freeze({min:24,max:150,maxSmall:80,perCenter:6,smallStage:360});
+/* Calor + corrente (0.17.x; regra de Matthiessen, Callister & Rethwisch): onde a rede está mais quente, os elétrons são
+   espalhados com mais frequência (a direção muda mais vezes) e a deriva média sob o campo diminui — a resistividade
+   aumenta com a temperatura. A rapidez de cada marcador NÃO muda (nos metais, a velocidade dos elétrons de condução
+   praticamente não depende da temperatura). Fatores didáticos, iguais para todos os metais; t ∈ [0, 1] (ambiente → fonte). */
+SILM.electronTransport=Object.freeze({scatter:t=>1+3*Math.max(0,Math.min(1,t)),drift:t=>1/(1+2*Math.max(0,Math.min(1,t)))});
 SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
  const L=SILM.electronLayerLimits;
  const canvas=document.createElement('canvas');canvas.className='silm-electron-canvas';canvas.setAttribute('aria-hidden','true');canvas.hidden=true;
  stage.insertBefore(canvas,before);
  const g2=canvas.getContext('2d');
- let particles=[],centers=[],bridges=[],radius=.1,visible=false,motion=false,field=false,wraps=0,frame=0,last=0,frames=0,cost=0,seed=1,colors=null,signature='',box=null;
+ let heat=false,particles=[],centers=[],bridges=[],radius=.1,visible=false,motion=false,field=false,wraps=0,frame=0,last=0,frames=0,cost=0,seed=1,colors=null,signature='',box=null;
  let width=0,height=0,dpr=1,cam={zoom:1,x:.5,y:.5},lim={x0:.01,y0:.01,x1:.99,y1:.99};
  /* Gerador determinístico: a distribuição estática é a mesma para a mesma estrutura. */
  const rng=()=>{seed=(seed+0x6D2B79F5)|0;let t=Math.imul(seed^(seed>>>15),1|seed);t=(t+Math.imul(t^(t>>>7),61|t))^t;return ((t^(t>>>14))>>>0)/4294967296;};
@@ -69,16 +74,16 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
   for(const p of particles){g2.beginPath();g2.arc(ox+p.x*sx,oy+p.y*sy,r,0,Math.PI*2);g2.fill();g2.stroke();}
  }
  function step(dt){
-  const speed=radius*2.2,diffusion=.6,n=target();
+  const speed=radius*2.2,diffusion=.6,n=target(),ET=SILM.electronTransport;
   if(particles.length>n){const i=particles.findIndex(p=>!p.hold);if(i>=0)particles.splice(i,1);}
   for(const p of particles){
    if(p.hold>0){p.hold-=dt;continue;}
-   p.a+=gauss()*Math.sqrt(2*diffusion*dt);
-   const drift=field?speed*.6:0;   // campo E para +x: deslocamento médio dos elétrons para −x
+   const t=p.t||0;p.a+=gauss()*Math.sqrt(2*diffusion*ET.scatter(t)*dt);
+   const drift=field?speed*.6*ET.drift(t):0;   // campo E para +x: deslocamento médio dos elétrons para −x (menor onde a rede está quente)
    p.x+=(Math.cos(p.a)*speed*(field?.75:1)-drift)*dt;p.y+=Math.sin(p.a)*speed*(field?.75:1)*dt;
    // Sob campo, quem sai a jusante (esquerda) reentra a montante (direita): fluxo contínuo pela estrutura.
    if(field&&box&&p.x<box.x0-radius*.5){p.x=box.x1+radius*.45;wraps++;if(nearest(p).d>1.2){const q=spawn();if(q){p.x=Math.max(q.x,box.x1-radius);p.y=q.y;}}continue;}
-   const {d,ref}=nearest(p);
+   const {d,ref}=nearest(p);p.t=ref?.t||0;
    if(d>1.6&&!(field&&box&&p.x<box.x0)){const q=spawn();if(q){p.x=q.x;p.y=q.y;}continue;}
    // Fora da região: vira suavemente de volta (sem reflexão em parede, sem órbita).
    if(d>1&&ref&&!(field&&box&&p.x<box.x0)){const back=Math.atan2(ref.y-p.y,ref.x-p.x);let delta=back-p.a;delta=Math.atan2(Math.sin(delta),Math.cos(delta));p.a+=delta*Math.min(1,dt*5);}
@@ -105,6 +110,8 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
    // estrutura); com movimento, os marcadores na região continuam e o conjunto se completa.
    if(!(visible&&motion&&!reducedMotion())){particles=[];seed=[...sig].reduce((h,c)=>Math.imul(h^c.charCodeAt(0),16777619),2166136261)|0;}reconcile();}
   if(centers.length){const xs=centers.map(c=>c.x);box={x0:Math.min(...xs),x1:Math.max(...xs)};}else box=null;
+  // Temperatura de cada centro (calor + corrente): muda sem refazer a distribuição.
+  if(list.length===centers.length)list.forEach((c,i)=>{centers[i].t=c.t||0;});heat=centers.some(c=>c.t>.01);
   // Cores lidas ao aparecer (e pelo observador de tema), não a cada atualização: getComputedStyle força o recálculo de estilos.
   const was=visible;visible=!!show&&centers.length>=SILM.electronModel.minUnits;motion=!!move;field=!!applied;if(visible&&(!was||!colors))readColors();sync();if(!effectiveMotion())draw();
  }
@@ -121,7 +128,7 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
  watcher.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-contrast','data-motion']});
  scope.cleanup(()=>{watcher.disconnect();if(frame)cancelAnimationFrame(frame);frame=0;particles=[];});
  // Diagnóstico somente leitura (testes): não expõe nem aceita estado científico.
- Object.defineProperty(canvas,'silmElectrons',{value:Object.freeze({snapshot:()=>({visible,running:!!frame,motion:effectiveMotion(),field,wraps,count:visible?particles.length:0,target:target(),frames,cost,radius,centers:centers.length,bridges:bridges.length,
+ Object.defineProperty(canvas,'silmElectrons',{value:Object.freeze({snapshot:()=>({visible,running:!!frame,heat,motion:effectiveMotion(),field,wraps,count:visible?particles.length:0,target:target(),frames,cost,radius,centers:centers.length,bridges:bridges.length,
   particles:visible?particles.map(p=>({x:p.x,y:p.y,dx:Math.cos(p.a),dy:Math.sin(p.a),vx:Math.cos(p.a)*(field?.75:1)-(field?.6:0),vy:Math.sin(p.a)*(field?.75:1)})):[],centerList:centers.map(c=>({...c})),camera:{...cam}})})});
  requestAnimationFrame(()=>resize());
  /* Câmera da representação: só o desenho muda (marcadores e centros continuam na cena). */

@@ -161,7 +161,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // Na deformação, a rede vira a amostra: todos os sítios do bloco, sem esmaecimento, deslizando com as unidades.
   const sys=specimen&&DF?DF.system(g):null,pr=scene.pr||{},n=pr?.active==='malleability'?pr.malleability.compression:pr?.active==='ductility'?pr.ductility.elongation:0;
   const out=[];for(const s of (specimen&&DF?DF.specimen(g):g.lattice())){if(occupied.has(s.key))continue;const q=layout.project(D(s.cart));if(specimen){out.push({q,fade:1,block:DF.block(sys,s.cart,n)});continue;}const T=scene.heatTemps?.get(s.key);if(q.x<w.x0-pad||q.x>w.x1+pad||q.y<w.y0-pad||q.y>w.y1+pad)continue;
-   const fade=Math.max(0,1-Math.hypot(q.x-cv.x,q.y-cv.y)/reach);if(fade<=.04)continue;out.push({q,fade:T===undefined?fade:Math.max(fade,.7),heat:T});}
+   const fade=Math.max(0,1-Math.hypot(q.x-cv.x,q.y-cv.y)/reach);if(fade<=.04)continue;out.push({q,fade:T===undefined?fade:Math.max(fade,.7),heat:T,key:s.key});}
   out.sort((a,b)=>b.fade-a.fade);return out.slice(0,LATTICE_CAP);
  }
  function drawLattice(sites){
@@ -241,7 +241,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // Calor e níveis: sempre sobre a projeção de referência (isométrica, congelada), para que a vista nunca mude a experiência.
   const refLayout=X.layout(g,[...g.cell.map(c=>c.cart),...(g.corners||[]),...list.map(u=>g.site(u.site).cart)].map(D),{margin:.12});
   const refCentres=list.map(u=>refLayout.project(D(g.site(u.site).cart))),refSpacing=d*refLayout.scale;
-  const continuous=!!thermalCtl&&active==='thermal';let heated=active==='thermal'&&(pr.thermal.heating||pr.thermal.stage>0),levels=[],sources=[],temps=null;
+  // Calor + corrente (0.17.x): a mesma fonte de calor também na condutividade elétrica (transitória, sem gravar).
+  const continuous=!!thermalCtl&&(active==='thermal'||active==='electrical');let heated=active==='thermal'&&(pr.thermal.heating||pr.thermal.stage>0),levels=[],sources=[],temps=null;
   if(continuous){
    // Grafo: as unidades e, na vista Rede, a rede extensa — com os vizinhos imediatos pela distância da geometria do banco.
    const sites=[...list.map(u=>g.site(u.site)),...(r.view==='lattice'?g.lattice().filter(s=>!list.some(u=>X.key(u.site)===s.key)):[])],ids=sites.map(s=>s.key);
@@ -251,8 +252,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    if(!thermalCtl.source){const units=proj.slice(0,list.length),left=units.reduce((a,p)=>p.x<a.x?p:a,units[0]);thermalCtl.setSource({x:left.x,y:left.y});}
    const src=thermalCtl.source,reach=Math.max(unitFraction*.9,d*layout.scale*.6),near=proj.map((p,i)=>[i,Math.hypot(p.x-src.x,p.y-src.y)]).filter(([,dd])=>dd<=reach).map(([i])=>i);
    if(!near.length){const best=proj.map((p,i)=>[i,Math.hypot(p.x-src.x,p.y-src.y)]).sort((a,b)=>a[1]-b[1])[0];if(best&&best[1]<=reach*2)near.push(best[0]);}
-   thermalCtl.sync();thermalCtl.setPinned(pr.thermal.heating?near:[]);temps=thermalCtl.temperatures();heated=true;
-   const pinned=new Set(pr.thermal.heating?near:[]);levels=list.map(u=>TH.level(temps.get(X.key(u.site))||0));sources=list.map((u,i)=>pinned.has(i));scene.heatTemps=temps;
+   thermalCtl.sync();const heatOn=thermalCtl.reading().on;thermalCtl.setPinned(heatOn?near:[]);temps=thermalCtl.temperatures();heated=active==='thermal'||[...temps.values()].some(v=>v>.01);scene.heatOn=heatOn;
+   const pinned=new Set(heatOn?near:[]);levels=list.map(u=>TH.level(temps.get(X.key(u.site))||0));sources=list.map((u,i)=>pinned.has(i));scene.heatTemps=temps;
   }else{scene.heatTemps=null;if(heated){levels=P.heat(refCentres,refSpacing,pr.thermal.stage);sources=P.heatSources(refCentres);}}
   const lit=new Set();if(active==='luster'&&pr.luster.light){const zs=list.map(u=>g.site(u.site).cart[2]),top=Math.max(...zs);list.forEach((u,i)=>{if(zs[i]>=top-.05)lit.add(u.id);});}
   // As fontes (região aquecida) ficam marcadas em qualquer projeção; a faixa "calor" só aparece onde elas estiverem à esquerda.
@@ -268,7 +269,9 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const fc=RD.fit(box,boxMargin),fa=RD.toScene(fc,{x:0,y:0}),fb=RD.toScene(fc,{x:1,y:1}),electronSites=latticeWindow({w:{x0:fa.x,y0:fa.y,x1:fb.x,y1:fb.y},c:{x:fc.x,y:fc.y},zoom:fc.zoom});
   const fieldOn=active==='electrical'&&pr.electrical.field;
   // A órbita atualiza a região projetada sem interromper a animação eletrônica.
-  electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:[...drawn,...electronSites.map(s=>s.q)],spacing:d*layout.scale,connect:false});
+  // Calor + corrente: cada centro leva a temperatura local (0 sem calor) para o espalhamento dos elétrons.
+  const tOf=k=>scene.heatTemps?.get(k)||0;
+  electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:[...drawn.map((q,i)=>({x:q.x,y:q.y,t:tOf(X.key(list[i].site))})),...electronSites.map(s=>({x:s.q.x,y:s.q.y,t:tOf(s.key)}))],spacing:d*layout.scale,connect:false});
   drawAxes();
   // Durante a animação da deformação, os controles e o texto são atualizados até 10 vezes por segundo (o desenho, a cada quadro).
   const busy=deforming&&!!deformCtl&&(r=>r.load>0||r.sliding||Math.abs(r.strain)>1e-3||(r.orient>1e-4&&r.orient<1-1e-4))(deformCtl.reading()),tNow=performance.now();
@@ -300,7 +303,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    plates={x0:(Math.min(...xs)-rr)*100,x1:(Math.max(...xs)+rr)*100,top:(Math.min(...ys)-rr)*100,bottom:(Math.max(...ys)+rr)*100};}
   // Fonte de calor (contínuo): na posição escolhida; ligada (contorno cheio) ou desligada (tracejado).
   const heaterOn=!!scene.continuousHeat&&!!thermalCtl?.source&&scene.module==='explorar';heater.hidden=!heaterOn;
-  if(heaterOn){const v=R.toView(thermalCtl.source),on=!!pr.thermal.heating;heater.style.left=Math.max(2,Math.min(98,v.x*100))+'%';heater.style.top=Math.max(2,Math.min(98,v.y*100))+'%';
+  if(heaterOn){const v=R.toView(thermalCtl.source),on=!!scene.heatOn;heater.style.left=Math.max(2,Math.min(98,v.x*100))+'%';heater.style.top=Math.max(2,Math.min(98,v.y*100))+'%';
    if(heater.dataset.on!==String(on)){heater.dataset.on=String(on);heater.setAttribute('aria-pressed',String(on));heater.setAttribute('aria-label','Fonte de calor: '+(on?'ligada':'desligada'));heater.title='Toque para '+(on?'desligar':'ligar')+'; arraste para mover. Teclado: Enter liga e desliga, setas movem.';}}
   const canPress=!!plates&&scene.module==='explorar';handle.hidden=!canPress;
   if(canPress){handle.style.left=Math.max(4,Math.min(96,(plates.x0+plates.x1)/2))+'%';handle.style.top=Math.max(3,Math.min(97,plates.top-2))+'%';handle.dataset.mode=reading.active;

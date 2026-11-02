@@ -10,7 +10,9 @@ window.SILM=window.SILM||{};
    - D é um coeficiente didático único, igual para todos os metais (o banco não tem condutividade nem difusividade
      térmica com fonte); a escala de tempo é da animação, não do metal; sem perdas para o ambiente; T vai de 0
      (ambiente) a 1 (fonte), sem fusão nem mudança de fase.
-   Estado: só "fonte ligada" (properties.thermal.heating) é guardado; temperaturas e posição da fonte são transitórias. */
+   Estado: só "fonte ligada" (properties.thermal.heating) é guardado; temperaturas e posição da fonte são transitórias.
+   Calor + corrente (0.17.x): na condutividade elétrica, a mesma fonte aquece a estrutura de forma transitória (não é
+   gravada) e a camada de elétrons usa a temperatura local para o espalhamento (SILM.electronTransport). */
 (()=>{
  // D didático: o calor leva alguns segundos para atravessar a célula (visível); não é a difusividade do metal.
  const D=.45,DT=1/120,SETTLE=.01;
@@ -34,8 +36,9 @@ window.SILM=window.SILM||{};
  const controllers=new WeakMap();
  function controller(model,{reducedMotion=()=>false}={}){
   if(controllers.has(model))return controllers.get(model);
-  const listeners=new Set();let T=new Float64Array(0),edges=[],keys=[],graphKey='',pinned=new Set(),frame=0,last=0,memo=null,source=null,on=false,active=false;
-  function ctx(){if(memo)return memo;const st=model.state,p=st.properties;memo={active:p?.active==='thermal',on:p?.active==='thermal'&&!!p.thermal.heating,key:(st.investigation?.id||'')+'|'+(st.metal?.atomicNumber||'')+'|'+(p?.startedAt||'')};queueMicrotask(()=>{memo=null;});return memo;}
+  const listeners=new Set();let T=new Float64Array(0),edges=[],keys=[],graphKey='',pinned=new Set(),frame=0,last=0,memo=null,source=null,on=false,active=false,transient=false;
+  function ctx(){if(memo)return memo;const st=model.state,p=st.properties,id=p?.active,combined=id==='electrical'&&st.structure?.mode==='crystalline';
+   memo={active:id==='thermal'||combined,combined,on:id==='thermal'?!!p.thermal.heating:combined&&transient,key:(st.investigation?.id||'')+'|'+(st.metal?.atomicNumber||'')+'|'+(id||'')+'|'+(p?.startedAt||'')};queueMicrotask(()=>{memo=null;});return memo;}
   const notify=()=>{for(const f of listeners)try{f();}catch(error){console.error(error);}};
   const settled=()=>!on&&spread(T)<SETTLE;
   let stateKey='';
@@ -51,17 +54,19 @@ window.SILM=window.SILM||{};
   const api={
    subscribe(f){listeners.add(f);return ()=>listeners.delete(f);},
    /* Chamado a cada desenho: experiência nova (ou encerrada) zera as temperaturas; fonte ligada mantém o laço. */
-   sync(){memo=null;const c=ctx();active=c.active;const wasOn=on;on=c.on;if(c.key!==stateKey||!active){stateKey=c.key;T=new Float64Array(keys.length);last=0;}
+   sync(){memo=null;let c=ctx();if(c.key!==stateKey&&transient){transient=false;memo=null;c=ctx();}active=c.active;const wasOn=on;on=c.on;if(c.key!==stateKey||!active){stateKey=c.key;T=new Float64Array(keys.length);last=0;}
     if(active&&(on||!settled())&&(on!==wasOn||!frame))wake();},
    setGraph(key,carts,nearest,ids){if(key===graphKey)return;const old=new Map(keys.map((k,i)=>[k,T[i]]));graphKey=key;keys=ids;edges=graph(carts,nearest);T=Float64Array.from(ids,k=>old.get(k)||0);pinned=new Set([...pinned].filter(i=>i<ids.length));},
    setPinned(list){const next=new Set(list);if(next.size===pinned.size&&[...next].every(i=>pinned.has(i)))return;pinned=next;if(on)wake();},
    setSource(p){source=p?{x:p.x,y:p.y}:null;},
    /* Restaurar: volta à temperatura ambiente (a fonte fica onde está). */
    reset(){T=new Float64Array(keys.length);last=0;notify();},
+   /* Calor + corrente: liga ou desliga a fonte na condutividade elétrica (transitório, não gravado). */
+   setHeating(v){transient=!!v;memo=null;const c=ctx();on=c.on;if(c.active)wake();notify();return transient;},
    get source(){return source;},
    temperature(key){const i=keys.indexOf(key);return i<0?0:T[i];},
    temperatures(){return new Map(keys.map((k,i)=>[k,T[i]]));},
-   reading(){const c=ctx(),n=T.length,warm=n?[...T].filter(v=>v>=.5).length/n:0;return {active:c.active,on:c.on,mean:n?sum(T)/n:0,spread:spread(T),warm,uniform:spread(T)<SETTLE,full:n>0&&[...T].every(v=>v>=.95),pinned:pinned.size};},
+   reading(){const c=ctx(),n=T.length,combined=c.combined,warm=n?[...T].filter(v=>v>=.5).length/n:0;return {active:c.active,combined,on:c.on,mean:n?sum(T)/n:0,spread:spread(T),warm,uniform:spread(T)<SETTLE,full:n>0&&[...T].every(v=>v>=.95),pinned:pinned.size};},
    get pinned(){return new Set(pinned);}
   };
   controllers.set(model,api);return api;
