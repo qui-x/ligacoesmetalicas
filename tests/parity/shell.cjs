@@ -99,13 +99,31 @@ module.exports=async(browser,url)=>{
  /* 4. Menu da atividade: Ajuda leva ao tópico das atividades e Relatório abre o relatório da atividade. */
  const act=await browser.newContext({viewport:{width:1366,height:900},reducedMotion:'reduce'});
  try{
-  const p=await open(act,'#/roteiros?item=ordem-metal');await p.locator('#route-mount').waitFor();
-  await p.locator('#route-metal').selectOption('29');await p.locator('#route-mount').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>location.hash==='#/ambiente');
+  // Atividade restrita: uma missão (o roteiro monta a oficina livre, como no SIAB).
+  const p=await open(act,'#/missoes?item=vizinhos-metal');await p.locator('#mission-mount').waitFor();await p.locator('#mission-metal').selectOption('29');await p.locator('#mission-mount').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>location.hash==='#/ambiente');
   await menu(p);assert.equal(await p.locator('#si-activity-menu').isVisible(),true,'Menu da atividade visível');
-  assert.deepEqual(await p.locator('#si-activity-menu .si-drawer-item').evaluateAll(x=>x.map(i=>i.textContent.trim())),['Sobre esta atividade','Ajuda','Relatório','Concluir roteiro','Encerrar atividade']);
+  assert.deepEqual(await p.locator('#si-activity-menu .si-drawer-item').evaluateAll(x=>x.map(i=>i.textContent.trim())),['Sobre esta atividade','Ajuda','Relatório','Concluir missão','Encerrar atividade']);
   assert.equal(await p.locator('#si-activity-menu a', {hasText:'Ajuda'}).getAttribute('href'),'#/manual?topico=atividades');
   await p.locator('#si-activity-report').click();await p.waitForFunction(()=>location.hash==='#/relatorios');await p.locator('#report-name').waitFor();
  }finally{await act.close();}
+ /* Nova versão instalada: como no SIAB, o aviso fica na tela com "Recarregar" até a pessoa decidir. A primeira troca de
+    controlador (primeira instalação) não avisa. */
+ const upd=await browser.newContext({viewport:{width:1366,height:900},reducedMotion:'reduce'});
+ try{
+  const p=await open(upd,'#/inicio');
+  assert.equal(await p.evaluate(()=>'serviceWorker' in navigator),true,'Chromium em localhost tem service worker');
+  {
+   await p.evaluate(()=>navigator.serviceWorker.dispatchEvent(new Event('controllerchange')));
+   const first=await p.evaluate(()=>!!document.getElementById('silm-update-notice'));
+   if(!first)await p.evaluate(()=>navigator.serviceWorker.dispatchEvent(new Event('controllerchange')));
+   await p.locator('#silm-update-notice').waitFor();
+   assert.match(await p.locator('#silm-update-notice').innerText(),/Nova versão do SILM instalada\. Recarregue para usar a atualização; seus dados salvos continuam\./);
+   assert.equal(await p.locator('#silm-update-reload').textContent(),'Recarregar');
+   await p.waitForTimeout(5000);assert.equal(await p.locator('#silm-update-notice').count(),1,'O aviso não some sozinho');
+   await p.evaluate(()=>navigator.serviceWorker.dispatchEvent(new Event('controllerchange')));assert.equal(await p.locator('#silm-update-notice').count(),1,'Sem avisos repetidos');
+   await p.getByRole('button',{name:'Dispensar aviso de atualização'}).click();assert.equal(await p.locator('#silm-update-notice').count(),0);
+  }
+ }finally{await upd.close();}
  assert.deepEqual(errors,[]);
- console.log('PASS TEST-SHELL: cabeçalho e Menu em 5 tamanhos, acessibilidade direta, animação de abertura, "Agora", Sobre, projetor, instalação, tela inicial e Relatório no menu da atividade.');
+ console.log('PASS TEST-SHELL: cabeçalho e Menu em 5 tamanhos, acessibilidade direta, animação de abertura, "Agora", Sobre, projetor, instalação, tela inicial, Relatório no menu da atividade e aviso de nova versão com Recarregar.');
 };

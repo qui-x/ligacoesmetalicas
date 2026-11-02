@@ -1,4 +1,30 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 11: Área do Professor
+## Em desenvolvimento — Pendências da paridade, revisão da jornada do estudante e roteiros como no SIAB
+
+- **Roteiros Experimentais como no SIAB.** "Montar na oficina" prepara a oficina livre com o metal, a estrutura inicial e o módulo do roteiro. Não há trava de navegação, de recursos ou de módulo, nem "Concluir roteiro" ou "Encerrar atividade": o estudante usa todos os painéis e termina no relatório (Dados → Relatório), que traz o título, o problema, os objetivos, as fontes do roteiro e a identificação preenchida antes de montar.
+  - Quando já há uma investigação, pede a mesma confirmação de "Iniciar outra investigação" das Montagens prontas.
+  - O Resumo mostra a linha "Roteiro", o Menu "Agora" mostra "Roteiro Experimental · módulo" e a lista marca "Montado na oficina".
+  - A página do roteiro fala em "Módulo inicial", "Recursos indicados" e "Evidência esperada".
+  - As Missões continuam sendo as atividades verificáveis (critério, conclusão e encerramento), e as atividades do professor continuam restritas.
+  - Manual "Roteiros, missões e atividades restritas" reescrito para o novo modelo.
+- **Revisão da jornada do estudante (Início → relatório):**
+  - o relatório não cita mais como fonte os candidatos descartados na auditoria (por exemplo, o COD 9013014 do cobre);
+  - números com vírgula decimal e cálculo sem entradas explicado;
+  - mensagens de início sem pontuação dupla e com o nome do módulo;
+  - avisos de medição e de cálculo não se acumulam sobre os controles;
+  - plural correto na contagem de registros;
+  - setas visíveis em "Fontes" e "O que observar";
+  - "Medir a" com instrução sem ambiguidade;
+  - título do painel sem corte;
+  - "oficina" no lugar de "bancada";
+  - link "Pular para o conteúdo" fora da impressão.
+- **Aviso de nova versão com "Recarregar"**, como no SIAB. O aviso fica na tela até a pessoa decidir e só recarrega quando ela pede; os dados salvos continuam. A primeira instalação não avisa, e o aviso não se repete.
+- **Manual:**
+  - tópico novo "Montagens prontas";
+  - "Roteiros, missões e atividades restritas" corrigido: descrevia demonstrações antigas ("Um percurso pelo SILM", "Revisar um registro") e agora traz os botões e as telas reais, incluindo a atividade do professor;
+  - Modo projetor também em "Ajuste a leitura e o contraste".
+- Plano de paridade: MANUAL-CONTENT-11 fechado; registros das Etapas 7 e 12 atualizados.
+
+## Paridade SIAB, Etapa 11: Área do Professor (mesclada em #37)
 
 - A Área do Professor ganhou "Preparar atividade" em três etapas, como no SIAB:
   - atividade e identificação: roteiro, missão ou montagem pronta do catálogo, título, turma, professor e data;

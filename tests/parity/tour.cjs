@@ -75,7 +75,7 @@ module.exports=async(browser,url)=>{
  /* 4. Durante uma atividade, o tour não começa e o aviso de primeira visita não aparece. */
  const act=await browser.newContext({viewport:{width:1366,height:900},reducedMotion:'reduce'});
  try{
-  const p=await open(act,'#/roteiros?item=ordem-metal');await p.locator('#route-mount').waitFor();await p.locator('#route-metal').selectOption('29');await p.locator('#route-mount').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>location.hash==='#/ambiente');
+  const p=await open(act,'#/missoes?item=vizinhos-metal');await p.locator('#mission-mount').waitFor();await p.locator('#mission-metal').selectOption('29');await p.locator('#mission-mount').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>location.hash==='#/ambiente');
   assert.equal(await p.locator('.silm-welcome').count(),0);
   await p.locator('#nav-toggle').click();await p.locator('#silm-tour-open').click();await p.waitForTimeout(300);
   assert.equal(await p.evaluate(()=>document.getElementById('silm-tour').open),false,'Tour só na oficina livre');

@@ -26,5 +26,8 @@ const S=loadRuntime(),D=S.data;
 assert.equal(D.search('cu')[0].symbol,'Cu');assert.equal(D.search('29')[0].name,'Cobre');assert.equal(D.search('cobre')[0].atomicNumber,29);
 assert.equal(D.search('ferro')[0].symbol,'Fe');assert.equal(D.search('').length,118);assert.equal(D.search('zz-inexistente').length,0);
 const cu=D.get(29);assert.equal(D.structure(cu).type,'CFC');assert.ok(D.sourceIds(cu).every(id=>D.source(id)));
+// Fontes citadas = fontes usadas: a ficha só consultada pela auditoria (COD 9013014, "complementar") não entra.
+assert.ok(D.sourceIds(cu).includes('src-nbs-539-v1')&&!D.sourceIds(cu).includes('src-cod-9013014'),'Fonte de auditoria fora das fontes do cobre');
+assert.ok(D.elements.every(e=>(e.reviewedCandidates||[]).filter(c=>c.decision!=='accepted').every(c=>!D.sourceIds(e).includes(c.sourceId)||JSON.stringify({...e,reviewedCandidates:[]}).includes(c.sourceId))),'Candidatos não aceitos só aparecem se usados em outro dado');
 assert.match(D.label(D.get(6)),/fora do escopo/);assert.match(D.label(D.get(29)),/disponível para investigação/);
 console.log(JSON.stringify({elements:118,availableMetals:available.length,sources:data.sources.length,negativeCases:negative.length,search:'ok'},null,2));

@@ -22,9 +22,29 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  B.menuActivityProgress=id=>session.context()?.id===id&&session.context().status==='completed'?1:0;
  B.advanceActivityFromMenu=()=>complete();B.clearGuidedReturn=()=>close();B.endGuidedActivity=()=>close();
  /* Etapa 11: atividade preparada pelo professor (roteiro ou missão do catálogo com restrições). */
+ // Título como frase: não duplica a pontuação final ("Quanto Cabe em uma Célula?" não vira "Célula?.").
+ const sentence=t=>/[.?!…]$/.test(t)?t:t+'.';
+ // Números no relatório com vírgula decimal (pt-BR), inclusive os que vêm do banco como texto ("298.15 K"). As constantes
+ // (por exemplo, N_A) aparecem com a grafia exata do próprio dado.
+ const decimal=v=>typeof v==='number'?String(v).replace('.',','):String(v).replace(/(\d)\.(\d)/g,'$1,$2');
  function enterTeacher(config,z){if(session.open()){say('Encerre a atividade em curso antes de abrir outra.','warning');return false;}const r=registry.get(config.item);if(!r)return false;
-  if(!session.start(r.id,z,{teacher:config})){say('Não foi possível preparar esta atividade.','warning');return false;}onModule(r.module);location.hash='#/ambiente';sync();say('Atividade do professor: '+config.title+'. Módulo '+r.module+' fixo.');return true;}
- function enter(r,z,resume,identity){if(session.open()){location.hash='#/ambiente';return;}if(!session.start(r.id,z,{resume})){say('Não foi possível preparar esta investigação.','warning');return;}if(identity&&!resume)for(const [k,v] of Object.entries(identity))if(v)session.edit(k,v);onModule(r.module);location.hash='#/ambiente';sync();say('Contexto restrito: '+r.title+'. Módulo '+r.module+' fixo.');}
+  if(!session.start(r.id,z,{teacher:config})){say('Não foi possível preparar esta atividade.','warning');return false;}onModule(r.module);location.hash='#/ambiente';sync();say('Atividade do professor: '+sentence(config.title)+' O módulo '+moduleName(r.module)+' fica fixo durante a atividade.');return true;}
+ /* Roteiro Experimental como no SIAB: "Montar na oficina" prepara a oficina LIVRE com o metal, a estrutura inicial e o
+    módulo do roteiro e guarda qual roteiro foi montado (título e proposta do relatório). Não há trava nem "concluir": o
+    estudante usa todos os painéis e termina no relatório (Dados → Relatório). Em atividade restrita, não monta. */
+ async function mountRoute(r,z,identity){
+  if(session.open()){say('Montagem definida pela atividade em andamento. Encerre a atividade para montar outro roteiro.','warning');return false;}
+  // Mesma confirmação de "Iniciar outra investigação" (e das Montagens prontas) quando já há uma investigação na oficina.
+  if(!await selectMetal(Number(z)))return false;
+  let ok=!!model.state.structure||model.beginAssembly();
+  for(let i=0;ok&&i<r.initialState.units;i++)ok=model.addUnit().ok;
+  if(ok&&r.initialState.mode==='crystalline')ok=model.organize().ok;
+  if(!ok||!model.setModule(r.module)){say('Não foi possível preparar esta investigação.','warning');return false;}
+  storage.set('route.experiment',{route:r.id,version:r.version,investigation:model.state.investigation.id,createdAt:new Date().toISOString()});
+  for(const [k,v] of Object.entries(identity||{}))if(v)unified.editReport(k,v);
+  onModule(r.module);location.hash='#/ambiente';sync();say('Roteiro montado na oficina: '+sentence(r.title)+' Quando terminar, abra Dados → Relatório.','success');return true;
+ }
+ function enter(r,z,resume,identity){if(session.open()){location.hash='#/ambiente';return;}if(!session.start(r.id,z,{resume})){say('Não foi possível preparar esta investigação.','warning');return;}if(identity&&!resume)for(const [k,v] of Object.entries(identity))if(v)session.edit(k,v);onModule(r.module);location.hash='#/ambiente';sync();say((r.type==='mission'?'Missão iniciada: ':'Roteiro iniciado: ')+sentence(r.title)+' O módulo '+moduleName(r.module)+' fica fixo durante a atividade.');}
 
  /* Missões na arquitetura do SIAB (Etapa 3 do plano de paridade): lista de linhas com situação, especificação em coluna de
     leitura antes de montar e, na Oficina, o painel da missão com problema, objetivo e regras, evidência acompanhada ao vivo,
@@ -91,7 +111,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  const IDENTITY=[['name','Nome','text'],['className','Turma','text'],['date','Data','date'],['teacher','Professor','text'],['group','Grupo','text']];
  const isoDate=br=>{const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(br||'');return m?m[3]+'-'+m[2]+'-'+m[1]:new Date().toLocaleDateString('en-CA');};
  const brDate=iso=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||'');return m?m[3]+'/'+m[2]+'/'+m[1]:iso;};
- const routeState=(doc,r)=>session.context()?.id===r.id?(session.context().status==='completed'?'Concluído':'Em andamento'):doc.completed[r.id]===r.version?'Concluído':doc.attempts[r.id]?'Em andamento':'';
+ const routeState=(doc,r)=>session.context()?.id===r.id?(session.context().status==='completed'?'Concluído':'Em andamento'):!session.open()&&unified.experiment()?.id===r.id?'Montado na oficina':'';
  let routeKey='',lastRoute=null;
  window.addEventListener('si-route-changed',event=>{if(event.detail!=='roteiros'){routeKey='';lastRoute=null;}});
  function routeCatalogue(){
@@ -111,9 +131,9 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const section=(heading,...nodes)=>{const box=N('section');box.append(N('h2',heading),...nodes);article.append(box);};
   const list=(tag,items)=>{const l=N(tag);for(const x of items)l.append(N('li',x));return l;};
   section('O problema',N('p',r.description));section('Objetivo',N('p',r.objectives.join(' ')));
-  section('O que você vai fazer',list('ol',[r.guidance.action,'Acompanhe a evidência no painel Roteiro da Oficina.','Registre observações, interpretação e conclusão no relatório.']));
-  section('Na oficina',list('ul',[r.initialState.mode==='free'?'Montagem livre com '+r.initialState.units+' unidades iniciais.':'Estrutura cristalina de referência do metal escolhido.','Módulo único: '+moduleName(r.module)+'.','Recursos liberados: '+toolNames(r.allowedTools)+'.',r.metalSelection.atomicNumbers.length+' metais elegíveis para este roteiro.']));
-  section('O que observar',N('p',r.guidance.hint));section('Critério de conclusão',N('p',r.guidance.criterion));
+  section('O que você vai fazer',list('ol',[r.guidance.action,'Quando terminar, abra Dados → Relatório e registre observações, interpretação e conclusão.']));
+  section('Na oficina',list('ul',[r.initialState.mode==='free'?'Montagem livre com '+r.initialState.units+' unidades iniciais.':'Estrutura cristalina de referência do metal escolhido.','Módulo inicial: '+moduleName(r.module)+'.','Recursos indicados: '+toolNames(r.allowedTools)+'.',r.metalSelection.atomicNumbers.length+' metais disponíveis para este roteiro.']));
+  section('O que observar',N('p',r.guidance.hint));section('Evidência esperada',N('p',r.guidance.criterion));
   if(session.open()){const actions=N('div');actions.className='silm-actions';const b=button(session.context()?.id===r.id?'Retomar na oficina':'Voltar à atividade em andamento',()=>{location.hash=session.context()?.id===r.id?'#/ambiente':url(session.context().id);},'route-resume');b.classList.replace('outline','primary');actions.append(b);article.append(actions);}
   else{
    // Identificação como no SIAB: guardada para a próxima montagem e copiada para o relatório desta sessão.
@@ -122,12 +142,11 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    const selection=N('select');selection.id='route-metal';for(const z of r.metalSelection.atomicNumbers){const e=S.data.get(z),o=N('option',e.name+' ('+e.symbol+')');o.value=z;selection.append(o);}selection.value=r.metalSelection.atomicNumbers.includes(29)?'29':String(r.metalSelection.atomicNumbers[0]);
    const mf=N('div');mf.className='silm-field';const ml=N('label','Metal da investigação');ml.htmlFor='route-metal';mf.append(ml,selection);
    const actions=N('div');actions.className='silm-actions';
-   if(doc.attempts[r.id])actions.append(button('Retomar investigação',()=>enter(r,doc.attempts[r.id].checkpoint.metal.atomicNumber,true),'route-resume'));
-   const mount=N('button',doc.completed[r.id]?'Refazer roteiro':'Montar na oficina');mount.type='submit';mount.className='button primary';mount.id='route-mount';actions.append(mount);
+   const mount=N('button','Montar na oficina');mount.type='submit';mount.className='button primary';mount.id='route-mount';actions.append(mount);
    if(doc.archives[r.id])actions.append(button('Abrir relatório',()=>{location.hash='#/relatorios?roteiro='+r.id;},'route-archive'));
    form.append(set,mf,actions);
    form.addEventListener('submit',async event=>{event.preventDefault();const identity={};for(const [k,,type] of IDENTITY){const v=form.elements[k].value.trim().slice(0,160);identity[k]=type==='date'?brDate(v):v;}storage.set('route.identity',identity);
-    if(!await B.confirmDialog({title:'Montar roteiro?',description:'Sua investigação livre será guardada e restaurada ao encerrar a atividade.',confirmText:'Montar'}))return;enter(r,Number(selection.value),false,identity);});
+    await mountRoute(r,Number(selection.value),identity);});
    article.append(form);
   }
   if(!session.open()){const related=S.themes.registry.filter(t=>t.relatedRoutes.includes(r.id));if(related.length){const box=N('section');box.className='silm-related';box.append(N('h2','Conteúdo relacionado'));const row=N('div');row.className='silm-related-row';row.append(N('span',related.length===1?'Tema relacionado':'Temas relacionados'));for(const t of related){const a=N('a',t.title);a.className='button outline';a.href='#/aprender?tema='+t.id;row.append(a);}box.append(row);article.append(box);}}
@@ -178,8 +197,9 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  function report(){
   const host=$('silm-route-report');host.replaceChildren();
   const params=new URLSearchParams(location.hash.split('?')[1]||''),archiveKey=params.get('arquivo'),archived=archiveKey?unified.archivedReport(archiveKey):null,id=params.get('roteiro')||session.context()?.id,record=archived?.record||session.report(id)||(!id&&!archiveKey?unified.freeReport():null);
-  if(!record){const empty=N('div');empty.className='silm-report-empty';empty.append(N('h1','Relatório'),N('p','Conclua um roteiro para abrir seu relatório.'));host.append(empty);return;}
-  const r=registry.get(record.activityContext.id)||{id:'laboratorio',title:archived?.title||'Investigação livre',subtitle:'Registros da Oficina',module:archived?.module||record.checkpoint.module.active,sources:[]},s=record.checkpoint,e=S.data.get(s.metal.atomicNumber),free=record.activityContext.type==='free',editable=!archived&&(free||session.context()?.id===r.id);
+  if(!record){const empty=N('div');empty.className='silm-report-empty';empty.append(N('h1','Relatório'),N('p','Inicie uma investigação na Oficina ou monte um roteiro experimental para abrir o relatório.'));host.append(empty);return;}
+  const exp=!archived&&record.activityContext.type==='free'?unified.experiment():null;
+  const r=registry.get(record.activityContext.id)||(exp?{...exp,id:'laboratorio',type:'free',module:record.checkpoint.module.active}:null)||{id:'laboratorio',title:archived?.title||'Investigação livre',subtitle:'Registros da Oficina',module:archived?.module||record.checkpoint.module.active,sources:[]},s=record.checkpoint,e=S.data.get(s.metal.atomicNumber),free=record.activityContext.type==='free',editable=!archived&&(free||session.context()?.id===r.id);
   // "Atividade de análise" é preparação do Professor: só fora de uma atividade e nunca num relatório arquivado (como no SIAB).
   const teacher=!archived&&!session.open(),key=archived?'arquivo:'+archiveKey:free?'livre:'+(s.investigation?.id||'sem-investigacao'):'atividade:'+r.id;
   const config=reportConfig(key);if(config.mode==='analise'&&!teacher)config.mode='completo';
@@ -231,7 +251,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   // 3. Condições de referência: metal e estrutura como dados tabelados, montagem como representação didática.
   if(inc('conditions')){const sec=section(3,'Condições de referência','condicoes'),structure=S.data.structure(e),crystalline=s.structure?.mode==='crystalline';
    const rows=[['Metal',e.name+' ('+e.symbol+'), Z = '+e.atomicNumber,'Dado tabelado'],['Estrutura',crystalline?S.crystal.label(s.structure.crystallography?.structureType,e):'Montagem livre, sem organização cristalina',crystalline?'Dado tabelado':'Representação didática'],['Montagem',(s.structure?.units.length||0)+' unidades','Representação didática']];
-   for(const [k,label] of [['temperature','Temperatura'],['pressure','Pressão'],['phase','Fase']]){const d=structure?.conditions?.[k];if(d)rows.push([label,d.display||String(d.value),'Condição de referência']);}
+   for(const [k,label] of [['temperature','Temperatura'],['pressure','Pressão'],['phase','Fase']]){const d=structure?.conditions?.[k];if(d)rows.push([label,decimal(d.display||String(d.value)),'Condição de referência']);}
    sec.append(reportTable('Metal, estrutura e condições',['Item','Valor','Origem'],rows));}
   // 4. Medições do modelo.
   if(inc('measurements')){const sec=section(4,'Medições do modelo','medicoes');
@@ -239,7 +259,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    else sec.append(N('p','Nenhuma medição registrada.'));}
   // 5. Cálculos do SILM.
   if(inc('calculations')){const sec=section(5,'Cálculos do SILM','calculos');
-   if(s.calculations.length)for(const c of s.calculations){const f=S.formulas[c.formulaId],box=N('div');box.className='silm-report-calc';box.append(N('h3',f.name),N('p',f.expression),reportTable('Entradas · '+f.name,['Entrada','Valor','Origem'],c.inputs.map(x=>[x.symbol,(Array.isArray(x.value)?x.value.join(' – '):x.value)+' '+x.unit,S.calculation.origins[x.origin]])));const res=N('p','Resultado: '+S.calculation.format(c.result,c.unit)+' · Calculado pelo SILM');res.className='silm-report-result';box.append(res);sec.append(box);}
+   if(s.calculations.length)for(const c of s.calculations){const f=S.formulas[c.formulaId],box=N('div');box.className='silm-report-calc';box.append(N('h3',f.name),N('p',f.expression),!c.inputs.length?N('p','Sem valores de entrada: o resultado vem da contagem geométrica das posições da célula.'):reportTable('Entradas · '+f.name,['Entrada','Valor','Origem'],c.inputs.map(x=>{const k=x.origin==='CONSTANT'?Object.values(S.constants).find(o=>o.key===x.key):null;return [x.symbol,k?k.display:(Array.isArray(x.value)?x.value.map(decimal).join(' – '):decimal(x.value))+' '+x.unit,S.calculation.origins[x.origin]];})));const res=N('p','Resultado: '+S.calculation.format(c.result,c.unit)+' · Calculado pelo SILM');res.className='silm-report-result';box.append(res);sec.append(box);}
    else sec.append(N('p','Nenhum cálculo registrado.'));}
   // 6. Estado da investigação.
   if(inc('state')){const sec=section(6,'Estado da investigação','estado'),observed=[];if(record.evidence.cell)observed.push('Célula unitária observada');if(record.evidence.lattice)observed.push('Rede observada');if(record.evidence.deformation)observed.push('Compressão representada');if(s.electrons?.representation.visible)observed.push('Distribuição eletrônica visível (representação qualitativa)');
@@ -277,5 +297,5 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  /* Durante uma atividade, a navegação fica no Início (com a retomada), na Oficina, na própria atividade, nos relatórios e no Manual. */
  function guard(){if(!session.open()||session.teacher()?.navigation==='livre')return;const route=B.currentRoute(location.hash),id=new URLSearchParams(location.hash.split('?')[1]||'').get('item');if(!['inicio','ambiente',isMission()?'missoes':'roteiros','relatorios','manual'].includes(route)||['roteiros','missoes'].includes(route)&&id!==session.context().id){location.replace(url(session.context().id));say('Durante '+(isMission()?'a missão':'o roteiro')+', ficam disponíveis o Início, a Oficina, o Manual e os relatórios. Encerre a atividade para abrir outras telas.');}}
  function init(){unified.init();for(const b of document.querySelectorAll('[data-left-tab]'))b.addEventListener('click',schedule);$('nav-toggle').addEventListener('click',()=>requestAnimationFrame(()=>{if(session.open()){$('si-now-description').textContent='Investigação orientada · '+session.route().module;$('si-activity-context').textContent=session.title()+' · '+(session.context().status==='completed'?'Concluído':'Em investigação');}}));document.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(session.open()&&a&&a.target!=='_blank'&&!a.getAttribute('href').startsWith('#')&&new URL(a.href).origin===location.origin){event.preventDefault();say('Encerre a atividade para abrir outra interface.','warning');}},true);const restored=session.load();if(restored){onModule(session.lockedModule());location.hash=url(session.context().id);}window.addEventListener('hashchange',guard);window.addEventListener('hashchange',schedule);window.addEventListener('si-route-changed',()=>{guard();schedule();});sync();}
- return {session,init,render,canBuild};
+ return {session,init,render,canBuild,experiment:()=>unified.experiment()};
 };

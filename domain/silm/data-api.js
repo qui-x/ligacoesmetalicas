@@ -10,6 +10,8 @@ window.SILM=window.SILM||{};
  const get=z=>map.get(Number(z))||null;
  const reason=e=>reasonMessages[e.silmEligibility.reasonCode]||'Disponível para investigação';
  const label=e=>`${e.name}, ${e.symbol}, número atômico ${e.atomicNumber}, ${e.silmEligibility.status==='available'?'disponível para investigação':e.classification.metallic?'metal indisponível para investigação':'fora do escopo de investigação metálica'}.`;
- const sourceIds=e=>{const ids=new Set();const scan=o=>{if(!o||typeof o!=='object')return;Object.entries(o).forEach(([k,v])=>{if(/sourceId$/i.test(k))ids.add(v);else if(typeof v==='object')scan(v);});};scan(e);return [...ids];};
+ /* Fontes dos dados que o SILM usa. As fichas só consultadas pela auditoria (reviewedCandidates: "complementar",
+    "substituída", "não homologada") ficam fora: citá-las no relatório ou em "Fontes" sugeriria que foram usadas. */
+ const sourceIds=e=>{const ids=new Set();const scan=o=>{if(!o||typeof o!=='object')return;Object.entries(o).forEach(([k,v])=>{if(k==='reviewedCandidates')return;if(/sourceId$/i.test(k))ids.add(v);else if(typeof v==='object')scan(v);});};scan(e);return [...ids];};
  SILM.data=Object.freeze({...data,get,source:id=>sourceMap.get(id),sourceIds,reason,label,categoryLabel:e=>categories[e.classification.category],structure:e=>e.structures.find(s=>s.id===e.referenceStructure)||null,search(query){const q=normalize(query);if(!q)return data.elements;const exact=data.elements.filter(e=>normalize(e.symbol)===q||String(e.atomicNumber)===q||normalize(e.name)===q);return exact.length?exact:data.elements.filter(e=>normalize(e.name).includes(q)||normalize(e.symbol).includes(q));}});
 })();

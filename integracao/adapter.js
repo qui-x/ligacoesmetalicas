@@ -35,7 +35,11 @@
  let representation=S.representation.defaults(null),invalidSavedState=false,unavailable3D=false;
  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.classList.contains('si-no-motion')||document.documentElement.classList.contains('si-simple-reading')||B.currentRoute(location.hash)!=='ambiente';
  const units=n=>n+(n===1?' unidade':' unidades');
- const say=(text,kind='info')=>{SimCore.notifications.announce(text);B.notify(text,kind);};
+ /* Avisos de um mesmo passo a passo (grupo) substituem o anterior em vez de empilhar: no Medir, "Selecione 2 pontos",
+    "Ponto 1 selecionado" e o resultado não cobrem mais os botões da Oficina (sobretudo no celular). */
+ const say=(text,kind='info',{group=null}={})=>{SimCore.notifications.announce(text);const rail=$('si-notifications');
+  if(group&&rail)for(const old of rail.querySelectorAll('[data-silm-group="'+group+'"]'))old.querySelector('button')?.click();
+  B.notify(text,kind);if(group&&rail?.lastElementChild)rail.lastElementChild.dataset.silmGroup=group;};
  const storage=S.createDurableStorage({backend:{getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),key:i=>localStorage.key(i),get length(){return localStorage.length;}},onStatus(){if(ready)storageStatus();},onConflict(){queueMicrotask(()=>{
   if($('si-storage-conflict'))return;
   const overlay=document.createElement('div');overlay.id='si-storage-conflict';overlay.setAttribute('role','alertdialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','silm-conflict-title');
@@ -183,7 +187,7 @@
   tools.render();experience.update();renderScene();if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
   text('silm-summary',e?e.name+' · '+units(n)+' · '+(s?.mode==='crystalline'?'estrutura cristalina':'montagem livre'):'Nenhuma investigação iniciada.');
   // Resumo em pares rótulo/valor, como o resumo da bancada do SIAB (só leitura do estado; nada é recalculado aqui).
-  const list=$('silm-summary-list');if(list){const rows=e?[['Metal',e.name+' ('+e.symbol+')'],['Estrutura',s?.mode==='crystalline'?S.crystal.label(s.crystallography?.structureType,e):'Montagem livre'],['Unidades',String(n)],['Módulo',{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active]],['Medições',String(state.measurements?.length||0)],['Cálculos',String(state.calculations?.length||0)]]:[];
+  const list=$('silm-summary-list');if(list){const exp=routeUI?.experiment?.();const rows=e?[...(exp&&!routeUI.session.open()?[['Roteiro',exp.title]]:[]),['Metal',e.name+' ('+e.symbol+')'],['Estrutura',s?.mode==='crystalline'?S.crystal.label(s.crystallography?.structureType,e):'Montagem livre'],['Unidades',String(n)],['Módulo',{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active]],['Medições',String(state.measurements?.length||0)],['Cálculos',String(state.calculations?.length||0)]]:[];
    const c=routeUI.session.context();if(c)rows.unshift([c.type==='mission'?'Missão':'Roteiro',routeUI.session.route().title]);
    const key=JSON.stringify(rows);if(list.dataset.key!==key){list.dataset.key=key;list.replaceChildren(...rows.flatMap(([k,v])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;return [dt,dd];}));}}
   text('scene-count',units(n));text('silm-metal-information',selected?S.data.get(Number(selected)).name:'');
@@ -318,7 +322,7 @@
   // "Agora": o contexto da tela, como no SIAB (Oficina com o módulo ou a atividade; Manual com o grupo e o tópico).
   const nowTitle=$('si-now-title'),nowText=$('si-now-description'),cont=$('si-nav-continue');
   const now=()=>{const route=B.currentRoute(location.hash),context=routeUI.session.context();let text='Seu contexto atual';
-   if(route==='ambiente'){const module=($('si-module-tag')?.textContent||'').split('·').pop().trim();text=(context?routeUI.session.route()?.title||'Atividade':'Oficina livre')+(module?' · '+module:'');}
+   if(route==='ambiente'){const module=($('si-module-tag')?.textContent||'').split('·').pop().trim();text=(context?routeUI.session.title()||'Atividade':routeUI.experiment()?'Roteiro Experimental':'Oficina livre')+(module?' · '+module:'');}
    else if(route==='manual'){const crumbs=(document.querySelector('#silm-manual .silm-manual-breadcrumb')?.textContent||'').split('/').map(x=>x.trim()).filter(Boolean);text=crumbs.length>1?crumbs.slice(1).join(' › '):'Guia de uso e consulta';}
    if(nowText&&nowText.textContent!==text)nowText.textContent=text;
    const label=route==='ambiente'?'Continuar na oficina':'Continuar nesta tela';if(cont&&cont.textContent!==label)cont.textContent=label;};

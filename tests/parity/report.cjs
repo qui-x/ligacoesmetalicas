@@ -76,11 +76,12 @@ module.exports=async(browser,url)=>{
   assert.equal(await p.locator('#report-analysis').inputValue(),'Cada vértice é compartilhado.');
   await p.locator('#route-report-back').click();await p.waitForFunction(()=>location.hash==='#/caderno');
  }finally{await ctx.close();}
- /* 3. Atividade: medida do modelo e cálculo do SILM identificados; sem modo de análise; Encerrar atividade no relatório. */
+ /* 3. Missão (atividade restrita): medida do modelo identificada, sem modo de análise e Encerrar atividade no relatório.
+    Roteiro (oficina livre, como no SIAB): cálculo do SILM com fórmula, entradas e origem, e o título do roteiro. */
  const act=await browser.newContext({viewport:{width:1366,height:900},reducedMotion:'reduce'});
  try{
-  const p=await open(act,'#/roteiros?item=medindo-ordem');await p.locator('#route-mount').waitFor();
-  await p.locator('#route-metal').selectOption('12');await p.locator('#route-mount').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>location.hash==='#/ambiente');
+  const p=await open(act,'#/missoes?item=medida-rede');await p.locator('#mission-mount').waitFor();
+  await p.locator('#mission-metal').selectOption('12');await p.locator('#mission-mount').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>location.hash==='#/ambiente');
   await nav.viewer(p,'instrumentos');await p.locator('#silm-instrument').selectOption('latticeParameter');await p.locator('[data-close-dock="right"]').click();
   const pair=await p.evaluate(()=>{const s=SILMIntegration.snapshot(),g=SILM.crystal.geometry(SILM.data.get(s.metal.atomicNumber));for(const a of s.structure.units)for(const b of s.structure.units){const m=SILM.measurement.compute('latticeParameter',g,[a.site,b.site]);if(m.ok&&m.parameter==='a')return[a.id,b.id];}});
   for(const id of pair)await p.locator('[data-unit-id="'+id+'"]').press('Enter');await p.waitForFunction(()=>SILMIntegration.snapshot().measurements.length===1);
@@ -88,12 +89,14 @@ module.exports=async(browser,url)=>{
   assert.deepEqual(await buttons(p),['Atualizar dados da investigação','Registrar no Caderno','Imprimir / salvar em PDF','Imprimir para preencher à mão','Voltar à oficina','Encerrar atividade']);
   assert.deepEqual(await p.locator('#report-mode option').allTextContents(),['Relatório completo','Para preencher à mão'],'Análise é preparação do Professor, fora da atividade');
   assert.match(await p.locator('[data-report-section="medicoes"]').innerText(),/Parâmetro de rede a[\s\S]*Medida do modelo/);
-  await p.locator('#route-report-close').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>!SILMIntegration.activity().current&&location.hash.startsWith('#/roteiros'));
-  // Cálculo do SILM com fórmula, entradas e origem.
-  await p.goto(base+'#/roteiros?item=volume-celula');await p.locator('#route-mount').waitFor();await p.locator('#route-metal').selectOption('26');await p.locator('#route-mount').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>location.hash==='#/ambiente');
+  await p.locator('#route-report-close').click();await p.locator('#si-modal-confirm').click();await p.waitForFunction(()=>!SILMIntegration.activity().current&&location.hash.startsWith('#/missoes'));
+  // Roteiro na oficina livre: cálculo do SILM com fórmula, entradas e origem (sem investigação livre restaurada, monta direto).
+  await p.goto(base+'#/roteiros?item=volume-celula');await p.locator('#route-mount').waitFor();await p.locator('#route-metal').selectOption('26');await p.locator('#route-mount').click();await p.waitForFunction(()=>location.hash==='#/ambiente');
   await nav.viewer(p,'calculos');await p.locator('#silm-formula').selectOption('cell-volume-cubic');await p.getByRole('button',{name:'Calcular',exact:true}).click();await p.locator('[data-close-dock="right"]').click();
   await toReport(p);const calc=await p.locator('[data-report-section="calculos"]').innerText();
   assert.match(calc,/Calculado pelo SILM/);assert.match(calc,/Entrada\s+Valor\s+Origem/);
+  assert.equal(await p.locator('#silm-route-report h1').innerText(),'Relatório — '+await p.evaluate(()=>SILM.routes.get('volume-celula').title),'Relatório com o título do roteiro');
+  assert.equal(await p.locator('#route-report-close').count(),0,'Roteiro sem Encerrar atividade');
  }finally{await act.close();}
  assert.deepEqual(errors,[]);
  console.log('PASS TEST-REPORT: ações, preparação e 10 seções em 5 tamanhos, origem dos dados, edição e persistência, atualizar, à mão, análise, impressão, arquivo, medida do modelo, cálculo do SILM e encerrar atividade.');

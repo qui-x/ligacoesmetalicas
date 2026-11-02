@@ -24,6 +24,9 @@ module.exports=async(browser,url)=>{
    assert.deepEqual(s.steps,['1 Escolha a atividade','2 Defina os recursos','3 Gere e confira como aluno']);
    assert.deepEqual(s.sections,['1. Atividade e identificação','2. Recursos do aluno']);assert.deepEqual(s.types,['Roteiro Experimental','Missão','Montagem pronta']);
    assert.equal(s.table,118,'Tabela de elementos com fontes');assert.deepEqual(s.small,[],'Controles com 44 px em '+where);assert.ok(s.overflow<=1,'Sem rolagem lateral em '+where+': '+s.overflow);
+   // A tabela ajusta a célula depois de medir o espaço: mesmo com a célula grande (antes do ajuste), a página não alarga.
+   const forced=await p.evaluate(()=>{const t=document.querySelector('#silm-professor-table .silm-periodic');t.style.setProperty('--periodic-cell','60px');const o=document.documentElement.scrollWidth-innerWidth;t.style.removeProperty('--periodic-cell');return o;});
+   assert.ok(forced<=1,'Tabela antes do ajuste não alarga a página em '+where+': '+forced);
   }finally{await ctx.close();}
  }
  /* 2. Preparar, gerar, abrir como aluno (outro navegador) e conferir as restrições. */
@@ -49,6 +52,8 @@ module.exports=async(browser,url)=>{
   // Impressão: só o guia vai para o papel.
   await p.evaluate(()=>{window.__printed=null;window.print=()=>{window.__printed={printing:document.body.classList.contains('silm-printing-guide'),title:document.querySelector('#silm-guide-print h1')?.textContent};};});
   await p.locator('#teacher-print').click();assert.deepEqual(await p.evaluate(()=>window.__printed),{printing:true,title:'Medida de a — 2º A'},'O guia impresso é o da atividade do formulário');
+  // Depois da impressão, a folha é limpa (assíncrono): espera a limpeza antes de conferir o layout de impressão.
+  await p.waitForFunction(()=>!document.body.classList.contains('silm-printing-guide')&&!document.getElementById('silm-guide-print').childElementCount);
   await p.evaluate(()=>{document.body.classList.add('silm-printing-guide');document.getElementById('silm-guide-print').replaceChildren(Object.assign(document.createElement('h1'),{textContent:'Guia'}));});await p.emulateMedia({media:'print'});
   assert.deepEqual(await p.evaluate(()=>({sheet:getComputedStyle(document.getElementById('silm-guide-print')).display,app:getComputedStyle(document.querySelector('.app-shell')||document.body.firstElementChild).display})),{sheet:'block',app:'none'});
   await p.emulateMedia({media:'screen'});await p.evaluate(()=>{document.body.classList.remove('silm-printing-guide');document.getElementById('silm-guide-print').replaceChildren();});
