@@ -26,7 +26,9 @@ SILM.createStructureComparison=({storage,host})=>{
  for(const [id,title]of [['none','Referência'],...S.properties.ids.map(id=>[id,S.properties.catalog[id].title])]){const o=N('option',title);o.value=id;select.append(o);}
  propertyField.append(label,select);
  const intensityField=N('div');intensityField.className='silm-comparison-field';
- const amountLabel=N('label','Intensidade'),amount=N('input');amount.type='range';amount.min=0;amount.max=3;amount.step=1;amount.value=0;amount.id='silm-comparison-level';amountLabel.htmlFor=amount.id;
+ // Intensidade em botões segmentados (0 a 3), no estilo de "Célula | Rede" — sem barra deslizante.
+ const amountLabel=N('span','Intensidade');amountLabel.id='silm-comparison-level-label';const amount=N('div');amount.id='silm-comparison-level';amount.className='silm-comparison-levels';amount.setAttribute('role','group');amount.setAttribute('aria-labelledby',amountLabel.id);
+ const levelButtons=[0,1,2,3].map(v=>{const b=N('button',String(v));b.type='button';b.dataset.comparisonLevel=String(v);b.className='secondary-btn';b.setAttribute('aria-label','Intensidade '+v+' de 3');b.setAttribute('aria-pressed',String(v===0));amount.append(b);return b;});
  const status=N('output','0/3');status.setAttribute('aria-live','polite');status.className='silm-comparison-level';intensityField.append(amountLabel,amount,status);
  const actions=N('div');actions.className='silm-comparison-actions';
  const reset=N('button','Restaurar');reset.type='button';reset.className='secondary-btn';
@@ -42,8 +44,9 @@ SILM.createStructureComparison=({storage,host})=>{
  limits.append(limitsTitle,limitsText);
  const cards=N('div');cards.className='silm-comparison-cards';host.append(controls,note,limits,cards);
  select.onchange=()=>{property=select.value;render();};
- amount.oninput=()=>{level=Number(amount.value);status.textContent=level+'/3';render();};
- reset.onclick=()=>{property='none';level=0;select.value='none';amount.value=0;status.textContent='0/3';render();};
+ const setLevel=v=>{level=v;status.textContent=level+'/3';for(const b of levelButtons)b.setAttribute('aria-pressed',String(Number(b.dataset.comparisonLevel)===v));};
+ for(const b of levelButtons)b.onclick=()=>{setLevel(Number(b.dataset.comparisonLevel));render();};
+ reset.onclick=()=>{property='none';select.value='none';setLevel(0);render();};
  function draw(g,e){
   const svg=document.createElementNS(svgNS,'svg');svg.setAttribute('viewBox','0 0 300 230');svg.setAttribute('role','img');svg.setAttribute('aria-label',e.name+' — '+g.label+' — '+(property==='none'?'referência':S.properties.catalog[property].title)+', nível '+level);
   const eligible=S.properties.eligibility(e)[property],apply=property!=='none'&&eligible?.status!=='unavailable';

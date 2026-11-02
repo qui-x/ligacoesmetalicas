@@ -6,6 +6,12 @@
   - A página do roteiro fala em "Módulo inicial", "Recursos indicados" e "Evidência esperada".
   - As Missões continuam sendo as atividades verificáveis (critério, conclusão e encerramento), e as atividades do professor continuam restritas.
   - Manual "Roteiros, missões e atividades restritas" reescrito para o novo modelo.
+- **Maleabilidade e ductilidade com mecânica contínua** (P1 de `docs/PLANO-PROPRIEDADES-METALICAS.md`):
+  - O aluno arrasta a prensa (ou a garra) na cena. Abaixo do limiar, a deformação é elástica e volta ao soltar. Acima dele, um plano inteiro desliza um passo b, e a forma muda de vez, em degraus. Com a alça em foco, as setas aplicam a força e Home solta.
+  - Deslizamento de planos no lugar do achatamento uniforme. Sistemas CFC {111}⟨110⟩, CCC {110}⟨111⟩ e HC basal (Callister & Rethwisch; edição e página a conferir pelo autor). O vetor b é calculado do parâmetro de rede do banco, e o cristal fica em orientação de ensaio a 45°, sempre de frente para a câmera.
+  - Planos deslizados em tracejado, blocos em tons alternados e uma fatia fina do cristal como amostra na vista Rede. A animação roda a 60 quadros por segundo.
+  - Barras deslizantes removidas. A comparação (Visão geral) usa botões segmentados de intensidade.
+  - Fonte nova: `src-callister-rethwisch`. Teste novo: `tests/deformation.cjs`, com os invariantes físicos.
 - **Revisão da jornada do estudante (Início → relatório):**
   - o relatório não cita mais como fonte os candidatos descartados na auditoria (por exemplo, o COD 9013014 do cobre);
   - números com vírgula decimal e cálculo sem entradas explicado;

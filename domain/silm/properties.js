@@ -10,12 +10,15 @@ window.SILM=window.SILM||{};
 (()=>{
  const IDS=Object.freeze(['electrical','thermal','malleability','ductility','luster']);
  const defaults=Object.freeze({electrical:Object.freeze({field:false}),thermal:Object.freeze({heating:false,stage:0}),malleability:Object.freeze({compression:0}),ductility:Object.freeze({elongation:0}),luster:Object.freeze({light:false})});
- const limits=Object.freeze({heatStages:4,compression:3,elongation:3});
+ // Deformação: até 4 deslizamentos (limite da representação; SILM.deformation.LIMIT).
+ const limits=Object.freeze({heatStages:4,compression:4,elongation:4});
+ // 0.17.x: limites declarados da deformação contínua (deslizamento de planos).
+ const DEFORMATION_LIMITS='Representação didática: um sistema de deslizamento representativo de cada estrutura (Callister & Rethwisch), com o cristal girado para que o plano fique a 45° da força. O limiar de escoamento e a deformação elástica (exagerada para ser vista) são os mesmos para todos os metais; a experiência não reproduz a curva tensão-deformação, o limite de escoamento nem o encruamento do metal.';
  const catalog=Object.freeze({
   electrical:{id:'electrical',title:'Condutividade elétrica',requires:'electrons',limitation:'O movimento visual dos elétrons sob campo é uma representação qualitativa e não corresponde diretamente à velocidade real dos portadores de carga.'},
   thermal:{id:'thermal',title:'Condutividade térmica',requires:'crystalline',limitation:'A transferência térmica apresentada é qualitativa e não constitui solução quantitativa da equação de transporte de calor.'},
-  malleability:{id:'malleability',title:'Maleabilidade',requires:'crystalline',limitation:'A deformação é uma representação didática e não reproduz uma curva tensão-deformação real do material.'},
-  ductility:{id:'ductility',title:'Ductilidade',requires:'crystalline',limitation:'A deformação é uma representação didática e não reproduz uma curva tensão-deformação real do material.'},
+  malleability:{id:'malleability',title:'Maleabilidade',requires:'crystalline',limitation:DEFORMATION_LIMITS},
+  ductility:{id:'ductility',title:'Ductilidade',requires:'crystalline',limitation:DEFORMATION_LIMITS},
   luster:{id:'luster',title:'Brilho metálico',requires:'crystalline',limitation:'A reflexão de luz é uma representação qualitativa do comportamento óptico metálico e não um cálculo espectroscópico completo.'}
  });
  const reasons=Object.freeze({
@@ -74,8 +77,10 @@ window.SILM=window.SILM||{};
  /* Ductilidade: tração ao longo do eixo vertical; a estrutura se alonga e se estreita (fio), com reorganização
     coletiva por deslizamento. Forma oposta à da lâmina: alta e fina, não larga e baixa. */
  function elongate(p,c,level){const t=level/limits.elongation;return [c[0]+(p[0]-c[0])*(1-.24*t)+.12*t*(p[2]-c[2]),c[1]+(p[1]-c[1])*(1-.24*t),c[2]+(p[2]-c[2])*(1+.5*t)];}
- function deformer(state,geometry){
+ function deformer(state,geometry,camera=null){
   const pr=state?.properties,c=geometry.center;if(!pr?.active)return null;
+  // 0.17.x: deslizamento de planos (SILM.deformation). A transformação afim antiga fica só como reserva sem o módulo.
+  if(SILM.deformation&&['malleability','ductility'].includes(pr.active)){const n=pr.active==='malleability'?pr.malleability.compression:pr.ductility.elongation;return SILM.deformation.staticTransform(geometry,pr.active,n,camera);}
   if(pr.active==='malleability'&&pr.malleability.compression)return p=>compress(p,c,pr.malleability.compression);
   if(pr.active==='ductility'&&pr.ductility.elongation)return p=>elongate(p,c,pr.ductility.elongation);
   return null;
@@ -93,12 +98,22 @@ window.SILM=window.SILM||{};
  }
  const heatWord=l=>['ambiente','baixa','moderada','alta','muito alta'][l];
  /* Textos curtos: o que você alterou, o que aconteceu, como interpretar (§78). */
- function narrative(id,params,{reduced=false,electronsVisible=true}={}){
+ function narrative(id,params,{reduced=false,electronsVisible=true,deformation=null}={}){
   const off={action:'Nenhuma ação aplicada.',observation:'Estado-base da estrutura.',interpretation:''};
   if(id==='electrical'){if(!params.field)return {action:'Campo elétrico desligado.',observation:'Sem estímulo externo, o movimento eletrônico não tem direção macroscópica preferencial.',interpretation:'Os elétrons de valência deslocalizados se movem em todas as direções; não há corrente orientada.'};
    return {action:'Campo elétrico aplicado (sentido indicado pela seta E).',observation:electronsVisible?(reduced?'Representação estática: a seta inferior indica o deslocamento médio dos elétrons, no sentido oposto ao do campo.':'A distribuição eletrônica passa a apresentar componente direcional: deslocamento coletivo médio no sentido oposto ao do campo.'):'Mostre os elétrons para observar a resposta coletiva.',interpretation:'Os elétrons de valência deslocalizados podem responder coletivamente a um campo elétrico; esse deslocamento orientado é a base qualitativa da condução elétrica.'};}
   if(id==='thermal'){if(!params.heating&&!params.stage)return {action:'Nenhuma região aquecida.',observation:'Estrutura em temperatura ambiente na representação.',interpretation:''};
    return {action:'Região à esquerda aquecida'+(params.heating?'':' (fonte desligada)')+'.',observation:'Etapa '+params.stage+' de '+limits.heatStages+': a energia térmica se espalha da região aquecida para o restante da estrutura (anéis indicam o nível)'+(params.stage>=limits.heatStages?'; sem fusão nem mudança de fase nesta representação.':'.'),interpretation:'No metal, a energia térmica é transferida pela vibração da rede e pelos elétrons deslocalizados; a representação é qualitativa e não inclui fusão.'};}
+  // 0.17.x: deformação contínua — o texto acompanha o regime (elástico ou plástico) e o sistema de deslizamento.
+  if((id==='malleability'||id==='ductility')&&deformation){const comp=id==='malleability',n=comp?params.compression:params.elongation,r=deformation,sys=r.system,fmt=v=>v.toFixed(2).replace('.',','),pct=Math.round(r.load*100)+' %';
+   const slip=sys?'um plano '+sys.planeLabel+' desliza um passo b = '+fmt(sys.b)+' Å na direção '+sys.directionLabel:'as camadas deslizam umas sobre as outras';
+   const kept=n===1?' O deslizamento anterior permanece.':n>1?' Os '+n+' deslizamentos anteriores permanecem.':'';
+   const cohesion='A ligação metálica não depende de pares fixos entre átomos: depois de cada passo, cada centro volta a ter vizinhos na mesma distância, e a coesão pelos elétrons deslocalizados continua. A deformação possível varia entre metais e condições.';
+   if(r.regime==='plastic')return {action:(comp?'Compressão':'Tração')+' acima do limiar de escoamento ('+pct+').',observation:'Regime plástico: '+slip+'; a vizinhança se refaz.'+(r.limitReached?' Limite da representação: '+limits.compression+' deslizamentos.':''),interpretation:cohesion};
+   if(r.regime==='elastic')return {action:(comp?'Compressão':'Tração')+' abaixo do limiar de escoamento ('+pct+').',observation:'Regime elástico: as distâncias entre os centros mudam um pouco e voltam ao soltar.'+kept,interpretation:'No regime elástico, a estrutura volta ao estado anterior quando a força é retirada. A deformação está exagerada para ficar visível.'};
+   if(r.regime==='returning')return {action:'Força retirada.',observation:'A parte elástica volta ao estado anterior.'+kept,interpretation:'Só a deformação elástica é reversível; os deslizamentos de planos permanecem.'};
+   if(!n)return {action:'Nenhuma força aplicada.',observation:'Cristal na orientação de ensaio'+(sys?': plano '+sys.planeLabel+' a 45° da força':'')+'. Arraste a '+(comp?'prensa':'garra')+' na cena (com a alça em foco, use as setas) ou use o botão.',interpretation:''};
+   return {action:n+' deslizamento'+(n>1?'s':'')+' permanente'+(n>1?'s':'')+'.',observation:comp?'A forma ficou mais baixa, em degraus: o sólido se encurta na direção da força e se espalha para o lado. Dentro de cada bloco, a rede é a mesma.':'A forma ficou mais alta, em degraus: o sólido se alonga na direção da força. Dentro de cada bloco, a rede é a mesma.',interpretation:cohesion};}
   if(id==='malleability'){if(!params.compression)return off;
    return {action:'Compressão aplicada (etapa '+params.compression+' de '+limits.compression+').',observation:'As camadas da estrutura deslizam umas sobre as outras e a forma se achata, como uma lâmina; os elétrons continuam distribuídos pelo conjunto.',interpretation:'A ligação metálica não depende de pares direcionais rígidos entre átomos específicos: as camadas podem se deslocar sem romper a coesão coletiva. A deformação possível varia entre metais.'};}
   if(id==='ductility'){if(!params.elongation)return off;

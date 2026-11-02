@@ -1660,5 +1660,21 @@
     "license": "Dados cristalográficos transcritos com atribuição; o conteúdo editorial da página não é redistribuído.",
     "notes": "WebElements lists HCP zirconium, space group P63/mmc (194), a = b = 323.2 pm and c = 514.7 pm. Referência primária citada pela ficha: B. Olinger and J. C. Jamieson, High Temperature–High Pressure, 1973, 5, 123.",
     "type": "dados"
+  },
+  {
+    "id": "src-callister-rethwisch",
+    "institution": "John Wiley & Sons (edição original) · LTC/GEN (edição brasileira)",
+    "authors": [
+      "Callister, W. D., Jr.",
+      "Rethwisch, D. G."
+    ],
+    "title": "Materials Science and Engineering: An Introduction (Ciência e Engenharia de Materiais: uma introdução) · tabela de sistemas de deslizamento",
+    "year": null,
+    "url": "https://www.wiley.com/",
+    "doi": null,
+    "accessedAt": "2026-11-02",
+    "license": "Direitos da publicação original; fatos transcritos com atribuição.",
+    "notes": "Sistemas de deslizamento usados pela experiência de deformação do SILM (P1 do plano de propriedades): CFC {111}⟨110⟩ (12 sistemas), CCC {110}⟨111⟩ (12) e HC basal {0001}⟨1 1 −2 0⟩ (3). O SILM usa um sistema representativo de cada família, com b e a distância entre planos calculados dos parâmetros de rede do banco. Fonte escolhida pelo autor em 02/11/2026. PENDENTE: edição, número da tabela e página a conferir pelo autor no livro; a URL é a página geral da editora, porque a rede deste ambiente bloqueou o acesso à página do livro.",
+    "type": "conceitual"
   }
 ]
