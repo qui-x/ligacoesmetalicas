@@ -1,3 +1,13 @@
+## Em desenvolvimento — Condução térmica contínua (P2)
+
+- **Fonte de calor na cena.** O aluno arrasta a fonte até qualquer ponto da estrutura e toca nela para ligar ou desligar. Com a fonte em foco, Enter liga e desliga, e as setas a movem.
+- **O calor avança sozinho, sem etapas.** A energia passa de cada centro para os vizinhos imediatos mais frios, pela equação do calor discreta no grafo de vizinhos da geometria do banco. A região perto da fonte esquenta primeiro.
+  - Sem fonte, a temperatura fica uniforme (equilíbrio térmico), e a energia que entrou continua na estrutura.
+  - Os níveis aparecem em anéis, brilho e vibração nas unidades, e em cor na rede extensa.
+- "Avançar propagação" saiu, e Restaurar volta à temperatura ambiente.
+- Limites declarados: o coeficiente é didático e igual para todos os metais (o banco não tem condutividade térmica com fonte), a escala de tempo é a da animação e não há perdas para o ambiente.
+- Testes: `tests/thermal.cjs` (invariantes físicos, em `test:scientific`) e TEST-THERMAL (navegador).
+
 ## Em desenvolvimento — Origem da célula num centro metálico (Np, Pu e Bi)
 
 - Pedido e decisão do autor: no netúnio (ortorrômbica, Pmcn), no plutônio (monoclínica, P2₁/m) e no bismuto (cela hexagonal), a célula desenhada não tinha centros nos vértices. O banco segue a origem padrão do grupo espacial, como na ficha cristalográfica, e nessas estruturas essa origem não cai sobre um átomo.

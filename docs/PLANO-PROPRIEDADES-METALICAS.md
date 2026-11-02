@@ -2,7 +2,7 @@
 
 Proposta de 02/11/2026, a partir do pedido do autor: "atualmente ela está meio movimenta barrinha e o desenho se mexe, precisamos de mais fluidez nessas mecânicas". O plano também avalia as quatro sugestões enviadas: mar de elétrons, massa-mola com escoamento, PBR e ligas.
 
-Status: **P1 implementada** (maleabilidade e ductilidade). P2 a P6 continuam como proposta.
+Status: **P1 e P2 implementadas** (maleabilidade e ductilidade; condução térmica). P3 a P6 continuam como proposta.
 
 **Decisões do autor (02/11/2026):**
 - Começar por maleabilidade e ductilidade (P1).
@@ -179,3 +179,21 @@ Cada etapa traz os testes da seção 5, a atualização do Manual ("Propriedades
   - o contorno da célula sai durante a deformação.
 - **Desempenho:** 60 quadros por segundo. O controlador lê o estado uma vez por quadro, porque cada leitura de `model.state` copia o estado inteiro.
 - **Testes:** `tests/deformation.cjs`, com os invariantes da seção 5 para Cu, Fe, Mg, Al, W e Ti.
+
+## 8. Como a P2 ficou (registro de implementação)
+
+- **Módulo:** `domain/silm/thermal.js`. Implementa a equação do calor discreta, dTᵢ/dt = D · Σⱼ (Tⱼ − Tᵢ), no grafo de vizinhos imediatos da estrutura (distâncias da geometria do banco).
+  - D é didático (0,45 s⁻¹, para o calor levar alguns segundos para atravessar a célula) e igual para todos os metais.
+  - Não há perdas para o ambiente, e T vai de 0 (ambiente) a 1 (fonte).
+- **Estado guardado:** só "fonte ligada" (`properties.thermal.heating`). As temperaturas e a posição da fonte são transitórias.
+- **Interação:**
+  - fonte de calor arrastável na cena: um toque liga ou desliga;
+  - teclado, com a fonte em foco: Enter liga e desliga, e as setas a movem;
+  - botão "Ligar fonte de calor" no painel;
+  - "Avançar propagação" saiu, porque o calor avança sozinho;
+  - Restaurar volta ao ambiente;
+  - com movimento reduzido, cada ação mostra o estado depois de 2 s de propagação.
+- **Cena:** os níveis aparecem em anéis, brilho e vibração nas unidades, e em cor na rede extensa.
+- **Testes:**
+  - `tests/thermal.cjs` (Cu, Fe, Mg e Np): grafo simétrico de vizinhos imediatos, energia conservada sem fonte, equilíbrio uniforme, a fonte aquece primeiro os vizinhos e as temperaturas ficam em [0, 1];
+  - TEST-THERMAL, no navegador.

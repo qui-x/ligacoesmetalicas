@@ -91,6 +91,21 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  scope.listen(handle,'pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;e.stopPropagation();const sign=model.state.properties?.active==='ductility'?-1:1,h=Math.max(120,stage.clientHeight*.32);deformCtl.setLoad(drag.base+sign*(e.clientY-drag.y)/h);});
  const releaseDrag=e=>{if(!drag||(e&&e.pointerId!==drag.id))return;drag=null;delete handle.dataset.dragging;deformCtl.setLoad(0);};
  for(const type of ['pointerup','pointercancel','lostpointercapture'])scope.listen(handle,type,releaseDrag);
+ /* 0.17.x: condução térmica contínua (SILM.thermal) — equação do calor no grafo de vizinhos, fonte de calor arrastável.
+    Toque na fonte liga ou desliga; arrastar a move. Teclado com a fonte em foco: setas movem, Enter ou Espaço ligam e desligam. */
+ const TH=SILM.thermal,thermalCtl=TH?TH.controller(model,{reducedMotion}):null;
+ if(thermalCtl)scope.cleanup(thermalCtl.subscribe(()=>{if(scope.active)render();}));
+ const heater=U.element('div',null,'silm-heat-handle');heater.hidden=true;heater.tabIndex=0;heater.setAttribute('role','button');stage.append(heater);
+ let heaterDrag=null;
+ const toggleHeat=()=>propertyOptions?.toggleHeat?.();
+ const moveSource=(dx,dy)=>{const s=thermalCtl?.source;if(!s)return;thermalCtl.setSource({x:Math.max(0,Math.min(1,s.x+dx)),y:Math.max(0,Math.min(1,s.y+dy))});render();};
+ scope.listen(heater,'pointerdown',e=>{if(!thermalCtl)return;e.preventDefault();e.stopPropagation();try{heater.setPointerCapture(e.pointerId);}catch{}heaterDrag={x:e.clientX,y:e.clientY,id:e.pointerId,moved:false,start:{...thermalCtl.source}};heater.dataset.dragging='';});
+ scope.listen(heater,'pointermove',e=>{if(!heaterDrag||e.pointerId!==heaterDrag.id)return;e.stopPropagation();const dx=e.clientX-heaterDrag.x,dy=e.clientY-heaterDrag.y;if(!heaterDrag.moved&&Math.hypot(dx,dy)<6)return;heaterDrag.moved=true;
+  // Da tela para a cena: a câmera aplica zoom e deslocamento; a escala do palco é o seu tamanho em pixels.
+  const z=R.camera.zoom||1,size=R.size||stage.clientWidth||300;thermalCtl.setSource({x:Math.max(0,Math.min(1,heaterDrag.start.x+dx/(size*z))),y:Math.max(0,Math.min(1,heaterDrag.start.y+dy/(size*z)))});render();});
+ const heaterUp=e=>{if(!heaterDrag||(e&&e.pointerId!==heaterDrag.id))return;const tap=!heaterDrag.moved;heaterDrag=null;delete heater.dataset.dragging;if(tap&&e?.type==='pointerup')toggleHeat();};
+ for(const type of ['pointerup','pointercancel','lostpointercapture'])scope.listen(heater,type,heaterUp);
+ scope.listen(heater,'keydown',e=>{const step={ArrowLeft:[-.04,0],ArrowRight:[.04,0],ArrowUp:[0,-.04],ArrowDown:[0,.04]}[e.key];if(step){e.preventDefault();e.stopPropagation();moveSource(...step);}else if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();toggleHeat();}});
  /* Enquadramento estável durante a deformação: caixa que cobre a forma de referência, a orientada e a de máximo
     deslizamento, para a câmera não "respirar" a cada quadro. */
  function deformFit(list,proj,view,id){
@@ -113,7 +128,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    axes.append(svgEl('path',{d:'M32 32L'+ex.toFixed(2)+' '+ey.toFixed(2),'stroke-dasharray':dash,class:'silm-axis silm-axis-'+name}));
    const t=svgEl('text',{x:32+(ex-32)*1.22,y:32+(ey-32)*1.22+3,'text-anchor':'middle',class:'silm-axis-label'});t.textContent=name;axes.append(t);}
  }
- function scheduleHeat(pr=model.state.properties){if(heatTimer||!propertyOptions?.advanceHeat||pr?.active!=='thermal'||!pr.thermal.heating||pr.thermal.stage>=P.limits.heatStages||reducedMotion())return;
+ function scheduleHeat(pr=model.state.properties){if(thermalCtl||heatTimer||!propertyOptions?.advanceHeat||pr?.active!=='thermal'||!pr.thermal.heating||pr.thermal.stage>=P.limits.heatStages||reducedMotion())return;
   heatTimer=true;scope.timeout(()=>{heatTimer=false;if(document.hidden){scheduleHeat();return;}propertyOptions.advanceHeat();},900);}
 
  const nodes=new Map();
@@ -145,13 +160,13 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   if(scene.rep.view!=='lattice')return [];const {w,c:cv}=view,pad=.06,occupied=new Set(scene.list.map(u=>X.key(u.site))),reach=.62/view.zoom;
   // Na deformação, a rede vira a amostra: todos os sítios do bloco, sem esmaecimento, deslizando com as unidades.
   const sys=specimen&&DF?DF.system(g):null,pr=scene.pr||{},n=pr?.active==='malleability'?pr.malleability.compression:pr?.active==='ductility'?pr.ductility.elongation:0;
-  const out=[];for(const s of (specimen&&DF?DF.specimen(g):g.lattice())){if(occupied.has(s.key))continue;const q=layout.project(D(s.cart));if(specimen){out.push({q,fade:1,block:DF.block(sys,s.cart,n)});continue;}if(q.x<w.x0-pad||q.x>w.x1+pad||q.y<w.y0-pad||q.y>w.y1+pad)continue;
-   const fade=Math.max(0,1-Math.hypot(q.x-cv.x,q.y-cv.y)/reach);if(fade<=.04)continue;out.push({q,fade});}
+  const out=[];for(const s of (specimen&&DF?DF.specimen(g):g.lattice())){if(occupied.has(s.key))continue;const q=layout.project(D(s.cart));if(specimen){out.push({q,fade:1,block:DF.block(sys,s.cart,n)});continue;}const T=scene.heatTemps?.get(s.key);if(q.x<w.x0-pad||q.x>w.x1+pad||q.y<w.y0-pad||q.y>w.y1+pad)continue;
+   const fade=Math.max(0,1-Math.hypot(q.x-cv.x,q.y-cv.y)/reach);if(fade<=.04)continue;out.push({q,fade:T===undefined?fade:Math.max(fade,.7),heat:T});}
   out.sort((a,b)=>b.fade-a.fade);return out.slice(0,LATTICE_CAP);
  }
  function drawLattice(sites){
   latticeLayer.replaceChildren();
-  for(const {q,fade,block}of [...sites].sort((a,b)=>b.q.depth-a.q.depth))latticeLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*36*dscale(q),opacity:(.14+.42*fade).toFixed(3),...(block===undefined?{}:{class:block%2?'silm-specimen silm-block-odd':'silm-specimen'})}));
+  for(const {q,fade,block,heat}of [...sites].sort((a,b)=>b.q.depth-a.q.depth))latticeLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*36*dscale(q),opacity:(.14+.42*fade).toFixed(3),...(block===undefined?{}:{class:block%2?'silm-specimen silm-block-odd':'silm-specimen'}),...(heat===undefined?{}:{style:'fill:color-mix(in srgb,var(--silm-heat) '+Math.round(heat*85)+'%,var(--silm-bronze))'})}));
  }
  function createNode(u){
   const node=U.element('button',null,'silm-unit silm-crystal-unit');node.type='button';node.dataset.unitId=u.id;node.tabIndex=-1;node.setAttribute('aria-describedby','silm-assembly-help');
@@ -226,14 +241,26 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // Calor e níveis: sempre sobre a projeção de referência (isométrica, congelada), para que a vista nunca mude a experiência.
   const refLayout=X.layout(g,[...g.cell.map(c=>c.cart),...(g.corners||[]),...list.map(u=>g.site(u.site).cart)].map(D),{margin:.12});
   const refCentres=list.map(u=>refLayout.project(D(g.site(u.site).cart))),refSpacing=d*refLayout.scale;
-  const heated=active==='thermal'&&(pr.thermal.heating||pr.thermal.stage>0),levels=heated?P.heat(refCentres,refSpacing,pr.thermal.stage):[],sources=heated?P.heatSources(refCentres):[];
+  const continuous=!!thermalCtl&&active==='thermal';let heated=active==='thermal'&&(pr.thermal.heating||pr.thermal.stage>0),levels=[],sources=[],temps=null;
+  if(continuous){
+   // Grafo: as unidades e, na vista Rede, a rede extensa — com os vizinhos imediatos pela distância da geometria do banco.
+   const sites=[...list.map(u=>g.site(u.site)),...(r.view==='lattice'?g.lattice().filter(s=>!list.some(u=>X.key(u.site)===s.key)):[])],ids=sites.map(s=>s.key);
+   thermalCtl.setGraph(r.view+'|'+ids.join(';'),sites.map(s=>s.cart),d,ids);
+   const proj=sites.map(s=>layout.project(D(s.cart)));
+   // Posição inicial: sobre a unidade mais à esquerda da célula (sempre visível), como a região aquecida das versões anteriores.
+   if(!thermalCtl.source){const units=proj.slice(0,list.length),left=units.reduce((a,p)=>p.x<a.x?p:a,units[0]);thermalCtl.setSource({x:left.x,y:left.y});}
+   const src=thermalCtl.source,reach=Math.max(unitFraction*.9,d*layout.scale*.6),near=proj.map((p,i)=>[i,Math.hypot(p.x-src.x,p.y-src.y)]).filter(([,dd])=>dd<=reach).map(([i])=>i);
+   if(!near.length){const best=proj.map((p,i)=>[i,Math.hypot(p.x-src.x,p.y-src.y)]).sort((a,b)=>a[1]-b[1])[0];if(best&&best[1]<=reach*2)near.push(best[0]);}
+   thermalCtl.sync();thermalCtl.setPinned(pr.thermal.heating?near:[]);temps=thermalCtl.temperatures();heated=true;
+   const pinned=new Set(pr.thermal.heating?near:[]);levels=list.map(u=>TH.level(temps.get(X.key(u.site))||0));sources=list.map((u,i)=>pinned.has(i));scene.heatTemps=temps;
+  }else{scene.heatTemps=null;if(heated){levels=P.heat(refCentres,refSpacing,pr.thermal.stage);sources=P.heatSources(refCentres);}}
   const lit=new Set();if(active==='luster'&&pr.luster.light){const zs=list.map(u=>g.site(u.site).cart[2]),top=Math.max(...zs);list.forEach((u,i)=>{if(zs[i]>=top-.05)lit.add(u.id);});}
   // As fontes (região aquecida) ficam marcadas em qualquer projeção; a faixa "calor" só aparece onde elas estiverem à esquerda.
-  list.forEach((u,i)=>{const node=nodes.get(u.id);if(heated){node.dataset.heat=String(levels[i]);node.setAttribute('aria-label',node.getAttribute('aria-label')+', energia térmica '+P.heatWord(levels[i])+(sources[i]?', na região aquecida':''));}else delete node.dataset.heat;
+  list.forEach((u,i)=>{const node=nodes.get(u.id);if(heated){node.dataset.heat=String(levels[i]);if(temps)node.style.setProperty('--heat',(temps.get(X.key(u.site))||0).toFixed(3));node.setAttribute('aria-label',node.getAttribute('aria-label')+', energia térmica '+P.heatWord(levels[i])+(sources[i]?(continuous?', sob a fonte de calor':', na região aquecida'):''));}else{delete node.dataset.heat;node.style.removeProperty('--heat');}
    if(sources[i])node.dataset.heatSource='';else delete node.dataset.heatSource;
    if(lit.has(u.id))node.dataset.lit='';else delete node.dataset.lit;});
   const sourcePts=drawn.filter((_,i)=>sources[i]),xs=drawn.map(p=>p.x),xMin=Math.min(...xs),xSpan=Math.max(1e-9,Math.max(...xs)-xMin);
-  scene.heatSources=sourcePts;scene.heatAside=sourcePts.length>0&&!sourcePts.every(p=>(p.x-xMin)/xSpan<=.25);
+  scene.heatSources=sourcePts;scene.heatAside=!continuous&&sourcePts.length>0&&!sourcePts.every(p=>(p.x-xMin)/xSpan<=.25);scene.continuousHeat=continuous;
   scene.deforming=deforming;scene.drawn=drawn;scene.lit=lit;scene.active=active;scene.pr=pr;scene.calcMark=calcMark;scene.d=d;
   const el=S.electrons,shownElectrons=!!el?.representation.visible,moving=shownElectrons&&el.representation.motion&&!reducedMotion();scene.shownElectrons=shownElectrons;scene.electrons=el;
   updateWindow();
@@ -271,12 +298,16 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const reading=deformCtl?.reading();let plates=null;
   if(scene.deforming&&reading?.active){const pts=[...drawn,...(scene.specimenPts||[])].map(p=>R.toView(p)),rr=unitFraction*(R.camera.zoom||1)*.6,xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);
    plates={x0:(Math.min(...xs)-rr)*100,x1:(Math.max(...xs)+rr)*100,top:(Math.min(...ys)-rr)*100,bottom:(Math.max(...ys)+rr)*100};}
+  // Fonte de calor (contínuo): na posição escolhida; ligada (contorno cheio) ou desligada (tracejado).
+  const heaterOn=!!scene.continuousHeat&&!!thermalCtl?.source&&scene.module==='explorar';heater.hidden=!heaterOn;
+  if(heaterOn){const v=R.toView(thermalCtl.source),on=!!pr.thermal.heating;heater.style.left=Math.max(2,Math.min(98,v.x*100))+'%';heater.style.top=Math.max(2,Math.min(98,v.y*100))+'%';
+   if(heater.dataset.on!==String(on)){heater.dataset.on=String(on);heater.setAttribute('aria-pressed',String(on));heater.setAttribute('aria-label','Fonte de calor: '+(on?'ligada':'desligada'));heater.title='Toque para '+(on?'desligar':'ligar')+'; arraste para mover. Teclado: Enter liga e desliga, setas movem.';}}
   const canPress=!!plates&&scene.module==='explorar';handle.hidden=!canPress;
   if(canPress){handle.style.left=Math.max(4,Math.min(96,(plates.x0+plates.x1)/2))+'%';handle.style.top=Math.max(3,Math.min(97,plates.top-2))+'%';handle.dataset.mode=reading.active;
    const comp=reading.active==='malleability',pct=Math.round(reading.load*100),word=reading.regime==='plastic'?'regime plástico':reading.regime==='elastic'?'regime elástico':'sem força';
    handle.setAttribute('aria-label',comp?'Prensa: força de compressão':'Garra: força de tração');handle.title=(comp?'Arraste a prensa para baixo':'Arraste a garra para cima')+' para aplicar a força; solte para retirar. Teclado: setas, Home solta.';
    if(handle.getAttribute('aria-valuenow')!==String(pct)){handle.setAttribute('aria-valuenow',String(pct));handle.setAttribute('aria-valuetext',pct+' %, '+word);}}
-  overlay.update({field:active==='electrical'&&pr.electrical.field,force:active==='malleability'?'compress':active==='ductility'?'stretch':null,level:active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0,plates,load:reading?.active?reading.load:0,heat:active==='thermal'&&pr.thermal.heating&&!scene.heatAside,light,heatX:Math.max(0,Math.min(.8,left-.05))*100});
+  overlay.update({field:active==='electrical'&&pr.electrical.field,force:active==='malleability'?'compress':active==='ductility'?'stretch':null,level:active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0,plates,load:reading?.active?reading.load:0,heat:active==='thermal'&&pr.thermal.heating&&!scene.heatAside&&!scene.continuousHeat,light,heatX:Math.max(0,Math.min(.8,left-.05))*100});
   const view=p=>{const v=R.toView(p);return {x:v.x,y:v.y};};
   let measureText='';
   // A deformação só existe em Explorar: sem medição em curso, nada a ler (evita cópias do estado a cada quadro).

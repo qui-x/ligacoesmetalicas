@@ -728,3 +728,13 @@ dialog.silm-dialog::backdrop{background:rgba(6,9,14,.72);backdrop-filter:blur(6p
  body.si-structure-expanded #silm-integration-scene .silm-assembly-tools>*{width:auto!important}
 }
 body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-height:0!important;flex:1 1 auto!important}
+/* 0.17.x — fonte de calor arrastável (condução térmica contínua). Desligada: contorno tracejado; ligada: brilho. */
+.silm-heat-handle{position:absolute;z-index:320;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:2px dashed var(--silm-heat);background:radial-gradient(circle,color-mix(in srgb,var(--silm-heat) 35%,transparent) 0,transparent 70%);cursor:grab;touch-action:none}
+.silm-heat-handle::after{content:'';position:absolute;inset:13px;border-radius:50%;background:var(--silm-heat);opacity:.55}
+.silm-heat-handle[data-on=true]{border-style:solid;box-shadow:0 0 0 4px color-mix(in srgb,var(--silm-heat) 30%,transparent),0 0 18px var(--silm-heat)}
+.silm-heat-handle[data-on=true]::after{opacity:1}
+.silm-heat-handle[data-dragging]{cursor:grabbing}
+.silm-heat-handle[hidden]{display:none}
+.silm-heat-handle:focus-visible{outline:3px solid var(--ring,var(--accent));outline-offset:3px}
+.silm-crystal-unit[data-heat] .silm-unit-body{filter:drop-shadow(0 0 calc(var(--heat,0)*9px) var(--silm-heat))}
+@media(forced-colors:active){.silm-heat-handle{border-color:ButtonText;background:Canvas}.silm-heat-handle::after{background:ButtonText}}

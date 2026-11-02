@@ -35,7 +35,7 @@ module.exports=async(browser,url)=>{
  await nav.viewer(p,'propriedades');
  for(const [id,action,key,value]of [['electrical','field','field',true],['thermal','heat','heating',true],['malleability','compress','compression',1],['ductility','stretch','elongation',1],['luster','light','light',true]]){
   await p.locator('#silm-panel-property-start-'+id).click();await p.locator('#silm-panel-property-'+action).click();
-  assert.equal((await state()).properties[id][key],value);if(id==='thermal'){await p.locator('#silm-panel-property-advance').click();assert.equal((await state()).properties.thermal.stage,1);}assert.deepEqual((await state()).structure.units,originalUnits,'Propriedade preserva sítios científicos');
+  assert.equal((await state()).properties[id][key],value);if(id==='thermal')assert.equal(await p.locator('#silm-panel-property-advance').isVisible(),false,'Condução contínua (0.17.x): o calor avança sozinho, sem "Avançar propagação"');assert.deepEqual((await state()).structure.units,originalUnits,'Propriedade preserva sítios científicos');
   await p.locator('#silm-panel-property-restore').click();await p.locator('#silm-panel-property-end').click();
  }
  await p.locator('[data-close-dock="right"]').click();
