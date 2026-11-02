@@ -136,7 +136,7 @@ module.exports=async(browser,url)=>{
    assert.deepEqual(o.clipped,[],'Nenhum controle cortado em '+where);for(const h of o.targets)assert.ok(h>=44,'Ação com 44 px em '+where);
    assert.ok(o.overflow<=1,'Sem rolagem lateral em '+where+': '+o.overflow+' px');
    if(width===1366){
-    await p.locator('#silm-comparison-property').selectOption('electrical');await p.locator('#silm-comparison-level').fill('2');
+    await p.locator('#silm-comparison-property').selectOption('electrical');await p.locator('[data-comparison-level="2"]').click();
     await p.waitForFunction(()=>[...document.querySelectorAll('.silm-comparison-card-state')].length===2,'',{timeout:4000});
     for(const t of await p.locator('.silm-comparison-card-state').allInnerTexts())assert.ok(/Qualitativa · 2\/3/.test(t)||t.length>10,'Cada cartão mostra o estado qualitativo ou o motivo: '+t);
     await p.getByRole('button',{name:'Restaurar',exact:true}).click();await p.waitForFunction(()=>document.querySelector('.silm-comparison-level')?.textContent==='0/3','',{timeout:4000});

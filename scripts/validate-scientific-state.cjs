@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..');
 function load(){const box={window:{},console,Math,Date,Uint8Array,crypto:globalThis.crypto};box.window=box;vm.createContext(box);
- for(const file of ['data/bundle.js','data-api.js','assembly.js','crystal.js','properties.js','measurements.js','calculations.js','state.js'])vm.runInContext(fs.readFileSync(path.join(root,'domain/silm',file),'utf8'),box,{filename:file});return box.SILM;}
+ for(const file of ['data/bundle.js','data-api.js','assembly.js','crystal.js','deformation.js','properties.js','measurements.js','calculations.js','state.js'])vm.runInContext(fs.readFileSync(path.join(root,'domain/silm',file),'utf8'),box,{filename:file});return box.SILM;}
 const plain=value=>JSON.parse(JSON.stringify(value));
 /* Geometria cristalográfica (§115–119): todos os metais suportados, a partir do banco. */
 function validateGeometry(S){
@@ -178,7 +178,7 @@ function validate(){const S=load(),A=S.assembly,C=A.contract,storage=new Map(),e
  assert.equal(pm.restoreProperty(),true);assert.equal(pm.state.properties.electrical.field,false);assert.equal(pm.state.properties.active,'electrical');assert.equal(pm.state.metal.symbol,'Cu');
  pm.organize();assert.equal(pm.state.properties.active,'electrical','Organizar mantém a experiência elétrica');
  const crystalBefore=plain(pm.state.structure);
- for(const [id,patch,bad] of [['thermal',{heating:true,stage:4},{stage:5}],['malleability',{compression:3},{compression:4}],['ductility',{elongation:3},{elongation:-1}],['luster',{light:true},{light:1}]]){
+ for(const [id,patch,bad] of [['thermal',{heating:true,stage:4},{stage:5}],['malleability',{compression:4},{compression:5}],['ductility',{elongation:4},{elongation:-1}],['luster',{light:true},{light:1}]]){
   const r=pm.startProperty(id);assert.equal(r.ok,true,id);assert.ok(P.ids.filter(x=>x!==id).every(x=>JSON.stringify(pm.state.properties[x])===JSON.stringify(P.defaults[x])),'Troca sem resíduo: '+id);
   assert.equal(pm.setPropertyParams(patch),true,id);assert.equal(pm.setPropertyParams(bad),false,id+' fora da faixa');assert.equal(S.validateScientificState(pm.state).ok,true,id);
   assert.deepEqual(plain(pm.state.structure),crystalBefore,'A experiência não altera a cristalografia: '+id);

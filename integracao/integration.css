@@ -646,3 +646,17 @@ dialog.silm-dialog::backdrop{background:rgba(6,9,14,.72);backdrop-filter:blur(6p
 /* Títulos longos no cabeçalho das docas ("Cálculos cristalográficos", "Instrumentos de medição") quebram com hífen em
    vez de serem cortados entre os botões. */
 .si-dock-header h2{overflow-wrap:anywhere;hyphens:auto;-webkit-hyphens:auto;line-height:1.2}
+/* 0.17.x — deformação contínua: placas da prensa/garras na amostra, alça de arraste (ponteiro) e "Força aplicada". */
+.silm-press-plate{fill:var(--text);opacity:.7}
+.silm-press-handle{position:absolute;z-index:320;width:48px;height:30px;margin:-15px 0 0 -24px;border-radius:15px;background:var(--surface);color:var(--accent);border:2px solid var(--accent);box-shadow:0 2px 6px rgb(0 0 0/.22);cursor:ns-resize;touch-action:none;display:grid;place-items:center}
+.silm-press-handle::before{content:'';width:20px;height:2px;border-radius:1px;background:currentColor;box-shadow:0 -6px 0 currentColor,0 6px 0 currentColor}
+.silm-press-handle[data-dragging]{cursor:grabbing;background:var(--tint)}
+.silm-press-handle[hidden]{display:none}
+.silm-press-handle:focus-visible{outline:3px solid var(--ring,var(--accent));outline-offset:3px}
+@media(forced-colors:active){.silm-press-plate{fill:CanvasText}.silm-press-handle{border-color:ButtonText;color:ButtonText}}
+.silm-crystal-unit[data-outside]{opacity:.3}
+/* Blocos que deslizam: tons alternados (luminosidade, não só cor) e planos já deslizados em tracejado. */
+.silm-lattice circle.silm-block-odd{filter:brightness(1.5) saturate(.75)}
+.silm-crystal-unit[data-block=odd] .silm-unit-body{filter:brightness(1.3) saturate(.75)}
+.silm-cell-planes line.silm-slip-plane{stroke:var(--scientific-accent);stroke-width:1.6;stroke-dasharray:6 4;opacity:.9;vector-effect:non-scaling-stroke}
+@media(forced-colors:active){.silm-cell-planes line.silm-slip-plane{stroke:LinkText}}

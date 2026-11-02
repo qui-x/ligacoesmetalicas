@@ -27,7 +27,8 @@ window.SILM=window.SILM||{};
   const svg=document.createElementNS(NS,'svg');svg.setAttribute('aria-hidden','true');svg.setAttribute('class','silm-measure-overlay');stage.append(svg);
   /* points: [{x,y,label}] em frações do palco; kind: distance | latticeParameter | angle | coordination | null; text: valor formatado. */
   function update({points=[],kind=null,text=''}={}){
-   svg.replaceChildren();const S=sized(svg,stage);if(!points.length)return;const P=points.map(p=>({x:p.x*S,y:p.y*S,label:p.label})),marks=P.map(p=>({x:p.x+11,y:p.y-11}));
+   // Sem marcas, nada a medir: não lê o tamanho do palco (evita refluxo a cada quadro de animação).
+   svg.replaceChildren();if(!points.length)return;const S=sized(svg,stage);const P=points.map(p=>({x:p.x*S,y:p.y*S,label:p.label})),marks=P.map(p=>({x:p.x+11,y:p.y-11}));
    if((kind==='distance'||kind==='latticeParameter')&&P.length===2)dimension(svg,S,P[0],P[1],text,marks);
    if(kind==='angle'&&P.length===3){
     const [a,b,c]=P;for(const p of [a,c])el(svg,'line',{x1:b.x,y1:b.y,x2:p.x,y2:p.y,class:'silm-angle-ray'});
@@ -46,7 +47,7 @@ window.SILM=window.SILM||{};
  SILM.createCalcOverlay=stage=>{
   const svg=document.createElementNS(NS,'svg');svg.setAttribute('aria-hidden','true');svg.setAttribute('class','silm-calc-overlay');stage.append(svg);
   function update({mode=null,points=[],text=''}={}){
-   svg.replaceChildren();const S=sized(svg,stage);if(mode!=='contact'||points.length!==2)return;
+   svg.replaceChildren();if(mode!=='contact'||points.length!==2)return;const S=sized(svg,stage);
    const P=points.map(p=>({x:p.x*S,y:p.y*S}));dimension(svg,S,P[0],P[1],text,[]);
    for(const p of P)el(svg,'circle',{cx:p.x,cy:p.y,r:5,class:'silm-calc-point'});
   }

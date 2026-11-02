@@ -11,7 +11,7 @@
     "build": "node scripts/validate-scientific-data.cjs && node scripts/validate-scientific-state.cjs && node scripts/build-scientific-data.cjs && node scripts/build-layout.cjs && node scripts/build-base-integration.cjs && node scripts/build-main-entry.cjs && node scripts/build-sw.cjs && node scripts/build-coverage.cjs && node scripts/build-route-coverage.cjs && node scripts/check-version.cjs",
     "test": "npm run test:scientific && npm run test:routes && npm run test:learning && npm run test:integration",
     "audit": "python3 scripts/audit-silm.py",
-    "test:scientific": "node scripts/check-version.cjs && node tests/scientific-data.cjs && node tests/crystal-coverage.cjs && node tests/structure-audit.cjs && node scripts/validate-scientific-state.cjs",
+    "test:scientific": "node scripts/check-version.cjs && node tests/scientific-data.cjs && node tests/crystal-coverage.cjs && node tests/structure-audit.cjs && node tests/deformation.cjs && node scripts/validate-scientific-state.cjs",
     "coverage": "node scripts/build-coverage.cjs && node scripts/build-route-coverage.cjs",
     "test:browser": "npm run test:integration",
     "test:a11y": "node tests/workspace-a11y.cjs",

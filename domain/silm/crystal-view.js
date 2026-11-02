@@ -74,7 +74,31 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:units}),propertyHost=U.element('div',null,'silm-property-host');R.layer('properties',overlay.root);
  footer.insertBefore(propertyHost,feedback);const propertyControls=propertyOptions?.controls?.(propertyHost,scope)||null;
  SILM.createSceneNotes(footer,{scope,items:[instructions,cameraHelp,legend,electronLegend,cellStatus,kind]});
- let deform=null,heatTimer=false;const D=c=>deform?deform(c):c;
+ let deform=null,heatTimer=false,nearest=null,lastControls=0;const D=c=>deform?deform(c):c;
+ /* 0.17.x: deformação contínua (SILM.deformation) — orientação de ensaio, elástico amortecido e deslizamento de planos
+    animado. A alça da prensa (ou da garra) é só para ponteiro; "Força aplicada" e os botões são a alternativa acessível. */
+ const DF=SILM.deformation,deformCtl=DF?DF.controller(model,{reducedMotion}):null;let specimen=false,stableBox=null,stableKey='',align=null,alignKey='';
+ // Câmera da vista no início da experiência (ou ao trocar de projeção 2D): a orientação de ensaio fica de frente para ela.
+ const camAngles=proj=>mode3d?X.orientation3D(m,{...rep2.camera3D(),...(orbitLive||{})}):(X.views[proj]?.[m.id]||X.orientation3D(m,{}));
+ if(deformCtl)scope.cleanup(deformCtl.subscribe(()=>{if(scope.active)render();}));
+ const handle=U.element('div',null,'silm-press-handle');handle.hidden=true;handle.tabIndex=0;handle.setAttribute('role','slider');handle.setAttribute('aria-valuemin','0');handle.setAttribute('aria-valuemax','100');handle.setAttribute('aria-valuenow','0');stage.append(handle);
+ // Teclado: setas aumentam ou diminuem a força (10 %), Home solta e End aplica a força máxima; sair da alça solta.
+ scope.listen(handle,'keydown',e=>{if(!deformCtl)return;const k=e.key,sign=model.state.properties?.active==='ductility'?-1:1,step={ArrowDown:.1*sign,ArrowUp:-.1*sign,ArrowRight:.1,ArrowLeft:-.1,PageDown:.25*sign,PageUp:-.25*sign}[k];
+  if(step!==undefined){e.preventDefault();e.stopPropagation();deformCtl.setLoad(deformCtl.load+step);}else if(k==='Home'||k==='Escape'){e.preventDefault();e.stopPropagation();deformCtl.setLoad(0);}else if(k==='End'){e.preventDefault();e.stopPropagation();deformCtl.setLoad(1);}});
+ scope.listen(handle,'blur',()=>{if(!drag)deformCtl?.setLoad(0);});
+ let drag=null;
+ scope.listen(handle,'pointerdown',e=>{if(!deformCtl)return;e.preventDefault();e.stopPropagation();try{handle.setPointerCapture(e.pointerId);}catch{}drag={y:e.clientY,id:e.pointerId,base:deformCtl.load};handle.dataset.dragging='';});
+ scope.listen(handle,'pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;e.stopPropagation();const sign=model.state.properties?.active==='ductility'?-1:1,h=Math.max(120,stage.clientHeight*.32);deformCtl.setLoad(drag.base+sign*(e.clientY-drag.y)/h);});
+ const releaseDrag=e=>{if(!drag||(e&&e.pointerId!==drag.id))return;drag=null;delete handle.dataset.dragging;deformCtl.setLoad(0);};
+ for(const type of ['pointerup','pointercancel','lostpointercapture'])scope.listen(handle,type,releaseDrag);
+ /* Enquadramento estável durante a deformação: caixa que cobre a forma de referência, a orientada e a de máximo
+    deslizamento, para a câmera não "respirar" a cada quadro. */
+ function deformFit(list,proj,view,id){
+  const sys=DF?.system(g),sign=id==='ductility'?1:-1;if(!sys)return null;const k=[id,proj,view,list.length,alignKey].join('|');if(k===stableKey&&stableBox)return stableBox;
+  const carts=[...g.cell.map(c=>c.cart),...(g.corners||[]),...list.map(u=>g.site(u.site).cart),...(view==='lattice'?DF.specimen(g).map(x=>x.cart):[])],camera=align;
+  const T=[DF.transform(sys,{orient:1,camera}),DF.transform(sys,{progress:DF.steps(DF.LIMIT),sign,orient:1,camera}),DF.transform(sys,{orient:1,strain:sign*DF.EPS_YIELD,camera}),DF.transform(sys,{progress:DF.steps(DF.LIMIT),sign,orient:1,strain:sign*DF.EPS_YIELD,camera})];
+  stableKey=k;stableBox=T.flatMap(t=>carts.map(t));return stableBox;
+ }
  // 0.9.x: medição — pontos escolhidos nas unidades; sobreposição dos sítios científicos, no espaço do palco.
  const measureOverlay=measureOptions?SILM.createMeasureOverlay(stage):null;if(measureOverlay)R.layer('measurementOverlay',measureOverlay.root);
  const calcOverlay=calcOptions?SILM.createCalcOverlay(stage):null;if(calcOverlay)R.layer('calculationOverlay',calcOverlay.root);
@@ -89,7 +113,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    axes.append(svgEl('path',{d:'M32 32L'+ex.toFixed(2)+' '+ey.toFixed(2),'stroke-dasharray':dash,class:'silm-axis silm-axis-'+name}));
    const t=svgEl('text',{x:32+(ex-32)*1.22,y:32+(ey-32)*1.22+3,'text-anchor':'middle',class:'silm-axis-label'});t.textContent=name;axes.append(t);}
  }
- function scheduleHeat(){const pr=model.state.properties;if(heatTimer||!propertyOptions?.advanceHeat||pr?.active!=='thermal'||!pr.thermal.heating||pr.thermal.stage>=P.limits.heatStages||reducedMotion())return;
+ function scheduleHeat(pr=model.state.properties){if(heatTimer||!propertyOptions?.advanceHeat||pr?.active!=='thermal'||!pr.thermal.heating||pr.thermal.stage>=P.limits.heatStages||reducedMotion())return;
   heatTimer=true;scope.timeout(()=>{heatTimer=false;if(document.hidden){scheduleHeat();return;}propertyOptions.advanceHeat();},900);}
 
  const nodes=new Map();
@@ -97,7 +121,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  /* 0.9.1: o símbolo acompanha o diâmetro da esfera na tela e some quando não cabe (a unidade continua nomeada por aria-label). */
  const sizeSymbols=()=>{const px=(R.size||300)*unitFraction*R.camera.zoom;stage.style.setProperty('--unit-px',px.toFixed(1)+'px');root.dataset.symbols=px<16?'hidden':'shown';root.dataset.labelsFit=px<20?'no':'yes';
   // Alvo mínimo de 24 px na tela (com folga): margem transparente em coordenadas do palco, descontando zoom e profundidade.
-  const visual=(R.size||300)*unitFraction,zoom=R.camera.zoom||1;for(const node of nodes.values()){const ds=parseFloat(node.style.getPropertyValue('--depth-scale'))||1;node.style.setProperty('--hit-pad',Math.max(0,(25/(zoom*ds)-visual)/2).toFixed(2)+'px');}};
+  const visual=(R.size||300)*unitFraction,zoom=R.camera.zoom||1;for(const node of nodes.values()){const ds=node.__depthScale||1;node.style.setProperty('--hit-pad',Math.max(0,(25/(zoom*ds)-visual)/2).toFixed(2)+'px');}};
  const shortRole=m.general?{corner:'V',edge:'Ar',face:'F',interior:'I',outside:''}:{corner:'V',face:'F',body:'C','base-vertex':'A','base-center':'A',interior:'B',outside:''};
  /* 0.10.x: fração de cada centro que pertence à célula (contagem do número efetivo). */
  const SHARE={BCC:{corner:'1/8',body:'1'},FCC:{corner:'1/8',face:'1/2'},HCP:{'base-vertex':'1/6','base-center':'1/2',interior:'1'},general:{corner:'1/8',edge:'1/4',face:'1/2',interior:'1'}};
@@ -119,13 +143,15 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const LATTICE_CAP=260;
  function latticeWindow(view={w:R.visible(),c:R.toScene({x:.5,y:.5}),zoom:R.camera.zoom}){
   if(scene.rep.view!=='lattice')return [];const {w,c:cv}=view,pad=.06,occupied=new Set(scene.list.map(u=>X.key(u.site))),reach=.62/view.zoom;
-  const out=[];for(const s of g.lattice()){if(occupied.has(s.key))continue;const q=layout.project(D(s.cart));if(q.x<w.x0-pad||q.x>w.x1+pad||q.y<w.y0-pad||q.y>w.y1+pad)continue;
+  // Na deformação, a rede vira a amostra: todos os sítios do bloco, sem esmaecimento, deslizando com as unidades.
+  const sys=specimen&&DF?DF.system(g):null,pr=scene.pr||{},n=pr?.active==='malleability'?pr.malleability.compression:pr?.active==='ductility'?pr.ductility.elongation:0;
+  const out=[];for(const s of (specimen&&DF?DF.specimen(g):g.lattice())){if(occupied.has(s.key))continue;const q=layout.project(D(s.cart));if(specimen){out.push({q,fade:1,block:DF.block(sys,s.cart,n)});continue;}if(q.x<w.x0-pad||q.x>w.x1+pad||q.y<w.y0-pad||q.y>w.y1+pad)continue;
    const fade=Math.max(0,1-Math.hypot(q.x-cv.x,q.y-cv.y)/reach);if(fade<=.04)continue;out.push({q,fade});}
   out.sort((a,b)=>b.fade-a.fade);return out.slice(0,LATTICE_CAP);
  }
  function drawLattice(sites){
   latticeLayer.replaceChildren();
-  for(const {q,fade}of [...sites].sort((a,b)=>b.q.depth-a.q.depth))latticeLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*36*dscale(q),opacity:(.14+.42*fade).toFixed(3)}));
+  for(const {q,fade,block}of [...sites].sort((a,b)=>b.q.depth-a.q.depth))latticeLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*36*dscale(q),opacity:(.14+.42*fade).toFixed(3),...(block===undefined?{}:{class:block%2?'silm-specimen silm-block-odd':'silm-specimen'})}));
  }
  function createNode(u){
   const node=U.element('button',null,'silm-unit silm-crystal-unit');node.type='button';node.dataset.unitId=u.id;node.tabIndex=-1;node.setAttribute('aria-describedby','silm-assembly-help');
@@ -146,7 +172,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    (scene.heatAside?' Nesta projeção, a região aquecida (contorno tracejado) não fica à esquerda; a experiência é a mesma da vista isométrica.':'');
  }
  function render(){
-  const S=model.state,s=S.structure;if(!s||s.mode!=='crystalline')return;const r=s.crystallography.representation,list=s.units,pr=S.properties,active=pr?.active||null;deform=P.deformer(S,g);
+  const S=model.state,s=S.structure;if(!s||s.mode!=='crystalline')return;const r=s.crystallography.representation,list=s.units,pr=S.properties,active=pr?.active||null;const alignNow=(mode3d?'3d':rep2.projection())+'|'+(pr?.startedAt||'');if(alignNow!==alignKey){alignKey=alignNow;align=camAngles(rep2.projection());}
+  deformCtl?.sync();const live=deformCtl?.transform(align)||null;deform=live||P.deformer(S,g,align);const deforming=!!live||(!!deform&&['malleability','ductility'].includes(active));specimen=deforming;
   const proj=rep2.projection(),cam3=mode3d?{...rep2.camera3D(),...(orbitLive||{})}:null,selectValue=mode3d?(cam3.preset&&cam3.preset!=='3d'?'3d-'+cam3.preset:'3d'):proj;
   if(projection.value!==selectValue)projection.value=selectValue;root.dataset.projection=mode3d?'3d':proj;root.dataset.viewMode=mode3d?'3d':'2d';
   if(perspectiveButton){const on=cam3.projection==='perspective';perspectiveButton.setAttribute('aria-pressed',String(on));perspectiveButton.setAttribute('aria-label',on?'Perspectiva (ligada)':'Perspectiva (desligada: ortográfica)');}
@@ -155,19 +182,24 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   for(const [id,node]of nodes)if(!list.some(u=>u.id===id)){node.remove();nodes.delete(id);}
   const selected=r.selectedUnitId,selectedUnit=selected?list.find(u=>u.id===selected):null,neighbors=r.neighbors&&selectedUnit?g.neighbors(selectedUnit.site):null,neighborKeys=new Set(neighbors?.list.map(x=>x.key)||[]);
   // Cena estável (sem vizinhos nem margem de rede): a câmera, e não o layout, enquadra o que estiver visível.
-  const fitCarts=[...g.cell.map(c=>c.cart),...(g.corners||[]),...list.map(u=>g.site(u.site).cart)];
+  // Durante a deformação, a cena enquadra também a amostra orientada e as formas extremas (sem "respirar" a cada quadro).
+  const extra=deforming&&!mode3d?deformFit(list,proj,r.view,active)||[]:[],fitCarts=[...g.cell.map(c=>c.cart),...(g.corners||[]),...list.map(u=>g.site(u.site).cart),...extra];
   if(mode3d){try{layout=X.layout3D(g,fitCarts,cam3);}catch(error){rep2.fail3D(error);layout=X.layoutFor(g,fitCarts,{margin:.12,projection:proj});}}
   else layout=X.layoutFor(g,fitCarts,{margin:.12,projection:proj});
-  const d=g.neighbors(g.cell[0]).distances[0];unitFraction=Math.min(.11,Math.max(.045,d*layout.scale*.3));stage.style.setProperty('--unit-size',(unitFraction*100).toFixed(3)+'%');
-  scene={rep:r,list,selected,neighbors};
+  // Distância entre vizinhos: fixa para a geometria (calculada uma vez, não a cada quadro).
+  const d=nearest??=g.neighbors(g.cell[0]).distances[0];unitFraction=Math.min(.11,Math.max(.045,d*layout.scale*.3));stage.style.setProperty('--unit-size',(unitFraction*100).toFixed(3)+'%');
+  scene={rep:r,list,selected,neighbors,active,module:S.module.active};
   const drawn=list.map(u=>layout.project(D(g.site(u.site).cart)));
   list.forEach((u,i)=>{
    let node=nodes.get(u.id);if(!node){node=createNode(u);nodes.set(u.id,node);}
    const p=drawn[i],info=g.role(u.site);
    if(!node.dataset.animating){node.style.left=(p.x*100)+'%';node.style.top=(p.y*100)+'%';}
    // Ordem dentro da camada da estrutura: profundidade; a selecionada fica por cima (o anel de seleção vem da camada própria).
-   node.style.zIndex=String(selected===u.id?200:10+Math.round((1-p.depth)*100));node.style.setProperty('--depth-scale',dscale(p).toFixed(3));node.style.setProperty('--depth-fade',(1-.22*p.depth).toFixed(3));
+   node.style.zIndex=String(selected===u.id?200:10+Math.round((1-p.depth)*100));node.__depthScale=dscale(p);node.style.setProperty('--depth-scale',node.__depthScale.toFixed(3));node.style.setProperty('--depth-fade',(1-.22*p.depth).toFixed(3));
    node.dataset.role=info.role;node.dataset.layer=info.layer||'';node.dataset.placement=u.placement;node.querySelector('.silm-site-label').textContent=calcMark?.mode==='fractions'?(shares[info.role]||''):(shortRole[info.role]||'');
+   // Rede durante a deformação: a amostra é uma fatia fina; unidades da célula fora dela ficam esmaecidas.
+   if(specimen&&r.view==='lattice'&&DF&&!DF.inSlab(g,g.site(u.site).cart))node.dataset.outside='';else delete node.dataset.outside;
+   {const k=specimen&&DF?DF.block(DF.system(g),g.site(u.site).cart,active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0):0;if(k%2)node.dataset.block='odd';else delete node.dataset.block;}
    const flag=neighborKeys.has(X.key(u.site));if(flag)node.dataset.neighbor='';else delete node.dataset.neighbor;
    node.setAttribute('aria-pressed',String(selected===u.id));
    node.setAttribute('aria-label','Unidade de '+name+' '+(i+1)+' de '+list.length+': '+info.label+(u.placement==='crystallographic'?', completada pelo SILM':'')+(flag?', vizinha imediata da unidade selecionada':''));
@@ -175,15 +207,20 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   unitItems=list.map((u,i)=>({id:u.id,x:drawn[i].x,y:drawn[i].y,r:unitFraction/2*dscale(drawn[i]),depth:drawn[i].depth,priority:selected===u.id?1:0}));
   selectedPoint=selectedUnit?drawn[list.indexOf(selectedUnit)]:null;
   const roving=selected||(focusId&&nodes.has(focusId)?focusId:list[0]?.id);for(const [id,node]of nodes)node.tabIndex=id===roving?0:-1;
-  drawCell(calcMark?.mode==='edges');
+  // Durante a deformação, o contorno da célula sai (os cantos ficam em blocos diferentes depois de deslizar).
+  if(deforming){cellLayer.replaceChildren();planeLayer.replaceChildren();const sys=DF?.system(g),n=active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0,half=(scene.rep.view==='lattice'?3.6:1.2)*(nearest||1);
+   // Planos já deslizados: linha tracejada ao longo da direção de deslizamento.
+   if(sys)for(let i=0;i<n;i++){const t=DF.trace(sys,i,half);if(!t)continue;const a=pt(t[0]),b=pt(t[1]);planeLayer.append(svgEl('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:'silm-slip-plane'}));}
+   scene.slipCount=n;}
+  else{scene.slipCount=0;drawCell(calcMark?.mode==='edges');}
   ghostLayer.replaceChildren();const ghosts=[];
   if(neighbors){const occupied=new Set(list.map(u=>X.key(u.site)));for(const n of neighbors.list)if(!occupied.has(n.key)){const q=layout.project(D(n.cart));ghosts.push(q);ghostLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*50*dscale(q)}));}}
   // Caixa de interesse da câmera: estrutura desenhada (com a deformação da propriedade e os vizinhos visíveis).
   const cellDrawn=[...g.cell.map(c=>c.cart),...(g.corners||[])].map(p=>layout.project(D(p)));
   // Trocar a projeção ou a vista (Célula/Rede) reenquadra; mostrar vizinhos ou deformar mantém a câmera do usuário.
-  const presetKey=mode3d?(cam3.preset||lastPreset||'3d'):'',key=(mode3d?'3d:'+presetKey:proj)+'|'+r.view,refit=fitKey!==null&&fitKey!==key&&R.camera.mode!=='fit';fitKey=key;if(mode3d&&cam3.preset)lastPreset=cam3.preset;
+  const presetKey=mode3d?(cam3.preset||lastPreset||'3d'):'',key=(mode3d?'3d:'+presetKey:proj)+'|'+r.view+(deforming?'|deformação':''),refit=fitKey!==null&&fitKey!==key&&R.camera.mode!=='fit';fitKey=key;if(mode3d&&cam3.preset)lastPreset=cam3.preset;
   if(refit)R.setCamera({...R.camera,mode:'fit'},{settled:false});
-  const box=mode3d?{x0:.08,y0:.08,x1:.92,y1:.92}:RD.boundsOf([...cellDrawn,...drawn,...ghosts]),boxMargin=mode3d?.08:r.view==='lattice'?.3:.12;
+  const box=mode3d?{x0:.08,y0:.08,x1:.92,y1:.92}:extra.length?RD.boundsOf(extra.map(c=>layout.project(c))):RD.boundsOf([...cellDrawn,...drawn,...ghosts]),boxMargin=mode3d?.08:extra.length?.17:r.view==='lattice'?.3:.12;
   R.setInterest(box,{margin:boxMargin});if(refit)rep2.saveCamera(cameraKey,R.camera);
   sizeSymbols();
   // Calor e níveis: sempre sobre a projeção de referência (isométrica, congelada), para que a vista nunca mude a experiência.
@@ -197,7 +234,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    if(lit.has(u.id))node.dataset.lit='';else delete node.dataset.lit;});
   const sourcePts=drawn.filter((_,i)=>sources[i]),xs=drawn.map(p=>p.x),xMin=Math.min(...xs),xSpan=Math.max(1e-9,Math.max(...xs)-xMin);
   scene.heatSources=sourcePts;scene.heatAside=sourcePts.length>0&&!sourcePts.every(p=>(p.x-xMin)/xSpan<=.25);
-  scene.drawn=drawn;scene.lit=lit;scene.active=active;scene.pr=pr;scene.calcMark=calcMark;scene.d=d;
+  scene.deforming=deforming;scene.drawn=drawn;scene.lit=lit;scene.active=active;scene.pr=pr;scene.calcMark=calcMark;scene.d=d;
   const el=S.electrons,shownElectrons=!!el?.representation.visible,moving=shownElectrons&&el.representation.motion&&!reducedMotion();scene.shownElectrons=shownElectrons;scene.electrons=el;
   updateWindow();
   /* Elétrons: centros na janela da vista enquadrada (não da câmera atual). Aproximar ou deslocar não refaz a distribuição. */
@@ -206,7 +243,9 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // A órbita atualiza a região projetada sem interromper a animação eletrônica.
   electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:[...drawn,...electronSites.map(s=>s.q)],spacing:d*layout.scale,connect:false});
   drawAxes();
-  root.dataset.property=active||'';propertyControls?.update();scheduleHeat();
+  // Durante a animação da deformação, os controles e o texto são atualizados até 10 vezes por segundo (o desenho, a cada quadro).
+  const busy=deforming&&!!deformCtl&&(r=>r.load>0||r.sliding||Math.abs(r.strain)>1e-3||(r.orient>1e-4&&r.orient<1-1e-4))(deformCtl.reading()),tNow=performance.now();
+  root.dataset.property=active||'';if(!busy||tNow-lastControls>100){lastControls=tNow;propertyControls?.update();}scheduleHeat(pr);
   const narrative=active?P.narrative(active,pr[active],{reduced:reducedMotion(),electronsVisible:shownElectrons}):null;
   root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;electronControls?.update();
   const inCell=list.filter(u=>g.cellKeys.has(X.key(u.site))).length,added=list.filter(u=>u.placement==='crystallographic').length;
@@ -221,17 +260,28 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   R.describe();
  }
  /* Rede na janela visível (refeita ao fim de cada gesto de câmera, não a cada quadro). */
- function updateWindow(){if(scene?.drawn)drawLattice(latticeWindow());}
+ function updateWindow(){if(scene?.drawn){const sites=latticeWindow();scene.specimenPts=specimen?sites.map(x=>x.q):[];drawLattice(sites);}}
  /* Sobreposições no espaço do palco (tamanho de tela constante): seguem a câmera sem refazer a estrutura. */
  function paint(){
   if(!scene?.drawn||!scene.lit)return;const {list,drawn,active,pr,calcMark,selected}=scene;
   electronLayer.setCamera?.(R.camera);
   let light=null;if(scene.lit.size){const tops=list.map((u,i)=>[u,drawn[i]]).filter(([u])=>scene.lit.has(u.id)).map(([,c])=>c),mean={x:tops.reduce((a,c)=>a+c.x,0)/tops.length,y:tops.reduce((a,c)=>a+c.y,0)/tops.length},v=R.toView(mean);light={x:v.x*100,y:v.y*100};}   // centro da face superior
   const sourceX=scene.heatSources.length?Math.min(...scene.heatSources.map(p=>p.x)):Math.min(...drawn.map(p=>p.x)),left=R.toView({x:sourceX-unitFraction,y:.5}).x;
-  overlay.update({field:active==='electrical'&&pr.electrical.field,force:active==='malleability'?'compress':active==='ductility'?'stretch':null,level:active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0,heat:active==='thermal'&&pr.thermal.heating&&!scene.heatAside,light,heatX:Math.max(0,Math.min(.8,left-.05))*100});
+  // Prensa (compressão) ou garras (tração) nas faces de cima e de baixo da amostra, acompanhando a forma a cada quadro.
+  const reading=deformCtl?.reading();let plates=null;
+  if(scene.deforming&&reading?.active){const pts=[...drawn,...(scene.specimenPts||[])].map(p=>R.toView(p)),rr=unitFraction*(R.camera.zoom||1)*.6,xs=pts.map(p=>p.x),ys=pts.map(p=>p.y);
+   plates={x0:(Math.min(...xs)-rr)*100,x1:(Math.max(...xs)+rr)*100,top:(Math.min(...ys)-rr)*100,bottom:(Math.max(...ys)+rr)*100};}
+  const canPress=!!plates&&scene.module==='explorar';handle.hidden=!canPress;
+  if(canPress){handle.style.left=Math.max(4,Math.min(96,(plates.x0+plates.x1)/2))+'%';handle.style.top=Math.max(3,Math.min(97,plates.top-2))+'%';handle.dataset.mode=reading.active;
+   const comp=reading.active==='malleability',pct=Math.round(reading.load*100),word=reading.regime==='plastic'?'regime plástico':reading.regime==='elastic'?'regime elástico':'sem força';
+   handle.setAttribute('aria-label',comp?'Prensa: força de compressão':'Garra: força de tração');handle.title=(comp?'Arraste a prensa para baixo':'Arraste a garra para cima')+' para aplicar a força; solte para retirar. Teclado: setas, Home solta.';
+   if(handle.getAttribute('aria-valuenow')!==String(pct)){handle.setAttribute('aria-valuenow',String(pct));handle.setAttribute('aria-valuetext',pct+' %, '+word);}}
+  overlay.update({field:active==='electrical'&&pr.electrical.field,force:active==='malleability'?'compress':active==='ductility'?'stretch':null,level:active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0,plates,load:reading?.active?reading.load:0,heat:active==='thermal'&&pr.thermal.heating&&!scene.heatAside,light,heatX:Math.max(0,Math.min(.8,left-.05))*100});
   const view=p=>{const v=R.toView(p);return {x:v.x,y:v.y};};
   let measureText='';
-  if(measureOverlay){const marks=measureOptions.marks();root.dataset.measuring=String(!!measureOptions.pickActive());
+  // A deformação só existe em Explorar: sem medição em curso, nada a ler (evita cópias do estado a cada quadro).
+  if(measureOverlay&&scene.deforming)measureOverlay.update({});
+  else if(measureOverlay){const marks=measureOptions.marks();root.dataset.measuring=String(!!measureOptions.pickActive());
    if(marks){const pts=marks.points.map(p=>{const site=p.site||list.find(u=>u.id===p.unitId)?.site;if(!site)return null;const q=view(layout.project(D(g.site(site).cart)));return {x:q.x,y:q.y,label:p.label};}).filter(Boolean);
     measureOverlay.update(pts.length===marks.points.length?{points:pts,kind:marks.kind,text:marks.text}:{});measureText=marks.spoken||'';}
    else measureOverlay.update({});}

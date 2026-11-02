@@ -43,6 +43,7 @@ const FILES=[
   "domain/silm/data-api.js",
   "domain/silm/assembly.js",
   "domain/silm/crystal.js",
+  "domain/silm/deformation.js",
   "domain/silm/properties.js",
   "domain/silm/measurements.js",
   "domain/silm/calculations.js",

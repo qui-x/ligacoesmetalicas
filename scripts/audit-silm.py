@@ -104,7 +104,9 @@ check('Estado científico no schema 8; banco e estado validados', 'schemaVersion
 crystal_view = read('domain/silm/crystal-view.js')
 crystal = strip_comments(read('domain/silm/crystal.js'))
 representation = strip_comments(read('domain/silm/representation.js'))
-check('Vista cristalina sem ligações fora do contorno da célula', not re.search(r'bond', crystal_view, re.I) and crystal_view.count("svgEl('line'") == 1)
+# Linhas permitidas: o contorno da célula e, na deformação (0.17.x), o traço do plano de deslizamento (não é ligação).
+slip_lines = crystal_view.count("svgEl('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:'silm-slip-plane'})")
+check('Vista cristalina sem ligações fora do contorno da célula', not re.search(r'bond', crystal_view, re.I) and crystal_view.count("svgEl('line'") == 1 + slip_lines and slip_lines <= 1)
 check('Representação fora do estado científico (câmera, projeção, modo 2D/3D)',
       'VERSION=2' in representation and not re.search(r'camera|zoom|projection|representation\.view', strip_comments(state)))
 check('Projeção isométrica congelada para o Organizar e o calor',
