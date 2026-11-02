@@ -105,7 +105,8 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
    // estrutura); com movimento, os marcadores na região continuam e o conjunto se completa.
    if(!(visible&&motion&&!reducedMotion())){particles=[];seed=[...sig].reduce((h,c)=>Math.imul(h^c.charCodeAt(0),16777619),2166136261)|0;}reconcile();}
   if(centers.length){const xs=centers.map(c=>c.x);box={x0:Math.min(...xs),x1:Math.max(...xs)};}else box=null;
-  visible=!!show&&centers.length>=SILM.electronModel.minUnits;motion=!!move;field=!!applied;readColors();sync();if(!effectiveMotion())draw();
+  // Cores lidas ao aparecer (e pelo observador de tema), não a cada atualização: getComputedStyle força o recálculo de estilos.
+  const was=visible;visible=!!show&&centers.length>=SILM.electronModel.minUnits;motion=!!move;field=!!applied;if(visible&&(!was||!colors))readColors();sync();if(!effectiveMotion())draw();
  }
  /* Transição curta átomo isolado → estrutura: alguns marcadores aparecem junto da nova unidade e logo se
     dispersam no conjunto. Não é ionização: o átomo passa a ser centro metálico da estrutura coletiva. */

@@ -3,19 +3,26 @@
 SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMetal,allows=()=>true})=>{
  const S=SILM,P=S.properties,U=SimCore.ExperienceUI,scope=SimCore.createScope();
  const editable=()=>model.state.module.active==='explorar';
+ // 0.17.x: deformação contínua — o mesmo controlador da cena (um por modelo).
+ const deform=()=>S.deformation?.controller(model,{reducedMotion:reduced})||null;
  const change=patch=>{if(!editable())return;const ok=model.setPropertyParams(patch);if(ok)schedule();return ok;};
  const actions={
   start(id){if(!allows(id)||!editable())return;const r=model.startProperty(id);if(!r.ok)say(P.reasons[r.reason]||'Organize uma estrutura cristalina para esta experiência.','warning');schedule();},
   field:()=>change({field:!model.state.properties.electrical.field}),
   heat:()=>change({heating:!model.state.properties.thermal.heating}),
   advance(){const p=model.state.properties.thermal;if(p.heating&&p.stage<P.limits.heatStages)return change({stage:p.stage+1});},
-  compress(){const p=model.state.properties.malleability;if(p.compression<P.limits.compression)return change({compression:p.compression+1});},
-  stretch(){const p=model.state.properties.ductility;if(p.elongation<P.limits.elongation)return change({elongation:p.elongation+1});},
+  compress(){if(!editable())return;const c=deform();if(c){const ok=c.pulse();schedule();return ok;}const p=model.state.properties.malleability;if(p.compression<P.limits.compression)return change({compression:p.compression+1});},
+  stretch(){if(!editable())return;const c=deform();if(c){const ok=c.pulse();schedule();return ok;}const p=model.state.properties.ductility;if(p.elongation<P.limits.elongation)return change({elongation:p.elongation+1});},
+
   light:()=>change({light:!model.state.properties.luster.light}),
-  restore(){model.restoreProperty();schedule();},end(){model.endProperty();schedule();}
+  restore(){deform()?.setLoad(0);model.restoreProperty();schedule();},end(){deform()?.setLoad(0);model.endProperty();schedule();}
  };
- const info=()=>({state:model.state,eligibility:P.eligibility(model.state.metal?S.data.get(model.state.metal.atomicNumber):null),editable:editable(),reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}});
+ // Uma leitura do estado por atualização (model.state devolve uma cópia completa).
+ const info=()=>{const st=model.state;return {deformation:deform()?.reading()||null,state:st,eligibility:P.eligibility(st.metal?S.data.get(st.metal.atomicNumber):null),editable:st.module.active==='explorar',reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}};};
  const controls=S.createPropertyControls(document.getElementById('silm-properties'),{scope,info,actions,prefix:'silm-panel-property'});
+ // Painel: até 10 atualizações por segundo durante a animação (a cena atualiza a cada quadro).
+ {const c=deform();let lastPanel=0,pending=0;const run=()=>{pending=0;lastPanel=performance.now();controls.update();};
+  if(c)scope.cleanup(c.subscribe(()=>{if(performance.now()-lastPanel>=100)run();else if(!pending)pending=setTimeout(run,100);}));}
  const scene={advanceHeat:actions.advance,controls:(host,viewScope)=>S.createPropertyControls(host,{scope:viewScope,info,actions,prefix:'silm-scene-property',compact:true})};
  const dialog=document.getElementById('silm-periodic-dialog'),body=document.getElementById('silm-periodic-body'),trigger=document.getElementById('silm-open-periodic');let tableScope;
  trigger.addEventListener('click',()=>{
