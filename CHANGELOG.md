@@ -1,4 +1,13 @@
-## Em desenvolvimento — Paridade SIAB, Etapa 11: Área do Professor
+## Em desenvolvimento — Pendências da paridade: aviso de atualização e Manual
+
+- **Aviso de nova versão com "Recarregar"**, como no SIAB. O aviso fica na tela até a pessoa decidir e só recarrega quando ela pede; os dados salvos continuam. A primeira instalação não avisa, e o aviso não se repete.
+- **Manual:**
+  - tópico novo "Montagens prontas";
+  - "Roteiros, missões e atividades restritas" corrigido: descrevia demonstrações antigas ("Um percurso pelo SILM", "Revisar um registro") e agora traz os botões e as telas reais, incluindo a atividade do professor;
+  - Modo projetor também em "Ajuste a leitura e o contraste".
+- Plano de paridade: MANUAL-CONTENT-11 fechado; registros das Etapas 7 e 12 atualizados.
+
+## Paridade SIAB, Etapa 11: Área do Professor (mesclada em #37)
 
 - A Área do Professor ganhou "Preparar atividade" em três etapas, como no SIAB:
   - atividade e identificação: roteiro, missão ou montagem pronta do catálogo, título, turma, professor e data;

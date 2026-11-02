@@ -629,3 +629,5 @@ dialog.silm-dialog::backdrop{background:rgba(6,9,14,.72);backdrop-filter:blur(6p
 .silm-guide-print{display:none}
 @media (max-width:520px){.silm-teacher-form,.silm-teacher-result,.silm-teacher-material{padding:14px}.silm-teacher-entry .silm-teacher-actions{width:100%}}
 @media print{body.silm-printing-guide>*:not(#silm-guide-print){display:none!important}body.silm-printing-guide #silm-guide-print{display:block!important;color:#000;background:#fff}body.silm-printing-guide .silm-teacher-guide .eyebrow{color:#444}}
+/* Aviso de nova versão com "Recarregar" (pendência da Etapa 12): fica na tela até a pessoa decidir. */
+.silm-update-notice{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}.silm-update-notice>span{flex:1 1 220px}.silm-update-notice .button{min-height:40px}

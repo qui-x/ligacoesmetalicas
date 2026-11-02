@@ -106,6 +106,24 @@ module.exports=async(browser,url)=>{
   assert.equal(await p.locator('#si-activity-menu a', {hasText:'Ajuda'}).getAttribute('href'),'#/manual?topico=atividades');
   await p.locator('#si-activity-report').click();await p.waitForFunction(()=>location.hash==='#/relatorios');await p.locator('#report-name').waitFor();
  }finally{await act.close();}
+ /* Nova versão instalada: como no SIAB, o aviso fica na tela com "Recarregar" até a pessoa decidir. A primeira troca de
+    controlador (primeira instalação) não avisa. */
+ const upd=await browser.newContext({viewport:{width:1366,height:900},reducedMotion:'reduce'});
+ try{
+  const p=await open(upd,'#/inicio');
+  assert.equal(await p.evaluate(()=>'serviceWorker' in navigator),true,'Chromium em localhost tem service worker');
+  {
+   await p.evaluate(()=>navigator.serviceWorker.dispatchEvent(new Event('controllerchange')));
+   const first=await p.evaluate(()=>!!document.getElementById('silm-update-notice'));
+   if(!first)await p.evaluate(()=>navigator.serviceWorker.dispatchEvent(new Event('controllerchange')));
+   await p.locator('#silm-update-notice').waitFor();
+   assert.match(await p.locator('#silm-update-notice').innerText(),/Nova versão do SILM instalada\. Recarregue para usar a atualização; seus dados salvos continuam\./);
+   assert.equal(await p.locator('#silm-update-reload').textContent(),'Recarregar');
+   await p.waitForTimeout(5000);assert.equal(await p.locator('#silm-update-notice').count(),1,'O aviso não some sozinho');
+   await p.evaluate(()=>navigator.serviceWorker.dispatchEvent(new Event('controllerchange')));assert.equal(await p.locator('#silm-update-notice').count(),1,'Sem avisos repetidos');
+   await p.getByRole('button',{name:'Dispensar aviso de atualização'}).click();assert.equal(await p.locator('#silm-update-notice').count(),0);
+  }
+ }finally{await upd.close();}
  assert.deepEqual(errors,[]);
- console.log('PASS TEST-SHELL: cabeçalho e Menu em 5 tamanhos, acessibilidade direta, animação de abertura, "Agora", Sobre, projetor, instalação, tela inicial e Relatório no menu da atividade.');
+ console.log('PASS TEST-SHELL: cabeçalho e Menu em 5 tamanhos, acessibilidade direta, animação de abertura, "Agora", Sobre, projetor, instalação, tela inicial, Relatório no menu da atividade e aviso de nova versão com Recarregar.');
 };

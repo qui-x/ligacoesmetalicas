@@ -49,6 +49,8 @@ module.exports=async(browser,url)=>{
   // Impressão: só o guia vai para o papel.
   await p.evaluate(()=>{window.__printed=null;window.print=()=>{window.__printed={printing:document.body.classList.contains('silm-printing-guide'),title:document.querySelector('#silm-guide-print h1')?.textContent};};});
   await p.locator('#teacher-print').click();assert.deepEqual(await p.evaluate(()=>window.__printed),{printing:true,title:'Medida de a — 2º A'},'O guia impresso é o da atividade do formulário');
+  // Depois da impressão, a folha é limpa (assíncrono): espera a limpeza antes de conferir o layout de impressão.
+  await p.waitForFunction(()=>!document.body.classList.contains('silm-printing-guide')&&!document.getElementById('silm-guide-print').childElementCount);
   await p.evaluate(()=>{document.body.classList.add('silm-printing-guide');document.getElementById('silm-guide-print').replaceChildren(Object.assign(document.createElement('h1'),{textContent:'Guia'}));});await p.emulateMedia({media:'print'});
   assert.deepEqual(await p.evaluate(()=>({sheet:getComputedStyle(document.getElementById('silm-guide-print')).display,app:getComputedStyle(document.querySelector('.app-shell')||document.body.firstElementChild).display})),{sheet:'block',app:'none'});
   await p.emulateMedia({media:'screen'});await p.evaluate(()=>{document.body.classList.remove('silm-printing-guide');document.getElementById('silm-guide-print').replaceChildren();});

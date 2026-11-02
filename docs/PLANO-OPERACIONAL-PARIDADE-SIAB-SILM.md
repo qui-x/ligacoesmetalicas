@@ -353,7 +353,7 @@ A tela do Laboratório no SIAB é a referência para o workspace. No SILM, traba
 - [x] `MANUAL-CONTENT-08` — "Mover a vista" e "Ver a estrutura em 3D" (projeções, teclado, toque, volta ao 2D).
 - [x] `MANUAL-CONTENT-09` — "Roteiros, missões e atividades restritas".
 - [x] `MANUAL-CONTENT-10` — "Usar o Caderno" (novo) e "Registrar e imprimir".
-- [~] `MANUAL-CONTENT-11` — Professor, acessibilidade e instalação offline cobertos; Tour e Montagens prontas entram com as Etapas 9 e 10; Projetor a revisar na Etapa 12.
+- [x] `MANUAL-CONTENT-11` — Professor, acessibilidade e instalação offline cobertos; "Tour da oficina e ajuda dos painéis" (Etapa 10); "Montagens prontas" (novo, Etapa 9); Modo projetor em "Ajuste a leitura e o contraste" e em "Área do Professor e apresentação à turma".
 - [x] `MANUAL-CONTENT-12` — Marcadores "Documentação provisória" removidos; relacionados validados pelo teste.
 
 **Aceite da etapa:** Manual navegável e pesquisável, com cobertura suficiente para todas as funções liberadas no SILM; não precisa copiar o conteúdo ácido-base nem a mesma quantidade de tópicos.
@@ -733,7 +733,7 @@ Diferenças de domínio / N/A: 23 tópicos nos quatro grupos do SIAB (não 52); 
 Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
   test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
 Evidências: docs/evidence-parity/MANUAL/
-Pendências: MANUAL-CONTENT-11 parcial (Tour, Montagens prontas, Projetor); Firefox, Safari e aparelhos físicos
+Pendências: Firefox, Safari e aparelhos físicos (MANUAL-CONTENT-11 fechado em 02/11/2026: Tour, Montagens prontas e Projetor; tópico "Roteiros, missões e atividades restritas" corrigido)
 Estado: [x]
 ```
 
@@ -844,7 +844,7 @@ Diferenças de domínio / N/A: sem tópico único "Referências e créditos" (as
 Testes executados: npm test; test:a11y; test:comparison; test:routes:browser (roteiros e workspace-family);
   test:backup; test:mobile-mechanics; test:parity; audit-silm.py — Chromium
 Evidências: docs/evidence-parity/SHELL/
-Pendências: botão "Recarregar" no aviso de nova versão; Firefox, Safari e aparelhos físicos
+Pendências: Firefox, Safari e aparelhos físicos (aviso de nova versão com "Recarregar" entrou em 02/11/2026, conferido no TEST-SHELL)
   (MENU-05, "Recursos" com Montagens prontas e Tour, fechado com as Etapas 9 e 10)
 Estado: [x]
 ```
