@@ -8,6 +8,7 @@
 - [Estímulo luminoso](ESTIMULO-LUMINOSO.md) — reflexão, resposta espectral, cor derivada de dados e validação científica.
 - [Estímulo térmico](ESTIMULO-TERMICO.md) — fonte, condução pela estrutura, capacidade térmica, troca com o ambiente, resfriamento e balanço de energia.
 - [Estímulo elétrico](ESTIMULO-ELETRICO.md) — campo aplicado, deriva dos elétrons, corrente convencional, espalhamento e aquecimento Joule.
+- [Estímulo mecânico](ESTIMULO-MECANICO.md) — força, tensão, deformação elástica e plástica, discordâncias e sistemas de deslizamento.
 
 ## 1. Princípio
 
