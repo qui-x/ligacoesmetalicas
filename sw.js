@@ -45,6 +45,7 @@ const FILES=[
   "domain/silm/crystal.js",
   "domain/silm/deformation.js",
   "domain/silm/thermal.js",
+  "domain/silm/drive.js",
   "domain/silm/properties.js",
   "domain/silm/measurements.js",
   "domain/silm/calculations.js",

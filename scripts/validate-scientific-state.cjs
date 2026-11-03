@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..');
 function load(){const box={window:{},console,Math,Date,Uint8Array,crypto:globalThis.crypto};box.window=box;vm.createContext(box);
- for(const file of ['data/bundle.js','data-api.js','assembly.js','crystal.js','deformation.js','thermal.js','properties.js','measurements.js','calculations.js','state.js'])vm.runInContext(fs.readFileSync(path.join(root,'domain/silm',file),'utf8'),box,{filename:file});return box.SILM;}
+ for(const file of ['data/bundle.js','data-api.js','assembly.js','crystal.js','deformation.js','thermal.js','drive.js','properties.js','measurements.js','calculations.js','state.js'])vm.runInContext(fs.readFileSync(path.join(root,'domain/silm',file),'utf8'),box,{filename:file});return box.SILM;}
 const plain=value=>JSON.parse(JSON.stringify(value));
 /* Geometria cristalográfica (§115–119): todos os metais suportados, a partir do banco. */
 function validateGeometry(S){

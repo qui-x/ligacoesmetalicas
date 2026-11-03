@@ -2,6 +2,8 @@
 
 > Série 0.7.x. Implementação: `domain/silm/properties.js` (catálogo, elegibilidade, dados, transformações e narrativas), `domain/silm/state.js` (contrato `properties`), `domain/silm/property-view.js` (sobreposição e controles), `crystal-view.js`, `assembly-view.js` e `electron-view.js` (representação) e `bootstrap.js` (painéis, Histórico e relatório).
 
+> **Atualização (mecânica contínua, 02/11/2026):** a condução térmica (§3), a maleabilidade (§4) e a ductilidade (§5) não usam mais etapas discretas nem "Avançar propagação"; o registro do que mudou está em [`PLANO-PROPRIEDADES-METALICAS.md`](PLANO-PROPRIEDADES-METALICAS.md) (§7 a §11). A condutividade elétrica (§2) ganhou a intensidade do campo e o brilho (§6) ganhou a lanterna, descritos abaixo.
+
 ## 1. Modelo adotado
 
 Toda experiência segue:
@@ -26,7 +28,8 @@ estrutura → comportamento → propriedade observada
 | Com campo | ao passeio aleatório soma-se um viés coletivo **no sentido oposto ao do campo** (portadores negativos). Os marcadores que saem a jusante reentram a montante, num fluxo contínuo pela estrutura. Nem todos andam em linha reta: o teste 0.7-141 exige que uma parte se mova contra o viés a cada instante |
 | Indicação | seta **E** na borda superior e seta tracejada "elétrons (média)" na borda inferior, fora da estrutura. Sem diagrama de circuito e sem setas por elétron |
 | Movimento reduzido | representação estática; as duas setas e o texto mantêm a informação |
-| Intensidade | **não** é proporcional à condutividade tabelada (§37); a mesma regra vale para todos os metais |
+| Intensidade do campo | alça na ponta da seta **E**, arrastável (teclado: setas de 10 em 10 %, Home e End), de 5 % a 100 %. A seta E e a deriva média crescem com ela (v ∝ E, qualitativo, sem unidade). É transitória: o estado guarda só "campo aplicado" |
+| Intensidade e metal | a deriva **não** é proporcional à condutividade tabelada (§37); a mesma regra vale para todos os metais |
 
 ## 3. Condutividade térmica
 
@@ -63,8 +66,8 @@ estrutura → comportamento → propriedade observada
 | | |
 |---|---|
 | Requisito | estrutura cristalina organizada |
-| Ação | **Incidir luz** / **Apagar luz** |
-| Representação | feixe incidente (hachurado) e feixe refletido sobre a face superior da estrutura; as unidades da superfície recebem realce e contorno |
+| Ação | **Incidir luz** / **Apagar luz**, ou toque na **lanterna** da cena. Arrastar a lanterna (ou as setas, com ela em foco) muda o ângulo de 5° a 80° da normal; Enter acende e apaga |
+| Representação | normal da superfície (tracejada), feixe incidente com **θᵢ** e feixe refletido com **θᵣ = θᵢ** (lei da reflexão), sobre o centro da face superior; nenhum feixe atravessa o metal (opaco à luz visível). As unidades da superfície recebem realce e contorno. O ângulo é transitório: o estado guarda só "luz acesa" |
 | Interpretação | os elétrons deslocalizados próximos da superfície respondem à luz e a reemitem, o que produz alta reflexão (modelo qualitativo) |
 | Limites | não é espelho perfeito nem espectro; a **cor própria** de cada metal (ouro, cobre) não é representada, por falta de dados ópticos homologados (§75–76) |
 

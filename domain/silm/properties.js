@@ -13,13 +13,13 @@ window.SILM=window.SILM||{};
  // Deformação: até 4 deslizamentos (limite da representação; SILM.deformation.LIMIT).
  const limits=Object.freeze({heatStages:4,compression:4,elongation:4});
  // 0.17.x: limites declarados da deformação contínua (deslizamento de planos).
- const DEFORMATION_LIMITS='Representação didática: um sistema de deslizamento representativo de cada estrutura (Callister & Rethwisch), com o cristal girado para que o plano fique a 45° da força. O limiar de escoamento e a deformação elástica (exagerada para ser vista) são os mesmos para todos os metais; a experiência não reproduz a curva tensão-deformação, o limite de escoamento nem o encruamento do metal.';
+ const DEFORMATION_LIMITS='Representação didática: um sistema de deslizamento representativo de cada estrutura (Callister & Rethwisch), com o cristal girado para que o plano fique a 45° da força. O limiar de escoamento e a deformação elástica (exagerada para ser vista) são os mesmos para todos os metais; a experiência não reproduz a curva tensão-deformação, o limite de escoamento nem o encruamento do metal. Com o campo elétrico, os defeitos deixados pelos deslizamentos (discordâncias, não desenhadas) aumentam um pouco o espalhamento dos elétrons de forma uniforme, com fatores didáticos (regra de Matthiessen, qualitativa).';
  const catalog=Object.freeze({
-  electrical:{id:'electrical',title:'Condutividade elétrica',requires:'electrons',limitation:'O movimento visual dos elétrons sob campo é uma representação qualitativa e não corresponde diretamente à velocidade real dos portadores de carga. Com a fonte de calor, o aumento do espalhamento e a redução da deriva nas regiões quentes seguem a regra de Matthiessen (Callister & Rethwisch) de forma qualitativa, com fatores didáticos iguais para todos os metais.'},
+  electrical:{id:'electrical',title:'Condutividade elétrica',requires:'electrons',limitation:'O movimento visual dos elétrons sob campo é uma representação qualitativa e não corresponde diretamente à velocidade real dos portadores de carga. Com a fonte de calor, o aumento do espalhamento e a redução da deriva nas regiões quentes seguem a regra de Matthiessen (Callister & Rethwisch) de forma qualitativa, com fatores didáticos iguais para todos os metais. A intensidade do campo vai de 5 % a 100 %, sem unidade: a deriva é proporcional a ela (v ∝ E) e não usa a condutividade do metal.'},
   thermal:{id:'thermal',title:'Condutividade térmica',requires:'crystalline',limitation:'Representação qualitativa: a energia passa entre vizinhos imediatos pela equação do calor discreta, com um coeficiente didático único (igual para todos os metais) e sem perdas para o ambiente. A escala de tempo é a da animação, não a do metal, e não há comparação entre metais.'},
   malleability:{id:'malleability',title:'Maleabilidade',requires:'crystalline',limitation:DEFORMATION_LIMITS},
   ductility:{id:'ductility',title:'Ductilidade',requires:'crystalline',limitation:DEFORMATION_LIMITS},
-  luster:{id:'luster',title:'Brilho metálico',requires:'crystalline',limitation:'A reflexão de luz é uma representação qualitativa do comportamento óptico metálico e não um cálculo espectroscópico completo.'}
+  luster:{id:'luster',title:'Brilho metálico',requires:'crystalline',limitation:'A reflexão de luz é uma representação qualitativa do comportamento óptico metálico e não um cálculo espectroscópico completo. O ângulo segue a lei da reflexão (θr = θi, física geral); a cor própria de cada metal não é representada.'}
  });
  const reasons=Object.freeze({
   PROPERTY_DATA_MISSING:'Dado tabelado não homologado no banco do SILM para este metal.',
@@ -98,7 +98,19 @@ window.SILM=window.SILM||{};
  }
  const heatWord=l=>['ambiente','baixa','moderada','alta','muito alta'][l];
  /* Textos curtos: o que você alterou, o que aconteceu, como interpretar (§78). */
- function narrative(id,params,{reduced=false,electronsVisible=true,deformation=null,thermal=null}={}){
+ function narrative(id,params,{reduced=false,electronsVisible=true,deformation=null,thermal=null,drive=null}={}){
+  const n=narrativeCore(id,params,{reduced,electronsVisible,deformation,thermal,drive});
+  // 0.17.x: intensidade do campo (P3), lanterna (P4) e deformação + corrente (Matthiessen, defeitos não desenhados).
+  const pct=drive?Math.round(drive.intensity*100)+' %':'';
+  if(id==='electrical'&&params.field&&drive)return {...n,observation:n.observation+' Intensidade do campo: '+pct+'; a deriva média cresce com a intensidade (v ∝ E).'};
+  if((id==='malleability'||id==='ductility')&&drive?.deformField){const k=id==='malleability'?params.compression:params.elongation;
+   const extra=electronsVisible?' Com o campo elétrico ('+pct+'): '+(k?'os deslizamentos geraram defeitos na rede (discordâncias, que esta representação não desenha); eles espalham um pouco mais os elétrons, e a deriva média diminui levemente.':'sem deslizamentos, a deriva é a da rede sem deformação; deforme para comparar.'):' Mostre os elétrons (Ver → Elétrons) para observar a deriva sob o campo.';
+   return {...n,observation:n.observation+extra,interpretation:(n.interpretation?n.interpretation+' ':'')+'Pela regra de Matthiessen, a resistividade de um metal soma contribuições térmica, de impurezas e de deformação; a da deformação vem dos defeitos criados ao deformar e é menor que a térmica à temperatura ambiente. Representação qualitativa, igual para todos os metais.'};}
+  if(id==='luster'&&params.light&&drive)return {action:'Luz incidente a θᵢ = '+drive.angle+'° da normal da superfície.',observation:'A superfície reflete a maior parte da luz visível: o feixe refletido sai do outro lado da normal com θᵣ = θᵢ = '+drive.angle+'° (reflexão especular). Não há feixe atravessando o metal.',interpretation:n.interpretation+' O ângulo de reflexão igual ao de incidência é a lei da reflexão, válida para qualquer superfície lisa; o alto brilho vem da resposta dos elétrons deslocalizados.'};
+  if(id==='luster'&&!params.light&&drive)return {...n,observation:'Sem luz incidente. Toque na lanterna (ou use Incidir luz) e arraste-a para mudar o ângulo.'};
+  return n;
+ }
+ function narrativeCore(id,params,{reduced=false,electronsVisible=true,deformation=null,thermal=null}={}){
   const off={action:'Nenhuma ação aplicada.',observation:'Estado-base da estrutura.',interpretation:''};
   // Calor + corrente (0.17.x; regra de Matthiessen, Callister & Rethwisch): efeito qualitativo, igual para todos os metais.
   if(id==='electrical'&&thermal?.combined&&(thermal.on||thermal.mean>.02)){
