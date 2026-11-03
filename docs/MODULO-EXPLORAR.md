@@ -10,6 +10,7 @@
 - [Estímulo elétrico](ESTIMULO-ELETRICO.md) — campo aplicado, deriva dos elétrons, corrente convencional, espalhamento e aquecimento Joule.
 - [Estímulo mecânico](ESTIMULO-MECANICO.md) — força, tensão, deformação elástica e plástica, discordâncias e sistemas de deslizamento.
 - [Combinações de estímulos](COMBINACOES-ESTIMULOS.md) — matriz de compatibilidade, acoplamentos existentes e proposta de painel contextual único para selecionar experiências e aplicar condições auxiliares.
+- [Camadas de visualização](CAMADAS-VISUALIZACAO.md) — significado das camadas, visibilidade independente do estado científico, organização do painel e persistência das preferências.
 
 ## 1. Princípio
 
@@ -64,7 +65,7 @@ O foco acompanha a última ação. Escolhido no painel, ele prevalece enquanto e
 
 ## 5. Camadas (Ver → Camadas)
 
-Centros metálicos, célula unitária, rede extensa, vizinhos, elétrons, rótulos e indicações da propriedade, com o estado lido por leitor de tela ("Camadas visíveis: …"). Só aparecem as camadas aplicáveis. Sua visibilidade não deve alterar o estado científico nem acionar uma ferramenta de outro módulo.
+Centros metálicos, célula unitária, rede extensa, vizinhos, elétrons, rótulos e indicações da propriedade, com o estado lido por leitor de tela ("Camadas visíveis: …"). Só aparecem as camadas aplicáveis. Sua visibilidade não deve alterar o estado científico nem acionar uma ferramenta de outro módulo. O contrato completo está em [Camadas de visualização](CAMADAS-VISUALIZACAO.md).
 
 ## 6. Comparação qualitativa (Ver → Comparar)
 
