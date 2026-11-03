@@ -306,6 +306,7 @@ A tabela é uma matriz de capacidades, não determinação de que todo método d
 - [x] Criar testes de contrato sem refatorar a lógica; aprovados no CI F0.
 - [ ] Validar no CI as fixtures em `tests/fixtures/engine-baseline.json`, executadas por `tests/engine-fixtures.cjs`.
 - [x] Congelar geometria Cu/Fe/Mg/Mn, passo térmico, sistemas FCC/BCC/HCP, estímulos, fatores eletrônicos qualitativos e defaults/limites do catálogo.
+- [x] Registrar a razão de vizinhança do Mg pela geometria de referência com seu parâmetro c/a; não impor a distância de HCP ideal.
 
 ### F1.2 — Definir descritores sem mover algoritmos
 

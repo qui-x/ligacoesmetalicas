@@ -157,7 +157,7 @@ Todas as etapas de setup, teste e cleanup terminaram com `success`. A advertênc
 
 ## 9. Decisão sobre F1
 
-F1 não deve alterar regras científicas antes do resultado do baseline. A partir do inventário estático, a primeira rodada de contratos deve cobrir:
+Com F0 aprovado, F1 pode congelar assinaturas e fixtures sem alterar as regras científicas. A primeira rodada de contratos cobre:
 
 - geometry/crystal: função determinística sem relógio;
 - thermal: motor dinâmico qualitativo;
@@ -173,12 +173,12 @@ O descritor de cada motor deve declarar ID, versão do algoritmo, classe de evid
 ## 10. Critério de fechamento do F0
 
 F0 só pode ser marcado como concluído quando:
-- [ ] O pipeline roda no commit-base da branch completa.
-- [ ] Build termina com sucesso.
-- [ ] A suíte de regressão exigida termina com sucesso.
-- [ ] Falhas preexistentes, se houver, estão identificadas por teste e log.
-- [ ] Resultados, versões e SHA estão registrados.
-- [ ] O baseline é reproduzível por outro checkout.
+- [x] O pipeline roda no commit-base da branch completa.
+- [x] Build termina com sucesso.
+- [x] A suíte de regressão exigida termina com sucesso.
+- [x] Falhas preexistentes, se houver, estão identificadas por teste e log.
+- [x] Resultados, versões e SHA estão registrados.
+- [x] O baseline é reproduzível por outro checkout.
 
 F0 está **aprovado** para o commit testado. Alterações posteriores de código ou testes devem executar novamente a suíte aplicável. Esta aprovação não autoriza alteração da `main`.
 

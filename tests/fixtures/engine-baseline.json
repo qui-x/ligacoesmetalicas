@@ -18,7 +18,7 @@
       "model": "HCP",
       "sites": 17,
       "coordination": 12,
-      "nearestOverA": 1
+      "nearestOverA": 0.9961283866006991
     },
     "Mn": {
       "model": "COMPLEX_CUBIC",
