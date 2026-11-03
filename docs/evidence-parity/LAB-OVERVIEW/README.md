@@ -37,3 +37,16 @@ Agora o contêiner tem uma coluna só, como "Sua bancada" no SIAB.
 ## Diferenças de domínio (N/A)
 
 - **N/A — "Selecionar recipientes", "Ordenar por pH" e o destaque "Em foco".** As estruturas recentes não são recipientes de uma bancada: cada uma é uma investigação independente, com a sua referência. A comparação é qualitativa e não tem escala comum, então ordenar por um valor sugeriria uma classificação que o plano proíbe (LAB-VIEW-08).
+
+## Segunda rodada (03/11/2026, pedido do autor: "ainda temos algumas falhas em comparação com o siab")
+
+| SIAB ("Sua bancada") | SILM antes | SILM agora |
+|---|---|---|
+| Título e ações na mesma faixa | Título, e os controles numa fila separada | "Estruturas recentes" à esquerda; Elétrons, Movimento e Ver em lista/grade à direita. A comparação por propriedade (Propriedade, Intensidade, Restaurar) fica na linha de baixo |
+| "Visão geral 2": contador na aba | Sem contador | "Visão geral 2" |
+| Cartões grandes, numerados, com "Em foco", desenho à esquerda e informações à direita | Cartões estreitos, desenho em cima e quase sem informação | Cartões em largura útil (2 por linha em 1366 px, 1 no celular), numerados, com "Em foco" na estrutura atual. O desenho fica à esquerda; à direita, metal, estrutura de referência, parâmetro de rede do banco, estado da propriedade e "Fonte e limites" |
+| Tocar num tubo leva ao "Tubo em foco" | Tocar num cartão não fazia nada | Tocar num cartão (ou numa ficha) abre a estrutura no Foco. Se for outro metal, o SILM pede a mesma confirmação de "Iniciar investigação" e organiza segundo a referência; se for o atual, só volta ao Foco |
+| "Ver em grade" | — | "Ver em lista" / "Ver em grade", guardado no navegador |
+| Barra de baixo: BANCADA, fichas dos tubos e "+ Novo tubo" | Desfazer, unidades e Mais (ações do Foco) | ESTRUTURAS, uma ficha por estrutura (número, metal e rótulo da estrutura, "em foco" marcada) e "+ Nova estrutura" (abre Montagem → Preparo) |
+
+Continuam N/A: "Selecionar recipientes" (não há misturas nem vínculos entre estruturas) e "Ordenar por pH" (ordenar por um valor sugeriria uma classificação que o plano proíbe).

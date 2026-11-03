@@ -140,9 +140,18 @@ module.exports=async(browser,url)=>{
     await p.waitForFunction(()=>[...document.querySelectorAll('.silm-comparison-card-state')].length===2,'',{timeout:4000});
     for(const t of await p.locator('.silm-comparison-card-state').allInnerTexts())assert.ok(/Qualitativa · 2\/3/.test(t)||t.length>10,'Cada cartão mostra o estado qualitativo ou o motivo: '+t);
     await p.getByRole('button',{name:'Restaurar',exact:true}).click();await p.waitForFunction(()=>document.querySelector('.silm-comparison-level')?.textContent==='0/3','',{timeout:4000});
+    // Segunda rodada, como "Sua bancada" do SIAB: contador na aba, "Em foco", fichas na barra de baixo e tocar abre no Foco.
+    assert.match(await p.locator('[data-scene-view="overview"]').innerText(),/Visão geral\s*2/,'Contador na aba');
+    assert.equal(await p.locator('.silm-comparison-card[data-current=true] h3').innerText(),'Ferro (Fe)','Em foco na estrutura atual');
+    assert.deepEqual(await p.locator('.silm-comparison-index').allInnerTexts(),['1','2'],'Cartões numerados');
+    assert.equal(await p.locator('.silm-overview-chip').count(),2);assert.equal(await p.locator('#scene-undo').isVisible(),false,'Ações do Foco fora da Visão geral');
+    await p.locator('#comparison-layout').click();assert.equal(await p.locator('.silm-comparison-cards').getAttribute('data-layout'),'list');await p.locator('#comparison-layout').click();
+    await p.locator('.silm-comparison-card').nth(1).locator('.silm-comparison-open').click();await p.locator('#si-modal-confirm').click();
+    await p.waitForFunction(()=>SILMIntegration.snapshot().metal?.atomicNumber===29&&SILMIntegration.snapshot().structure?.mode==='crystalline');
+    assert.equal(await p.locator('#workspace-focus').isVisible(),true,'Abrir no Foco');assert.equal(await p.locator('#scene-undo').isVisible(),true,'Ações do Foco de volta');
    }
   }finally{await octx.close();}
  }
  assert.deepEqual(errors,[]);
- console.log('PASS TEST-WORKSPACE 5.1–5.5: Oficina vazia em 5 tamanhos com ações funcionais, etiqueta do módulo, adicionar/desfazer, troca de módulo sem perder a investigação; Montagem com Fechar, grupos, ação principal, resumo em pares, retorno do foco e indisponibilidade explícita; Investigar e Dados da investigação com famílias do módulo, camadas sem efeito científico, origens, registros rotulados e seção Relatório; Visão geral com controles em largura total, cartões úteis, nada cortado, propriedade e Restaurar.');
+ console.log('PASS TEST-WORKSPACE 5.1–5.5: Oficina vazia em 5 tamanhos com ações funcionais, etiqueta do módulo, adicionar/desfazer, troca de módulo sem perder a investigação; Montagem com Fechar, grupos, ação principal, resumo em pares, retorno do foco e indisponibilidade explícita; Investigar e Dados da investigação com famílias do módulo, camadas sem efeito científico, origens, registros rotulados e seção Relatório; Visão geral com controles em largura total, cartões úteis, nada cortado, propriedade e Restaurar; como "Sua bancada" do SIAB: contador na aba, cartões numerados com Em foco, fichas na barra de baixo, lista/grade e abrir no Foco.');
 };

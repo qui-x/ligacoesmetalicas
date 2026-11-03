@@ -1,3 +1,19 @@
+## Em desenvolvimento — Visão geral como "Sua bancada" do SIAB
+
+- Pedido do autor: "ainda temos algumas falhas em comparação com o siab".
+- **Faixa do título:** "Estruturas recentes" à esquerda; Elétrons, Movimento e "Ver em lista" (ou "Ver em grade") à direita. A comparação por propriedade (Propriedade, Intensidade e Restaurar) fica na linha de baixo.
+- **Contador na aba:** "Visão geral 2".
+- **Cartões como os do SIAB:**
+  - número e "Em foco" na estrutura atual;
+  - desenho à esquerda e, à direita, o metal, a estrutura de referência, o parâmetro de rede do banco, o estado da propriedade e "Fonte e limites";
+  - dois por linha no computador e um no celular.
+- **Tocar num cartão abre a estrutura no Foco:**
+  - se for outro metal, o SILM pede a mesma confirmação de "Iniciar investigação" e organiza a estrutura segundo a referência;
+  - se for o atual, só volta ao Foco;
+  - em atividade, o SILM avisa para encerrá-la antes.
+- **Barra de baixo na Visão geral:** ESTRUTURAS, uma ficha por estrutura e "+ Nova estrutura" (abre Montagem → Preparo), no lugar das ações do Foco.
+- Manual ("Conheça a Oficina dos Metais") e evidências de paridade (`docs/evidence-parity/LAB-OVERVIEW/`) atualizados.
+
 ## Em desenvolvimento — Barra de controles da cena reorganizada
 
 - Pedido do autor: "reorganize a barra de controles da cena, ela está desorganizada após mudar o tamanho e foco da cena".
