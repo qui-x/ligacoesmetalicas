@@ -36,7 +36,7 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
  motion.onclick=()=>{moving=!moving;motion.setAttribute('aria-pressed',String(moving));syncLayers();};
  view.onclick=()=>{layout=layout==='grid'?'list':'grid';storage.set('comparison.layout',layout);applyLayout();};
  actions.append(electrons,motion,view);head.append(actions);
- const note=N('p','Toque numa estrutura para abri-la no Foco; ✕ a remove desta lista. Até seis; cada uma usa sua referência, sem escala comum.','silm-comparison-intro');title.tabIndex=-1;
+ title.tabIndex=-1;
  // Comparar uma propriedade: seletor, intensidade em botões segmentados (0 a 3) e Restaurar.
  const controls=N('div',null,'silm-comparison-controls');
  const propertyField=N('div',null,'silm-comparison-field');
@@ -51,7 +51,9 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
  controls.append(propertyField,intensityField,reset);
  const limits=document.createElement('details');limits.className='silm-comparison-limits';
  limits.append(N('summary','Limites da comparação'),N('p','A intensidade é didática. As cenas não permitem classificar qual metal conduz ou deforma mais.'));
- const cards=N('div',null,'silm-comparison-cards');host.append(head,note,controls,limits,cards);
+ // Menos texto: "Limites da comparação" (recolhido) fica na mesma linha dos controles; a dica saiu (o ✕ e o cartão dizem o que fazem).
+ limits.querySelector('p').textContent='Até seis estruturas, cada uma com a sua referência e sem escala comum. A intensidade é didática: as cenas não permitem classificar qual metal conduz ou deforma mais.';controls.append(limits);
+ const cards=N('div',null,'silm-comparison-cards');host.append(head,controls,cards);
  select.onchange=()=>{property=select.value;render();};
  const setLevel=v=>{level=v;status.textContent=level+'/3';for(const b of levelButtons)b.setAttribute('aria-pressed',String(Number(b.dataset.comparisonLevel)===v));};
  for(const b of levelButtons)b.onclick=()=>{setLevel(Number(b.dataset.comparisonLevel));render();};
@@ -74,24 +76,37 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
   recent.forEach((z,i)=>{const e=S.data.get(z),b=N('button',null,'silm-overview-chip');b.type='button';b.setAttribute('aria-pressed',String(z===cur));
    const sym=N('span',e.symbol,'silm-overview-chip-symbol');sym.setAttribute('aria-hidden','true');const txt=N('span');txt.append(N('strong',e.name),N('small',(i+1)+' · '+(structureCode(e)||'referência')));
    b.append(sym,txt);b.setAttribute('aria-label',(i+1)+'. '+e.name+(z===cur?', em foco':'')+' — abrir no Foco');b.onclick=()=>openStructure(z);chips.append(b);});}
- function draw(g,e){
-  const svg=document.createElementNS(svgNS,'svg');svg.setAttribute('viewBox','0 0 300 230');svg.setAttribute('role','img');svg.setAttribute('aria-label',e.name+' — '+g.label+' — '+(property==='none'?'referência':S.properties.catalog[property].title)+', nível '+level);
+ /* Desenho do cartão como no Foco (03/11/2026, pedido do autor: "dê o mesmo foco que deu na parte de em foco"): esferas
+    com volume (o mesmo gradiente das unidades do Foco), menores e desenhadas antes quando estão mais ao fundo, com o
+    símbolo do metal; arestas da célula finas; sem texto além de "E" no campo. Fonte e referência ficam no nome acessível. */
+ let gradientId=0;
+ function draw(g,e,source){
+  const svg=document.createElementNS(svgNS,'svg');svg.setAttribute('viewBox','0 0 300 230');svg.setAttribute('role','img');
   const eligible=S.properties.eligibility(e)[property],apply=property!=='none'&&eligible?.status!=='unavailable';
+  svg.setAttribute('aria-label',e.name+' — '+g.label+' — '+(property==='none'?'referência':S.properties.catalog[property].title+(apply?', intensidade '+level+' de 3 (qualitativa)':', indisponível: '+(eligible?.message||'nesta estrutura')))+(source?'. Fonte: '+source:''));
   const transform=p=>apply&&property==='malleability'?S.properties.compress(p,g.center,level):apply&&property==='ductility'?S.properties.elongate(p,g.center,level):p;
-  const project=p=>{const q=p.map((v,i)=>v-g.center[i]);return [q[0]+.35*q[1],-q[2]+.3*q[1]];};
-  const fit=[...g.points,...g.edges.flat()].map(project),max=Math.max(1,...fit.flat().map(Math.abs))*1.3;
-  const screen=p=>{const q=project(transform(p));return [150+q[0]*105/max,115+q[1]*105/max];};
-  const shape=(tag,attrs)=>{const n=document.createElementNS(svgNS,tag);for(const [k,v]of Object.entries(attrs))n.setAttribute(k,v);svg.append(n);};
-  for(const [a,b]of g.edges){const p=screen(a),q=screen(b);shape('line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],stroke:'currentColor','stroke-opacity':.4});}
-  const pts=g.points.map(screen);const xs=pts.map(p=>p[0]),min=Math.min(...xs),span=Math.max(1,Math.max(...xs)-min);
-  pts.forEach((p,i)=>{const heat=apply&&property==='thermal'?Math.max(0,level/3-(p[0]-min)/span*.6):0;shape('circle',{cx:p[0],cy:p[1],r:Math.max(3,7-Math.log10(pts.length)),fill:heat?`hsl(${45-45*heat} 85% 55%)`:'#b69a51',stroke:'currentColor'});if(heat)shape('circle',{cx:p[0],cy:p[1],r:9+heat*4,fill:'none',stroke:'currentColor','stroke-dasharray':'2 3'});});
-  if(apply&&property==='electrical'&&level){for(let i=0;i<8;i++){const x=65+(i%4)*50,y=180+Math.floor(i/4)*15;shape('circle',{cx:x,cy:y,r:2,fill:'#168aad'});shape('line',{x1:x,y1:y,x2:x-level*6,y2:y,stroke:'#168aad'});}const t=document.createElementNS(svgNS,'text');t.setAttribute('x','15');t.setAttribute('y','22');t.setAttribute('fill','currentColor');t.textContent='Campo →   deriva dos elétrons ←';svg.append(t);}
-  if(apply&&property==='luster'&&level)for(let i=0;i<level;i++){shape('line',{x1:20+i*20,y1:15,x2:100+i*20,y2:80,stroke:'#b69a51','stroke-width':2});shape('line',{x1:100+i*20,y1:80,x2:180+i*20,y2:15,stroke:'#b69a51','stroke-dasharray':'5 3'});}
+  const project=p=>{const q=p.map((v,i)=>v-g.center[i]);return [q[0]+.35*q[1],-q[2]+.3*q[1],q[1]];};
+  const fit=[...g.points,...g.edges.flat()].map(project),max=Math.max(1,...fit.flatMap(q=>[Math.abs(q[0]),Math.abs(q[1])]))*1.32;
+  const screen=p=>{const q=project(transform(p));return [150+q[0]*105/max,117+q[1]*105/max,q[2]];};
+  const shape=(tag,attrs,parent=svg)=>{const n=document.createElementNS(svgNS,tag);for(const [k,v]of Object.entries(attrs))n.setAttribute(k,v);parent.append(n);return n;};
+  const gid='silm-cmp-sphere-'+(++gradientId),defs=shape('defs',{}),grad=shape('radialGradient',{id:gid,cx:'34%',cy:'30%',r:'72%'},defs);
+  for(const [o,c]of [['0','#f3e7c2'],['.34','#d4b465'],['.74','#a8743b'],['1','#6e4a22']])shape('stop',{offset:o,'stop-color':c},grad);
+  for(const [a,b]of g.edges){const p=screen(a),q=screen(b);shape('line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],stroke:'currentColor','stroke-opacity':.35,'stroke-width':1.2,class:'silm-comparison-edge'});}
+  const pts=g.points.map(screen),ds=pts.map(p=>p[2]),dMin=Math.min(...ds),dSpan=Math.max(1e-9,Math.max(...ds)-dMin);
+  const xs=pts.map(p=>p[0]),min=Math.min(...xs),span=Math.max(1,Math.max(...xs)-min),R=Math.max(8,Math.min(17,60/Math.sqrt(pts.length)));
+  // Do fundo para a frente: as esferas da frente cobrem as de trás, como no Foco.
+  pts.map((p,i)=>({p,i,far:(p[2]-dMin)/dSpan})).sort((a,b)=>b.far-a.far).forEach(({p,far})=>{
+   const r=R*(1-.22*far),heat=apply&&property==='thermal'?Math.max(0,level/3-(p[0]-min)/span*.6):0;
+   shape('circle',{cx:p[0],cy:p[1],r,fill:`url(#${gid})`,stroke:'#2a2016','stroke-width':1,class:'silm-comparison-sphere'});
+   if(heat){shape('circle',{cx:p[0],cy:p[1],r,fill:`hsl(${45-45*heat} 90% 55%)`,'fill-opacity':(.25+.45*heat).toFixed(2)});shape('circle',{cx:p[0],cy:p[1],r:r+3+heat*4,fill:'none',stroke:'currentColor','stroke-dasharray':'2 3'});}
+   if(r>=10){const t=shape('text',{x:p[0],y:p[1],'text-anchor':'middle','dominant-baseline':'central','font-size':(r*.78).toFixed(1),'font-weight':800,fill:'#17181b',class:'silm-comparison-symbol'});t.textContent=e.symbol;}
+  });
+  const arrow=(x1,y1,x2,y2,color)=>{shape('line',{x1,y1,x2,y2,stroke:color,'stroke-width':2.2,'stroke-linecap':'round'});const a=Math.atan2(y2-y1,x2-x1),h=7;shape('polygon',{points:[[x2,y2],[x2-h*Math.cos(a-.45),y2-h*Math.sin(a-.45)],[x2-h*Math.cos(a+.45),y2-h*Math.sin(a+.45)]].map(q=>q.map(v=>v.toFixed(1)).join(',')).join(' '),fill:color});};
+  if(apply&&property==='electrical'&&level){arrow(118,12,182,12,'currentColor');const t=shape('text',{x:190,y:12,'dominant-baseline':'central','font-size':13,'font-weight':800,fill:'currentColor'});t.textContent='E';
+   for(let i=0;i<3;i++){const y=216;const x=110+i*40;arrow(x+level*5,y,x-level*5,y,'#168aad');}}
+  if(apply&&property==='luster'&&level)for(let i=0;i<level;i++){shape('line',{x1:20+i*20,y1:12,x2:100+i*20,y2:70,stroke:'#b69a51','stroke-width':2});shape('line',{x1:100+i*20,y1:70,x2:180+i*20,y2:12,stroke:'#b69a51','stroke-dasharray':'5 3'});}
   return {svg,eligible,apply,centers:pts.map(p=>({x:p[0]/300,y:p[1]/230}))};
  }
- // Parâmetros de rede da referência (valores do banco, como registrados): a; b e c só quando diferem de a.
- function params(e){const r=e?.structures?.find(x=>x.id===e.referenceStructure),p=r?.latticeParameters;if(!p?.a)return '';const show=k=>p[k]?.display?k+' = '+String(p[k].display).replace('.',',')+' '+(p[k].unit||''):'';
-  const parts=[show('a')];if(p.b&&p.b.value!==p.a.value)parts.push(show('b'));if(p.c&&p.c.value!==p.a.value)parts.push(show('c'));return parts.filter(Boolean).join(' · ');}
  function render(){for(const scope of scopes)scope.destroy();scopes=[];layers=[];cards.replaceChildren();const cur=current();shownCurrent=cur;updateCount();renderStrip(cur);
   if(!recent.length){cards.append(N('p','Inicie uma investigação para incluir a primeira estrutura.'));return;}
   recent.forEach((z,i)=>{
@@ -100,24 +115,19 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
    const index=N('span',String(i+1),'silm-comparison-index');index.setAttribute('aria-hidden','true');card.append(index);
    if(focused){const badge=N('span','Em foco','silm-comparison-focus');card.append(badge);}
    else{const del=N('button','✕','silm-comparison-remove');del.type='button';del.setAttribute('aria-label','Remover '+e.name+' da Visão geral');del.title='Remover da Visão geral';del.onclick=ev=>{ev.stopPropagation();removeStructure(z);};card.append(del);}
-   const body=N('div',null,'silm-comparison-body');
+   // O cartão inteiro abre a estrutura no Foco (botão transparente sobre o cartão; o nome acessível diz o que faz).
+   const go=N('button',null,'silm-comparison-open');go.type='button';go.setAttribute('aria-label',(focused?'Ver ':'Abrir ')+e.name+' ('+e.symbol+') no Foco'+(focused?' (em foco)':''));go.title=focused?'Ver no Foco':'Abrir no Foco';go.onclick=()=>openStructure(z);card.append(go);
    const heading=N('header',null,'silm-comparison-card-heading');heading.append(N('h3',e.name+' ('+e.symbol+')'));
    if(g){
-    const code=g.canonical?(g.code||g.label):(g.label||g.code);heading.append(N('span',code,'silm-comparison-structure'));body.append(heading);
-    const {svg,eligible,apply,centers}=draw(g,e),stage=N('div',null,'silm-comparison-stage');stage.append(svg);card.append(stage);
+    let sourceTitle=g.source;try{sourceTitle=S.data.source(g.source)?.title||g.source;}catch(_){}
+    const code=g.canonical?(g.code||g.label):(g.label||g.code),pill=N('span',code,'silm-comparison-structure');pill.title=(g.label&&g.label!==code?g.label.charAt(0).toUpperCase()+g.label.slice(1)+'. ':'')+'Fonte: '+(sourceTitle||'não informada')+(g.canonical?'':'. Célula construída a partir dos sítios e da simetria registrados.');heading.append(pill);
+    const {svg,eligible,apply,centers}=draw(g,e,sourceTitle),stage=N('div',null,'silm-comparison-stage');stage.append(svg);card.append(stage);
     const scope=SimCore.createScope();scopes.push(scope);const layer=S.createElectronLayer(stage,{scope,reducedMotion:reduced});layers.push({layer,options:{centers,spacing:.12,connect:true,field:apply&&property==='electrical'&&level>0}});
-    if(g.label&&g.label!==code)body.append(N('p',g.label.charAt(0).toUpperCase()+g.label.slice(1),'silm-comparison-kind'));
-    const pr=params(e);if(pr)body.append(N('p',pr,'silm-comparison-params'));
-    if(property!=='none')body.append(N('p',apply?'Qualitativa · '+level+'/3':eligible?.message||'Indisponível nesta estrutura.','silm-comparison-card-state'));
-    const details=document.createElement('details');details.className='silm-comparison-details';details.append(N('summary','Fonte e limites'));
-    const detailBody=N('div');let sourceTitle=g.source;try{sourceTitle=S.data.source(g.source)?.title||g.source;}catch(_){}
-    detailBody.append(N('p','Fonte: '+(sourceTitle||'Não informada')+'.'));
-    if(!g.canonical)detailBody.append(N('p','Célula de referência construída a partir dos sítios e das operações de simetria registrados. Medições e cálculos desta estrutura ainda não estão disponíveis na oficina.'));
-    details.append(detailBody);body.append(details);
-   }else{body.append(heading,N('p','Geometria de referência indisponível.','silm-comparison-kind'));}
-   // O cartão inteiro abre a estrutura no Foco (botão esticado sobre o cartão; "Fonte e limites" fica por cima).
-   const go=N('button',focused?'Ver no Foco':'Abrir no Foco','silm-comparison-open');go.type='button';go.setAttribute('aria-label',(focused?'Ver ':'Abrir ')+e.name+' ('+e.symbol+') no Foco'+(focused?' (em foco)':''));go.onclick=()=>openStructure(z);
-   body.append(go);card.append(body);cards.append(card);
+    card.dataset.state=property==='none'?'reference':apply?'qualitative':'unavailable';
+    // Só a indisponibilidade aparece em texto (curto); o motivo fica no título e no nome acessível do desenho.
+    if(property!=='none'&&!apply){const chip=N('span','Indisponível','silm-comparison-card-state');chip.title=eligible?.message||'Indisponível nesta estrutura.';heading.append(chip);}
+   }else{card.dataset.state='no-geometry';const none=N('p','Geometria de referência indisponível.','silm-comparison-kind');card.append(none);}
+   card.append(heading);cards.append(card);
   });
   syncLayers();
  }

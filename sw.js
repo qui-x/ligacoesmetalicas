@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.5';
 // BUILD muda com o conteúdo de qualquer arquivo do cache (scripts/sw-build-id.cjs): o navegador instala a versão nova.
-const BUILD='93c7f5f533dd';
+const BUILD='56ec93c12880';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "./",

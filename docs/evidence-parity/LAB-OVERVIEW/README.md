@@ -51,3 +51,11 @@ Agora o contêiner tem uma coluna só, como "Sua bancada" no SIAB.
 | Barra de baixo: BANCADA, fichas dos tubos e "+ Novo tubo" | Desfazer, unidades e Mais (ações do Foco) | ESTRUTURAS, uma ficha por estrutura (número, metal e rótulo da estrutura, "em foco" marcada) e "+ Nova estrutura" (abre Montagem → Preparo) |
 
 Continuam N/A: "Selecionar recipientes" (não há misturas nem vínculos entre estruturas) e "Ordenar por pH" (ordenar por um valor sugeriria uma classificação que o plano proíbe).
+
+## Terceira rodada (03/11/2026): estrutura como no Foco, menos texto
+
+Pedido do autor: "dê o mesmo foco que deu na parte de em foco para a estrutura nos cards de visão geral e remova a parte de excesso de textos".
+
+- **Desenho:** os cartões desenham a estrutura como o Foco: esferas com o gradiente das unidades e o símbolo; as do fundo menores e atrás; arestas finas e fundo de palco.
+- **Texto:** o cartão mostra só o nome e a sigla; "Indisponível" aparece só quando cabe.
+- **Onde ficou o resto:** a fonte, a forma por extenso, a propriedade, a intensidade e o motivo de indisponibilidade estão no título da sigla e no nome acessível do desenho. A dica saiu, e "Limites da comparação" foi para a linha dos controles.
