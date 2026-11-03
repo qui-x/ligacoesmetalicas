@@ -1,3 +1,16 @@
+## Em desenvolvimento — Barra de controles da cena reorganizada
+
+- Pedido do autor: "reorganize a barra de controles da cena, ela está desorganizada após mudar o tamanho e foco da cena".
+- Com o 3D livre há 12 controles. Em uma coluna eles não cabiam na cena, e o botão de tela cheia ia sozinho para uma segunda coluna.
+- Fora do celular, a barra agora é uma grade de duas colunas, em pares:
+  - aproximar e afastar, com o zoom embaixo;
+  - enquadrar e centralizar;
+  - restaurar vista e tela cheia;
+  - separados por uma linha fina, só no 3D: girar para a esquerda e para a direita, inclinar para cima e para baixo, e perspectiva.
+- A barra ficou com menos da metade da altura e, quando há espaço, fica ao lado da cena, sem cobrir a estrutura.
+- A ordem do teclado segue a ordem de leitura.
+- No celular, o painel "Vista" usa a mesma ordem.
+
 ## Em desenvolvimento — Corrente com intensidade (P3), lanterna (P4) e deformação + corrente
 
 - Pedido do autor: "pode fazer os três ao mesmo tempo". Sem barras deslizantes: tudo se controla na própria cena.
