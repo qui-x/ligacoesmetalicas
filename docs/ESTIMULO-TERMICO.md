@@ -422,10 +422,10 @@ A forma de teste deve comparar:
 \Delta U =
 E_{\mathrm{fonte}}
 -
-E_{\mathrm{ambiente}}
+E_{\mathrm{perda\,ambiente}}
 \]
 
-com a variação da energia armazenada na amostra, dentro da tolerância numérica definida pelo integrador. A tolerância e a escala só podem ser especificadas depois que o modelo de capacidade térmica e a unidade de cada termo estiverem fixados.
+em que a perda líquida para o ambiente é positiva quando a amostra perde energia e negativa quando o ambiente aquece a amostra. O teste compara essa diferença com a variação da energia armazenada, dentro da tolerância numérica definida pelo integrador. A tolerância e a escala só podem ser especificadas depois que o modelo de capacidade térmica e a unidade de cada termo estiverem fixados.
 
 ### 12.3 Critérios de aceitação
 
