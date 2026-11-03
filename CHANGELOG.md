@@ -1,3 +1,22 @@
+## Em desenvolvimento — Visão geral: estrutura como no Foco e menos texto
+
+- Pedido do autor: "dê o mesmo foco que deu na parte de em foco para a estrutura nos cards de visão geral e remova a parte de excesso de textos [...] isso tá deixando muito mais textual do que experimental".
+- **Cartões com a estrutura como no Foco:**
+  - esferas com volume (o mesmo gradiente das unidades do Foco), com o símbolo do metal;
+  - as esferas do fundo são menores e ficam atrás das da frente;
+  - arestas finas e fundo de palco;
+  - o desenho ocupa o cartão.
+- **Menos texto:**
+  - saíram a dica, a forma por extenso, o parâmetro de rede, "Qualitativa · n/3", "Fonte e limites" e "Abrir no Foco";
+  - o cartão mostra só o nome e a sigla da estrutura;
+  - "Indisponível" aparece só quando a propriedade não se aplica, com o motivo no título;
+  - no campo elétrico, setas e "E", sem a frase.
+- **Nada some para quem precisa:**
+  - a fonte e a forma por extenso aparecem ao passar sobre a sigla, e a fonte também em Dados → Dados do metal;
+  - o desenho tem nome acessível com metal, estrutura, propriedade, intensidade (ou o motivo da indisponibilidade) e fonte;
+  - "Limites da comparação" (recolhido) foi para a linha dos controles.
+- TEST-WORKSPACE confere o estado no nome acessível, nenhum texto de estado quando a propriedade se aplica e nenhum texto extra nos cartões.
+
 ## Em desenvolvimento — Aviso de nova versão sempre que algo muda
 
 - Pedido do autor: "ainda não apareceu para recarregar e atualizar a versão".

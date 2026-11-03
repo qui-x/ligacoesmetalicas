@@ -137,8 +137,11 @@ module.exports=async(browser,url)=>{
    assert.ok(o.overflow<=1,'Sem rolagem lateral em '+where+': '+o.overflow+' px');
    if(width===1366){
     await p.locator('#silm-comparison-property').selectOption('electrical');await p.locator('[data-comparison-level="2"]').click();
-    await p.waitForFunction(()=>[...document.querySelectorAll('.silm-comparison-card-state')].length===2,'',{timeout:4000});
-    for(const t of await p.locator('.silm-comparison-card-state').allInnerTexts())assert.ok(/Qualitativa · 2\/3/.test(t)||t.length>10,'Cada cartão mostra o estado qualitativo ou o motivo: '+t);
+    // Menos texto: o estado fica no desenho (nome acessível); só "Indisponível" aparece escrito, com o motivo no título.
+    await p.waitForFunction(()=>[...document.querySelectorAll('.silm-comparison-card')].every(c=>['qualitative','unavailable'].includes(c.dataset.state)),'',{timeout:4000});
+    for(const label of await p.locator('.silm-comparison-stage svg').evaluateAll(n=>n.map(x=>x.getAttribute('aria-label'))))assert.ok(/intensidade 2 de 3 \(qualitativa\)|indisponível/.test(label),'Estado no nome acessível: '+label);
+    assert.equal(await p.locator('.silm-comparison-card[data-state=qualitative] .silm-comparison-card-state').count(),0,'Sem texto de estado quando a propriedade se aplica');
+    assert.equal(await p.locator('.silm-comparison-intro, .silm-comparison-details, .silm-comparison-params').count(),0,'Sem textos extras nos cartões');
     await p.getByRole('button',{name:'Restaurar',exact:true}).click();await p.waitForFunction(()=>document.querySelector('.silm-comparison-level')?.textContent==='0/3','',{timeout:4000});
     // Segunda rodada, como "Sua bancada" do SIAB: contador na aba, "Em foco", fichas na barra de baixo e tocar abre no Foco.
     assert.match(await p.locator('[data-scene-view="overview"]').innerText(),/Visão geral\s*2/,'Contador na aba');
