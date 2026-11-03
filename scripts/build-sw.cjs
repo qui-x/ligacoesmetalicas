@@ -13,5 +13,6 @@ const icons=(manifest.icons||[]).map(i=>i.src.replace(/^\.\//,'')).filter(exists
 const jazz=['jazz-club/index.html','jazz-club/src/dance.css','jazz-club/src/dance.js','jazz-club/src/dance-core.js','jazz-club/src/dance-fallback.js','jazz-club/src/builtin-track.js','jazz-club/src/jukebox.css','jazz-club/src/jukebox-core.js','jazz-club/src/jukebox-library.js','jazz-club/src/jukebox-scene.js','jazz-club/audio/jazz e metais/catalogo.json'].filter(exists);
 const files=[...new Set(['./','index.html','completo.html','manifest.webmanifest','favicon-light.svg','favicon-dark.svg',...icons,...walk('assets'),...referenced,...jazz])];
 const template=fs.readFileSync(path.join(root,'scripts/sw-template.js'),'utf8');
-fs.writeFileSync(path.join(root,'sw.js'),template.replace('/*__PRECACHE__*/',JSON.stringify(files,null,2)));
-console.log('Service worker: '+files.length+' recursos no cache offline.');
+const build=require('./sw-build-id.cjs')(root,files);
+fs.writeFileSync(path.join(root,'sw.js'),template.replace('/*__PRECACHE__*/',JSON.stringify(files,null,2)).replace("const BUILD='__BUILD__';","const BUILD='"+build+"';"));
+console.log('Service worker: '+files.length+' recursos no cache offline; build '+build+'.');
