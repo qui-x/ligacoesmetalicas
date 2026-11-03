@@ -2,14 +2,16 @@
   "schemaVersion": 1,
   "catalogId": "silm.explorar.component-catalog",
   "catalogVersion": "0.1.0",
-  "status": "candidate",
+  "status": "approved",
   "baseline": {
     "branch": "especificacoes-atuais",
     "f0Commit": "73040ddfce0491cee81c9c430abff67471f4fce8",
     "f11Commit": "73e3067c35fe85e4817c910430e4ec7b4f20afd4",
     "fixtureSet": "tests/fixtures/engine-baseline.json",
     "fixtureVersion": 1,
-    "validationRun": 41740686034
+    "validationRun": 41740686034,
+    "f12Commit": "de7a0fe440c52a5fd9646f06a1a13198480ccaa6",
+    "f12ValidationRun": 41742138978
   },
   "product": {
     "packageVersion": "0.15.5",

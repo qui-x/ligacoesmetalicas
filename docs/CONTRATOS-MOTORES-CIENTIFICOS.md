@@ -1,6 +1,6 @@
 # Contratos dos motores científicos — F1
 
-> **Status:** F1.1 aprovado (CI 41740686034); F1.2 implementado como catálogo declarativo, aguardando CI.  
+> **Status:** F1.1 e F1.2 aprovados; CI F1.2 41742138978 concluído com sucesso no commit `de7a0fe440c52a5fd9646f06a1a13198480ccaa6`.  
 > **Baseline de código:** branch especificacoes-atuais, commit 73040ddfce0491cee81c9c430abff67471f4fce8 (F0 aprovado na execução 41737430380).  
 > **Escopo:** identidade, evidência, aplicabilidade, entradas, saídas, unidades, estado, ciclo de vida e testes dos componentes científicos do Explorar.  
 > **Regra:** preservar as APIs atuais por adaptadores durante a primeira migração; não alterar equações nem comportamento nesta fase.
@@ -315,7 +315,7 @@ A tabela é uma matriz de capacidades, não determinação de que todo método d
 - [x] Formalizar a primeira versão interna `0.1.0` para geometria, modelo térmico qualitativo, transformação mecânica qualitativa, controlador de estímulos, renderer e catálogo de propriedades, todos vinculados às fixtures F1.1.
 - [x] Manter explicitamente sem versão formal o dataset, Medir, Calcular e adaptador enquanto faltarem revisões/fixtures próprias; não substituir lacunas pela versão do pacote.
 - [x] Separar versão do pacote (0.15.5), schema científico (8), versões persistidas de modelos (2/1/1) e versões de componente.
-- [ ] Validar no CI a correspondência do catálogo com exports reais e fronteiras de estado/tempo via `tests/engine-catalog.cjs`.
+- [x] Validar no CI a correspondência do catálogo com exports reais e fronteiras de estado/tempo via `tests/engine-catalog.cjs` — [execução 41742138978](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41742138978), sucesso.
 - Não mover algoritmos nem alterar os registros de `scientificState`.
 
 ### F1.3 — Criar adaptadores de compatibilidade
@@ -399,6 +399,6 @@ Possíveis arquivos novos: um manifesto de descritores e fixtures de contrato. A
 
 ## 12. Limites e próximo passo
 
-F0 está formalmente aprovado no commit `73040ddfce0491cee81c9c430abff67471f4fce8` (execução [41737430380](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41737430380)). F1.1 está aprovado no commit `73e3067c35fe85e4817c910430e4ec7b4f20afd4` (execução [41740686034](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41740686034)). F1.2 agora contém o catálogo declarativo e o teste de correspondência com as APIs; aguarda CI. Versões ausentes continuam explicitamente sem versão.
+F0 está formalmente aprovado no commit `73040ddfce0491cee81c9c430abff67471f4fce8` (execução [41737430380](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41737430380)). F1.1 está aprovado no commit `73e3067c35fe85e4817c910430e4ec7b4f20afd4` (execução [41740686034](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41740686034)). F1.2 está aprovado no commit `de7a0fe440c52a5fd9646f06a1a13198480ccaa6` (execução [41742138978](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41742138978)); o catálogo declara dez componentes e o teste confere os exports, caminhos, versões, classes e fronteiras de tempo/estado. O dataset, Medir, Calcular e adaptador seguem sem versão formal até haver revisões e fixtures próprias.
 
 A F2 só poderá começar depois de F1 homologada. Ela tratará especificamente do relógio comum e do orquestrador, sem antecipar motores físicos dimensionais.
