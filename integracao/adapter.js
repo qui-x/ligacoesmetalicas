@@ -71,7 +71,18 @@
   saveCamera(mode,value){representation.cameras[mode]=S.representation.sanitizeCamera(value);saveView();}
  };
  function saveView(){return storage.set('representation.view',representation);}
- const comparison=S.createStructureComparison({storage,host:$('silm-comparison-items')});
+ // Visão geral como no SIAB: tocar numa estrutura abre-a no Foco (substituir a investigação pede confirmação).
+ const showFocus=()=>document.querySelector('[data-scene-view="focus"]')?.click();
+ async function openStructure(z){
+  if(model.state.metal?.atomicNumber===z){showFocus();return true;}
+  if(routeUI?.session.open()){say('Encerre a atividade em curso para abrir outra estrutura.','info');return false;}
+  $('silm-metal').value=String(z);selected=String(z);if(!await start())return false;
+  if(!model.state.structure)model.beginAssembly();if(!model.state.structure.units.length&&!model.addUnit().ok)return false;
+  const r=model.organize();const e=S.data.get(z);
+  if(r.ok)say(e.name+' aberto no Foco, organizado segundo a estrutura de referência.','success');else say(e.name+' aberto no Foco. Organize a estrutura em Montagem.','info');
+  showFocus();return true;
+ }
+ const comparison=S.createStructureComparison({storage,host:$('silm-comparison-items'),current:()=>model.state.metal?.atomicNumber||null,open:openStructure,newStructure:()=>{showFocus();openLeft('preparo');},say});
  const tools=S.createIntegrationTools({model,host:$('silm-tools'),moduleHost:$('silm-module-choice'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
  const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session});
  const prepareMetal=z=>{if(routeUI?.session.open()||S.data.get(z)?.silmEligibility.status!=='available')return false;$('silm-metal').value=String(z);selected=String(z);schedule();return true;};

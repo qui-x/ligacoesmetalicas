@@ -775,3 +775,63 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
  .silm-camera-bar>[id$="-camera-yaw-left"],.silm-camera-bar>[id$="-camera-yaw-right"]{margin-top:9px;position:relative}
  .silm-camera-bar>[id$="-camera-yaw-left"]::before{content:'';position:absolute;left:0;top:-7px;width:92px;border-top:1px solid var(--silm-soft-border)}
 }
+/* Visão geral como "Sua bancada" do SIAB (pedido do autor, 03/11/2026: "ainda temos algumas falhas em comparação com o
+   siab"): título e ações na mesma faixa; cartões numerados, com "Em foco", desenho à esquerda e informações à direita,
+   que abrem a estrutura no Foco; contador na aba; barra inferior com as estruturas e "Nova estrutura". */
+#silm-comparison-items .silm-overview-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;min-width:0}
+#silm-comparison-items .silm-overview-head h2{margin:0;font-size:1.25rem;line-height:1.2}
+#silm-comparison-items .silm-overview-head .silm-comparison-actions{margin-left:auto}
+#silm-comparison-items .silm-comparison-reset{min-height:44px;padding:7px 12px}
+#silm-comparison-items .silm-comparison-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr))}
+#silm-comparison-items .silm-comparison-cards[data-layout=list]{grid-template-columns:minmax(0,1fr)}
+#silm-comparison-items .silm-comparison-card{position:relative;display:grid;grid-template-columns:minmax(150px,56%) minmax(0,1fr);align-items:center;gap:10px 18px;padding:40px 16px 14px 14px;cursor:pointer;transition:border-color .15s}
+#silm-comparison-items .silm-comparison-cards[data-layout=list] .silm-comparison-card{grid-template-columns:minmax(150px,340px) minmax(0,1fr);padding-top:14px;padding-left:48px}
+#silm-comparison-items .silm-comparison-cards[data-layout=list] .silm-comparison-index{top:50%;transform:translateY(-50%)}
+#silm-comparison-items .silm-comparison-card:hover{border-color:var(--accent)}
+#silm-comparison-items .silm-comparison-card[data-current=true]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+#silm-comparison-items .silm-comparison-card:has(.silm-comparison-open:focus-visible){outline:3px solid var(--ring);outline-offset:2px}
+.silm-comparison-index{position:absolute;z-index:1;top:10px;left:10px;display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--border);border-radius:50%;background:var(--bg);color:var(--text);font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums}
+.silm-comparison-focus{position:absolute;z-index:1;top:10px;right:10px;padding:2px 9px;border:1px solid var(--accent);border-radius:999px;color:var(--accent);font-size:.72rem;font-weight:700}
+.silm-comparison-body{display:flex;flex-direction:column;gap:4px;min-width:0}
+/* Remover da lista (✕), acima do botão esticado do cartão. */
+.silm-comparison-remove{position:absolute;z-index:2;top:8px;right:8px;display:grid;place-items:center;width:32px;height:32px;padding:0;border:1px solid var(--border);border-radius:50%;background:var(--surface);color:var(--muted);font:inherit;font-size:.85rem;line-height:1;cursor:pointer}
+.silm-comparison-remove:hover{color:var(--text);border-color:var(--text)}
+.silm-comparison-remove:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+#silm-comparison-items .silm-comparison-card-heading{justify-content:flex-start;flex-wrap:wrap}
+.silm-comparison-kind,.silm-comparison-params{margin:0;font-size:.82rem;color:var(--muted)}
+.silm-comparison-params{font-variant-numeric:tabular-nums}
+.silm-comparison-open{align-self:flex-start;min-height:32px;margin-top:2px;padding:4px 0;border:0;background:none;color:var(--accent);font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}
+.silm-comparison-open:focus-visible{outline:none;text-decoration:underline}
+/* Botão esticado: o cartão inteiro abre no Foco; "Fonte e limites" fica por cima e continua abrindo sozinho. */
+.silm-comparison-open::after{content:'';position:absolute;inset:0;border-radius:inherit}
+#silm-comparison-items .silm-comparison-details{position:relative;z-index:2}
+/* Contador na aba "Visão geral". */
+.si-tab-count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;margin-left:4px;border-radius:999px;background:var(--tint);color:var(--text);font-size:.72rem;font-weight:700;font-variant-numeric:tabular-nums}
+.si-tab-count[hidden]{display:none}
+/* Barra inferior na Visão geral: estruturas e "Nova estrutura" no lugar das ações do Foco. */
+.silm-overview-strip{display:none}
+#si-workspace[data-view-mode=overview] .si-actionbar>:not(.silm-overview-strip){display:none!important}
+#si-workspace[data-view-mode=overview] .si-actionbar>.silm-overview-strip{display:flex;align-items:center;gap:12px;width:100%;min-width:0}
+.silm-overview-strip-label{display:flex;flex-direction:column;flex:none;color:var(--muted);font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;line-height:1.3}
+.silm-overview-strip-label strong{color:var(--text);font-size:.9rem;letter-spacing:0}
+.silm-overview-chips{display:flex;flex:1 1 auto;gap:8px;min-width:0;padding:2px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
+.silm-overview-chip{display:flex;flex:none;align-items:center;gap:8px;min-height:48px;padding:5px 12px 5px 6px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.silm-overview-chip[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.silm-overview-chip[aria-pressed=true] strong{color:var(--accent)}
+.silm-overview-chip-symbol{display:grid;place-items:center;flex:none;width:32px;height:32px;border:1px solid var(--silm-bronze,var(--border));border-radius:50%;font-size:.8rem;font-weight:800}
+.silm-overview-chip strong{display:block;font-size:.85rem;line-height:1.2}
+.silm-overview-chip small{display:block;color:var(--muted);font-size:.72rem;line-height:1.2}
+.silm-overview-new{flex:none;margin-left:auto;min-height:44px;white-space:nowrap}
+@media(max-width:600px){
+ .silm-overview-strip-label{display:none}
+ #si-workspace[data-view-mode=overview] .si-actionbar>.silm-overview-strip{gap:8px}
+ #silm-comparison-items .silm-overview-head .silm-comparison-actions{margin-left:0;width:100%}
+}
+@media(max-width:520px){
+ /* Celular: o desenho ocupa a largura do cartão (a estrutura em destaque); as informações ficam embaixo. */
+ #silm-comparison-items .silm-comparison-card,#silm-comparison-items .silm-comparison-cards[data-layout=list] .silm-comparison-card{grid-template-columns:minmax(0,1fr);gap:6px;padding:38px 12px 12px}
+ #silm-comparison-items .silm-comparison-cards[data-layout=list] .silm-comparison-index{top:10px;transform:none}
+ #silm-comparison-items .silm-comparison-stage{max-height:260px}
+}
+@media(prefers-reduced-motion:reduce){#silm-comparison-items .silm-comparison-card{transition:none}}
+@media(forced-colors:active){.silm-comparison-index,.silm-comparison-focus,.si-tab-count,.silm-overview-chip,.silm-comparison-remove{border:1px solid CanvasText}.silm-comparison-card[data-current=true],.silm-overview-chip[aria-pressed=true]{outline:2px solid Highlight}}
