@@ -1,46 +1,102 @@
-# SILM 0.15.5 — A Arquitetura dos Metais
+# SILM — Simulador Interativo de Ligações Metálicas
 
-A 0.15.5 consolida o trabalho da segunda quinzena de outubro. Ela junta a auditoria de paridade mecânica com o SIAB, os textos enxutos e os testes de acessibilidade e celular. Também unifica a versão, enxuga o cache offline e atualiza a auditoria para a arquitetura atual, e as esferas do palco ganham alvos de toque de 24 px. Veja `docs/SILM-0.15.5.md`.
+O SILM é um simulador para estudar a **ligação metálica**:
 
-A 0.15.4 compara referências recentes na Visão Geral, mantém os elétrons em movimento durante a órbita 3D e prepara Montagem ao selecionar um metal na tabela. Geometrias adicionais são referências visuais; sua integração com o motor de medições e cálculos continua pendente.
+- montar e organizar estruturas cristalinas de metais reais (CFC, CCC, HC e outras);
+- observar os elétrons deslocalizados;
+- experimentar as propriedades metálicas: condução elétrica e térmica, maleabilidade, ductilidade e brilho;
+- medir, calcular e registrar tudo no Caderno e no relatório.
 
-A 0.15.3 coordena a gravação da investigação e da sessão, protege abas obsoletas e inclui os relatórios completos no backup do Caderno.
+Os dados científicos vêm de fontes registradas, e o SILM não inventa valores que faltam.
 
-A 0.15.2 aproxima a operação da Oficina dos Metais à família SI: módulos em **Montagem**, famílias e ferramentas em **Ver**, consultas e documentos em **Dados**, com retorno contextual e expansão do painel pela Base. Consulte [o escopo e a validação desta correção](docs/PARIDADE-BASE-SI-0.15.2.md).
+Esta branch (`main`) contém **só a aplicação**: os arquivos que o site carrega.
 
-A página inicial oferece a Oficina dos Metais como espaço de manipulação das estruturas e mantém o card do Caderno com a contagem de registros. A versão 0.15.1 amplia a cobertura experimental: 57 metais podem ser investigados e 48 têm visualização cristalográfica em CCC, CFC ou HC ([notas da versão](docs/SILM-0.15.1.md)). Os nove metais com estruturas fora desses modelos continuam sinalizados, sem substituição artificial. A correção de tela inteira e menus contextuais está documentada em [0.14.7](docs/SILM-0.14.7.md). O Caderno reúne anotações com título, conclusões de missões/roteiros e referências reabríveis a relatórios. A interface integrada usa o snapshot da Base SI 0.9.17; o motor científico, os dados e o schema 8 do SILM continuam separados e preservados.
+## 1. Usar pela internet (mais fácil)
 
-Simulador Interativo de Ligações Metálicas sobre a Base SI 0.9.17. A interface reúne a Home e a navegação da base com o motor científico do SILM, identidade ouro/grafite e dados com fontes.
+Abra **<https://qui-x.github.io/ligacoesmetalicas/>** num navegador atual (Chrome, Edge, Firefox ou Safari), no computador ou no celular.
 
-## Usar
+- **Instalar como aplicativo:** Menu (☰) → **Instalar aplicativo**. Depois da primeira visita completa, o SILM funciona **sem internet**.
+- **Atualizações:** quando sai uma versão nova, aparece o aviso **"Nova versão do SILM instalada"**. Toque em **Recarregar**; os dados salvos continuam.
 
-Abra index.html por um servidor estático. A página inicial oferece Oficina dos Metais, Aprender, Missões, Roteiros Experimentais e Caderno. O menu também dá acesso ao manual operacional, à tabela para apresentação, ao caderno e ao relatório da investigação livre. O endereço completo.html é mantido como encaminhamento compatível, sem iniciar outro aplicativo.
+## 2. Executar no seu computador
 
-A Oficina dos Metais utiliza Montagem, Ver e Dados. Investigue metais elegíveis, organize estruturas CCC/CFC/HC, compare célula/rede/vizinhança e representações 2D/3D. Depois de organizar uma estrutura cristalina, use **Expandir** para abrir a mesma cena em uma área ampliada; pressione Esc ou use Voltar para retornar. Essa visualização não cria outra montagem nem altera os dados científicos. Os mesmos serviços oferecem elétrons deslocalizados, cinco propriedades qualitativas, Medir e Calcular com origens explícitas. Dados ausentes não recebem valores inventados.
+### Passo 1 — Baixar
 
-## Atividades e conteúdos
+- **Com Git:** `git clone https://github.com/qui-x/ligacoesmetalicas.git`
+- **Sem Git:** no GitHub, botão **Code → Download ZIP**, depois descompacte.
 
-- Seis missões científicas independentes nos módulos Explorar, Medir e Calcular.
-- Cinco roteiros experimentais com orientações, contexto restrito e relatório.
-- Sete temas conceituais não lineares com missões, roteiros e fontes relacionados.
+### Passo 2 — Abrir
 
-Concluir mantém a bancada aberta. Encerrar restaura a investigação livre. Atividades concluídas continuam acessíveis/refazíveis; tentativas anteriores não dispensam evidências na nova execução. Há retomada, marcadores Concluído e uso offline após carregamento completo. Não há recompensas ou porcentagem gamificada.
+**Jeito recomendado: com um servidor local.** Assim funcionam todos os recursos, inclusive o modo offline e "Instalar aplicativo". Dentro da pasta do projeto, rode um destes comandos:
 
-## Persistência e validação
+```bash
+python3 -m http.server 8000      # se você tem Python
+npx serve .                      # se você tem Node.js
+```
 
-O estado científico permanece no schema 8. Uma sessão antiga válida é recuperada quando a nova está vazia, preservando o original. JSON de investigações continua disponível em Dados. Cores e acessibilidade não alteram valores científicos.
+Depois abra **<http://localhost:8000/>** no navegador. Com `npx serve`, use o endereço que ele mostrar.
 
-`npm test` executa validação científica, contratos dos roteiros/missões/temas e integração de navegador. Playwright/Chromium precisam estar disponíveis no ambiente. `npm run build:integration` verifica o snapshot upstream e gera a entrada principal.
+**Jeito rápido: abrir o arquivo direto.** Dê dois cliques em `index.html`. O simulador funciona, mas sem o modo offline e sem "Instalar aplicativo", porque o navegador não permite isso em arquivos locais (`file://`).
 
-## Documentação
+Não é preciso instalar nada além do navegador: não há etapa de compilação para usar o programa.
 
-[0.15.1](docs/SILM-0.15.1.md) · [Relatório desta rodada](docs/RELATORIO-BUILD-TESTES-0.15.1.md) · [0.14.7](docs/SILM-0.14.7.md) · [0.14.4](docs/SILM-0.14.4.md) · [0.14.0](docs/SILM-0.14.0.md) · [Missões](docs/MISSOES.md) · [Contrato de Missões](docs/CONTRATO-MISSOES.md) · [Temas](docs/APRENDER-TEMAS.md) · [Contrato de Temas](docs/CONTRATO-TEMAS.md) · [Auditoria](docs/AUDITORIA-GAMIFICACAO-0.14.0.md) · [Roteiros](docs/ROTEIROS-EXPERIMENTAIS.md) · [Cobertura](docs/COBERTURA-ROTEIROS.md).
+## 3. Primeiros passos no programa
 
-A Área do Professor, o Manual e a ampliação dos relatórios da 0.15.x continuam em desenvolvimento. A execução automatizada dos testes desta rodada ainda precisa ser confirmada; outros navegadores e dispositivos físicos também requerem homologação. Licença GPL-3.0.
+1. Na página inicial, escolha **Oficina dos Metais**. O **Manual** (no Menu) explica cada parte.
+2. No Menu, abra **Montagens prontas** e comece pelo cobre (CFC), pelo ferro (CCC) ou pelo magnésio (HC). Você também pode escolher qualquer metal disponível em **Montagem → Preparo**.
+3. Use **Ver** para observar:
+   - célula e rede;
+   - vizinhos;
+   - elétrons;
+   - projeções 2D e 3D;
+   - propriedades metálicas.
+4. Use **Dados** para ver as medições, os cálculos, o histórico, os dados do metal e o relatório.
+5. Use **Visão geral** para comparar as estruturas recentes e tocar numa delas para abri-la no Foco.
 
-Quando existem sessões antiga e atual distintas, Dados oferece Exportar investigação antiga (JSON). O original e a sessão atual permanecem intactos; a importação posterior usa o fluxo de confirmação do mesmo aplicativo.
+## 4. Onde ficam os seus dados
 
+Investigações, Caderno e relatórios ficam guardados **no próprio navegador**, no computador ou celular que você usa. Nada é enviado para servidores.
 
-## Caderno didático — 0.14.4
+Para levar o trabalho para outro aparelho, exporte:
 
-O Caderno registra observações, hipóteses e conclusões com título. Conclusões de missões/roteiros entram automaticamente na linha do tempo; relatórios podem ser vinculados e reabertos pelo próprio registro. Há filtros por tipo, atividade e relatório, exclusão confirmada, importação validada de JSON, exportação JSON/CSV e impressão. O contrato de armazenamento de notas da Base SI continua preservado.
+- a investigação em **Dados**;
+- o Caderno no próprio **Caderno**.
+
+Limpar os dados do site no navegador apaga esses registros.
+
+## 5. O que há nesta pasta
+
+| Arquivo ou pasta | Para que serve |
+|---|---|
+| `index.html` | Entrada do programa |
+| `completo.html` | Endereço antigo, que leva ao `index.html` |
+| `sw.js` | Modo offline (service worker) e aviso de nova versão |
+| `manifest.webmanifest`, `favicon-*.svg`, `assets/` | Ícones e dados para instalar como aplicativo |
+| `integracao/` | Interface: páginas, painéis Montagem/Ver/Dados, Caderno, Manual |
+| `domain/silm/` | Motor científico: estruturas cristalinas, elétrons, propriedades, medições, cálculos e banco de dados dos metais (`domain/silm/data/`) |
+| `LICENSE` | Licença GPL-3.0 |
+
+## 6. Desenvolvimento, especificações e testes
+
+O projeto completo continua na branch **[`especificacoes-atuais`](https://github.com/qui-x/ligacoesmetalicas/tree/especificacoes-atuais)**. Ela tem tudo o que saiu da `main`:
+
+- especificações, contratos e planos (`docs/`);
+- fontes dos dados, scripts de build e testes automáticos;
+- evidências de paridade com o SIAB e histórico de versões (`CHANGELOG.md`);
+- o Clube de Jazz e Metais (`jazz-club/`).
+
+Para desenvolver a partir dela (é preciso ter o Node.js 22 ou mais novo):
+
+```bash
+git checkout especificacoes-atuais
+npm ci                # instala as ferramentas de teste
+npm run build         # gera os dados, a entrada e o sw.js
+npm test              # testes científicos, rotas, aprendizagem e integração
+npm run test:parity   # telas comparadas com o SIAB (navegador)
+```
+
+Para publicar uma versão nova na `main`, leve à `main` só os arquivos da aplicação, os mesmos da tabela acima. Sempre gere o `sw.js` antes, com `npm run build`; senão, o aviso de nova versão não aparece para quem já tem o SILM instalado.
+
+## Licença
+
+GPL-3.0. Veja `LICENSE`.

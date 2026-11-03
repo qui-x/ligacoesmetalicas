@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.5';
 // BUILD muda com o conteúdo de qualquer arquivo do cache (scripts/sw-build-id.cjs): o navegador instala a versão nova.
-const BUILD='56ec93c12880';
+const BUILD='c7fa7574c453';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "./",
@@ -79,18 +79,7 @@ const FILES=[
   "domain/silm/abertura/silm-intro-v3.css",
   "domain/silm/abertura/silm-intro-v3.js",
   "integracao/pwa.js",
-  "integracao/legacy-entry.js",
-  "jazz-club/index.html",
-  "jazz-club/src/dance.css",
-  "jazz-club/src/dance.js",
-  "jazz-club/src/dance-core.js",
-  "jazz-club/src/dance-fallback.js",
-  "jazz-club/src/builtin-track.js",
-  "jazz-club/src/jukebox.css",
-  "jazz-club/src/jukebox-core.js",
-  "jazz-club/src/jukebox-library.js",
-  "jazz-club/src/jukebox-scene.js",
-  "jazz-club/audio/jazz e metais/catalogo.json"
+  "integracao/legacy-entry.js"
 ];
 const local=value=>{const url=new URL(value,ROOT);if(url.origin!==ROOT.origin||!url.pathname.startsWith(ROOT.pathname))throw new TypeError('Recurso fora do escopo');return url;};
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES.map(file=>new Request(local(file),{cache:'reload'})))).then(()=>self.skipWaiting())));
