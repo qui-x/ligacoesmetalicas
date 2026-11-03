@@ -510,4 +510,4 @@ Nenhuma etapa posterior autoriza introduzir ligas, minerais, sistemas multicompo
 
 A Etapa 8 conclui a especificação da arquitetura do motor científico e de seus contratos. Não houve alteração dos motores, criação de orquestrador, migração de estado, inclusão de dados numéricos, execução de testes ou publicação na branch `main`.
 
-A Etapa 9 — [Registro de experiências](REGISTRO-EXPERIENCIAS.md) — está especificada. Com ela, conclui-se a sequência documental de nove etapas do Explorar; a próxima fase é planejar a implementação dos contratos, em vez de abrir uma nova etapa conceitual.
+A Etapa 9 — [Registro de experiências](REGISTRO-EXPERIENCIAS.md) — está especificada. Com ela, conclui-se a sequência documental de nove etapas do Explorar. A implementação deve seguir o [Plano operacional de implementação](PLANO-IMPLEMENTACAO-EXPLORAR.md), sem abrir uma nova etapa conceitual.
