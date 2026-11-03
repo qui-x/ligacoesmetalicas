@@ -1,0 +1,936 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "silm.explorar.component-catalog",
+  "catalogVersion": "0.1.0",
+  "status": "candidate",
+  "baseline": {
+    "branch": "especificacoes-atuais",
+    "f0Commit": "73040ddfce0491cee81c9c430abff67471f4fce8",
+    "f11Commit": "73e3067c35fe85e4817c910430e4ec7b4f20afd4",
+    "fixtureSet": "tests/fixtures/engine-baseline.json",
+    "fixtureVersion": 1,
+    "validationRun": 41740686034
+  },
+  "product": {
+    "packageVersion": "0.15.5",
+    "scientificStateSchemaVersion": 8,
+    "persistedModelVersions": {
+      "structure": 2,
+      "electronModel": 1,
+      "properties": 1
+    },
+    "rule": "A versão do pacote, do schema do estado, dos modelos persistidos e dos componentes deste catálogo são identificadores independentes."
+  },
+  "versionPolicy": {
+    "scheme": "semver",
+    "baseline": "0.1.0",
+    "meaning": "Primeira revisão formal de comportamento congelada pelas fixtures F1.1. Não afirma validação experimental nem capacidade quantitativa.",
+    "patch": "Correção interna que não altera a semântica observável das saídas cobertas por contrato.",
+    "minor": "Extensão retrocompatível de API, entradas ou saídas opcionais.",
+    "major": "Alteração incompatível ou mudança semântica de resultado, unidade, condição de validade ou evidência.",
+    "unversioned": "Não atribuir versão sem fixtures específicas e revisão de proveniência. O identificador de versão do pacote ou do estado não preenche esta lacuna."
+  },
+  "stateBoundary": {
+    "owner": "domain/silm/state.js",
+    "schemaVersion": 8,
+    "writePolicy": "Serviço único de escrita; componentes não persistem uma segunda cópia do estado científico.",
+    "modules": [
+      "explorar",
+      "medir",
+      "calcular"
+    ]
+  },
+  "entries": [
+    {
+      "id": "crystal.geometry",
+      "name": "Geometria cristalográfica",
+      "api": "SILM.crystal",
+      "implementationPath": "domain/silm/crystal.js",
+      "componentClass": "deterministic-geometry-service",
+      "evidenceClass": "GEOMETRIC",
+      "status": "active",
+      "version": {
+        "kind": "algorithm",
+        "status": "versioned",
+        "value": "0.1.0",
+        "baselineFixture": "tests/fixtures/engine-baseline.json#geometry"
+      },
+      "applicability": {
+        "mode": "data-driven",
+        "requires": [
+          "registro de elemento resolvido por SILM.data",
+          "estrutura cristalográfica de referência válida",
+          "parâmetros de rede e sítios coerentes"
+        ],
+        "structures": [
+          "BCC",
+          "FCC",
+          "HCP",
+          "tipos gerais validados"
+        ],
+        "note": "A elegibilidade é resolvida por metal e dados; tipo geral não implica modelo canônico de coordenação."
+      },
+      "inputs": [
+        "registro científico imutável",
+        "grupo espacial",
+        "parâmetros de rede e unidade",
+        "sítios fracionários e operações de simetria"
+      ],
+      "outputs": [
+        "elegibilidade com motivo",
+        "célula e sítios cartesianos",
+        "vizinhança e distâncias",
+        "projeções e organização geométrica"
+      ],
+      "units": [
+        "comprimentos geométricos em Å",
+        "ângulos cristalográficos em graus",
+        "coordenadas de tela normalizadas são apresentação, não medidas físicas"
+      ],
+      "dependencies": [
+        "data.reference-catalog"
+      ],
+      "state": {
+        "owner": "none",
+        "mutability": "pure-derived-result",
+        "persistence": "Não grava no scientificState."
+      },
+      "time": {
+        "mode": "none",
+        "scientificClock": false,
+        "usesRequestAnimationFrame": false
+      },
+      "capabilities": [
+        "eligibility",
+        "geometry",
+        "expandSites",
+        "matchesBasis",
+        "parseOperation",
+        "projector",
+        "layout",
+        "organize",
+        "layout3D"
+      ],
+      "publicApi": {
+        "root": "crystal",
+        "functions": [
+          "eligibility",
+          "geometry",
+          "expandSites",
+          "matchesBasis",
+          "parseOperation",
+          "projector",
+          "layout",
+          "organize",
+          "layout3D"
+        ],
+        "properties": [
+          "models",
+          "canonicalModels",
+          "generalTypes",
+          "reasons",
+          "structureTypes"
+        ]
+      },
+      "limitations": [
+        "Geometria derivada dos dados de referência; não estima propriedades físicas.",
+        "Estruturas inconsistentes ou incompletas são bloqueadas com motivo.",
+        "Coordenadas e distâncias não devem ser confundidas com coordenadas do canvas."
+      ],
+      "failurePolicy": "Retornar null ou estado unavailable com reasonCode; não inferir estrutura nem preencher dado ausente."
+    },
+    {
+      "id": "thermal.qualitative-diffusion",
+      "name": "Propagação térmica qualitativa",
+      "api": "SILM.thermal",
+      "implementationPath": "domain/silm/thermal.js",
+      "componentClass": "qualitative-dynamic-model",
+      "evidenceClass": "QUALITATIVE",
+      "status": "active",
+      "version": {
+        "kind": "algorithm",
+        "status": "versioned",
+        "value": "0.1.0",
+        "baselineFixture": "tests/fixtures/engine-baseline.json#thermal"
+      },
+      "applicability": {
+        "mode": "data-driven",
+        "requires": [
+          "geometria com grafo de vizinhos",
+          "investigação térmica ou experiência elétrica acoplada permitida"
+        ],
+        "structures": [
+          "geometrias com vizinhança calculável"
+        ],
+        "note": "O coeficiente e a escala de tempo são didáticos e iguais para todos os metais."
+      },
+      "inputs": [
+        "grafo de vizinhos imediatos",
+        "campo T normalizado em [0,1]",
+        "passo nominal do modelo",
+        "fonte e centros fixados, quando presentes"
+      ],
+      "outputs": [
+        "campo térmico normalizado",
+        "soma e dispersão",
+        "nível agregado de aquecimento"
+      ],
+      "units": [
+        "T: adimensional e normalizada [0,1]",
+        "dt: segundos da animação/modelo; não é escala temporal física",
+        "D: coeficiente didático adimensional"
+      ],
+      "dependencies": [
+        "crystal.geometry",
+        "drive.stimulus-controller"
+      ],
+      "state": {
+        "owner": "SILM.thermal.controller",
+        "kind": "transient",
+        "persistedFields": [
+          "properties.thermal.heating"
+        ],
+        "nonPersistedFields": [
+          "temperaturas locais",
+          "posição da fonte",
+          "acumulador temporal"
+        ]
+      },
+      "time": {
+        "mode": "own-controller-raf",
+        "scientificClock": true,
+        "stepFunction": "step(T, edges, pinned, dt, D)",
+        "note": "O controlador atual avança por requestAnimationFrame; a coordenação por relógio comum é F2."
+      },
+      "capabilities": [
+        "graph",
+        "step",
+        "spread",
+        "sum",
+        "level",
+        "controller"
+      ],
+      "publicApi": {
+        "root": "thermal",
+        "functions": [
+          "graph",
+          "step",
+          "spread",
+          "sum",
+          "level",
+          "controller"
+        ],
+        "properties": [
+          "D",
+          "DT",
+          "SETTLE"
+        ]
+      },
+      "limitations": [
+        "Não declara °C, K, W, J ou condutividade/difusividade térmica do metal.",
+        "Não há perdas ambientais, capacidade térmica por metal nem mudança de fase.",
+        "Fonte ideal fixa centros em T=1."
+      ],
+      "failurePolicy": "Não avançar sem grafo e estado válidos; a integração deve respeitar o contexto ativo do modelo."
+    },
+    {
+      "id": "deformation.qualitative-slip",
+      "name": "Transformação geométrica por deslizamento",
+      "api": "SILM.deformation",
+      "implementationPath": "domain/silm/deformation.js",
+      "componentClass": "qualitative-geometric-dynamic-model",
+      "evidenceClass": "GEOMETRIC_QUALITATIVE",
+      "status": "active",
+      "version": {
+        "kind": "algorithm",
+        "status": "versioned",
+        "value": "0.1.0",
+        "baselineFixture": "tests/fixtures/engine-baseline.json#deformation"
+      },
+      "applicability": {
+        "mode": "structure-family",
+        "requires": [
+          "geometria cristalográfica suportada",
+          "sistema representativo de deslizamento disponível"
+        ],
+        "structures": [
+          "FCC",
+          "BCC",
+          "HCP"
+        ],
+        "note": "O sistema é representativo da família; modelos gerais sem sistema homologado permanecem indisponíveis."
+      },
+      "inputs": [
+        "geometria e vetores de rede",
+        "sistema representativo (plano e direção)",
+        "comando normalizado de carga/tração/compressão",
+        "passos de deslizamento"
+      ],
+      "outputs": [
+        "vetor de Burgers derivado da rede",
+        "sistema e planos de deslizamento",
+        "transformação de forma",
+        "strain/progresso normalizados e leitura qualitativa"
+      ],
+      "units": [
+        "b: Å calculado a partir da rede",
+        "carga, strain e progresso: valores do modelo didático, sem unidade de ensaio",
+        "não produz Pa, MPa, N ou módulo elástico"
+      ],
+      "dependencies": [
+        "crystal.geometry"
+      ],
+      "state": {
+        "owner": "SILM.deformation.controller",
+        "kind": "transient",
+        "persistedFields": [
+          "propriedades e contagem consolidadas pelo state.js conforme a experiência"
+        ],
+        "nonPersistedFields": [
+          "carga instantânea",
+          "velocidade",
+          "progresso transitório",
+          "orientação transitória"
+        ]
+      },
+      "time": {
+        "mode": "own-controller-raf",
+        "scientificClock": true,
+        "stepFunction": "Controlador atual com evolução interna; método step público não exposto.",
+        "note": "A coordenação por relógio comum é F2; não duplicar laços ao migrar."
+      },
+      "capabilities": [
+        "system",
+        "transform",
+        "staticTransform",
+        "controller",
+        "steps",
+        "describe",
+        "specimen",
+        "trace"
+      ],
+      "publicApi": {
+        "root": "deformation",
+        "functions": [
+          "system",
+          "transform",
+          "staticTransform",
+          "controller",
+          "steps",
+          "describe",
+          "specimen",
+          "trace"
+        ],
+        "properties": [
+          "SYSTEMS",
+          "LIMIT",
+          "YIELD",
+          "EPS_YIELD",
+          "SOURCE"
+        ]
+      },
+      "limitations": [
+        "LIMIT=4, YIELD=0.5 e EPS_YIELD=0.06 são parâmetros da representação didática.",
+        "Não representa curva tensão-deformação, CRSS, fratura ou encruamento real.",
+        "Sistema por família não constitui validação específica de cada metal."
+      ],
+      "failurePolicy": "Retornar null quando a estrutura não tem sistema representativo homologado; não substituir por deslizamento genérico."
+    },
+    {
+      "id": "drive.stimulus-controller",
+      "name": "Controlador de estímulos",
+      "api": "SILM.drive",
+      "implementationPath": "domain/silm/drive.js",
+      "componentClass": "transient-stimulus-controller",
+      "evidenceClass": "CONTROL_ONLY",
+      "status": "active",
+      "version": {
+        "kind": "controller",
+        "status": "versioned",
+        "value": "0.1.0",
+        "baselineFixture": "tests/fixtures/engine-baseline.json#drive"
+      },
+      "applicability": {
+        "mode": "experience-driven",
+        "requires": [
+          "contexto ativo da experiência e comando permitido pelo domínio"
+        ],
+        "properties": [
+          "electrical",
+          "luster",
+          "malleability",
+          "ductility"
+        ]
+      },
+      "inputs": [
+        "comando de intensidade normalizada",
+        "ângulo da lanterna em graus",
+        "sinalizador transitório do campo auxiliar mecânico"
+      ],
+      "outputs": [
+        "intensidade em [0.05,1]",
+        "ângulo em [5°,80°]",
+        "campo auxiliar on/off",
+        "par de ângulos de reflexão geométrica"
+      ],
+      "units": [
+        "intensidade: adimensional, sem unidade elétrica",
+        "ângulo: graus em relação à normal",
+        "não produz V, A, W ou V/m"
+      ],
+      "dependencies": [
+        "stateBoundary",
+        "electron-view.marker-renderer",
+        "deformation.qualitative-slip"
+      ],
+      "state": {
+        "owner": "SILM.drive.controller",
+        "kind": "transient",
+        "persistedFields": [],
+        "note": "O estado persistido guarda apenas os parâmetros de experiência explicitamente previstos; o controlador não grava uma cópia."
+      },
+      "time": {
+        "mode": "none",
+        "scientificClock": false,
+        "usesRequestAnimationFrame": false
+      },
+      "capabilities": [
+        "controller",
+        "reflect",
+        "setIntensity",
+        "setAngle",
+        "setDeformField",
+        "reading"
+      ],
+      "publicApi": {
+        "root": "drive",
+        "functions": [
+          "controller",
+          "reflect"
+        ],
+        "properties": [
+          "MIN_INTENSITY",
+          "MIN_ANGLE",
+          "MAX_ANGLE"
+        ]
+      },
+      "limitations": [
+        "Intensidade é normalizada e não é campo elétrico dimensional.",
+        "Reflexão aplica a igualdade geométrica θr=θi.",
+        "O campo auxiliar de deformação é transitório."
+      ],
+      "failurePolicy": "Aplicar clamp às faixas declaradas; não interpretar parâmetros como grandezas elétricas medidas."
+    },
+    {
+      "id": "electron-view.marker-renderer",
+      "name": "Renderer de marcadores eletrônicos",
+      "api": "SILM.createElectronLayer",
+      "implementationPath": "domain/silm/electron-view.js",
+      "componentClass": "visual-renderer",
+      "evidenceClass": "VISUAL_QUALITATIVE",
+      "status": "active",
+      "version": {
+        "kind": "renderer",
+        "status": "versioned",
+        "value": "0.1.0",
+        "baselineFixture": "tests/fixtures/engine-baseline.json#electrons"
+      },
+      "applicability": {
+        "mode": "scene-driven",
+        "requires": [
+          "cena com centros e conectividade válidos",
+          "escopo de ciclo de vida da interface"
+        ],
+        "note": "A camada pode ser ocultada ou suspensa sem alterar o resultado científico."
+      },
+      "inputs": [
+        "coordenadas da cena e centros metálicos",
+        "conectividade e geometria",
+        "temperatura e campo normalizados",
+        "defeitos normalizados",
+        "preferência de movimento reduzido"
+      ],
+      "outputs": [
+        "canvas de marcadores decorativos",
+        "movimento visual",
+        "leituras acessíveis da representação"
+      ],
+      "units": [
+        "nenhuma saída dimensional",
+        "posições e velocidades são da animação, não grandezas físicas"
+      ],
+      "dependencies": [
+        "crystal.geometry",
+        "thermal.qualitative-diffusion",
+        "drive.stimulus-controller"
+      ],
+      "state": {
+        "owner": "renderer-internal",
+        "kind": "visual-only",
+        "persistedFields": [],
+        "note": "Não escreve no scientificState, não conta elétrons reais e não produz corrente."
+      },
+      "time": {
+        "mode": "visual-raf",
+        "scientificClock": false,
+        "usesRequestAnimationFrame": true,
+        "note": "Relógio visual independente; não deve comandar nem sincronizar os passos científicos."
+      },
+      "capabilities": [
+        "createElectronLayer",
+        "update",
+        "incorporate",
+        "resize",
+        "setCamera",
+        "createElectronControls"
+      ],
+      "publicApi": {
+        "root": "SILM",
+        "functions": [
+          "createElectronLayer",
+          "createElectronControls"
+        ],
+        "properties": [
+          "electronLayerLimits",
+          "electronTransport"
+        ]
+      },
+      "limitations": [
+        "Não é solver de transporte eletrônico.",
+        "Fatores de espalhamento e deriva são regras visuais qualitativas e normalizadas.",
+        "Sem corrente, mobilidade, resistividade, velocidade de deriva ou distribuição quântica calculadas."
+      ],
+      "failurePolicy": "Se a cena não puder criar o canvas, manter a experiência científica independente da representação; limpeza de recursos é gerida pelo scope da cena."
+    },
+    {
+      "id": "properties.eligibility-catalog",
+      "name": "Catálogo de propriedades e elegibilidade",
+      "api": "SILM.properties",
+      "implementationPath": "domain/silm/properties.js",
+      "componentClass": "domain-catalog-and-policy",
+      "evidenceClass": "CATALOG_POLICY",
+      "status": "active",
+      "version": {
+        "kind": "catalog",
+        "status": "versioned",
+        "value": "0.1.0",
+        "baselineFixture": "tests/fixtures/engine-baseline.json#properties"
+      },
+      "applicability": {
+        "mode": "per-element-and-property",
+        "requires": [
+          "registro de elemento e dados de fase/estrutura/propriedades"
+        ],
+        "note": "A elegibilidade é calculada por elemento e propriedade; disponibilidade qualitativa não equivale a dado quantitativo."
+      },
+      "inputs": [
+        "registro científico do elemento",
+        "estado e condição de referência",
+        "dados tabulados e referências disponíveis"
+      ],
+      "outputs": [
+        "IDs das propriedades",
+        "defaults e limites didáticos",
+        "elegibilidade e reasonCode",
+        "narrativa e política de disponibilidade"
+      ],
+      "units": [
+        "limites didáticos normalizados; unidades físicas apenas nos dados de referência, quando presentes"
+      ],
+      "dependencies": [
+        "data.reference-catalog",
+        "crystal.geometry"
+      ],
+      "state": {
+        "owner": "domain/silm/state.js",
+        "kind": "policy-plus-declared-state",
+        "persistedFields": [
+          "properties.modelVersion",
+          "properties.active",
+          "parâmetros de experiência"
+        ],
+        "note": "properties.modelVersion não é a versão do catálogo nem do algoritmo."
+      },
+      "time": {
+        "mode": "none",
+        "scientificClock": false,
+        "usesRequestAnimationFrame": false
+      },
+      "capabilities": [
+        "phase",
+        "data",
+        "eligibility",
+        "deformer",
+        "compress",
+        "elongate",
+        "heat",
+        "heatSources",
+        "heatWord",
+        "narrative",
+        "fresh"
+      ],
+      "publicApi": {
+        "root": "properties",
+        "functions": [
+          "phase",
+          "data",
+          "eligibility",
+          "deformer",
+          "compress",
+          "elongate",
+          "heat",
+          "heatSources",
+          "heatWord",
+          "narrative",
+          "fresh"
+        ],
+        "properties": [
+          "ids",
+          "defaults",
+          "limits",
+          "catalog",
+          "reasons"
+        ]
+      },
+      "limitations": [
+        "Catálogo e elegibilidade não são motores de evolução temporal.",
+        "Parâmetros qualitativos não substituem dado tabelado homologado.",
+        "Não preenche lacunas com valores típicos."
+      ],
+      "failurePolicy": "Marcar unavailable/qualitative com reasonCode; valores ausentes permanecem ausentes."
+    },
+    {
+      "id": "data.reference-catalog",
+      "name": "Banco científico e proveniência",
+      "api": "SILM.data",
+      "implementationPath": "domain/silm/data-api.js",
+      "componentClass": "immutable-data-and-provenance-service",
+      "evidenceClass": "TABULATED_QUALITATIVE",
+      "status": "active",
+      "version": {
+        "kind": "dataset",
+        "status": "unversioned",
+        "value": null,
+        "reason": "A revisão do conjunto de dados ainda não tem um identificador de release próprio. Cada campo conserva sourceId/kind/conditions; o SHA do bundle não substitui uma política de revisão do dataset."
+      },
+      "applicability": {
+        "mode": "element-record",
+        "requires": [
+          "ID atômico ou consulta de busca válida"
+        ]
+      },
+      "inputs": [
+        "dados científicos gerados dos JSON canônicos",
+        "ID de elemento",
+        "ID de fonte ou consulta textual"
+      ],
+      "outputs": [
+        "registros imutáveis de elemento",
+        "metadados de estrutura e propriedade",
+        "fontes efetivamente usadas",
+        "mensagens e categorias"
+      ],
+      "units": [
+        "unidade, condição, kind e sourceId pertencem a cada campo individual"
+      ],
+      "dependencies": [],
+      "state": {
+        "owner": "domain/silm/data-api.js",
+        "kind": "immutable-read-only",
+        "persistedFields": [],
+        "note": "A camada não altera dados nem deduz parâmetros em falta."
+      },
+      "time": {
+        "mode": "none",
+        "scientificClock": false,
+        "usesRequestAnimationFrame": false
+      },
+      "capabilities": [
+        "get",
+        "source",
+        "sourceIds",
+        "reason",
+        "label",
+        "categoryLabel",
+        "structure",
+        "search"
+      ],
+      "publicApi": {
+        "root": "data",
+        "functions": [
+          "get",
+          "source",
+          "sourceIds",
+          "reason",
+          "label",
+          "categoryLabel",
+          "structure",
+          "search"
+        ],
+        "properties": [
+          "elements",
+          "sources"
+        ]
+      },
+      "limitations": [
+        "A existência de uma ficha de metal não garante elegibilidade para todos os modelos.",
+        "Fontes candidatas não homologadas não devem ser reportadas como usadas.",
+        "Sem revisão formal do dataset, permanece unversioned."
+      ],
+      "failurePolicy": "Retornar null ou conjunto vazio conforme consulta; não inferir valores de campo ausentes."
+    },
+    {
+      "id": "measurement.virtual-instrument",
+      "name": "Serviço de Medir",
+      "api": "SILM.measurement",
+      "implementationPath": "domain/silm/measurements.js",
+      "componentClass": "pure-model-measurement-service",
+      "evidenceClass": "MODEL_MEASUREMENT",
+      "status": "active",
+      "version": {
+        "kind": "method",
+        "status": "unversioned",
+        "value": null,
+        "reason": "F1.1 congelou a assinatura, mas ainda não criou fixtures próprias para cada instrumento e unidade."
+      },
+      "applicability": {
+        "mode": "crystalline-geometry-only",
+        "requires": [
+          "estrutura cristalina organizada",
+          "tipo de instrumento conhecido",
+          "pontos/sítios compatíveis"
+        ]
+      },
+      "inputs": [
+        "geometria cristalina",
+        "tipo e pontos do instrumento virtual",
+        "unidade de leitura"
+      ],
+      "outputs": [
+        "valor geométrico do modelo",
+        "unidade e resolução do instrumento virtual",
+        "contexto de estrutura e proveniência MODEL_MEASUREMENT"
+      ],
+      "units": [
+        "unidades de comprimento Å, pm, nm",
+        "ângulo em graus, conforme tipo do instrumento"
+      ],
+      "dependencies": [
+        "crystal.geometry",
+        "data.reference-catalog"
+      ],
+      "state": {
+        "owner": "domain/silm/state.js",
+        "kind": "recorded-measurements",
+        "persistedFields": [
+          "measurements[]"
+        ],
+        "note": "O serviço calcula; state.js valida e registra/remove os resultados."
+      },
+      "time": {
+        "mode": "none",
+        "scientificClock": false,
+        "usesRequestAnimationFrame": false
+      },
+      "capabilities": [
+        "compute",
+        "context",
+        "current",
+        "validate",
+        "siteRef",
+        "fractional",
+        "round"
+      ],
+      "publicApi": {
+        "root": "measurement",
+        "functions": [
+          "compute",
+          "context",
+          "current",
+          "validate",
+          "siteRef",
+          "fractional",
+          "round"
+        ],
+        "properties": [
+          "types",
+          "limit"
+        ]
+      },
+      "limitations": [
+        "Montagem livre sem escala não produz medida absoluta.",
+        "Resolução do instrumento não é incerteza experimental.",
+        "Medida do modelo não é dado tabelado nem cálculo derivado."
+      ],
+      "failurePolicy": "Retornar {ok:false, reason}; não gerar medida absoluta sem escala cristalográfica."
+    },
+    {
+      "id": "calculation.formula-service",
+      "name": "Serviço de Calcular",
+      "api": "SILM.calculation",
+      "implementationPath": "domain/silm/calculations.js",
+      "componentClass": "pure-formula-calculation-service",
+      "evidenceClass": "CALCULATED",
+      "status": "active",
+      "version": {
+        "kind": "method",
+        "status": "unversioned",
+        "value": null,
+        "reason": "F1.1 congelou a assinatura, mas ainda faltam fixtures próprias para fórmulas, unidades e linhagem de entradas."
+      },
+      "applicability": {
+        "mode": "formula-driven",
+        "requires": [
+          "fórmula conhecida e aplicável",
+          "entradas com unidade, origem e referência",
+          "contexto geométrico quando exigido"
+        ]
+      },
+      "inputs": [
+        "ID da fórmula",
+        "entradas com origem/unidade/referência",
+        "constantes e contexto científico permitido"
+      ],
+      "outputs": [
+        "resultado e unidade",
+        "entradas/constantes usadas",
+        "origens, referências, dependências e proveniência CALCULATED"
+      ],
+      "units": [
+        "unidade definida pela fórmula",
+        "conversões centralizadas no serviço"
+      ],
+      "dependencies": [
+        "data.reference-catalog",
+        "crystal.geometry"
+      ],
+      "state": {
+        "owner": "domain/silm/state.js",
+        "kind": "recorded-calculations",
+        "persistedFields": [
+          "calculations[]"
+        ],
+        "note": "O serviço calcula; state.js valida e registra/remove os resultados."
+      },
+      "time": {
+        "mode": "none",
+        "scientificClock": false,
+        "usesRequestAnimationFrame": false
+      },
+      "capabilities": [
+        "compute",
+        "validate",
+        "applicable",
+        "effective",
+        "effectiveFormula",
+        "tabulated",
+        "convert",
+        "context",
+        "current"
+      ],
+      "publicApi": {
+        "root": "calculation",
+        "functions": [
+          "compute",
+          "validate",
+          "applicable",
+          "effective",
+          "effectiveFormula",
+          "tabulated",
+          "convert",
+          "context",
+          "current"
+        ],
+        "properties": [
+          "origins",
+          "quantities",
+          "inputs",
+          "counting",
+          "limit",
+          "conversions"
+        ]
+      },
+      "limitations": [
+        "Não é motor temporal.",
+        "Cada fórmula tem condições, unidade e referências específicas.",
+        "Não preencher entradas ausentes nem converter medida do modelo em dado tabelado."
+      ],
+      "failurePolicy": "Retornar {ok:false, reason, input?} e impedir registro parcial."
+    },
+    {
+      "id": "experience.metallic-adapter",
+      "name": "Adaptador da experiência metálica",
+      "api": "SILM.createMetallicExperience",
+      "implementationPath": "integracao/metallic-experience.js",
+      "componentClass": "presentation-domain-adapter",
+      "evidenceClass": "NOT_SCIENTIFIC",
+      "status": "active",
+      "version": {
+        "kind": "adapter",
+        "status": "unversioned",
+        "value": null,
+        "reason": "Não é algoritmo científico; revisão deve acompanhar contrato de integração e testes de ciclo de vida."
+      },
+      "applicability": {
+        "mode": "workspace-explorar",
+        "requires": [
+          "SimCore e DOM da experiência",
+          "modelo científico conectado",
+          "controles habilitados pela política de domínio"
+        ]
+      },
+      "inputs": [
+        "comandos de UI",
+        "ScientificState através do model",
+        "schedule/say/reduced e callbacks da aplicação"
+      ],
+      "outputs": [
+        "cena",
+        "controles e atualização de apresentação",
+        "comandos encaminhados ao state/service"
+      ],
+      "units": [
+        "nenhuma saída científica própria"
+      ],
+      "dependencies": [
+        "stateBoundary",
+        "properties.eligibility-catalog",
+        "thermal.qualitative-diffusion",
+        "deformation.qualitative-slip",
+        "drive.stimulus-controller"
+      ],
+      "state": {
+        "owner": "domain/silm/state.js",
+        "kind": "adapter-no-duplicate-state",
+        "persistedFields": [],
+        "note": "O adaptador não deve manter cópia própria nem tomar decisões independentes de elegibilidade."
+      },
+      "time": {
+        "mode": "presentation-scheduling",
+        "scientificClock": false,
+        "usesRequestAnimationFrame": false,
+        "note": "Pode agendar atualização visual; não assume a autoridade temporal científica."
+      },
+      "capabilities": [
+        "createMetallicExperience",
+        "update",
+        "scene-actions",
+        "scope-cleanup"
+      ],
+      "publicApi": {
+        "root": "source",
+        "symbols": [
+          "SILM.createMetallicExperience"
+        ],
+        "functions": [],
+        "properties": []
+      },
+      "limitations": [
+        "Não resolve equações ou elegibilidade científica.",
+        "Integração não é proprietária do estado científico.",
+        "O relógio científico comum permanece fora do escopo F1."
+      ],
+      "failurePolicy": "Encaminhar comandos autorizados ao serviço de estado e abandonar ações fora de Explorar."
+    }
+  ]
+}

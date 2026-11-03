@@ -1,6 +1,6 @@
 # Contratos dos motores científicos — F1
 
-> **Status:** F1.1 em execução — contrato de APIs existente aprovado no baseline; fixtures automatizadas incluídas neste incremento, CI pendente.  
+> **Status:** F1.1 aprovado (CI 41740686034); F1.2 implementado como catálogo declarativo, aguardando CI.  
 > **Baseline de código:** branch especificacoes-atuais, commit 73040ddfce0491cee81c9c430abff67471f4fce8 (F0 aprovado na execução 41737430380).  
 > **Escopo:** identidade, evidência, aplicabilidade, entradas, saídas, unidades, estado, ciclo de vida e testes dos componentes científicos do Explorar.  
 > **Regra:** preservar as APIs atuais por adaptadores durante a primeira migração; não alterar equações nem comportamento nesta fase.
@@ -304,16 +304,19 @@ A tabela é uma matriz de capacidades, não determinação de que todo método d
 
 - [x] Registrar exports e métodos públicos atuais em `tests/engine-contracts.cjs`.
 - [x] Criar testes de contrato sem refatorar a lógica; aprovados no CI F0.
-- [ ] Validar no CI as fixtures em `tests/fixtures/engine-baseline.json`, executadas por `tests/engine-fixtures.cjs`.
+- [x] Validar as fixtures em `tests/fixtures/engine-baseline.json` no CI [41740686034](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41740686034), no commit `73e3067c35fe85e4817c910430e4ec7b4f20afd4`.
 - [x] Congelar geometria Cu/Fe/Mg/Mn, passo térmico, sistemas FCC/BCC/HCP, estímulos, fatores eletrônicos qualitativos e defaults/limites do catálogo.
 - [x] Registrar a razão de vizinhança do Mg pela geometria de referência com seu parâmetro c/a; não impor a distância de HCP ideal.
 
 ### F1.2 — Definir descritores sem mover algoritmos
 
-- Criar metadados dos componentes e capacidades.
-- Declarar as versões formais iniciais somente depois de fixtures aprovadas.
-- Não alterar as formas dos registros de scientificState.
-- Marcar explicitamente os componentes sem versão isolada como pendência.
+- [x] Criar o catálogo declarativo `domain/silm/engine-catalog.json`, sem alterar a ordem de carregamento dos scripts do navegador.
+- [x] Registrar dez componentes com ID estável, classe, evidência, aplicabilidade, entradas/saídas, unidades, dependências, proprietário de estado, ciclo temporal, capacidades e política de falha.
+- [x] Formalizar a primeira versão interna `0.1.0` para geometria, modelo térmico qualitativo, transformação mecânica qualitativa, controlador de estímulos, renderer e catálogo de propriedades, todos vinculados às fixtures F1.1.
+- [x] Manter explicitamente sem versão formal o dataset, Medir, Calcular e adaptador enquanto faltarem revisões/fixtures próprias; não substituir lacunas pela versão do pacote.
+- [x] Separar versão do pacote (0.15.5), schema científico (8), versões persistidas de modelos (2/1/1) e versões de componente.
+- [ ] Validar no CI a correspondência do catálogo com exports reais e fronteiras de estado/tempo via `tests/engine-catalog.cjs`.
+- Não mover algoritmos nem alterar os registros de `scientificState`.
 
 ### F1.3 — Criar adaptadores de compatibilidade
 
@@ -396,6 +399,6 @@ Possíveis arquivos novos: um manifesto de descritores e fixtures de contrato. A
 
 ## 12. Limites e próximo passo
 
-F0 está formalmente aprovado no commit `73040ddfce0491cee81c9c430abff67471f4fce8` (execução [41737430380](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41737430380)). O teste das assinaturas públicas já passou; as fixtures desta entrega aguardam validação no próximo CI. F1.2 — descritores e capacidades — começa após aprovação das fixtures, sem atribuir versões artificiais a algoritmos ainda não versionados.
+F0 está formalmente aprovado no commit `73040ddfce0491cee81c9c430abff67471f4fce8` (execução [41737430380](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41737430380)). F1.1 está aprovado no commit `73e3067c35fe85e4817c910430e4ec7b4f20afd4` (execução [41740686034](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41740686034)). F1.2 agora contém o catálogo declarativo e o teste de correspondência com as APIs; aguarda CI. Versões ausentes continuam explicitamente sem versão.
 
 A F2 só poderá começar depois de F1 homologada. Ela tratará especificamente do relógio comum e do orquestrador, sem antecipar motores físicos dimensionais.
