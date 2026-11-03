@@ -147,7 +147,7 @@ Uma combinação só pode ser habilitada quando existir uma definição explíci
 
 Essas combinações não significam que duas experiências principais estejam ativas. O estímulo acoplado é um controle auxiliar do contexto principal e deve ser identificado como tal.
 
-Não habilitar automaticamente combinações como luz + calor + campo + deformação. Uma combinação nova exige definição e validação próprias.
+Não habilitar automaticamente combinações como luz + calor + campo + deformação. Uma combinação nova exige definição e validação próprias. A matriz completa, os acoplamentos aceitos e as combinações não homologadas estão em [Combinações de estímulos — Etapa 6](COMBINACOES-ESTIMULOS.md). A interface-alvo deve reunir a seleção da experiência principal e a aplicação de condições auxiliares em um único painel contextual de propriedades dentro de Explorar, sem criar painéis ou áreas de navegação independentes por família de estímulo. Essa proposta ainda não está implementada.
 
 ## 7. Contrato de interação e autorização por módulo
 
@@ -305,4 +305,6 @@ Esta seção evita confundir o que já existe com o que esta especificação exi
 - [Etapa 4 — Estímulo elétrico](ESTIMULO-ELETRICO.md): especificada. Distingue campo, deriva eletrônica, corrente convencional e aquecimento Joule; define acoplamento térmico, requisitos de dados e lacunas de intensidade entre modos.
 - [Etapa 5 — Estímulo mecânico](ESTIMULO-MECANICO.md): especificada. Distingue força, tensão, deformação elástica/plástica, movimento de discordâncias, sistemas de deslizamento por estrutura e limitações do modelo atual.
 
-A Etapa 6 deve detalhar as **combinações de estímulos**: matriz de compatibilidade, acoplamentos validados, variáveis compartilhadas, sequência de aplicação e prevenção de motores duplicados.
+- [Etapa 6 — Combinações de estímulos](COMBINACOES-ESTIMULOS.md): especificada. Audita os dois acoplamentos qualitativos existentes, classifica os seis pares possíveis, define limites para combinações maiores, variáveis compartilhadas, prevenção de motores duplicados e proposta de painel contextual único para aplicação de propriedades e condições auxiliares.
+
+A Etapa 7 deverá detalhar as **camadas de visualização**, distinguindo representação científica, elementos auxiliares, indicadores de estado e controles de visibilidade.
