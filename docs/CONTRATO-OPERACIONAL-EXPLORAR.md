@@ -307,4 +307,6 @@ Esta seção evita confundir o que já existe com o que esta especificação exi
 
 - [Etapa 6 — Combinações de estímulos](COMBINACOES-ESTIMULOS.md): especificada. Audita os dois acoplamentos qualitativos existentes, classifica os seis pares possíveis, define limites para combinações maiores, variáveis compartilhadas, prevenção de motores duplicados e proposta de painel contextual único para aplicação de propriedades e condições auxiliares.
 
-A Etapa 7 deverá detalhar as **camadas de visualização**, distinguindo representação científica, elementos auxiliares, indicadores de estado e controles de visibilidade.
+- [Etapa 7 — Camadas de visualização](CAMADAS-VISUALIZACAO.md): especificada. Audita a composição das cenas, classifica camadas de estrutura, modelos, respostas, anotações e interação; separa modo de vista, visibilidade e aplicação de estímulos; define invariância científica, persistência e migração futura.
+
+A Etapa 8 deverá detalhar o **motor científico** e seus contratos de execução.
