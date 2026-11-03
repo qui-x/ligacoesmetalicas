@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feat/silm-0.16-acessibilidade-mobile
+      - especificacoes-atuais
   pull_request:
     branches:
       - main
