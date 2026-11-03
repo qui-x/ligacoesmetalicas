@@ -11,6 +11,7 @@
 - [Estímulo mecânico](ESTIMULO-MECANICO.md) — força, tensão, deformação elástica e plástica, discordâncias e sistemas de deslizamento.
 - [Combinações de estímulos](COMBINACOES-ESTIMULOS.md) — matriz de compatibilidade, acoplamentos existentes e proposta de painel contextual único para selecionar experiências e aplicar condições auxiliares.
 - [Camadas de visualização](CAMADAS-VISUALIZACAO.md) — significado das camadas, visibilidade independente do estado científico, organização do painel e persistência das preferências.
+- [Motor científico](MOTOR-CIENTIFICO.md) — arquitetura dos motores, contratos, orquestração temporal, unidades, proveniência e validação dos resultados.
 
 ## 1. Princípio
 
