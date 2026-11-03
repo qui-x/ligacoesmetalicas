@@ -309,4 +309,6 @@ Esta seção evita confundir o que já existe com o que esta especificação exi
 
 - [Etapa 7 — Camadas de visualização](CAMADAS-VISUALIZACAO.md): especificada. Audita a composição das cenas, classifica camadas de estrutura, modelos, respostas, anotações e interação; separa modo de vista, visibilidade e aplicação de estímulos; define invariância científica, persistência e migração futura.
 
-A Etapa 8 deverá detalhar o **motor científico** e seus contratos de execução.
+- [Etapa 8 — Motor científico](MOTOR-CIENTIFICO.md): especificada. Audita a arquitetura atual, separa dados, geometria, estado, motores, orquestração, Medir/Calcular e apresentação; define contratos de execução, tempo comum, unidades, evidência e validação.
+
+A Etapa 9 deverá detalhar o **registro reproduzível de experiências**.
