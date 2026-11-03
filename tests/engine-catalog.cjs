@@ -36,7 +36,16 @@ for(const entry of catalog.entries){
  assert.ok(entry.version&&typeof entry.version.status==='string');
  if(entry.version.status==='versioned'){
   assert.match(entry.version.value,/^\d+\.\d+\.\d+$/);
-  assert.equal(entry.version.baselineFixture,'tests/fixtures/engine-baseline.json#'+entry.id.split('.')[0].replace('crystal','geometry'));
+  const fixtureAnchors={
+   'crystal.geometry':'geometry',
+   'thermal.qualitative-diffusion':'thermal',
+   'deformation.qualitative-slip':'deformation',
+   'drive.stimulus-controller':'drive',
+   'electron-view.marker-renderer':'electrons',
+   'properties.eligibility-catalog':'properties'
+  };
+  assert.ok(fixtureAnchors[entry.id],entry.id+': âncora de fixture não mapeada');
+  assert.equal(entry.version.baselineFixture,'tests/fixtures/engine-baseline.json#'+fixtureAnchors[entry.id]);
  }else{
   assert.equal(entry.version.value,null,entry.id+': componente sem versão formal deve ser explícito');
   assert.ok(entry.version.reason&&entry.version.reason.length>0,entry.id+': justificativa da lacuna de versão');
