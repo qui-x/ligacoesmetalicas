@@ -295,6 +295,9 @@ Esta seção evita confundir o que já existe com o que esta especificação exi
 | Motores transitórios | Temperatura e carga mecânica possuem controladores próprios; parte do estado não é persistida. | Definir suspensão, retomada e persistência mínima. |
 | Registro reproduzível | Parâmetros atuais e eventos de domínio existem, mas não há registro estruturado completo de cada execução. | Especificar o modelo de registro antes de alterar o schema. |
 
-## 13. Próxima etapa
+## 13. Etapas de aprofundamento
 
-Com este contrato operacional como base, a Etapa 2 deve detalhar o **estímulo luminoso**: fonte, geometria de incidência, reflexão, interação com a superfície, dados ópticos necessários, visualização e critérios de validação. A especificação não deve atribuir uma cor fixa ao elemento sem evidência espectral adequada.
+- [Etapa 1 — Contrato operacional do Explorar](CONTRATO-OPERACIONAL-EXPLORAR.md): documentada. Formaliza ciclo de vida, famílias de estímulos, combinações, autorização por módulo e estados persistentes/transitórios.
+- [Etapa 2 — Estímulo luminoso](ESTIMULO-LUMINOSO.md): especificada. Define reflexão geométrica, resposta espectral, colorimetria, fontes de dados e critérios de homologação. A especificação não equivale a implementação da resposta espectral.
+
+A Etapa 3 deve detalhar o **estímulo térmico**: fonte, posição, intensidade, difusão, dissipação para o ambiente, resposta da rede e distinção entre aquecimento, equilíbrio térmico e resfriamento.
