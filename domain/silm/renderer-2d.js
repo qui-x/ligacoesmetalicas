@@ -82,7 +82,8 @@ SILM.renderer2d=(()=>{
    const fitButton=button('fit','⤢','Enquadrar a estrutura','F',()=>fitNow()),centerButton=button('center','⌖','Centralizar','C',()=>centerNow()),resetButton=button('reset','↺','Restaurar vista','0',()=>resetNow());
    // Valor do zoom só visual: <output> seria região viva e falaria a cada quadro do gesto; o anúncio é um por gesto.
    zoomLabel=U.element('span',zoomText(),'silm-camera-zoom');zoomLabel.id=idPrefix+'-camera-zoom';zoomLabel.setAttribute('aria-hidden','true');
-   bar.append(inButton,zoomLabel,outButton,fitButton,centerButton,resetButton);inButton.tabIndex=0;area.append(dock);
+   // Ordem de leitura (e do teclado) em pares: aproximar, afastar, zoom; enquadrar, centralizar; restaurar (e tela cheia).
+   bar.append(inButton,outButton,zoomLabel,fitButton,centerButton,resetButton);inButton.tabIndex=0;area.append(dock);
    buttons=[inButton,outButton,fitButton,centerButton,resetButton];
    // 0.12.x: girar a vista 3D (só aparecem no modo 'orbit') e botões extras da vista (perspectiva/ortográfica).
    if(onOrbit){orbitButtons=[button('yaw-left','⟲','Girar para a esquerda','J',()=>orbitKey(-1,0)),button('yaw-right','⟳','Girar para a direita','L',()=>orbitKey(1,0)),

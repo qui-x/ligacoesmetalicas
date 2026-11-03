@@ -756,3 +756,22 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
 /* Rótulos da sobreposição legíveis sobre os centros (halo da cor do fundo). */
 .silm-overlay-label{paint-order:stroke;stroke:var(--bg);stroke-width:.9px;stroke-linejoin:round}
 @media(forced-colors:active){.silm-field-knob,.silm-lantern{border-color:ButtonText}.silm-light-in-line,.silm-light-out-line,.silm-normal-line{stroke:CanvasText}.silm-overlay-label{stroke:Canvas}}
+/* Barra de controles da vista (pedido do autor, 03/11/2026: "reorganize a barra de controles da cena"). Com o 3D livre
+   são 12 controles; em uma coluna eles não cabiam na cena e o último ia sozinho para uma segunda coluna. Agora, fora do
+   celular, a barra é uma grade de duas colunas, em pares: aproximar | afastar, o zoom, enquadrar | centralizar,
+   restaurar | tela cheia, girar ⟲ | ⟳ e inclinar ⇡ | ⇣ (só no 3D), perspectiva. A ordem do DOM (e do teclado) é a
+   mesma da leitura. A barra fica ao lado da cena quando há espaço; senão, no canto de dentro. */
+@media(min-width:601px) and (min-height:501px),(min-width:601px) and (orientation:portrait){
+ .silm-camera{right:max(6px,calc((100% - var(--stage,300px))/2 - 114px))}
+ .silm-camera-bar,.silm-camera:not([data-open]) .silm-camera-bar,
+ .si-scene-region.si-scene-expanded .silm-camera-bar,.si-scene-region.si-scene-expanded .silm-camera:not([data-open]) .silm-camera-bar,
+ body.si-structure-expanded .silm-camera-bar,body.si-structure-expanded .silm-camera:not([data-open]) .silm-camera-bar{
+  display:grid!important;grid-template-columns:repeat(2,44px);grid-auto-rows:auto;align-content:start;justify-content:center;gap:4px;
+  max-width:none;max-height:calc(var(--stage,300px) - 12px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+ .silm-camera-bar>[hidden]{display:none!important}
+ .silm-camera-bar>.silm-camera-zoom{grid-column:1/-1;width:auto;line-height:16px}
+ .silm-camera-bar>#si-expand-structure.si-structure-expand-in-camera{width:44px;height:44px}
+ /* Grupo 3D (girar e inclinar) separado do grupo da vista por uma linha fina. */
+ .silm-camera-bar>[id$="-camera-yaw-left"],.silm-camera-bar>[id$="-camera-yaw-right"]{margin-top:9px;position:relative}
+ .silm-camera-bar>[id$="-camera-yaw-left"]::before{content:'';position:absolute;left:0;top:-7px;width:92px;border-top:1px solid var(--silm-soft-border)}
+}
