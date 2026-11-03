@@ -2,6 +2,11 @@
 
 > **Referência histórica:** este documento registra a organização visual e a perspectiva de investigação introduzidas na série 0.8.x. Para as regras operacionais atuais — ciclo de vida das experiências, estímulos, combinações, autorização por módulo e estado transitório — consulte o [Contrato operacional do Explorar](CONTRATO-OPERACIONAL-EXPLORAR.md). O contrato visual anterior permanece disponível em [CONTRATO-EXPLORACAO.md](CONTRATO-EXPLORACAO.md).
 
+## Especificações aprofundadas
+
+- [Contrato operacional do Explorar](CONTRATO-OPERACIONAL-EXPLORAR.md) — regras comuns de experiência, fontes, ferramentas, coexistência e autorização.
+- [Estímulo luminoso](ESTIMULO-LUMINOSO.md) — reflexão, resposta espectral, cor derivada de dados e validação científica.
+
 ## 1. Princípio
 
 Explorar **não** é um novo estado científico nem uma coleção de submódulos. Ele organiza, sobre o mesmo estado científico, as mecânicas já implementadas:
