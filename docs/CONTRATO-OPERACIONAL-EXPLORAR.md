@@ -299,5 +299,6 @@ Esta seção evita confundir o que já existe com o que esta especificação exi
 
 - [Etapa 1 — Contrato operacional do Explorar](CONTRATO-OPERACIONAL-EXPLORAR.md): documentada. Formaliza ciclo de vida, famílias de estímulos, combinações, autorização por módulo e estados persistentes/transitórios.
 - [Etapa 2 — Estímulo luminoso](ESTIMULO-LUMINOSO.md): especificada. Define reflexão geométrica, resposta espectral, colorimetria, fontes de dados e critérios de homologação. A especificação não equivale a implementação da resposta espectral.
+- [Etapa 3 — Estímulo térmico](ESTIMULO-TERMICO.md): especificada. Define fonte finita e localizada, condução, capacidade térmica, troca ambiental, resfriamento, proveniência de dados e testes de conservação de energia. A especificação não equivale à implementação do novo motor.
 
-A Etapa 3 deve detalhar o **estímulo térmico**: fonte, posição, intensidade, difusão, dissipação para o ambiente, resposta da rede e distinção entre aquecimento, equilíbrio térmico e resfriamento.
+A Etapa 4 deve detalhar o **estímulo elétrico**: fonte/campo, geometria, resposta dos elétrons, corrente como fenômeno coletivo, acoplamento com temperatura e limites entre visualização qualitativa e grandezas elétricas mensuráveis.
