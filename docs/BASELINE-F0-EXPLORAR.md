@@ -1,24 +1,27 @@
 # Baseline F0 — Explorar
 
-> **Status:** inventário estático concluído; execução automatizada pendente.  
+> **Status:** APROVADO — baseline automatizado integralmente verde.  
 > **Data da captura:** 03/11/2026.  
 > **Branch auditada:** especificacoes-atuais.  
-> **Commit auditado:** 9049b7db12be96945181531f02edb1159b25c02f.  
+> **Commit auditado:** 73040ddfce0491cee81c9c430abff67471f4fce8.  
 > **Objetivo:** fixar o estado de partida antes de modificar contratos, relógio, motores ou persistência.
 
 ## 1. Resultado executivo
 
-A inspeção do código, dos scripts, dos testes e dos workflows foi concluída. O estado atual está documentado abaixo, mas o baseline **não pode ser marcado como aprovado** até que build e testes sejam executados sobre este commit ou sobre um commit de baseline equivalente.
+O baseline F0 foi executado no GitHub Actions sobre o commit **73040ddfce0491cee81c9c430abff67471f4fce8** e terminou com conclusão `success`. Todas as etapas do job passaram, incluindo build, regressão, navegação de browser, mobile, backup, acessibilidade, paridade e comparação.
 
-Nesta execução:
-- inventário do código e dos testes: concluído;
-- identificação de versões, valores didáticos e ciclos temporais independentes: concluída;
-- consulta de checks do HEAD: nenhum check registrado;
-- execução local de npm: não realizada, pois o ambiente não conseguiu resolver github.com para obter o repositório;
-- workflow de validação: identificado, mas não cobria a branch especificacoes-atuais;
-- resultados de testes: pendentes, não presumidos.
+Resultados consolidados:
+- `npm ci`: sucesso; cinco pacotes instalados e zero vulnerabilidades reportadas;
+- `npm run build`: sucesso;
+- `npm test`: sucesso; suítes científica, rotas, aprendizagem e integração;
+- mecânicas móveis: sucesso em 320×640, 390×844 e 844×390;
+- backup/restauração: sucesso em navegador vazio e bloqueio de aba obsoleta;
+- acessibilidade: 84 cenários, sete viewports e três temas, sem overflow ou alvos menores que 24×24 px;
+- paridade SIAB × SILM: 15 cenários de tela/experiência aprovados;
+- comparação: geometria, elétrons 3D, montagem, tabela e interação aprovados;
+- navegação de browser: sucesso com foco, teclado e expansão.
 
-A falha de acesso de rede ao clonar não é uma falha de build do SILM. É uma limitação do ambiente de execução desta auditoria. O documento não atribui sucesso nem falha ao código sem log real.
+Nenhuma falha de teste foi registrada. A advertência de depreciação do módulo Node `punycode` não interrompeu a execução e foi tratada como não bloqueante.
 
 ## 2. Identidade do baseline e relação entre branches
 
@@ -26,7 +29,7 @@ A falha de acesso de rede ao clonar não é uma falha de build do SILM. É uma l
 |---|---|
 | Repositório | qui-x/ligacoesmetalicas |
 | Branch de desenvolvimento/documentação | especificacoes-atuais |
-| HEAD auditado | 9049b7db12be96945181531f02edb1159b25c02f |
+| HEAD auditado | 73040ddfce0491cee81c9c430abff67471f4fce8 |
 | Main no momento da captura | 0f59c73ede10500a2be0ace3e582db36881fb874 |
 | Merge base retornado pelo GitHub | 5db5c95950456a5e5c1fe8aa5a234daa93c981e9 |
 | Versão do pacote na branch completa | 0.15.5 |
@@ -103,64 +106,54 @@ O conjunto s080-explorar já verifica fluxos integrados, modos livre/cristalino,
 
 A existência dos testes não comprova que a revisão atual passa. Nenhum resultado de execução foi inferido a partir da presença dos arquivos.
 
-## 7. CI observado e lacuna de gatilho
+## 7. CI executado
 
-O workflow .github/workflows/silm-016-validation.yml executa:
-1. npm ci;
-2. instalação do Chromium para Playwright;
-3. npm run build;
-4. npm run test:mobile-mechanics;
-5. npm test;
-6. npm run test:a11y;
-7. npm run test:parity;
-8. npm run test:comparison;
-9. npm run test:routes:browser com SILM_BROWSER_SUITE=workspace-family.
+O workflow `.github/workflows/silm-016-validation.yml` foi habilitado para pushes na branch `especificacoes-atuais`. A execução [#47 / 41737430380](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41737430380) rodou sobre o SHA indicado neste relatório e concluiu com sucesso.
 
-Antes desta captura, seu gatilho de push abrangia somente feat/silm-0.16-acessibilidade-mobile. O gatilho pull_request exigia destino main e alterações em caminhos de código, testes, scripts ou package files. Por isso, commits exclusivamente documentais na especificacoes-atuais não recebiam validação.
+Etapas executadas:
+1. checkout da branch;
+2. Node.js 22 e `npm ci`;
+3. instalação do Chromium para Playwright;
+4. `npm run build`;
+5. `npm run test:mobile-mechanics`;
+6. `npm test`;
+7. `npm run test:backup`;
+8. `npm run test:a11y`;
+9. `npm run test:parity`;
+10. `npm run test:comparison`;
+11. `npm run test:routes:browser` com `SILM_BROWSER_SUITE=workspace-family`.
 
-A consulta de check-runs no HEAD 9049b7d retornou zero checks. A lista de Actions não apresentou execução na branch especificacoes-atuais. Execuções bem-sucedidas encontradas para a branch claude/optimistic-cerf-167d72 não são o baseline deste HEAD e não devem ser usadas para afirmar aprovação.
+O gatilho de branch alterado para permitir a execução em `especificacoes-atuais` é infraestrutura de CI; não mudou a aplicação. A validação ocorreu na branch de desenvolvimento, sem merge ou escrita na `main`.
 
-**Correção operacional proposta:** habilitar o mesmo workflow de validação nos pushes de especificacoes-atuais. Isso não muda a aplicação; permite que o próximo commit da branch inicie o pipeline real de F0.
+## 8. Registro da execução aprovada
 
-## 8. Execução pendente — comandos e captura obrigatória
-
-Executar no runner com Node.js 22 e instalar dependências com npm ci. Registrar o SHA exato avaliado.
-
-Ordem:
-1. npm ci
-2. npm run build
-3. npm run test:scientific
-4. npm run test:routes
-5. npm run test:learning
-6. npm run test:integration
-7. npm run test:mobile-mechanics
-8. npm run test:a11y
-9. npm run test:parity
-10. npm run test:comparison
-11. npm run test:backup
-12. npm run test:routes:browser
-
-Capturar para cada etapa: resultado, duração, logs de falha, versão real de Node/npm, navegador e commit testado. Se o workflow não executar todos os comandos, executar os que faltam em pipeline adicional antes de marcar F0 como concluída.
-
-### Registro de execução
-
-| Etapa | Resultado nesta auditoria |
+| Campo | Resultado |
 |---|---|
-| Clone/checkout do repositório | Bloqueado: DNS não resolveu github.com no ambiente local. |
-| npm ci | Não executado. |
-| npm run build | Não executado. |
-| npm run test:scientific | Não executado. |
-| npm run test:routes | Não executado. |
-| npm run test:learning | Não executado. |
-| npm run test:integration | Não executado. |
-| npm run test:mobile-mechanics | Não executado. |
-| npm run test:a11y | Não executado. |
-| npm run test:parity | Não executado. |
-| npm run test:comparison | Não executado. |
-| npm run test:backup | Não executado. |
-| npm run test:routes:browser | Não executado. |
+| Workflow | SILM 0.16 — acessibilidade e mobile |
+| Run | [#47 / 41737430380](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41737430380) |
+| Commit testado | `73040ddfce0491cee81c9c430abff67471f4fce8` |
+| Início / fim | 23:13:28Z / 23:19:57Z |
+| Duração | 6 min 29 s |
+| Runner | Ubuntu 24.04.5 |
+| Node.js / npm | v22.23.4 / 10.9.9 |
+| Navegador | Chromium 151.0.7922.34 (Playwright Chromium v1234) |
+| Resultado geral | `completed / success` |
 
-Não interpretar “Não executado” como sucesso ou falha. O baseline automatizado permanece pendente.
+| Comando | Resultado observado |
+|---|---|
+| `npm ci` | PASS; cinco pacotes instalados, zero vulnerabilidades reportadas |
+| `npm run build` | PASS |
+| `npm test` | PASS; científico, rotas, aprendizagem e integração; inclui `engine-contracts.cjs` |
+| `npm run test:mobile-mechanics` | PASS; três viewports móveis |
+| `npm run test:backup` | PASS; backup/restauração em navegador vazio e bloqueio de aba obsoleta |
+| `npm run test:a11y` | PASS; 84 cenários, sete viewports e três temas |
+| `npm run test:parity` | PASS; 15 áreas de tela/experiência SIAB × SILM |
+| `npm run test:comparison` | PASS; geometria, elétrons 3D, tabela e interação de 62 estruturas |
+| `npm run test:routes:browser` | PASS; workspace, foco, teclado e expansão |
+
+Todas as etapas de setup, teste e cleanup terminaram com `success`. A advertência Node `punycode` não interrompeu a execução.
+
+**Decisão:** F0 está fechado e aprovado para o commit testado. A validação comprova o baseline técnico e sua regressão automatizada; não é ensaio experimental de propriedades físicas.
 
 ## 9. Decisão sobre F1
 
@@ -187,8 +180,8 @@ F0 só pode ser marcado como concluído quando:
 - [ ] Resultados, versões e SHA estão registrados.
 - [ ] O baseline é reproduzível por outro checkout.
 
-Até lá, F0 tem **inventário estático concluído e baseline automatizado pendente**.
+F0 está **aprovado** para o commit testado. Alterações posteriores de código ou testes devem executar novamente a suíte aplicável. Esta aprovação não autoriza alteração da `main`.
 
 ## 11. Limites
 
-Esta captura não alterou os motores, o schema científico, os dados, a interface ou os testes. O workflow poderá ter seu gatilho de branch ampliado como infraestrutura de CI, sem alterar a aplicação. Não há homologação científica ou técnica reivindicada por esta auditoria.
+A homologação F0 confirma a base técnica e os testes de regressão no commit indicado; não constitui validação experimental de grandezas físicas nem transforma modelos qualitativos em quantitativos. A `main` permaneceu intacta.

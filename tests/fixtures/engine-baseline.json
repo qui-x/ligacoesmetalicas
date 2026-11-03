@@ -1,0 +1,140 @@
+{
+  "fixtureVersion": 1,
+  "schemaVersion": 8,
+  "geometry": {
+    "Cu": {
+      "model": "FCC",
+      "sites": 14,
+      "coordination": 12,
+      "nearestOverA": 0.7071067811865475
+    },
+    "Fe": {
+      "model": "BCC",
+      "sites": 9,
+      "coordination": 8,
+      "nearestOverA": 0.8660254037844386
+    },
+    "Mg": {
+      "model": "HCP",
+      "sites": 17,
+      "coordination": 12,
+      "nearestOverA": 1
+    },
+    "Mn": {
+      "model": "COMPLEX_CUBIC",
+      "general": true
+    }
+  },
+  "thermal": {
+    "D": 0.45,
+    "dt": 0.008333333333333333,
+    "settle": 0.01,
+    "chain": {
+      "initial": [
+        1,
+        0,
+        0
+      ],
+      "edges": [
+        [
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1
+        ]
+      ],
+      "result": [
+        0.99625,
+        0.00375,
+        0
+      ],
+      "sum": 1,
+      "spread": 0.99625
+    }
+  },
+  "deformation": {
+    "limit": 4,
+    "yield": 0.5,
+    "epsYield": 0.06,
+    "systems": {
+      "FCC": {
+        "family": "{111}⟨110⟩",
+        "planeLabel": "(111)",
+        "directionLabel": "[−1 0 1]",
+        "count": 12
+      },
+      "BCC": {
+        "family": "{110}⟨111⟩",
+        "planeLabel": "(101)",
+        "directionLabel": "[−1 1 1]",
+        "count": 12
+      },
+      "HCP": {
+        "family": "{0001}⟨1 1 −2 0⟩",
+        "planeLabel": "(0001)",
+        "directionLabel": "[2 −1 −1 0]",
+        "count": 3
+      }
+    }
+  },
+  "drive": {
+    "initialIntensity": 0.6,
+    "initialAngle": 35,
+    "minIntensity": 0.05,
+    "maxIntensity": 1,
+    "minAngle": 5,
+    "maxAngle": 80
+  },
+  "electrons": {
+    "limits": {
+      "min": 24,
+      "max": 150,
+      "maxSmall": 80,
+      "perCenter": 6,
+      "smallStage": 360
+    },
+    "scatter0": 1,
+    "drift0": 1,
+    "scatterHalf": 2.5,
+    "driftHalf": 0.5,
+    "defectScatter": 1.6,
+    "defectDrift": 0.7692307692307692,
+    "fieldHalf": 0.5
+  },
+  "properties": {
+    "ids": [
+      "electrical",
+      "thermal",
+      "malleability",
+      "ductility",
+      "luster"
+    ],
+    "limits": {
+      "heatStages": 4,
+      "compression": 4,
+      "elongation": 4
+    },
+    "defaults": {
+      "electrical": {
+        "field": false
+      },
+      "thermal": {
+        "heating": false,
+        "stage": 0
+      },
+      "malleability": {
+        "compression": 0
+      },
+      "ductility": {
+        "elongation": 0
+      },
+      "luster": {
+        "light": false
+      }
+    }
+  }
+}

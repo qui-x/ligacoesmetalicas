@@ -139,7 +139,11 @@ A sequência de motores depois da infraestrutura pode ter trabalho paralelo de c
 
 **Critério de saída:** baseline verde ou lista de falhas anteriores aprovada e separada das regressões novas. Nenhuma falha preexistente deve ser silenciosamente atribuída à fase seguinte.
 
+**Homologação registrada:** F0 aprovado no commit `73040ddfce0491cee81c9c430abff67471f4fce8`, execução [GitHub Actions #47 / 41737430380](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41737430380), conclusão `success`; ver `docs/BASELINE-F0-EXPLORAR.md`.
+
 ### F1 — Contrato de motores e adaptadores
+
+**Documento operacional:** `docs/CONTRATOS-MOTORES-CIENTIFICOS.md`.
 
 **Objetivo:** tornar explícita a identidade, a aplicabilidade e o ciclo de vida de cada motor sem ainda mudar a física.
 

@@ -1,7 +1,7 @@
 # Contratos dos motores científicos — F1
 
-> **Status:** contrato de arquitetura para F1; desenho e inventário concluídos, implementação pendente.  
-> **Baseline de código:** branch especificacoes-atuais, commit 086375f670ee2ef71509a423d6836b5f8bc35783.  
+> **Status:** F1.1 em execução — contrato de APIs existente aprovado no baseline; fixtures automatizadas incluídas neste incremento, CI pendente.  
+> **Baseline de código:** branch especificacoes-atuais, commit 73040ddfce0491cee81c9c430abff67471f4fce8 (F0 aprovado na execução 41737430380).  
 > **Escopo:** identidade, evidência, aplicabilidade, entradas, saídas, unidades, estado, ciclo de vida e testes dos componentes científicos do Explorar.  
 > **Regra:** preservar as APIs atuais por adaptadores durante a primeira migração; não alterar equações nem comportamento nesta fase.
 
@@ -302,10 +302,10 @@ A tabela é uma matriz de capacidades, não determinação de que todo método d
 
 ### F1.1 — Congelar assinaturas e fixtures
 
-- Registrar exports e métodos públicos atuais.
-- Criar testes de contrato sem refatorar a lógica.
-- Criar fixtures para os casos representativos do baseline.
-- Registrar parâmetros e evidências qualitativas que não podem mudar nesta fase.
+- [x] Registrar exports e métodos públicos atuais em `tests/engine-contracts.cjs`.
+- [x] Criar testes de contrato sem refatorar a lógica; aprovados no CI F0.
+- [ ] Validar no CI as fixtures em `tests/fixtures/engine-baseline.json`, executadas por `tests/engine-fixtures.cjs`.
+- [x] Congelar geometria Cu/Fe/Mg/Mn, passo térmico, sistemas FCC/BCC/HCP, estímulos, fatores eletrônicos qualitativos e defaults/limites do catálogo.
 
 ### F1.2 — Definir descritores sem mover algoritmos
 
@@ -395,6 +395,6 @@ Possíveis arquivos novos: um manifesto de descritores e fixtures de contrato. A
 
 ## 12. Limites e próximo passo
 
-Este documento formaliza F1; não implementa descritores, adaptadores ou testes. A implementação de F1 permanece bloqueada até o fechamento formal do baseline F0.
+F0 está formalmente aprovado no commit `73040ddfce0491cee81c9c430abff67471f4fce8` (execução [41737430380](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41737430380)). O teste das assinaturas públicas já passou; as fixtures desta entrega aguardam validação no próximo CI. F1.2 — descritores e capacidades — começa após aprovação das fixtures, sem atribuir versões artificiais a algoritmos ainda não versionados.
 
 A F2 só poderá começar depois de F1 homologada. Ela tratará especificamente do relógio comum e do orquestrador, sem antecipar motores físicos dimensionais.
