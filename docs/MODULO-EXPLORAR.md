@@ -6,6 +6,7 @@
 
 - [Contrato operacional do Explorar](CONTRATO-OPERACIONAL-EXPLORAR.md) — regras comuns de experiência, fontes, ferramentas, coexistência e autorização.
 - [Estímulo luminoso](ESTIMULO-LUMINOSO.md) — reflexão, resposta espectral, cor derivada de dados e validação científica.
+- [Estímulo térmico](ESTIMULO-TERMICO.md) — fonte, condução pela estrutura, capacidade térmica, troca com o ambiente, resfriamento e balanço de energia.
 
 ## 1. Princípio
 
