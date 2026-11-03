@@ -422,7 +422,7 @@ Com a Etapa 9, conclui-se a sequência de especificação do Explorar:
 
 O aprofundamento está concluído em nível de documentação, não de implementação. As nove especificações formam requisitos verificáveis para uma futura fase de planejamento operacional e desenvolvimento.
 
-A próxima ação recomendada não é criar outro módulo nem uma décima etapa conceitual: é converter os nove contratos em plano de implementação priorizado, com dependências entre mudanças de schema, motores, interface, exportação e testes.
+O [Plano operacional de implementação do Explorar](PLANO-IMPLEMENTACAO-EXPLORAR.md) converte os nove contratos em fases priorizadas, com dependências entre estado, orquestração, motores, dados, interface, registro, exportação e testes.
 
 ## 16. Referências internas auditadas
 
