@@ -313,4 +313,4 @@ Esta seção evita confundir o que já existe com o que esta especificação exi
 
 - [Etapa 9 — Registro de experiências](REGISTRO-EXPERIENCIAS.md): especificada. Distingue investigação, execução, sessão, histórico, relatório, Caderno, medições e cálculos; define eventos semânticos, checkpoints, metadados dos motores, níveis R0/R1/R2, exportação, integridade e privacidade.
 
-As nove etapas do aprofundamento estão especificadas. A próxima fase deverá transformar os contratos em um plano operacional priorizado de implementação; isso não cria um quarto módulo nem uma nova etapa conceitual do Explorar.
+As nove etapas do aprofundamento estão especificadas. O [Plano operacional de implementação](PLANO-IMPLEMENTACAO-EXPLORAR.md) organiza a execução por dependências, entregas, arquivos candidatos, testes e gates de homologação; isso não cria um quarto módulo nem uma nova etapa conceitual do Explorar.
