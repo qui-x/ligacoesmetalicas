@@ -314,4 +314,4 @@ O teste não deve simplesmente comparar o JSON completo, porque o estado atual a
 
 A Etapa 7 conclui a especificação das camadas, de seu significado e de sua separação em relação ao estado científico. Não houve alteração de código, migração de schema, redesenho do painel, execução de testes ou publicação na branch `main`.
 
-A próxima etapa do aprofundamento é a **Etapa 8 — Motor científico**: definir a arquitetura de execução, a fonte única de verdade, a atualização dos estados, os contratos de entrada/saída e os critérios de validação dos motores qualitativos e quantitativos.
+A Etapa 8 — [Motor científico](MOTOR-CIENTIFICO.md) — está especificada. A próxima etapa do aprofundamento é a **Etapa 9 — Registro de experiências**: definir como guardar uma execução reproduzível sem registrar cada quadro de animação.
