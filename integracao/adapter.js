@@ -82,7 +82,7 @@
   if(r.ok)say(e.name+' aberto no Foco, organizado segundo a estrutura de referência.','success');else say(e.name+' aberto no Foco. Organize a estrutura em Montagem.','info');
   showFocus();return true;
  }
- const comparison=S.createStructureComparison({storage,host:$('silm-comparison-items'),current:()=>model.state.metal?.atomicNumber||null,open:openStructure,newStructure:()=>{showFocus();openLeft('preparo');}});
+ const comparison=S.createStructureComparison({storage,host:$('silm-comparison-items'),current:()=>model.state.metal?.atomicNumber||null,open:openStructure,newStructure:()=>{showFocus();openLeft('preparo');},say});
  const tools=S.createIntegrationTools({model,host:$('silm-tools'),moduleHost:$('silm-module-choice'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
  const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session});
  const prepareMetal=z=>{if(routeUI?.session.open()||S.data.get(z)?.silmEligibility.status!=='available')return false;$('silm-metal').value=String(z);selected=String(z);schedule();return true;};

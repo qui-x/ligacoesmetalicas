@@ -784,8 +784,8 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
 #silm-comparison-items .silm-comparison-reset{min-height:44px;padding:7px 12px}
 #silm-comparison-items .silm-comparison-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr))}
 #silm-comparison-items .silm-comparison-cards[data-layout=list]{grid-template-columns:minmax(0,1fr)}
-#silm-comparison-items .silm-comparison-card{position:relative;display:grid;grid-template-columns:minmax(110px,42%) minmax(0,1fr);align-items:center;gap:10px 18px;padding:40px 16px 14px 14px;cursor:pointer;transition:border-color .15s}
-#silm-comparison-items .silm-comparison-cards[data-layout=list] .silm-comparison-card{grid-template-columns:minmax(110px,220px) minmax(0,1fr);padding-top:14px;padding-left:48px}
+#silm-comparison-items .silm-comparison-card{position:relative;display:grid;grid-template-columns:minmax(150px,56%) minmax(0,1fr);align-items:center;gap:10px 18px;padding:40px 16px 14px 14px;cursor:pointer;transition:border-color .15s}
+#silm-comparison-items .silm-comparison-cards[data-layout=list] .silm-comparison-card{grid-template-columns:minmax(150px,340px) minmax(0,1fr);padding-top:14px;padding-left:48px}
 #silm-comparison-items .silm-comparison-cards[data-layout=list] .silm-comparison-index{top:50%;transform:translateY(-50%)}
 #silm-comparison-items .silm-comparison-card:hover{border-color:var(--accent)}
 #silm-comparison-items .silm-comparison-card[data-current=true]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
@@ -793,6 +793,10 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
 .silm-comparison-index{position:absolute;z-index:1;top:10px;left:10px;display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--border);border-radius:50%;background:var(--bg);color:var(--text);font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums}
 .silm-comparison-focus{position:absolute;z-index:1;top:10px;right:10px;padding:2px 9px;border:1px solid var(--accent);border-radius:999px;color:var(--accent);font-size:.72rem;font-weight:700}
 .silm-comparison-body{display:flex;flex-direction:column;gap:4px;min-width:0}
+/* Remover da lista (✕), acima do botão esticado do cartão. */
+.silm-comparison-remove{position:absolute;z-index:2;top:8px;right:8px;display:grid;place-items:center;width:32px;height:32px;padding:0;border:1px solid var(--border);border-radius:50%;background:var(--surface);color:var(--muted);font:inherit;font-size:.85rem;line-height:1;cursor:pointer}
+.silm-comparison-remove:hover{color:var(--text);border-color:var(--text)}
+.silm-comparison-remove:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
 #silm-comparison-items .silm-comparison-card-heading{justify-content:flex-start;flex-wrap:wrap}
 .silm-comparison-kind,.silm-comparison-params{margin:0;font-size:.82rem;color:var(--muted)}
 .silm-comparison-params{font-variant-numeric:tabular-nums}
@@ -824,10 +828,10 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
  #silm-comparison-items .silm-overview-head .silm-comparison-actions{margin-left:0;width:100%}
 }
 @media(max-width:520px){
- #silm-comparison-items .silm-comparison-card,#silm-comparison-items .silm-comparison-cards[data-layout=list] .silm-comparison-card{grid-template-columns:minmax(118px,42%) minmax(0,1fr);gap:8px 12px;padding:12px 12px 12px 42px}
- #silm-comparison-items .silm-comparison-index{top:50%;transform:translateY(-50%)}
- #silm-comparison-items .silm-comparison-card[data-current=true] .silm-comparison-card-heading{padding-right:64px}
- #silm-comparison-items .silm-comparison-stage{max-height:none}
+ /* Celular: o desenho ocupa a largura do cartão (a estrutura em destaque); as informações ficam embaixo. */
+ #silm-comparison-items .silm-comparison-card,#silm-comparison-items .silm-comparison-cards[data-layout=list] .silm-comparison-card{grid-template-columns:minmax(0,1fr);gap:6px;padding:38px 12px 12px}
+ #silm-comparison-items .silm-comparison-cards[data-layout=list] .silm-comparison-index{top:10px;transform:none}
+ #silm-comparison-items .silm-comparison-stage{max-height:260px}
 }
 @media(prefers-reduced-motion:reduce){#silm-comparison-items .silm-comparison-card{transition:none}}
-@media(forced-colors:active){.silm-comparison-index,.silm-comparison-focus,.si-tab-count,.silm-overview-chip{border:1px solid CanvasText}.silm-comparison-card[data-current=true],.silm-overview-chip[aria-pressed=true]{outline:2px solid Highlight}}
+@media(forced-colors:active){.silm-comparison-index,.silm-comparison-focus,.si-tab-count,.silm-overview-chip,.silm-comparison-remove{border:1px solid CanvasText}.silm-comparison-card[data-current=true],.silm-overview-chip[aria-pressed=true]{outline:2px solid Highlight}}

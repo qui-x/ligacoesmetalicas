@@ -11,6 +11,11 @@
   - se for outro metal, o SILM pede a mesma confirmação de "Iniciar investigação" e organiza a estrutura segundo a referência;
   - se for o atual, só volta ao Foco;
   - em atividade, o SILM avisa para encerrá-la antes.
+- **Remover da lista (✕):**
+  - cada estrutura fora de foco tem ✕;
+  - remover tira a estrutura só da Visão geral; nada da investigação é apagado, e a que está em foco não sai;
+  - ela volta quando o metal for investigado de novo.
+- **A estrutura em destaque:** o desenho ocupa mais da metade do cartão no computador e a largura toda no celular (com as informações embaixo), e a estrutura preenche mais o quadro.
 - **Barra de baixo na Visão geral:** ESTRUTURAS, uma ficha por estrutura e "+ Nova estrutura" (abre Montagem → Preparo), no lugar das ações do Foco.
 - Manual ("Conheça a Oficina dos Metais") e evidências de paridade (`docs/evidence-parity/LAB-OVERVIEW/`) atualizados.
 

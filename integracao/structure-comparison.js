@@ -15,8 +15,9 @@ SILM.referenceGeometry=e=>{
 /* Visão geral como "Sua bancada" do SIAB (03/11/2026, pedido do autor): título e ações na mesma faixa, contador na aba,
    cartões numerados com "Em foco", desenho à esquerda e informações à direita; tocar num cartão abre a estrutura no Foco
    (a investigação atual é substituída só depois da confirmação); barra inferior com as estruturas e "Nova estrutura".
-   current(): metal da investigação atual; open(z): abre a estrutura no Foco; newStructure(): abre Montagem → Preparo. */
-SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStructure=null})=>{
+   current(): metal da investigação atual; open(z): abre a estrutura no Foco; newStructure(): abre Montagem → Preparo.
+   Remover (✕) tira a estrutura só desta lista (nada da investigação é apagado); a estrutura em foco não sai. */
+SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStructure=null,say=null})=>{
  const S=SILM,N=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;},svgNS='http://www.w3.org/2000/svg';
  let recent=storage.get('comparison.recent',[]);if(!Array.isArray(recent))recent=[];recent=recent.filter(z=>Number.isInteger(z)&&S.data.get(z)?.silmEligibility.status==='available').slice(0,6);
  let last=null,shownCurrent=null,property='none',level=0,showElectrons=true,moving=false,scopes=[],layers=[];
@@ -35,7 +36,7 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
  motion.onclick=()=>{moving=!moving;motion.setAttribute('aria-pressed',String(moving));syncLayers();};
  view.onclick=()=>{layout=layout==='grid'?'list':'grid';storage.set('comparison.layout',layout);applyLayout();};
  actions.append(electrons,motion,view);head.append(actions);
- const note=N('p','Toque numa estrutura para abri-la no Foco. Até seis estruturas recentes; cada uma usa sua referência, sem escala comum.','silm-comparison-intro');
+ const note=N('p','Toque numa estrutura para abri-la no Foco; ✕ a remove desta lista. Até seis; cada uma usa sua referência, sem escala comum.','silm-comparison-intro');title.tabIndex=-1;
  // Comparar uma propriedade: seletor, intensidade em botões segmentados (0 a 3) e Restaurar.
  const controls=N('div',null,'silm-comparison-controls');
  const propertyField=N('div',null,'silm-comparison-field');
@@ -66,6 +67,9 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
  strip.append(stripLabel,chips,add);document.querySelector('#si-workspace .si-actionbar')?.append(strip);
  const structureCode=e=>{try{const g=S.referenceGeometry(e);return g?(g.canonical?(g.code||g.label):(g.label||g.code)):'';}catch{return '';}};
  async function openStructure(z){if(open)await open(z);}
+ function removeStructure(z){const i=recent.indexOf(z);if(i<0||z===current())return;const next=recent.filter(v=>v!==z);if(!storage.set('comparison.recent',next))return;recent=next;render();
+  say?.(S.data.get(z).name+' removido da Visão geral. Ele volta à lista quando for investigado de novo.','info');
+  (cards.querySelectorAll('.silm-comparison-open')[Math.min(i,recent.length-1)]||title).focus();}
  function renderStrip(cur){chips.replaceChildren();stripCount.textContent=String(recent.length);
   recent.forEach((z,i)=>{const e=S.data.get(z),b=N('button',null,'silm-overview-chip');b.type='button';b.setAttribute('aria-pressed',String(z===cur));
    const sym=N('span',e.symbol,'silm-overview-chip-symbol');sym.setAttribute('aria-hidden','true');const txt=N('span');txt.append(N('strong',e.name),N('small',(i+1)+' · '+(structureCode(e)||'referência')));
@@ -75,7 +79,7 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
   const eligible=S.properties.eligibility(e)[property],apply=property!=='none'&&eligible?.status!=='unavailable';
   const transform=p=>apply&&property==='malleability'?S.properties.compress(p,g.center,level):apply&&property==='ductility'?S.properties.elongate(p,g.center,level):p;
   const project=p=>{const q=p.map((v,i)=>v-g.center[i]);return [q[0]+.35*q[1],-q[2]+.3*q[1]];};
-  const fit=[...g.points,...g.edges.flat()].map(project),max=Math.max(1,...fit.flat().map(Math.abs))*1.65;
+  const fit=[...g.points,...g.edges.flat()].map(project),max=Math.max(1,...fit.flat().map(Math.abs))*1.3;
   const screen=p=>{const q=project(transform(p));return [150+q[0]*105/max,115+q[1]*105/max];};
   const shape=(tag,attrs)=>{const n=document.createElementNS(svgNS,tag);for(const [k,v]of Object.entries(attrs))n.setAttribute(k,v);svg.append(n);};
   for(const [a,b]of g.edges){const p=screen(a),q=screen(b);shape('line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],stroke:'currentColor','stroke-opacity':.4});}
@@ -95,6 +99,7 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
    const focused=z===cur;if(focused)card.dataset.current='true';
    const index=N('span',String(i+1),'silm-comparison-index');index.setAttribute('aria-hidden','true');card.append(index);
    if(focused){const badge=N('span','Em foco','silm-comparison-focus');card.append(badge);}
+   else{const del=N('button','✕','silm-comparison-remove');del.type='button';del.setAttribute('aria-label','Remover '+e.name+' da Visão geral');del.title='Remover da Visão geral';del.onclick=ev=>{ev.stopPropagation();removeStructure(z);};card.append(del);}
    const body=N('div',null,'silm-comparison-body');
    const heading=N('header',null,'silm-comparison-card-heading');heading.append(N('h3',e.name+' ('+e.symbol+')'));
    if(g){

@@ -47,6 +47,7 @@ Agora o contêiner tem uma coluna só, como "Sua bancada" no SIAB.
 | Cartões grandes, numerados, com "Em foco", desenho à esquerda e informações à direita | Cartões estreitos, desenho em cima e quase sem informação | Cartões em largura útil (2 por linha em 1366 px, 1 no celular), numerados, com "Em foco" na estrutura atual. O desenho fica à esquerda; à direita, metal, estrutura de referência, parâmetro de rede do banco, estado da propriedade e "Fonte e limites" |
 | Tocar num tubo leva ao "Tubo em foco" | Tocar num cartão não fazia nada | Tocar num cartão (ou numa ficha) abre a estrutura no Foco. Se for outro metal, o SILM pede a mesma confirmação de "Iniciar investigação" e organiza segundo a referência; se for o atual, só volta ao Foco |
 | "Ver em grade" | — | "Ver em lista" / "Ver em grade", guardado no navegador |
+| Excluir um item da bancada | Sem como remover | ✕ em cada estrutura fora de foco: tira da lista (a investigação não muda; a estrutura em foco não sai) |
 | Barra de baixo: BANCADA, fichas dos tubos e "+ Novo tubo" | Desfazer, unidades e Mais (ações do Foco) | ESTRUTURAS, uma ficha por estrutura (número, metal e rótulo da estrutura, "em foco" marcada) e "+ Nova estrutura" (abre Montagem → Preparo) |
 
 Continuam N/A: "Selecionar recipientes" (não há misturas nem vínculos entre estruturas) e "Ordenar por pH" (ordenar por um valor sugeriria uma classificação que o plano proíbe).
