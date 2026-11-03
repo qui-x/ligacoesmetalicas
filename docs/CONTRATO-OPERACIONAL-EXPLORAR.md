@@ -294,11 +294,13 @@ Esta seção evita confundir o que já existe com o que esta especificação exi
 | Guarda no domínio | A troca de módulo altera o módulo; serviços de experiência não centralizam todos os bloqueios por módulo. | Centralizar autorização nos serviços e controladores. |
 | Motores transitórios | Temperatura e carga mecânica possuem controladores próprios; parte do estado não é persistida. | Definir suspensão, retomada e persistência mínima. |
 | Registro reproduzível | Parâmetros atuais e eventos de domínio existem, mas não há registro estruturado completo de cada execução. | Especificar o modelo de registro antes de alterar o schema. |
+| Intensidade e polaridade do campo | A intensidade transitória é integrada à visualização cristalina; a montagem livre não recebe esse parâmetro e usa o padrão do motor. O sentido é fixo. | Unificar intensidade nos dois modos e permitir inversão consistente do campo, deriva e corrente convencional. |
 
 ## 13. Etapas de aprofundamento
 
 - [Etapa 1 — Contrato operacional do Explorar](CONTRATO-OPERACIONAL-EXPLORAR.md): documentada. Formaliza ciclo de vida, famílias de estímulos, combinações, autorização por módulo e estados persistentes/transitórios.
 - [Etapa 2 — Estímulo luminoso](ESTIMULO-LUMINOSO.md): especificada. Define reflexão geométrica, resposta espectral, colorimetria, fontes de dados e critérios de homologação. A especificação não equivale a implementação da resposta espectral.
 - [Etapa 3 — Estímulo térmico](ESTIMULO-TERMICO.md): especificada. Define fonte finita e localizada, condução, capacidade térmica, troca ambiental, resfriamento, proveniência de dados e testes de conservação de energia. A especificação não equivale à implementação do novo motor.
+- [Etapa 4 — Estímulo elétrico](ESTIMULO-ELETRICO.md): especificada. Distingue campo, deriva eletrônica, corrente convencional e aquecimento Joule; define acoplamento térmico, requisitos de dados e lacunas de intensidade entre modos.
 
-A Etapa 4 deve detalhar o **estímulo elétrico**: fonte/campo, geometria, resposta dos elétrons, corrente como fenômeno coletivo, acoplamento com temperatura e limites entre visualização qualitativa e grandezas elétricas mensuráveis.
+A Etapa 5 deve detalhar o **estímulo mecânico**: força aplicada, tensão e deformação, regime elástico, deslizamento de planos, deformação plástica, recuperação e limites do modelo por estrutura cristalina.
