@@ -57,20 +57,22 @@ module.exports=async(browser,url)=>{
   /* Deformação + corrente. */
   await start(p,'malleability');const fieldBtn=p.locator('#silm-panel-property-field');
   assert.equal(await fieldBtn.innerText(),'Aplicar campo elétrico');assert.equal(await fieldBtn.getAttribute('aria-pressed'),'false');
-  await fieldBtn.click();assert.equal(await fieldBtn.innerText(),'Remover campo elétrico');assert.equal(await fieldBtn.getAttribute('aria-pressed'),'true');
+  await fieldBtn.click();await p.waitForFunction(()=>{const b=document.getElementById('silm-panel-property-field');return b?.textContent==='Remover campo elétrico'&&b.getAttribute('aria-pressed')==='true';},null,{timeout:4000});
   await p.waitForFunction(()=>document.querySelector('.silm-electron-canvas')?.silmElectrons.snapshot().field===true);assert.equal((await electrons(p)).defects,0,'Sem deslizamentos, sem defeitos');
   for(const n of [1,2]){await p.locator('#silm-panel-property-compress').click();await p.waitForFunction(k=>SILMIntegration.snapshot().properties.malleability.compression===k,n,{timeout:6000});}
   await p.waitForFunction(()=>document.querySelector('.silm-electron-canvas')?.silmElectrons.snapshot().defects===.5);
-  assert.match(await status(p),/os deslizamentos geraram defeitos na rede \(discordâncias, que esta representação não desenha\)/);
+  // O texto da cena é atualizado até 10 vezes por segundo durante a animação do deslizamento: espera a atualização.
+  await p.waitForFunction(()=>/os deslizamentos geraram defeitos na rede \(discordâncias, que esta representação não desenha\)/.test(document.getElementById('silm-scene-property-status')?.textContent||''),'',{timeout:6000});
   await closeDock(p);await knob.waitFor();assert.ok(await inStage(p,'.silm-field-knob'),'Alça dentro da cena na deformação');
   await nav.viewer(p,'propriedades');await p.locator('#silm-panel-property-restore').click();
   await p.waitForFunction(()=>SILMIntegration.snapshot().properties.malleability.compression===0);
-  assert.equal(await fieldBtn.innerText(),'Aplicar campo elétrico','Restaurar desliga o campo');assert.equal((await electrons(p)).field,false);
+  await p.waitForFunction(()=>document.getElementById('silm-panel-property-field')?.textContent==='Aplicar campo elétrico',null,{timeout:4000});
+  await p.waitForFunction(()=>document.querySelector('.silm-electron-canvas')?.silmElectrons.snapshot().field===false,null,{timeout:4000});
   // Ductilidade também oferece o campo; experiência nova começa com o campo desligado.
   await start(p,'ductility');assert.equal(await fieldBtn.getAttribute('aria-pressed'),'false');
   // Elétrons ocultos: aplicar o campo os mostra (como ao iniciar a condutividade elétrica).
   await nav.viewer(p,'eletrons');await p.locator('#silm-electrons').click();await p.waitForFunction(()=>SILMIntegration.snapshot().electrons?.representation.visible===false);
-  await nav.viewer(p,'propriedades');await fieldBtn.click();await p.waitForFunction(()=>SILMIntegration.snapshot().electrons?.representation.visible===true);assert.equal(await fieldBtn.getAttribute('aria-pressed'),'true');
+  await nav.viewer(p,'propriedades');await fieldBtn.click();await p.waitForFunction(()=>SILMIntegration.snapshot().electrons?.representation.visible===true);await p.waitForFunction(()=>document.getElementById('silm-panel-property-field')?.getAttribute('aria-pressed')==='true',null,{timeout:4000});
  }finally{await ctx.close();}
  /* Celular: alças dentro da cena, sem rolagem lateral; teclado na lanterna. */
  const mob=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'reduce'});
