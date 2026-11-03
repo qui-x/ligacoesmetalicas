@@ -294,4 +294,4 @@ As referências sustentam a plausibilidade física dos mecanismos, mas não forn
 
 Esta etapa conclui a especificação das combinações e do painel contextual de aplicação. Não inclui alteração de código, novo controlador, interface implementada, mudança de schema, dados numéricos, testes executados ou publicação na branch `main`.
 
-A próxima etapa do aprofundamento do Explorar é a **Etapa 7 — Camadas de visualização**, distinguindo camadas científicas, representações auxiliares, indicadores de estado e controles de visibilidade sem alterar o estado científico.
+A Etapa 7 — [Camadas de visualização](CAMADAS-VISUALIZACAO.md) — está especificada. A próxima etapa do aprofundamento do Explorar é a **Etapa 8 — Motor científico**, definindo contratos de execução, estados compartilhados e critérios de validação.
