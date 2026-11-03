@@ -83,6 +83,10 @@ Trocar Explorar → Medir → Calcular → Explorar preserva investigação, met
 
 As regras de suspensão dos motores transitórios, preservação de uma experiência ativa e autorização no domínio são definidas no [Contrato operacional do Explorar](CONTRATO-OPERACIONAL-EXPLORAR.md), que prevalece sobre este recorte histórico.
 
-## 9. Limite deste documento
+## 9. Plano de implementação
+
+O aprofundamento científico e operacional do Explorar está especificado em nove contratos. A sequência de execução, dependências, arquivos candidatos, migrações, testes e critérios de homologação está consolidada no [Plano operacional de implementação](PLANO-IMPLEMENTACAO-EXPLORAR.md).
+
+## 10. Limite deste documento
 
 As referências de série e o recorte de funcionalidades desta página descrevem a evolução visual iniciada em 0.8.x. Não devem ser usados como roadmap atual de Medir, Calcular ou dos motores científicos. Para requisitos operacionais vigentes, prevalecem os contratos específicos de cada módulo.
