@@ -106,6 +106,24 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const heaterUp=e=>{if(!heaterDrag||(e&&e.pointerId!==heaterDrag.id))return;const tap=!heaterDrag.moved;heaterDrag=null;delete heater.dataset.dragging;if(tap&&e?.type==='pointerup')toggleHeat();};
  for(const type of ['pointerup','pointercancel','lostpointercapture'])scope.listen(heater,type,heaterUp);
  scope.listen(heater,'keydown',e=>{const step={ArrowLeft:[-.04,0],ArrowRight:[.04,0],ArrowUp:[0,-.04],ArrowDown:[0,.04]}[e.key];if(step){e.preventDefault();e.stopPropagation();moveSource(...step);}else if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();toggleHeat();}});
+ /* 0.17.x (SILM.drive, transitórios): alça de intensidade na seta E (P3) e lanterna do brilho (P4). Arraste ou teclado. */
+ const DR=SILM.drive,driveCtl=DR?DR.controller(model):null;
+ if(driveCtl)scope.cleanup(driveCtl.subscribe(()=>{if(scope.active)render();}));
+ const slider=(cls,label,min,max)=>{const n=U.element('div',null,cls);n.hidden=true;n.tabIndex=0;n.setAttribute('role','slider');n.setAttribute('aria-label',label);n.setAttribute('aria-valuemin',String(min));n.setAttribute('aria-valuemax',String(max));stage.append(n);return n;};
+ const fieldKnob=slider('silm-field-knob','Intensidade do campo elétrico',5,100),lantern=slider('silm-lantern','Lanterna: ângulo de incidência (graus)',5,80);
+ const stageXY=e=>{const r=stage.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*100,y:(e.clientY-r.top)/r.height*100};};
+ let knobDrag=null,lampDrag=null;
+ scope.listen(fieldKnob,'pointerdown',e=>{if(!driveCtl)return;e.preventDefault();e.stopPropagation();try{fieldKnob.setPointerCapture(e.pointerId);}catch{}knobDrag={id:e.pointerId};fieldKnob.dataset.dragging='';});
+ scope.listen(fieldKnob,'pointermove',e=>{if(!knobDrag||e.pointerId!==knobDrag.id)return;e.stopPropagation();driveCtl.setIntensity((stageXY(e).x-55)/25);});
+ scope.listen(lantern,'pointerdown',e=>{if(!driveCtl)return;e.preventDefault();e.stopPropagation();try{lantern.setPointerCapture(e.pointerId);}catch{}lampDrag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};lantern.dataset.dragging='';});
+ scope.listen(lantern,'pointermove',e=>{if(!lampDrag||e.pointerId!==lampDrag.id)return;e.stopPropagation();if(!lampDrag.moved&&Math.hypot(e.clientX-lampDrag.x,e.clientY-lampDrag.y)<6)return;lampDrag.moved=true;
+  const s=scene?.surfaceView;if(!s)return;const q=stageXY(e);driveCtl.setAngle(Math.atan2(s.x-q.x,s.y-q.y)*180/Math.PI);});
+ const dragEnd=(node,get,set,tap)=>e=>{const d=get();if(!d||(e&&e.pointerId!==d.id))return;set(null);delete node.dataset.dragging;if(tap&&!d.moved&&e?.type==='pointerup')tap();};
+ for(const type of ['pointerup','pointercancel','lostpointercapture']){scope.listen(fieldKnob,type,dragEnd(fieldKnob,()=>knobDrag,v=>{knobDrag=v;},null));scope.listen(lantern,type,dragEnd(lantern,()=>lampDrag,v=>{lampDrag=v;},()=>propertyOptions?.toggleLight?.()));}
+ scope.listen(fieldKnob,'keydown',e=>{if(!driveCtl)return;const step={ArrowRight:.1,ArrowUp:.1,ArrowLeft:-.1,ArrowDown:-.1,PageUp:.25,PageDown:-.25}[e.key];
+  if(step!==undefined){e.preventDefault();e.stopPropagation();driveCtl.setIntensity(driveCtl.intensity+step);}else if(e.key==='Home'||e.key==='End'){e.preventDefault();e.stopPropagation();driveCtl.setIntensity(e.key==='End'?1:.05);}});
+ scope.listen(lantern,'keydown',e=>{if(!driveCtl)return;const step={ArrowRight:-5,ArrowUp:-5,ArrowLeft:5,ArrowDown:5}[e.key];
+  if(step!==undefined){e.preventDefault();e.stopPropagation();driveCtl.setAngle(driveCtl.angle+step);}else if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();propertyOptions?.toggleLight?.();}});
  /* Enquadramento estável durante a deformação: caixa que cobre a forma de referência, a orientada e a de máximo
     deslizamento, para a câmera não "respirar" a cada quadro. */
  function deformFit(list,proj,view,id){
@@ -255,7 +273,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    thermalCtl.sync();const heatOn=thermalCtl.reading().on;thermalCtl.setPinned(heatOn?near:[]);temps=thermalCtl.temperatures();heated=active==='thermal'||[...temps.values()].some(v=>v>.01);scene.heatOn=heatOn;
    const pinned=new Set(heatOn?near:[]);levels=list.map(u=>TH.level(temps.get(X.key(u.site))||0));sources=list.map((u,i)=>pinned.has(i));scene.heatTemps=temps;
   }else{scene.heatTemps=null;if(heated){levels=P.heat(refCentres,refSpacing,pr.thermal.stage);sources=P.heatSources(refCentres);}}
-  const lit=new Set();if(active==='luster'&&pr.luster.light){const zs=list.map(u=>g.site(u.site).cart[2]),top=Math.max(...zs);list.forEach((u,i)=>{if(zs[i]>=top-.05)lit.add(u.id);});}
+  const lit=new Set(),surface=[];if(active==='luster'){const zs=list.map(u=>g.site(u.site).cart[2]),top=Math.max(...zs);list.forEach((u,i)=>{if(zs[i]>=top-.05){surface.push(i);if(pr.luster.light)lit.add(u.id);}});}scene.surfaceIdx=surface;
   // As fontes (região aquecida) ficam marcadas em qualquer projeção; a faixa "calor" só aparece onde elas estiverem à esquerda.
   list.forEach((u,i)=>{const node=nodes.get(u.id);if(heated){node.dataset.heat=String(levels[i]);if(temps)node.style.setProperty('--heat',(temps.get(X.key(u.site))||0).toFixed(3));node.setAttribute('aria-label',node.getAttribute('aria-label')+', energia térmica '+P.heatWord(levels[i])+(sources[i]?(continuous?', sob a fonte de calor':', na região aquecida'):''));}else{delete node.dataset.heat;node.style.removeProperty('--heat');}
    if(sources[i])node.dataset.heatSource='';else delete node.dataset.heatSource;
@@ -267,11 +285,16 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   updateWindow();
   /* Elétrons: centros na janela da vista enquadrada (não da câmera atual). Aproximar ou deslocar não refaz a distribuição. */
   const fc=RD.fit(box,boxMargin),fa=RD.toScene(fc,{x:0,y:0}),fb=RD.toScene(fc,{x:1,y:1}),electronSites=latticeWindow({w:{x0:fa.x,y0:fa.y,x1:fb.x,y1:fb.y},c:{x:fc.x,y:fc.y},zoom:fc.zoom});
-  const fieldOn=active==='electrical'&&pr.electrical.field;
+  driveCtl?.sync();const deformExp=active==='malleability'||active==='ductility',slips=active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0;
+  const fieldOn=active==='electrical'&&pr.electrical.field||deformExp&&!!driveCtl?.deformField,defects=deformExp&&DF?slips/DF.LIMIT:0,ET=SILM.electronTransport;
+  scene.fieldOn=fieldOn;scene.defects=defects;
   // A órbita atualiza a região projetada sem interromper a animação eletrônica.
   // Calor + corrente: cada centro leva a temperatura local (0 sem calor) para o espalhamento dos elétrons.
   const tOf=k=>scene.heatTemps?.get(k)||0;
-  electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:[...drawn.map((q,i)=>({x:q.x,y:q.y,t:tOf(X.key(list[i].site))})),...electronSites.map(s=>({x:s.q.x,y:s.q.y,t:tOf(s.key)}))],spacing:d*layout.scale,connect:false});
+  const centersT=[...drawn.map((q,i)=>({x:q.x,y:q.y,t:tOf(X.key(list[i].site))})),...electronSites.map(s=>({x:s.q.x,y:s.q.y,t:tOf(s.key)}))];
+  // Deriva média relativa (seta "elétrons (média)"): calor e defeitos reduzem; a intensidade do campo aumenta.
+  scene.driftFactor=ET?(centersT.reduce((a,c)=>a+ET.drift(c.t),0)/Math.max(1,centersT.length))*ET.defectDrift(defects):1;
+  electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:centersT,spacing:d*layout.scale,connect:false,drive:driveCtl?.intensity??.6,defects});
   drawAxes();
   // Durante a animação da deformação, os controles e o texto são atualizados até 10 vezes por segundo (o desenho, a cada quadro).
   const busy=deforming&&!!deformCtl&&(r=>r.load>0||r.sliding||Math.abs(r.strain)>1e-3||(r.orient>1e-4&&r.orient<1-1e-4))(deformCtl.reading()),tNow=performance.now();
@@ -295,7 +318,18 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  function paint(){
   if(!scene?.drawn||!scene.lit)return;const {list,drawn,active,pr,calcMark,selected}=scene;
   electronLayer.setCamera?.(R.camera);
-  let light=null;if(scene.lit.size){const tops=list.map((u,i)=>[u,drawn[i]]).filter(([u])=>scene.lit.has(u.id)).map(([,c])=>c),mean={x:tops.reduce((a,c)=>a+c.x,0)/tops.length,y:tops.reduce((a,c)=>a+c.y,0)/tops.length},v=R.toView(mean);light={x:v.x*100,y:v.y*100};}   // centro da face superior
+  // Margens em % para as alças (raio em px) ficarem inteiras dentro da cena, também no celular.
+  const pct=px=>px/(R.size||stage.clientWidth||300)*100,lampEdge=()=>Math.max(4,pct(24)),fieldY=Math.max(4.5,pct(20));
+  // Lanterna (P4): ponto da superfície (centro da face de cima), lanterna a θ da normal e feixe refletido a θ do outro lado.
+  let beam=null;scene.surfaceView=null;
+  if(driveCtl&&active==='luster'&&scene.surfaceIdx?.length){const pts=scene.surfaceIdx.map(i=>drawn[i]),m={x:pts.reduce((a,c)=>a+c.x,0)/pts.length,y:pts.reduce((a,c)=>a+c.y,0)/pts.length},v=R.toView(m),P={x:v.x*100,y:v.y*100};
+   const th=driveCtl.angle*Math.PI/180,sn=Math.sin(th),cs=Math.cos(th),e=lampEdge(),Rr=Math.max(8,Math.min(38,(P.y-e)/cs,(P.x-e)/Math.max(sn,.01),(100-e-P.x)/Math.max(sn,.01)));
+   beam={point:P,lantern:{x:P.x-Rr*sn,y:P.y-Rr*cs},end:{x:P.x+Rr*sn,y:P.y-Rr*cs},angle:driveCtl.angle,on:!!pr.luster.light};scene.surfaceView=P;}
+  const lampOn=!!beam&&scene.module==='explorar';lantern.hidden=!lampOn;
+  if(lampOn){lantern.style.left=beam.lantern.x+'%';lantern.style.top=beam.lantern.y+'%';lantern.dataset.on=String(beam.on);lantern.setAttribute('aria-valuenow',String(beam.angle));lantern.setAttribute('aria-valuetext',beam.angle+' graus da normal, luz '+(beam.on?'acesa':'apagada'));lantern.title='Arraste para mudar o ângulo; toque para '+(beam.on?'apagar':'acender')+'. Teclado: setas mudam o ângulo, Enter acende e apaga.';}
+  const knobOn=!!driveCtl&&!!scene.fieldOn&&scene.module==='explorar';fieldKnob.hidden=!knobOn;
+  if(knobOn){const I=driveCtl.intensity;fieldKnob.style.left=(55+25*I)+'%';fieldKnob.style.top=fieldY+'%';fieldKnob.setAttribute('aria-valuenow',String(Math.round(I*100)));fieldKnob.setAttribute('aria-valuetext',Math.round(I*100)+' %');}
+  let light=null;if(!beam&&scene.lit.size){const tops=list.map((u,i)=>[u,drawn[i]]).filter(([u])=>scene.lit.has(u.id)).map(([,c])=>c),mean={x:tops.reduce((a,c)=>a+c.x,0)/tops.length,y:tops.reduce((a,c)=>a+c.y,0)/tops.length},v=R.toView(mean);light={x:v.x*100,y:v.y*100};}   // centro da face superior
   const sourceX=scene.heatSources.length?Math.min(...scene.heatSources.map(p=>p.x)):Math.min(...drawn.map(p=>p.x)),left=R.toView({x:sourceX-unitFraction,y:.5}).x;
   // Prensa (compressão) ou garras (tração) nas faces de cima e de baixo da amostra, acompanhando a forma a cada quadro.
   const reading=deformCtl?.reading();let plates=null;
@@ -310,7 +344,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    const comp=reading.active==='malleability',pct=Math.round(reading.load*100),word=reading.regime==='plastic'?'regime plástico':reading.regime==='elastic'?'regime elástico':'sem força';
    handle.setAttribute('aria-label',comp?'Prensa: força de compressão':'Garra: força de tração');handle.title=(comp?'Arraste a prensa para baixo':'Arraste a garra para cima')+' para aplicar a força; solte para retirar. Teclado: setas, Home solta.';
    if(handle.getAttribute('aria-valuenow')!==String(pct)){handle.setAttribute('aria-valuenow',String(pct));handle.setAttribute('aria-valuetext',pct+' %, '+word);}}
-  overlay.update({field:active==='electrical'&&pr.electrical.field,force:active==='malleability'?'compress':active==='ductility'?'stretch':null,level:active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0,plates,load:reading?.active?reading.load:0,heat:active==='thermal'&&pr.thermal.heating&&!scene.heatAside&&!scene.continuousHeat,light,heatX:Math.max(0,Math.min(.8,left-.05))*100});
+  overlay.update({field:!!scene.fieldOn,intensity:driveCtl?.intensity??null,drift:scene.driftFactor,fieldY,beam,force:active==='malleability'?'compress':active==='ductility'?'stretch':null,level:active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0,plates,load:reading?.active?reading.load:0,heat:active==='thermal'&&pr.thermal.heating&&!scene.heatAside&&!scene.continuousHeat,light,heatX:Math.max(0,Math.min(.8,left-.05))*100});
   const view=p=>{const v=R.toView(p);return {x:v.x,y:v.y};};
   let measureText='';
   // A deformação só existe em Explorar: sem medição em curso, nada a ler (evita cópias do estado a cada quadro).

@@ -2,7 +2,7 @@
 
 Proposta de 02/11/2026, a partir do pedido do autor: "atualmente ela está meio movimenta barrinha e o desenho se mexe, precisamos de mais fluidez nessas mecânicas". O plano também avalia as quatro sugestões enviadas: mar de elétrons, massa-mola com escoamento, PBR e ligas.
 
-Status: **P1 e P2 implementadas** (maleabilidade e ductilidade; condução térmica). P3 a P6 continuam como proposta.
+Status: **P1 a P4 implementadas** (maleabilidade e ductilidade; condução térmica; condução elétrica com intensidade; brilho com lanterna). Propriedades juntas (P7): calor + corrente e deformação + corrente. P5 e P6 continuam como proposta.
 
 **Decisões do autor (02/11/2026):**
 - Começar por maleabilidade e ductilidade (P1).
@@ -156,8 +156,8 @@ Carbono no ferro, por exemplo, forma solução **intersticial** com um não meta
 |---|---|---|
 | **P1** | Laço contínuo comum. Maleabilidade e ductilidade com molas (elástico) e deslizamento de planos em passos de b (plástico). | Sim: confirmar a fonte dos sistemas de deslizamento. |
 | **P2** | Condução térmica contínua (equação do calor no grafo e fonte arrastável). | Não. |
-| **P3** | Condução elétrica com intensidade contínua e indicador de fluxo. | Não. |
-| **P4** | Brilho com lanterna arrastável e lei da reflexão. | Não. |
+| **P3** | Condução elétrica com intensidade contínua e indicador de fluxo. **Implementada** (§10). | Não. |
+| **P4** | Brilho com lanterna arrastável e lei da reflexão. **Implementada** (§11). | Não. |
 | **P5** | Comparar metais com dados reais (condutividades). | Sim: dados com fonte. |
 | **P6** | Ligas (solução sólida substitucional). | Sim: conteúdo e fontes. |
 
@@ -206,6 +206,29 @@ Cada etapa traz os testes da seção 5, a atualização do Manual ("Propriedades
   - na condutividade elétrica (estrutura cristalina), a fonte de calor da P2 aquece a estrutura de forma transitória;
   - a camada de elétrons usa a temperatura do centro mais próximo: o espalhamento é 1 + 3·T e a deriva é 1/(1 + 2·T);
   - os fatores são didáticos, e T vai de 0 (ambiente) a 1 (fonte).
-- **Próximas combinações possíveis**, a decidir pelo autor:
-  - deformação + corrente (contribuição da deformação na regra de Matthiessen; efeito pequeno);
-  - corrente + calor como um só transporte (lei de Wiedemann–Franz: os mesmos elétrons levam carga e calor).
+- **Deformação + corrente (implementada, pedido do autor "pode fazer os três ao mesmo tempo"):**
+  - na maleabilidade e na ductilidade, o botão "Aplicar campo elétrico" liga um campo transitório (não gravado; uma experiência nova começa sem ele, e Restaurar o desliga);
+  - cada deslizamento deixa defeitos na rede (discordâncias). Esta representação não os desenha: depois de um deslizamento completo, os blocos têm rede perfeita, e a discordância é o que passou por eles;
+  - o efeito na camada de elétrons é uniforme e cresce com d = deslizamentos/4: espalhamento 1 + 1,2·d e deriva 1/(1 + 0,6·d). É a contribuição da deformação na regra de Matthiessen (ρ = ρ_térmica + ρ_impurezas + ρ_deformação), qualitativa, igual para todos os metais e menor que a do calor máximo (o metal deformado continua conduzindo bem);
+  - testes: `tests/drive.cjs` (monotonia e limites dos fatores) e TEST-DRIVE (botão, defeitos nos elétrons, texto e Restaurar).
+- **Próxima combinação possível**, a decidir pelo autor: corrente + calor como um só transporte (lei de Wiedemann–Franz: os mesmos elétrons levam carga e calor).
+
+## 10. Como a P3 ficou (registro de implementação)
+
+- **Módulo:** `domain/silm/drive.js` (controles transitórios, um por modelo). Nada é gravado: o estado guarda só "campo aplicado" (`properties.electrical.field`).
+- **Ciência (qualitativa):** a velocidade média de deriva é proporcional ao campo, v = μE (mobilidade μ; Callister & Rethwisch, capítulo de propriedades elétricas, edição e página a conferir pelo autor). O SILM mostra só a proporção: a intensidade vai de 5 % a 100 %, sem unidade, e a mesma regra vale para todos os metais (a deriva não usa a condutividade do banco).
+- **Interação:** a alça fica na ponta da seta E. Arrastar para a direita aumenta; com a alça em foco, as setas mudam de 10 em 10 % e Home e End vão ao mínimo e ao máximo. A seta E cresce com a intensidade, e a seta "elétrons (média)" cresce com a deriva (intensidade × efeitos do calor e dos defeitos).
+- **Texto:** "Intensidade do campo: X %; a deriva média cresce com a intensidade (v ∝ E)."
+- **Testes:** `tests/drive.cjs` (limites, arredondamento, deriva proporcional) e TEST-DRIVE (arraste, teclado, deriva da camada de elétrons, nada gravado, celular).
+
+## 11. Como a P4 ficou (registro de implementação)
+
+- **Ciência:** lei da reflexão, θᵣ = θᵢ, com os ângulos medidos a partir da normal da superfície (física geral, sem dado do metal). Os metais são opacos à luz visível, então nenhum feixe atravessa a amostra. O alto brilho vem da resposta dos elétrons deslocalizados (Callister & Rethwisch, capítulo de propriedades ópticas, edição e página a conferir pelo autor). A cor própria de cada metal continua fora, por falta de dados ópticos homologados.
+- **Interação:**
+  - lanterna na cena: um toque acende ou apaga;
+  - arrastar muda o ângulo de 5° a 80° da normal;
+  - com a lanterna em foco, as setas mudam o ângulo de 5 em 5° e Enter acende e apaga;
+  - o botão "Incidir luz" continua no painel.
+- **Cena:** o ponto de incidência é o centro da face de cima. A normal é tracejada, o feixe incidente é contínuo e o refletido é tracejado, com os rótulos θᵢ e θᵣ. A lanterna e a alça do campo ficam inteiras dentro da cena, também no celular.
+- **Estado:** só "luz acesa" (`properties.luster.light`). O ângulo é transitório.
+- **Testes:** `tests/drive.cjs` (θᵣ = θᵢ e limites) e TEST-DRIVE (toque, arraste, teclado, rótulos iguais, geometria simétrica à normal, só três linhas e nenhuma abaixo da superfície, celular).

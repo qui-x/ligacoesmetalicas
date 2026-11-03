@@ -6,10 +6,13 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
  // 0.17.x: deformação contínua — o mesmo controlador da cena (um por modelo).
  const deform=()=>S.deformation?.controller(model,{reducedMotion:reduced})||null;
  const thermal=()=>S.thermal?.controller(model,{reducedMotion:reduced})||null;
+ const drive=()=>S.drive?.controller(model)||null;
  const change=patch=>{if(!editable())return;const ok=model.setPropertyParams(patch);if(ok)schedule();return ok;};
  const actions={
   start(id){if(!allows(id)||!editable())return;const r=model.startProperty(id);if(!r.ok)say(P.reasons[r.reason]||'Organize uma estrutura cristalina para esta experiência.','warning');schedule();},
-  field:()=>change({field:!model.state.properties.electrical.field}),
+  // Deformação + corrente: na maleabilidade e na ductilidade, o campo é transitório (SILM.drive), sem gravar.
+  // Ligar o campo mostra os elétrons, se estiverem ocultos (como ao iniciar a condutividade elétrica).
+  field(){const st=model.state,id=st.properties.active;if(id==='malleability'||id==='ductility'){const d=drive();if(d&&editable()){const on=!d.deformField;if(on&&!st.electrons?.representation.visible)model.activateElectrons?.();d.setDeformField(on);schedule();}return;}return change({field:!model.state.properties.electrical.field});},
   // Calor + corrente: na condutividade elétrica, a fonte de calor é transitória (controlador térmico, sem gravar).
   heat(){if(model.state.properties.active==='electrical'){const t=thermal();if(t&&editable()){t.setHeating(!t.reading().on);schedule();}return;}return change({heating:!model.state.properties.thermal.heating});},
   advance(){const p=model.state.properties.thermal;if(p.heating&&p.stage<P.limits.heatStages)return change({stage:p.stage+1});},
@@ -17,16 +20,16 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   stretch(){if(!editable())return;const c=deform();if(c){const ok=c.pulse();schedule();return ok;}const p=model.state.properties.ductility;if(p.elongation<P.limits.elongation)return change({elongation:p.elongation+1});},
 
   light:()=>change({light:!model.state.properties.luster.light}),
-  restore(){deform()?.setLoad(0);model.restoreProperty();const t=thermal();if(t){t.setHeating(false);t.reset();}schedule();},end(){deform()?.setLoad(0);model.endProperty();schedule();}
+  restore(){deform()?.setLoad(0);drive()?.setDeformField(false);model.restoreProperty();const t=thermal();if(t){t.setHeating(false);t.reset();}schedule();},end(){deform()?.setLoad(0);model.endProperty();schedule();}
  };
  // Uma leitura do estado por atualização (model.state devolve uma cópia completa).
- const info=()=>{const st=model.state;return {deformation:deform()?.reading()||null,thermal:thermal()?.reading()||null,state:st,eligibility:P.eligibility(st.metal?S.data.get(st.metal.atomicNumber):null),editable:st.module.active==='explorar',reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}};};
+ const info=()=>{const st=model.state;return {deformation:deform()?.reading()||null,thermal:thermal()?.reading()||null,drive:drive()?.reading()||null,state:st,eligibility:P.eligibility(st.metal?S.data.get(st.metal.atomicNumber):null),editable:st.module.active==='explorar',reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}};};
  const controls=S.createPropertyControls(document.getElementById('silm-properties'),{scope,info,actions,prefix:'silm-panel-property'});
  // Painel: até 10 atualizações por segundo durante a animação (a cena atualiza a cada quadro).
  {const c=deform();let lastPanel=0,pending=0;const run=()=>{pending=0;lastPanel=performance.now();controls.update();};
   const tick=()=>{if(performance.now()-lastPanel>=100)run();else if(!pending)pending=setTimeout(run,100);};
-  if(c)scope.cleanup(c.subscribe(tick));const t=thermal();if(t)scope.cleanup(t.subscribe(tick));}
- const scene={advanceHeat:actions.advance,toggleHeat:()=>actions.heat(),controls:(host,viewScope)=>S.createPropertyControls(host,{scope:viewScope,info,actions,prefix:'silm-scene-property',compact:true})};
+  if(c)scope.cleanup(c.subscribe(tick));const t=thermal();if(t)scope.cleanup(t.subscribe(tick));const dv=drive();if(dv)scope.cleanup(dv.subscribe(tick));}
+ const scene={advanceHeat:actions.advance,toggleHeat:()=>actions.heat(),toggleLight:()=>actions.light(),controls:(host,viewScope)=>S.createPropertyControls(host,{scope:viewScope,info,actions,prefix:'silm-scene-property',compact:true})};
  const dialog=document.getElementById('silm-periodic-dialog'),body=document.getElementById('silm-periodic-body'),trigger=document.getElementById('silm-open-periodic');let tableScope;
  trigger.addEventListener('click',()=>{
   tableScope?.destroy();tableScope=SimCore.createScope();body.replaceChildren();
