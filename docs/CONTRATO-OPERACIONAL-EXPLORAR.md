@@ -295,6 +295,7 @@ Esta seção evita confundir o que já existe com o que esta especificação exi
 | Motores transitórios | Temperatura e carga mecânica possuem controladores próprios; parte do estado não é persistida. | Definir suspensão, retomada e persistência mínima. |
 | Registro reproduzível | Parâmetros atuais e eventos de domínio existem, mas não há registro estruturado completo de cada execução. | Especificar o modelo de registro antes de alterar o schema. |
 | Intensidade e polaridade do campo | A intensidade transitória é integrada à visualização cristalina; a montagem livre não recebe esse parâmetro e usa o padrão do motor. O sentido é fixo. | Unificar intensidade nos dois modos e permitir inversão consistente do campo, deriva e corrente convencional. |
+| Deformação mecânica | O motor representa um sistema de deslizamento por estrutura, carga e limiar normalizados, até quatro eventos; não calcula tensão real, encruamento ou fratura. | Corrigir a interpretação didática do deslizamento, preservar os limites e curar dados antes de prever comportamento específico por metal. |
 
 ## 13. Etapas de aprofundamento
 
@@ -302,5 +303,6 @@ Esta seção evita confundir o que já existe com o que esta especificação exi
 - [Etapa 2 — Estímulo luminoso](ESTIMULO-LUMINOSO.md): especificada. Define reflexão geométrica, resposta espectral, colorimetria, fontes de dados e critérios de homologação. A especificação não equivale a implementação da resposta espectral.
 - [Etapa 3 — Estímulo térmico](ESTIMULO-TERMICO.md): especificada. Define fonte finita e localizada, condução, capacidade térmica, troca ambiental, resfriamento, proveniência de dados e testes de conservação de energia. A especificação não equivale à implementação do novo motor.
 - [Etapa 4 — Estímulo elétrico](ESTIMULO-ELETRICO.md): especificada. Distingue campo, deriva eletrônica, corrente convencional e aquecimento Joule; define acoplamento térmico, requisitos de dados e lacunas de intensidade entre modos.
+- [Etapa 5 — Estímulo mecânico](ESTIMULO-MECANICO.md): especificada. Distingue força, tensão, deformação elástica/plástica, movimento de discordâncias, sistemas de deslizamento por estrutura e limitações do modelo atual.
 
-A Etapa 5 deve detalhar o **estímulo mecânico**: força aplicada, tensão e deformação, regime elástico, deslizamento de planos, deformação plástica, recuperação e limites do modelo por estrutura cristalina.
+A Etapa 6 deve detalhar as **combinações de estímulos**: matriz de compatibilidade, acoplamentos validados, variáveis compartilhadas, sequência de aplicação e prevenção de motores duplicados.
