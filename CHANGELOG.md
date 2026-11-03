@@ -1,3 +1,25 @@
+## Em desenvolvimento — Corrente com intensidade (P3), lanterna (P4) e deformação + corrente
+
+- Pedido do autor: "pode fazer os três ao mesmo tempo". Sem barras deslizantes: tudo se controla na própria cena.
+- **Corrente com intensidade (P3):**
+  - com o campo aplicado, uma alça na ponta da seta **E** muda a intensidade de 5 % a 100 %. Pode ser arrastada; com a alça em foco, as setas mudam de 10 em 10 %, e Home e End vão ao mínimo e ao máximo;
+  - a seta E e a seta "elétrons (média)" crescem juntas, e a deriva média dos elétrons é proporcional à intensidade (v ∝ E, qualitativo, sem unidade e igual para todos os metais);
+  - a intensidade é transitória: o estado continua guardando só "campo aplicado".
+- **Brilho com lanterna (P4):**
+  - uma lanterna na cena acende e apaga com um toque e muda o ângulo quando arrastada (5° a 80° da normal). Com ela em foco, as setas mudam o ângulo e Enter acende e apaga;
+  - a cena mostra a normal da superfície, o feixe incidente com θᵢ e o refletido com θᵣ = θᵢ (lei da reflexão). Nenhum feixe atravessa o metal, porque ele é opaco à luz visível;
+  - o ângulo é transitório: o estado guarda só "luz acesa".
+- **Deformação + corrente (propriedades juntas):**
+  - na maleabilidade e na ductilidade, o botão "Aplicar campo elétrico" mostra a corrente passando pelo metal deformado;
+  - cada deslizamento deixa defeitos na rede (discordâncias, que a representação não desenha), e eles espalham um pouco mais os elétrons, com deriva média um pouco menor. É a contribuição da deformação na regra de Matthiessen (Callister & Rethwisch), qualitativa e menor que a do calor;
+  - o campo da deformação é transitório. Restaurar e uma experiência nova o desligam.
+- Os rótulos da cena ganharam um contorno da cor do fundo, para continuarem legíveis sobre os centros.
+- A lanterna e a alça do campo ficam inteiras dentro da cena também no celular.
+- Manual (Propriedades metálicas), textos de limites do modelo, `docs/PROPRIEDADES-METALICAS.md` e o plano (§9 a §11) atualizados.
+- Testes:
+  - `tests/drive.cjs`, em `test:scientific`: limites, θᵣ = θᵢ, deriva proporcional à intensidade, efeito monótono dos defeitos e nada gravado no estado;
+  - TEST-DRIVE, no navegador: arraste e teclado na alça e na lanterna, deriva da camada de elétrons, rótulos e geometria da reflexão, deformação + corrente, Restaurar e celular.
+
 ## Em desenvolvimento — Propriedades juntas: calor + corrente
 
 - Pedido do autor: demonstrar propriedades metálicas acontecendo juntas. Ele escolheu começar por **calor + corrente**.

@@ -738,3 +738,18 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
 .silm-heat-handle:focus-visible{outline:3px solid var(--ring,var(--accent));outline-offset:3px}
 .silm-crystal-unit[data-heat] .silm-unit-body{filter:drop-shadow(0 0 calc(var(--heat,0)*9px) var(--silm-heat))}
 @media(forced-colors:active){.silm-heat-handle{border-color:ButtonText;background:Canvas}.silm-heat-handle::after{background:ButtonText}}
+/* 0.17.x — alça de intensidade na seta E (P3) e lanterna do brilho (P4). */
+.silm-field-knob,.silm-lantern{position:absolute;z-index:320;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;touch-action:none;cursor:grab;display:grid;place-items:center}
+.silm-field-knob{background:var(--surface);border:2px solid var(--silm-electron);box-shadow:0 2px 6px rgb(0 0 0/.25)}
+.silm-field-knob::before{content:'↔';font-weight:800;color:var(--silm-electron)}
+.silm-lantern{width:44px;height:44px;margin:-22px 0 0 -22px;background:radial-gradient(circle,var(--silm-light) 0 30%,transparent 72%);border:2px dashed var(--silm-light)}
+.silm-lantern[data-on=true]{border-style:solid;box-shadow:0 0 16px var(--silm-light)}
+.silm-field-knob[hidden],.silm-lantern[hidden]{display:none}
+.silm-field-knob[data-dragging],.silm-lantern[data-dragging]{cursor:grabbing}
+.silm-field-knob:focus-visible,.silm-lantern:focus-visible{outline:3px solid var(--ring,var(--accent));outline-offset:3px}
+.silm-normal-line{stroke:var(--text);stroke-width:.35;stroke-dasharray:1.5 1.2;opacity:.7;vector-effect:non-scaling-stroke}
+.silm-light-in-line,.silm-light-out-line{stroke:var(--silm-light);stroke-width:2.2;vector-effect:non-scaling-stroke}
+.silm-light-out-line{stroke-dasharray:6 3}
+/* Rótulos da sobreposição legíveis sobre os centros (halo da cor do fundo). */
+.silm-overlay-label{paint-order:stroke;stroke:var(--bg);stroke-width:.9px;stroke-linejoin:round}
+@media(forced-colors:active){.silm-field-knob,.silm-lantern{border-color:ButtonText}.silm-light-in-line,.silm-light-out-line,.silm-normal-line{stroke:CanvasText}.silm-overlay-label{stroke:Canvas}}
