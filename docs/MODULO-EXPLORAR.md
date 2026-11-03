@@ -9,6 +9,7 @@
 - [Estímulo térmico](ESTIMULO-TERMICO.md) — fonte, condução pela estrutura, capacidade térmica, troca com o ambiente, resfriamento e balanço de energia.
 - [Estímulo elétrico](ESTIMULO-ELETRICO.md) — campo aplicado, deriva dos elétrons, corrente convencional, espalhamento e aquecimento Joule.
 - [Estímulo mecânico](ESTIMULO-MECANICO.md) — força, tensão, deformação elástica e plástica, discordâncias e sistemas de deslizamento.
+- [Combinações de estímulos](COMBINACOES-ESTIMULOS.md) — matriz de compatibilidade, acoplamentos existentes e proposta de painel contextual único para selecionar experiências e aplicar condições auxiliares.
 
 ## 1. Princípio
 
@@ -22,7 +23,7 @@ Explorar **não** é um novo estado científico nem uma coleção de submódulos
 | 0.6.x | modelo eletrônico, elétrons deslocalizados, movimento, movimento reduzido |
 | 0.7.x em diante | propriedades e experiências qualitativas: campo elétrico, calor, compressão, tração e luz |
 
-Nenhum motor deve ser duplicado para reorganizar a experiência: há uma única camada eletrônica ativa por cena e uma experiência principal de propriedade por vez. Combinações auxiliares só são permitidas quando possuem acoplamento definido e validado, conforme o contrato operacional.
+Nenhum motor deve ser duplicado para reorganizar a experiência: há uma única camada eletrônica ativa por cena e uma experiência principal de propriedade por vez. Combinações auxiliares só são permitidas quando possuem acoplamento definido e validado, conforme o contrato operacional. A evolução proposta reúne seleção de experiências e aplicação de condições auxiliares em um único painel contextual, sem separar a interface em áreas independentes de luz, calor, eletricidade e mecânica. Essa proposta ainda não foi implementada.
 
 ## 2. Estados da experiência (referência visual 0.8.x)
 
