@@ -1,3 +1,14 @@
+## Em desenvolvimento — Aviso de nova versão sempre que algo muda
+
+- Pedido do autor: "ainda não apareceu para recarregar e atualizar a versão".
+- **Causa:** o service worker (o que guarda o SILM para funcionar offline) só mudava quando a lista de arquivos mudava. Nas versões #43 e #44 nenhum arquivo novo entrou. Por isso, o navegador não percebia a atualização, continuava mostrando a versão guardada e não exibia "Nova versão do SILM instalada".
+- **Correção:**
+  - o `sw.js` agora traz um `BUILD`: os 12 primeiros dígitos do SHA-256 do caminho e do conteúdo de cada arquivo do cache offline (`scripts/sw-build-id.cjs`);
+  - qualquer mudança num desses arquivos muda o `sw.js`, e o navegador instala a versão nova e mostra o aviso com "Recarregar";
+  - o nome do cache inclui o `BUILD`, e a cópia antiga é apagada quando a nova assume;
+  - os dados salvos (investigações, Caderno) não são afetados.
+- `tests/service-worker.cjs` (em `test:routes`) confere que o `sw.js` publicado corresponde aos arquivos atuais.
+
 ## Em desenvolvimento — Visão geral como "Sua bancada" do SIAB
 
 - Pedido do autor: "ainda temos algumas falhas em comparação com o siab".
