@@ -15,6 +15,7 @@
   - o campo da deformação é transitório. Restaurar e uma experiência nova o desligam.
 - Os rótulos da cena ganharam um contorno da cor do fundo, para continuarem legíveis sobre os centros.
 - A lanterna e a alça do campo ficam inteiras dentro da cena também no celular.
+- Docas: o cabeçalho (que pode ter duas linhas) não é mais espremido quando o conteúdo é longo. Antes, a área rolável podia cobrir parte do botão Fechar.
 - Manual (Propriedades metálicas), textos de limites do modelo, `docs/PROPRIEDADES-METALICAS.md` e o plano (§9 a §11) atualizados.
 - Testes:
   - `tests/drive.cjs`, em `test:scientific`: limites, θᵣ = θᵢ, deriva proporcional à intensidade, efeito monótono dos defeitos e nada gravado no estado;

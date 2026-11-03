@@ -15,7 +15,9 @@ module.exports=async(browser,url)=>{
  const electrons=p=>p.locator('.silm-electron-canvas').first().evaluate(c=>{const s=c.silmElectrons.snapshot();return {drive:s.drive,defects:s.defects,field:s.field};});
  const status=p=>p.locator('#silm-scene-property-status').innerText();
  const start=async(p,id)=>{await nav.viewer(p,'propriedades');if(await p.locator('#silm-panel-property-end').isVisible())await p.locator('#silm-panel-property-end').click();await p.locator('#silm-panel-property-start-'+id).click();};
- const closeDock=p=>p.locator('[data-close-dock="right"]').click();
+ // Fechar a doca: cabeçalho inteiro (não espremido pelo conteúdo longo) e botão Fechar sem nada por cima.
+ const closeDock=async p=>{const r=await p.evaluate(()=>{const h=document.querySelector('#si-dock-right .si-dock-header'),b=document.querySelector('[data-close-dock="right"]').getBoundingClientRect(),hit=document.elementFromPoint(b.x+b.width/2,b.y+b.height-2);return {clipped:h.scrollHeight-h.clientHeight,free:!!hit?.closest('[data-close-dock="right"]')};});
+  assert.ok(r.clipped<=1,'Cabeçalho da doca não espremido ('+r.clipped+' px cortados)');assert.ok(r.free,'Botão Fechar livre até a borda de baixo');return p.locator('[data-close-dock="right"]').click();};
  const inStage=(p,sel)=>p.evaluate(s=>{const st=document.querySelector('.silm-crystal-stage').getBoundingClientRect(),b=document.querySelector(s).getBoundingClientRect();return b.left>=st.left-1&&b.right<=st.right+1&&b.top>=st.top-1&&b.bottom<=st.bottom+1;},sel);
  const ctx=await browser.newContext({viewport:{width:1366,height:900},reducedMotion:'no-preference'});
  try{

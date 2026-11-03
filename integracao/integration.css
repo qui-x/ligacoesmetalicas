@@ -689,6 +689,9 @@ dialog.silm-dialog::backdrop{background:rgba(6,9,14,.72);backdrop-filter:blur(6p
 /* Título das docas: quebra entre palavras (ou vai para a linha de baixo), nunca no meio da palavra. */
 .si-dock-header h2{overflow-wrap:break-word;hyphens:manual;-webkit-hyphens:manual}
 #si-dock-right .si-dock-header h2{flex:1 1 150px}
+/* O cabeçalho da doca nunca é espremido: com conteúdo longo, a área rolável encolhe; antes, o cabeçalho de duas linhas
+   encolhia e a área rolável cobria o botão Fechar. */
+.si-dock>:not(.si-dock-scroll){flex-shrink:0}
 /* Celular (remodelação de 02/11/2026, pedido do autor): cabeçalho da cena compacto (nome numa linha, ferramentas numa
    faixa rolável), controles da experiência visíveis embaixo da cena (antes ficavam escondidos, e o painel — modal na
    Base — bloqueava a cena a cada ação) e painel mais baixo, para a estrutura continuar visível como referência. */
