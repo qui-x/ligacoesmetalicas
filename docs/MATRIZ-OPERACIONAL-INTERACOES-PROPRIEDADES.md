@@ -282,6 +282,7 @@ O comportamento atual de heatElectrical precisa ser revisado antes de qualquer r
 - [ ] Expansão livre não gera tensão térmica espúria.
 - [ ] Restrição térmica produz resposta compatível com o modelo.
 - [ ] Mudança de forma/superfície afeta a reflexão geométrica sem inventar cor.
+- [ ] T + M + O compartilha o campo térmico e a geometria atual; termorrefletância é calibrada, absorção gera fonte sem dupla contagem e os balanços óptico/térmico fecham.
 - [ ] Resultados qualitativos não são apresentados como medições.
 
 ### 9.2 Interface e estado
@@ -301,7 +302,7 @@ O comportamento atual de heatElectrical precisa ser revisado antes de qualquer r
 5. **E + M:** separar contribuição geométrica e microestrutural para resistividade; manter eletroplasticidade bloqueada.
 6. **E + M + O:** compartilhar uma única geometria deformada; validar resistência geométrica/microestrutural e reflexão local. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md).
 7. **T + M + O:** integrar campo térmico, resposta mecânica, superfície deformada e termorrefletância; distinguir probe, pump–probe e feixe único, fechar balanços e validar o caminho fototérmico. Ver [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md).
-7. **E + T + M:** integrar os três campos com avanço temporal e testes de conservação/estabilidade.
+8. **E + T + M:** integrar os três campos com avanço temporal e testes de conservação/estabilidade.
 
 ## 11. Decisões que ainda precisam ser aprovadas
 
