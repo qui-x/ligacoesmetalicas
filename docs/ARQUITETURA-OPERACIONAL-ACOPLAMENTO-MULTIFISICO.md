@@ -513,7 +513,7 @@ Esta arquitetura operacionaliza, sem substituir, as especificações físicas:
 - [Acoplamento E+M+O](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md)
 - [Acoplamento T+M+O](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md)
 
-**Conclusão:** A0 — contrato de dados e estados — foi especificada em documento e schemas JSON separados. A próxima entrega de engenharia será A1 — geometria macroscópica da amostra.
+**Conclusão:** A0 — contrato de dados e estados — e A1 — geometria macroscópica da amostra — estão especificadas em documentos e schemas JSON separados. A próxima entrega de engenharia será A2 — orquestrador e estado transacional.
 
 ## 19. Contrato técnico A0
 
@@ -526,3 +526,12 @@ A arquitetura conceitual é detalhada em [CONTRATO-DADOS-ESTADOS-MULTIFISICO.md]
 A0 mantém intactos `scientificSchemaVersion = 8` e `silm-documents-v1`. Também distingue coordenadas de progresso por tempo físico, incremento de carga, frequência e escala múltipla. Os schemas definem a estrutura local; validações entre documentos e validação física permanecem responsabilidades do futuro validador semântico e dos solvers.
 
 **Estado:** A0 especificada; nenhum código de runtime alterado. Próxima etapa: A1 — geometria macroscópica, regiões, terminais, superfícies e referencial.
+
+
+## 20. Geometria macroscópica A1
+
+A geometria de referência da amostra está especificada em [GEOMETRIA-MACROSCOPICA-AMOSTRA-MULTIFISICA.md](GEOMETRIA-MACROSCOPICA-AMOSTRA-MULTIFISICA.md), com schema próprio em [multiphysics-geometry.schema.json](schemas/multiphysics-geometry.schema.json).
+
+A definição A0 fixa a revisão geométrica e as fronteiras referenciam IDs de regiões. O prisma retangular é a geometria inicial; a rede cristalina continua sendo microestrutura/orientação, e as malhas permanecem específicas por domínio.
+
+**Próxima etapa:** A2 — ciclo de vida do orquestrador, commit/rollback, cancelamento, retomada e publicação dos snapshots aceitos.
