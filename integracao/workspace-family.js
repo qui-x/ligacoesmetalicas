@@ -1,6 +1,6 @@
 'use strict';
 /* Adaptação do workspace pela API pública da Base SI. A ciência continua no modelo SILM. */
-SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshScene=()=>{}})=>{
+SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienceInfo=()=>null,refreshScene=()=>{}})=>{
  const B=BaseDemoSI,$=id=>document.getElementById(id);
  const node=(tag,text,className)=>{const el=document.createElement(tag);if(text)el.textContent=text;if(className)el.className=className;return el;};
  const emptyScene=()=>({schemaVersion:1,entities:[],selectedId:null});
@@ -96,6 +96,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    if(enabling&&!rep.selectedUnitId&&structure.units.length)patch.selectedUnitId=structure.units[0].id;
    model.setCrystalRepresentation(patch);refreshScene();renderViewers();
   }});
+  const experience=experienceInfo?.()||{};
   const propertyActions=actionGroup(root,'Propriedades metálicas');
   const propertyInfo=[
    ['electrical','Condutividade elétrica',actionIcons.electrical],
@@ -111,6 +112,21 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
     quickActions?.toggleProperty?.(id);refreshScene();renderViewers();
    }});
   }
+  const combinedActions=actionGroup(root,'Combinações estudadas · P7');
+  const ability=id=>element?model.propertyAvailability(id):{ok:false,reason:'NO_STRUCTURE'};
+  const heatElectrical=!!(state.properties?.active==='electrical'&&experience.thermal?.combined&&experience.thermal?.on);
+  const deformationElectrical=id=>state.properties?.active===id&&!!experience.drive?.deformField;
+  const comboReason=(id)=>!crystal?'Requer uma estrutura cristalina organizada':!canExplore?'Disponível no módulo Explorar':!ability(id).ok?(SILM.properties.reasons[ability(id).reason]||'Experiência indisponível nesta estrutura'):'';
+  actionButton(combinedActions,{id:'p7-heat-electrical',label:'Calor + corrente',path:actionIcons.thermal,pressed:heatElectrical,disabled:!canExplore||!crystal||!ability('electrical').ok,reason:comboReason('electrical'),hint:'Aplica uma fonte térmica à estrutura durante a condução elétrica. O aquecimento aumenta o espalhamento dos elétrons nas regiões quentes.',onClick:()=>{
+   quickActions?.activateCombination?.('heatElectrical');refreshScene();renderViewers();
+  }});
+  actionButton(combinedActions,{id:'p7-malleability-electrical',label:'Maleabilidade + corrente',path:actionIcons.electrical,pressed:deformationElectrical('malleability'),disabled:!canExplore||!crystal||!ability('malleability').ok,reason:comboReason('malleability'),hint:'Aplica um campo elétrico durante a compressão e o deslizamento de planos. Os defeitos aumentam qualitativamente o espalhamento eletrônico.',onClick:()=>{
+   quickActions?.activateCombination?.('malleabilityElectrical');refreshScene();renderViewers();
+  }});
+  actionButton(combinedActions,{id:'p7-ductility-electrical',label:'Ductilidade + corrente',path:actionIcons.electrical,pressed:deformationElectrical('ductility'),disabled:!canExplore||!crystal||!ability('ductility').ok,reason:comboReason('ductility'),hint:'Aplica um campo elétrico durante a tração e o deslizamento de planos. Os defeitos aumentam qualitativamente o espalhamento eletrônico.',onClick:()=>{
+   quickActions?.activateCombination?.('ductilityElectrical');refreshScene();renderViewers();
+  }});
+  combinedActions.parentElement.append(node('p','Combinações P7 registradas. As demais combinações entre propriedades ainda não têm modelo conjunto validado.','silm-observer-action-note'));
   if(!structure)root.append(node('p','Monte uma estrutura para identificar os centros e observar a interação metálica.','silm-observer-action-note'));
   output.append(root);
  }
