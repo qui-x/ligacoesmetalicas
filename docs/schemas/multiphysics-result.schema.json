@@ -116,7 +116,9 @@
       "items": {
         "type": "string",
         "pattern": "^field-[A-Za-z0-9-]{12,80}$"
-      }
+      },
+      "minItems": 1,
+      "uniqueItems": true
     },
     "balances": {
       "type": "array",
@@ -177,7 +179,8 @@
           "additionalProperties": {
             "type": "string",
             "minLength": 1
-          }
+          },
+          "minProperties": 1
         },
         "datasetVersions": {
           "type": "array",
