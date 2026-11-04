@@ -51,6 +51,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null})=>{
   const grid=node('div',null,'silm-observer-action-grid');section.append(grid);parent.append(section);return grid;
  }
  function renderObserverContext(output){
+  for(const panel of document.querySelectorAll('[data-silm-viewer]'))panel.hidden=true;
   const state=model.state,structure=state.structure,crystal=structure?.mode==='crystalline';
   const rep=crystal?structure.crystallography.representation:null,element=state.metal?SILM.data.get(state.metal.atomicNumber):null;
   const root=node('section',null,'silm-observer-actions');
