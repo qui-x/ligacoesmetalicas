@@ -21,6 +21,14 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null})=>{
  ];
  let ready=false,dataPage=null;
  const names={explorar:'Explorar',medir:'Medir',calcular:'Calcular'};
+ // Mantém o renderizador da Base SI disponível para ações rápidas e seleção de ferramentas.
+ // Preserva o foco da navegação por teclado quando o conteúdo do painel é reconstruído.
+ function renderViewers(){
+  const focused=document.activeElement;
+  const tab=focused?.closest('#si-viewer-families')?focused.getAttribute('aria-selected'):null;
+  B.renderViewers(emptyScene());
+  if(tab)$('si-viewer-families').querySelector('[aria-selected="true"]')?.focus({preventScroll:true});
+ }
  const actionIcons={
   view:'M3 7 12 3l9 4-9 4-9-4ZM3 12l9 4 9-4M3 17l9 4 9-4',
   cell:'M4 4h16v16H4zM4 9h16M9 4v16',
