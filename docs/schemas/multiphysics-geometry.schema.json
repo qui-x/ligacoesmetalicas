@@ -1,0 +1,365 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:silm:schema:multiphysics-geometry:1.0.0",
+  "title": "SILM Multiphysics Reference Geometry",
+  "description": "Geometria macroscópica de referência parametrizada da amostra. Não é malha nem geometria da rede cristalina.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "schemaVersion",
+    "geometryId",
+    "revision",
+    "createdAt",
+    "coordinateFrame",
+    "shape",
+    "surfaceModelId",
+    "regions"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "silm.multiphysics.geometry"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "geometryId": {
+      "type": "string",
+      "pattern": "^geo-[A-Za-z0-9-]{12,80}$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "coordinateFrame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unit",
+        "handedness",
+        "originM",
+        "axes"
+      ],
+      "properties": {
+        "unit": {
+          "const": "m"
+        },
+        "handedness": {
+          "const": "right"
+        },
+        "originM": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": 0
+            },
+            {
+              "const": 0
+            },
+            {
+              "const": 0
+            }
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "axes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "x",
+            "y",
+            "z"
+          ],
+          "properties": {
+            "x": {
+              "const": "longitudinal"
+            },
+            "y": {
+              "const": "transverse"
+            },
+            "z": {
+              "const": "thickness"
+            }
+          }
+        }
+      }
+    },
+    "shape": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "dimensionsM"
+      ],
+      "properties": {
+        "kind": {
+          "const": "rectangular-prism"
+        },
+        "dimensionsM": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "lengthM",
+            "widthM",
+            "thicknessM"
+          ],
+          "properties": {
+            "lengthM": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "widthM": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "thicknessM": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        }
+      }
+    },
+    "surfaceModelId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+    },
+    "crystalOrientation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "matrixRowMajor",
+        "evidence",
+        "sourceId"
+      ],
+      "properties": {
+        "matrixRowMajor": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 9,
+          "maxItems": 9
+        },
+        "evidence": {
+          "enum": [
+            "measured",
+            "calculated",
+            "assumed"
+          ]
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+        },
+        "referenceStructureId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+        }
+      }
+    },
+    "regions": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "regionId",
+          "topology",
+          "selector",
+          "roles"
+        ],
+        "properties": {
+          "regionId": {
+            "type": "string",
+            "pattern": "^reg-[A-Za-z0-9-]{3,80}$"
+          },
+          "topology": {
+            "enum": [
+              "volume",
+              "surface"
+            ]
+          },
+          "selector": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "whole-volume"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "box-all-faces"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "axis",
+                  "side"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "box-face"
+                  },
+                  "axis": {
+                    "enum": [
+                      "x",
+                      "y",
+                      "z"
+                    ]
+                  },
+                  "side": {
+                    "enum": [
+                      "min",
+                      "max"
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "axis",
+                  "side",
+                  "uRange",
+                  "vRange"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "box-face-patch"
+                  },
+                  "axis": {
+                    "enum": [
+                      "x",
+                      "y",
+                      "z"
+                    ]
+                  },
+                  "side": {
+                    "enum": [
+                      "min",
+                      "max"
+                    ]
+                  },
+                  "uRange": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "vRange": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                }
+              }
+            ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "sample-bulk",
+                "electrical-terminal",
+                "thermal-boundary",
+                "mechanical-support",
+                "mechanical-load",
+                "optical-surface",
+                "contact-interface",
+                "symmetry-plane"
+              ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 100
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 2000
+    }
+  },
+  "allOf": [
+    {
+      "properties": {
+        "regions": {
+          "contains": {
+            "properties": {
+              "topology": {
+                "const": "volume"
+              },
+              "selector": {
+                "properties": {
+                  "kind": {
+                    "const": "whole-volume"
+                  }
+                }
+              },
+              "roles": {
+                "contains": {
+                  "const": "sample-bulk"
+                }
+              }
+            },
+            "required": [
+              "topology",
+              "selector",
+              "roles"
+            ]
+          }
+        }
+      },
+      "required": [
+        "regions"
+      ]
+    }
+  ]
+}
