@@ -290,3 +290,51 @@ body.si-structure-expanded #silm-scene-actionbar{flex:0 0 auto!important;min-hei
  .silm-quick-projection select option:checked{color:HighlightText!important;background:Highlight!important}
  .silm-quick-projection select option:disabled{color:GrayText!important}
 }
+
+/* Seletor de projeção próprio do SILM: menu sempre acompanha grafite/ouro e mantém contraste. */
+.silm-quick-projection{position:relative;color:var(--text)}
+.silm-projection-trigger{
+ display:inline-flex;align-items:center;justify-content:space-between;gap:9px;
+ min-width:112px;min-height:34px;padding:4px 8px;border:0;border-radius:7px;
+ background:transparent;color:var(--text);font:inherit;font-size:.78rem;cursor:pointer;
+}
+.silm-projection-trigger:hover,.silm-projection-trigger[aria-expanded=true]{background:var(--tint)}
+.silm-projection-value{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.silm-projection-chevron{color:var(--muted);font-size:.7rem}
+.silm-projection-trigger:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+.silm-projection-menu{
+ position:fixed;z-index:3200;display:grid;gap:6px;
+ width:max-content;min-width:205px;max-width:min(290px,calc(100vw - 24px));
+ max-height:min(420px,calc(100dvh - 24px));overflow:auto;padding:7px;
+ border:1px solid var(--border);border-radius:11px;
+ background:var(--surface)!important;color:var(--text)!important;
+ box-shadow:0 12px 32px rgb(0 0 0/.32);overscroll-behavior:contain;
+}
+.silm-projection-menu[hidden]{display:none!important}
+.silm-projection-group{display:grid;gap:2px}
+.silm-projection-group+.silm-projection-group{padding-top:5px;border-top:1px solid var(--border)}
+.silm-projection-group-label{
+ display:block;padding:4px 9px 3px;color:var(--accent)!important;
+ font-size:.68rem;font-weight:850;letter-spacing:.08em;text-transform:uppercase;
+}
+.silm-projection-option{
+ display:flex;align-items:center;width:100%;min-height:34px;padding:6px 10px;
+ border:0;border-radius:7px;background:transparent!important;
+ color:var(--text)!important;font:inherit;font-size:.8rem;text-align:left;cursor:pointer;
+}
+.silm-projection-option:hover{background:var(--tint)!important}
+.silm-projection-option[aria-selected=true]{
+ background:color-mix(in srgb,var(--accent) 22%,var(--surface))!important;
+ color:var(--accent)!important;font-weight:800;
+ box-shadow:inset 3px 0 var(--accent);
+}
+.silm-projection-option:disabled{
+ color:var(--muted)!important;opacity:.45;cursor:not-allowed;
+}
+.silm-projection-option:focus-visible{outline:2px solid var(--ring);outline-offset:-2px}
+@media(forced-colors:active){
+ .silm-projection-menu{border:1px solid CanvasText;background:Canvas!important;color:CanvasText!important;box-shadow:none}
+ .silm-projection-option{color:CanvasText!important}
+ .silm-projection-option[aria-selected=true]{background:Highlight!important;color:HighlightText!important}
+ .silm-projection-option:disabled{color:GrayText!important}
+}
