@@ -76,7 +76,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  // Elétrons e propriedades mantêm seus controles completos no painel Ver; o palco recebe somente as camadas visuais.
  // 0.7.x: a sobreposição da experiência permanece sobre a cena; comandos ficam em Ver → Observar.
  const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:units});R.layer('properties',overlay.root);
- const notesHost=document.getElementById('silm-crystal-notes');
+ const notesHost=document.getElementById('silm-structure-notes');
  if(notesHost){notesHost.replaceChildren();SILM.createSceneNotes(notesHost,{scope,items:[instructions,cameraHelp,legend,electronLegend,cellStatus,kind]});}
  let deform=null,heatTimer=false,nearest=null,lastControls=0;const D=c=>deform?deform(c):c;
  /* 0.17.x: deformação contínua (SILM.deformation) — orientação de ensaio, elástico amortecido e deslizamento de planos

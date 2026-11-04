@@ -30,34 +30,40 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  const rep2=representation||{camera:()=>null,saveCamera:()=>{}};
  const statusLabel={empty:'Vazia',assembling:'Em construção',assembled:'Concluída pelo usuário'};
  const root=U.element('section',null,'silm-assembly');root.dataset.editable=String(editable);root.setAttribute('aria-labelledby','silm-assembly-title');
- const bar=U.element('header',null,'silm-assembly-bar'),identity=U.element('div',null,'silm-assembly-identity'),titles=U.element('div');
- const badge=U.element('span',element.symbol,'silm-assembly-symbol');badge.setAttribute('aria-hidden','true');
- const eyebrow=U.element('p','MONTAGEM LIVRE','eyebrow silm-assembly-eyebrow');
- const title=U.element('h1',element.name);title.id='silm-assembly-title';title.tabIndex=-1;
- const help=U.element('a','?','ajuda-link');help.href='#/manual/montagem';help.setAttribute('aria-label','Ajuda: montagem da estrutura');help.title='Ajuda: montagem da estrutura';
- const heading=U.element('div',null,'silm-assembly-heading');heading.append(title,help);
- const meta=U.element('p','','silm-assembly-meta');meta.id='silm-assembly-meta';titles.append(eyebrow,heading,meta);identity.append(badge,titles);
- const tools=U.element('div',null,'silm-assembly-tools');let add=null,undo=null;
- let organizeButton=null;
- if(editable){add=SILM.actionButton('Adicionar unidade',()=>actions.add(),scope,{id:'silm-assembly-add',primary:true,glyph:'+'});tools.append(add); // Desfazer fica só na barra de ações da Oficina (#scene-undo), sem duplicar o comando na cena.
-  // 0.5.x: organização cristalográfica segundo a estrutura de referência do banco.
-  if(organize){organizeButton=SILM.actionButton('Organizar estrutura',()=>organize.run(),scope,{id:'silm-assembly-organize'});organizeButton.setAttribute('aria-describedby','silm-assembly-crystal-reason');tools.append(organizeButton);}}
- else if(canExplore())tools.append(SILM.actionButton('Montar em Explorar',onExplore,scope,{id:'silm-assembly-explore'}));
- bar.append(identity,tools);
+ const title=U.element('h1',element.name+' — montagem livre','sr-only');title.id='silm-assembly-title';
+ const quickHost=document.getElementById('silm-view-quick-actions'),cameraHost=document.getElementById('silm-view-controls');
+ if(quickHost){quickHost.hidden=false;quickHost.replaceChildren();}
+ if(cameraHost)cameraHost.replaceChildren();
+ let add=null,organizeButton=null;
+ const quickButton=(id,label,d,handler,primary=false)=>{
+  const button=U.element('button',null,'secondary-btn silm-quick-icon'+(primary?' primary-btn':''));
+  button.type='button';button.id=id;button.setAttribute('aria-label',label);button.title=label;
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.8');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true');
+  const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',d);svg.append(path);button.append(svg);
+  scope.listen(button,'click',()=>{if(button.getAttribute('aria-disabled')!=='true')handler();});
+  quickHost?.append(button);return button;
+ };
+ if(editable){
+  add=quickButton('silm-quick-add-unit','Adicionar unidade','M12 5v14M5 12h14',()=>actions.add(),true);
+  if(organize)organizeButton=quickButton('silm-quick-organize','Organizar estrutura','M4 4h16v16H4zM4 10h16M10 4v16',()=>organize.run());
+ }else if(canExplore())quickButton('silm-quick-explore','Montar em Explorar','M4 12h16M12 4v16',onExplore);
+ scope.cleanup(()=>{if(quickHost){quickHost.replaceChildren();quickHost.hidden=true;}if(cameraHost)cameraHost.replaceChildren();});
  const area=U.element('div',null,'silm-assembly-area'),stage=U.element('div',null,'silm-assembly-stage');stage.id='silm-assembly-stage';
  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 100 100');svg.setAttribute('aria-hidden','true');svg.classList.add('silm-assembly-collective');
  const collective=document.createElementNS(svg.namespaceURI,'g');svg.append(collective);
  const layer=U.element('div',null,'silm-assembly-units');
  const empty=U.element('p','Montagem iniciada. Use Adicionar unidade para inserir a primeira unidade de '+name+'.','silm-assembly-empty');
  stage.append(empty);area.append(stage);
- const footer=U.element('div',null,'silm-assembly-footer'),assist=U.element('span','Posicionamento assistido','silm-assist-badge');assist.title='Mecanismo de interface: evita sobreposição. Não representa forças entre átomos.';
- const kind=U.element('span','Representação didática, sem escala física · ainda não representa a geometria cristalográfica '+reference+'.','silm-assembly-kind');
+ const assist=U.element('p','Posicionamento assistido: evita sobreposição visual; não representa forças nem cristalização.','silm-assist-badge');assist.title='Mecanismo de interface: evita sobreposição. Não representa forças entre átomos.';
+ const kind=U.element('p','Montagem livre em coordenadas normalizadas, sem escala física e sem geometria cristalográfica.','silm-assembly-kind');
  const instructions=U.element('p',editable?'Selecione uma unidade e toque no destino, arraste-a ou use as setas. Shift + seta move em passo fino; Esc solta a unidade.':(note?note+' ':'')+'A edição da montagem está disponível em Explorar.','silm-assembly-help');instructions.id='silm-assembly-help';
- const cameraHelp=U.element('p','Vista: + e − aproximam e afastam, F enquadra a área de montagem, C centraliza, 0 restaura e Shift + setas deslocam (com a unidade selecionada em foco, Shift + seta é o passo fino). Arraste o fundo para deslocar; no celular, use dois dedos para aproximar. A vista não muda as posições.','silm-camera-help');
- const feedback=U.element('p','','silm-assembly-feedback');feedback.id='silm-assembly-feedback';
+ const cameraHelp=U.element('p','Vista: + e − aproximam e afastam, F enquadra, C centraliza, 0 restaura e Shift + setas deslocam (com unidade selecionada, Shift + seta é o passo fino). Arraste o fundo para deslocar; no celular, use dois dedos para aproximar. A câmera não muda as posições.','silm-camera-help');
+ const feedback=U.element('p','','sr-only silm-assembly-feedback');feedback.id='silm-assembly-feedback';feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
  const crystalReason=U.element('p','','silm-assembly-reason');crystalReason.id='silm-assembly-crystal-reason';
- // O motivo de "Organizar estrutura" estar indisponível fica junto do botão (na faixa da cena), não no rodapé.
- bar.append(crystalReason);footer.append(feedback);root.append(bar,area,footer);host.append(root);
+ root.append(title,area,feedback);host.append(root);
+ const notesHost=document.getElementById('silm-structure-notes');
+ if(notesHost){notesHost.replaceChildren();SILM.createSceneNotes(notesHost,{scope,items:[instructions,cameraHelp,assist,kind,crystalReason]});}
+ const caption=U.element('span',element.name+' · Montagem livre','silm-scene-caption');caption.setAttribute('aria-hidden','true');stage.append(caption);
  const nodes=new Map();let selected=null,focusId=null,serial=0,drag=null,keyMove=null,suppressUntil=0,lastRegion=new Map();
  const units=()=>model.state.structure?.units||[];
  /* ---------- renderizador comum ---------- */
@@ -68,18 +74,15 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
   items:()=>units().map(u=>({id:u.id,x:u.position.x,y:u.position.y,r:C.minDistance/2,priority:u.id===selected?1:0,hit:u.id!==selected})),
   focusPoint:()=>{const list=units(),s=list.find(u=>u.id===selected);if(s)return s.position;if(!list.length)return null;return {x:list.reduce((a,u)=>a+u.position.x,0)/list.length,y:list.reduce((a,u)=>a+u.position.y,0)/list.length};},
   canArrowPan:()=>true,onBackgroundTap:editable?point=>backgroundTap(point):null,onUnitPress:editable?(id,event)=>{const node=nodes.get(id);if(node)beginDrag(node,event);}:null,
-  ownsUnitDrag:editable,onGestureStart:()=>cancelDrag(),toggleHost:tools});
+  ownsUnitDrag:editable,onGestureStart:()=>cancelDrag(),toolbarHost:cameraHost});
  R.layer('background',svg,{camera:true});R.layer('structure',layer,{camera:true});if(editable&&R.descriptionId)layer.setAttribute('aria-describedby',R.descriptionId);R.setInterest({x0:0,y0:0,x1:1,y1:1},{margin:0});
  const selectionRing=R.selectionLayer();
  // 0.6.x: elétrons de valência deslocalizados — distribuição preliminar sobre a montagem livre.
  const electronLayer=SILM.createElectronLayer(stage,{scope,before:layer,reducedMotion});R.layer('electrons',electronLayer.canvas);
  const electronLegend=U.element('p','Pontos ciano: elétrons de valência deslocalizados, marcadores qualitativos (não indicam o número real de elétrons). Na montagem livre, a distribuição é uma representação didática preliminar da ligação metálica coletiva.','silm-electron-legend');electronLegend.id='silm-electron-legend';electronLegend.hidden=true;
- const electronControls=electronOptions?SILM.createElectronControls(footer,{scope,state:()=>model.state,actions:electronOptions.actions,reducedMotion,canActivate:electronOptions.canActivate}):null;
- if(electronControls)footer.prepend(electronControls.root);
+ // Os controles completos de elétrons e propriedades ficam no painel Ver; a cena mantém somente as camadas visuais.
  // 0.7.x: na montagem livre, somente a condutividade elétrica (observação básica sobre os elétrons).
- const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:layer}),propertyHost=U.element('div',null,'silm-property-host');R.layer('properties',overlay.root);
- footer.insertBefore(propertyHost,feedback);const propertyControls=propertyOptions?.controls?.(propertyHost,scope)||null;
- SILM.createSceneNotes(footer,{scope,items:[instructions,cameraHelp,electronLegend,assist,kind]});
+ const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:layer});R.layer('properties',overlay.root);
  const known=new Set();let drawn=false;
  const freeSpacing=list=>{if(list.length<2)return .12;const nn=list.map(u=>Math.min(...list.filter(v=>v!==u).map(v=>A.distance(u.position,v.position)))).sort((a,b)=>a-b);return Math.max(.1,Math.min(.2,nn[Math.floor(nn.length/2)]));};
  if(editable){layer.setAttribute('role','group');layer.setAttribute('aria-label','Unidades da montagem de '+name);}
@@ -110,15 +113,15 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
   const el=model.state.electrons,shownElectrons=!!el?.representation.visible&&list.length>=2;
   const pr=model.state.properties,fieldOn=pr?.active==='electrical'&&pr.electrical.field;
   electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:list.map(u=>u.position),spacing:freeSpacing(list),connect:true});
-  overlay.update({field:fieldOn});root.dataset.property=pr?.active||'';propertyControls?.update();electronLayer.setCamera(R.camera);paintSelection();R.describe();
+  overlay.update({field:fieldOn});root.dataset.property=pr?.active||'';electronLayer.setCamera(R.camera);paintSelection();R.describe();
   for(const u of list)if(!known.has(u.id)){known.add(u.id);if(drawn&&shownElectrons)electronLayer.incorporate(u.position);}
   for(const id of [...known])if(!list.some(u=>u.id===id))known.delete(id);drawn=true;
-  root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;electronControls?.update();
+  root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;
   const n=list.length;meta.textContent='Montagem metálica · '+n+' '+(n===1?'unidade':'unidades')+' · '+statusLabel[s.status]+(pr?.active?' · '+P.catalog[pr.active].title+' em estudo':'');meta.title=meta.textContent;
   empty.hidden=n>0;assist.hidden=!s.assistance.enabled;root.dataset.status=s.status;
   if(!editable)stage.setAttribute('aria-label','Montagem de '+name+' com '+n+' '+(n===1?'unidade':'unidades')+'. Representação didática; a edição está disponível em Explorar.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica.':'')+(fieldOn?' Campo elétrico aplicado: a representação eletrônica apresenta deslocamento coletivo orientado.':''));
-  add?.setAttribute('aria-disabled',String(n>=C.maxUnits));undo?.setAttribute('aria-disabled',String(!model.canUndo));if(undo){const last=describeLast();undo.title=last?'Desfazer: '+last:'Nada para desfazer';}
-  if(organize){const o=organize.state();crystalReason.textContent=o.reason||'';if(o.reason&&o.more){const a=U.element('a',o.more.label);a.href=o.more.href;crystalReason.append(' ',a);}crystalReason.hidden=!o.reason;if(organizeButton){organizeButton.setAttribute('aria-disabled',String(o.disabled));organizeButton.title=o.reason||o.title||'';}}
+  add?.setAttribute('aria-disabled',String(n>=C.maxUnits));
+  if(organize){const o=organize.state();crystalReason.textContent=o.reason||'';if(o.reason&&o.more){const a=U.element('a',o.more.label);a.href=o.more.href;crystalReason.append(' ',a);}crystalReason.hidden=!o.reason;if(organizeButton){organizeButton.setAttribute('aria-disabled',String(o.disabled));organizeButton.title=o.reason||o.title||'Organizar segundo a referência cristalográfica';}}
  }
  /* Anel de seleção na camada própria (acima da estrutura, tamanho de tela constante). */
  function paintSelection(){const u=selected&&units().find(x=>x.id===selected);if(!u){selectionRing.update([]);return;}const p=drag?.id===u.id?drag.position:keyMove?.id===u.id?keyMove.position:u.position;selectionRing.update([{x:p.x,y:p.y,r:C.minDistance*.42}]);}
