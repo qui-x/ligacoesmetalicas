@@ -289,7 +289,7 @@ O comportamento atual de heatElectrical precisa ser revisado antes de qualquer r
 3. **T + M:** incluir expansão e restrição térmica, sem inventar propriedades por metal.
 4. **M + O:** refletir mudanças geométricas da superfície.
 5. **E + M:** separar contribuição geométrica e microestrutural para resistividade; manter eletroplasticidade bloqueada.
-6. **O quantitativa e demais combinações:** somente após cadastro e validação dos parâmetros necessários.
+6. **E + M + O e O quantitativa:** compartilhar uma única geometria deformada; validar resistência geométrica/microestrutural e reflexão local; liberar elasto-óptica apenas com dados específicos. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md).
 7. **E + T + M:** integrar os três campos com avanço temporal e testes de conservação/estabilidade.
 
 ## 11. Decisões que ainda precisam ser aprovadas
