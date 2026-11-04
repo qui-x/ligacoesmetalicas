@@ -11,7 +11,6 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null})=>{
  const definitions=[
   {id:'observacao-contextual',title:'Observação contextual',capability:'tools',family:'observar',description:'Síntese e leitura contextual da investigação.',render:output=>renderObserverContext(output)},
   {id:'camadas-estrutura',title:'Estrutura',capability:'tools',family:'camadas',description:'Centros metálicos, célula unitária, rede extensa e vizinhos.',render:output=>renderLayerStructure(output)},
-  {id:'camadas-modelos',title:'Modelos',capability:'tools',family:'camadas',description:'Visibilidade e movimento dos elétrons deslocalizados.',render:output=>renderLayerModels(output)},
   {id:'camadas-indicacoes',title:'Indicações',capability:'tools',family:'camadas',description:'Respostas visuais, rótulos e legendas.',render:output=>renderLayerIndications(output)},
   {id:'comparar-livre-cristalina',title:'Montagem livre × cristalina',capability:'tools',family:'comparar',description:'Compare a preparação livre com a organização cristalográfica.',render:output=>renderComparison('free-crystal',output)},
   {id:'comparar-celula-rede',title:'Célula × rede',capability:'tools',family:'comparar',description:'Compare a célula unitária com a rede extensa.',render:output=>renderComparison('cell-lattice',output)},
@@ -66,7 +65,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null})=>{
   actionButton(structureActions,{id:'neighbors',label:rep?.neighbors?'Ocultar vizinhos':'Mostrar vizinhos',path:actionIcons.neighbors,pressed:!!rep?.neighbors,disabled:!crystal||!canExplore,onClick:()=>{
    if(rep)model.setCrystalRepresentation({neighbors:!rep.neighbors});renderViewers();
   }});
-  const modelActions=actionGroup(root,'Modelos');
+  const modelActions=actionGroup(root,'Modelo eletrônico');
   const electrons=state.electrons,minimum=SILM.electronModel?.minUnits||2;
   const electronsActive=!!electrons?.representation.visible&&!!electrons?.representation.motion;
   actionButton(modelActions,{id:'electrons',label:electronsActive?'Ocultar elétrons e pausar movimento':'Mostrar elétrons e ativar movimento',path:actionIcons.electrons,pressed:electronsActive,disabled:!canExplore||(!electrons&&(!structure||structure.units.length<minimum)),reason:!structure?'Monte uma estrutura primeiro':!electrons&&structure.units.length<minimum?'São necessárias '+minimum+' unidades': '',onClick:()=>{
@@ -83,7 +82,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null})=>{
   for(const [id,label,path]of propertyInfo){
    const active=state.properties?.active===id,availability=element?model.propertyAvailability(id):{ok:false,reason:'NO_STRUCTURE'};
    const why=availability.ok?'':SILM.properties.reasons[availability.reason]||'Prepare a estrutura para esta experiência.';
-   actionButton(propertyActions,{id:'property-'+id,label, path,pressed:active,disabled:!canExplore||(!active&&!availability.ok),reason:why,onClick:()=>{
+   actionButton(propertyActions,{id:'property-'+id,label,path,pressed:active,disabled:!canExplore||(!active&&!availability.ok),reason:why,onClick:()=>{
     quickActions?.toggleProperty?.(id);renderViewers();
    }});
   }
@@ -106,29 +105,10 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null})=>{
  }
  function layerChanged(key,value){layerState[key]=!!value;persistLayerState();applyLayerPresentation();renderViewers();}
  function renderLayerStructure(output){
-  const s=model.state.structure,crystal=s?.mode==='crystalline',rep=crystal?s.crystallography.representation:null,group=node('section',null,'silm-layer-group');
-  group.append(node('h3','Vista e visibilidade'));
-  const views=node('div',null,'silm-layer-segmented');views.setAttribute('role','group');views.setAttribute('aria-label','Vista da estrutura');
-  for(const [id,label] of [['cell','Célula'],['lattice','Rede']]){
-   const b=node('button',label,'button outline');b.type='button';b.disabled=!crystal;b.setAttribute('aria-pressed',String(crystal&&rep.view===id));
-   b.addEventListener('click',()=>{if(crystal&&model.setCrystalRepresentation({view:id}))renderViewers();});views.append(b);
-  }
-  group.append(views);
-  toggleRow(group,{title:'Célula unitária visível',description:crystal?'Mostrar ou ocultar somente o contorno e os planos da célula.':'Disponível após organizar a estrutura cristalina.',checked:crystal?rep.unitCell:false,disabled:!crystal,onChange:v=>{model.setCrystalRepresentation({unitCell:v});renderViewers();}});
-  toggleRow(group,{title:'Vizinhos visíveis',description:crystal?'Realçar os vizinhos da unidade selecionada. Selecione um centro na cena.':'Disponível após organizar a estrutura cristalina.',checked:crystal?rep.neighbors:false,disabled:!crystal,onChange:v=>{model.setCrystalRepresentation({neighbors:v});renderViewers();}});
+  const group=node('section',null,'silm-layer-group');
+  group.append(node('h3','Destaque estrutural'));
   toggleRow(group,{title:'Destacar centros metálicos',description:'Reduzir o destaque não remove as unidades.',checked:layerState.centers,onChange:v=>layerChanged('centers',v)});
-  if(!crystal)group.append(node('p','Organize uma estrutura cristalina para habilitar célula, rede e vizinhos.','silm-layer-note'));
-  output.append(group);
- }
- function renderLayerModels(output){
-  const state=model.state,el=state.electrons,units=state.structure?.units.length||0,min=SILM.electronModel?.minUnits||2,group=node('section',null,'silm-layer-group');
-  group.append(node('h3','Modelo eletrônico'));
-  toggleRow(group,{title:'Elétrons visíveis',description:el?'Ocultar os marcadores não desativa o modelo.':'Mostrar inicia o modelo, quando há unidades suficientes.',checked:!!el?.representation.visible,disabled:!el&&units<min,onChange:v=>{
-   if(v){const result=el?model.setElectronRepresentation({visible:true}):model.activateElectrons();if(result===false||result?.ok===false)B.notify('Não foi possível ativar o modelo eletrônico.','warning');}
-   else if(el)model.setElectronRepresentation({visible:false});renderViewers();
-  }});
-  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.motion==='on'||document.documentElement.classList.contains('si-no-motion');
-  toggleRow(group,{title:'Movimento eletrônico',description:reduced?'A preferência de movimento reduzido mantém os marcadores estáticos.':'Pausar a animação não desativa o modelo.',checked:!!el?.representation.motion,disabled:!el||!el.representation.visible||reduced,onChange:v=>{if(el)model.setElectronRepresentation({motion:v});renderViewers();}});
+  group.append(node('p','Célula, rede, unidade e vizinhos são ações diretas em Observar.','silm-layer-note'));
   output.append(group);
  }
  function renderLayerIndications(output){
