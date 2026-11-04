@@ -66,8 +66,10 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienc
   const state=model.state,structure=state.structure,crystal=structure?.mode==='crystalline';
   const rep=crystal?structure.crystallography.representation:null,element=state.metal?SILM.data.get(state.metal.atomicNumber):null;
   const root=node('section',null,'silm-observer-actions');
-  const canExplore=state.module.active==='explorar'&&!activity()?.lockedModule?.();
-  const editableStructure=!!structure&&canExplore;
+  const activityLocked=!!activity()?.lockedModule?.();
+  const canExplore=state.module.active==='explorar'&&!activityLocked;
+  const canObserve=!!structure&&!activityLocked;
+  const editableStructure=canObserve;
   const structureActions=actionGroup(root,'Centros metálicos');
   actionButton(structureActions,{id:'centers',label:observer.centers?'Ocultar identificação':'Identificar centros',path:actionIcons.centers,pressed:observer.centers,disabled:!editableStructure,reason:!structure?'Monte uma estrutura primeiro':!canExplore?'Disponível no módulo Explorar':'',hint:'Destaca todos os centros. Na montagem livre, identifica cada unidade; na célula cristalina, mostra o papel de cada sítio.',onClick:()=>{
    observer.centers=!observer.centers;B.storage.write(observerKey,{centers:observer.centers});
@@ -82,15 +84,15 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienc
   }});
   const crystalActions=actionGroup(root,'Célula e rede cristalina');
   const unavailableCrystal=!crystal?'Organize a montagem para habilitar a célula e a rede':!canExplore?'Disponível no módulo Explorar':'';
-  actionButton(crystalActions,{id:'view-toggle',label:crystal?(rep.view==='cell'?'Mostrar rede':'Mostrar célula'):'Célula / rede',path:actionIcons.view,pressed:!!crystal&&rep.view==='lattice',disabled:!crystal||!canExplore,reason:unavailableCrystal,onClick:()=>{
+  actionButton(crystalActions,{id:'view-toggle',label:crystal?(rep.view==='cell'?'Mostrar rede':'Mostrar célula'):'Célula / rede',path:actionIcons.view,pressed:!!crystal&&rep.view==='lattice',disabled:!crystal||!canObserve,reason:!crystal?'Organize a montagem para habilitar a célula e a rede':activityLocked?'Recurso restrito nesta atividade':'',onClick:()=>{
    if(!crystal||!canExplore)return;
    model.setCrystalRepresentation({view:rep.view==='cell'?'lattice':'cell'});refreshScene();renderViewers();
   }});
-  actionButton(crystalActions,{id:'unit-cell',label:rep?.unitCell?'Ocultar célula unitária':'Mostrar célula unitária',path:actionIcons.cell,pressed:!!rep?.unitCell,disabled:!crystal||!canExplore,reason:unavailableCrystal,onClick:()=>{
+  actionButton(crystalActions,{id:'unit-cell',label:rep?.unitCell?'Ocultar célula unitária':'Mostrar célula unitária',path:actionIcons.cell,pressed:!!rep?.unitCell,disabled:!crystal||!canObserve,reason:!crystal?'Organize a montagem para habilitar a célula unitária':activityLocked?'Recurso restrito nesta atividade':'',onClick:()=>{
    if(!crystal||!canExplore)return;
    model.setCrystalRepresentation({unitCell:!rep.unitCell});refreshScene();renderViewers();
   }});
-  actionButton(crystalActions,{id:'neighbors',label:rep?.neighbors?'Ocultar vizinhos':'Mostrar vizinhos',path:actionIcons.neighbors,pressed:!!rep?.neighbors,disabled:!crystal||!canExplore,reason:unavailableCrystal,onClick:()=>{
+  actionButton(crystalActions,{id:'neighbors',label:rep?.neighbors?'Ocultar vizinhos':'Mostrar vizinhos',path:actionIcons.neighbors,pressed:!!rep?.neighbors,disabled:!crystal||!canObserve,reason:!crystal?'Organize a montagem para habilitar os vizinhos':activityLocked?'Recurso restrito nesta atividade':'',onClick:()=>{
    if(!crystal||!canExplore)return;
    const enabling=!rep.neighbors,patch={neighbors:enabling};
    if(enabling&&!rep.selectedUnitId&&structure.units.length)patch.selectedUnitId=structure.units[0].id;
