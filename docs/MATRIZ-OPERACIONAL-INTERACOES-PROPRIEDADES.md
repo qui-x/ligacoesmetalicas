@@ -97,7 +97,7 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 |---|---|---|---|
 | E + T | Tensão OU corrente; condição térmica; fronteiras térmicas | Dissipação Joule aquece a amostra; temperatura altera a resistividade/condutividade; transporte térmico remove/distribui calor | Prioridade 1, com balanço energético |
 | E + M | Condição elétrica; tração ou compressão; geometria e apoios | Deformação muda geometria e pode criar defeitos/dislocações que alteram a resistividade | Prioridade 2; primeiro qualitativo e separado de eletroplasticidade |
-| E + O | Espectro da luz; geometria óptica; resposta elétrica em frequência óptica | Resposta óptica ligada à estrutura eletrônica e às propriedades eletromagnéticas espectrais | Bloqueada até haver dados ópticos |
+| E + O | Condição elétrica DC; espectro, incidência e polarização da luz; função dielétrica/resposta óptica espectral | Origem eletrônica compartilhada, mas respostas em frequências distintas; refletância via Fresnel a partir de n(λ), κ(λ) ou ε̃(ω) | Especificada em ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md; implementação bloqueada até dados espectrais homologados |
 | T + M | Gradiente/fonte térmica; carregamento mecânico; apoios | Expansão térmica e variação da resposta mecânica com temperatura; restrição pode gerar tensão térmica | Prioridade 1 |
 | T + O | Luz e absorção espectral; condição térmica e fronteiras | Luz absorvida atua como fonte de calor; temperatura pode alterar resposta óptica | Prioridade 2, depende de absorção/óptica espectral |
 | M + O | Carregamento mecânico; superfície; iluminação | Deformação altera orientação, forma e rugosidade da superfície, mudando a reflexão geométrica | Prioridade 1 simplificada |
@@ -128,8 +128,13 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 - O modo inicial pode mostrar apenas a mudança geométrica do raio refletido.
 
 **E + O**
-- Não calcular resposta óptica com a condutividade DC.
-- Exigir constantes ópticas ou função dielétrica/resposta elétrica em frequência óptica.
+- Não calcular resposta óptica com a condutividade DC nem converter intensidade do campo didático em amplitude da onda luminosa.
+- Tratar a resposta elétrica DC e a resposta óptica espectral como regimes distintos da resposta eletrônica do material.
+- Exigir n(λ) + iκ(λ), ε̃(ω) ou σ̃(ω), com faixa, fase, temperatura, superfície, método e fonte.
+- Calcular refletância por Fresnel; para filme/substrato, incluir espessuras e interfaces.
+- Não alterar a refletância só porque a corrente foi ligada. Campo DC modulando a resposta óptica exige modelo específico e evidência.
+- Se a alteração óptica vier do aquecimento Joule, classificar a experiência como E + T + O e fechar o balanço de energia.
+- Manter E+O bloqueada até os dados espectrais e os testes do motor óptico serem homologados.
 
 **T + O**
 - Só converter iluminação em calor quando a absorção estiver definida.
