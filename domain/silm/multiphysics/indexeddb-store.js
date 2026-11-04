@@ -211,7 +211,7 @@
             runId, experiment: clone(result.definition?.value), manifest: clone(result.run.manifest),
             runtime: clone(result.run.runtime), storageRevision: result.run.storageRevision,
             eventSequence: result.run.eventSequence, checkpoint: clone(result.checkpoint),
-            snapshots: clone(result.snapshots || []), fields: clone(result.fields || []),
+            snapshots: clone((result.snapshots || []).map(item => item.value)), fields: clone(result.fields || []),
             meshes: clone(result.meshes || []), events: clone((result.events || []).sort((a, b) => a.sequence - b.sequence))
           });
         };
@@ -302,7 +302,7 @@
             eventSequence: input.event.sequence, updatedAt: input.runtime.updatedAt
           });
           const snapshotStore = tx.objectStore('snapshots');
-          snapshotStore.add({ ...clone(input.snapshot), acceptedStep: input.runtime.acceptedStep });
+          snapshotStore.add({ snapshotId: input.snapshot.snapshotId, runId: input.runId, acceptedStep: input.runtime.acceptedStep, value: clone(input.snapshot) });
           const fieldStore = tx.objectStore('fields');
           const blockStore = tx.objectStore('fieldBlocks');
           input.fields.forEach(field => fieldStore.add({
@@ -339,7 +339,7 @@
       const tx = db.transaction(['snapshots'], 'readonly');
       const value = await request(tx.objectStore('snapshots').get(snapshotId));
       await new Promise((resolve, reject) => { tx.oncomplete = resolve; tx.onabort = () => reject(tx.error); });
-      return value?.runId === runId ? value : null;
+      return value?.runId === runId ? value.value : null;
     }
 
     async function close() {
