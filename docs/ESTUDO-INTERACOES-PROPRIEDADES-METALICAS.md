@@ -185,10 +185,12 @@ A matriz considera quatro famílias físicas: elétrica (E), térmica (T), mecâ
 |---|---|---|
 | E + T + M | acoplamento eletrotérmico e termomecânico, com deformação alterando transporte | alta: resolver potencial/corrente, temperatura e deslocamento/deformação de modo acoplado |
 | E + T + O | corrente DC gera Joule; iluminação gera calor pela absorção; T altera resposta DC e óptica | muito alta: dois domínios de excitação, três fontes/saídas energéticas, realimentação σDC(T) e R/A/Topt(λ,T); balanço global |
-| E + M + O | deformação altera geometria/óptica e defeitos alteram transporte elétrico | muito alta: acoplar microestrutura, contatos e óptica |
+| E + M + O | uma deformação comum altera geometria/resistência, microestrutura e superfície/reflexão; a resposta óptica intrínseca pode ser sensível à tensão | muito alta: geometria compartilhada, resistividade microestrutural, contatos e óptica espectral; ver [especificação E+M+O](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md) |
 | T + M + O | aquecimento altera resposta mecânica e geometria/óptica | alta: expansão, tensão térmica, superfície e balanço óptico-térmico |
 
 **Quatro famílias E + T + M + O:** fisicamente possível em um problema multifísico específico, mas não deve ser um “modo geral” do SILM sem dados, equações, condições de contorno e validação dos quatro campos.
+
+**Especificação E + M + O:** [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md). A primeira etapa usa reflexão geométrica e resistência geométrica; as extensões microestrutural e elasto-óptica exigem parâmetros próprios.
 
 ---
 
