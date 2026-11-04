@@ -183,7 +183,7 @@ A matriz considera quatro famílias físicas: elétrica (E), térmica (T), mecâ
 
 | Combinação | Fenômeno principal | Complexidade / requisito |
 |---|---|---|
-| E + T + M | acoplamento eletrotérmico e termomecânico, com deformação alterando transporte | alta: resolver potencial/corrente, temperatura e deslocamento/deformação de modo acoplado |
+| E + T + M | a corrente produz Joule; T altera condutividade, expansão e resposta mecânica; M atualiza geometria, contatos e microestrutura, retroalimentando E e T | muito alta: resolver/iterar {u,V,T}, resistividade e propriedades mecânicas T-dependentes, geometria/contatos e balanços; ver [especificação E+T+M](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md) |
 | E + T + O | corrente DC gera Joule; iluminação gera calor pela absorção; T altera resposta DC e óptica | muito alta: dois domínios de excitação, três fontes/saídas energéticas, realimentação σDC(T) e R/A/Topt(λ,T); balanço global |
 | E + M + O | uma deformação comum altera geometria/resistência, microestrutura e superfície/reflexão; a resposta óptica intrínseca pode ser sensível à tensão | muito alta: geometria compartilhada, resistividade microestrutural, contatos e óptica espectral; ver [especificação E+M+O](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md) |
 | T + M + O | um campo T altera expansão e resposta mecânica; a geometria atual altera a reflexão e R(λ,T)/CTR altera o sinal óptico; absorção pode realimentar T | muito alta: campo térmico, mecânica com propriedades T-dependentes, superfície/normal, termorrefletância, absorção e balanços; ver [especificação T+M+O](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md) |
@@ -193,6 +193,8 @@ A matriz considera quatro famílias físicas: elétrica (E), térmica (T), mecâ
 **Especificação E + M + O:** [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md). A primeira etapa usa reflexão geométrica e resistência geométrica; as extensões microestrutural e elasto-óptica exigem parâmetros próprios.
 
 **Especificação T + M + O:** [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md). A primeira etapa usa expansão e reflexão geométricas; termorrefletância, absorção fototérmica e plasticidade dependente de temperatura exigem dados e balanços validados.
+
+**Especificação E + T + M:** [ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md). Integra potencial/corrente, Joule, temperatura e deslocamento/deformação; contatos e calor plástico são extensões com dados próprios, e a solução quantitativa exige convergência do estado {u,V,T}.
 
 ---
 
@@ -238,7 +240,7 @@ Os coeficientes didáticos atuais não devem ser apresentados como propriedades 
 - Comparação entre metais (condutividades, resistividade, capacidade térmica, expansão, propriedades mecânicas, dados ópticos), sempre com valor, unidade, condição e fonte.
 
 ### Nível 3 — multifísica avançada
-- E + T + M acoplados no mesmo passo de tempo.
+- E + T + M acoplados no mesmo passo de tempo, com geometria/contatos atualizados e balanços elétrico, térmico e mecânico. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md).
 - E + T + O com fontes Joule e fototérmica integradas e resposta espectral dependente de temperatura.
 - E + M + O com uma geometria deformada compartilhada entre os domínios elétrico e óptico; a extensão elasto-óptica exige dados específicos. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md).
 - T + M + O com campo térmico, equilíbrio mecânico, superfície deformada e termorrefletância integrados; o modo fototérmico exige absorção e fechamento dos balanços. Ver [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md).
@@ -293,6 +295,11 @@ Regras:
 13. Epishin, A. I.; Lisovenko, D. S. “Temperature Dependences of Elastic Properties of Cubic Crystals of Simple Substances. Review”. *Mechanics of Solids*, 60, 3367–3382, 2025. [DOI 10.1134/S0025654425602721](https://doi.org/10.1134/S0025654425602721). Dependência térmica e anomalias das propriedades elásticas.
 14. Languy, F. et al. “Space mirror deformation: from thermo-mechanical measurements by speckle interferometry to optical comparison with multiphysics simulation”. *Applied Optics*, 57(24), 6982–6989, 2018. [DOI 10.1364/AO.57.006982](https://doi.org/10.1364/AO.57.006982). Validação experimental da deformação de superfície sob gradiente térmico e comparação óptica.
 15. Nassar, O. “On the conversion of plastic work into heat in metals”. *Proceedings of the Royal Society A*, 481(2308), 20240139, 2025. [DOI 10.1098/rspa.2024.0139](https://doi.org/10.1098/rspa.2024.0139). Variabilidade do coeficiente Taylor–Quinney e métodos de medição.
+16. Dassault Systèmes. *Abaqus 2025 Documentation*, “Fully Coupled Thermal-Electrical-Structural Analysis”. [Documentação](https://docs.software.vt.edu/abaqusv2025/English/SIMACAEANLRefMap/simaanl-c-coupthermalelecstruct.htm). Formulação simultânea para deslocamento, potencial e temperatura; dependência de σe em T, Joule, expansão, dissipação inelástica e contato.
+17. Dassault Systèmes. *Abaqus 2025 Documentation*, “Coupled Thermal-Electrical Analysis”. [Documentação](https://docs.software.vt.edu/abaqusv2025/English/SIMACAEANLRefMap/simaanl-c-jouleheating.htm). Lei de Joule, transporte elétrico e térmico, dependência de condutividade e temperatura.
+18. Dash, A. et al. “Electroplasticity of Metals and Ceramics: Current Status”. *Annual Review of Materials Research*, 55, 151–174, 2025. [DOI 10.1146/annurev-matsci-081720-111526](https://doi.org/10.1146/annurev-matsci-081720-111526). Mecanismos elétricos/atérmicos além do aquecimento Joule.
+19. Yang, Y. et al. “Electric-current-assisted processing of metals: Mechanisms, microstructural control, and plasticity enhancement”. *Review of Materials Research*, 2(3), 100187, 2026. [DOI 10.1016/j.revmat.2026.100187](https://doi.org/10.1016/j.revmat.2026.100187). Revisão recente sobre efeitos térmicos e atérmicos da corrente no processamento e na plasticidade.
+20. Li, X. et al. “Electrically Assisted Processing of Metallic Materials: Coupled Mechanisms, Microstructure Evolution, and Service Performance”. *Metals*, 16(6), 578, 2026. [DOI 10.3390/met16060578](https://doi.org/10.3390/met16060578). Revisão de mecanismos acoplados eletro-termo-mecânicos em materiais metálicos.
 
 ---
 
