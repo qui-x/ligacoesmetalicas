@@ -1,13 +1,13 @@
 # SILM — Especificação do acoplamento termo-óptico (T+O)
 
 **Status:** especificação científica e operacional — não implementada  
-**Branch:** \`study/silm-coupled-properties-transport-20261104\`  
+**Branch:** `study/silm-coupled-properties-transport-20261104`  
 **Famílias:** térmica (T) + óptica (O)  
 **Documentos de base:**
-- \`ESTUDO-INTERACOES-PROPRIEDADES-METALICAS.md\`
-- \`MATRIZ-OPERACIONAL-INTERACOES-PROPRIEDADES.md\`
-- \`ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md\`
-- \`ESPECIFICACAO-ACOPLAMENTO-MECANICO-OPTICO.md\`
+- `ESTUDO-INTERACOES-PROPRIEDADES-METALICAS.md`
+- `MATRIZ-OPERACIONAL-INTERACOES-PROPRIEDADES.md`
+- `ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md`
+- `ESPECIFICACAO-ACOPLAMENTO-MECANICO-OPTICO.md`
 
 ---
 
@@ -39,70 +39,70 @@ A experiência deve ser identificada como **fototérmica** quando a luz funciona
 
 Para uma amostra passiva, em regime estacionário e com as mesmas convenções de potência e área, a energia incidente se distribui entre reflexão, absorção e transmissão:
 
-\`\`\`
+```
 Pinc = Pref + Pabs + Ptrans
 R + A + Topt = 1
-\`\`\`
+```
 
-- \`R\`: refletância de potência;
-- \`A\`: absorptância;
-- \`Topt\`: transmitância óptica (não confundir com temperatura);
-- em amostra opaca, \`Topt\` pode ser desprezível, mas só quando a espessura e o espectro justificarem essa aproximação.
+- `R`: refletância de potência;
+- `A`: absorptância;
+- `Topt`: transmitância óptica (não confundir com temperatura);
+- em amostra opaca, `Topt` pode ser desprezível, mas só quando a espessura e o espectro justificarem essa aproximação.
 
 É útil explicitar a potência absorvida:
 
-\`\`\`
+```
 Pabs = A(λ,T,θ,pol,stack) · Pinc
 Qabs = ∫ Pabs(t) dt
-\`\`\`
+```
 
-A absorptância depende do comprimento de onda, temperatura, ângulo, polarização, composição, fase, espessura, substrato, camadas superficiais e rugosidade. Em uma amostra de várias camadas, não se deve usar automaticamente \`A=1−R\`: a transmissão e as reflexões internas podem ser relevantes.
+A absorptância depende do comprimento de onda, temperatura, ângulo, polarização, composição, fase, espessura, substrato, camadas superficiais e rugosidade. Em uma amostra de várias camadas, não se deve usar automaticamente `A=1−R`: a transmissão e as reflexões internas podem ser relevantes.
 
-A refletância e a absorptância também podem mudar durante o aquecimento. Se \`A\` for atualizada com a temperatura, a fonte térmica precisa usar o valor atualizado no mesmo passo de acoplamento, respeitando o balanço de energia.
+A refletância e a absorptância também podem mudar durante o aquecimento. Se `A` for atualizada com a temperatura, a fonte térmica precisa usar o valor atualizado no mesmo passo de acoplamento, respeitando o balanço de energia.
 
 ### 2.2 Da absorção para a fonte térmica
 
-O calor é inicialmente gerado na região em que a energia eletromagnética é absorvida. Em uma aproximação de absorção exponencial de passagem única, para meio homogêneo, sem interferência e com coeficiente de absorção de intensidade \`α\`:
+O calor é inicialmente gerado na região em que a energia eletromagnética é absorvida. Em uma aproximação de absorção exponencial de passagem única, para meio homogêneo, sem interferência e com coeficiente de absorção de intensidade `α`:
 
-\`\`\`
+```
 I(z) = I(0) exp(−αz)
 q'''opt(z) = α I(z)
 α = 4πκ/λ
-\`\`\`
+```
 
-\`q'''opt\` tem unidade W/m³ quando \`I\` é irradiância em W/m² e \`z\` está em metros. Para uma interface, \`I(0)\` dentro do material precisa considerar a fração transmitida pela interface, e não deve ser igualada à irradiância incidente no ar.
+`q'''opt` tem unidade W/m³ quando `I` é irradiância em W/m² e `z` está em metros. Para uma interface, `I(0)` dentro do material precisa considerar a fração transmitida pela interface, e não deve ser igualada à irradiância incidente no ar.
 
 Essa aproximação só é válida quando a geometria pode ser tratada como meio homogêneo e a propagação por passagem única é apropriada. Para filmes finos, multicamadas, cavidades ou absorção com interferência, a distribuição da energia deve ser calculada a partir do campo eletromagnético local (por exemplo, matriz de transferência óptica e dissipação local), e não por uma exponencial simples.
 
 A profundidade característica de penetração da intensidade, nesse modelo simples, é:
 
-\`\`\`
+```
 δopt = 1/α = λ/(4πκ)
-\`\`\`
+```
 
-Ela depende de \`λ\` e de \`κ(λ,T)\`. Não assumir que todo metal é opticamente opaco para qualquer espessura e comprimento de onda.
+Ela depende de `λ` e de `κ(λ,T)`. Não assumir que todo metal é opticamente opaco para qualquer espessura e comprimento de onda.
 
 ### 2.3 Evolução térmica
 
 A temperatura deve resultar de uma equação de conservação de energia. Para um sólido contínuo, sem movimento macroscópico e com propriedades térmicas isotrópicas:
 
-\`\`\`
+```
 ρ cp(T) ∂T/∂t = ∇·[k(T) ∇T] + q'''opt + q'''other
-\`\`\`
+```
 
-- \`ρ\`: densidade de massa (kg/m³);
-- \`cp\`: capacidade térmica específica (J/(kg·K));
-- \`k\`: condutividade térmica (W/(m·K));
-- \`q'''opt\`: fonte volumétrica absorvida (W/m³);
-- \`q'''other\`: outras fontes explicitamente selecionadas, se houver.
+- `ρ`: densidade de massa (kg/m³);
+- `cp`: capacidade térmica específica (J/(kg·K));
+- `k`: condutividade térmica (W/(m·K));
+- `q'''opt`: fonte volumétrica absorvida (W/m³);
+- `q'''other`: outras fontes explicitamente selecionadas, se houver.
 
-Para materiais anisotrópicos, substituir \`k∇T\` pelo tensor de condutividade térmica. O modelo também pode exigir propriedades variáveis com temperatura, interfaces, calor latente e mudança de fase. Esses fenômenos não devem surgir implicitamente.
+Para materiais anisotrópicos, substituir `k∇T` pelo tensor de condutividade térmica. O modelo também pode exigir propriedades variáveis com temperatura, interfaces, calor latente e mudança de fase. Esses fenômenos não devem surgir implicitamente.
 
 Em um modelo concentrado (lumped), o balanço pode ser aproximado por:
 
-\`\`\`
+```
 m cp dT/dt = Pabs − Pout
-\`\`\`
+```
 
 Esse modelo só é aceitável quando as diferenças internas de temperatura forem desprezíveis na escala de interesse. Não o usar para afirmar gradientes espaciais, profundidade de absorção ou resposta de filmes multicamadas.
 
@@ -117,11 +117,11 @@ A primeira especificação deve permitir declarar:
 - convecção: fluxo proporcional à diferença de temperatura e coeficiente declarado;
 - radiação térmica: emissão/absorção térmica com emissividade e temperatura do entorno, quando habilitada.
 
-Para uma interface entre duas camadas com condutância térmica de contato \`G\`:
+Para uma interface entre duas camadas com condutância térmica de contato `G`:
 
-\`\`\`
+```
 q''int = G (T1 − T2)
-\`\`\`
+```
 
 Não supor contato térmico perfeito entre filme e substrato se a resistência de interface for relevante. Não aplicar convecção ou radiação por padrão sem declarar os coeficientes/condições.
 
@@ -133,15 +133,15 @@ Não supor contato térmico perfeito entre filme e substrato se a resistência d
 
 O índice de refração complexo pode ser representado por:
 
-\`\`\`
+```
 N(λ,T) = n(λ,T) + i κ(λ,T)
-\`\`\`
+```
 
 A função dielétrica complexa também depende de frequência e temperatura. A refletância calculada por Fresnel muda quando os parâmetros ópticos mudam:
 
-\`\`\`
+```
 R = R[n(λ,T), κ(λ,T), θ, pol, stack]
-\`\`\`
+```
 
 A mudança de refletância pode ser positiva ou negativa, dependendo do metal, comprimento de onda, temperatura, polarização, amostra e superfície. Não assumir que aquecer sempre aumenta ou sempre reduz o brilho. Tampouco assumir que todos os metais têm a mesma resposta térmico-óptica.
 
@@ -149,18 +149,18 @@ A resposta óptica pode mudar por diferentes mecanismos: alargamento por espalha
 
 ### 3.2 Coeficiente de termorrefletância
 
-Para pequenas variações de temperatura em torno de uma condição de referência \`T0\`, pode-se usar:
+Para pequenas variações de temperatura em torno de uma condição de referência `T0`, pode-se usar:
 
-\`\`\`
+```
 CTR(λ,T0) = (1/R) (∂R/∂T)|λ,T0
 ΔR/R ≈ CTR(λ,T0) ΔT
-\`\`\`
+```
 
-A aproximação linear só vale dentro de uma faixa em que \`CTR\` permaneça aproximadamente constante. O coeficiente tem unidade K⁻¹ e depende, no mínimo, de material/amostra, comprimento de onda, temperatura de referência, ângulo, polarização, preparação e estado da superfície. O valor e até o sinal não podem ser generalizados para todos os metais.
+A aproximação linear só vale dentro de uma faixa em que `CTR` permaneça aproximadamente constante. O coeficiente tem unidade K⁻¹ e depende, no mínimo, de material/amostra, comprimento de onda, temperatura de referência, ângulo, polarização, preparação e estado da superfície. O valor e até o sinal não podem ser generalizados para todos os metais.
 
-Para grandes excursões de temperatura, mudanças de fase, oxidação ou alterações permanentes, usar curvas \`R(λ,T)\` ou \`n(λ,T), κ(λ,T)\` medidas/modeladas na faixa, em vez de extrapolar linearmente.
+Para grandes excursões de temperatura, mudanças de fase, oxidação ou alterações permanentes, usar curvas `R(λ,T)` ou `n(λ,T), κ(λ,T)` medidas/modeladas na faixa, em vez de extrapolar linearmente.
 
-O sinal de termorrefletância é frequentemente pequeno. A expressão \`ΔR/R\` descreve uma variação relativa; não é uma nova refletância absoluta nem deve ser somada diretamente a \`R\` sem uma atualização consistente.
+O sinal de termorrefletância é frequentemente pequeno. A expressão `ΔR/R` descreve uma variação relativa; não é uma nova refletância absoluta nem deve ser somada diretamente a `R` sem uma atualização consistente.
 
 ### 3.3 Termorrefletância: bomba e prova
 
@@ -177,15 +177,15 @@ No SILM, essa separação é recomendada para evitar circularidade: a bomba gera
 
 | Conceito | Definição | Regra para o SILM |
 |---|---|---|
-| Refletância óptica \`R\` | Fração da potência incidente que retorna como luz refletida, para banda/ângulo/polarização definidos | Resposta óptica; depende de λ e T |
-| Absorptância \`A\` | Fração da potência incidente absorvida pela amostra/stack | É a fração que pode alimentar a fonte fototérmica |
-| Transmitância \`Topt\` | Fração que atravessa o conjunto | Não confundir com temperatura; pode ser desprezível apenas em amostra opaca |
+| Refletância óptica `R` | Fração da potência incidente que retorna como luz refletida, para banda/ângulo/polarização definidos | Resposta óptica; depende de λ e T |
+| Absorptância `A` | Fração da potência incidente absorvida pela amostra/stack | É a fração que pode alimentar a fonte fototérmica |
+| Transmitância `Topt` | Fração que atravessa o conjunto | Não confundir com temperatura; pode ser desprezível apenas em amostra opaca |
 | Emissividade térmica | Propriedade de emissão/absorção de radiação térmica, espectral e direcional | Não igualar à refletância visível sem condições; em equilíbrio e condições apropriadas, a relação de Kirchhoff usa a mesma λ, direção e polarização |
-| Condutividade térmica \`k\` | Relação entre fluxo térmico e gradiente de temperatura | Não é a capacidade térmica nem a velocidade visual da difusão |
-| Difusividade \`αth=k/(ρcp)\` | Mede a escala de difusão temporal da temperatura | Não confundir com coeficiente óptico de absorção \`αopt\` |
-| Coeficiente \`CTR\` | Derivada relativa da refletância em relação à temperatura | Sensibilidade óptica à temperatura; não é \`k\`, \`cp\` ou absorptividade |
+| Condutividade térmica `k` | Relação entre fluxo térmico e gradiente de temperatura | Não é a capacidade térmica nem a velocidade visual da difusão |
+| Difusividade `αth=k/(ρcp)` | Mede a escala de difusão temporal da temperatura | Não confundir com coeficiente óptico de absorção `αopt` |
+| Coeficiente `CTR` | Derivada relativa da refletância em relação à temperatura | Sensibilidade óptica à temperatura; não é `k`, `cp` ou absorptividade |
 
-**Atenção às letras:** a literatura usa frequentemente \`α\` para difusividade térmica e para coeficiente óptico de absorção. No código SILM, nomear explicitamente como \`thermalDiffusivity\` e \`opticalAbsorptionCoefficient\`.
+**Atenção às letras:** a literatura usa frequentemente `α` para difusividade térmica e para coeficiente óptico de absorção. No código SILM, nomear explicitamente como `thermalDiffusivity` e `opticalAbsorptionCoefficient`.
 
 ## 5. Condições mínimas da experiência
 
@@ -234,7 +234,7 @@ O modo pump–probe deve permitir que a prova tenha potência desprezível no or
 
 ### 6.1 Dados ópticos e de absorção
 
-- série espectral \`n(λ,T)\` e \`κ(λ,T)\`, ou \`R(λ,T)\` e, quando necessário, \`A(λ,T)\` e \`Topt(λ,T)\`;
+- série espectral `n(λ,T)` e `κ(λ,T)`, ou `R(λ,T)` e, quando necessário, `A(λ,T)` e `Topt(λ,T)`;
 - temperatura de cada série, faixa medida e incerteza;
 - fase, composição/pureza, orientação e condição superficial;
 - tipo de amostra (bulk, filme, multicamada), espessura, substrato, óxido/passivação e rugosidade;
@@ -246,7 +246,7 @@ Uma curva obtida para filme de ouro sobre substrato não deve ser aplicada ao ou
 
 ### 6.2 Dados de termorrefletância
 
-Cada valor de \`CTR\` precisa conter:
+Cada valor de `CTR` precisa conter:
 - metal e identificação da amostra;
 - λ, ângulo e polarização;
 - temperatura de referência e intervalo de calibração;
@@ -255,7 +255,7 @@ Cada valor de \`CTR\` precisa conter:
 - método de aquecimento e calibração térmica;
 - fonte original.
 
-Se somente \`|CTR|\` for publicado e o sinal não estiver disponível, não usar como coeficiente assinado para atualizar \`R\`. Pode ser mostrado como magnitude de sensibilidade, com limitação clara.
+Se somente `|CTR|` for publicado e o sinal não estiver disponível, não usar como coeficiente assinado para atualizar `R`. Pode ser mostrado como magnitude de sensibilidade, com limitação clara.
 
 ### 6.3 Dados térmicos
 
@@ -286,10 +286,10 @@ A cobertura deve ser registrada por **metal × fase × λ × temperatura × tipo
 ### 7.1 Fluxo computacional recomendado
 
 1. Ler estado da amostra, propriedades e condições de contorno.
-2. Calcular propagação óptica, \`R\`, \`A\`, \`Topt\` e distribuição espacial de absorção para \`T\` atual.
-3. Converter absorção em \`q'''opt\` ou fluxo térmico de fronteira conforme a resolução física.
-4. Avançar equação térmica e obter \`T(x,t+Δt)\`.
-5. Atualizar \`n(λ,T)\`, \`κ(λ,T)\`, \`R(λ,T)\` ou usar \`CTR\` no domínio linear.
+2. Calcular propagação óptica, `R`, `A`, `Topt` e distribuição espacial de absorção para `T` atual.
+3. Converter absorção em `q'''opt` ou fluxo térmico de fronteira conforme a resolução física.
+4. Avançar equação térmica e obter `T(x,t+Δt)`.
+5. Atualizar `n(λ,T)`, `κ(λ,T)`, `R(λ,T)` ou usar `CTR` no domínio linear.
 6. Atualizar a emissão/reflexão de leitura e a apresentação de temperatura.
 7. Se a alteração térmica for grande o suficiente para alterar absorção, repetir o acoplamento iterativamente até convergência ou avançar com passo temporal estável.
 
@@ -338,7 +338,7 @@ No estado atual:
 
 O estado deve manter estímulos, dados materiais, resultados e proveniência separados:
 
-\`\`\`ts
+```ts
 type EvidenceLevel =
   | "measured" | "assessed" | "fitted"
   | "calculated" | "qualitative" | "missing";
@@ -427,7 +427,7 @@ interface ThermoOpticalExperiment {
     energyResidualJ?: number;
   };
 }
-\`\`\`
+```
 
 Este contrato é conceitual, não um esquema pronto. Os arrays devem ter dimensões, ordenação e unidades validadas. A interpolação só pode ocorrer dentro das faixas registradas, com método e incerteza. Não usar valores padrão para n, κ, CTR, k, cp ou emissividade.
 
@@ -470,25 +470,25 @@ Não exibir todos esses campos sempre. Ocultar parâmetros não aplicáveis, mas
 ## 11. Critérios de aceite
 
 ### 11.1 Balanço óptico
-- [ ] Para amostra passiva, \`R+A+Topt=1\` dentro da tolerância.
-- [ ] Para amostra opaca, \`Topt≈0\` só quando a condição estiver justificada.
-- [ ] \`Pabs=A·Pinc\` respeita unidade e geometria.
-- [ ] Perfil \`q'''opt\` integra para a potência absorvida, sem duplicação.
+- [ ] Para amostra passiva, `R+A+Topt=1` dentro da tolerância.
+- [ ] Para amostra opaca, `Topt≈0` só quando a condição estiver justificada.
+- [ ] `Pabs=A·Pinc` respeita unidade e geometria.
+- [ ] Perfil `q'''opt` integra para a potência absorvida, sem duplicação.
 - [ ] Para filmes/multicamadas, interferência e absorção por camada são consideradas quando relevantes.
 - [ ] Alterar λ, polarização, ângulo, temperatura ou stack atualiza a absorção de acordo com os dados/modelo.
 
 ### 11.2 Balanço térmico
 - [ ] Sem iluminação e sem outra fonte, não há geração fototérmica.
-- [ ] Com \`A=0\`, a fonte fototérmica é zero.
+- [ ] Com `A=0`, a fonte fototérmica é zero.
 - [ ] Desligar a bomba interrompe a entrada óptica, mas não zera instantaneamente a temperatura.
 - [ ] Com fronteiras dissipativas, a amostra retorna ao equilíbrio definido.
 - [ ] Com fronteira isolada, energia acumulada é conservada após a fonte desligada (salvo outros termos explicitados).
 - [ ] A fonte integra para a energia absorvida.
-- [ ] Energia residual \`Ein−Eout−ΔU\` fica dentro da tolerância numérica.
+- [ ] Energia residual `Ein−Eout−ΔU` fica dentro da tolerância numérica.
 - [ ] O resultado não depende arbitrariamente da taxa de quadros.
 
 ### 11.3 Resposta termorrefletiva
-- [ ] Para ΔT pequeno e CTR válido, \`ΔR/R≈CTR·ΔT\`.
+- [ ] Para ΔT pequeno e CTR válido, `ΔR/R≈CTR·ΔT`.
 - [ ] O sinal de CTR é preservado; não presumir aumento de R.
 - [ ] Alterar λ ou temperatura usa o coeficiente/série correspondente.
 - [ ] Fora da faixa calibrada, o modo quantitativo é bloqueado ou explicitamente marcado como extrapolação não validada.
@@ -507,7 +507,7 @@ Não exibir todos esses campos sempre. Ocultar parâmetros não aplicáveis, mas
 
 **Fase A — contrato de energia**
 - Definir amostra, stack, iluminação e condições de contorno.
-- Implementar balanço \`R+A+Topt=1\` com dados medidos ou parâmetros do piloto.
+- Implementar balanço `R+A+Topt=1` com dados medidos ou parâmetros do piloto.
 - Manter o aquecimento desabilitado no SILM produtivo enquanto não houver escala material.
 
 **Fase B — fonte fototérmica e condução**
@@ -548,7 +548,7 @@ Não exibir todos esses campos sempre. Ocultar parâmetros não aplicáveis, mas
 ## 14. Referências
 
 1. Favaloro, T.; Bahk, J.-H.; Shakouri, A. “Characterization of the temperature dependence of the thermoreflectance coefficient for conductive thin films”. *Review of Scientific Instruments*, 86, 024903 (2015). [DOI: 10.1063/1.4907354](https://doi.org/10.1063/1.4907354). Mede coeficientes em ouro, platina e alumínio e demonstra dependência com temperatura, comprimento de onda e passivação.
-2. Wilson, R. B.; Apgar, B. A.; Martin, L. W.; Cahill, D. G. “Thermoreflectance of metal transducers for optical pump-probe studies of thermal properties”. *Optics Express*, 20(27), 28829–28838 (2012). [DOI: 10.1364/OE.20.028829](https://doi.org/10.1364/OE.20.028829). Mediçōes de dR/dT em quinze elementos a 1,03 μm e séries espectrais de filmes.
+2. Wilson, R. B.; Apgar, B. A.; Martin, L. W.; Cahill, D. G. “Thermoreflectance of metal transducers for optical pump-probe studies of thermal properties”. *Optics Express*, 20(27), 28829–28838 (2012). [DOI: 10.1364/OE.20.028829](https://doi.org/10.1364/OE.20.028829). Medições de dR/dT em quinze elementos a 1,03 μm e séries espectrais de filmes.
 3. Zollner, S.; Abadizaman, F.; Emminger, C.; Samarasingha, N. “Spectroscopic ellipsometry from 10 to 700 K”. *Advanced Optical Technologies*, 11(3–4), 117–135 (2022). [DOI: 10.1515/aot-2022-0016](https://doi.org/10.1515/aot-2022-0016). Revisão da determinação de constantes ópticas em função da temperatura e da faixa espectral.
 4. Mohan, R.; Khan, S.; Wilson, R. B. et al. “Time-domain thermoreflectance”. *Nature Reviews Methods Primers*, 5, 55 (2025). [DOI: 10.1038/s43586-025-00425-8](https://doi.org/10.1038/s43586-025-00425-8). Fundamentos ópticos e térmicos de TDTR e aplicações em filmes, interfaces e materiais maciços.
 5. Kirsch, D.; Martin, J. B.; Warzoha, R.; McLean, M.; Windover, D.; Takeuchi, I. “An Instrumentation Guide to Measuring Thermal Conductivity Using Frequency Domain Thermoreflectance (FDTR)”. *Review of Scientific Instruments*, 95, 103006 (2024). [DOI: 10.1063/5.0213738](https://doi.org/10.1063/5.0213738). Modelos térmicos difusivos multicamadas, ajuste de fase e incerteza.
