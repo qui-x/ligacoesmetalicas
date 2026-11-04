@@ -121,6 +121,7 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
    }
   }else{
    let geometry=null;try{geometry=S.referenceGeometry(element);}catch{}
+   const expected=structure.crystallography?.structureType;if(geometry&&expected&&geometry.model?.id!==expected)geometry=null;
    if(geometry&&geometry.points?.length&&geometry.edges?.length){
     const project=p=>{const q=p.map((v,i)=>v-geometry.center[i]);return [q[0]+.35*q[1],-q[2]+.3*q[1],q[1]];};
     const all=[...geometry.points,...geometry.edges.flat()].map(project);
@@ -185,35 +186,38 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
  function renderCards(cur){
   cards.replaceChildren();
   if(!records.length){
-   const empty=N('div',null,'silm-structure-empty');empty.append(N('h3','Nenhuma estrutura salva'),N('p','Adicione unidades em Montagem. Cada estrutura criada aparece aqui com seu próprio nome e pode ser retomada no Foco.'));
-   const action=N('button','Abrir Montagem','button primary');action.type='button';action.addEventListener('click',()=>newStructure?.());empty.append(action);cards.append(empty);return;
+   const empty=N('div',null,'silm-structure-empty');
+   empty.append(N('h3','Nenhuma estrutura salva'),N('p','Adicione unidades em Montagem. Cada estrutura criada aparece aqui com seu próprio nome e pode ser retomada no Foco.'));
+   const action=N('button','Abrir Montagem','button primary');action.type='button';action.addEventListener('click',()=>newStructure?.());
+   empty.append(action);cards.append(empty);return;
   }
   for(const [index,record]of records.entries()){
-   const e=S.data.get(record.atomicNumber),card=N('article',null,'silm-structure-card');card.dataset.structureId=record.id;
+   const e=S.data.get(record.atomicNumber);if(!e)continue;
+   const structure=record.snapshot.structure;
+   const card=N('article',null,'silm-structure-card');card.dataset.structureId=record.id;card.dataset.mode=record.mode;
    if(record.id===cur)card.dataset.current='true';
-   card.dataset.mode=record.mode;
    const head=N('header',null,'silm-structure-card-head');
-   const symbol=N('span',e.symbol,'silm-overview-chip-symbol');symbol.setAttribute('aria-hidden','true');
+   const counter=N('span','#'+String(index+1).padStart(2,'0'),'silm-structure-card-index');
    const heading=N('div',null,'silm-structure-card-heading');
-   const eyebrow=N('span','Estrutura '+String(index+1).padStart(2,'0'),'silm-structure-card-index');
-   const title=N('h3',record.name,'silm-structure-title');heading.append(eyebrow,title);
-   const badge=N('span',record.id===cur?'Em foco':'Salva','silm-structure-status');
-   head.append(symbol,heading,badge);card.append(head);
+   const title=N('h3',record.name,'silm-structure-title');
+   const kind=record.mode==='crystalline'?S.crystal.label(structure.crystallography.structureType,e):'Montagem livre';
+   const composition=N('p',e.name+' ('+e.symbol+') · '+kind+' · '+record.unitCount+' '+(record.unitCount===1?'unidade':'unidades'),'silm-structure-composition');
+   heading.append(title,composition);
+   const status=N('span',record.id===cur?'Em foco':'Salva','silm-structure-status');
+   head.append(counter,heading,status);card.append(head);
    const figure=N('div',null,'silm-structure-preview');figure.append(preview(record));card.append(figure);
-   const details=N('div',null,'silm-structure-card-caption');
-   const kind=record.mode==='crystalline'?S.crystal.label(record.snapshot.structure.crystallography.structureType,e):'Montagem livre';
-   const type=N('span',kind,'silm-structure-type');
-   const metal=N('span',e.name+' ('+e.symbol+')','silm-structure-metal');
-   const units=N('span',record.unitCount+' '+(record.unitCount===1?'unidade':'unidades'),'silm-structure-units');
-   details.append(type,metal,units);card.append(details);
    const actions=N('div',null,'silm-structure-card-actions');
-   const focus=N('button',record.id===cur?'Em foco':'Exibir no Foco',record.id===cur?'button outline':'button primary');focus.type='button';focus.disabled=record.id===cur;focus.addEventListener('click',()=>openRecord(record.id));
+   const focus=N('button',record.id===cur?'Em foco':'Exibir no Foco',record.id===cur?'button outline':'button primary');
+   focus.type='button';focus.disabled=record.id===cur;focus.addEventListener('click',()=>openRecord(record.id));
    const rename=N('button','Renomear','button outline');rename.type='button';rename.addEventListener('click',()=>editName(record,card,rename));
-   const remove=N('button','Remover','button outline silm-structure-remove');remove.type='button';remove.disabled=record.id===cur;remove.title=record.id===cur?'A estrutura em foco não pode ser removida.':'Remover esta estrutura salva';remove.addEventListener('click',()=>removeRecord(record));
+   const remove=N('button','Remover','button outline silm-structure-remove');remove.type='button';remove.disabled=record.id===cur;
+   remove.title=record.id===cur?'A estrutura em foco não pode ser removida.':'Remover esta estrutura salva';
+   remove.addEventListener('click',()=>removeRecord(record));
    actions.append(focus,rename,remove);card.append(actions);
+   cards.append(card);
   }
  }
-   function render(){
+  function render(){
   const cur=current();updateCount(cur);renderStrip(cur);renderCards(cur);setLayout();
  }
  function update(state){
