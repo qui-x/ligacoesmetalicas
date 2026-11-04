@@ -102,10 +102,11 @@
           "additionalProperties": false,
           "required": [
             "geometryId",
+            "geometryRevision",
+            "geometrySchemaVersion",
             "scale",
             "coordinateUnit",
-            "coordinateSystem",
-            "surfaceModelId"
+            "coordinateSystem"
           ],
           "properties": {
             "geometryId": {
@@ -123,37 +124,12 @@
             "coordinateSystem": {
               "const": "cartesian-right-handed"
             },
-            "surfaceModelId": {
-              "type": "string",
-              "minLength": 3,
-              "maxLength": 128,
-              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            "geometryRevision": {
+              "type": "integer",
+              "minimum": 1
             },
-            "dimensionsM": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "lengthM": {
-                  "type": "number",
-                  "exclusiveMinimum": 0
-                },
-                "widthM": {
-                  "type": "number",
-                  "exclusiveMinimum": 0
-                },
-                "thicknessM": {
-                  "type": "number",
-                  "exclusiveMinimum": 0
-                }
-              }
-            },
-            "orientation": {
-              "type": "array",
-              "items": {
-                "type": "number"
-              },
-              "minItems": 3,
-              "maxItems": 3
+            "geometrySchemaVersion": {
+              "const": "1.0.0"
             }
           }
         }
@@ -926,7 +902,8 @@
           "id",
           "domain",
           "kind",
-          "modelId"
+          "modelId",
+          "regionIds"
         ],
         "properties": {
           "id": {
@@ -970,6 +947,15 @@
               "maxLength": 128,
               "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
             },
+            "uniqueItems": true
+          },
+          "regionIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^reg-[A-Za-z0-9-]{3,80}$"
+            },
+            "minItems": 1,
             "uniqueItems": true
           }
         }
