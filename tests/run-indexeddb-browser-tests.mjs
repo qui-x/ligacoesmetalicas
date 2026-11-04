@@ -9,7 +9,7 @@ if (!["chromium", "firefox"].includes(browserName)) {
   throw new Error("BROWSER_NAME deve ser chromium ou firefox.");
 }
 
-const require = createRequire(new URL("../package.json", import.meta.url));
+const require = createRequire(import.meta.url);
 const playwright = require(modulePath);
 const browserType = playwright[browserName];
 if (!browserType) throw new Error("Browser Playwright indisponível: " + browserName);
