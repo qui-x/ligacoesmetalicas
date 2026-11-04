@@ -189,8 +189,8 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienc
    }
    if(ok){clearPropertySelection();refreshScene();renderViewers();}
    else{
-    propertyHelp.textContent='Não foi possível ativar a seleção. Confira a disponibilidade das propriedades.';
     syncPropertySelection();
+    propertyHelp.textContent='Não foi possível ativar a seleção. Confira a disponibilidade das propriedades.';
    }
    return ok;
   }
