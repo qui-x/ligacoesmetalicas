@@ -367,12 +367,28 @@
       const runtime = loaded.runtime;
       const checkpoint = loaded.checkpoint;
       if (!checkpoint || checkpoint.runId !== runId || checkpoint.acceptedStep !== runtime.acceptedStep ||
+          checkpoint.runtime?.runId !== runtime.runId ||
+          checkpoint.runtime?.experimentId !== runtime.experimentId ||
+          checkpoint.runtime?.definitionRevision !== runtime.definitionRevision ||
           checkpoint.runtime?.acceptedStep !== runtime.acceptedStep ||
+          checkpoint.runtime?.status !== runtime.status ||
+          JSON.stringify(checkpoint.runtime) !== JSON.stringify(runtime) ||
           JSON.stringify(checkpoint.acceptedCoordinate) !== JSON.stringify(runtime.acceptedCoordinate) ||
           checkpoint.runtime?.lastAcceptedSnapshotId !== (runtime.lastAcceptedSnapshotId || undefined) ||
           checkpoint.geometry?.revision !== runtime.geometry?.revision ||
           checkpoint.geometry?.referenceRevision !== runtime.geometry?.referenceRevision) {
         return fail('CHECKPOINT_METADATA_MISMATCH');
+      }
+      if (loaded.manifest?.solverVersions &&
+          JSON.stringify(checkpoint.solverVersions || {}) !== JSON.stringify(loaded.manifest.solverVersions)) {
+        return fail('CHECKPOINT_SOLVER_VERSION_MISMATCH');
+      }
+      if (Array.isArray(loaded.manifest?.domains)) {
+        const expectedDomains = [...loaded.manifest.domains].sort();
+        const checkpointDomains = Object.keys(checkpoint.domainStates || {}).sort();
+        if (JSON.stringify(checkpointDomains) !== JSON.stringify(expectedDomains)) {
+          return fail('CHECKPOINT_DOMAIN_STATES_MISMATCH');
+        }
       }
       if (runtime.acceptedStep === 0) {
         return runtime.fields?.length || runtime.lastAcceptedSnapshotId
@@ -389,10 +405,23 @@
       if (!fields.length || new Set(fieldIds).size !== fieldIds.length ||
           snapshot.fieldRefs.length !== fieldIds.length ||
           snapshot.fieldRefs.some(fieldId => !fieldIds.includes(fieldId))) return fail('SNAPSHOT_FIELD_SET_MISMATCH');
+      const currentSnapshotFields = (loaded.fields || []).filter(field => field.snapshotId === snapshot.snapshotId);
+      if (currentSnapshotFields.length !== fieldIds.length ||
+          currentSnapshotFields.some(field => !fieldIds.includes(field.fieldId))) {
+        return fail('FIELD_METADATA_SET_MISMATCH');
+      }
+      const persistedMeshes = loaded.meshes || [];
+      for (const mesh of runtime.meshes || []) {
+        const storedMesh = persistedMeshes.find(item => item.meshId === mesh.meshId &&
+          item.domain === mesh.domain && item.geometryRevision === mesh.geometryRevision &&
+          item.version === mesh.version);
+        if (!storedMesh) return fail('MESH_METADATA_MISSING', { meshId: mesh.meshId });
+      }
       for (const field of fields) {
-        const storedField = loaded.fields.find(item => item.fieldId === field.fieldId);
+        const storedField = currentSnapshotFields.find(item => item.fieldId === field.fieldId);
         if (!storedField || storedField.snapshotId !== snapshot.snapshotId ||
-            storedField.geometryRevision !== runtime.geometry.revision) return fail('FIELD_METADATA_MISMATCH', { fieldId: field.fieldId });
+            storedField.geometryRevision !== runtime.geometry.revision ||
+            storedField.checksum !== field.checksum) return fail('FIELD_METADATA_MISMATCH', { fieldId: field.fieldId });
         const mesh = (runtime.meshes || []).find(item => item.meshId === field.meshId &&
           item.domain === field.domain && item.geometryRevision === field.geometryRevision);
         if (!mesh) return fail('FIELD_MESH_MISMATCH', { fieldId: field.fieldId });
