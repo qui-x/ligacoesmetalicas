@@ -25,7 +25,7 @@ SILM.createSceneNotes=(parent,{scope,items=[]})=>{
    Sem linhas entre unidades e sem escala física. Elétrons (0.6.x): camada própria, qualitativa, sobre a mesma cena.
    Na montagem livre a posição científica (normalizada) é a própria cena; a câmera só muda a apresentação, e o toque,
    o arrasto e o destino passam pela inversa da câmera. Enquadrar mostra a área de montagem inteira. */
-SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',reference='de referência',moduleTitle='Explorar',describeLast=()=>null,canExplore=()=>false,onExplore=()=>{},organize=null,reducedMotion=()=>false,electrons:electronOptions=null,properties:propertyOptions=null,representation=null})=>{
+SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',reference='de referência',moduleTitle='Explorar',describeLast=()=>null,canExplore=()=>false,onExplore=()=>{},organize=null,reducedMotion=()=>false,electrons:electronOptions=null,properties:propertyOptions=null,representation=null,observer=null})=>{
  const U=SimCore.ExperienceUI,A=SILM.assembly,C=A.contract,name=element.name.toLocaleLowerCase('pt-BR');
  const rep2=representation||{camera:()=>null,saveCamera:()=>{}};
  const statusLabel={empty:'Vazia',assembling:'Em construção',assembled:'Concluída pelo usuário'};
@@ -79,7 +79,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  const selectionRing=R.selectionLayer();
  // 0.6.x: elétrons de valência deslocalizados — distribuição preliminar sobre a montagem livre.
  const electronLayer=SILM.createElectronLayer(stage,{scope,before:layer,reducedMotion});R.layer('electrons',electronLayer.canvas);
- const electronLegend=U.element('p','Pontos ciano: elétrons de valência deslocalizados, marcadores qualitativos (não indicam o número real de elétrons). Na montagem livre, a distribuição é uma representação didática preliminar da ligação metálica coletiva.','silm-electron-legend');electronLegend.id='silm-electron-legend';electronLegend.hidden=true;
+ const electronLegend=U.element('p','Pontos ciano: elétrons de valência deslocalizados. A distribuição representa a interação metálica coletiva entre os centros, não ligações localizadas entre pares nem o número real de elétrons.','silm-electron-legend');electronLegend.id='silm-electron-legend';electronLegend.hidden=true;
  // Os controles completos de elétrons e propriedades ficam no painel Ver; a cena mantém somente as camadas visuais.
  // 0.7.x: na montagem livre, somente a condutividade elétrica (observação básica sobre os elétrons).
  const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:layer});R.layer('properties',overlay.root);
@@ -97,15 +97,19 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  function createNode(u){
   const node=U.element(editable?'button':'span',null,'silm-unit');node.dataset.unitId=u.id;
   if(editable){node.type='button';node.setAttribute('aria-describedby',instructions.id);node.tabIndex=-1;}else node.setAttribute('aria-hidden','true');
-  const core=U.element('span',element.symbol,'silm-unit-core');core.setAttribute('aria-hidden','true');node.append(core);layer.append(node);return node;
+  const core=U.element('span',element.symbol,'silm-unit-core');core.setAttribute('aria-hidden','true');
+  const centerTag=U.element('span','','silm-observer-center-tag');centerTag.setAttribute('aria-hidden','true');centerTag.hidden=true;
+  node.append(core,centerTag);layer.append(node);return node;
  }
  function render(){
-  const s=model.state.structure;if(!s)return;const list=s.units;let lostFocus=false;
+  const s=model.state.structure;if(!s)return;const list=s.units,centerAnalysis=observer?.centers===true;let lostFocus=false;
+  root.dataset.observerCenters=String(centerAnalysis);
   for(const [id,node]of nodes)if(!list.some(u=>u.id===id)){lostFocus=lostFocus||node.contains(document.activeElement);node.remove();nodes.delete(id);lastRegion.delete(id);if(selected===id)selected=null;if(focusId===id)focusId=null;}
   for(const u of list){let node=nodes.get(u.id);if(!node){node=createNode(u);nodes.set(u.id,node);}
    if(drag?.id!==u.id&&keyMove?.id!==u.id){place(node,u.position);delete node.dataset.conflict;}
    if(editable){node.setAttribute('aria-label',label(u.id));node.setAttribute('aria-pressed',String(selected===u.id));}
    node.dataset.placement=u.placement;
+   const tag=node.querySelector('.silm-observer-center-tag');tag.textContent='M'+(indexOf(u.id)+1);tag.hidden=!centerAnalysis;
   }
   const roving=selected||(focusId&&nodes.has(focusId)?focusId:list[0]?.id);if(editable)for(const [id,node]of nodes)node.tabIndex=id===roving?0:-1;
   if(lostFocus)(nodes.get(roving)||title).focus({preventScroll:true});
@@ -123,6 +127,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
   add?.setAttribute('aria-disabled',String(n>=C.maxUnits));
   if(organize){const o=organize.state();crystalReason.textContent=o.reason||'';if(o.reason&&o.more){const a=U.element('a',o.more.label);a.href=o.more.href;crystalReason.append(' ',a);}crystalReason.hidden=!o.reason;if(organizeButton){organizeButton.setAttribute('aria-disabled',String(o.disabled));organizeButton.title=o.reason||o.title||'Organizar segundo a referência cristalográfica';}}
  }
+ scope.listen(window,'silm:observer-presentation-changed',render);
  /* Anel de seleção na camada própria (acima da estrutura, tamanho de tela constante). */
  function paintSelection(){const u=selected&&units().find(x=>x.id===selected);if(!u){selectionRing.update([]);return;}const p=drag?.id===u.id?drag.position:keyMove?.id===u.id?keyMove.position:u.position;selectionRing.update([{x:p.x,y:p.y,r:C.minDistance*.42}]);}
  R.onCamera(cam=>{electronLayer.setCamera(cam);paintSelection();});R.onResize(()=>paintSelection());
