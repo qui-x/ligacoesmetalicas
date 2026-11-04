@@ -331,3 +331,10 @@ A arquitetura estabelece uma experiência comum, solvers especializados, geometr
 ## 12. Contrato técnico e próxima etapa
 
 O contrato A0 está documentado em [CONTRATO-DADOS-ESTADOS-MULTIFISICO.md](CONTRATO-DADOS-ESTADOS-MULTIFISICO.md), com schemas JSON para definição, runtime e snapshot de resultados. A etapa seguinte será A1 — geometria macroscópica, regiões, terminais, superfícies e coordenadas da amostra.
+
+
+## 13. Geometria macroscópica da amostra — A1
+
+A etapa A1 está especificada em [GEOMETRIA-MACROSCOPICA-AMOSTRA-MULTIFISICA.md](GEOMETRIA-MACROSCOPICA-AMOSTRA-MULTIFISICA.md), com schema em [multiphysics-geometry.schema.json](schemas/multiphysics-geometry.schema.json). A amostra tem geometria de referência própria, separada da montagem normalizada e da rede cristalina; regiões nomeadas conectam essa mesma geometria aos quatro domínios.
+
+**A0 + A1 especificadas:** os três contratos de estado e a geometria macroscópica possuem schemas versionados independentes. Próximo ponto: A2 — orquestrador e transações de execução.
