@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import { webcrypto } from 'node:crypto';
 
 const source = await readFile(new URL('../domain/silm/multiphysics/orchestrator.js', import.meta.url), 'utf8');
 function loadApi() {
@@ -45,6 +46,9 @@ function makeSolver(domain, { fail = false, waitForAbort = false } = {}) {
       }
       if (fail) return { ok: false, reason: 'MOCK_DOMAIN_FAILURE' };
       const fieldId = `field-${domain}-${context.stepAttemptId.slice(-12)}`;
+      const data = Uint8Array.of(domain.length, context.previousState.count + 1);
+      const digest = await webcrypto.subtle.digest('SHA-256', data);
+      const checksum = [...new Uint8Array(digest)].map(value => value.toString(16).padStart(2, '0')).join('');
       return {
         ok: true,
         converged: true,
@@ -55,8 +59,9 @@ function makeSolver(domain, { fail = false, waitForAbort = false } = {}) {
           fieldId, domain, name: `mock.${domain}.field`, meshId: `mesh-${domain}-prototype`,
           unit: '1', timeS: context.coordinate.timeS,
           geometryRevision: context.geometry.revision, storageRef: `mock/${fieldId}`,
-          checksum: '0'.repeat(64), valueType: 'float64', shape: [1]
+          checksum, valueType: 'float64', shape: [1]
         }],
+        fieldBlocks: [{ fieldId, data }],
         observables: [{ id: `obs-${domain}-mock`, domain, quantity: 'mock-state', value: context.previousState.count + 1, unit: '1', sourceFieldIds: [fieldId] }],
         balances: []
       };
