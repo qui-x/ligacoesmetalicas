@@ -160,11 +160,19 @@
       };
       try {
         await transact(db, ['definitions', 'runs', 'checkpoints', 'auditEvents'], 'readwrite', (tx, control) => {
-          tx.objectStore('definitions').add(definition);
-          tx.objectStore('runs').add(run);
-          tx.objectStore('checkpoints').add({ ...clone(input.checkpoint), runId: input.runId });
-          tx.objectStore('auditEvents').add(clone(input.event));
-          control.setResult({ ok: true, storageRevision: 0 });
+          const definitionStore = tx.objectStore('definitions');
+          const existing = definitionStore.get(key);
+          existing.onsuccess = () => {
+            if (existing.result && JSON.stringify(existing.result.value) !== JSON.stringify(definition.value)) {
+              control.abort('DEFINITION_REVISION_CONFLICT');
+              return;
+            }
+            if (!existing.result) definitionStore.add(definition);
+            tx.objectStore('runs').add(run);
+            tx.objectStore('checkpoints').add({ ...clone(input.checkpoint), runId: input.runId });
+            tx.objectStore('auditEvents').add(clone(input.event));
+            control.setResult({ ok: true, storageRevision: 0 });
+          };
         });
         return { ok: true, storageRevision: 0 };
       } catch (error) {
