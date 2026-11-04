@@ -142,7 +142,14 @@ Para uma combinação térmica-mecânica consistente são necessários: `αT`, m
 
 ### 3.4 Óptica ↔ térmica
 
-A parcela de luz absorvida pode aquecer a superfície; a parcela refletida não fica disponível como calor absorvido. A demonstração exige irradiância, espectro, absorptividade/refletividade e transferência do calor absorvido para a rede. A lanterna atual só mostra raios e ângulos, sem balanço de energia; portanto, ainda não sustenta uma experiência fototérmica.
+A relação é bidirecional e exige dois modelos acoplados:
+
+1. **Fototérmica (O → T):** a parcela absorvida da potência óptica é convertida em fonte térmica espacial, não a parcela refletida/transmitida. Exige irradiância/espectro, R/A/Topt, profundidade e perfil de absorção, geometria da amostra, ρ, cp, k e fronteiras térmicas.
+2. **Termorrefletância (T → O):** a temperatura altera n(λ,T), κ(λ,T), R(λ,T) ou o coeficiente CTR. O sinal pode ser positivo ou negativo e depende de metal, comprimento de onda, temperatura, amostra, superfície e polarização; aquecer não implica sempre aumentar o brilho.
+
+Pump–probe separa a bomba que aquece da prova que lê a mudança de refletância. Para mudanças pequenas pode-se usar ΔR/R ≈ CTR·ΔT dentro da faixa calibrada; para variações grandes são necessárias curvas R(λ,T) ou constantes ópticas dependentes de T. A energia absorvida e a energia que sai pelas fronteiras devem fechar o balanço térmico.
+
+O motor atual de brilho não calcula absorção/refletância espectral e o motor térmico é qualitativo, sem escala física para energia/temperatura. Portanto, T+O permanece não implementada e quantitativamente bloqueada. Especificação completa: `docs/ESPECIFICACAO-ACOPLAMENTO-TERMO-OPTICO.md`.
 
 ### 3.5 Óptica ↔ elétrica
 
@@ -166,7 +173,7 @@ A matriz considera quatro famílias físicas: elétrica (E), térmica (T), mecâ
 | E + O | resposta eletrônica comum em frequências distintas; refletância calculada a partir da resposta óptica espectral | n(λ), κ(λ) ou ε̃(ω), espectro, polarização, ângulo, superfície e fase | especificada em ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md; não implementada |
 | T + M (compressão) | temperatura altera escoamento/ductilidade; expansão e tensão térmica | fonte/gradiente, apoios, αT, E(T), escoamento(T), taxa | não implementada |
 | T + M (tração) | temperatura altera resistência/ductilidade durante tração | fonte/gradiente, apoios, αT, E(T), curva tensão–deformação(T) | não implementada |
-| T + O | absorção luminosa aquece a superfície | irradiância, espectro, absorptividade e condução para o interior | não implementada |
+| T + O | absorção óptica gera calor; temperatura altera refletância/absorção | R/A/Topt, perfil de absorção, ρ, cp, k, fronteiras, R(λ,T) ou CTR | especificada em ESPECIFICACAO-ACOPLAMENTO-TERMO-OPTICO.md; não implementada |
 | M + O (compressão) | forma e orientação da superfície alteram reflexão | geometria da superfície, normal local, rugosidade | não implementada |
 | M + O (tração) | alongamento/alinhamento altera geometria e reflexão | geometria da superfície, normal local, rugosidade | não implementada |
 
@@ -220,6 +227,7 @@ Os coeficientes didáticos atuais não devem ser apresentados como propriedades 
 ### Nível 2 — depende de dados e estudo adicional
 - Seebeck, Peltier e Thomson (exigem coeficientes termoelétricos e condições de junção/gradiente).
 - E + O por constantes ópticas e resposta espectral; a condutividade DC não substitui σ̃(ω), e efeitos de aquecimento exigem E + T + O. Ver `docs/ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md`.
+- T + O por absorção fototérmica e termorrefletância; exige R/A/Topt, transferência de calor e resposta óptica dependente de T. A variação de refletância pode ter qualquer sinal. Ver `docs/ESPECIFICACAO-ACOPLAMENTO-TERMO-OPTICO.md`.
 - Eletroplasticidade além de Joule (campo/corrente, pulsos, temperatura controlada, mecanismo microestrutural e fonte).
 - Comparação entre metais (condutividades, resistividade, capacidade térmica, expansão, propriedades mecânicas, dados ópticos), sempre com valor, unidade, condição e fonte.
 
