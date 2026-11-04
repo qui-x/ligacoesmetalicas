@@ -258,6 +258,8 @@ O schema verifica a forma de cada referência. A validação semântica deverá 
 2. o campo produzido existe no solver de origem;
 3. a entrada consumidora aceita aquele campo;
 4. lei, dataset e operador estão registrados e compatíveis;
+5. a dependência temperatura-condutividade é denominada explicitamente, sem confundi-la com efeitos termoelétricos Seebeck/Peltier;
+6. regime multiescala declara escala e horizonte temporal físico;
 5. a versão das geometrias/malhas corresponde;
 6. ciclos de dependência usam estratégia iterativa;
 7. não há dupla contagem de energia ou fontes incompatíveis.
