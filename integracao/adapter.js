@@ -8,7 +8,7 @@
  // Endereço com que o SILM foi aberto: a tela inicial escolhida só vale para a abertura sem destino, como no SIAB.
  const entryHash=location.hash,specificEntry=!!entryHash&&!['#','#/'].includes(entryHash);
  const startupChoice=()=>{const v=B.storage.read('startup.choice');return v==='inicio'||v==='ambiente'?v:null;};
- B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.15.5',
+ B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.15.6',
   routes:[...B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios','aprender','missoes','caderno','professor'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'Oficina dos Metais':route.title})),
    {id:'montagens',title:'Montagens prontas',subtitle:'Montagens prontas'},{id:'atividade',title:'Atividade',subtitle:'Atividade do professor'}]});
  // Etapas 9 e 11: "Montagens prontas" e "Atividade" (link do aluno) são telas do SILM que a lista fixa de rotas da Base não conhece.
