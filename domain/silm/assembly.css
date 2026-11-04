@@ -25,6 +25,11 @@
 /* Área de toque igual ao espaçamento mínimo; a forma visível mantém o raio da unidade. */
 .silm-unit{position:absolute;width:10%;height:10%;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:50%;background:none;display:grid;place-items:center;transform:translate(-50%,-50%);touch-action:none;cursor:grab;transition:left 120ms ease-out,top 120ms ease-out}
 .silm-unit-core{width:84%;height:84%;display:grid;place-items:center;border-radius:50%;border:1px solid #2a2016;background:radial-gradient(circle at 34% 30%,#f3e7c2 0,#d4b465 34%,#a8743b 74%,#6e4a22 100%);box-shadow:inset 0 -2px 4px #0006,0 1px 3px #0005;color:#17181b;font-weight:800;font-size:max(10px,calc(var(--stage)*.03));line-height:1;letter-spacing:.01em;white-space:nowrap;overflow-wrap:normal;word-break:keep-all;overflow:hidden}
+/* Identificação dos centros metálicos na montagem livre. */
+.silm-observer-center-tag{position:absolute;z-index:8;top:-9%;right:-12%;display:grid;place-items:center;min-width:18px;height:18px;padding:0 3px;border:1px solid var(--scientific-accent);border-radius:999px;background:var(--panel);color:var(--text);font-size:9px;font-weight:850;line-height:1;pointer-events:none}
+.silm-observer-center-tag[hidden]{display:none!important}
+.silm-assembly[data-observer-centers=true] .silm-unit-core{outline:2px solid var(--scientific-accent);outline-offset:2px;box-shadow:0 0 0 4px color-mix(in srgb,var(--scientific-accent) 20%,transparent),inset 0 -2px 4px #0006}
+.silm-crystal[data-observer-centers=true] .silm-crystal-unit .silm-unit-core{outline:2px solid var(--scientific-accent);outline-offset:2px}
 .silm-assembly[data-editable=false] .silm-unit{cursor:default}
 .silm-unit:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 /* Seleção: anel tracejado + contorno espesso; não depende somente de cor. */

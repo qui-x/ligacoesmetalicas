@@ -54,7 +54,38 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   // Maleabilidade e ductilidade ativam o atuador correspondente na cena; a carga é aplicada pelo gesto do usuário.
   schedule();return true;
  }
- const quickActions=Object.freeze({toggleElectrons,toggleProperty});
+ function activateCombination(kind){
+  if(!editable())return false;
+  const target={heatElectrical:'electrical',malleabilityElectrical:'malleability',ductilityElectrical:'ductility'}[kind];
+  if(!target||!allows(target))return false;
+  const state=model.state,starting=state.properties.active!==target;
+  const alreadyCombined=!starting&&(kind==='heatElectrical'
+   ?!!state.properties.electrical.field&&!!thermal()?.reading().on
+   :!!drive()?.reading().deformField);
+  if(starting&&!toggleProperty(target))return false;
+  // Ao trocar a experiência, sincroniza primeiro a chave transitória dos controladores.
+  // Só depois liga o efeito complementar, para que o primeiro render não o interprete como resíduo antigo.
+  if(starting){
+   if(kind==='heatElectrical')thermal()?.sync();
+   else drive()?.sync();
+  }
+  // P7: calor + corrente (fonte transitória) ou deformação + corrente (campo transitório).
+  if(kind==='heatElectrical'){
+   if(model.state.structure?.mode!=='crystalline')return false;
+   if(alreadyCombined)actions.heat();
+   else{
+    if(!model.state.properties.electrical.field)actions.field();
+    if(!thermal()?.reading().on)actions.heat();
+   }
+  }else{
+   const able=model.propertyAvailability(target);
+   if(!able.ok||model.state.structure?.mode!=='crystalline')return false;
+   if(alreadyCombined)actions.field();
+   else if(!drive()?.reading().deformField)actions.field();
+  }
+  schedule();return true;
+ }
+ const quickActions=Object.freeze({toggleElectrons,toggleProperty,activateCombination});
  // Uma leitura do estado por atualização (model.state devolve uma cópia completa).
  const info=()=>{const st=model.state;return {deformation:deform()?.reading()||null,thermal:thermal()?.reading()||null,drive:drive()?.reading()||null,state:st,eligibility:P.eligibility(st.metal?Data.get(st.metal.atomicNumber):null),editable:st.module.active==='explorar',reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}};};
  const controls=S.createPropertyControls(document.getElementById('silm-properties'),{scope,info,actions,prefix:'silm-panel-property'});
@@ -71,7 +102,7 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
  });
  document.getElementById('silm-close-periodic').addEventListener('click',()=>dialog.close());
  dialog.addEventListener('close',()=>{tableScope?.destroy();trigger.focus({preventScroll:true});});
- return {scene,quickActions,update(){controls.update();for(const id of P.ids){const b=document.getElementById('silm-panel-property-start-'+id);b.parentElement.hidden=!allows(id);}document.getElementById('silm-properties').hidden=!model.state.metal;document.getElementById('silm-property-caption').textContent=model.state.properties.active?P.catalog[model.state.properties.active].limitation:'As experiências qualitativas são distintas dos dados tabelados do metal.';}};
+ return {scene,quickActions,info,update(){controls.update();for(const id of P.ids){const b=document.getElementById('silm-panel-property-start-'+id);b.parentElement.hidden=!allows(id);}document.getElementById('silm-properties').hidden=!model.state.metal;document.getElementById('silm-property-caption').textContent=model.state.properties.active?P.catalog[model.state.properties.active].limitation:'As experiências qualitativas são distintas dos dados tabelados do metal.';}};
 };
 SILM.renderIntegrationMetalData=(host,e,state)=>{
  const S=SILM,el=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
