@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Testes IndexedDB — SILM A2.2</title>
+<style>
+:root{color-scheme:light dark;font:15px/1.5 system-ui,sans-serif}body{max-width:900px;margin:32px auto;padding:0 18px}h1{font-size:1.45rem}#summary{font-weight:700;margin:16px 0}li{padding:5px 0}.pass{color:#16834a}.fail{color:#d34b4b}code{overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<h1>SILM — Testes de persistência transacional A2.2</h1>
+<p>Este ensaio usa IndexedDB e Web Crypto reais do navegador. O banco é temporário e exclusivo desta página.</p>
+<div id="summary">Executando…</div>
+<ol id="results"></ol>
+<script src="../domain/silm/multiphysics/indexeddb-store.js"></script>
+<script>
+(async () => {
+  const output = document.getElementById('results');
+  const summary = document.getElementById('summary');
+  let passed = 0, failed = 0;
+  const checks = [];
+  const assert = (condition, message) => { if (!condition) throw new Error(message); };
+  const test = async (name, run) => {
+    const item = document.createElement('li');
+    item.textContent = name + ' — ';
+    output.append(item);
+    try { await run(); item.className = 'pass'; item.append('APROVADO'); passed++; }
+    catch (error) { item.className = 'fail'; item.append('FALHOU: ' + (error?.message || error)); failed++; }
+    summary.textContent = passed + ' aprovados · ' + failed + ' falhas';
+  };
+  const dbName = 'silm-a22-browser-test-' + crypto.randomUUID();
+  const store = SILM.createMultiphysicsIndexedDBStore({ databaseName: dbName });
+  const store2 = SILM.createMultiphysicsIndexedDBStore({ databaseName: dbName });
+  const runId = 'run-a22-indexeddb-0001';
+  const experiment = {
+    id: 'exp-a22-indexeddb-0001', revision: 1,
+    createdAt: '2026-11-04T12:00:00.000Z', schemaVersion: '1.0.0'
+  };
+  const geometry = { geometryId: 'geo-a22-indexeddb-0001', revision: 1, referenceRevision: 1 };
+  const manifest = { runId, experimentId: experiment.id, definitionRevision: 1 };
+  const initialRuntime = () => ({
+    schemaId: 'silm.multiphysics.runtime', schemaVersion: '1.0.0', runId,
+    experimentId: experiment.id, definitionRevision: 1, status: 'prepared', acceptedStep: 0,
+    geometry: structuredClone(geometry), meshes: [], fields: [], domainReports: [],
+    acceptedCoordinate: { kind: 'time', timeS: 0 }, referenceRevision: 1,
+    updatedAt: '2026-11-04T12:00:00.000Z'
+  });
+  const checkpoint = (step, runtime) => ({
+    runId, acceptedStep: step, acceptedCoordinate: structuredClone(runtime.acceptedCoordinate),
+    domainStates: { electrical: { step } }, geometry: structuredClone(runtime.geometry), runtime: structuredClone(runtime)
+  });
+  const event = (sequence, type) => ({
+    eventId: 'event-a22-indexeddb-' + String(sequence).padStart(4, '0'),
+    runId, sequence, type, createdAt: '2026-11-04T12:00:00.000Z'
+  });
+  const makeField = async (step, suffix) => {
+    const fieldId = 'field-a22-' + suffix + '-' + String(step).padStart(4, '0');
+    const data = Uint8Array.of(step, suffix.length, 17);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    const checksum = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+    const meshId = 'mesh-a22-' + suffix + '-0001';
+    return {
+      metadata: {
+        fieldId, domain: 'electrical', name: 'test.field', meshId, unit: '1',
+        timeS: step / 10, geometryRevision: 1, storageRef: 'idb://' + fieldId,
+        checksum, valueType: 'uint8', shape: [3]
+      },
+      block: { fieldId, data }
+    };
+  };
+  const buildCommit = async ({ step, expectedStorageRevision, expectedSnapshotId, snapshotId, eventSequence, suffix }) => {
+    const field = await makeField(step, suffix);
+    const runtime = {
+      ...initialRuntime(), status: step === 2 ? 'converged' : 'running', acceptedStep: step,
+      geometry: { ...geometry, parentRevision: 1 }, acceptedCoordinate: { kind: 'time', timeS: step / 10 },
+      meshes: [{ meshId: field.metadata.meshId, domain: 'electrical', geometryRevision: 1, version: 'mock-1' }],
+      fields: [field.metadata], lastAcceptedSnapshotId: snapshotId,
+      updatedAt: '2026-11-04T12:00:00.000Z'
+    };
+    const snapshot = {
+      snapshotId, runId, experimentId: experiment.id, definitionRevision: 1,
+      accepted: true, converged: true, fieldRefs: [field.metadata.fieldId],
+      coordinate: runtime.acceptedCoordinate, createdAt: '2026-11-04T12:00:00.000Z'
+    };
+    return {
+      runId, expectedStorageRevision, expectedAcceptedStep: step - 1,
+      expectedSnapshotId, runtime, checkpoint: checkpoint(step, runtime), snapshot,
+      fields: [field.metadata], fieldBlocks: [field.block],
+      event: event(eventSequence, 'step-committed')
+    };
+  };
+  try {
+    await test('Criação atômica de definição, run, checkpoint e auditoria', async () => {
+      const runtime = initialRuntime();
+      const result = await store.createRun({
+        runId, experiment, manifest, runtime, checkpoint: checkpoint(0, runtime),
+        event: event(1, 'run-prepared')
+      });
+      assert(result.ok && result.storageRevision === 0, 'createRun não confirmou');
+      const loaded = await store.readRun(runId);
+      assert(loaded?.experiment?.id === experiment.id, 'definição não foi recuperada');
+      assert(loaded.events.length === 1 && loaded.checkpoint.acceptedStep === 0, 'documentos iniciais incompletos');
+    });
+
+    await test('Transição prepared → running sem avançar o passo aceito', async () => {
+      const loaded = await store.readRun(runId);
+      const runtime = { ...loaded.runtime, status: 'running', updatedAt: '2026-11-04T12:00:01.000Z' };
+      const result = await store.transition({
+        runId, expectedStorageRevision: loaded.storageRevision, runtime,
+        checkpoint: { ...loaded.checkpoint, runtime },
+        event: event(2, 'run-started')
+      });
+      assert(result.ok && result.storageRevision === 1, 'transição não confirmou');
+      const current = await store.readRun(runId);
+      assert(current.runtime.status === 'running' && current.runtime.acceptedStep === 0, 'runtime alterado indevidamente');
+    });
+
+    await test('Commit persiste snapshot, metadados, bytes, malha e checkpoint juntos', async () => {
+      const commit = await buildCommit({
+        step: 1, expectedStorageRevision: 1, expectedSnapshotId: null,
+        snapshotId: 'result-a22-indexeddb-0001', eventSequence: 3, suffix: 'electric'
+      });
+      const result = await store.commitStep(commit);
+      assert(result.ok && result.storageRevision === 2, 'commit não confirmou');
+      const loaded = await store.readRun(runId);
+      assert(loaded.runtime.acceptedStep === 1 && loaded.snapshots.length === 1, 'snapshot/runtime divergentes');
+      assert(loaded.fields.length === 1 && loaded.meshes.length === 1, 'metadados ausentes');
+      const block = await store.getFieldBlock(runId, commit.fields[0].fieldId);
+      assert(block?.data?.byteLength === 3, 'bloco binário não foi persistido');
+      const digest = await crypto.subtle.digest('SHA-256', block.data);
+      const checksum = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+      assert(checksum === commit.fields[0].checksum, 'checksum do bloco diverge');
+    });
+
+    await test('Checksum incorreto bloqueia gravação antes da transação', async () => {
+      const loaded = await store.readRun(runId);
+      const commit = await buildCommit({
+        step: 2, expectedStorageRevision: loaded.storageRevision,
+        expectedSnapshotId: loaded.runtime.lastAcceptedSnapshotId,
+        snapshotId: 'result-a22-checksum-failure-0001', eventSequence: 4, suffix: 'checksum'
+      });
+      commit.fieldBlocks[0].data[0] = 255;
+      const result = await store.commitStep(commit);
+      assert(!result.ok && result.reason === 'FIELD_BLOCK_SET_INCOMPLETE' || !result.ok && result.reason === 'FIELD_CHECKSUM_MISMATCH', 'checksum incorreto aceito');
+      const current = await store.readRun(runId);
+      assert(current.runtime.acceptedStep === 1 && current.snapshots.length === 1, 'falha alterou estado aceito');
+    });
+
+    await test('Abort de transação após colisão de snapshot reverte todas as stores', async () => {
+      const loaded = await store.readRun(runId);
+      const commit = await buildCommit({
+        step: 2, expectedStorageRevision: loaded.storageRevision,
+        expectedSnapshotId: loaded.runtime.lastAcceptedSnapshotId,
+        snapshotId: 'result-a22-indexeddb-0001', eventSequence: 4, suffix: 'rollback'
+      });
+      const result = await store.commitStep(commit);
+      assert(!result.ok, 'snapshot duplicado deveria abortar');
+      const current = await store.readRun(runId);
+      assert(current.runtime.acceptedStep === 1 && current.storageRevision === 2, 'run avançou apesar do abort');
+      assert(current.snapshots.length === 1 && current.fields.length === 1, 'metadados parciais sobreviveram');
+      assert(await store.getFieldBlock(runId, commit.fields[0].fieldId) === null, 'bloco binário parcial sobreviveu');
+    });
+
+    await test('Duas conexões não confirmam sobre a mesma revisão-base', async () => {
+      const loaded = await store.readRun(runId);
+      const a = await buildCommit({
+        step: 2, expectedStorageRevision: loaded.storageRevision,
+        expectedSnapshotId: loaded.runtime.lastAcceptedSnapshotId,
+        snapshotId: 'result-a22-race-a-0001', eventSequence: 4, suffix: 'racea'
+      });
+      const b = await buildCommit({
+        step: 2, expectedStorageRevision: loaded.storageRevision,
+        expectedSnapshotId: loaded.runtime.lastAcceptedSnapshotId,
+        snapshotId: 'result-a22-race-b-0001', eventSequence: 4, suffix: 'raceb'
+      });
+      const results = await Promise.all([store.commitStep(a), store2.commitStep(b)]);
+      assert(results.filter(item => item.ok).length === 1, 'não houve exatamente um vencedor');
+      const rejected = results.find(item => !item.ok);
+      assert(['STORAGE_CONFLICT', 'STALE_CANDIDATE'].includes(rejected.reason), 'motivo de conflito inesperado');
+      const current = await store.readRun(runId);
+      assert(current.runtime.acceptedStep === 2 && current.snapshots.length === 2, 'estado final inconsistente');
+    });
+
+    await test('Reabertura do banco recupera o último estado confirmado', async () => {
+      const before = await store.readRun(runId);
+      await store.close();
+      const reopened = SILM.createMultiphysicsIndexedDBStore({ databaseName: dbName });
+      const after = await reopened.readRun(runId);
+      assert(after.runtime.acceptedStep === before.runtime.acceptedStep, 'passo aceito não persistiu');
+      assert(after.runtime.lastAcceptedSnapshotId === before.runtime.lastAcceptedSnapshotId, 'ponteiro do snapshot divergiu');
+      assert(after.events.length === 4, 'auditoria não foi preservada');
+      await reopened.close();
+      await store2.close();
+      await new Promise(resolve => {
+        const deletion = indexedDB.deleteDatabase(dbName);
+        deletion.onsuccess = resolve;
+        deletion.onerror = resolve;
+        deletion.onblocked = resolve;
+      });
+    });
+  } catch (error) {
+    failed++;
+    summary.textContent = passed + ' aprovados · ' + failed + ' falhas';
+    const item = document.createElement('li');
+    item.className = 'fail';
+    item.textContent = 'Falha no executor: ' + (error?.message || error);
+    output.append(item);
+  }
+  if (!failed) summary.textContent += ' · suíte concluída';
+  document.body.dataset.testResult = failed ? 'failed' : 'passed';
+})();
+</script>
+</body>
+</html>
