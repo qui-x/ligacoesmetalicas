@@ -83,17 +83,16 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienc
    quickActions?.toggleElectrons?.();refreshScene();renderViewers();
   }});
   const crystalActions=actionGroup(root,'Célula e rede cristalina');
-  const unavailableCrystal=!crystal?'Organize a montagem para habilitar a célula e a rede':!canExplore?'Disponível no módulo Explorar':'';
   actionButton(crystalActions,{id:'view-toggle',label:crystal?(rep.view==='cell'?'Mostrar rede':'Mostrar célula'):'Célula / rede',path:actionIcons.view,pressed:!!crystal&&rep.view==='lattice',disabled:!crystal||!canObserve,reason:!crystal?'Organize a montagem para habilitar a célula e a rede':activityLocked?'Recurso restrito nesta atividade':'',onClick:()=>{
-   if(!crystal||!canExplore)return;
+   if(!crystal||!canObserve)return;
    model.setCrystalRepresentation({view:rep.view==='cell'?'lattice':'cell'});refreshScene();renderViewers();
   }});
   actionButton(crystalActions,{id:'unit-cell',label:rep?.unitCell?'Ocultar célula unitária':'Mostrar célula unitária',path:actionIcons.cell,pressed:!!rep?.unitCell,disabled:!crystal||!canObserve,reason:!crystal?'Organize a montagem para habilitar a célula unitária':activityLocked?'Recurso restrito nesta atividade':'',onClick:()=>{
-   if(!crystal||!canExplore)return;
+   if(!crystal||!canObserve)return;
    model.setCrystalRepresentation({unitCell:!rep.unitCell});refreshScene();renderViewers();
   }});
   actionButton(crystalActions,{id:'neighbors',label:rep?.neighbors?'Ocultar vizinhos':'Mostrar vizinhos',path:actionIcons.neighbors,pressed:!!rep?.neighbors,disabled:!crystal||!canObserve,reason:!crystal?'Organize a montagem para habilitar os vizinhos':activityLocked?'Recurso restrito nesta atividade':'',onClick:()=>{
-   if(!crystal||!canExplore)return;
+   if(!crystal||!canObserve)return;
    const enabling=!rep.neighbors,patch={neighbors:enabling};
    if(enabling&&!rep.selectedUnitId&&structure.units.length)patch.selectedUnitId=structure.units[0].id;
    model.setCrystalRepresentation(patch);refreshScene();renderViewers();
