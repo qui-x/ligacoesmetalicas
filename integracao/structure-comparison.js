@@ -39,15 +39,17 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
  const count=N('span','0 estruturas','silm-structure-count');count.setAttribute('role','status');
  toolbar.append(count,layoutButton);
  const cards=N('div',null,'silm-structure-cards');host.append(intro,toolbar,cards);
- const actionbar=document.querySelector('#si-workspace .si-actionbar');
  const strip=N('div',null,'silm-overview-strip');strip.setAttribute('role','group');strip.setAttribute('aria-label','Estruturas salvas');
  const stripLabel=N('div',null,'silm-overview-strip-label');stripLabel.append(N('span','Estruturas'),N('strong','0'));
  const chips=N('div',null,'silm-overview-chips');
  const add=N('button','+ Nova estrutura','button outline silm-overview-new');add.type='button';add.addEventListener('click',()=>newStructure?.());
- strip.append(stripLabel,chips,add);actionbar?.append(strip);
+ strip.append(stripLabel,chips,add);
+ // A faixa é conteúdo exclusivo da Visão geral: deve ser filha do painel de gerenciamento,
+ // nunca da barra de ações compartilhada com o Foco.
+ host.append(strip);
  const defaultName=state=>{
   const e=S.data.get(state.metal.atomicNumber),structure=state.structure;
-  const label=structure.mode==='crystalline'?S.crystal.label(structure.crystallography?.structureType,e):'Montagem livre';
+  const label=structure.mode==='crystalline'?'Estrutura cristalina':'Montagem livre';
   return (e?.name||'Estrutura')+' · '+label;
  };
  function persist(next){

@@ -953,3 +953,28 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
  #silm-comparison-items .silm-structure-card[data-current=true]{border:2px solid Highlight}
  #silm-comparison-items .silm-structure-card-detail{border:1px solid CanvasText}
 }
+
+/* Escopo da Visão geral: a faixa de estruturas mora no gerenciador, nunca na barra do Foco. */
+#si-workspace[data-view-mode=overview] .si-actionbar{display:none!important}
+#silm-comparison-items>.silm-overview-strip{
+ display:flex!important;align-items:center;gap:12px;width:100%;min-width:0;
+ padding:10px 0 2px;border-top:1px solid var(--border);
+}
+#silm-comparison-items .silm-overview-strip-label{
+ display:flex;flex-direction:column;flex:none;min-width:86px;
+ color:var(--muted);font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;line-height:1.3;
+}
+#silm-comparison-items .silm-overview-strip-label strong{color:var(--text);font-size:.9rem;letter-spacing:0}
+#silm-comparison-items .silm-overview-chips{display:flex;flex:1 1 auto;gap:8px;min-width:0;padding:2px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
+#silm-comparison-items .silm-overview-chip{display:flex;flex:none;align-items:center;gap:8px;min-height:44px;padding:5px 12px 5px 6px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font:inherit;text-align:left;cursor:pointer}
+#silm-comparison-items .silm-overview-chip[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+#silm-comparison-items .silm-overview-chip[aria-pressed=true] strong{color:var(--accent)}
+#silm-comparison-items .silm-overview-chip-symbol{display:grid;place-items:center;flex:none;width:30px;height:30px;border:1px solid var(--silm-bronze,var(--border));border-radius:50%;font-size:.76rem;font-weight:800}
+#silm-comparison-items .silm-overview-chip strong{display:block;font-size:.8rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#silm-comparison-items .silm-overview-chip small{display:block;color:var(--muted);font-size:.69rem;line-height:1.2}
+#silm-comparison-items .silm-overview-new{flex:none;margin-left:auto;min-height:40px;white-space:nowrap}
+@media(max-width:600px){
+ #silm-comparison-items>.silm-overview-strip{gap:8px;flex-wrap:wrap}
+ #silm-comparison-items .silm-overview-strip-label{display:none}
+ #silm-comparison-items .silm-overview-new{min-height:38px}
+}

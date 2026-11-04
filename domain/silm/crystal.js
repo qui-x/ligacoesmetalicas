@@ -283,7 +283,7 @@ SILM.crystal=(()=>{
   for(const [,i,j]of pairs){if(unitTaken.has(i)||siteTaken.has(j))continue;unitTaken.add(i);siteTaken.add(j);assigned[i]=targets[j];}
   return {assigned,missing:targets.filter((_,j)=>!siteTaken.has(j))};
  }
- const label=(id,e)=>{const m=MODELS[id];if(m)return m.code+' ('+m.international+') · '+m.name;const ref=e&&eligibility(e).reference;if(GENERAL[id])return ref?ref.label+' · grupo espacial '+ref.spaceGroup:GENERAL[id].name;return id;};
+ const label=(id,e)=>{const m=MODELS[id];if(m)return m.code+' — '+m.name;const ref=e&&eligibility(e).reference;if(GENERAL[id])return ref?ref.label+' · grupo espacial '+ref.spaceGroup:GENERAL[id].name;return id;};
  return Object.freeze({models:Object.freeze({...MODELS,...GENERAL}),canonicalModels:MODELS,generalTypes:GENERAL,isGeneral:id=>!!GENERAL[id],typeByDatabase:TYPE_BY_DB,reasons:REASONS,structureTypes:Object.freeze([...Object.keys(MODELS),...Object.keys(GENERAL)]),
   eligibility,geometry,projector,layout,organize,expandSites,matchesBasis,parseOperation,key,label,projections:PROJECTIONS,views:VIEWS,projectorFor,layoutFor,presets3D:PRESETS3D,orientation3D,layout3D});
 })();

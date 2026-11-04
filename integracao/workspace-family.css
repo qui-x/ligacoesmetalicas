@@ -265,3 +265,28 @@ body.si-structure-expanded #silm-scene-actionbar{flex:0 0 auto!important;min-hei
 @media(max-width:900px){.silm-structure-cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}.silm-structure-card-actions button{min-height:42px}}
 @media(max-width:520px){.silm-structure-cards,.silm-structure-cards[data-layout=list]{grid-template-columns:minmax(0,1fr)}.silm-structure-card{padding:10px}.silm-structure-preview{height:126px}}
 @media(forced-colors:active){.silm-structure-card[data-current=true]{border:2px solid Highlight}.silm-structure-status{border:1px solid CanvasText}.silm-structure-preview{border:1px solid CanvasText}}
+
+/* Menu nativo de projeções: esquema claro explícito para evitar texto claro sobre lista branca. */
+.silm-quick-projection{color-scheme:light}
+.silm-quick-projection select{
+ color:#202329!important;-webkit-text-fill-color:#202329;
+ background-color:#fff!important;color-scheme:light;
+}
+.silm-quick-projection select optgroup{
+ color:#604515!important;background-color:#fff!important;font-weight:800;
+}
+.silm-quick-projection select option{
+ color:#202329!important;background-color:#fff!important;font-weight:500;
+}
+.silm-quick-projection select option:checked{
+ color:#17191d!important;background-color:#dfc16e!important;
+}
+.silm-quick-projection select option:disabled{
+ color:#777d86!important;-webkit-text-fill-color:#777d86;opacity:1!important;
+}
+@media(forced-colors:active){
+ .silm-quick-projection select{color:FieldText!important;background:Field!important}
+ .silm-quick-projection select optgroup,.silm-quick-projection select option{color:CanvasText!important;background:Canvas!important}
+ .silm-quick-projection select option:checked{color:HighlightText!important;background:Highlight!important}
+ .silm-quick-projection select option:disabled{color:GrayText!important}
+}
