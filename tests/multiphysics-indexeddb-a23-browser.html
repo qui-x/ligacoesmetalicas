@@ -80,10 +80,14 @@ code{overflow-wrap:anywhere}
         domainReports: [], acceptedCoordinate: { kind: 'time', timeS: 0 },
         referenceRevision: 1, updatedAt: new Date().toISOString()
       };
-      const manifest = { runId, experimentId: experiment.id, definitionRevision: 1 };
+      const manifest = {
+        runId, experimentId: experiment.id, definitionRevision: 1,
+        domains: ['electrical'], solverVersions: { electrical: 'test-solver-1' }
+      };
       const checkpoint0 = {
         runId, acceptedStep: 0, acceptedCoordinate: structuredClone(runtime0.acceptedCoordinate),
-        domainStates: {}, geometry: structuredClone(runtime0.geometry), runtime: structuredClone(runtime0)
+        domainStates: { electrical: { initialized: true } }, solverVersions: { electrical: 'test-solver-1' },
+        geometry: structuredClone(runtime0.geometry), runtime: structuredClone(runtime0)
       };
       const event1 = { eventId: 'event-a23-0001', runId, sequence: 1, type: 'run-prepared', createdAt: new Date().toISOString() };
       const created = await store.createRun({ runId, experiment, manifest, runtime: runtime0, checkpoint: checkpoint0, event: event1 });
@@ -124,7 +128,8 @@ code{overflow-wrap:anywhere}
       };
       const checkpoint1 = {
         runId, acceptedStep: 1, acceptedCoordinate: structuredClone(runtime1.acceptedCoordinate),
-        domainStates: {}, geometry: structuredClone(runtime1.geometry), runtime: structuredClone(runtime1)
+        domainStates: { electrical: { step: 1 } }, solverVersions: { electrical: 'test-solver-1' },
+        geometry: structuredClone(runtime1.geometry), runtime: structuredClone(runtime1)
       };
       const committed = await store.commitStep({
         runId, expectedStorageRevision: 1, expectedAcceptedStep: 0, expectedSnapshotId: null,
@@ -154,6 +159,30 @@ code{overflow-wrap:anywhere}
       const result = await store.verifyCheckpoint(runId);
       assert(!result.ok && result.reason === 'CHECKPOINT_METADATA_MISMATCH', 'checkpoint adulterado foi aceito: ' + result.reason);
       await transact(db, ['checkpoints'], 'readwrite', tx => tx.objectStore('checkpoints').put(original.checkpoint));
+      assert((await store.verifyCheckpoint(runId)).ok, 'restauração do checkpoint de teste falhou');
+    });
+
+    await test('Versões dos solvers e estados dos domínios devem corresponder ao manifesto', async () => {
+      const db = await store.open();
+      const original = (await store.readRun(runId)).checkpoint;
+      await transact(db, ['checkpoints'], 'readwrite', tx => {
+        const req = tx.objectStore('checkpoints').get(runId);
+        req.onsuccess = () => {
+          const value = req.result;
+          value.solverVersions = { electrical: 'obsolete-solver' };
+          tx.objectStore('checkpoints').put(value);
+        };
+      });
+      let result = await store.verifyCheckpoint(runId);
+      assert(!result.ok && result.reason === 'CHECKPOINT_SOLVER_VERSION_MISMATCH', 'versão divergente foi aceita: ' + result.reason);
+      await transact(db, ['checkpoints'], 'readwrite', tx => {
+        const value = structuredClone(original);
+        value.domainStates = {};
+        tx.objectStore('checkpoints').put(value);
+      });
+      result = await store.verifyCheckpoint(runId);
+      assert(!result.ok && result.reason === 'CHECKPOINT_DOMAIN_STATES_MISMATCH', 'estados de domínio divergentes foram aceitos: ' + result.reason);
+      await transact(db, ['checkpoints'], 'readwrite', tx => tx.objectStore('checkpoints').put(original));
       assert((await store.verifyCheckpoint(runId)).ok, 'restauração do checkpoint de teste falhou');
     });
 
