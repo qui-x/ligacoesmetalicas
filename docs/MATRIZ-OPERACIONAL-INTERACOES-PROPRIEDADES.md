@@ -99,7 +99,7 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 | E + M | Condição elétrica; tração ou compressão; geometria e apoios | Deformação muda geometria e pode criar defeitos/dislocações que alteram a resistividade | Prioridade 2; primeiro qualitativo e separado de eletroplasticidade |
 | E + O | Condição elétrica DC; espectro, incidência e polarização da luz; função dielétrica/resposta óptica espectral | Origem eletrônica compartilhada, mas respostas em frequências distintas; refletância via Fresnel a partir de n(λ), κ(λ) ou ε̃(ω) | Especificada em ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md; implementação bloqueada até dados espectrais homologados |
 | T + M | Gradiente/fonte térmica; carregamento mecânico; apoios | Expansão térmica e variação da resposta mecânica com temperatura; restrição pode gerar tensão térmica | Prioridade 1 |
-| T + O | Luz e absorção espectral; condição térmica e fronteiras | Luz absorvida atua como fonte de calor; temperatura pode alterar resposta óptica | Prioridade 2, depende de absorção/óptica espectral |
+| T + O | Espectro/irradiância, R+A+Topt, perfil de absorção, propriedades térmicas, fronteiras e R(λ,T) ou CTR | Absorção óptica gera fonte térmica; difusão muda T; temperatura realimenta refletância/absorção | Especificada em ESPECIFICACAO-ACOPLAMENTO-TERMO-OPTICO.md; bloqueada até homologar dados e balanços |
 | M + O | Carregamento mecânico; superfície; iluminação | Deformação altera orientação, forma e rugosidade da superfície, mudando a reflexão geométrica | Prioridade 1 simplificada |
 
 ### 4.1 Regras específicas por par
@@ -137,9 +137,15 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 - Manter E+O bloqueada até os dados espectrais e os testes do motor óptico serem homologados.
 
 **T + O**
-- Só converter iluminação em calor quando a absorção estiver definida.
-- Não assumir que toda luz incidente é absorvida.
-- Separar energia incidente, refletida, transmitida e absorvida quando o modelo de balanço estiver disponível.
+- Separar potência incidente, refletida, absorvida e transmitida; não assumir que toda luz incidente vira calor.
+- Converter apenas a parcela absorvida em fonte térmica, com perfil espacial compatível com profundidade de absorção e camadas.
+- Resolver difusão térmica com ρ, cp, k e condições de contorno explícitas; não usar taxa de quadros como tempo físico nem malha atômica como amostra macroscópica.
+- Atualizar R(λ,T), n(λ,T), κ(λ,T) ou CTR(λ,T0) somente com dados/modelo validados na faixa da amostra.
+- Preservar o sinal de CTR: aquecer não significa necessariamente aumentar o brilho.
+- Diferenciar feixe de bomba (aquece) e prova (mede) no modo pump–probe; incluir a potência da prova no balanço se seu aquecimento não for desprezível.
+- Ao desligar a bomba, interromper a fonte óptica, mas manter a evolução térmica até o equilíbrio imposto pelas fronteiras.
+- Não confundir refletância visível com emissividade térmica; a relação de Kirchhoff exige mesma faixa espectral e condições direcionais/polarização.
+- Manter T+O bloqueada como interação quantitativa até homologar absorção, propriedades térmicas, resposta óptica dependente de T e testes de conservação.
 
 ## 5. Combinações de três e quatro famílias
 
