@@ -114,7 +114,6 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    if(enabling&&!rep.selectedUnitId&&structure.units.length)patch.selectedUnitId=structure.units[0].id;
    model.setCrystalRepresentation(patch);refreshScene();renderViewers();
   }});
-  const experience=experienceInfo?.()||{};
   const propertyActions=actionGroup(root,'Propriedades metálicas');
   const propertyInfo=[
    ['electrical','Condutividade elétrica',actionIcons.electrical],
