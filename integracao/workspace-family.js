@@ -17,11 +17,6 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienc
   'electrical|malleability':'malleabilityElectrical',
   'ductility|electrical':'ductilityElectrical'
  };
- const propertyComboNames={
-  heatElectrical:'Calor + corrente',
-  malleabilityElectrical:'Maleabilidade + corrente',
-  ductilityElectrical:'Ductilidade + corrente'
- };
  function onModifierRelease(event){
   if((event.key==='Control'||event.key==='Meta')&&ctrlSelectionPending){
    ctrlSelectionPending=false;applyPendingSelection?.();
@@ -187,6 +182,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienc
     }
     ok=!!quickActions?.activateCombination?.(combination);
     if(!ok){
+     syncPropertySelection();
      propertyHelp.textContent='Esta combinação não está disponível para a estrutura atual. Confira a elegibilidade das propriedades.';
      return false;
     }
