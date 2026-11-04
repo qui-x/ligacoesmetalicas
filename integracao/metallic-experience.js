@@ -60,6 +60,12 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   if(!target||!allows(target))return false;
   const state=model.state,starting=state.properties.active!==target;
   if(starting&&!toggleProperty(target))return false;
+  // Ao trocar a experiência, sincroniza primeiro a chave transitória dos controladores.
+  // Só depois liga o efeito complementar, para que o primeiro render não o interprete como resíduo antigo.
+  if(starting){
+   if(kind==='heatElectrical')thermal()?.sync();
+   else drive()?.sync();
+  }
   // P7: calor + corrente (fonte transitória) ou deformação + corrente (campo transitório).
   if(kind==='heatElectrical'){
    if(model.state.structure?.mode!=='crystalline')return false;
