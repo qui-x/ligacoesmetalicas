@@ -45,7 +45,7 @@ SILM.renderer2d=(()=>{
 
  function createStage(stage,{scope,area=null,readOnly=false,idPrefix='silm',camera:initial=null,reducedMotion=()=>false,announce=()=>{},describe=null,
   onCamera=null,onBackgroundTap=null,onUnitTap=null,onUnitPress=null,items=()=>[],focusPoint=null,canArrowPan=()=>true,onReset=null,toolbar=!readOnly,
-  ownsUnitDrag=false,onGestureStart=null,toggleHost=null,onOrbit=null,extraButtons=null}={}){
+  ownsUnitDrag=false,onGestureStart=null,toggleHost=null,toolbarHost=null,onOrbit=null,extraButtons=null}={}){
   const U=SimCore.ExperienceUI;
   let cam=R.sanitizeCamera(initial||R.camera()),interest={x0:0,y0:0,x1:1,y1:1},margin=0,size=0,dragMode='pan';
   stage.classList.add('silm-stage');stage.dataset.renderer='2d';if(readOnly)stage.dataset.readonly='';
@@ -68,22 +68,28 @@ SILM.renderer2d=(()=>{
   /* ---------- barra de câmera (fora do palco, sobre o canto da cena; gramática de controles da família) ---------- */
   let bar=null,zoomLabel=null,inButton=null,outButton=null,dock=null,buttons=[],orbitButtons=[];
   if(toolbar&&area){
-   /* No celular e na paisagem curta, a barra fica recolhida atrás de "Vista" (como "Doses" no SIAB): a cena não fica coberta. */
-   dock=U.element('div',null,'silm-camera');const toggle=U.element('button',null,'secondary-btn silm-camera-toggle');toggle.type='button';toggle.id=idPrefix+'-camera-toggle';
-   toggle.append(U.element('span','Vista'));toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-controls',idPrefix+'-camera-bar');toggle.title='Mostrar ou ocultar os controles da vista';
+   dock=U.element('div',null,'silm-camera'+(toolbarHost?' silm-camera-inline':''));
    bar=U.element('div',null,'silm-camera-bar');bar.id=idPrefix+'-camera-bar';bar.setAttribute('role','toolbar');bar.setAttribute('aria-label','Controles da vista');
-   scope.listen(toggle,'click',()=>{const open=dock.dataset.open===undefined;if(open)dock.dataset.open='';else delete dock.dataset.open;toggle.setAttribute('aria-expanded',String(open));if(open)(bar.querySelector('button[tabindex="0"]')||bar.querySelector('button'))?.focus();});
-   scope.listen(dock,'keydown',e=>{if(e.key==='Escape'&&dock.dataset.open!==undefined&&getComputedStyle(toggle).display!=='none'){e.preventDefault();e.stopPropagation();delete dock.dataset.open;toggle.setAttribute('aria-expanded','false');toggle.focus();}});
-   // toggleHost: o botão "Vista" fica nas ferramentas do cabeçalho da cena (não cobre unidades em 320 px).
-   if(toggleHost){toggleHost.append(toggle);dock.append(bar);}else dock.append(toggle,bar);
+   if(toolbarHost){
+    dock.dataset.inline='';dock.append(bar);toolbarHost.append(dock);
+    // O host persiste fora da cena; remover a faixa ao destruir a instância evita comandos órfãos.
+    scope.cleanup(()=>dock.remove());
+   }else{
+    /* Na montagem livre, os controles continuam recolhíveis para não cobrir as unidades. */
+    const toggle=U.element('button',null,'secondary-btn silm-camera-toggle');toggle.type='button';toggle.id=idPrefix+'-camera-toggle';
+    toggle.append(U.element('span','Vista'));toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-controls',idPrefix+'-camera-bar');toggle.title='Mostrar ou ocultar os controles da vista';
+    scope.listen(toggle,'click',()=>{const open=dock.dataset.open===undefined;if(open)dock.dataset.open='';else delete dock.dataset.open;toggle.setAttribute('aria-expanded',String(open));if(open)(bar.querySelector('button[tabindex="0"]')||bar.querySelector('button'))?.focus();});
+    scope.listen(dock,'keydown',e=>{if(e.key==='Escape'&&dock.dataset.open!==undefined&&getComputedStyle(toggle).display!=='none'){e.preventDefault();e.stopPropagation();delete dock.dataset.open;toggle.setAttribute('aria-expanded','false');toggle.focus();}});
+    if(toggleHost){toggleHost.append(toggle);dock.append(bar);}else dock.append(toggle,bar);
+    area.append(dock);
+   }
    const button=(id,glyph,label,key,run)=>{const b=U.element('button',null,'secondary-btn silm-camera-btn');b.type='button';b.id=idPrefix+'-camera-'+id;b.setAttribute('aria-label',label);b.title=label+' (tecla '+key+')';b.tabIndex=-1;
     const g=U.element('span',glyph,'silm-camera-glyph');g.setAttribute('aria-hidden','true');b.append(g);scope.listen(b,'click',()=>{if(b.getAttribute('aria-disabled')!=='true')run();});return b;};
    inButton=button('in','+','Aproximar','+',()=>zoomStep(Z.step));outButton=button('out','−','Afastar','−',()=>zoomStep(1/Z.step));
    const fitButton=button('fit','⤢','Enquadrar a estrutura','F',()=>fitNow()),centerButton=button('center','⌖','Centralizar','C',()=>centerNow()),resetButton=button('reset','↺','Restaurar vista','0',()=>resetNow());
    // Valor do zoom só visual: <output> seria região viva e falaria a cada quadro do gesto; o anúncio é um por gesto.
    zoomLabel=U.element('span',zoomText(),'silm-camera-zoom');zoomLabel.id=idPrefix+'-camera-zoom';zoomLabel.setAttribute('aria-hidden','true');
-   // Ordem de leitura (e do teclado) em pares: aproximar, afastar, zoom; enquadrar, centralizar; restaurar (e tela cheia).
-   bar.append(inButton,outButton,zoomLabel,fitButton,centerButton,resetButton);inButton.tabIndex=0;area.append(dock);
+   bar.append(inButton,outButton,zoomLabel,fitButton,centerButton,resetButton);inButton.tabIndex=0;
    buttons=[inButton,outButton,fitButton,centerButton,resetButton];
    // 0.12.x: girar a vista 3D (só aparecem no modo 'orbit') e botões extras da vista (perspectiva/ortográfica).
    if(onOrbit){orbitButtons=[button('yaw-left','⟲','Girar para a esquerda','J',()=>orbitKey(-1,0)),button('yaw-right','⟳','Girar para a direita','L',()=>orbitKey(1,0)),
