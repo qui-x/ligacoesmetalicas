@@ -30,7 +30,6 @@
 .silm-observer-center-tag[hidden]{display:none!important}
 .silm-assembly[data-observer-centers=true] .silm-unit-core{outline:2px solid var(--scientific-accent);outline-offset:2px;box-shadow:0 0 0 4px color-mix(in srgb,var(--scientific-accent) 20%,transparent),inset 0 -2px 4px #0006}
 .silm-crystal[data-observer-centers=true] .silm-crystal-unit .silm-unit-core{outline:2px solid var(--scientific-accent);outline-offset:2px}
-.silm-crystal[data-observer-centers=true] .silm-site-label:not(:empty){display:block}
 .silm-assembly[data-editable=false] .silm-unit{cursor:default}
 .silm-unit:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 /* Seleção: anel tracejado + contorno espesso; não depende somente de cor. */
