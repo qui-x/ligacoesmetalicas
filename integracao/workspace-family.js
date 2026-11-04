@@ -139,10 +139,12 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   function selectionSignature(){return [...selectedProperties].sort().join('|');}
   function syncPropertySelection(){
    for(const [id,button]of propertyButtons){
-    const chosen=selectedProperties.has(id),active=state.properties?.active===id;
+    const chosen=selectedProperties.has(id),activityState=quickActions?.propertyState?.(id);
+    const active=activityState?.active??(state.properties?.active===id),combined=!!activityState?.combined;
     button.dataset.multiSelected=String(chosen);
+    button.dataset.combinedActive=String(combined);
     button.setAttribute('aria-pressed',String(chosen||active));
-    button.title=chosen?'Selecionada para análise conjunta: '+propertyLabels[id]:button.disabled&&button.dataset.disabledReason?button.dataset.disabledReason:'Ctrl (ou ⌘) + clique para selecionar junto com outra propriedade.';
+    button.title=chosen?'Selecionada para análise conjunta: '+propertyLabels[id]:combined?'Ativa como efeito complementar da combinação: '+propertyLabels[id]:button.disabled&&button.dataset.disabledReason?button.dataset.disabledReason:'Ctrl (ou ⌘) + clique para selecionar junto com outra propriedade.';
    }
    const names=[...selectedProperties].map(id=>propertyLabels[id]);
    if(names.length){
@@ -201,7 +203,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   applySelectionButton.addEventListener('click',applyPropertySelection);
   clearSelectionButton.addEventListener('click',clearPropertySelection);
   for(const [id,label,path]of propertyInfo){
-   const active=state.properties?.active===id,availability=element?model.propertyAvailability(id):{ok:false,reason:'NO_STRUCTURE'};
+   const activityState=quickActions?.propertyState?.(id),active=activityState?.active??(state.properties?.active===id),availability=element?model.propertyAvailability(id):{ok:false,reason:'NO_STRUCTURE'};
    const why=availability.ok?'':SILM.properties.reasons[availability.reason]||'Prepare a estrutura para esta experiência.';
    const button=actionButton(propertyActions,{id:'property-'+id,label,path,pressed:active,disabled:!canExplore||(!active&&!availability.ok),reason:why,hint:'Clique para uma experiência isolada; Ctrl (ou ⌘) + clique para selecionar em conjunto.',onClick:event=>{
     const withModifier=!!(event?.ctrlKey||event?.metaKey);
