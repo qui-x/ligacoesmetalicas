@@ -342,13 +342,52 @@
       return value?.runId === runId ? value.value : null;
     }
 
+    async function verifyCheckpoint(runId) {
+      const loaded = await readRun(runId);
+      if (!loaded) return fail('RUN_NOT_FOUND');
+      const runtime = loaded.runtime;
+      const checkpoint = loaded.checkpoint;
+      if (!checkpoint || checkpoint.runId !== runId || checkpoint.acceptedStep !== runtime.acceptedStep ||
+          checkpoint.runtime?.acceptedStep !== runtime.acceptedStep ||
+          checkpoint.geometry?.revision !== runtime.geometry?.revision ||
+          checkpoint.geometry?.referenceRevision !== runtime.geometry?.referenceRevision) {
+        return fail('CHECKPOINT_METADATA_MISMATCH');
+      }
+      if (runtime.acceptedStep === 0) {
+        return runtime.fields?.length || runtime.lastAcceptedSnapshotId
+          ? fail('INITIAL_CHECKPOINT_NOT_EMPTY')
+          : { ok: true, runtime, checkpoint, snapshot: null, fields: [] };
+      }
+      const snapshot = await getSnapshot(runId, runtime.lastAcceptedSnapshotId);
+      if (!snapshot || snapshot.accepted !== true || snapshot.converged !== true ||
+          snapshot.definitionRevision !== runtime.definitionRevision) return fail('LAST_SNAPSHOT_INVALID');
+      const fields = runtime.fields || [];
+      const fieldIds = fields.map(field => field.fieldId);
+      if (!fields.length || new Set(fieldIds).size !== fieldIds.length ||
+          snapshot.fieldRefs.length !== fieldIds.length ||
+          snapshot.fieldRefs.some(fieldId => !fieldIds.includes(fieldId))) return fail('SNAPSHOT_FIELD_SET_MISMATCH');
+      for (const field of fields) {
+        const storedField = loaded.fields.find(item => item.fieldId === field.fieldId);
+        if (!storedField || storedField.snapshotId !== snapshot.snapshotId ||
+            storedField.geometryRevision !== runtime.geometry.revision) return fail('FIELD_METADATA_MISMATCH', { fieldId: field.fieldId });
+        const mesh = (runtime.meshes || []).find(item => item.meshId === field.meshId &&
+          item.domain === field.domain && item.geometryRevision === field.geometryRevision);
+        if (!mesh) return fail('FIELD_MESH_MISMATCH', { fieldId: field.fieldId });
+        const block = await getFieldBlock(runId, field.fieldId);
+        if (!block || block.checksum !== field.checksum || !block.data) return fail('FIELD_BLOCK_MISSING', { fieldId: field.fieldId });
+        const bytes = bytesOf(block.data);
+        if (!bytes || await digestHex(bytes) !== field.checksum) return fail('FIELD_BLOCK_CORRUPT', { fieldId: field.fieldId });
+      }
+      return { ok: true, runtime: clone(runtime), checkpoint: clone(checkpoint), snapshot: clone(snapshot), fields: clone(fields) };
+    }
+
     async function close() {
       if (database) database.close();
       database = null;
       databasePromise = null;
     }
 
-    return Object.freeze({ open, createRun, readRun, transition, commitStep, getFieldBlock, getSnapshot, close, databaseName });
+    return Object.freeze({ open, createRun, readRun, transition, commitStep, getFieldBlock, getSnapshot, verifyCheckpoint, close, databaseName });
   }
 
   SILM.createMultiphysicsIndexedDBStore = createMultiphysicsIndexedDBStore;
