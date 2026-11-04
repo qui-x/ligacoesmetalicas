@@ -100,7 +100,7 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 | E + O | Condição elétrica DC; espectro, incidência e polarização da luz; função dielétrica/resposta óptica espectral | Origem eletrônica compartilhada, mas respostas em frequências distintas; refletância via Fresnel a partir de n(λ), κ(λ) ou ε̃(ω) | Especificada em ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md; implementação bloqueada até dados espectrais homologados |
 | T + M | Gradiente/fonte térmica; carregamento mecânico; apoios | Expansão térmica e variação da resposta mecânica com temperatura; restrição pode gerar tensão térmica | Prioridade 1 |
 | T + O | Espectro/irradiância, R+A+Topt, perfil de absorção, propriedades térmicas, fronteiras e R(λ,T) ou CTR | Absorção óptica gera fonte térmica; difusão muda T; temperatura realimenta refletância/absorção | Especificada em ESPECIFICACAO-ACOPLAMENTO-TERMO-OPTICO.md; bloqueada até homologar dados e balanços |
-| M + O | Carregamento mecânico; superfície; iluminação | Deformação altera orientação, forma e rugosidade da superfície, mudando a reflexão geométrica | Prioridade 1 simplificada |
+| M + O | Carregamento mecânico; superfície; iluminação | Atualização geométrica das normais; alteração intrínseca elasto-óptica apenas com dados de tensão/deformação | Especificada; geometria primeiro, extensão intrínseca parametrizada e bloqueada sem dados |
 
 ### 4.1 Regras específicas por par
 
@@ -123,9 +123,9 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 - Separar expansão térmica reversível de deformação plástica permanente.
 
 **M + O**
-- A reflexão muda pela orientação da normal local e, se modelada, pela rugosidade.
-- Não alterar automaticamente a cor real ou a refletância espectral sem parâmetros ópticos.
-- O modo inicial pode mostrar apenas a mudança geométrica do raio refletido.
+- Atualizar a normal local a partir da geometria deformada; a reflexão especular usa a normal atual, não a normal global de referência.
+- Rugosidade/BRDF exige topografia ou estatística de superfície na escala óptica; não inferir rugosidade de deslizamentos internos que não emergem na superfície.
+- Não alterar automaticamente cor ou refletância intrínseca. Uma extensão elasto-óptica exige ε̃(ω, tensão/deformação) ou coeficientes medidos para a mesma amostra, faixa espectral e polarização.
 
 **E + O**
 - Não calcular resposta óptica com a condutividade DC nem converter intensidade do campo didático em amplitude da onda luminosa.
@@ -135,6 +135,15 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 - Não alterar a refletância só porque a corrente foi ligada. Campo DC modulando a resposta óptica exige modelo específico e evidência.
 - Se a alteração óptica vier do aquecimento Joule, classificar a experiência como E + T + O e fechar o balanço de energia.
 - Manter E+O bloqueada até os dados espectrais e os testes do motor óptico serem homologados.
+
+**E + M + O**
+- O estado mecânico e a geometria atual da amostra são compartilhados pelos domínios elétrico e óptico.
+- Separar a mudança geométrica de resistência (L/A), a mudança de resistividade por microestrutura e a resistência de contato.
+- Atualizar a normal óptica por F⁻ᵀN e refletir pela normal local; a mudança intrínseca da resposta óptica depende de coeficientes elasto-ópticos específicos.
+- Manter corrente DC e iluminação como estímulos distintos; não inferir óptica a partir de σDC.
+- Manter a condição isotérmica controlada. Aquecimento Joule/fototérmico significativo exige E+T+M+O.
+- Manter eletroplasticidade desligada e não converter deslizamentos visuais em densidade de discordâncias.
+- Especificação completa: [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md).
 
 **T + O**
 - Separar potência incidente, refletida, absorvida e transmitida; não assumir que toda luz incidente vira calor.
@@ -163,7 +172,7 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 |---|---|---|
 | E + T + M | Corrente → Joule → temperatura; temperatura e defeitos afetam resposta elétrica; temperatura e carregamento afetam deformação; deformação retorna ao estado elétrico | Objetivo principal da evolução multifísica, após validação dos pares |
 | E + T + O | Corrente DC gera Joule; luz gera calor apenas pela absorção; temperatura retroage em σDC(T) e R/A/Topt(λ,T) | Especificada em ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-OPTICO.md; bloqueada até fechar os balanços elétrico, óptico e térmico |
-| E + M + O | Deformação altera geometria/superfície e microestrutura; isso afeta resposta elétrica e reflexão | Depende de modelo microestrutural e óptico |
+| E + M + O | Deformação compartilhada altera geometria elétrica, microestrutura e superfície; pode alterar a resposta óptica intrínseca com coeficientes específicos | Especificada em [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md); bloqueada quantitativamente até validar geometria, resistividade e óptica |
 | T + M + O | Temperatura altera dimensões e resposta mecânica; expansão/deformação altera superfície e reflexão | Parcialmente possível por geometria; resposta óptica quantitativa depende de dados |
 | E + T + M + O | Acoplamento de todos os campos e balanços, com retroalimentação temporal | Etapa avançada; não habilitar por simples soma de animações |
 
