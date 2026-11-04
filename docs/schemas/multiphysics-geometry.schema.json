@@ -319,7 +319,85 @@
             "type": "string",
             "maxLength": 100
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "selector": {
+                  "properties": {
+                    "kind": {
+                      "const": "whole-volume"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              },
+              "required": [
+                "selector"
+              ]
+            },
+            "then": {
+              "properties": {
+                "topology": {
+                  "const": "volume"
+                },
+                "roles": {
+                  "contains": {
+                    "const": "sample-bulk"
+                  }
+                }
+              },
+              "required": [
+                "topology",
+                "roles"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "selector": {
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "box-all-faces",
+                        "box-face",
+                        "box-face-patch"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              },
+              "required": [
+                "selector"
+              ]
+            },
+            "then": {
+              "properties": {
+                "topology": {
+                  "const": "surface"
+                },
+                "roles": {
+                  "not": {
+                    "contains": {
+                      "const": "sample-bulk"
+                    }
+                  }
+                }
+              },
+              "required": [
+                "topology",
+                "roles"
+              ]
+            }
+          }
+        ]
       }
     },
     "notes": {
@@ -353,6 +431,25 @@
               "topology",
               "selector",
               "roles"
+            ]
+          }
+        }
+      },
+      "required": [
+        "regions"
+      ]
+    },
+    {
+      "properties": {
+        "regions": {
+          "contains": {
+            "properties": {
+              "topology": {
+                "const": "surface"
+              }
+            },
+            "required": [
+              "topology"
             ]
           }
         }
