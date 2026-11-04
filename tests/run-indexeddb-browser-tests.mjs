@@ -32,6 +32,7 @@ try {
       if (!response?.ok()) throw new Error("HTTP " + (response?.status() ?? "sem resposta"));
       await page.waitForFunction(
         () => ["passed", "failed"].includes(document.body.dataset.testResult),
+        undefined,
         { timeout: 90000 }
       );
 
