@@ -2462,15 +2462,70 @@ var BaseDemoSI;
         if (!trigger || !menu)
             return;
         const items = () => Array.from(menu.querySelectorAll('[role="menuitem"]:not([disabled])'));
-        const close = (restore) => { menu.hidden = true; trigger.setAttribute("aria-expanded", "false"); if (restore)
-            trigger.focus({ preventScroll: true }); };
-        const open = () => { if (modalOpen)
-            return; menu.hidden = false; trigger.setAttribute("aria-expanded", "true"); items()[0]?.focus({ preventScroll: true }); };
+        const viewport = () => ({
+            width: window.visualViewport?.width || document.documentElement.clientWidth || window.innerWidth,
+            height: window.visualViewport?.height || document.documentElement.clientHeight || window.innerHeight,
+            left: window.visualViewport?.offsetLeft || 0,
+            top: window.visualViewport?.offsetTop || 0
+        });
+        const position = () => {
+            if (menu.hidden)
+                return;
+            const triggerRect = trigger.getBoundingClientRect();
+            const view = viewport(), gap = 8, edge = 8;
+            menu.style.position = "fixed";
+            menu.style.inset = "auto";
+            menu.style.right = "auto";
+            menu.style.bottom = "auto";
+            menu.style.zIndex = "2400";
+            menu.style.maxHeight = Math.max(100, view.height - edge * 2) + "px";
+            const menuRect = menu.getBoundingClientRect();
+            const width = Math.min(Math.max(menuRect.width, triggerRect.width), view.width - edge * 2);
+            const height = Math.min(menuRect.height, view.height - edge * 2);
+            const below = view.top + view.height - triggerRect.bottom - gap - edge;
+            const above = triggerRect.top - view.top - gap - edge;
+            const top = below >= height || below >= above
+                ? Math.min(triggerRect.bottom + gap, view.top + view.height - height - edge)
+                : Math.max(view.top + edge, triggerRect.top - height - gap);
+            const left = Math.max(view.left + edge, Math.min(triggerRect.right - width, view.left + view.width - width - edge));
+            menu.style.left = left + "px";
+            menu.style.top = top + "px";
+            menu.style.minWidth = Math.min(Math.max(190, triggerRect.width), view.width - edge * 2) + "px";
+        };
+        const close = (restore) => {
+            menu.hidden = true;
+            menu.style.position = "";
+            menu.style.inset = "";
+            menu.style.left = "";
+            menu.style.top = "";
+            menu.style.right = "";
+            menu.style.bottom = "";
+            menu.style.maxHeight = "";
+            menu.style.minWidth = "";
+            menu.style.zIndex = "";
+            trigger.setAttribute("aria-expanded", "false");
+            if (restore)
+                trigger.focus({ preventScroll: true });
+        };
+        const open = (last = false) => {
+            if (modalOpen)
+                return;
+            menu.hidden = false;
+            trigger.setAttribute("aria-expanded", "true");
+            position();
+            const list = items();
+            (last ? list[list.length - 1] : list[0])?.focus({ preventScroll: true });
+        };
         trigger.addEventListener("click", () => menu.hidden ? open() : close(true));
-        trigger.addEventListener("keydown", event => { if (["ArrowDown", "Enter", " "].includes(event.key)) {
-            event.preventDefault();
-            open();
-        } });
+        trigger.addEventListener("keydown", event => {
+            if (["ArrowDown", "Enter", " "].includes(event.key)) {
+                event.preventDefault();
+                open();
+            } else if (event.key === "ArrowUp") {
+                event.preventDefault();
+                open(true);
+            }
+        });
         menu.addEventListener("click", event => {
             const clicked = event.target.closest('[role="menuitem"]');
             if (!clicked || !menu.contains(clicked))
@@ -2499,11 +2554,14 @@ var BaseDemoSI;
             list[next]?.focus();
         });
         document.addEventListener("pointerdown", event => {
-            if (menu.hidden)
-                return;
-            if (!menu.contains(event.target) && !trigger.contains(event.target))
+            if (!menu.hidden && !menu.contains(event.target) && !trigger.contains(event.target))
                 close(false);
         });
+        const reposition = () => position();
+        window.addEventListener("resize", reposition, { passive: true });
+        window.addEventListener("scroll", reposition, true);
+        window.visualViewport?.addEventListener("resize", reposition, { passive: true });
+        window.visualViewport?.addEventListener("scroll", reposition, { passive: true });
         window.addEventListener("si-route-changed", () => close(false));
     }
     BaseDemoSI.setupActionMenu = setupActionMenu;
