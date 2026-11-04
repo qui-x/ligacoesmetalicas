@@ -59,6 +59,9 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   const target={heatElectrical:'electrical',malleabilityElectrical:'malleability',ductilityElectrical:'ductility'}[kind];
   if(!target||!allows(target))return false;
   const state=model.state,starting=state.properties.active!==target;
+  const alreadyCombined=!starting&&(kind==='heatElectrical'
+   ?!!state.properties.electrical.field&&!!thermal()?.reading().on
+   :!!drive()?.reading().deformField);
   if(starting&&!toggleProperty(target))return false;
   // Ao trocar a experiência, sincroniza primeiro a chave transitória dos controladores.
   // Só depois liga o efeito complementar, para que o primeiro render não o interprete como resíduo antigo.
@@ -69,11 +72,16 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   // P7: calor + corrente (fonte transitória) ou deformação + corrente (campo transitório).
   if(kind==='heatElectrical'){
    if(model.state.structure?.mode!=='crystalline')return false;
-   actions.heat();
+   if(alreadyCombined)actions.heat();
+   else{
+    if(!model.state.properties.electrical.field)actions.field();
+    if(!thermal()?.reading().on)actions.heat();
+   }
   }else{
    const able=model.propertyAvailability(target);
    if(!able.ok||model.state.structure?.mode!=='crystalline')return false;
-   actions.field();
+   if(alreadyCombined)actions.field();
+   else if(!drive()?.reading().deformField)actions.field();
   }
   schedule();return true;
  }
