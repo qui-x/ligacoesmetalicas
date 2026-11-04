@@ -71,7 +71,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienc
   const canObserve=!!structure&&!activityLocked;
   const editableStructure=canObserve;
   const structureActions=actionGroup(root,'Centros metálicos');
-  actionButton(structureActions,{id:'centers',label:observer.centers?'Ocultar identificação':'Identificar centros',path:actionIcons.centers,pressed:observer.centers,disabled:!editableStructure,reason:!structure?'Monte uma estrutura primeiro':!canExplore?'Disponível no módulo Explorar':'',hint:'Destaca todos os centros. Na montagem livre, identifica cada unidade; na célula cristalina, mostra o papel de cada sítio.',onClick:()=>{
+  actionButton(structureActions,{id:'centers',label:observer.centers?'Ocultar identificação':'Identificar centros',path:actionIcons.centers,pressed:observer.centers,disabled:!editableStructure,reason:!structure?'Monte uma estrutura primeiro':activityLocked?'Recurso restrito nesta atividade':'',hint:'Destaca todos os centros. Na montagem livre, identifica cada unidade; na célula cristalina, mostra o papel de cada sítio.',onClick:()=>{
    observer.centers=!observer.centers;B.storage.write(observerKey,{centers:observer.centers});
    window.dispatchEvent(new CustomEvent('silm:observer-presentation-changed'));
    refreshScene();renderViewers();
