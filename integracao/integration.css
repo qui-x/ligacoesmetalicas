@@ -844,7 +844,7 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
 }
 #workspace-overview.si-overview-view[hidden],
 #workspace-focus.si-focus-view[hidden]{display:none!important}
-#workspace-focus.si-focus-view:not([hidden]){min-height:0;flex:1 1 0;overflow:hidden}
+#workspace-focus.si-focus-view:not([hidden]){min-height:0;flex:1 1 0}
 #si-stage{min-height:0;overflow:hidden}
 #workspace-overview.si-overview-view>h2{
  flex:none;margin:0;font-size:clamp(1.2rem,1.65vw,1.55rem);line-height:1.2;letter-spacing:-.02em;
