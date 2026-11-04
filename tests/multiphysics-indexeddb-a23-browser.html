@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SILM — Homologação IndexedDB A2.3</title>
+<style>
+:root{color-scheme:light dark;font:15px/1.5 system-ui,sans-serif}
+body{max-width:920px;margin:32px auto;padding:0 18px}
+h1{font-size:1.45rem}
+#summary{font-weight:700;margin:16px 0}
+li{padding:6px 0}
+.pass{color:#16834a}.fail{color:#d34b4b}
+.note{padding:12px;border:1px solid currentColor;border-radius:8px;opacity:.85}
+code{overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<h1>SILM — Homologação IndexedDB A2.3</h1>
+<p>Ensaio isolado de integridade, recuperação e ciclo de versão. Usa IndexedDB e Web Crypto reais; não abre nem modifica a aplicação publicada.</p>
+<p class="note">A quota real do navegador não é forçada nesta página: preencher o armazenamento deliberadamente é destrutivo e varia por navegador/perfil. Esse cenário permanece como ensaio controlado separado.</p>
+<div id="summary">Executando…</div>
+<ol id="results"></ol>
+<script src="../domain/silm/multiphysics/indexeddb-store.js"></script>
+<script>
+(async () => {
+  const output = document.getElementById('results');
+  const summary = document.getElementById('summary');
+  let passed = 0, failed = 0;
+  const assert = (condition, message) => { if (!condition) throw new Error(message); };
+  const test = async (name, run) => {
+    const item = document.createElement('li');
+    item.textContent = name + ' — ';
+    output.append(item);
+    try {
+      await run();
+      item.className = 'pass';
+      item.append('APROVADO');
+      passed++;
+    } catch (error) {
+      item.className = 'fail';
+      item.append('FALHOU: ' + (error?.message || error));
+      failed++;
+    }
+    summary.textContent = passed + ' aprovados · ' + failed + ' falhas';
+  };
+  const digestHex = async data => {
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(digest)].map(value => value.toString(16).padStart(2, '0')).join('');
+  };
+  const transact = (db, stores, mode, action) => new Promise((resolve, reject) => {
+    let tx;
+    try { tx = db.transaction(stores, mode); } catch (error) { reject(error); return; }
+    try { action(tx); } catch (error) { try { tx.abort(); } catch {} reject(error); return; }
+    tx.oncomplete = resolve;
+    tx.onabort = () => reject(tx.error || new Error('TRANSACTION_ABORTED'));
+    tx.onerror = () => {};
+  });
+  const deleteDatabase = name => new Promise((resolve, reject) => {
+    const req = indexedDB.deleteDatabase(name);
+    req.onsuccess = resolve;
+    req.onerror = () => reject(req.error || new Error('DATABASE_DELETE_FAILED'));
+    req.onblocked = () => reject(new Error('DATABASE_DELETE_BLOCKED'));
+  });
+  const primaryDb = 'silm-a23-integrity-' + crypto.randomUUID();
+  const runId = 'run-a23-integrity-0001';
+  const experiment = { id: 'exp-a23-integrity-0001', revision: 1, createdAt: new Date().toISOString(), schemaVersion: '1.0.0' };
+  const geometry = { geometryId: 'geo-a23-integrity-0001', revision: 1, referenceRevision: 1 };
+  let store = SILM.createMultiphysicsIndexedDBStore({ databaseName: primaryDb });
+  let acceptedFieldId = null;
+  let acceptedMeshKey = null;
+  let acceptedBlock = null;
+
+  try {
+    await test('Criação, transição e commit de um passo confirmado', async () => {
+      const runtime0 = {
+        schemaId: 'silm.multiphysics.runtime', schemaVersion: '1.0.0', runId,
+        experimentId: experiment.id, definitionRevision: 1, status: 'prepared',
+        acceptedStep: 0, geometry: structuredClone(geometry), meshes: [], fields: [],
+        domainReports: [], acceptedCoordinate: { kind: 'time', timeS: 0 },
+        referenceRevision: 1, updatedAt: new Date().toISOString()
+      };
+      const manifest = { runId, experimentId: experiment.id, definitionRevision: 1 };
+      const checkpoint0 = {
+        runId, acceptedStep: 0, acceptedCoordinate: structuredClone(runtime0.acceptedCoordinate),
+        domainStates: {}, geometry: structuredClone(runtime0.geometry), runtime: structuredClone(runtime0)
+      };
+      const event1 = { eventId: 'event-a23-0001', runId, sequence: 1, type: 'run-prepared', createdAt: new Date().toISOString() };
+      const created = await store.createRun({ runId, experiment, manifest, runtime: runtime0, checkpoint: checkpoint0, event: event1 });
+      assert(created.ok, 'createRun: ' + created.reason);
+
+      const loaded = await store.readRun(runId);
+      const runtimeRunning = { ...loaded.runtime, status: 'running', updatedAt: new Date().toISOString() };
+      const checkpointRunning = { ...loaded.checkpoint, runtime: structuredClone(runtimeRunning) };
+      const started = await store.transition({
+        runId, expectedStorageRevision: loaded.storageRevision, runtime: runtimeRunning,
+        checkpoint: checkpointRunning,
+        event: { eventId: 'event-a23-0002', runId, sequence: 2, type: 'run-started', createdAt: new Date().toISOString() }
+      });
+      assert(started.ok, 'transition: ' + started.reason);
+
+      const fieldId = 'field-a23-integrity-0001';
+      const meshId = 'mesh-a23-integrity-0001';
+      const data = Uint8Array.of(11, 29, 47, 83);
+      const checksum = await digestHex(data);
+      const field = {
+        fieldId, domain: 'electrical', name: 'test.potential', meshId, unit: 'V',
+        timeS: 0.1, geometryRevision: 1, storageRef: 'idb://' + fieldId,
+        checksum, valueType: 'uint8', shape: [4]
+      };
+      const snapshotId = 'snapshot-a23-integrity-0001';
+      const runtime1 = {
+        ...runtimeRunning, acceptedStep: 1,
+        acceptedCoordinate: { kind: 'time', timeS: 0.1 },
+        geometry: { ...geometry, parentRevision: 1 },
+        meshes: [{ meshId, domain: 'electrical', geometryRevision: 1, version: 'test-mesh-1' }],
+        fields: [field], lastAcceptedSnapshotId: snapshotId,
+        updatedAt: new Date().toISOString()
+      };
+      const snapshot = {
+        snapshotId, runId, experimentId: experiment.id, definitionRevision: 1,
+        accepted: true, converged: true, fieldRefs: [fieldId],
+        coordinate: structuredClone(runtime1.acceptedCoordinate), createdAt: new Date().toISOString()
+      };
+      const checkpoint1 = {
+        runId, acceptedStep: 1, acceptedCoordinate: structuredClone(runtime1.acceptedCoordinate),
+        domainStates: {}, geometry: structuredClone(runtime1.geometry), runtime: structuredClone(runtime1)
+      };
+      const committed = await store.commitStep({
+        runId, expectedStorageRevision: 1, expectedAcceptedStep: 0, expectedSnapshotId: null,
+        runtime: runtime1, checkpoint: checkpoint1, snapshot,
+        fields: [field], fieldBlocks: [{ fieldId, data }],
+        event: { eventId: 'event-a23-0003', runId, sequence: 3, type: 'step-committed', createdAt: new Date().toISOString() }
+      });
+      assert(committed.ok && committed.storageRevision === 2, 'commitStep: ' + committed.reason);
+      acceptedFieldId = fieldId;
+      acceptedMeshKey = runId + '|' + meshId + '|1';
+      acceptedBlock = data.buffer.slice(0);
+      const integrity = await store.verifyCheckpoint(runId);
+      assert(integrity.ok, 'checkpoint válido foi rejeitado: ' + integrity.reason);
+    });
+
+    await test('Adulteração dos metadados do checkpoint bloqueia a retomada', async () => {
+      const db = await store.open();
+      const original = await store.readRun(runId);
+      await transact(db, ['checkpoints'], 'readwrite', tx => {
+        const req = tx.objectStore('checkpoints').get(runId);
+        req.onsuccess = () => {
+          const value = req.result;
+          value.runtime = { ...value.runtime, updatedAt: 'tampered-checkpoint' };
+          tx.objectStore('checkpoints').put(value);
+        };
+      });
+      const result = await store.verifyCheckpoint(runId);
+      assert(!result.ok && result.reason === 'CHECKPOINT_METADATA_MISMATCH', 'checkpoint adulterado foi aceito: ' + result.reason);
+      await transact(db, ['checkpoints'], 'readwrite', tx => tx.objectStore('checkpoints').put(original.checkpoint));
+      assert((await store.verifyCheckpoint(runId)).ok, 'restauração do checkpoint de teste falhou');
+    });
+
+    await test('Metadados de malha ausentes bloqueiam a retomada', async () => {
+      const db = await store.open();
+      await transact(db, ['meshes'], 'readwrite', tx => tx.objectStore('meshes').delete(acceptedMeshKey));
+      const result = await store.verifyCheckpoint(runId);
+      assert(!result.ok && result.reason === 'MESH_METADATA_MISSING', 'malha ausente foi aceita: ' + result.reason);
+      const record = {
+        key: acceptedMeshKey, runId, meshId: 'mesh-a23-integrity-0001',
+        domain: 'electrical', geometryRevision: 1, version: 'test-mesh-1'
+      };
+      await transact(db, ['meshes'], 'readwrite', tx => tx.objectStore('meshes').add(record));
+      assert((await store.verifyCheckpoint(runId)).ok, 'reposição da malha de teste falhou');
+    });
+
+    await test('Bloco binário corrompido bloqueia a retomada', async () => {
+      const db = await store.open();
+      await transact(db, ['fieldBlocks'], 'readwrite', tx => {
+        const req = tx.objectStore('fieldBlocks').get(acceptedFieldId);
+        req.onsuccess = () => {
+          const value = req.result;
+          value.data = Uint8Array.of(255, 255, 255, 255).buffer;
+          tx.objectStore('fieldBlocks').put(value);
+        };
+      });
+      const result = await store.verifyCheckpoint(runId);
+      assert(!result.ok && result.reason === 'FIELD_BLOCK_CORRUPT', 'bloco corrompido foi aceito: ' + result.reason);
+      await transact(db, ['fieldBlocks'], 'readwrite', tx => {
+        const req = tx.objectStore('fieldBlocks').get(acceptedFieldId);
+        req.onsuccess = () => { const value = req.result; value.data = acceptedBlock; tx.objectStore('fieldBlocks').put(value); };
+      });
+      assert((await store.verifyCheckpoint(runId)).ok, 'reposição do bloco de teste falhou');
+    });
+
+    await test('Fechamento e reabertura recuperam o último passo aceito', async () => {
+      const before = await store.readRun(runId);
+      await store.close();
+      store = SILM.createMultiphysicsIndexedDBStore({ databaseName: primaryDb });
+      const after = await store.readRun(runId);
+      assert(after.runtime.acceptedStep === before.runtime.acceptedStep, 'passo aceito divergiu');
+      assert(after.runtime.lastAcceptedSnapshotId === before.runtime.lastAcceptedSnapshotId, 'ponteiro do snapshot divergiu');
+      assert(after.events.length === 3, 'sequência de auditoria divergiu');
+      const integrity = await store.verifyCheckpoint(runId);
+      assert(integrity.ok, 'checkpoint não sobreviveu à reabertura: ' + integrity.reason);
+    });
+
+    await test('Upgrade de versão aguarda a aba bloqueadora e fecha a conexão antiga', async () => {
+      const versionDb = 'silm-a23-version-' + crypto.randomUUID();
+      let versionChangeSeen = false;
+      let blockedSeen = false;
+      const versionStore = SILM.createMultiphysicsIndexedDBStore({
+        databaseName: versionDb,
+        onVersionChange: event => { versionChangeSeen = true; }
+      });
+      await versionStore.open();
+      const blockerRequest = indexedDB.open(versionDb);
+      const blocker = await new Promise((resolve, reject) => {
+        blockerRequest.onsuccess = () => resolve(blockerRequest.result);
+        blockerRequest.onerror = () => reject(blockerRequest.error || new Error('BLOCKER_OPEN_FAILED'));
+      });
+      let upgradeRequest;
+      const blockedSignal = new Promise((resolve, reject) => {
+        upgradeRequest = indexedDB.open(versionDb, 2);
+        upgradeRequest.onblocked = () => { blockedSeen = true; resolve(true); };
+        upgradeRequest.onerror = () => reject(upgradeRequest.error || new Error('UPGRADE_FAILED'));
+      });
+      const upgraded = new Promise((resolve, reject) => {
+        upgradeRequest.onupgradeneeded = event => {
+          if (!event.target.result.objectStoreNames.contains('a23MigrationProbe')) {
+            event.target.result.createObjectStore('a23MigrationProbe');
+          }
+        };
+        upgradeRequest.onsuccess = () => resolve(upgradeRequest.result);
+        upgradeRequest.onerror = () => reject(upgradeRequest.error || new Error('UPGRADE_FAILED'));
+      });
+      await Promise.race([
+        blockedSignal,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('UPGRADE_NOT_BLOCKED')), 3000))
+      ]);
+      assert(versionChangeSeen, 'conexão antiga não recebeu versionchange');
+      assert(blockedSeen, 'upgrade não reportou blocked enquanto a outra conexão estava aberta');
+      blocker.close();
+      const db = await upgraded;
+      assert(db.version === 2, 'versão do banco não avançou');
+      assert(db.objectStoreNames.contains('definitions') && db.objectStoreNames.contains('runs'), 'stores existentes foram perdidos');
+      db.close();
+      await versionStore.close();
+      await deleteDatabase(versionDb);
+    });
+  } finally {
+    try { await store.close(); } catch {}
+    try { await deleteDatabase(primaryDb); } catch {}
+  }
+
+  const usage = await navigator.storage?.estimate?.().catch?.(() => null);
+  if (usage && Number.isFinite(usage.usage) && Number.isFinite(usage.quota)) {
+    const info = document.createElement('p');
+    info.textContent = 'Uso estimado da origem: ' + Math.round(usage.usage / 1048576) +
+      ' MiB de ' + Math.round(usage.quota / 1048576) + ' MiB. Estimativa informativa; não comprova teste de quota.';
+    output.after(info);
+  }
+  summary.textContent = passed + ' aprovados · ' + failed + ' falhas' + (failed ? '' : ' · ensaio concluído');
+  document.body.dataset.testResult = failed ? 'failed' : 'passed';
+})();
+</script>
+</body>
+</html>
