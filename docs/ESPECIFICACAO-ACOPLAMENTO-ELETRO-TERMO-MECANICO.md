@@ -630,8 +630,9 @@ O SILM possui demonstrações qualitativas isoladas e combinações visuais de c
 - [ ] E, T e M compartilham a mesma amostra, geometria e estado temporal.
 - [ ] Alterar T modifica σe e C/α/escoamento somente segundo funções materiais declaradas.
 - [ ] Alterar a geometria atualiza R, J e contatos.
-- [ ] A potência terminal fecha com Joule de volume e contatos.
-- [ ] Trabalho mecânico fecha com energia elástica, dissipação plástica e outras parcelas incluídas.
+- [ ] A potência terminal fecha com Joule de volume e contatos (balanço elétrico).
+- [ ] Fontes térmicas, energia interna e fluxos de fronteira fecham (balanço térmico).
+- [ ] Trabalho mecânico fecha com energia elástica, dissipação plástica e outras parcelas incluídas (balanço mecânico).
 - [ ] Energia plástica convertida em calor não é contada duas vezes.
 - [ ] Contato elétrico/térmico não é considerado sem lei e parâmetro de interface.
 - [ ] A eletroplasticidade atérmica permanece desativada.
@@ -675,7 +676,7 @@ O SILM possui demonstrações qualitativas isoladas e combinações visuais de c
 **Fase E — plasticidade e dissipação**
 - Homologar curvas tensão–deformação(T), taxa, encruamento e evolução de microestrutura.
 - Adicionar q̇plastic somente com β calibrado.
-- Separar energia armazenada, calor e dissipaçāo de contato/fricção.
+- Separar energia armazenada, calor e dissipação de contato/fricção.
 
 **Fase F — acoplamento forte e interfaces**
 - Implementar contatos elétricos e térmicos dependentes de pressão/separação, se necessários.
