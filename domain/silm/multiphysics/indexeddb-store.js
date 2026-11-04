@@ -144,8 +144,10 @@
     async function createRun(input) {
       if (!record(input) || !record(input.experiment) || !record(input.manifest) ||
           !record(input.runtime) || !record(input.checkpoint) || !record(input.event)) return fail('RUN_RECORD_INVALID');
-      if (input.runtime.status !== 'prepared' || input.runtime.acceptedStep !== 0 ||
-          input.event.runId !== input.runId || input.event.sequence !== 1) return fail('INITIAL_RUN_STATE_INVALID');
+      if (input.runtime.status !== 'prepared' || input.runtime.acceptedStep !== 0 || input.runtime.runId !== input.runId ||
+          input.manifest.runId !== input.runId || input.event.runId !== input.runId || input.event.sequence !== 1 ||
+          input.checkpoint.runId !== input.runId || input.checkpoint.acceptedStep !== 0 ||
+          input.checkpoint.runtime?.acceptedStep !== 0 || input.checkpoint.geometry?.revision !== input.runtime.geometry?.revision) return fail('INITIAL_RUN_STATE_INVALID');
       const db = await open();
       const key = definitionKey(input.experiment.id, input.experiment.revision);
       const definition = {
@@ -211,7 +213,7 @@
             runId, experiment: clone(result.definition?.value), manifest: clone(result.run.manifest),
             runtime: clone(result.run.runtime), storageRevision: result.run.storageRevision,
             eventSequence: result.run.eventSequence, checkpoint: clone(result.checkpoint),
-            snapshots: clone((result.snapshots || []).map(item => item.value)), fields: clone(result.fields || []),
+            snapshots: clone((result.snapshots || []).sort((a, b) => a.acceptedStep - b.acceptedStep).map(item => item.value)), fields: clone(result.fields || []),
             meshes: clone(result.meshes || []), events: clone((result.events || []).sort((a, b) => a.sequence - b.sequence))
           });
         };
@@ -238,6 +240,9 @@
           if (!validateEvent(current, input.event)) return abort('AUDIT_SEQUENCE_CONFLICT');
           const oldRuntime = current.runtime;
           const nextRuntime = input.runtime;
+          if (input.checkpoint.runId !== input.runId || input.checkpoint.acceptedStep !== oldRuntime.acceptedStep ||
+              input.checkpoint.runtime?.status !== nextRuntime.status || input.checkpoint.runtime?.acceptedStep !== nextRuntime.acceptedStep ||
+              input.checkpoint.geometry?.revision !== nextRuntime.geometry?.revision) return abort('CHECKPOINT_TRANSITION_MISMATCH');
           const allowed =
             (oldRuntime.status === 'prepared' && nextRuntime.status === 'running') ||
             (oldRuntime.status === 'running' && ['interrupted', 'rejected'].includes(nextRuntime.status)) ||
@@ -275,7 +280,10 @@
           fieldGeometryRevisions.length !== 1 || input.runtime.geometry?.revision !== fieldGeometryRevisions[0] ||
           input.snapshot.runId !== input.runId || input.snapshot.definitionRevision !== input.runtime.definitionRevision ||
           JSON.stringify(input.snapshot.coordinate) !== JSON.stringify(input.runtime.acceptedCoordinate) ||
-          input.checkpoint.runId !== input.runId || input.checkpoint.geometry?.revision !== input.runtime.geometry.revision) {
+          input.runtime.runId !== input.runId || input.runtime.experimentId !== input.snapshot.experimentId ||
+          input.checkpoint.runId !== input.runId || input.checkpoint.acceptedStep !== input.runtime.acceptedStep ||
+          input.checkpoint.runtime?.lastAcceptedSnapshotId !== input.snapshot.snapshotId ||
+          input.checkpoint.geometry?.revision !== input.runtime.geometry.revision) {
         return fail('COMMIT_STATE_MISMATCH');
       }
       for (const field of input.fields) {
@@ -354,10 +362,13 @@
     async function verifyCheckpoint(runId) {
       const loaded = await readRun(runId);
       if (!loaded) return fail('RUN_NOT_FOUND');
+      if (!loaded.experiment || loaded.experiment.id !== loaded.runtime.experimentId || loaded.experiment.revision !== loaded.runtime.definitionRevision) return fail('DEFINITION_REFERENCE_INVALID');
       const runtime = loaded.runtime;
       const checkpoint = loaded.checkpoint;
       if (!checkpoint || checkpoint.runId !== runId || checkpoint.acceptedStep !== runtime.acceptedStep ||
           checkpoint.runtime?.acceptedStep !== runtime.acceptedStep ||
+          JSON.stringify(checkpoint.acceptedCoordinate) !== JSON.stringify(runtime.acceptedCoordinate) ||
+          checkpoint.runtime?.lastAcceptedSnapshotId !== (runtime.lastAcceptedSnapshotId || undefined) ||
           checkpoint.geometry?.revision !== runtime.geometry?.revision ||
           checkpoint.geometry?.referenceRevision !== runtime.geometry?.referenceRevision) {
         return fail('CHECKPOINT_METADATA_MISMATCH');
@@ -369,7 +380,8 @@
       }
       const snapshot = await getSnapshot(runId, runtime.lastAcceptedSnapshotId);
       if (!snapshot || snapshot.accepted !== true || snapshot.converged !== true ||
-          snapshot.definitionRevision !== runtime.definitionRevision || !Array.isArray(snapshot.fieldRefs)) return fail('LAST_SNAPSHOT_INVALID');
+          snapshot.definitionRevision !== runtime.definitionRevision ||
+          JSON.stringify(snapshot.coordinate) !== JSON.stringify(runtime.acceptedCoordinate) || !Array.isArray(snapshot.fieldRefs)) return fail('LAST_SNAPSHOT_INVALID');
       const fields = runtime.fields || [];
       if (!Array.isArray(fields) || !Array.isArray(loaded.fields) || !Array.isArray(runtime.meshes)) return fail('RUNTIME_FIELD_SET_INVALID');
       const fieldIds = fields.map(field => field.fieldId);
