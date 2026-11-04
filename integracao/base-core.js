@@ -2727,7 +2727,7 @@ var BaseDemoSI;
         const families = availableViewerFamilies();
         if (!families.includes(selectedFamily))
             selectedFamily = families[0] ?? "observar";
-        if (!allowed.some(v => v.id === selectedViewer))
+        if (!allowed.some(v => v.id === selectedViewer && viewerFamily(v) === selectedFamily))
             selectedViewer = allowed.find(v => viewerFamily(v) === selectedFamily)?.id ?? "";
         tabs.replaceChildren();
         for (const family of families) {
