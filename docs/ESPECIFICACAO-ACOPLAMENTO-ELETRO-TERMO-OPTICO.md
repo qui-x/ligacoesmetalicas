@@ -1,14 +1,14 @@
 # SILM — Especificação do acoplamento eletro-termo-óptico (E+T+O)
 
 **Status:** especificação científica e operacional — não implementada  
-**Branch:** \`study/silm-coupled-properties-transport-20261104\`  
+**Branch:** `study/silm-coupled-properties-transport-20261104`  
 **Famílias:** elétrica (E) + térmica (T) + óptica (O)  
 **Documentos de base:**
-- \`ESTUDO-INTERACOES-PROPRIEDADES-METALICAS.md\`
-- \`MATRIZ-OPERACIONAL-INTERACOES-PROPRIEDADES.md\`
-- \`ESPECIFICACAO-ACOPLAMENTO-ELETROTERMICO.md\`
-- \`ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md\`
-- \`ESPECIFICACAO-ACOPLAMENTO-TERMO-OPTICO.md\`
+- `ESTUDO-INTERACOES-PROPRIEDADES-METALICAS.md`
+- `MATRIZ-OPERACIONAL-INTERACOES-PROPRIEDADES.md`
+- `ESPECIFICACAO-ACOPLAMENTO-ELETROTERMICO.md`
+- `ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md`
+- `ESPECIFICACAO-ACOPLAMENTO-TERMO-OPTICO.md`
 
 ---
 
@@ -73,17 +73,17 @@ JDC = σDC(T) EDC
 ∇ · [σDC(T) ∇V] = 0
 ~~~
 
-- \`V\`: potencial elétrico DC (V);
-- \`EDC\`: campo elétrico DC (V/m);
-- \`JDC\`: densidade de corrente DC (A/m²);
-- \`σDC(T)\`: condutividade elétrica de baixa frequência (S/m);
-- \`ρe(T)=1/σDC(T)\`: resistividade elétrica (Ω·m).
+- `V`: potencial elétrico DC (V);
+- `EDC`: campo elétrico DC (V/m);
+- `JDC`: densidade de corrente DC (A/m²);
+- `σDC(T)`: condutividade elétrica de baixa frequência (S/m);
+- `ρe(T)=1/σDC(T)`: resistividade elétrica (Ω·m).
 
 O sistema precisa de terminais, geometria, contatos e um caminho de retorno. Para a mesma amostra, a distribuição de corrente e a geração Joule devem ser resolvidas novamente quando σDC mudar com T.
 
 ### 3.2 Óptica — resposta à onda incidente
 
-A luz é descrita por uma frequência óptica \`ω=2πc/λ\`, um campo oscilante, direção de propagação e polarização. A resposta linear do metal é complexa e dispersiva:
+A luz é descrita por uma frequência óptica `ω=2πc/λ`, um campo oscilante, direção de propagação e polarização. A resposta linear do metal é complexa e dispersiva:
 
 ~~~
 N(λ,T) = n(λ,T) + i κ(λ,T)
@@ -111,12 +111,12 @@ Na aproximação de temperatura única, em meio contínuo sem mudança de fase:
   ∇ · [k(T) ∇T] + q'''J + q'''opt + q'''ext
 ~~~
 
-- \`ρm\`: densidade de massa (kg/m³);
-- \`cp\`: calor específico (J/(kg·K));
-- \`k\`: condutividade térmica (W/(m·K));
-- \`q'''J\`: fonte volumétrica por Joule DC (W/m³);
-- \`q'''opt\`: fonte volumétrica por absorção óptica (W/m³);
-- \`q'''ext\`: fonte térmica adicional explicitamente prescrita (W/m³), zero por padrão.
+- `ρm`: densidade de massa (kg/m³);
+- `cp`: calor específico (J/(kg·K));
+- `k`: condutividade térmica (W/(m·K));
+- `q'''J`: fonte volumétrica por Joule DC (W/m³);
+- `q'''opt`: fonte volumétrica por absorção óptica (W/m³);
+- `q'''ext`: fonte térmica adicional explicitamente prescrita (W/m³), zero por padrão.
 
 A mesma variável T é usada para alimentar σDC(T) e a resposta óptica dependente de T, desde que a aproximação de equilíbrio térmico local e de temperatura única seja válida.
 
@@ -189,8 +189,8 @@ Quando a perda estiver incorporada à parte imaginária da função dielétrica,
 
 ### 4.4 Separação entre frequências
 
-- \`q'''J\` vem do campo/corrente de baixa frequência do circuito DC;
-- \`q'''opt\` vem da onda óptica absorvida, com parâmetros em \`ωopt\`;
+- `q'''J` vem do campo/corrente de baixa frequência do circuito DC;
+- `q'''opt` vem da onda óptica absorvida, com parâmetros em `ωopt`;
 - os valores DC e ópticos são calculados em seus próprios domínios de frequência;
 - o calor total é a soma das duas dissipações físicas, desde que ambas sejam fontes independentes e que cada perda tenha sido incluída uma só vez.
 
@@ -226,7 +226,7 @@ Para a amostra e interfaces abrangidas pelo modelo:
 ΔU = ∫dt [PJ,amostra + Pabs,opt + Pext] − ∫dt Pout,thermal
 ~~~
 
-\`ΔU\` é a variação de energia interna; \`Pout,thermal\` inclui apenas as saídas térmicas realmente modeladas (fluxo para fronteira fixa, substrato, convecção, radiação etc.). O balanço deve respeitar a região de controle: energia dissipada fora da amostra não pode aparecer como calor recebido por ela.
+`ΔU` é a variação de energia interna; `Pout,thermal` inclui apenas as saídas térmicas realmente modeladas (fluxo para fronteira fixa, substrato, convecção, radiação etc.). O balanço deve respeitar a região de controle: energia dissipada fora da amostra não pode aparecer como calor recebido por ela.
 
 Em cada passo, calcular um residual:
 
@@ -310,10 +310,10 @@ Cl(Tl) ∂Tl/∂t =
   ∇·[kl ∇Tl] + G(Te − Tl) + q'''J,l
 ~~~
 
-- \`Te\`, \`Tl\`: temperaturas eletrônica e da rede;
-- \`Ce\`, \`Cl\`: capacidades volumétricas;
-- \`G\`: acoplamento elétron–rede (W/(m³·K));
-- \`ke\`, \`kl\`: condutividades térmicas eletrônica e da rede.
+- `Te`, `Tl`: temperaturas eletrônica e da rede;
+- `Ce`, `Cl`: capacidades volumétricas;
+- `G`: acoplamento elétron–rede (W/(m³·K));
+- `ke`, `kl`: condutividades térmicas eletrônica e da rede.
 
 A divisão exata de fontes e capacidades depende do modelo material. Não ativar duas temperaturas apenas porque o usuário escolheu um laser; verificar duração do pulso, escala de relaxação, regime de repetição e parâmetros do metal. A primeira versão deve usar temperatura única em regime contínuo/modulado suficientemente lento ou após o equilíbrio elétron–rede ser válido.
 
@@ -350,10 +350,10 @@ Convecção, radiação e contato precisam ser declarados, não assumidos. Na pr
 ## 10. Auditoria do SILM atual
 
 ### 10.1 Elétrica
-O motor \`domain/silm/drive.js\` oferece intensidade de campo visual normalizada, não resolve terminais, potencial, densidade de corrente ou potência elétrica. \`domain/silm/properties.js\` permite usar valores de condutividade/resistividade do banco quando homologados, mas a deriva mostrada não é calculada com uma geometria elétrica quantitativa.
+O motor `domain/silm/drive.js` oferece intensidade de campo visual normalizada, não resolve terminais, potencial, densidade de corrente ou potência elétrica. `domain/silm/properties.js` permite usar valores de condutividade/resistividade do banco quando homologados, mas a deriva mostrada não é calculada com uma geometria elétrica quantitativa.
 
 ### 10.2 Térmica
-O motor \`domain/silm/thermal.js\` é uma difusão qualitativa normalizada sobre uma rede de vizinhos. O coeficiente não é específico de metal e não representa capacidade térmica, volume, condutividade com unidade ou tempo físico. A fonte e o resfriamento atuais não substituem um modelo térmico macroscópico com contorno e balanço energético completos.
+O motor `domain/silm/thermal.js` é uma difusão qualitativa normalizada sobre uma rede de vizinhos. O coeficiente não é específico de metal e não representa capacidade térmica, volume, condutividade com unidade ou tempo físico. A fonte e o resfriamento atuais não substituem um modelo térmico macroscópico com contorno e balanço energético completos.
 
 ### 10.3 Óptica
 A experiência de brilho usa reflexão geométrica; não calcula espectro, absorptância, refletância quantitativa, transmissão, profundidade óptica nem n(λ,T)/κ(λ,T). A intensidade da lanterna não está calibrada em irradiância.
