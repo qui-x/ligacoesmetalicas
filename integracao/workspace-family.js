@@ -98,13 +98,13 @@ SILM.createWorkspaceFamily=({model,activity=()=>null})=>{
    compareCard(grid,'A','Estado-base','Condição de referência anterior à experiência.',active?'Base conceitual':'Sem experiência ativa');
    compareCard(grid,'B','Resposta atual',entry?entry.title+' · '+(narrative?.observation||'Resposta qualitativa em andamento.'):'Nenhuma propriedade está em estudo.',entry?'Estado atual':'Sem experiência ativa');
   }
-  output.append(grid,node('p','Quadro informativo, somente leitura. Não cria outra amostra nem produz medições.','silm-compare-note'));
+  output.append(grid,node('p','Quadro informativo, somente leitura. As cenas A/B lado a lado ainda não estão conectadas; não cria outra amostra nem produz medições.','silm-compare-note'));
  }
  function setupViewers(){
   for(const definition of definitions)B.registerViewer({...definition,render(_snapshot,_records,output){
    output.append(node('p',definition.description,'silm-tool-description'));
-   if(typeof definition.render==='function'){definition.render(output);return;}
    for(const panel of document.querySelectorAll('[data-silm-viewer]'))panel.hidden=!panel.dataset.silmViewer.split(' ').includes(definition.id);
+   if(typeof definition.render==='function'){definition.render(output);return;}
   }});
   window.addEventListener('si-viewer-family-selected',renderViewers);window.addEventListener('si-viewer-selected',renderViewers);renderViewers();
  }
