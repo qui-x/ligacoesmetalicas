@@ -86,38 +86,57 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
  let gradient=0;
  function preview(record){
   const state=record.snapshot,element=S.data.get(record.atomicNumber),structure=state.structure;
-  const svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox','0 0 300 190');svg.setAttribute('role','img');
-  svg.setAttribute('aria-label',record.name+', '+record.unitCount+' unidades, '+(record.mode==='crystalline'?'estrutura cristalina':'montagem livre'));
+  const width=360,height=240;
+  const svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox','0 0 360 240');svg.setAttribute('preserveAspectRatio','xMidYMid meet');svg.setAttribute('role','img');
+  svg.setAttribute('aria-label',record.name+', '+record.unitCount+' unidades, '+(record.mode==='crystalline'?'prévia da estrutura cristalográfica':'prévia da montagem livre'));
   const defs=document.createElementNS(NS,'defs'),gid='silm-manager-sphere-'+(++gradient);
-  const grad=document.createElementNS(NS,'radialGradient');grad.id=gid;grad.setAttribute('cx','34%');grad.setAttribute('cy','28%');grad.setAttribute('r','76%');
-  for(const [offset,color]of [['0','#f3e7c2'],['.34','#d4b465'],['.74','#a8743b'],['1','#6e4a22']]){const stop=document.createElementNS(NS,'stop');stop.setAttribute('offset',offset);stop.setAttribute('stop-color',color);grad.append(stop);}
+  const grad=document.createElementNS(NS,'radialGradient');grad.id=gid;grad.setAttribute('cx','32%');grad.setAttribute('cy','25%');grad.setAttribute('r','78%');
+  for(const [offset,color]of [['0','#fff1cb'],['.32','#e2c273'],['.72','#b98743'],['1','#69451f']]){
+   const stop=document.createElementNS(NS,'stop');stop.setAttribute('offset',offset);stop.setAttribute('stop-color',color);grad.append(stop);
+  }
   defs.append(grad);svg.append(defs);
-  const line=(x1,y1,x2,y2)=>{const l=document.createElementNS(NS,'line');for(const [k,v]of Object.entries({x1,y1,x2,y2}))l.setAttribute(k,String(v));l.setAttribute('stroke','currentColor');l.setAttribute('stroke-opacity','.35');l.setAttribute('stroke-width','1.2');svg.append(l);};
+  const line=(x1,y1,x2,y2,opacity=.48)=>{
+   const l=document.createElementNS(NS,'line');
+   for(const [k,v]of Object.entries({x1,y1,x2,y2}))l.setAttribute(k,String(v));
+   l.setAttribute('stroke','currentColor');l.setAttribute('stroke-opacity',String(opacity));l.setAttribute('stroke-width','1.35');l.setAttribute('stroke-linecap','round');svg.append(l);
+  };
   const sphere=(x,y,r)=>{
-   const c=document.createElementNS(NS,'circle');c.setAttribute('cx',String(x));c.setAttribute('cy',String(y));c.setAttribute('r',String(r));c.setAttribute('fill','url(#'+gid+')');c.setAttribute('stroke','#2a2016');c.setAttribute('stroke-width','1');svg.append(c);
-   if(r>=9){const t=document.createElementNS(NS,'text');t.setAttribute('x',String(x));t.setAttribute('y',String(y));t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','central');t.setAttribute('font-size',String(r*.82));t.setAttribute('font-weight','800');t.setAttribute('fill','#17181b');t.textContent=element.symbol;svg.append(t);}
+   const halo=document.createElementNS(NS,'circle');halo.setAttribute('cx',String(x));halo.setAttribute('cy',String(y));halo.setAttribute('r',String(r+2.2));halo.setAttribute('fill','none');halo.setAttribute('stroke','#d9b55e');halo.setAttribute('stroke-opacity','.48');halo.setAttribute('stroke-width','1.1');svg.append(halo);
+   const c=document.createElementNS(NS,'circle');c.setAttribute('cx',String(x));c.setAttribute('cy',String(y));c.setAttribute('r',String(r));c.setAttribute('fill','url(#'+gid+')');c.setAttribute('stroke','#4a361c');c.setAttribute('stroke-width','1.15');svg.append(c);
+   if(r>=9){const t=document.createElementNS(NS,'text');t.setAttribute('x',String(x));t.setAttribute('y',String(y));t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','central');t.setAttribute('font-size',String(Math.max(8,r*.82)));t.setAttribute('font-weight','800');t.setAttribute('fill','#17181b');t.textContent=element.symbol;svg.append(t);}
   };
   if(structure.mode==='free'){
-   const radius=Math.max(8,Math.min(17,62/Math.sqrt(structure.units.length)));
-   for(const u of structure.units)sphere(22+u.position.x*256,17+u.position.y*156,radius);
+   const units=structure.units||[],positions=units.map(u=>u.position).filter(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y));
+   if(positions.length){
+    const xs=positions.map(p=>p.x),ys=positions.map(p=>p.y),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+    const spanX=Math.max(1e-6,maxX-minX),spanY=Math.max(1e-6,maxY-minY),scale=Math.min(250/spanX,150/spanY);
+    const cx=(minX+maxX)/2,cy=(minY+maxY)/2,radius=Math.max(9,Math.min(19,86/Math.sqrt(positions.length)));
+    positions.forEach(p=>sphere(width/2+(p.x-cx)*scale,height/2-(p.y-cy)*scale,radius));
+   }
   }else{
    let geometry=null;try{geometry=S.referenceGeometry(element);}catch{}
-   if(geometry){
+   if(geometry&&geometry.points?.length&&geometry.edges?.length){
     const project=p=>{const q=p.map((v,i)=>v-geometry.center[i]);return [q[0]+.35*q[1],-q[2]+.3*q[1],q[1]];};
-    const all=[...geometry.points,...geometry.edges.flat()].map(project),xs=all.map(p=>p[0]),ys=all.map(p=>p[1]);
-    const span=Math.max(1,...xs)-Math.min(...xs),height=Math.max(1,...ys)-Math.min(...ys),scale=150/Math.max(span,height);
-    const screen=p=>{const q=project(p);return [150+(q[0]-(Math.min(...xs)+Math.max(...xs))/2)*scale,95-(q[1]-(Math.min(...ys)+Math.max(...ys))/2)*scale,q[2]];};
-    for(const [a,b]of geometry.edges){const p=screen(a),q=screen(b);line(p[0],p[1],q[0],q[1]);}
-    const points=geometry.points.map(screen),depth=points.map(p=>p[2]),lo=Math.min(...depth),hi=Math.max(...depth),spanDepth=Math.max(1e-9,hi-lo);
-    points.map(p=>({p,far:(p[2]-lo)/spanDepth})).sort((a,b)=>b.far-a.far).forEach(({p,far})=>sphere(p[0],p[1],Math.max(7,Math.min(16,58/Math.sqrt(points.length)))*(1-.18*far)));
+    const all=[...geometry.points,...geometry.edges.flat()].map(project);
+    const xs=all.map(p=>p[0]),ys=all.map(p=>p[1]);
+    const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+    const spanX=Math.max(1e-6,maxX-minX),spanY=Math.max(1e-6,maxY-minY);
+    // Todas as prévias cristalográficas usam a mesma moldura e orientação, com escala
+    // normalizada pela maior dimensão da célula, para permitir comparação visual direta.
+    const scale=Math.min(250/spanX,162/spanY);
+    const centerX=(minX+maxX)/2,centerY=(minY+maxY)/2;
+    const screen=p=>{const q=project(p);return [width/2+(q[0]-centerX)*scale,height/2-(q[1]-centerY)*scale,q[2]];};
+    for(const [a,b]of geometry.edges){const p=screen(a),q=screen(b);line(p[0],p[1],q[0],q[1],.54);}
+    const points=geometry.points.map(screen),depth=points.map(p=>p[2]),lo=Math.min(...depth),hi=Math.max(...depth),depthSpan=Math.max(1e-9,hi-lo);
+    const radius=Math.max(7.5,Math.min(18,82/Math.sqrt(points.length)));
+    points.map(p=>({p,far:(p[2]-lo)/depthSpan})).sort((a,b)=>b.far-a.far).forEach(({p,far})=>sphere(p[0],p[1],radius*(1-.12*far)));
    }else{
-    const n=structure.units.length,radius=Math.max(7,Math.min(13,48/Math.sqrt(n)));
-    structure.units.forEach((_,i)=>{const a=i*2.399963,rr=12+Math.sqrt(i)*14;sphere(150+Math.cos(a)*rr,95+Math.sin(a)*rr,radius);});
+    const label=document.createElementNS(NS,'text');label.setAttribute('x','180');label.setAttribute('y','120');label.setAttribute('text-anchor','middle');label.setAttribute('dominant-baseline','central');label.setAttribute('fill','currentColor');label.setAttribute('opacity','.72');label.setAttribute('font-size','13');label.textContent='Geometria de referência indisponível';svg.append(label);
    }
   }
   return svg;
  }
- function setLayout(){
+  function setLayout(){
   cards.dataset.layout=layout;layoutButton.textContent=layout==='grid'?'Ver em lista':'Ver em grade';
   layoutButton.setAttribute('aria-label',layout==='grid'?'Ver estruturas em lista':'Ver estruturas em grade');
  }
@@ -166,27 +185,29 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
   for(const [index,record]of records.entries()){
    const e=S.data.get(record.atomicNumber),card=N('article',null,'silm-structure-card');card.dataset.structureId=record.id;
    if(record.id===cur)card.dataset.current='true';
-   const head=N('header',null,'silm-structure-card-head'),symbol=N('span',e.symbol,'silm-overview-chip-symbol');symbol.setAttribute('aria-hidden','true');
+   card.dataset.mode=record.mode;
+   const head=N('header',null,'silm-structure-card-head');
+   const symbol=N('span',e.symbol,'silm-overview-chip-symbol');symbol.setAttribute('aria-hidden','true');
    const heading=N('div',null,'silm-structure-card-heading');
-   const title=N('h3',record.name,'silm-structure-title');heading.append(title);
+   const eyebrow=N('span','Estrutura '+String(index+1).padStart(2,'0'),'silm-structure-card-index');
+   const title=N('h3',record.name,'silm-structure-title');heading.append(eyebrow,title);
    const badge=N('span',record.id===cur?'Em foco':'Salva','silm-structure-status');
    head.append(symbol,heading,badge);card.append(head);
-   const kind=record.mode==='crystalline'?S.crystal.label(record.snapshot.structure.crystallography.structureType,e):'Montagem livre';
-   const details=N('dl',null,'silm-structure-card-details');
-   const detail=(label,value)=>{const item=N('div',null,'silm-structure-card-detail');item.append(N('dt',label),N('dd',value));details.append(item);};
-   detail('Metal',e.name+' ('+e.symbol+')');
-   detail('Modelo',kind);
-   detail('Unidades',String(record.unitCount));
-   card.append(details);
    const figure=N('div',null,'silm-structure-preview');figure.append(preview(record));card.append(figure);
+   const details=N('div',null,'silm-structure-card-caption');
+   const kind=record.mode==='crystalline'?S.crystal.label(record.snapshot.structure.crystallography.structureType,e):'Montagem livre';
+   const type=N('span',kind,'silm-structure-type');
+   const metal=N('span',e.name+' ('+e.symbol+')','silm-structure-metal');
+   const units=N('span',record.unitCount+' '+(record.unitCount===1?'unidade':'unidades'),'silm-structure-units');
+   details.append(type,metal,units);card.append(details);
    const actions=N('div',null,'silm-structure-card-actions');
    const focus=N('button',record.id===cur?'Em foco':'Exibir no Foco',record.id===cur?'button outline':'button primary');focus.type='button';focus.disabled=record.id===cur;focus.addEventListener('click',()=>openRecord(record.id));
    const rename=N('button','Renomear','button outline');rename.type='button';rename.addEventListener('click',()=>editName(record,card,rename));
    const remove=N('button','Remover','button outline silm-structure-remove');remove.type='button';remove.disabled=record.id===cur;remove.title=record.id===cur?'A estrutura em foco não pode ser removida.':'Remover esta estrutura salva';remove.addEventListener('click',()=>removeRecord(record));
-   actions.append(focus,rename,remove);card.append(actions);cards.append(card);
+   actions.append(focus,rename,remove);card.append(actions);
   }
  }
-  function render(){
+   function render(){
   const cur=current();updateCount(cur);renderStrip(cur);renderCards(cur);setLayout();
  }
  function update(state){
