@@ -402,7 +402,7 @@ interface ElectroThermoOpticalMaterial {
   thermal: {
     densityKgM3?: number;
     heatCapacityCurve?: Array<{ temperatureK: number; cpJKgK: number }>;
-    conductivityCurve?: Array<{ temperatureK: number; kWmK: number }>;
+    conductivityCurve?: Array<{ temperatureK: number; thermalConductivityWmK: number }>;
     interfaceConductances?: Record<string, number>;
     evidence: EvidenceLevel;
     sourceIds: string[];
