@@ -317,3 +317,12 @@ Regras:
 - As combinações E+T, E+M e T+M precisam ser tratadas como relações físicas, e não como duas animações independentes.
 - E+T+M deve ser o objetivo central de acoplamento multifísico; óptica entra por modelos próprios quando os dados espectrais e de superfície estiverem disponíveis.
 - Até que valores por metal sejam homologados, os resultados permanecem qualitativos e devem ser identificados como tais.
+
+
+## 11. Da pesquisa científica à arquitetura operacional
+
+A cobertura das combinações E/T/M/O foi concluída no nível de especificação científica. A próxima camada está documentada em [ARQUITETURA-OPERACIONAL-ACOPLAMENTO-MULTIFISICO.md](ARQUITETURA-OPERACIONAL-ACOPLAMENTO-MULTIFISICO.md).
+
+A arquitetura estabelece uma experiência comum, solvers especializados, geometria física corrente, malhas próprias por domínio, transferência explícita de campos, relógio independente do renderer, convergência transacional e proveniência reproduzível. Também registra a auditoria dos motores atuais e a migração gradual, preservando os modos didáticos.
+
+**Próximo ponto de engenharia:** A0 — congelar schema, unidades SI, proveniência e separação entre definição, execução e resultados. Esta especificação ainda não altera código nem libera novas combinações quantitativas.
