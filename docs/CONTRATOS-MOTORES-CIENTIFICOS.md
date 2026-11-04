@@ -1,6 +1,6 @@
 # Contratos dos motores científicos — F1
 
-> **Status:** F1.1 e F1.2 aprovados; CI F1.2 41742138978 concluído com sucesso no commit `de7a0fe440c52a5fd9646f06a1a13198480ccaa6`.  
+> **Status:** F1 homologada — F1.1, F1.2, F1.3 e F1.4 concluídas no CI; sem alteração das regras científicas ou do schema 8.  
 > **Baseline de código:** branch especificacoes-atuais, commit 73040ddfce0491cee81c9c430abff67471f4fce8 (F0 aprovado na execução 41737430380).  
 > **Escopo:** identidade, evidência, aplicabilidade, entradas, saídas, unidades, estado, ciclo de vida e testes dos componentes científicos do Explorar.  
 > **Regra:** preservar as APIs atuais por adaptadores durante a primeira migração; não alterar equações nem comportamento nesta fase.
@@ -320,17 +320,23 @@ A tabela é uma matriz de capacidades, não determinação de que todo método d
 
 ### F1.3 — Criar adaptadores de compatibilidade
 
-- Adaptar chamadas atuais à estrutura descrita.
-- Preservar APIs públicas enquanto renderer e integração migram.
-- Não permitir que o adaptador duplique estado ou decida elegibilidade.
-- Não adicionar relógio comum ainda; isso é F2.
+- [x] Criar `domain/silm/engine-adapters.js` como resolvedor de APIs declaradas, sem substituir os módulos.
+- [x] Gerar `domain/silm/engine-catalog.js` a partir do JSON canônico por `scripts/build-engine-catalog.cjs`; manter defer/load order explícita na entrada integrada.
+- [x] Adaptar `integracao/metallic-experience.js` para resolver propriedades, térmico, deformação, estímulos, dados e cálculo pelo registry.
+- [x] Preservar APIs públicas originais e devolver referências diretas; chamadas só são permitidas quando declaradas no catálogo.
+- [x] Tratar componente/raiz/API ausente com erro estruturado; não copiar estado, persistir uma segunda versão ou decidir elegibilidade.
+- [x] Validar 10 componentes, resolução, invocação, falhas e ausência de escrita duplicada em `tests/engine-adapters.cjs`.
+- [x] Build, regressão, backup, acessibilidade, paridade, comparação e navegação aprovados na execução [41744291802](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41744291802), commit `bbf85176f03e05c2900ed488530c42615c8cacd0`.
+- [x] Atualizar o pré-cache offline para 89 recursos e BUILD `7dbb78476ddc` conforme artefato gerado pelo mesmo build.
 
 ### F1.4 — Homologar F1
 
-- Comparar resultados antes/depois por fixtures.
-- Executar todos os testes científicos e integração.
-- Verificar que schema 8, importação, exportação e Caderno continuam compatíveis.
-- Rejeitar qualquer diferença não explicada ou nova grandeza sem unidade/proveniência.
+- [x] Comparar resultados pelos fixtures F1.1 após os adaptadores; a suíte `engine-fixtures` permaneceu verde.
+- [x] Executar build, testes científicos e integração; `npm test` passou no CI F1.3.
+- [x] Verificar schema 8, importação, exportação e Caderno; testes de rotas, backup/restauração e browser passaram.
+- [x] Rejeitar mudança não explicada de resultado, unidade ou proveniência; nenhum algoritmo científico foi modificado neste incremento.
+
+**Homologação F1:** execução [41744291802](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41744291802) em `bbf85176f03e05c2900ed488530c42615c8cacd0`, `completed / success`.
 
 ## 9. Testes de contrato de F1
 
@@ -386,19 +392,19 @@ Possíveis arquivos novos: um manifesto de descritores e fixtures de contrato. A
 
 ## 11. Critérios de conclusão de F1
 
-- [ ] Todas as classes de componente estão corretamente identificadas.
-- [ ] Cada componente tem ID, evidência, aplicabilidade e fronteiras documentadas.
-- [ ] Versão do motor, versão do produto e schema do estado estão separadas.
-- [ ] APIs atuais estão congeladas por testes de contrato.
-- [ ] As capacidades opcionais não forçam motores estáticos a criar loop.
-- [ ] Renderer eletrônico está explicitamente fora do solver físico.
-- [ ] Medir e Calcular continuam independentes.
-- [ ] Nenhum estado duplicado ou elegibilidade paralela foi introduzido.
-- [ ] Fixtures comprovam preservação dos resultados qualitativos.
-- [ ] Build e suíte aplicável passam antes de iniciar F2.
+- [x] Todas as classes de componente estão corretamente identificadas.
+- [x] Cada componente tem ID, evidência, aplicabilidade e fronteiras documentadas.
+- [x] Versão do motor, versão do produto e schema do estado estão separadas.
+- [x] APIs atuais estão congeladas por testes de contrato.
+- [x] As capacidades opcionais não forçam motores estáticos a criar loop.
+- [x] Renderer eletrônico está explicitamente fora do solver físico.
+- [x] Medir e Calcular continuam independentes.
+- [x] Nenhum estado duplicado ou elegibilidade paralela foi introduzido.
+- [x] Fixtures comprovam preservação dos resultados qualitativos.
+- [x] Build e suíte aplicável passam antes de iniciar F2.
 
 ## 12. Limites e próximo passo
 
-F0 está formalmente aprovado no commit `73040ddfce0491cee81c9c430abff67471f4fce8` (execução [41737430380](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41737430380)). F1.1 está aprovado no commit `73e3067c35fe85e4817c910430e4ec7b4f20afd4` (execução [41740686034](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41740686034)). F1.2 está aprovado no commit `de7a0fe440c52a5fd9646f06a1a13198480ccaa6` (execução [41742138978](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41742138978)); o catálogo declara dez componentes e o teste confere os exports, caminhos, versões, classes e fronteiras de tempo/estado. O dataset, Medir, Calcular e adaptador seguem sem versão formal até haver revisões e fixtures próprias.
+F0 está aprovado (execução [41737430380](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41737430380)); F1.1 e F1.2 estão aprovadas nas execuções [41740686034](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41740686034) e [41742138978](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41742138978). F1.3 e F1.4 foram homologadas na execução [41744291802](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41744291802), commit `bbf85176f03e05c2900ed488530c42615c8cacd0`. Os dez componentes têm descritores e resolução compatível; dataset, Medir, Calcular e adaptador seguem sem versão formal de algoritmo, por não haver ainda revisões/fixtures científicas específicas. O adapter de integração não recebe versionamento científico.
 
-A F2 só poderá começar depois de F1 homologada. Ela tratará especificamente do relógio comum e do orquestrador, sem antecipar motores físicos dimensionais.
+**F1 está concluída.** A próxima fase é F2 — desenho e implementação incremental do relógio comum/orquestrador. Ela não pode começar com mudanças de equação ou parâmetros; primeiro deve especificar ordem de execução, passo fixo, pause/resume, dispose, visibilidade, movimento reduzido e política de erro.

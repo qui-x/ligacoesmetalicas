@@ -145,6 +145,8 @@ A sequência de motores depois da infraestrutura pode ter trabalho paralelo de c
 
 **Documento operacional:** `docs/CONTRATOS-MOTORES-CIENTIFICOS.md`.
 
+**Homologação registrada:** F1.1–F1.4 concluídas; execução [GitHub Actions 41744291802](https://github.com/qui-x/ligacoesmetalicas/actions/runs/41744291802), commit `bbf85176f03e05c2900ed488530c42615c8cacd0`, `completed / success`. Descritores, fixtures, adaptadores e fronteiras de estado/tempo estão testados. F2 permanece próxima fase, sem alteração das equações existentes.
+
 **Objetivo:** tornar explícita a identidade, a aplicabilidade e o ciclo de vida de cada motor sem ainda mudar a física.
 
 **Arquivos previstos:**
