@@ -329,3 +329,10 @@
 @media(forced-colors:active){.silm-axis{stroke:CanvasText}.silm-axis-label{fill:CanvasText}}
 @media print{.silm-camera{display:none}}
 @media print{.silm-camera-bar{display:none}}
+
+/* SILM — cena cristalina ampla; comandos e explicações ficam no painel Ver. */
+.silm-assembly.silm-crystal{display:flex;flex-direction:column;gap:0;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);min-height:0}
+.silm-assembly.silm-crystal .silm-assembly-area{grid-column:auto;grid-row:auto;flex:1 1 auto;min-height:0;width:100%;overflow:hidden;padding:0}
+.silm-assembly.silm-crystal .silm-assembly-footer,.silm-assembly.silm-crystal .silm-assembly-bar{display:none!important}
+.silm-assembly.silm-crystal .silm-assembly-stage{border-radius:0;border-inline:0;width:var(--stage);height:var(--stage)}
+@media(max-width:900px){.silm-assembly.silm-crystal .silm-assembly-stage{border-radius:8px;border:1px solid var(--silm-soft-border)}}

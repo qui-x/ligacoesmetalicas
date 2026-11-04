@@ -15,48 +15,54 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const mode3d=rep2.viewMode()==='3d',cameraKey=mode3d?'crystal3d':'crystal';
  const structureName='Estrutura cristalina '+m.name+' de '+name;
  const root=U.element('section',null,'silm-assembly silm-crystal');root.dataset.editable='true';root.setAttribute('aria-labelledby','silm-assembly-title');
- const bar=U.element('header',null,'silm-assembly-bar'),identity=U.element('div',null,'silm-assembly-identity'),titles=U.element('div');
- const badge=U.element('span',element.symbol,'silm-assembly-symbol');badge.setAttribute('aria-hidden','true');
- const eyebrow=U.element('p','ESTRUTURA CRISTALINA','eyebrow silm-assembly-eyebrow');
- const title=U.element('h1',element.name);title.id='silm-assembly-title';title.tabIndex=-1;
- const help=U.element('a','?','ajuda-link');help.href='#/manual/estruturas-cristalinas';help.setAttribute('aria-label','Ajuda: estruturas cristalinas');help.title='Ajuda: estruturas cristalinas';
- const heading=U.element('div',null,'silm-assembly-heading');heading.append(title,help);
- const meta=U.element('p','','silm-assembly-meta');meta.id='silm-assembly-meta';titles.append(eyebrow,heading,meta);identity.append(badge,titles);
- const tools=U.element('div',null,'silm-assembly-tools silm-crystal-tools');
- const views=U.element('div',null,'silm-segmented');views.setAttribute('role','group');views.setAttribute('aria-label','Vista da estrutura');
- const cellView=SILM.actionButton('Célula',()=>actions.represent({view:'cell'}),scope,{id:'silm-crystal-view-cell'}),latticeView=SILM.actionButton('Rede',()=>actions.represent({view:'lattice'}),scope,{id:'silm-crystal-view-lattice'});
- views.append(cellView,latticeView);
- const neighborsButton=SILM.actionButton('Mostrar vizinhos',()=>actions.toggleNeighbors(),scope,{id:'silm-crystal-neighbors'});
- // 0.11.x: projeção da representação (não muda a estrutura nem as medidas).
- const projectionBox=U.element('label',null,'silm-projection'),projectionText=U.element('span','Projeção','silm-projection-label'),projection=U.element('select');projection.id='silm-crystal-projection';
- // 0.12.x: um só seletor para as vistas 2D (projeções) e 3D (órbita livre e planos XY, XZ e YZ).
- const group2=U.element('optgroup'),group3=U.element('optgroup');group2.label='2D';group3.label='3D';
- for(const id of RP.PROJECTIONS){const o=U.element('option',RP.LABELS[id]);o.value=id;group2.append(o);}
- for(const id of RP.PRESETS){const o=U.element('option',RP.PRESET_LABELS[id]);o.value=id==='3d'?'3d':'3d-'+id;o.disabled=!rep2.available3D();group3.append(o);}
- projection.append(group2,group3);projectionBox.append(projectionText,projection);
- scope.listen(projection,'change',()=>{const v=projection.value;
-  if(v.startsWith('3d')){const preset=v==='3d'?'3d':v.slice(3);rep2.setCamera3D({preset,yaw:null,pitch:null},{silent:!mode3d});if(!mode3d)rep2.setViewMode('3d');}
-  else if(mode3d)rep2.setViewMode('2d',{projection:v});else rep2.setProjection(v);});
- tools.append(views,neighborsButton,projectionBox);bar.append(identity,tools);
+ const title=U.element('h1',structureName,'sr-only');title.id='silm-assembly-title';
+ const meta=U.element('p','','sr-only');meta.id='silm-assembly-meta';
+ const quickHost=document.getElementById('silm-view-quick-actions'),cameraHost=document.getElementById('silm-view-controls');
+ if(quickHost){quickHost.hidden=false;quickHost.replaceChildren();}
+ if(cameraHost)cameraHost.replaceChildren();
  const area=U.element('div',null,'silm-assembly-area'),stage=U.element('div',null,'silm-assembly-stage silm-crystal-stage');stage.id='silm-assembly-stage';stage.setAttribute('role','group');
  const units=U.element('div',null,'silm-assembly-units');units.setAttribute('role','group');units.setAttribute('aria-label','Unidades da estrutura de '+name);
  area.append(stage);
- const footer=U.element('div',null,'silm-assembly-footer');
- const kind=U.element('span','Representação didática: esferas reduzidas, sem escala física absoluta; proporções da célula a partir dos parâmetros tabelados.','silm-assembly-kind');
- const cellStatus=U.element('span','','silm-assist-badge');cellStatus.id='silm-crystal-cell-status';
- const instructions=U.element('p','Selecione uma unidade (clique, toque ou Enter) e use Mostrar vizinhos. Setas percorrem as unidades; Esc limpa a seleção.'+(note?' '+note:''),'silm-assembly-help');instructions.id='silm-assembly-help';
- const cameraHelp=U.element('p',mode3d?'Vista 3D: arraste para girar (no celular, um dedo); J e L giram na horizontal, I e K na vertical, P alterna perspectiva e ortográfica. Shift + arrastar desloca; + e − aproximam; F enquadra; 0 restaura. Os eixos no canto são só referência. A vista não muda a estrutura nem as medidas.':
-  'Vista: + e − aproximam e afastam, F enquadra, C centraliza, 0 restaura e Shift + setas deslocam. Arraste o fundo para deslocar; no celular, use dois dedos para aproximar. A vista não muda a estrutura nem as medidas.','silm-camera-help');
- const legend=U.element('p',m.id==='HCP'?'Camadas A e B: empilhamento ABAB. Unidades da camada B têm anel interno tracejado. Na projeção Superior, a camada B aparece nos espaços entre os centros da camada A.':m.general?'Célula da ficha cristalográfica (grupo espacial '+m.spaceGroup+'), com as posições geradas pelas operações de simetria registradas.'+(m.originShift?.some(v=>v)?' Origem da célula num centro de '+name+', para os vértices terem centros: na ficha, a origem fica deslocada de ('+m.originShift.map(v=>v.toFixed(3).replace('.',',')).join('; ')+') em frações da célula. É só uma convenção: a célula, as distâncias e a contagem são as mesmas.':'')+' O sólido continua em todas as direções: a célula é a unidade que se repete.':'O sólido continua em todas as direções: a célula é a unidade que se repete.','silm-crystal-legend');
- const feedback=U.element('p','','silm-assembly-feedback');feedback.id='silm-assembly-feedback';
- footer.append(feedback);root.append(bar,area,footer);host.append(root);
+ const feedback=U.element('p','','sr-only silm-assembly-feedback');feedback.id='silm-assembly-feedback';feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
+ root.append(title,meta,area,feedback);host.append(root);
  const say=(text,{announce=true}={})=>{feedback.textContent=text;if(announce)SimCore.notifications.announce(text);};
- /* ---------- renderizador comum ---------- */
+ /* ---------- comandos rápidos: os mesmos estados de Ver → Camadas → Estrutura ---------- */
+ const paths={cell:'M4 4h16v16H4zM4 9h16M9 4v16',lattice:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z',neighbors:'M6 12a2 2 0 1 0 0-.01M18 6a2 2 0 1 0 0-.01M18 18a2 2 0 1 0 0-.01M8 11l8-4M8 13l8 4',unitCell:'M4 4h16v16H4zM4 4l8 8 8-8M12 12v8'};
+ const quickButton=(id,label,path,handler)=>{
+  const button=U.element('button',null,'secondary-btn silm-quick-icon');button.type='button';button.id=id;button.setAttribute('aria-label',label);button.title=label;
+  const svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.8');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true');
+  const shape=document.createElementNS(NS,'path');shape.setAttribute('d',path);svg.append(shape);button.append(svg);scope.listen(button,'click',handler);quickHost?.append(button);return button;
+ };
+ const cellView=quickButton('silm-quick-view-cell','Vista da célula',paths.cell,()=>actions.represent({view:'cell'}));
+ const latticeView=quickButton('silm-quick-view-lattice','Vista da rede',paths.lattice,()=>actions.represent({view:'lattice'}));
+ const unitCellButton=quickButton('silm-quick-unit-cell','Mostrar ou ocultar célula unitária',paths.unitCell,()=>{const r=model.state.structure?.crystallography?.representation;if(r)model.setCrystalRepresentation({unitCell:!r.unitCell});});
+ const neighborsButton=quickButton('silm-quick-neighbors','Mostrar vizinhos',paths.neighbors,()=>actions.toggleNeighbors());
+ const projectionBox=U.element('label',null,'silm-quick-projection'),projectionIcon=document.createElementNS(NS,'svg');projectionIcon.setAttribute('viewBox','0 0 24 24');projectionIcon.setAttribute('fill','none');projectionIcon.setAttribute('stroke','currentColor');projectionIcon.setAttribute('stroke-width','1.8');projectionIcon.setAttribute('aria-hidden','true');
+ const projectionShape=document.createElementNS(NS,'path');projectionShape.setAttribute('d','M3 6h18M6 3v6M18 3v6M5 13h14l-3 8H8z');projectionIcon.append(projectionShape);
+ const projection=U.element('select');projection.id='silm-crystal-projection';projection.setAttribute('aria-label','Projeção e orientação da vista');projectionBox.title='Projeção e orientação da vista';projectionBox.append(projectionIcon,projection);
+ const group2=U.element('optgroup'),group3=U.element('optgroup');group2.label='2D';group3.label='3D';
+ for(const id of RP.PROJECTIONS){const o=U.element('option',RP.LABELS[id]);o.value=id;group2.append(o);}
+ for(const id of RP.PRESETS){const o=U.element('option',RP.PRESET_LABELS[id]);o.value=id==='3d'?'3d':'3d-'+id;o.disabled=!rep2.available3D();group3.append(o);}
+ projection.append(group2,group3);quickHost?.append(projectionBox);
+ scope.listen(projection,'change',()=>{const v=projection.value;if(v.startsWith('3d')){const preset=v==='3d'?'3d':v.slice(3);rep2.setCamera3D({preset,yaw:null,pitch:null},{silent:!mode3d});if(!mode3d)rep2.setViewMode('3d');}
+  else if(mode3d)rep2.setViewMode('2d',{projection:v});else rep2.setProjection(v);});
+ const syncQuickControls=r=>{
+  cellView.setAttribute('aria-pressed',String(r.view==='cell'));latticeView.setAttribute('aria-pressed',String(r.view==='lattice'));
+  unitCellButton.setAttribute('aria-pressed',String(r.unitCell));neighborsButton.setAttribute('aria-pressed',String(r.neighbors));
+  neighborsButton.setAttribute('aria-label',r.neighbors?'Ocultar vizinhos':'Mostrar vizinhos');neighborsButton.title=r.neighbors?'Ocultar vizinhos':'Mostrar vizinhos';
+ };
+ scope.cleanup(()=>{if(quickHost){quickHost.replaceChildren();quickHost.hidden=true;}});
+ const instructions=U.element('p','Selecione uma unidade (clique, toque ou Enter) para identificar seu centro e consultar vizinhos. Setas percorrem as unidades; Esc limpa a seleção.'+(note?' '+note:''),'silm-assembly-help');instructions.id='silm-assembly-help';
+ const cameraHelp=U.element('p',mode3d?'Vista 3D: arraste para girar; J e L giram na horizontal, I e K na vertical e P alterna perspectiva/ortográfica. Shift + arrastar desloca; + e − aproximam; F enquadra; 0 restaura.':'Vista: + e − aproximam e afastam, F enquadra, C centraliza, 0 restaura e Shift + setas deslocam. Arraste o fundo para deslocar; no celular, use dois dedos para aproximar.','silm-camera-help');
+ const legend=U.element('p',m.id==='HCP'?'Camadas A e B: empilhamento ABAB. Unidades da camada B têm anel interno tracejado. Na projeção Superior, a camada B aparece nos espaços entre os centros da camada A.':m.general?'Célula da ficha cristalográfica (grupo espacial '+m.spaceGroup+'), com posições geradas pelas operações de simetria registradas. O sólido continua em todas as direções: a célula é a unidade que se repete.':'O sólido continua em todas as direções: a célula é a unidade que se repete.','silm-crystal-legend');
+ const electronLegend=U.element('p','Pontos ciano: elétrons de valência deslocalizados pela estrutura inteira; marcadores qualitativos, sem representar o número real de elétrons.','silm-electron-legend');
+ const cellStatus=U.element('span','','silm-assist-badge');cellStatus.id='silm-crystal-cell-status';
+ const kind=U.element('p','Representação didática: esferas reduzidas, sem escala física absoluta; proporções da célula a partir dos parâmetros tabelados.','silm-assembly-kind');
  let layout=null,scene=null,selectedPoint=null,unitItems=[],fitKey=null;
  let perspectiveButton=null,orbitLive=null,orbitFrame=0,orbiting=false,lastPreset=null;
  const R=RD.createStage(stage,{scope,area,idPrefix:'silm',camera:rep2.camera(cameraKey),reducedMotion,announce:text=>SimCore.notifications.announce(text),
   describe:()=>sceneDescription(),onCamera:c=>rep2.saveCamera(cameraKey,c),items:()=>unitItems,focusPoint:()=>selectedPoint,canArrowPan:()=>true,
-  onUnitTap:id=>unitAction(id),onReset:()=>{if(mode3d){orbitLive=null;rep2.setCamera3D({preset:'3d',yaw:null,pitch:null},{silent:true});render();}else if(rep2.projection()!=='isometric')rep2.setProjection('isometric');},toggleHost:tools,
+  onUnitTap:id=>unitAction(id),onReset:()=>{if(mode3d){orbitLive=null;rep2.setCamera3D({preset:'3d',yaw:null,pitch:null},{silent:true});render();}else if(rep2.projection()!=='isometric')rep2.setProjection('isometric');},toolbarHost:cameraHost,
   onOrbit:mode3d?(dx,dy,phase)=>orbit(dx,dy,phase):null,
   extraButtons:mode3d?button=>{perspectiveButton=button('perspective','◫','Perspectiva (desligada: ortográfica)','P',()=>rep2.setCamera3D({projection:rep2.camera3D().projection==='perspective'?'orthographic':'perspective'}));return [perspectiveButton];}:null});
  if(mode3d)R.setDragMode('orbit');
@@ -67,13 +73,11 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  R.layer('lattice',latticeSvg,{camera:true});R.layer('unitCell',cellSvg,{camera:true});R.layer('neighbors',ghostSvg,{camera:true});R.layer('structure',units,{camera:true});
  // 0.6.x: a distribuição eletrônica acompanha a rede; o contorno da célula não é parede.
  const electronLayer=SILM.createElectronLayer(stage,{scope,before:units,reducedMotion});R.layer('electrons',electronLayer.canvas);
- const electronLegend=U.element('p','Pontos ciano: elétrons de valência deslocalizados pela estrutura inteira, marcadores qualitativos (não indicam o número real de elétrons). Não pertencem a um átomo nem a pares de átomos.','silm-electron-legend');electronLegend.id='silm-electron-legend';electronLegend.hidden=true;
- const electronControls=electronOptions?SILM.createElectronControls(footer,{scope,state:()=>model.state,actions:electronOptions.actions,reducedMotion,canActivate:electronOptions.canActivate}):null;
- if(electronControls)footer.prepend(electronControls.root);
- // 0.7.x: experiências de propriedades — sobreposição fora da estrutura e controles da propriedade ativa.
- const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:units}),propertyHost=U.element('div',null,'silm-property-host');R.layer('properties',overlay.root);
- footer.insertBefore(propertyHost,feedback);const propertyControls=propertyOptions?.controls?.(propertyHost,scope)||null;
- SILM.createSceneNotes(footer,{scope,items:[instructions,cameraHelp,legend,electronLegend,cellStatus,kind]});
+ // Elétrons e propriedades mantêm seus controles completos no painel Ver; o palco recebe somente as camadas visuais.
+ // 0.7.x: a sobreposição da experiência permanece sobre a cena; comandos ficam em Ver → Observar.
+ const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:units});R.layer('properties',overlay.root);
+ const notesHost=document.getElementById('silm-crystal-notes');
+ if(notesHost){notesHost.replaceChildren();SILM.createSceneNotes(notesHost,{scope,items:[instructions,cameraHelp,legend,electronLegend,cellStatus,kind]});}
  let deform=null,heatTimer=false,nearest=null,lastControls=0;const D=c=>deform?deform(c):c;
  /* 0.17.x: deformação contínua (SILM.deformation) — orientação de ensaio, elástico amortecido e deslizamento de planos
     animado. A alça da prensa (ou da garra) é só para ponteiro; "Força aplicada" e os botões são a alternativa acessível. */
@@ -298,18 +302,16 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   drawAxes();
   // Durante a animação da deformação, os controles e o texto são atualizados até 10 vezes por segundo (o desenho, a cada quadro).
   const busy=deforming&&!!deformCtl&&(r=>r.load>0||r.sliding||Math.abs(r.strain)>1e-3||(r.orient>1e-4&&r.orient<1-1e-4))(deformCtl.reading()),tNow=performance.now();
-  root.dataset.property=active||'';if(!busy||tNow-lastControls>100){lastControls=tNow;propertyControls?.update();}scheduleHeat(pr);
+  root.dataset.property=active||'';scheduleHeat(pr);
   const narrative=active?P.narrative(active,pr[active],{reduced:reducedMotion(),electronsVisible:shownElectrons}):null;
-  root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;electronControls?.update();
+  root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;
   const inCell=list.filter(u=>g.cellKeys.has(X.key(u.site))).length,added=list.filter(u=>u.placement==='crystallographic').length;
   // Indicador compacto (0.8.x): estrutura e, quando houver, a propriedade em estudo.
   meta.textContent=(m.general?m.label+' · '+m.spaceGroup:m.code+' · '+m.name)+' · '+list.length+' unidades'+(added?' ('+added+' completadas pelo SILM)':'')+(active?' · '+P.catalog[active].title+' em estudo':'');
   meta.title=meta.textContent;   // 0.9.1: texto integral quando o celular limita a duas linhas
   paint();
   stage.setAttribute('aria-label',structureName+'. '+(r.view==='lattice'?'Vista da rede extensa':'Vista da célula')+'; célula unitária '+(r.unitCell?'visível':'oculta')+'. '+inCell+' unidades na célula desenhada.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica; '+(moving?'movimento visual ativo.':'representação estática.'):'')+(narrative&&JSON.stringify(pr[active])!==JSON.stringify(P.defaults[active])?' '+P.catalog[active].title+': '+narrative.action+' '+narrative.observation:'')+(scene.measureText?' '+scene.measureText:''));
-  cellStatus.textContent='Célula unitária '+(r.unitCell?'visível':'oculta');
-  cellView.setAttribute('aria-pressed',String(r.view==='cell'));latticeView.setAttribute('aria-pressed',String(r.view==='lattice'));
-  neighborsButton.setAttribute('aria-pressed',String(r.neighbors));neighborsButton.textContent=r.neighbors?'Ocultar vizinhos':'Mostrar vizinhos';
+  cellStatus.textContent='Célula unitária '+(r.unitCell?'visível':'oculta');syncQuickControls(r);
   R.describe();
  }
  /* Rede na janela visível (refeita ao fim de cada gesto de câmera, não a cada quadro). */

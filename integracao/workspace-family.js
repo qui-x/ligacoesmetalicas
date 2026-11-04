@@ -47,11 +47,17 @@ SILM.createWorkspaceFamily=({model,activity=()=>null})=>{
  function layerChanged(key,value){layerState[key]=!!value;persistLayerState();applyLayerPresentation();renderViewers();}
  function renderLayerStructure(output){
   const s=model.state.structure,crystal=s?.mode==='crystalline',rep=crystal?s.crystallography.representation:null,group=node('section',null,'silm-layer-group');
-  group.append(node('h3','Visibilidade estrutural'));
+  group.append(node('h3','Vista e visibilidade'));
+  const views=node('div',null,'silm-layer-segmented');views.setAttribute('role','group');views.setAttribute('aria-label','Vista da estrutura');
+  for(const [id,label] of [['cell','Célula'],['lattice','Rede']]){
+   const b=node('button',label,'button outline');b.type='button';b.disabled=!crystal;b.setAttribute('aria-pressed',String(crystal&&rep.view===id));
+   b.addEventListener('click',()=>{if(crystal&&model.setCrystalRepresentation({view:id}))renderViewers();});views.append(b);
+  }
+  group.append(views);
+  toggleRow(group,{title:'Célula unitária visível',description:crystal?'Mostrar ou ocultar somente o contorno e os planos da célula.':'Disponível após organizar a estrutura cristalina.',checked:crystal?rep.unitCell:false,disabled:!crystal,onChange:v=>{model.setCrystalRepresentation({unitCell:v});renderViewers();}});
+  toggleRow(group,{title:'Vizinhos visíveis',description:crystal?'Realçar os vizinhos da unidade selecionada. Selecione um centro na cena.':'Disponível após organizar a estrutura cristalina.',checked:crystal?rep.neighbors:false,disabled:!crystal,onChange:v=>{model.setCrystalRepresentation({neighbors:v});renderViewers();}});
   toggleRow(group,{title:'Destacar centros metálicos',description:'Reduzir o destaque não remove as unidades.',checked:layerState.centers,onChange:v=>layerChanged('centers',v)});
-  toggleRow(group,{title:'Mostrar contorno da célula',description:crystal?'Controla apenas o contorno e os planos; não troca entre as vistas Célula e Rede.':'Disponível após organizar a estrutura cristalina.',checked:crystal?rep.unitCell:false,disabled:!crystal,onChange:v=>{model.setCrystalRepresentation({unitCell:v});renderViewers();}});
-  if(!crystal)group.append(node('p','Célula, rede e vizinhos ficam disponíveis após organizar a estrutura cristalina.','silm-layer-note'));
-  else group.append(node('p','A vista Célula/Rede e os vizinhos são controlados diretamente na barra da cena.','silm-layer-note'));
+  if(!crystal)group.append(node('p','Organize uma estrutura cristalina para habilitar célula, rede e vizinhos.','silm-layer-note'));
   output.append(group);
  }
  function renderLayerModels(output){
