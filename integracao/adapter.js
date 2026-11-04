@@ -93,7 +93,18 @@
  const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session,quickActions:experience.quickActions});
  routeUI=S.createRouteUI({model,storage,prepareMetal,view:()=>representation,onView:(value,{persist=true}={})=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);return persist?saveView():true;},schedule,say,onModule:m=>B.selectModule(m),selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
  const run={
-  add(){if(routeUI.session.open()&&!routeUI.canBuild())return;if(!model.state.structure)model.beginAssembly();return report(model.addUnit());},
+  add(){
+   if(routeUI.session.open()&&!routeUI.canBuild())return;
+   if(!model.state.structure)model.beginAssembly();
+   const result=model.addUnit();
+   // Reflita a inclusão no palco imediatamente; não dependa apenas do ciclo global de atualização.
+   if(result?.ok){
+    const current=view;
+    current?.update();
+    requestAnimationFrame(()=>{if(view===current&&current?.root?.isConnected)current.update();});
+   }
+   return report(result);
+  },
   move:(id,target,options)=>(!routeUI.session.open()||routeUI.canBuild())&&report(model.moveUnit(id,target,options)),
   undo:()=>(!routeUI.session.open()||routeUI.canBuild())&&model.state.module.active==='explorar'&&report(model.undo()),
   organize:()=>(!routeUI.session.open()||routeUI.canBuild())&&report(model.organize()),
