@@ -6,7 +6,7 @@ import { webcrypto } from 'node:crypto';
 
 const source = await readFile(new URL('../domain/silm/multiphysics/orchestrator.js', import.meta.url), 'utf8');
 function loadApi() {
-  const sandbox = { AbortController, console, setTimeout, clearTimeout };
+  const sandbox = { AbortController, structuredClone, console, setTimeout, clearTimeout };
   vm.runInNewContext(source, sandbox, { filename: 'orchestrator.js' });
   return sandbox.SILM;
 }
