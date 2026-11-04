@@ -9,25 +9,19 @@ SILM.createWorkspaceFamily=({model,activity=()=>null})=>{
  const storedLayers=B.storage.read(layerKey);
  const layerState={...layerDefaults,...(storedLayers&&typeof storedLayers==='object'?storedLayers:{})};
  const definitions=[
-  {id:'estrutura',title:'Estrutura e representação',capability:'tools',family:'observar',description:'Observe a célula, a rede e a geometria da amostra.'},
-  {id:'eletrons',title:'Elétrons deslocalizados',capability:'tools',family:'observar',description:'Observe o modelo qualitativo de elétrons de valência.'},
-  {id:'propriedades',title:'Propriedades metálicas',capability:'tools',family:'observar',description:'Escolha a experiência principal e configure estímulos auxiliares validados.'},
-  {id:'camadas-estrutura',title:'Estrutura',capability:'tools',family:'camadas',description:'Centros metálicos, célula unitária, rede extensa e vizinhos.',render:output=>renderLayerStructure(output)},
-  {id:'camadas-modelos',title:'Modelos',capability:'tools',family:'camadas',description:'Visibilidade e movimento dos elétrons deslocalizados.',render:output=>renderLayerModels(output)},
-  {id:'camadas-indicacoes',title:'Indicações',capability:'tools',family:'camadas',description:'Respostas visuais, rótulos e legendas.',render:output=>renderLayerIndications(output)},
-  {id:'comparar-livre-cristalina',title:'Montagem livre × cristalina',capability:'tools',family:'comparar',description:'Compare a preparação livre com a organização cristalográfica.',render:output=>renderComparison('free-crystal',output)},
-  {id:'comparar-celula-rede',title:'Célula × rede',capability:'tools',family:'comparar',description:'Compare a célula unitária com a rede extensa.',render:output=>renderComparison('cell-lattice',output)},
-  {id:'comparar-eletrons',title:'Elétrons ocultos × visíveis',capability:'tools',family:'comparar',description:'Compare a mesma estrutura com o modelo eletrônico oculto e visível.',render:output=>renderComparison('electrons',output)},
-  {id:'comparar-propriedade',title:'Antes × depois da propriedade',capability:'tools',family:'comparar',description:'Consulte o estado-base e a resposta da experiência atual.',render:output=>renderComparison('property',output)},
-  {id:'instrumentos',title:'Instrumentos de medição',capability:'measure',family:'medir',description:'Escolha um instrumento e selecione pontos na estrutura. Os registros ficam em Dados.'},
-  {id:'calculos',title:'Cálculos cristalográficos',capability:'analyze',family:'calcular',description:'Escolha uma fórmula e a origem de cada valor. Consulte os resultados e a proveniência em Dados.'}
- ];
+  {id:'observacao',title:'Observar',capability:'tools',family:'observar',description:'Exibição da cena, modelos, experiências e comparações da mesma investigação.',render:output=>renderObserverSummary(output)},
+  {id:'instrumentos',title:'Instrumentos de medição',capability:'measure',family:'medir',description:'Selecione instrumentos e registre medidas do modelo cristalográfico.'},
+  {id:'calculos',title:'Cálculos cristalográficos',capability:'analyze',family:'calcular',description:'Aplique fórmulas aos dados da mesma estrutura e registre a proveniência.'}
+ ];;
  let ready=false,dataPage=null;
- const names={explorar:'Explorar',medir:'Medir',calcular:'Calcular'};
+ let comparisonSelection='cell-lattice';
  function renderViewers(){
   const focused=document.activeElement;
   const tab=focused?.closest('#si-viewer-families')?focused.getAttribute('aria-selected'):null;
   B.renderViewers(emptyScene());
+  const observer=model.state.module.active==='explorar';
+  $('si-viewer-catalog')?.classList.toggle('silm-unified-observer',observer);
+  $('silm-observer-workspace').hidden=!observer;
   if(tab)$('si-viewer-families').querySelector('[aria-selected="true"]')?.focus({preventScroll:true});
  }
  function toggleRow(output,{title,description,checked,disabled=false,onChange}){
@@ -46,39 +40,32 @@ SILM.createWorkspaceFamily=({model,activity=()=>null})=>{
  }
  function layerChanged(key,value){layerState[key]=!!value;persistLayerState();applyLayerPresentation();renderViewers();}
  function renderLayerStructure(output){
-  const s=model.state.structure,crystal=s?.mode==='crystalline',rep=crystal?s.crystallography.representation:null,group=node('section',null,'silm-layer-group');
-  group.append(node('h3','Vista e visibilidade'));
-  const views=node('div',null,'silm-layer-segmented');views.setAttribute('role','group');views.setAttribute('aria-label','Vista da estrutura');
-  for(const [id,label] of [['cell','Célula'],['lattice','Rede']]){
-   const b=node('button',label,'button outline');b.type='button';b.disabled=!crystal;b.setAttribute('aria-pressed',String(crystal&&rep.view===id));
-   b.addEventListener('click',()=>{if(crystal&&model.setCrystalRepresentation({view:id}))renderViewers();});views.append(b);
-  }
-  group.append(views);
-  toggleRow(group,{title:'Célula unitária visível',description:crystal?'Mostrar ou ocultar somente o contorno e os planos da célula.':'Disponível após organizar a estrutura cristalina.',checked:crystal?rep.unitCell:false,disabled:!crystal,onChange:v=>{model.setCrystalRepresentation({unitCell:v});renderViewers();}});
-  toggleRow(group,{title:'Vizinhos visíveis',description:crystal?'Realçar os vizinhos da unidade selecionada. Selecione um centro na cena.':'Disponível após organizar a estrutura cristalina.',checked:crystal?rep.neighbors:false,disabled:!crystal,onChange:v=>{model.setCrystalRepresentation({neighbors:v});renderViewers();}});
-  toggleRow(group,{title:'Destacar centros metálicos',description:'Reduzir o destaque não remove as unidades.',checked:layerState.centers,onChange:v=>layerChanged('centers',v)});
-  if(!crystal)group.append(node('p','Organize uma estrutura cristalina para habilitar célula, rede e vizinhos.','silm-layer-note'));
+  const state=model.state,s=state.structure,crystal=s?.mode==='crystalline',rep=crystal?s.crystallography.representation:null,group=node('div',null,'silm-observer-state-line');
+  const view=crystal?(rep.view==='cell'?'Célula':'Rede'):'Montagem livre';
+  const details=crystal?'Célula unitária '+(rep.unitCell?'visível':'oculta')+' · vizinhos '+(rep.neighbors?'visíveis':'ocultos'):'Sem célula unitária ou escala cristalográfica.';
+  group.append(node('span',view,'silm-observer-state-primary'),node('span',details,'silm-observer-state-secondary'));
   output.append(group);
  }
  function renderLayerModels(output){
-  const state=model.state,el=state.electrons,units=state.structure?.units.length||0,min=SILM.electronModel?.minUnits||2,group=node('section',null,'silm-layer-group');
-  group.append(node('h3','Modelo eletrônico'));
-  toggleRow(group,{title:'Elétrons visíveis',description:el?'Ocultar os marcadores não desativa o modelo.':'Mostrar inicia o modelo, quando há unidades suficientes.',checked:!!el?.representation.visible,disabled:!el&&units<min,onChange:v=>{
-   if(v){const result=el?model.setElectronRepresentation({visible:true}):model.activateElectrons();if(result===false||result?.ok===false)B.notify('Não foi possível ativar o modelo eletrônico.','warning');}
-   else if(el)model.setElectronRepresentation({visible:false});renderViewers();
-  }});
-  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.motion==='on'||document.documentElement.classList.contains('si-no-motion');
-  toggleRow(group,{title:'Movimento eletrônico',description:reduced?'A preferência de movimento reduzido mantém os marcadores estáticos.':'Pausar a animação não desativa o modelo.',checked:!!el?.representation.motion,disabled:!el||!el.representation.visible||reduced,onChange:v=>{if(el)model.setElectronRepresentation({motion:v});renderViewers();}});
-  output.append(group);
+  const el=model.state.electrons,visible=!!el?.representation.visible,motion=!!el?.representation.motion;
+  output.append(node('p',!el?'Modelo eletrônico ainda não ativado.':visible?(motion?'Elétrons visíveis · movimento ativo':'Elétrons visíveis · estáticos'):'Modelo ativo · marcadores ocultos','silm-observer-state-line'));
+ }
+ function iconAction(output,{id,label,path,pressed=false,disabled=false,activate}){
+  const b=node('button',null,'silm-observer-icon-action');b.type='button';b.dataset.action=id;b.disabled=!!disabled;
+  b.setAttribute('aria-label',label);b.title=label;b.setAttribute('aria-pressed',String(pressed));
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.8');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true');
+  for(const d of path){const shape=document.createElementNS(svg.namespaceURI,'path');shape.setAttribute('d',d);svg.append(shape);}
+  b.append(svg,node('span',label,'silm-observer-icon-label'));b.addEventListener('click',activate);output.append(b);return b;
  }
  function renderLayerIndications(output){
-  const group=node('section',null,'silm-layer-group');group.append(node('h3','Indicações da cena'));
-  toggleRow(group,{title:'Indicações da propriedade',description:'Ocultar a sobreposição não desliga fontes nem encerra a experiência.',checked:layerState.property,onChange:v=>layerChanged('property',v)});
-  toggleRow(group,{title:'Rótulos',description:'Mostra ou oculta símbolos e identificadores auxiliares.',checked:layerState.labels,onChange:v=>layerChanged('labels',v)});
-  toggleRow(group,{title:'Legendas e orientação',description:'Recolhe as notas auxiliares de leitura da cena.',checked:layerState.legend,onChange:v=>layerChanged('legend',v)});
-  group.append(node('p','Visibilidade altera somente a apresentação; não altera o estado científico.','silm-layer-note'));output.append(group);
+  const group=node('div',null,'silm-observer-action-grid');group.setAttribute('role','group');group.setAttribute('aria-label','Camadas de apresentação');
+  iconAction(group,{id:'centers',label:'Destacar centros',path:['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z','M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z'],pressed:layerState.centers,activate:()=>layerChanged('centers',!layerState.centers)});
+  iconAction(group,{id:'property',label:'Indicações da propriedade',path:['M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z','M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z'],pressed:layerState.property,activate:()=>layerChanged('property',!layerState.property)});
+  iconAction(group,{id:'labels',label:'Rótulos',path:['M4 5h16','M4 12h12','M4 19h8'],pressed:layerState.labels,activate:()=>layerChanged('labels',!layerState.labels)});
+  iconAction(group,{id:'legend',label:'Legendas e notas',path:['M5 4h14v16H5z','M8 8h8','M8 12h8','M8 16h5'],pressed:layerState.legend,activate:()=>layerChanged('legend',!layerState.legend)});
+  output.append(group,node('p','Esses comandos alteram somente o que aparece na cena. Não ativam nem encerram experiências.','silm-layer-note'));
  }
- function compareCard(parent,kicker,title,description,status){
+  function compareCard(parent,kicker,title,description,status){
   const card=node('article',null,'silm-compare-card');card.append(node('span',kicker,'silm-compare-kicker'),node('h3',title),node('p',description));if(status)card.append(node('small',status,'silm-compare-status'));parent.append(card);
  }
  function renderComparison(kind,output){
@@ -102,31 +89,49 @@ SILM.createWorkspaceFamily=({model,activity=()=>null})=>{
   }
   output.append(grid,node('p','Quadro informativo, somente leitura. As cenas A/B lado a lado ainda não estão conectadas; não cria outra amostra nem produz medições.','silm-compare-note'));
  }
- function setupViewers(){
+ function renderObserverComparisons(){
+  const actions=$('silm-observer-comparison-actions'),content=$('silm-observer-comparison-content');
+  if(!actions||!content)return;actions.replaceChildren();content.replaceChildren();
+  const state=model.state,s=state.structure,hasFree=!!(s?.mode==='crystalline'&&Array.isArray(s.crystallography.freeUnits));
+  const choices=[
+   {id:'free-crystal',label:'Montagem × cristalina',enabled:hasFree},
+   {id:'cell-lattice',label:'Célula × rede',enabled:s?.mode==='crystalline'},
+   {id:'electrons',label:'Elétrons',enabled:!!state.electrons},
+   {id:'property',label:'Propriedade',enabled:!!state.properties?.active}
+  ];
+  if(!choices.some(x=>x.id===comparisonSelection&&x.enabled))comparisonSelection=choices.find(x=>x.enabled)?.id||'cell-lattice';
+  const group=node('div',null,'silm-observer-comparison-options');group.setAttribute('role','group');group.setAttribute('aria-label','Comparações disponíveis');
+  for(const choice of choices){
+   const b=node('button',choice.label,'silm-observer-compare-choice');b.type='button';b.disabled=!choice.enabled;b.setAttribute('aria-pressed',String(choice.id===comparisonSelection));
+   b.addEventListener('click',()=>{comparisonSelection=choice.id;renderObserverComparisons();});group.append(b);
+  }
+  actions.append(group);
+  if(choices.some(x=>x.id===comparisonSelection&&x.enabled))renderComparison(comparisonSelection,content);
+  else content.append(node('p','As comparações ficam disponíveis conforme a estrutura, o modelo eletrônico e a experiência em estudo.','silm-compare-note'));
+ }
+ function renderObserverSummary(output){
+  const state=model.state,e=state.metal?SILM.data.get(state.metal.atomicNumber):null,s=state.structure;
+  const summary=node('div',null,'silm-observer-summary');
+  const headline=node('p',e?e.name+' ('+e.symbol+')':'Nenhum metal selecionado','silm-observer-summary-title');
+  const detail=node('p',!s?'Investigação sem montagem':s.mode==='crystalline'?SILM.crystal.label(s.crystallography.structureType,e)+' · '+s.units.length+' unidades':'Montagem livre · '+s.units.length+' unidades','silm-observer-summary-detail');
+  summary.append(headline,detail);output.append(summary);
+  const display=$('silm-observer-display-actions');display?.replaceChildren();
+  if(display){renderLayerStructure(display);renderLayerIndications(display);}
+  const electrons=$('silm-observer-electron-state');electrons?.replaceChildren();if(electrons)renderLayerModels(electrons);
+  renderObserverComparisons();
+ }
+  function setupViewers(){
   for(const definition of definitions)B.registerViewer({...definition,render(_snapshot,_records,output){
-   output.append(node('p',definition.description,'silm-tool-description'));
-   for(const panel of document.querySelectorAll('[data-silm-viewer]'))panel.hidden=!panel.dataset.silmViewer.split(' ').includes(definition.id);
+   const observer=definition.id==='observacao';
+   $('silm-observer-workspace').hidden=!observer;
+   for(const panel of document.querySelectorAll('[data-silm-viewer]')){
+    const ids=panel.dataset.silmViewer.split(' ');
+    panel.hidden=observer?!['estrutura','eletrons','propriedades'].some(id=>ids.includes(id)):!ids.includes(definition.id);
+   }
+   if(!observer)output.append(node('p',definition.description,'silm-tool-description'));
    if(typeof definition.render==='function'){definition.render(output);return;}
   }});
   window.addEventListener('si-viewer-family-selected',renderViewers);window.addEventListener('si-viewer-selected',renderViewers);renderViewers();
- }
- function modules(){
-  const descriptions={
-   explorar:['Monte e observe','Escolha um metal, adicione unidades e organize a estrutura. Explore elétrons e propriedades qualitativas.'],
-   medir:['Meça o modelo','Use distância, ângulo, parâmetro de rede e coordenação numa estrutura cristalina válida.'],
-   calcular:['Relacione os dados','Calcule contagem de átomos, volume, raio, empacotamento e densidade, identificando a origem dos valores.']
-  };
-  const host=$('silm-module-cards');
-  for(const [index,id]of Object.keys(descriptions).entries()){
-   const card=node('details',null,'silm-module-card');card.dataset.module=id;
-   const summary=node('summary');summary.append(node('span',String(index+1),'silm-module-number'),node('strong',names[id]));
-   const badge=node('span','Ativo','silm-module-badge');badge.hidden=true;summary.append(badge);
-   const body=node('div',null,'silm-module-body');body.append(node('h4',descriptions[id][0]),node('p',descriptions[id][1]));
-   const activate=node('button','Ativar módulo '+names[id],'button outline');activate.type='button';activate.id='silm-module-activate-'+id;
-   activate.addEventListener('click',()=>{const choice=$('silm-module');if(choice.disabled)return;choice.value=id;choice.dispatchEvent(new Event('change',{bubbles:true}));queueMicrotask(()=>$('silm-module')?.focus({preventScroll:true}));});
-   body.append(activate);card.append(summary,body);host.append(card);
-   card.addEventListener('toggle',()=>{if(card.open)for(const other of host.children)if(other!==card)other.open=false;});
-  }
  }
  function showData(id,{focus=true}={}){
   dataPage=id;
@@ -147,12 +152,6 @@ SILM.createWorkspaceFamily=({model,activity=()=>null})=>{
   if(!ready)return;
   renderViewers();
   applyLayerPresentation();
-  const current=model.state.module.active,locked=!!activity()?.lockedModule();
-  for(const card of $('silm-module-cards').children){
-   const active=card.dataset.module===current;card.classList.toggle('is-active',active);card.querySelector('.silm-module-badge').hidden=!active;
-   const button=card.querySelector('button');button.disabled=locked||active;button.setAttribute('aria-pressed',String(active));button.textContent=active?'Módulo '+names[current]+' em uso':'Ativar módulo '+names[card.dataset.module];
-  }
-  $('silm-module-context').textContent=locked?'O módulo é definido pela atividade em andamento.':'A troca de módulo preserva a investigação e seus registros.';
   {const n=model.state.structure?.units.length||0;$('silm-unit-count').textContent=n+(n===1?' unidade':' unidades')+' na montagem';}
   {const m=model.state.measurements.length,c=model.state.calculations.length;$('silm-record-count').textContent=m+(m===1?' medição':' medições')+' · '+c+(c===1?' cálculo':' cálculos');}
   const active=B.activeViewer();if(active&&document.querySelector('[data-open-dock="ver"]').getAttribute('aria-expanded')==='true'&&!$('si-viewer-detail').hidden)$('si-right-title').textContent=active.title;
@@ -161,6 +160,6 @@ SILM.createWorkspaceFamily=({model,activity=()=>null})=>{
  // Como no SIAB, os painéis abertos por Ver e Dados se chamam "Investigar" e "Dados da investigação". A Base reescreve o
  // título a cada desenho da doca; o observador troca só esses rótulos genéricos e deixa os títulos de detalhe como estão.
  function titleInvestigar(){const title=$('si-right-title');if(!title)return;const fix=()=>{const label={Ver:'Investigar',Dados:'Dados da investigação'}[title.textContent];if(label)title.textContent=label;};new MutationObserver(fix).observe(title,{childList:true,characterData:true,subtree:true});fix();}
- function init(){modules();setupViewers();setupData();titleInvestigar();ready=true;update();}
+ function init(){setupViewers();setupData();titleInvestigar();ready=true;update();}
  return {init,update};
 };

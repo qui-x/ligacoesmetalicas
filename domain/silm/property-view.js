@@ -56,29 +56,44 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  const B={field:button('field','Aplicar campo elétrico',()=>actions.field(),{primary:true}),heat:button('heat','Aquecer região',()=>actions.heat(),{primary:true}),advance:button('advance','Avançar propagação',()=>actions.advance()),
   compress:button('compress','Aplicar compressão',()=>actions.compress(),{primary:true}),stretch:button('stretch','Alongar',()=>actions.stretch(),{primary:true}),light:button('light','Incidir luz',()=>actions.light(),{primary:true}),
   restore:button('restore','Restaurar',()=>actions.restore()),end:button('end','Encerrar experiência',()=>actions.end())};
- const starts=Object.fromEntries(P.ids.map(id=>[id,button('start-'+id,P.catalog[id].title,()=>actions.start(id))]));
+ const glyphs={
+  electrical:['M13 2 4 14h7l-1 8 10-13h-7z'],
+  thermal:['M14 14.76V5a2 2 0 0 0-4 0v9.76a4 4 0 1 0 4 0Z','M12 17v2'],
+  malleability:['M3 8h7m-3-3 3 3-3 3','M21 16h-7m3-3-3 3 3 3'],
+  ductility:['M3 12h7m-3-3 3 3-3 3','M21 12h-7m3-3-3 3 3 3'],
+  luster:['M12 2v3','M12 19v3','M2 12h3','M19 12h3','m5 5 2 2','m17 17 2 2','m19 5-2 2','m7 17-2 2','M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z']
+ };
+ const decorate=(button,label,paths,cls)=>{
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.8');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true');
+  for(const d of paths){const p=document.createElementNS(svg.namespaceURI,'path');p.setAttribute('d',d);svg.append(p);}
+  const caption=U.element('span',label,'silm-property-icon-label');button.replaceChildren(svg,caption);button.classList.add(cls);button.setAttribute('aria-label',label);button.title=label;
+ };
+ const starts=Object.fromEntries(P.ids.map(id=>[id,button('start-'+id,P.catalog[id].title,()=>{
+  if(info().state.properties.active===id)actions.end();else actions.start(id);
+ })]));
  const reasons=Object.fromEntries(P.ids.map(id=>{const r=U.element('span','','silm-property-reason');r.id=prefix+'-reason-'+id;starts[id].setAttribute('aria-describedby',r.id);return [id,r];}));
- for(const id of P.ids){const item=U.element('div',null,'silm-property-item');item.append(starts[id],reasons[id]);list.append(item);}
+ for(const id of P.ids){decorate(starts[id],P.catalog[id].title,glyphs[id],'silm-property-choice');const item=U.element('div',null,'silm-property-item');item.append(starts[id],reasons[id]);list.append(item);}
  function update(){
   const {state,eligibility,editable,reduced,availability}=info(),pr=state.properties,active=pr?.active;
-  box.dataset.active=active||'';list.hidden=!!active||compact;row.hidden=!active;
-  if(!active){head.textContent=compact?'':'Escolha uma propriedade para investigar.';status.textContent=compact?'':'Uma experiência por vez; as experiências não alteram a estrutura científica.';
-   for(const id of P.ids){const el=eligibility[id],able=availability(id),ok=el.status!=='unavailable'&&able.ok&&editable;starts[id].setAttribute('aria-disabled',String(!ok));
-    reasons[id].textContent=el.status==='unavailable'?'Indisponível: '+el.message:!able.ok?able.message:!editable?'Disponível em Explorar.':(el.status==='available'?'Experiência qualitativa · dado tabelado':'Experiência qualitativa');}
-   return;}
-  const p=pr[active],L=P.limits;head.textContent=P.catalog[active].title;
+  box.dataset.active=active||'';list.hidden=!!compact;row.hidden=!active;
+  head.textContent=active?'Experiência ativa: '+P.catalog[active].title:'Aplicação das propriedades';
+  status.textContent=active?'Ajuste a experiência abaixo. Selecione outra propriedade para trocar diretamente; a anterior retorna ao estado-base.':'Uma experiência principal por vez. Selecione um ícone para ativar; clicar no ícone ativo encerra a experiência.';
+  for(const id of P.ids){
+   const el=eligibility[id],able=availability(id),selected=active===id,ok=selected||(el.status!=='unavailable'&&able.ok&&editable);
+   starts[id].disabled=!ok;starts[id].setAttribute('aria-disabled',String(!ok));starts[id].setAttribute('aria-pressed',String(selected));
+   starts[id].dataset.active=String(selected);
+   starts[id].title=selected?'Encerrar '+P.catalog[id].title:!ok?(el.status==='unavailable'?'Indisponível: '+el.message:able.message||'Disponível somente em Explorar.'): 'Ativar '+P.catalog[id].title+(active?' e trocar a experiência atual':'');
+   reasons[id].textContent=selected?'Ativa · clique para encerrar':el.status==='unavailable'?'Indisponível: '+el.message:!able.ok?able.message:!editable?'Disponível em Explorar.':(el.status==='available'?'Experiência qualitativa · dado tabelado':'Experiência qualitativa');
+  }
+  if(!active)return;
+  const p=pr[active],L=P.limits;
   const show=(...ids)=>{for(const [k,b]of Object.entries(B))b.hidden=!ids.includes(k);};
-  // Calor + corrente (0.17.x): na estrutura cristalina, a condutividade elétrica também tem a fonte de calor.
   const combined=active==='electrical'&&!!info().thermal?.combined;
   if(combined){B.heat.textContent=info().thermal.on?'Desligar fonte de calor':'Ligar fonte de calor';B.heat.setAttribute('aria-pressed',String(!!info().thermal.on));}
   if(active==='electrical'){show('field',...(combined?['heat']:[]),'restore','end');B.field.textContent=p.field?'Remover campo':'Aplicar campo elétrico';B.field.setAttribute('aria-pressed',String(p.field));}
-  // 0.17.x: no modo contínuo, o calor avança sozinho no tempo; não há "Avançar propagação".
   if(active==='thermal'&&info().thermal){show('heat','restore','end');B.heat.textContent=p.heating?'Desligar fonte de calor':'Ligar fonte de calor';B.heat.setAttribute('aria-pressed',String(p.heating));}
   else if(active==='thermal'){show('heat','advance','restore','end');B.heat.textContent=p.heating?'Desligar fonte de calor':'Aquecer região';B.heat.setAttribute('aria-pressed',String(p.heating));B.advance.setAttribute('aria-disabled',String(!p.heating||p.stage>=L.heatStages||!editable));}
-  // 0.17.x: na deformação contínua, a força vem da prensa ou da garra na cena (arraste ou teclado); o botão faz um pulso completo.
-  const r=info().deformation||null;
-  // Deformação + corrente: botão de campo elétrico (transitório) na maleabilidade e na ductilidade.
-  const dv=info().drive,deformField=!!dv&&(active==='malleability'||active==='ductility');
+  const r=info().deformation||null,dv=info().drive,deformField=!!dv&&(active==='malleability'||active==='ductility');
   if(deformField){B.field.textContent=dv.deformField?'Remover campo elétrico':'Aplicar campo elétrico';B.field.setAttribute('aria-pressed',String(dv.deformField));}
   if(active==='malleability'){show('compress',...(deformField?['field']:[]),'restore','end');B.compress.setAttribute('aria-disabled',String(p.compression>=L.compression||!editable));B.compress.textContent=r?'Comprimir até deslizar ('+p.compression+'/'+L.compression+')':p.compression?'Comprimir mais ('+p.compression+'/'+L.compression+')':'Aplicar compressão';}
   if(active==='ductility'){show('stretch',...(deformField?['field']:[]),'restore','end');B.stretch.setAttribute('aria-disabled',String(p.elongation>=L.elongation||!editable));B.stretch.textContent=r?'Puxar até deslizar ('+p.elongation+'/'+L.elongation+')':p.elongation?'Alongar mais ('+p.elongation+'/'+L.elongation+')':'Alongar';}
@@ -87,5 +102,5 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   B.end.setAttribute('aria-disabled','false');
   const n=P.narrative(active,p,{reduced,electronsVisible:!!state.electrons?.representation.visible,deformation:info().deformation||null,thermal:info().thermal||null,drive:info().drive||null});if(status.textContent!==n.observation)status.textContent=n.observation;
  }
- for(const b of Object.values(B))row.append(b);update();return Object.freeze({root:box,update});
+  for(const b of Object.values(B))row.append(b);update();return Object.freeze({root:box,update});
 };

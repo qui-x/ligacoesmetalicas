@@ -90,8 +90,28 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
   const state=model.state,key=state.investigation?.id+':'+state.structure?.mode;
   if(key!==context){context=key;reset();}
   host.replaceChildren();moduleHost.replaceChildren();history.replaceChildren();
-  field(moduleHost,'Módulo ativo',select('silm-module',[['explorar','Explorar'],['medir','Medir'],['calcular','Calcular']],state.module.active,v=>{if(activity()?.lockedModule())return;reset();model.setModule(v);onModule(v);change();}));
-  document.getElementById('silm-module').disabled=!!activity()?.lockedModule();
+  const switcher=node('div',null,'silm-module-switcher');switcher.setAttribute('role','tablist');switcher.setAttribute('aria-label','Módulos da mesma investigação');
+  const locked=activity()?.lockedModule?.()||null,measureReady=model.measurementAvailability().ok,calculationReady=model.calculationAvailability().ok;
+  const choices=[
+   {id:'explorar',label:'Explorar',available:!locked||locked==='explorar'},
+   {id:'medir',label:'Medir',available:(measureReady||state.module.active==='medir')&&(!locked||locked==='medir')},
+   {id:'calcular',label:'Calcular',available:(calculationReady||state.module.active==='calcular')&&(!locked||locked==='calcular')}
+  ];
+  for(const item of choices){
+   if(!item.available)continue;
+   const active=state.module.active===item.id,b=node('button',item.label,'silm-module-tab');
+   b.type='button';b.dataset.module=item.id;b.setAttribute('role','tab');b.setAttribute('aria-selected',String(active));b.setAttribute('aria-pressed',String(active));b.tabIndex=active?0:-1;b.disabled=active||!!locked;
+   b.addEventListener('click',()=>{
+    const currentLock=activity()?.lockedModule?.()||null;if(currentLock||model.state.module.active===item.id)return;
+    if(item.id==='medir'&&!model.measurementAvailability().ok)return;
+    if(item.id==='calcular'&&!model.calculationAvailability().ok)return;
+    reset();if(!model.setModule(item.id))return;onModule(item.id);change();
+    say('Módulo '+item.label+' ativo. A investigação, a estrutura e os registros foram preservados.','info');
+   });
+   switcher.append(b);
+  }
+  moduleHost.append(switcher);
+  const hint=node('p',locked?'O módulo está definido pela atividade em andamento.':'A troca mantém a mesma investigação, estrutura e registros.','silm-module-switcher-hint');moduleHost.append(hint);
   if(state.module.active!=='explorar'){
    host.append(node('p','Medições e cálculos usam o modelo cristalográfico em escala física. Zoom e projeção não alteram os valores.'));
    if(!available())host.append(node('p',model.measurementAvailability().reason==='DEFORMED'?'Restaure a experiência de deformação em Explorar para medir ou calcular a estrutura de referência.':'Organize uma estrutura cristalina em Explorar para usar este módulo. A montagem livre não tem escala física.'));

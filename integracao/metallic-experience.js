@@ -11,8 +11,16 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
  const thermal=()=>T?.controller(model,{reducedMotion:reduced})||null;
  const drive=()=>V?.controller(model)||null;
  const change=patch=>{if(!editable())return;const ok=model.setPropertyParams(patch);if(ok)schedule();return ok;};
+ const resetLiveEffects=()=>{
+  deform()?.setLoad(0);drive()?.setDeformField(false);
+  const controller=thermal();if(controller){controller.setHeating(false);controller.reset();}
+ };
  const actions={
-  start(id){if(!allows(id)||!editable())return;const r=model.startProperty(id);if(!r.ok)say(P.reasons[r.reason]||'Organize uma estrutura cristalina para esta experiência.','warning');schedule();},
+  start(id){
+   if(!allows(id)||!editable())return;
+   if(model.state.properties.active&&model.state.properties.active!==id)resetLiveEffects();
+   const r=model.startProperty(id);if(!r.ok)say(P.reasons[r.reason]||'Organize uma estrutura cristalina para esta experiência.','warning');schedule();
+  },
   // Deformação + corrente: na maleabilidade e na ductilidade, o campo é transitório (SILM.drive), sem gravar.
   // Ligar o campo mostra os elétrons, se estiverem ocultos (como ao iniciar a condutividade elétrica).
   field(){const st=model.state,id=st.properties.active;if(id==='malleability'||id==='ductility'){const d=drive();if(d&&editable()){const on=!d.deformField;if(on&&!st.electrons?.representation.visible)model.activateElectrons?.();d.setDeformField(on);schedule();}return;}return change({field:!model.state.properties.electrical.field});},
@@ -23,7 +31,7 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   stretch(){if(!editable())return;const c=deform();if(c){const ok=c.pulse();schedule();return ok;}const p=model.state.properties.ductility;if(p.elongation<P.limits.elongation)return change({elongation:p.elongation+1});},
 
   light:()=>change({light:!model.state.properties.luster.light}),
-  restore(){deform()?.setLoad(0);drive()?.setDeformField(false);model.restoreProperty();const t=thermal();if(t){t.setHeating(false);t.reset();}schedule();},end(){deform()?.setLoad(0);model.endProperty();schedule();}
+  restore(){resetLiveEffects();model.restoreProperty();schedule();},end(){resetLiveEffects();model.endProperty();schedule();}
  };
  // Uma leitura do estado por atualização (model.state devolve uma cópia completa).
  const info=()=>{const st=model.state;return {deformation:deform()?.reading()||null,thermal:thermal()?.reading()||null,drive:drive()?.reading()||null,state:st,eligibility:P.eligibility(st.metal?Data.get(st.metal.atomicNumber):null),editable:st.module.active==='explorar',reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}};};

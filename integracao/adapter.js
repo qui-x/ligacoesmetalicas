@@ -87,7 +87,7 @@
   showFocus();schedule();say(record.name+' exibida no Foco.','success');return true;
  }
  const comparison=S.createStructureComparison({storage,host:$('silm-comparison-items'),current:()=>model.state.structure?.units?.length?model.state.investigation?.id:null,open:openStructure,newStructure:()=>{showFocus();openLeft('preparo');},say,confirm:options=>B.confirmDialog(options)});
- const tools=S.createIntegrationTools({model,host:$('silm-tools'),moduleHost:$('silm-module-choice'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
+ const tools=S.createIntegrationTools({model,host:$('silm-tools'),moduleHost:$('si-viewer-module-choice'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
  const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session});
  const prepareMetal=z=>{if(routeUI?.session.open()||S.data.get(z)?.silmEligibility.status!=='available')return false;$('silm-metal').value=String(z);selected=String(z);schedule();return true;};
  const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,prepareMetal,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
@@ -213,10 +213,13 @@
   $('si-compact-clear').disabled=state.module.active!=='explorar'||!n;$('scene-count').dataset.compactCount=units(n);
   $('silm-add').disabled=state.module.active!=='explorar'||!e||s?.mode==='crystalline';$('silm-organize').disabled=state.module.active!=='explorar'||!n||s?.mode==='crystalline'||S.crystal.eligibility(e).status!=='available';{const el=e?S.crystal.eligibility(e):null,why=$('silm-organize-reason');if(why){why.textContent=el&&el.status!=='available'?organizeReason(e,el):'';why.hidden=!why.textContent;}}
   $('silm-free').hidden=s?.mode!=='crystalline';$('silm-free').disabled=state.module.active!=='explorar';$('silm-export').disabled=!e;
-  $('silm-electrons').disabled=n<2;
-  const visible=!!state.electrons?.representation.visible;
-  $('silm-motion').disabled=!visible||reduced();$('silm-motion').setAttribute('aria-pressed',String(visible&&!!state.electrons?.representation.motion&&!reduced()));
-  text('silm-electrons',visible?'Ocultar elétrons':'Mostrar elétrons');$('silm-electrons').setAttribute('aria-pressed',String(visible));
+  const electronButton=$('silm-electrons'),electronVisible=!!state.electrons?.representation.visible,electronAvailable=n>=S.electronModel.minUnits;
+  electronButton.disabled=!electronVisible&&!electronAvailable;
+  electronButton.dataset.active=String(electronVisible);electronButton.setAttribute('aria-pressed',String(electronVisible));
+  const electronLabel=$('silm-electrons-label');
+  if(electronLabel)electronLabel.textContent=electronVisible?'Desativar elétrons e movimento':'Ativar elétrons e movimento';
+  electronButton.setAttribute('aria-label',electronVisible?'Desativar aparição e movimento dos elétrons':'Ativar aparição e movimento dos elétrons');
+  electronButton.title=!electronVisible&&!electronAvailable?'São necessárias pelo menos '+S.electronModel.minUnits+' unidades para ativar o modelo eletrônico.':electronVisible?'Clique para ocultar os elétrons e interromper seu movimento.':'Clique para mostrar os elétrons e iniciar seu movimento.';
   $('silm-export-legacy').hidden=!legacyState();
   const data=$('silm-data');data.replaceChildren();
   if(e){
@@ -285,7 +288,7 @@
   // Tour da oficina (Etapa 10): coachmark como no SIAB, só na oficina livre; cada passo aponta um controle real e visível.
   const TOUR=[
    {title:'Prepare a oficina',text:'Abra Montagem → Preparo para escolher o metal e usar Iniciar investigação. A Tabela periódica mostra os metais disponíveis.',left:'preparo',target:()=>$('si-dock-left'),mobile:'[data-open-dock="montagem"]'},
-   {title:'Escolha um módulo',text:'Explorar, Medir e Calcular são independentes. Escolha em Montagem → Módulo, pelo objetivo da investigação.',left:'modulo',target:()=>$('si-dock-left'),mobile:'[data-open-dock="montagem"]'},
+   {title:'Alterne os módulos',text:'Use os botões no topo de Investigar. A troca preserva a mesma investigação, a estrutura e os registros; módulos indisponíveis não são oferecidos.',right:'ver',target:()=>$('si-dock-right'),mobile:'[data-open-dock="ver"]'},
    {title:'Monte a estrutura',text:'Em Explorar, use Adicionar unidade e Organizar estrutura para dispor as unidades na estrutura de referência. Desfazer recupera o estado anterior.',left:'preparo',target:()=>$('silm-group-structure')?.closest('section,.silm-dock-group')||$('silm-add'),mobile:'[data-open-dock="montagem"]'},
    {title:'Observe',text:'A cena mostra a montagem. Girar, aproximar ou trocar a vista não altera medições nem cálculos.',target:()=>$('si-stage'),mobile:'#si-stage'},
    {title:'Investigue e consulte os dados',text:'Em Ver, observe, meça e analise conforme o módulo. Em Dados, consulte os valores, as fontes e o relatório.',right:'ver',target:()=>$('si-dock-right'),mobile:'[data-open-dock="ver"]'}];
@@ -320,7 +323,7 @@
   window.addEventListener('resize',placeTour);document.addEventListener('scroll',placeTour,true);
   // Ajuda "?" das docas: o tópico do Manual que corresponde ao que o painel mostra agora (como as ajudas do SIAB).
   const VIEWER_TOPICS=[['Estrutura','vista'],['Elétrons','eletrons-deslocalizados'],['Propriedades','propriedades-metalicas'],['Instrumentos','medir'],['Medir','medir'],['Cálculos','calcular'],['Calcular','calcular']];
-  const dockTopic=side=>{if(side==='left'){const tab=document.querySelector('[data-left-tab][aria-pressed="true"]')?.dataset.leftTab;return {resumo:'interface',preparo:'selecionar-metal',objetos:'montagem',missao:'atividades',modulo:{explorar:'explorar',medir:'medir',calcular:'calcular'}[model.state.module.active]||'interface'}[tab]||'montagem';}
+  const dockTopic=side=>{if(side==='left'){const tab=document.querySelector('[data-left-tab][aria-pressed="true"]')?.dataset.leftTab;return {resumo:'interface',preparo:'selecionar-metal',objetos:'montagem',missao:'atividades'}[tab]||'montagem';}
    if(document.querySelector('[data-open-dock="ver"]')?.getAttribute('aria-expanded')==='true'&&shown($('si-dock-viewer-back'))){const title=$('si-right-title').textContent;return VIEWER_TOPICS.find(([k])=>title.includes(k))?.[1]||'vista';}
    return 'interface';};
   const helpDialog=$('silm-help-dialog');
@@ -376,9 +379,11 @@
   $('scene-undo').addEventListener('click',run.undo);$('scene-clear').addEventListener('click',clear);
   B.setupActionMenu('scene-menu-toggle','scene-tools-menu',action=>{if(action==='clear')return clear();if(action==='help')location.hash='#/manual';});
   $('silm-electrons').addEventListener('click',()=>{
-   if(model.state.electrons)model.setElectronRepresentation({visible:!model.state.electrons.representation.visible});else report(model.activateElectrons());
+   const el=model.state.electrons;
+   if(el?.representation.visible)model.setElectronRepresentation({visible:false,motion:false});
+   else if(el)model.setElectronRepresentation({visible:true,motion:true});
+   else report(model.activateElectrons());
   });
-  $('silm-motion').addEventListener('click',()=>{if(model.state.electrons)model.setElectronRepresentation({motion:!model.state.electrons.representation.motion});});
   $('silm-export-legacy').addEventListener('click',()=>{const value=legacyState();if(value&&!routeUI.session.open())downloadState(value);});
   $('silm-export').addEventListener('click',exportState);$('silm-import').addEventListener('change',importState);
   window.addEventListener('si-route-changed',()=>{if(B.currentRoute(location.hash)!=='ambiente')setStageExpanded(false,{restoreFocus:false});view?.update();});

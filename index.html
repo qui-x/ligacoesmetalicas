@@ -209,11 +209,11 @@
                 <button type="button" data-left-tab="resumo" aria-pressed="false">Resumo</button>
                 <button type="button" data-left-tab="preparo" aria-pressed="true">Preparo</button>
                 <button type="button" data-left-tab="objetos" aria-pressed="false">Unidades</button>
-                <button type="button" data-left-tab="modulo" aria-pressed="false">Módulo</button>
+                
                 <button type="button" data-left-tab="missao" aria-pressed="false" hidden>Roteiro</button>
               </nav>
               <div class="si-dock-scroll" id="si-left-scroll" tabindex="-1">
-                <div data-left-panel="resumo"><h3>Investigação atual</h3><p id="silm-summary"></p><dl id="silm-summary-list" class="silm-summary-list"></dl></div><div data-left-panel="preparo"><section class="silm-dock-group" aria-labelledby="silm-group-metal"><h3 id="silm-group-metal">Metal da investigação</h3><label for="silm-metal">Escolha um metal</label><select id="silm-metal"></select><div class="silm-dock-actions"><button id="silm-open-periodic" type="button" class="button outline">Tabela periódica</button><button id="silm-start" class="button primary" type="button">Iniciar investigação</button><a id="silm-open-presets" class="button outline" href="#/montagens">Montagens prontas</a></div><p id="silm-metal-information"></p></section><section class="silm-dock-group" aria-labelledby="silm-group-structure"><h3 id="silm-group-structure">Estrutura</h3><div class="silm-dock-actions"><button id="silm-add" class="button outline" type="button">Adicionar unidade</button><button id="silm-organize" class="button outline" type="button" aria-describedby="silm-organize-reason">Organizar estrutura</button><p id="silm-organize-reason" class="silm-organize-reason" hidden></p><button id="silm-free" class="button outline" type="button">Retornar à montagem livre</button></div></section></div><div data-left-panel="objetos"><h3>Unidades metálicas</h3><p id="silm-unit-count"></p><p>Mova unidades na montagem livre; na estrutura cristalina, as posições seguem o modelo.</p></div><div data-left-panel="modulo"><h3>Módulos científicos</h3><div id="silm-module-choice"></div><p id="silm-module-context"></p><div id="silm-module-cards"></div></div><div data-left-panel="missao" hidden>
+                <div data-left-panel="resumo"><h3>Investigação atual</h3><p id="silm-summary"></p><dl id="silm-summary-list" class="silm-summary-list"></dl></div><div data-left-panel="preparo"><section class="silm-dock-group" aria-labelledby="silm-group-metal"><h3 id="silm-group-metal">Metal da investigação</h3><label for="silm-metal">Escolha um metal</label><select id="silm-metal"></select><div class="silm-dock-actions"><button id="silm-open-periodic" type="button" class="button outline">Tabela periódica</button><button id="silm-start" class="button primary" type="button">Iniciar investigação</button><a id="silm-open-presets" class="button outline" href="#/montagens">Montagens prontas</a></div><p id="silm-metal-information"></p></section><section class="silm-dock-group" aria-labelledby="silm-group-structure"><h3 id="silm-group-structure">Estrutura</h3><div class="silm-dock-actions"><button id="silm-add" class="button outline" type="button">Adicionar unidade</button><button id="silm-organize" class="button outline" type="button" aria-describedby="silm-organize-reason">Organizar estrutura</button><p id="silm-organize-reason" class="silm-organize-reason" hidden></p><button id="silm-free" class="button outline" type="button">Retornar à montagem livre</button></div></section></div><div data-left-panel="objetos"><h3>Unidades metálicas</h3><p id="silm-unit-count"></p><p>Mova unidades na montagem livre; na estrutura cristalina, as posições seguem o modelo.</p></div><div data-left-panel="missao" hidden>
                   <div id="silm-route-guidance"></div>
                   <p id="si-dock-activity-status" role="status">Nenhuma atividade orientada em andamento.</p>
                   </div>
@@ -223,6 +223,7 @@
               <header class="si-dock-header"><button id="si-dock-viewer-back" type="button" class="si-dock-back" aria-label="Voltar às visualizações" hidden>← Ver</button><h2 id="si-right-title">Ver</h2><button id="si-expand" type="button" class="si-dock-expand" aria-controls="si-dock-right" aria-expanded="false">Expandir painel</button><button type="button" class="si-dock-help" data-dock-help="right" aria-label="Ajuda deste painel" title="Ajuda deste painel">?</button><button type="button" class="si-dock-close" data-close-dock="right" aria-label="Fechar painel">Fechar</button></header>
               <div class="si-dock-scroll" id="si-right-scroll">
                 <div data-right-panel="ver">
+                  <div id="si-viewer-module-choice" aria-label="Alternar módulo da investigação"></div>
                   <div id="si-viewer-catalog" class="si-viewer-controls" role="group" aria-label="Visualizações científicas">
                     <div id="si-viewer-families" class="si-viewer-family-tabs" role="tablist" aria-label="Famílias do painel Ver"></div>
                     <div id="si-viewer-family-panel" class="si-viewer-family-panel" role="tabpanel" aria-label="Ferramentas da família escolhida">
@@ -232,9 +233,40 @@
                   </div>
                   <section id="si-viewer-detail" aria-label="Visualização selecionada" hidden>
                     <div id="si-viewer-output" class="si-viewer-output"></div>
-                    <div class="silm-viewer-panel" data-silm-viewer="estrutura"><h3>Estrutura e representação</h3><p>A mesma estrutura pode ser observada na vista da célula ou da rede. A projeção e a câmera alteram somente a apresentação, nunca a geometria científica.</p><div id="silm-structure-notes"></div><a href="#/manual?topico=vista" class="button outline">Ajuda sobre representação</a></div>
-                    <div class="silm-viewer-panel" data-silm-viewer="eletrons" hidden><h3>Elétrons deslocalizados</h3><button type="button" id="silm-electrons" class="button outline">Mostrar elétrons</button><button id="silm-motion" type="button" class="button outline">Movimento eletrônico</button><p>Modelo qualitativo de elétrons de valência deslocalizados.</p></div>
-                    <div class="silm-viewer-panel" data-silm-viewer="propriedades" hidden><h3>Propriedades metálicas</h3><div id="silm-properties"></div><p id="silm-property-caption"></p></div>
+                    <div id="silm-observer-workspace" class="silm-observer-workspace" hidden>
+                      <section class="silm-observer-block" aria-labelledby="silm-observer-display-title">
+                        <h3 id="silm-observer-display-title">Exibição da cena</h3>
+                        <div id="silm-observer-display-summary"></div>
+                        <div id="silm-observer-display-actions"></div>
+                      </section>
+                      <section class="silm-viewer-panel silm-observer-block" data-silm-viewer="estrutura">
+                        <h3>Estrutura e representação</h3>
+                        <p>A projeção, a câmera e as camadas alteram a apresentação, nunca a geometria científica.</p>
+                        <div id="silm-structure-notes"></div>
+                        <a href="#/manual?topico=vista" class="button outline">Ajuda sobre representação</a>
+                      </section>
+                      <section class="silm-viewer-panel silm-observer-block" data-silm-viewer="eletrons" hidden>
+                        <h3>Modelo de elétrons deslocalizados</h3>
+                        <button type="button" id="silm-electrons" class="button outline silm-electron-toggle" aria-pressed="false">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><ellipse cx="12" cy="12" rx="9" ry="4.2"/><ellipse cx="12" cy="12" rx="4.2" ry="9"/><circle cx="12" cy="12" r="1.4"/></svg>
+                          <span id="silm-electrons-label">Ativar elétrons</span>
+                        </button>
+                        <p>Um único comando controla a aparição e o movimento dos marcadores qualitativos.</p>
+                        <div id="silm-observer-electron-state"></div>
+                      </section>
+                      <section class="silm-viewer-panel silm-observer-block" data-silm-viewer="propriedades" hidden>
+                        <h3>Aplicação das propriedades</h3>
+                        <p>Selecione uma propriedade para iniciar. Ativar outra encerra a anterior e a devolve ao estado-base.</p>
+                        <div id="silm-properties"></div>
+                        <p id="silm-property-caption"></p>
+                      </section>
+                      <section class="silm-observer-block silm-observer-comparison" aria-labelledby="silm-observer-comparison-title">
+                        <h3 id="silm-observer-comparison-title">Comparar estados da investigação</h3>
+                        <p>Escolha duas condições da mesma investigação para consultar a diferença conceitual.</p>
+                        <div id="silm-observer-comparison-actions"></div>
+                        <div id="silm-observer-comparison-content"></div>
+                      </section>
+                    </div>
                     <div class="silm-viewer-panel" data-silm-viewer="instrumentos calculos" hidden><div id="silm-tools"></div></div>
                   </section>
                 </div>
