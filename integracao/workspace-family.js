@@ -124,7 +124,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   ];
   const propertyButtons=new Map();
   const propertyTools=node('div',null,'silm-observer-selection-tools');
-  const propertyHelp=node('p','Ctrl + clique em duas propriedades e solte Ctrl para combinar.','silm-observer-selection-status');
+  const propertyHelp=node('p','Ctrl (ou ⌘) + clique em duas propriedades e solte para combinar.','silm-observer-selection-status');
   propertyHelp.setAttribute('role','status');propertyHelp.setAttribute('aria-live','polite');
   const touchModeButton=node('button','Selecionar várias','silm-observer-select-mode');
   touchModeButton.type='button';touchModeButton.setAttribute('aria-pressed','false');
@@ -142,7 +142,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
     const chosen=selectedProperties.has(id),active=state.properties?.active===id;
     button.dataset.multiSelected=String(chosen);
     button.setAttribute('aria-pressed',String(chosen||active));
-    button.title=chosen?'Selecionada para análise conjunta: '+propertyLabels[id]:'Ctrl + clique para selecionar junto com outra propriedade.';
+    button.title=chosen?'Selecionada para análise conjunta: '+propertyLabels[id]:button.disabled&&why?why:'Ctrl (ou ⌘) + clique para selecionar junto com outra propriedade.';
    }
    const names=[...selectedProperties].map(id=>propertyLabels[id]);
    if(names.length){
@@ -203,7 +203,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   for(const [id,label,path]of propertyInfo){
    const active=state.properties?.active===id,availability=element?model.propertyAvailability(id):{ok:false,reason:'NO_STRUCTURE'};
    const why=availability.ok?'':SILM.properties.reasons[availability.reason]||'Prepare a estrutura para esta experiência.';
-   const button=actionButton(propertyActions,{id:'property-'+id,label,path,pressed:active,disabled:!canExplore||(!active&&!availability.ok),reason:why,hint:'Clique para uma experiência isolada; Ctrl + clique para selecionar em conjunto.',onClick:event=>{
+   const button=actionButton(propertyActions,{id:'property-'+id,label,path,pressed:active,disabled:!canExplore||(!active&&!availability.ok),reason:why,hint:'Clique para uma experiência isolada; Ctrl (ou ⌘) + clique para selecionar em conjunto.',onClick:event=>{
     const withModifier=!!(event?.ctrlKey||event?.metaKey);
     if(multiSelectMode||withModifier){
      stageProperty(id,{fromCtrl:withModifier});
