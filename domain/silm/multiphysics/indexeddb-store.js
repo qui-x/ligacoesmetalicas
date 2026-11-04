@@ -31,12 +31,8 @@
 
     function open() {
       if (databasePromise) return databasePromise;
+      if (!root.indexedDB) return Promise.reject(Object.assign(new Error('INDEXEDDB_UNAVAILABLE'), { code: 'INDEXEDDB_UNAVAILABLE' }));
       databasePromise = new Promise((resolve, reject) => {
-        if (!root.indexedDB) {
-          databasePromise = null;
-          reject(Object.assign(new Error('INDEXEDDB_UNAVAILABLE'), { code: 'INDEXEDDB_UNAVAILABLE' }));
-          return;
-        }
         let settled = false;
         const req = root.indexedDB.open(databaseName, DB_VERSION);
         req.onupgradeneeded = () => {
@@ -133,7 +129,9 @@
         const data = bytesOf(block?.data);
         if (!metadata || !data) return fail('FIELD_BLOCK_INVALID', { fieldId: block?.fieldId });
         if (!/^[a-f0-9]{64}$/.test(metadata.checksum || '')) return fail('FIELD_CHECKSUM_INVALID', { fieldId: block.fieldId });
-        const checksum = await digestHex(data);
+        let checksum;
+        try { checksum = await digestHex(data); }
+        catch (error) { return fail(error.code || error.name || 'CHECKSUM_UNAVAILABLE', { fieldId: block.fieldId }); }
         if (checksum !== metadata.checksum) return fail('FIELD_CHECKSUM_MISMATCH', { fieldId: block.fieldId });
         prepared.push({ fieldId: block.fieldId, data, checksum, byteLength: data.byteLength });
       }
@@ -148,7 +146,8 @@
           input.manifest.runId !== input.runId || input.event.runId !== input.runId || input.event.sequence !== 1 ||
           input.checkpoint.runId !== input.runId || input.checkpoint.acceptedStep !== 0 ||
           input.checkpoint.runtime?.acceptedStep !== 0 || input.checkpoint.geometry?.revision !== input.runtime.geometry?.revision) return fail('INITIAL_RUN_STATE_INVALID');
-      const db = await open();
+      let db;
+      try { db = await open(); } catch (error) { return fail(error.code || error.name || 'STORAGE_FAILURE'); }
       const key = definitionKey(input.experiment.id, input.experiment.revision);
       const definition = {
         key, experimentId: input.experiment.id, revision: input.experiment.revision,
@@ -223,7 +222,8 @@
     }
 
     async function transition(input) {
-      const db = await open();
+      let db;
+      try { db = await open(); } catch (error) { return fail(error.code || error.name || 'STORAGE_FAILURE'); }
       return new Promise(resolve => {
         let tx;
         let abortReason = null;
@@ -289,7 +289,8 @@
       for (const field of input.fields) {
         if (!input.snapshot.fieldRefs.includes(field.fieldId) || field.runId && field.runId !== input.runId) return fail('FIELD_REFERENCE_INVALID');
       }
-      const db = await open();
+      let db;
+      try { db = await open(); } catch (error) { return fail(error.code || error.name || 'STORAGE_FAILURE'); }
       return new Promise(resolve => {
         let tx;
         let abortReason = null;
