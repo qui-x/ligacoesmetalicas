@@ -184,7 +184,7 @@ A matriz considera quatro famílias físicas: elétrica (E), térmica (T), mecâ
 | Combinação | Fenômeno principal | Complexidade / requisito |
 |---|---|---|
 | E + T + M | acoplamento eletrotérmico e termomecânico, com deformação alterando transporte | alta: resolver potencial/corrente, temperatura e deslocamento/deformação de modo acoplado |
-| E + T + O | condução elétrica, geração/absorção de calor e resposta óptica | muito alta: inclui espectro, absorção, Joule e transferência térmica |
+| E + T + O | corrente DC gera Joule; iluminação gera calor pela absorção; T altera resposta DC e óptica | muito alta: dois domínios de excitação, três fontes/saídas energéticas, realimentação σDC(T) e R/A/Topt(λ,T); balanço global |
 | E + M + O | deformação altera geometria/óptica e defeitos alteram transporte elétrico | muito alta: acoplar microestrutura, contatos e óptica |
 | T + M + O | aquecimento altera resposta mecânica e geometria/óptica | alta: expansão, tensão térmica, superfície e balanço óptico-térmico |
 
@@ -227,13 +227,15 @@ Os coeficientes didáticos atuais não devem ser apresentados como propriedades 
 ### Nível 2 — depende de dados e estudo adicional
 - Seebeck, Peltier e Thomson (exigem coeficientes termoelétricos e condições de junção/gradiente).
 - E + O por constantes ópticas e resposta espectral; a condutividade DC não substitui σ̃(ω), e efeitos de aquecimento exigem E + T + O. Ver `docs/ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md`.
+- E + T + O integra corrente DC, Joule, absorção luminosa e termorrefletância, com fontes sem duplicação e balanço energético global. Ver `docs/ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-OPTICO.md`.
 - T + O por absorção fototérmica e termorrefletância; exige R/A/Topt, transferência de calor e resposta óptica dependente de T. A variação de refletância pode ter qualquer sinal. Ver `docs/ESPECIFICACAO-ACOPLAMENTO-TERMO-OPTICO.md`.
 - Eletroplasticidade além de Joule (campo/corrente, pulsos, temperatura controlada, mecanismo microestrutural e fonte).
 - Comparação entre metais (condutividades, resistividade, capacidade térmica, expansão, propriedades mecânicas, dados ópticos), sempre com valor, unidade, condição e fonte.
 
 ### Nível 3 — multifísica avançada
 - E + T + M acoplados no mesmo passo de tempo.
-- Combinações com O em escala espectral e de superfície.
+- E + T + O com fontes Joule e fototérmica integradas e resposta espectral dependente de temperatura.
+- Combinações com O em escala espectral e de superfície, após validação dos pares e trios.
 - Estado multiaxial combinando compressão, tração e cisalhamento.
 
 ## 7. Limites do banco e salvaguardas
