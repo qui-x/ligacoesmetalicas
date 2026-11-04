@@ -116,3 +116,42 @@
  .silm-quick-projection select{min-width:76px;max-width:94px;font-size:.72rem}
 }
 @media(forced-colors:active){.silm-quick-icon[aria-pressed=true]{border:2px solid Highlight}}
+
+/* Correção da barra inferior: neutraliza a grade vertical de 2 colunas legada do integration.css. */
+#silm-scene-actionbar{display:flex!important;align-items:center!important;flex-flow:row nowrap!important;min-height:54px!important;height:auto!important;gap:5px!important}
+#silm-scene-actionbar #silm-view-quick-actions{display:flex!important;flex:0 0 auto!important;flex-flow:row nowrap!important;align-items:center!important;gap:3px!important}
+#silm-scene-actionbar #silm-view-controls{display:flex!important;flex:0 0 auto!important;flex-flow:row nowrap!important;align-items:center!important;position:static!important;min-width:0!important;overflow:visible!important}
+#silm-scene-actionbar #silm-view-controls .silm-camera-inline{display:flex!important;position:static!important;inset:auto!important;flex:0 0 auto!important;flex-flow:row nowrap!important;align-items:center!important;gap:0!important;max-width:none!important;max-height:none!important;overflow:visible!important}
+#silm-scene-actionbar #silm-view-controls .silm-camera-bar,
+#silm-scene-actionbar #silm-view-controls .silm-camera-bar.silm-camera-bar-has-expand{display:flex!important;position:static!important;flex:0 0 auto!important;flex-flow:row nowrap!important;align-items:center!important;justify-content:flex-start!important;align-content:center!important;grid-template-columns:none!important;grid-auto-flow:unset!important;grid-auto-rows:unset!important;gap:3px!important;width:auto!important;max-width:none!important;max-height:none!important;height:auto!important;overflow:visible!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+#silm-scene-actionbar #silm-view-controls .silm-camera-btn,
+#silm-scene-actionbar #silm-view-controls #si-expand-structure.si-structure-expand-in-camera{display:grid!important;flex:0 0 32px!important;width:32px!important;min-width:32px!important;height:32px!important;min-height:32px!important;padding:0!important;margin:0!important}
+#silm-scene-actionbar #silm-view-controls .silm-camera-glyph{font-size:1rem!important}
+#silm-scene-actionbar #silm-view-controls .silm-camera-zoom{display:block!important;flex:0 0 auto!important;grid-column:auto!important;width:auto!important;min-width:32px!important;padding:0 2px!important;margin:0!important;font-size:.64rem!important;line-height:1!important;white-space:nowrap!important}
+#silm-scene-actionbar #silm-view-controls .silm-camera-bar>[id$="-camera-yaw-left"],
+#silm-scene-actionbar #silm-view-controls .silm-camera-bar>[id$="-camera-yaw-right"]{position:static!important;margin:0!important}
+#silm-scene-actionbar #silm-view-controls .silm-camera-bar>[id$="-camera-yaw-left"]::before{display:none!important}
+#silm-scene-actionbar #silm-view-controls .silm-structure-expand-in-camera span{display:none!important}
+#silm-scene-actionbar .scene-count{flex:0 0 auto!important;margin-left:auto!important;white-space:nowrap!important}
+#silm-scene-actionbar .si-toolmenu-wrap{position:sticky!important;right:0!important;z-index:2!important;flex:0 0 auto!important;margin-left:2px!important;background:var(--surface)!important;padding-left:4px!important}
+#silm-scene-actionbar #scene-menu-toggle{min-height:36px!important;padding:5px 9px!important;white-space:nowrap!important}
+@media(max-width:900px){
+ #silm-scene-actionbar{overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:thin!important;overscroll-behavior-x:contain!important;padding:0 6px!important}
+ #silm-scene-actionbar #silm-view-controls .silm-camera-zoom{display:none!important}
+ #silm-scene-actionbar #silm-view-controls .silm-camera-btn,
+ #silm-scene-actionbar #silm-view-controls #si-expand-structure.si-structure-expand-in-camera{flex-basis:30px!important;width:30px!important;min-width:30px!important;height:30px!important;min-height:30px!important}
+ #silm-scene-actionbar #silm-view-quick-actions .silm-quick-icon{flex-basis:30px!important;width:30px!important;min-width:30px!important;height:30px!important;min-height:30px!important}
+}
+@media(max-width:520px){
+ #silm-scene-actionbar{gap:3px!important}
+ #silm-scene-actionbar #silm-view-controls .silm-camera-bar{gap:2px!important}
+ #silm-scene-actionbar #silm-view-controls .silm-camera-btn,
+ #silm-scene-actionbar #silm-view-controls #si-expand-structure.si-structure-expand-in-camera{flex-basis:28px!important;width:28px!important;min-width:28px!important;height:28px!important;min-height:28px!important}
+ #silm-scene-actionbar #silm-view-quick-actions .silm-quick-icon{flex-basis:28px!important;width:28px!important;min-width:28px!important;height:28px!important;min-height:28px!important}
+ #silm-scene-actionbar .si-toolmenu-wrap{padding-left:3px!important}
+ #silm-scene-actionbar #scene-menu-toggle{min-height:32px!important;padding:3px 7px!important}
+}
+@media(forced-colors:active){
+ #silm-scene-actionbar #silm-view-controls .silm-camera-bar{border:0!important}
+ #silm-scene-actionbar #silm-view-controls .silm-camera-btn:focus-visible{outline:2px solid Highlight}
+}
