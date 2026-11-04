@@ -209,40 +209,51 @@ code{overflow-wrap:anywhere}
         databaseName: versionDb,
         onVersionChange: event => { versionChangeSeen = true; }
       });
-      await versionStore.open();
-      const blockerRequest = indexedDB.open(versionDb);
-      const blocker = await new Promise((resolve, reject) => {
-        blockerRequest.onsuccess = () => resolve(blockerRequest.result);
-        blockerRequest.onerror = () => reject(blockerRequest.error || new Error('BLOCKER_OPEN_FAILED'));
-      });
-      let upgradeRequest;
-      const blockedSignal = new Promise((resolve, reject) => {
-        upgradeRequest = indexedDB.open(versionDb, 2);
-        upgradeRequest.onblocked = () => { blockedSeen = true; resolve(true); };
-        upgradeRequest.onerror = () => reject(upgradeRequest.error || new Error('UPGRADE_FAILED'));
-      });
-      const upgraded = new Promise((resolve, reject) => {
-        upgradeRequest.onupgradeneeded = event => {
-          if (!event.target.result.objectStoreNames.contains('a23MigrationProbe')) {
-            event.target.result.createObjectStore('a23MigrationProbe');
-          }
-        };
-        upgradeRequest.onsuccess = () => resolve(upgradeRequest.result);
-        upgradeRequest.onerror = () => reject(upgradeRequest.error || new Error('UPGRADE_FAILED'));
-      });
-      await Promise.race([
-        blockedSignal,
-        new Promise((_, reject) => setTimeout(() => reject(new Error('UPGRADE_NOT_BLOCKED')), 3000))
-      ]);
-      assert(versionChangeSeen, 'conexão antiga não recebeu versionchange');
-      assert(blockedSeen, 'upgrade não reportou blocked enquanto a outra conexão estava aberta');
-      blocker.close();
-      const db = await upgraded;
-      assert(db.version === 2, 'versão do banco não avançou');
-      assert(db.objectStoreNames.contains('definitions') && db.objectStoreNames.contains('runs'), 'stores existentes foram perdidos');
-      db.close();
-      await versionStore.close();
-      await deleteDatabase(versionDb);
+      let blocker = null;
+      let upgradedDb = null;
+      let upgraded = null;
+      try {
+        await versionStore.open();
+        const blockerRequest = indexedDB.open(versionDb);
+        blocker = await new Promise((resolve, reject) => {
+          blockerRequest.onsuccess = () => resolve(blockerRequest.result);
+          blockerRequest.onerror = () => reject(blockerRequest.error || new Error('BLOCKER_OPEN_FAILED'));
+        });
+        let upgradeRequest;
+        const blockedSignal = new Promise((resolve, reject) => {
+          upgradeRequest = indexedDB.open(versionDb, 2);
+          upgradeRequest.onblocked = () => { blockedSeen = true; resolve(true); };
+          upgradeRequest.onerror = () => reject(upgradeRequest.error || new Error('UPGRADE_FAILED'));
+        });
+        upgraded = new Promise((resolve, reject) => {
+          upgradeRequest.onupgradeneeded = event => {
+            if (!event.target.result.objectStoreNames.contains('a23MigrationProbe')) {
+              event.target.result.createObjectStore('a23MigrationProbe');
+            }
+          };
+          upgradeRequest.onsuccess = () => resolve(upgradeRequest.result);
+          upgradeRequest.onerror = () => reject(upgradeRequest.error || new Error('UPGRADE_FAILED'));
+        }).then(db => { upgradedDb = db; return db; });
+        await Promise.race([
+          blockedSignal,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('UPGRADE_NOT_BLOCKED')), 3000))
+        ]);
+        assert(versionChangeSeen, 'conexão antiga não recebeu versionchange');
+        assert(blockedSeen, 'upgrade não reportou blocked enquanto a outra conexão estava aberta');
+        blocker.close();
+        blocker = null;
+        const db = await upgraded;
+        assert(db.version === 2, 'versão do banco não avançou');
+        assert(db.objectStoreNames.contains('definitions') && db.objectStoreNames.contains('runs'), 'stores existentes foram perdidos');
+      } finally {
+        if (blocker) blocker.close();
+        if (upgraded) {
+          try { const db = await upgraded; db.close(); } catch {}
+        }
+        if (upgradedDb) upgradedDb.close();
+        try { await versionStore.close(); } catch {}
+        try { await deleteDatabase(versionDb); } catch {}
+      }
     });
   } finally {
     try { await store.close(); } catch {}
