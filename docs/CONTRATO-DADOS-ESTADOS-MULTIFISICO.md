@@ -443,7 +443,7 @@ O exemplo abaixo é estrutural e ilustrativo. Os IDs de dados, geometria, modelo
     "phaseId": "solid-reference",
     "referenceTemperatureK": 293.15,
     "geometry": {
-      "geometryId": "geo-demo-001",
+      "geometryId": "geo-prism-demo-001",
       "geometryRevision": 1,
       "geometrySchemaVersion": "1.0.0",
       "scale": "macroscopic",
