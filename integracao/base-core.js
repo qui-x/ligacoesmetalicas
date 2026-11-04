@@ -2637,24 +2637,32 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
-    const familyNames = { observar: "Observar", medir: "Medir", analisar: "Analisar" };
-    // Ícones vetoriais próprios do contrato de navegação da família (SVGs locais).
+    const familyNames = { observar: "Observar", camadas: "Camadas", comparar: "Comparar", medir: "Medir", calcular: "Calcular" };
+    // Famílias de Ver do SILM. A capacidade continua sendo a regra de autorização do módulo.
     const familyIcons = {
         observar: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0",
+        camadas: "m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5",
+        comparar: "M4 5h7v14H4zM13 5h7v14h-7z",
         medir: "M4 17 17 4l3 3L7 20H4ZM8 13l2 2M11 10l2 2M14 7l2 2",
-        analisar: "M4 3v17h17M7 16l4-5 4 2 5-8"
+        calcular: "M4 3v17h17M7 16l4-5 4 2 5-8"
     };
     const familyDescriptions = {
-        observar: "Representações e propriedades dos objetos em foco.",
-        medir: "Instrumentos disponíveis e leituras da investigação.",
-        analisar: "Comparações e interpretações dos dados da cena."
+        observar: "Estrutura, elétrons deslocalizados e propriedades metálicas.",
+        camadas: "Controle a apresentação sem alterar a amostra ou a experiência.",
+        comparar: "Compare variantes da investigação em modo somente leitura.",
+        medir: "Instrumentos e leituras do modelo cristalográfico.",
+        calcular: "Fórmulas, entradas identificadas e resultados da investigação."
     };
+    const familyOrder = Object.keys(familyNames);
     const viewerRegistry = new Map();
     let selectedViewer = "observacao";
     let selectedFamily = "observar";
     const viewerFamilyKey = "viewer-family-selection-v1";
-    function viewerFamily(capability) {
-        return capability === "measure" ? "medir" : capability === "analyze" ? "analisar" : "observar";
+    function viewerFamily(viewer) {
+        if (viewer && typeof viewer === "object" && familyNames[viewer.family])
+            return viewer.family;
+        const capability = typeof viewer === "string" ? viewer : viewer?.capability;
+        return capability === "measure" ? "medir" : capability === "analyze" ? "calcular" : "observar";
     }
     BaseDemoSI.viewerFamily = viewerFamily;
     function activeViewer() {
@@ -2663,7 +2671,7 @@ var BaseDemoSI;
     }
     BaseDemoSI.activeViewer = activeViewer;
     function availableViewerFamilies() {
-        const choices = new Set([...viewerRegistry.values()].filter(v => BaseDemoSI.moduleAllows(v.capability)).map(v => viewerFamily(v.capability)));
+        const choices = new Set([...viewerRegistry.values()].filter(v => BaseDemoSI.moduleAllows(v.capability)).map(v => viewerFamily(v)));
         return Object.keys(familyNames).filter(id => choices.has(id));
     }
     BaseDemoSI.availableViewerFamilies = availableViewerFamilies;
@@ -2686,6 +2694,7 @@ var BaseDemoSI;
         if (!viewer || !/^[a-z][a-z0-9-]{1,40}$/.test(viewer.id) || viewerRegistry.has(viewer.id)
             || typeof viewer.title !== "string" || viewer.title.length < 2 || viewer.title.length > 60
             || !["tools", "measure", "observe", "analyze"].includes(viewer.capability)
+            || (viewer.family != null && !familyNames[viewer.family])
             || typeof viewer.render !== "function")
             return false;
         viewerRegistry.set(viewer.id, viewer);
@@ -2699,7 +2708,7 @@ var BaseDemoSI;
         if (!viewer || !BaseDemoSI.moduleAllows(viewer.capability))
             return false;
         selectedViewer = id;
-        selectedFamily = viewerFamily(viewer.capability);
+        selectedFamily = viewerFamily(viewer);
         BaseDemoSI.storage.write(viewerKey, id);
         BaseDemoSI.storage.write(viewerFamilyKey, selectedFamily);
         renderViewers(viewerScene?.());
@@ -2718,8 +2727,8 @@ var BaseDemoSI;
         const families = availableViewerFamilies();
         if (!families.includes(selectedFamily))
             selectedFamily = families[0] ?? "observar";
-        if (!allowed.some(v => v.id === selectedViewer))
-            selectedViewer = allowed.find(v => viewerFamily(v.capability) === selectedFamily)?.id ?? "";
+        if (!allowed.some(v => v.id === selectedViewer && viewerFamily(v) === selectedFamily))
+            selectedViewer = allowed.find(v => viewerFamily(v) === selectedFamily)?.id ?? "";
         tabs.replaceChildren();
         for (const family of families) {
             const tab = document.createElement("button");
@@ -2758,7 +2767,7 @@ var BaseDemoSI;
         panel.setAttribute("aria-label", `${familyNames[selectedFamily]} — ferramentas`);
         description.textContent = families.length ? familyDescriptions[selectedFamily] : "Nenhuma família disponível neste módulo.";
         buttons.replaceChildren();
-        for (const v of allowed.filter(v => viewerFamily(v.capability) === selectedFamily)) {
+        for (const v of allowed.filter(v => viewerFamily(v) === selectedFamily)) {
             const btn = document.createElement("button");
             btn.type = "button";
             btn.className = "si-viewer-item";
@@ -2825,7 +2834,9 @@ var BaseDemoSI;
         if (stored && viewerRegistry.has(stored))
             selectedViewer = stored;
         const family = BaseDemoSI.storage.read(viewerFamilyKey);
-        if (family && ["observar", "medir", "analisar"].includes(family))
+        if (family === "analisar")
+            selectedFamily = "calcular";
+        else if (family && familyOrder.includes(family))
             selectedFamily = family;
         else
             selectedFamily = viewerRegistry.has(selectedViewer) ? viewerFamily(viewerRegistry.get(selectedViewer).capability) : "observar";
