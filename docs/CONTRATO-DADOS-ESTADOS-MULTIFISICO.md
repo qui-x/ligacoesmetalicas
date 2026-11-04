@@ -246,7 +246,7 @@ A lista de mecanismos admitidos na versão 1 inclui:
 |---|---|---|
 | \`joule-heating\` | E → T | \`q̇J = J·E\`, unidade W/m³ e balanço elétrico/térmico |
 | \`optical-absorption\` | O → T | energia absorvida consistente com R/A/T e distribuição de absorção |
-| \`thermoelectric-conductivity\` | T → E | σDC(T) ou ρDC(T) com faixa válida |
+| \`temperature-dependent-conductivity\` | T → E | σDC(T) ou ρDC(T) com faixa válida |
 | \`thermal-expansion\` | T → M | α(T), C(T), restrições e caso livre/restrito |
 | \`deformed-geometry\` | M → E/O | geometria, área, contatos e normais revisados |
 | \`thermo-optic-response\` | T → O | n(λ,T), κ(λ,T) ou dados equivalentes |
