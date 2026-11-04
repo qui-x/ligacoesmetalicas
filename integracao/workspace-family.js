@@ -1,6 +1,6 @@
 'use strict';
 /* Adaptação do workspace pela API pública da Base SI. A ciência continua no modelo SILM. */
-SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienceInfo=()=>null,refreshScene=()=>{}})=>{
+SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshScene=()=>{}})=>{
  const B=BaseDemoSI,$=id=>document.getElementById(id);
  const node=(tag,text,className)=>{const el=document.createElement(tag);if(text)el.textContent=text;if(className)el.className=className;return el;};
  const emptyScene=()=>({schemaVersion:1,entities:[],selectedId:null});
