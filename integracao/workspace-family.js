@@ -47,15 +47,11 @@ SILM.createWorkspaceFamily=({model,activity=()=>null})=>{
  function layerChanged(key,value){layerState[key]=!!value;persistLayerState();applyLayerPresentation();renderViewers();}
  function renderLayerStructure(output){
   const s=model.state.structure,crystal=s?.mode==='crystalline',rep=crystal?s.crystallography.representation:null,group=node('section',null,'silm-layer-group');
-  group.append(node('h3','Estrutura científica'));
+  group.append(node('h3','Visibilidade estrutural'));
   toggleRow(group,{title:'Destacar centros metálicos',description:'Reduzir o destaque não remove as unidades.',checked:layerState.centers,onChange:v=>layerChanged('centers',v)});
-  toggleRow(group,{title:'Célula unitária',description:crystal?'Mostrar ou ocultar o contorno e os planos.':'Disponível após organizar a estrutura cristalina.',checked:crystal?rep.unitCell:false,disabled:!crystal,onChange:v=>{model.setCrystalRepresentation({unitCell:v});renderViewers();}});
-  toggleRow(group,{title:'Vizinhos',description:crystal?(rep.selectedUnitId?'Destacar vizinhos imediatos do centro selecionado.':'Selecione um centro na cena para ver sua vizinhança.'):'Disponível na estrutura cristalina.',checked:crystal?rep.neighbors:false,disabled:!crystal,onChange:v=>{model.setCrystalRepresentation({neighbors:v});renderViewers();}});
-  const mode=node('div',null,'silm-layer-mode');mode.append(node('span','Modo de vista'));
-  const buttons=node('div',null,'silm-layer-segmented');buttons.setAttribute('role','group');buttons.setAttribute('aria-label','Modo de vista da estrutura');
-  for(const [id,label] of [['cell','Célula'],['lattice','Rede extensa']]){const b=node('button',label,'button outline');b.type='button';b.setAttribute('aria-pressed',String(crystal&&rep.view===id));b.disabled=!crystal;b.addEventListener('click',()=>{if(model.setCrystalRepresentation({view:id}))renderViewers();});buttons.append(b);}
-  mode.append(buttons);group.append(mode);
-  if(!crystal)group.append(node('p','A montagem livre não possui célula unitária, rede periódica nem vizinhos cristalográficos.','silm-layer-note'));
+  toggleRow(group,{title:'Mostrar contorno da célula',description:crystal?'Controla apenas o contorno e os planos; não troca entre as vistas Célula e Rede.':'Disponível após organizar a estrutura cristalina.',checked:crystal?rep.unitCell:false,disabled:!crystal,onChange:v=>{model.setCrystalRepresentation({unitCell:v});renderViewers();}});
+  if(!crystal)group.append(node('p','Célula, rede e vizinhos ficam disponíveis após organizar a estrutura cristalina.','silm-layer-note'));
+  else group.append(node('p','A vista Célula/Rede e os vizinhos são controlados diretamente na barra da cena.','silm-layer-note'));
   output.append(group);
  }
  function renderLayerModels(output){
@@ -87,8 +83,8 @@ SILM.createWorkspaceFamily=({model,activity=()=>null})=>{
    compareCard(grid,'B','Estrutura cristalina',organized?organized.length+' unidades na estrutura organizada.':'Organize a montagem para obter a estrutura cristalina de referência.',organized?'Registro disponível':'Aguardando organização');
   }else if(kind==='cell-lattice'){
    const rep=s?.mode==='crystalline'?s.crystallography.representation:null;
-   compareCard(grid,'A','Célula unitária','Unidade de referência cristalográfica. A vista da célula é selecionável em Camadas → Estrutura.',rep?'Geometria disponível':'Requer estrutura cristalina');
-   compareCard(grid,'B','Rede extensa','Repetição periódica da mesma estrutura. A vista da rede é selecionável em Camadas → Estrutura.',rep?'Geometria disponível':'Requer estrutura cristalina');
+   compareCard(grid,'A','Célula unitária','Unidade de referência cristalográfica. Use Célula/Rede na barra da cena para alternar o enquadramento.',rep?'Geometria disponível':'Requer estrutura cristalina');
+   compareCard(grid,'B','Rede extensa','Repetição periódica da mesma estrutura. Use Célula/Rede na barra da cena para alternar o enquadramento.',rep?'Geometria disponível':'Requer estrutura cristalina');
   }else if(kind==='electrons'){
    const visible=!!state.electrons?.representation.visible;
    compareCard(grid,'A','Elétrons ocultos','A camada eletrônica não aparece na cena.',state.electrons?(visible?'Variante A':'Estado atual'):'Modelo não ativado');
