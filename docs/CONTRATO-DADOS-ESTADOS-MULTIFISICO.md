@@ -274,7 +274,7 @@ O runtime guarda o último passo aceito. Inclui:
 - \`runId\`, \`experimentId\` e revisão da definição;
 - \`status\`: \`prepared\`, \`running\`, \`converged\`, \`rejected\` ou \`interrupted\`;
 - \`acceptedTimeS\` e \`acceptedStep\`;
-- revisão da geometria corrente;
+- `geometry.referenceRevision` fixa a revisão de referência declarada na experiência e `geometry.revision` identifica a geometria corrente aceita;
 - identificadores de malhas;
 - referências de campos já persistidos;
 - resíduos e relatórios de balanço;
@@ -486,6 +486,13 @@ O exemplo abaixo é estrutural e ilustrativo. Os IDs de dados, geometria, modelo
       "regionIds": ["reg-terminal-a"]
     },
     {
+      "id": "bc-electrical-b",
+      "domain": "electrical",
+      "kind": "electrical-terminal-potential",
+      "modelId": "terminal-b-potential-demo",
+      "regionIds": ["reg-terminal-b"]
+    },
+    {
       "id": "bc-thermal-demo",
       "domain": "thermal",
       "kind": "thermal-temperature",
@@ -587,3 +594,8 @@ A geometria de referência agora é um ativo versionado independente, definido e
 A definição da experiência passa a fixar `geometryId`, `geometryRevision` e `geometrySchemaVersion`. Cada condição de contorno exige `regionIds`; contatos usam dois IDs de regiões. A1 mantém dimensões e seletores no ativo geométrico, evitando duplicar a geometria dentro da definição.
 
 **A0 + A1:** o contrato de dados identifica a revisão da geometria, e a geometria fornece as regiões topológicas às quais cada domínio pode se conectar. A próxima etapa é A2 — orquestrador e estado transacional de execução.
+
+
+### 17.1 Revisão de referência e revisão corrente
+
+A definição fixa `sample.geometry.geometryId + geometryRevision`. No runtime, `geometry.referenceRevision` aponta para essa revisão imutável e `geometry.revision` identifica a geometria corrente consumida pelos campos. No início da execução ambas podem coincidir; após deslocamento aceito, a revisão corrente avança sem alterar a referência. Campos de cada solver registram a revisão corrente efetivamente utilizada.
