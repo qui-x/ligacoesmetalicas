@@ -325,4 +325,9 @@ A cobertura das combinações E/T/M/O foi concluída no nível de especificaçã
 
 A arquitetura estabelece uma experiência comum, solvers especializados, geometria física corrente, malhas próprias por domínio, transferência explícita de campos, relógio independente do renderer, convergência transacional e proveniência reproduzível. Também registra a auditoria dos motores atuais e a migração gradual, preservando os modos didáticos.
 
-**Próximo ponto de engenharia:** A0 — congelar schema, unidades SI, proveniência e separação entre definição, execução e resultados. Esta especificação ainda não altera código nem libera novas combinações quantitativas.
+**A0 concluída no nível de especificação:** [CONTRATO-DADOS-ESTADOS-MULTIFISICO.md](CONTRATO-DADOS-ESTADOS-MULTIFISICO.md) e os três schemas JSON versionados definem estrutura, unidades SI, proveniência, validação, estados, persistência futura e compatibilidade com o schema científico 8. Nenhum código de runtime foi alterado. **Próximo ponto:** A1 — geometria macroscópica da amostra.
+
+
+## 12. Contrato técnico e próxima etapa
+
+O contrato A0 está documentado em [CONTRATO-DADOS-ESTADOS-MULTIFISICO.md](CONTRATO-DADOS-ESTADOS-MULTIFISICO.md), com schemas JSON para definição, runtime e snapshot de resultados. A etapa seguinte será A1 — geometria macroscópica, regiões, terminais, superfícies e coordenadas da amostra.
