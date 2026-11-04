@@ -88,9 +88,9 @@
  }
  const comparison=S.createStructureComparison({storage,host:$('silm-comparison-items'),current:()=>model.state.structure?.units?.length?model.state.investigation?.id:null,open:openStructure,newStructure:()=>{showFocus();openLeft('preparo');},say,confirm:options=>B.confirmDialog(options)});
  const tools=S.createIntegrationTools({model,host:$('silm-tools'),moduleHost:$('silm-module-choice'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
- const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session});
  const prepareMetal=z=>{if(routeUI?.session.open()||S.data.get(z)?.silmEligibility.status!=='available')return false;$('silm-metal').value=String(z);selected=String(z);schedule();return true;};
  const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,prepareMetal,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
+ const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session,quickActions:experience.quickActions});
  routeUI=S.createRouteUI({model,storage,prepareMetal,view:()=>representation,onView:(value,{persist=true}={})=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);return persist?saveView():true;},schedule,say,onModule:m=>B.selectModule(m),selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
  const run={
   add(){if(routeUI.session.open()&&!routeUI.canBuild())return;if(!model.state.structure)model.beginAssembly();return report(model.addUnit());},
