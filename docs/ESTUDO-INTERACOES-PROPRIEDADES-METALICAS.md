@@ -325,12 +325,12 @@ A cobertura das combinações E/T/M/O foi concluída no nível de especificaçã
 
 A arquitetura estabelece uma experiência comum, solvers especializados, geometria física corrente, malhas próprias por domínio, transferência explícita de campos, relógio independente do renderer, convergência transacional e proveniência reproduzível. Também registra a auditoria dos motores atuais e a migração gradual, preservando os modos didáticos.
 
-**A0 concluída no nível de especificação:** [CONTRATO-DADOS-ESTADOS-MULTIFISICO.md](CONTRATO-DADOS-ESTADOS-MULTIFISICO.md) e os três schemas JSON versionados definem estrutura, unidades SI, proveniência, validação, estados, persistência futura e compatibilidade com o schema científico 8. Nenhum código de runtime foi alterado. **Próximo ponto:** A1 — geometria macroscópica da amostra.
+**A0 concluída no nível de especificação:** [CONTRATO-DADOS-ESTADOS-MULTIFISICO.md](CONTRATO-DADOS-ESTADOS-MULTIFISICO.md) e os três schemas JSON versionados definem estrutura, unidades SI, proveniência, validação, estados, persistência futura e compatibilidade com o schema científico 8. Nenhum código de runtime foi alterado. **Próximo ponto:** A2 — orquestrador e estado transacional.
 
 
 ## 12. Contrato técnico e próxima etapa
 
-O contrato A0 está documentado em [CONTRATO-DADOS-ESTADOS-MULTIFISICO.md](CONTRATO-DADOS-ESTADOS-MULTIFISICO.md), com schemas JSON para definição, runtime e snapshot de resultados. A etapa seguinte será A1 — geometria macroscópica, regiões, terminais, superfícies e coordenadas da amostra.
+O contrato A0 está documentado em [CONTRATO-DADOS-ESTADOS-MULTIFISICO.md](CONTRATO-DADOS-ESTADOS-MULTIFISICO.md), com schemas JSON para definição, runtime e snapshot de resultados. A etapa A1 foi concluída em documento e schema próprios. A próxima etapa é A2 — ciclo de vida do orquestrador, estado transacional, commit/rollback, cancelamento e retomada.
 
 
 ## 13. Geometria macroscópica da amostra — A1
