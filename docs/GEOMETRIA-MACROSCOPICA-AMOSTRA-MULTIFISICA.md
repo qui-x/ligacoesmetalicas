@@ -226,7 +226,7 @@ A deformação calculada não sobrescreve a geometria de referência. O runtime 
 4. solvers dependentes recebem a mesma revisão corrente;
 5. malhas são atualizadas ou reconstruídas conforme a qualidade e a topologia.
 
-A revisão de geometria corrente pertence ao estado de execução; ela não muda a definição que originou a execução.
+A revisão de geometria corrente pertence ao estado de execução; ela não muda a definição que originou a execução. O runtime conserva `referenceRevision` para o ativo inicial e `revision` para a geometria corrente aceita. No instante de preparação, ambas podem ter o mesmo valor.
 
 ### 9.3 Topologia e identidade das regiões
 
@@ -362,6 +362,7 @@ A definição da experiência referencia este ativo por \`geometryId\` e \`geome
 - [ ] Região de volume bulk é única.
 - [ ] Regiões podem receber papéis em mais de um domínio sem compartilhar leis físicas.
 - [ ] Condições de contorno apontam para regionIds, não índices de malha.
+- [ ] Runtime distingue revisão de geometria de referência e geometria corrente.
 - [ ] Superfície geométrica é distinta de propriedades ópticas e rugosidade.
 - [ ] Malhas são derivadas por domínio e preservam regionIds.
 - [ ] Deformação não sobrescreve a referência geométrica.
