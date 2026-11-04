@@ -9,6 +9,26 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienc
  const observerKey='silm-observer-presentation-v1';
  const storedObserver=B.storage.read(observerKey);
  const observer={centers:storedObserver?.centers===true};
+ const selectedProperties=new Set();
+ let multiSelectMode=false,ctrlSelectionPending=false,applyPendingSelection=null;
+ const propertyLabels={electrical:'Condutividade elétrica',thermal:'Condutividade térmica',malleability:'Maleabilidade',ductility:'Ductilidade',luster:'Brilho metálico'};
+ const propertyCombinations={
+  'electrical|thermal':'heatElectrical',
+  'electrical|malleability':'malleabilityElectrical',
+  'ductility|electrical':'ductilityElectrical'
+ };
+ const propertyComboNames={
+  heatElectrical:'Calor + corrente',
+  malleabilityElectrical:'Maleabilidade + corrente',
+  ductilityElectrical:'Ductilidade + corrente'
+ };
+ function onModifierRelease(event){
+  if((event.key==='Control'||event.key==='Meta')&&ctrlSelectionPending){
+   ctrlSelectionPending=false;applyPendingSelection?.();
+  }
+ }
+ window.addEventListener('keyup',onModifierRelease);
+ window.addEventListener('blur',()=>{if(ctrlSelectionPending){ctrlSelectionPending=false;applyPendingSelection?.();}});
  const storedLayers=B.storage.read(layerKey);
  const layerState={...layerDefaults,...(storedLayers&&typeof storedLayers==='object'?storedLayers:{})};
  const definitions=[
@@ -29,8 +49,10 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienc
  function renderViewers(){
   const focused=document.activeElement;
   const tab=focused?.closest('#si-viewer-families')?focused.getAttribute('aria-selected'):null;
+  const action=focused?.closest('.silm-observer-action')?.dataset.action||null;
   B.renderViewers(emptyScene());
   if(tab)$('si-viewer-families').querySelector('[aria-selected="true"]')?.focus({preventScroll:true});
+  else if(action)document.querySelector('.silm-observer-action[data-action="'+action+'"]')?.focus({preventScroll:true});
  }
  const actionIcons={
   view:'M3 7 12 3l9 4-9 4-9-4ZM3 12l9 4 9-4M3 17l9 4 9-4',
@@ -106,29 +128,98 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienc
    ['ductility','Ductilidade',actionIcons.ductility],
    ['luster','Brilho metálico',actionIcons.luster]
   ];
+  const propertyButtons=new Map();
+  const propertyTools=node('div',null,'silm-observer-selection-tools');
+  const propertyHelp=node('p','Ctrl + clique em duas propriedades e solte Ctrl para combinar.','silm-observer-selection-status');
+  propertyHelp.setAttribute('role','status');propertyHelp.setAttribute('aria-live','polite');
+  const touchModeButton=node('button','Selecionar várias','silm-observer-select-mode');
+  touchModeButton.type='button';touchModeButton.setAttribute('aria-pressed','false');
+  const applySelectionButton=node('button','Aplicar seleção','silm-observer-selection-command');
+  applySelectionButton.type='button';applySelectionButton.hidden=true;applySelectionButton.disabled=true;
+  const clearSelectionButton=node('button','Cancelar','silm-observer-selection-command');
+  clearSelectionButton.type='button';clearSelectionButton.hidden=true;
+  const touchCapable=(()=>{try{return window.matchMedia('(hover: none) and (pointer: coarse)').matches;}catch{return false;}})();
+  touchModeButton.hidden=!touchCapable;
+  propertyTools.append(propertyHelp,touchModeButton,applySelectionButton,clearSelectionButton);
+  propertyActions.parentElement.insertBefore(propertyTools,propertyActions);
+  function selectionSignature(){return [...selectedProperties].sort().join('|');}
+  function syncPropertySelection(){
+   for(const [id,button]of propertyButtons){
+    const chosen=selectedProperties.has(id),active=state.properties?.active===id;
+    button.dataset.multiSelected=String(chosen);
+    button.setAttribute('aria-pressed',String(chosen||active));
+    button.title=chosen?'Selecionada para análise conjunta: '+propertyLabels[id]:'Ctrl + clique para selecionar junto com outra propriedade.';
+   }
+   const names=[...selectedProperties].map(id=>propertyLabels[id]);
+   if(names.length){
+    const pending=names.join(' + ');
+    propertyHelp.textContent='Seleção: '+pending+(multiSelectMode?' · toque em Aplicar seleção':' · solte Ctrl para aplicar');
+   }else{
+    propertyHelp.textContent=multiSelectMode?'Selecione duas propriedades compatíveis e toque em Aplicar seleção.':'Ctrl + clique em duas propriedades e solte Ctrl para combinar.';
+   }
+   touchModeButton.setAttribute('aria-pressed',String(multiSelectMode));
+   touchModeButton.textContent=multiSelectMode?'Seleção múltipla ativa':'Selecionar várias';
+   applySelectionButton.hidden=!multiSelectMode;
+   applySelectionButton.disabled=selectedProperties.size===0;
+   clearSelectionButton.hidden=!multiSelectMode&&selectedProperties.size===0;
+  }
+  function clearPropertySelection(){
+   selectedProperties.clear();multiSelectMode=false;ctrlSelectionPending=false;syncPropertySelection();
+  }
+  function stageProperty(id,{fromCtrl=false}={}){
+   if(selectedProperties.has(id))selectedProperties.delete(id);else selectedProperties.add(id);
+   if(fromCtrl)ctrlSelectionPending=true;
+   syncPropertySelection();
+  }
+  function applyPropertySelection(){
+   const ids=[...selectedProperties].sort(),signature=selectionSignature();
+   if(!ids.length){clearPropertySelection();return false;}
+   let ok=false;
+   if(ids.length===1){
+    ok=!!quickActions?.toggleProperty?.(ids[0]);
+   }else{
+    const combination=propertyCombinations[signature];
+    if(!combination){
+     propertyHelp.textContent='Combinação não homologada: '+ids.map(id=>propertyLabels[id]).join(' + ')+'. Selecione um dos pares estudados ou cancele.';
+     syncPropertySelection();
+     propertyHelp.textContent='Combinação não homologada: '+ids.map(id=>propertyLabels[id]).join(' + ')+'. Selecione um dos pares estudados ou cancele.';
+     return false;
+    }
+    ok=!!quickActions?.activateCombination?.(combination);
+    if(!ok){
+     propertyHelp.textContent='Esta combinação não está disponível para a estrutura atual. Confira a elegibilidade das propriedades.';
+     return false;
+    }
+   }
+   if(ok){clearPropertySelection();refreshScene();renderViewers();}
+   else{
+    propertyHelp.textContent='Não foi possível ativar a seleção. Confira a disponibilidade das propriedades.';
+    syncPropertySelection();
+   }
+   return ok;
+  }
+  applyPendingSelection=applyPropertySelection;
+  touchModeButton.addEventListener('click',()=>{
+   multiSelectMode=!multiSelectMode;ctrlSelectionPending=false;
+   if(!multiSelectMode&&selectedProperties.size)clearPropertySelection();else syncPropertySelection();
+  });
+  applySelectionButton.addEventListener('click',applyPropertySelection);
+  clearSelectionButton.addEventListener('click',clearPropertySelection);
   for(const [id,label,path]of propertyInfo){
    const active=state.properties?.active===id,availability=element?model.propertyAvailability(id):{ok:false,reason:'NO_STRUCTURE'};
    const why=availability.ok?'':SILM.properties.reasons[availability.reason]||'Prepare a estrutura para esta experiência.';
-   actionButton(propertyActions,{id:'property-'+id,label,path,pressed:active,disabled:!canExplore||(!active&&!availability.ok),reason:why,onClick:()=>{
+   const button=actionButton(propertyActions,{id:'property-'+id,label,path,pressed:active,disabled:!canExplore||(!active&&!availability.ok),reason:why,hint:'Clique para uma experiência isolada; Ctrl + clique para selecionar em conjunto.',onClick:event=>{
+    const withModifier=!!(event?.ctrlKey||event?.metaKey);
+    if(multiSelectMode||withModifier){
+     stageProperty(id,{fromCtrl:withModifier});
+     return;
+    }
+    clearPropertySelection();
     quickActions?.toggleProperty?.(id);refreshScene();renderViewers();
    }});
+   propertyButtons.set(id,button);
   }
-  const combinedActions=actionGroup(root,'Combinações estudadas · P7');
-  const ability=id=>element?model.propertyAvailability(id):{ok:false,reason:'NO_STRUCTURE'};
-  const heatElectrical=!!(state.properties?.active==='electrical'&&state.properties.electrical?.field&&experience.thermal?.combined&&experience.thermal?.on);
-  const deformationElectrical=id=>state.properties?.active===id&&!!experience.drive?.deformField;
-  const comboReason=(id)=>!crystal?'Requer uma estrutura cristalina organizada':!canExplore?'Disponível no módulo Explorar':!ability(id).ok?(SILM.properties.reasons[ability(id).reason]||'Experiência indisponível nesta estrutura'):'';
-  actionButton(combinedActions,{id:'p7-heat-electrical',label:'Calor + corrente',path:actionIcons.thermal,pressed:heatElectrical,disabled:!canExplore||!crystal||!ability('electrical').ok,reason:comboReason('electrical'),hint:'Aplica uma fonte térmica à estrutura durante a condução elétrica. O aquecimento aumenta o espalhamento dos elétrons nas regiões quentes.',onClick:()=>{
-   quickActions?.activateCombination?.('heatElectrical');refreshScene();renderViewers();
-  }});
-  actionButton(combinedActions,{id:'p7-malleability-electrical',label:'Maleabilidade + corrente',path:actionIcons.electrical,pressed:deformationElectrical('malleability'),disabled:!canExplore||!crystal||!ability('malleability').ok,reason:comboReason('malleability'),hint:'Aplica um campo elétrico durante a compressão e o deslizamento de planos. Os defeitos aumentam qualitativamente o espalhamento eletrônico.',onClick:()=>{
-   quickActions?.activateCombination?.('malleabilityElectrical');refreshScene();renderViewers();
-  }});
-  actionButton(combinedActions,{id:'p7-ductility-electrical',label:'Ductilidade + corrente',path:actionIcons.electrical,pressed:deformationElectrical('ductility'),disabled:!canExplore||!crystal||!ability('ductility').ok,reason:comboReason('ductility'),hint:'Aplica um campo elétrico durante a tração e o deslizamento de planos. Os defeitos aumentam qualitativamente o espalhamento eletrônico.',onClick:()=>{
-   quickActions?.activateCombination?.('ductilityElectrical');refreshScene();renderViewers();
-  }});
-  combinedActions.parentElement.append(node('p','Combinações P7 registradas. As demais combinações entre propriedades ainda não têm modelo conjunto validado.','silm-observer-action-note'));
-  if(!structure)root.append(node('p','Monte uma estrutura para identificar os centros e observar a interação metálica.','silm-observer-action-note'));
+  syncPropertySelection();
   output.append(root);
  }
   function toggleRow(output,{title,description,checked,disabled=false,onChange}){
