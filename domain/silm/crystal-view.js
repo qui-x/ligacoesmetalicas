@@ -37,15 +37,78 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const latticeView=quickButton('silm-quick-view-lattice','Vista da rede',paths.lattice,()=>actions.represent({view:'lattice'}));
  const unitCellButton=quickButton('silm-quick-unit-cell','Mostrar ou ocultar célula unitária',paths.unitCell,()=>{const r=model.state.structure?.crystallography?.representation;if(r)model.setCrystalRepresentation({unitCell:!r.unitCell});});
  const neighborsButton=quickButton('silm-quick-neighbors','Mostrar vizinhos',paths.neighbors,()=>actions.toggleNeighbors());
- const projectionBox=U.element('label',null,'silm-quick-projection'),projectionIcon=document.createElementNS(NS,'svg');projectionIcon.setAttribute('viewBox','0 0 24 24');projectionIcon.setAttribute('fill','none');projectionIcon.setAttribute('stroke','currentColor');projectionIcon.setAttribute('stroke-width','1.8');projectionIcon.setAttribute('aria-hidden','true');
+ const projectionBox=U.element('div',null,'silm-quick-projection');
+ const projectionIcon=document.createElementNS(NS,'svg');projectionIcon.setAttribute('viewBox','0 0 24 24');projectionIcon.setAttribute('fill','none');projectionIcon.setAttribute('stroke','currentColor');projectionIcon.setAttribute('stroke-width','1.8');projectionIcon.setAttribute('aria-hidden','true');
  const projectionShape=document.createElementNS(NS,'path');projectionShape.setAttribute('d','M3 6h18M6 3v6M18 3v6M5 13h14l-3 8H8z');projectionIcon.append(projectionShape);
- const projection=U.element('select');projection.id='silm-crystal-projection';projection.setAttribute('aria-label','Projeção e orientação da vista');projectionBox.title='Projeção e orientação da vista';projectionBox.append(projectionIcon,projection);
- const group2=U.element('optgroup'),group3=U.element('optgroup');group2.label='2D';group3.label='3D';
- for(const id of RP.PROJECTIONS){const o=U.element('option',RP.LABELS[id]);o.value=id;group2.append(o);}
- for(const id of RP.PRESETS){const o=U.element('option',RP.PRESET_LABELS[id]);o.value=id==='3d'?'3d':'3d-'+id;o.disabled=!rep2.available3D();group3.append(o);}
- projection.append(group2,group3);quickHost?.append(projectionBox);
- scope.listen(projection,'change',()=>{const v=projection.value;if(v.startsWith('3d')){const preset=v==='3d'?'3d':v.slice(3);rep2.setCamera3D({preset,yaw:null,pitch:null},{silent:!mode3d});if(!mode3d)rep2.setViewMode('3d');}
-  else if(mode3d)rep2.setViewMode('2d',{projection:v});else rep2.setProjection(v);});
+ const projection=document.createElement('button');projection.type='button';projection.id='silm-crystal-projection';projection.className='silm-projection-trigger';
+ projection.setAttribute('aria-label','Projeção e orientação da vista');projection.setAttribute('aria-haspopup','listbox');projection.setAttribute('aria-expanded','false');projection.setAttribute('aria-controls','silm-crystal-projection-list');
+ const projectionValue=U.element('span','Isométrica','silm-projection-value'),projectionChevron=U.element('span','▾','silm-projection-chevron');projectionChevron.setAttribute('aria-hidden','true');projection.append(projectionValue,projectionChevron);
+ projectionBox.title='Projeção e orientação da vista';projectionBox.append(projectionIcon,projection);quickHost?.append(projectionBox);
+ const projectionMenu=U.element('div',null,'silm-projection-menu');projectionMenu.id='silm-crystal-projection-list';projectionMenu.hidden=true;projectionMenu.setAttribute('role','listbox');projectionMenu.setAttribute('aria-label','Projeções 2D e orientações 3D');
+ const projectionChoices=[
+  {group:'2D',items:RP.PROJECTIONS.map(id=>({value:id,label:RP.LABELS[id]}))},
+  {group:'3D',items:RP.PRESETS.map(id=>({value:id==='3d'?'3d':'3d-'+id,label:RP.PRESET_LABELS[id]}))}
+ ];
+ const projectionOptions=new Map();
+ for(const group of projectionChoices){
+  const section=U.element('div',null,'silm-projection-group');section.setAttribute('role','group');section.setAttribute('aria-label',group.group);
+  section.append(U.element('span',group.group,'silm-projection-group-label'));
+  for(const item of group.items){
+   const option=U.element('button',item.label,'silm-projection-option');option.type='button';option.dataset.value=item.value;option.setAttribute('role','option');option.setAttribute('aria-selected','false');
+   if(group.group==='3D'&&!rep2.available3D()){option.disabled=true;option.title='Representação 3D indisponível neste ambiente.';}
+   option.addEventListener('click',()=>chooseProjection(item.value));section.append(option);projectionOptions.set(item.value,option);
+  }
+  projectionMenu.append(section);
+ }
+ document.body.append(projectionMenu);
+ const projectionLabel=value=>projectionChoices.flatMap(group=>group.items).find(item=>item.value===value)?.label||'Isométrica';
+ const syncProjectionPicker=value=>{
+  projectionValue.textContent=projectionLabel(value);
+  projection.setAttribute('aria-label','Projeção e orientação da vista: '+projectionLabel(value));
+  for(const [id,option]of projectionOptions)option.setAttribute('aria-selected',String(id===value));
+ };
+ const closeProjectionMenu=({restore=false}={})=>{
+  if(projectionMenu.hidden)return;
+  projectionMenu.hidden=true;projection.setAttribute('aria-expanded','false');
+  if(restore)projection.focus({preventScroll:true});
+ };
+ const positionProjectionMenu=()=>{
+  if(projectionMenu.hidden)return;
+  const rect=projection.getBoundingClientRect(),vw=window.visualViewport?.width||window.innerWidth,vh=window.visualViewport?.height||window.innerHeight;
+  projectionMenu.style.maxHeight=Math.max(120,Math.min(420,vh-24))+'px';
+  const menuHeight=Math.min(projectionMenu.scrollHeight,420,vh-24),menuWidth=Math.min(Math.max(projectionMenu.offsetWidth,190),vw-24);
+  const above=rect.top-12,below=vh-rect.bottom-12;
+  const top=above>=Math.min(menuHeight,220)?Math.max(12,rect.top-menuHeight-8):Math.min(rect.bottom+8,Math.max(12,vh-menuHeight-12));
+  const left=Math.max(12,Math.min(rect.left,vw-menuWidth-12));
+  projectionMenu.style.left=left+'px';projectionMenu.style.top=top+'px';
+ };
+ const openProjectionMenu=()=>{
+  projectionMenu.hidden=false;projection.setAttribute('aria-expanded','true');positionProjectionMenu();
+  const selected=projectionMenu.querySelector('[role=option][aria-selected=true]:not(:disabled)');
+  (selected||projectionMenu.querySelector('[role=option]:not(:disabled)'))?.focus({preventScroll:true});
+ };
+ const chooseProjection=value=>{
+  closeProjectionMenu();
+  if(value.startsWith('3d')){const preset=value==='3d'?'3d':value.slice(3);rep2.setCamera3D({preset,yaw:null,pitch:null},{silent:!mode3d});if(!mode3d)rep2.setViewMode('3d');}
+  else if(mode3d)rep2.setViewMode('2d',{projection:value});else rep2.setProjection(value);
+ };
+ scope.listen(projection,'click',()=>projectionMenu.hidden?openProjectionMenu():closeProjectionMenu({restore:true}));
+ scope.listen(projection,'keydown',event=>{
+  if(['ArrowDown','ArrowUp','Enter',' '].includes(event.key)){event.preventDefault();openProjectionMenu();}
+ });
+ scope.listen(projectionMenu,'keydown',event=>{
+  const options=Array.from(projectionMenu.querySelectorAll('[role=option]:not(:disabled)')),index=options.indexOf(document.activeElement);
+  if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeProjectionMenu({restore:true});return;}
+  if(event.key==='Tab'){closeProjectionMenu();return;}
+  if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){
+   event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?options.length-1:(index+(event.key==='ArrowDown'?1:-1)+options.length)%options.length;options[next]?.focus({preventScroll:true});
+  }
+ });
+ scope.listen(document,'pointerdown',event=>{if(!projectionMenu.hidden&&!projectionMenu.contains(event.target)&&!projection.contains(event.target))closeProjectionMenu();});
+ const repositionProjectionMenu=()=>positionProjectionMenu();
+ scope.listen(window,'resize',repositionProjectionMenu);scope.listen(window,'scroll',repositionProjectionMenu,{capture:true});
+ if(window.visualViewport){scope.listen(window.visualViewport,'resize',repositionProjectionMenu);scope.listen(window.visualViewport,'scroll',repositionProjectionMenu);}
+ scope.cleanup(()=>projectionMenu.remove());
  const syncQuickControls=r=>{
   cellView.setAttribute('aria-pressed',String(r.view==='cell'));latticeView.setAttribute('aria-pressed',String(r.view==='lattice'));
   unitCellButton.setAttribute('aria-pressed',String(r.unitCell));neighborsButton.setAttribute('aria-pressed',String(r.neighbors));
@@ -212,7 +275,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const S=model.state,s=S.structure;if(!s||s.mode!=='crystalline')return;const r=s.crystallography.representation,list=s.units,pr=S.properties,active=pr?.active||null;const alignNow=(mode3d?'3d':rep2.projection())+'|'+(pr?.startedAt||'');if(alignNow!==alignKey){alignKey=alignNow;align=camAngles(rep2.projection());}
   deformCtl?.sync();const live=deformCtl?.transform(align)||null;deform=live||P.deformer(S,g,align);const deforming=!!live||(!!deform&&['malleability','ductility'].includes(active));specimen=deforming;
   const proj=rep2.projection(),cam3=mode3d?{...rep2.camera3D(),...(orbitLive||{})}:null,selectValue=mode3d?(cam3.preset&&cam3.preset!=='3d'?'3d-'+cam3.preset:'3d'):proj;
-  if(projection.value!==selectValue)projection.value=selectValue;root.dataset.projection=mode3d?'3d':proj;root.dataset.viewMode=mode3d?'3d':'2d';
+  syncProjectionPicker(selectValue);root.dataset.projection=mode3d?'3d':proj;root.dataset.viewMode=mode3d?'3d':'2d';
   if(perspectiveButton){const on=cam3.projection==='perspective';perspectiveButton.setAttribute('aria-pressed',String(on));perspectiveButton.setAttribute('aria-label',on?'Perspectiva (ligada)':'Perspectiva (desligada: ortográfica)');}
   const calcMark=calcOptions?.marks?.()||null;root.dataset.calc=calcMark?.mode||'';
   root.dataset.view=r.view;root.dataset.labels=String(r.labels);root.dataset.cell=String(r.unitCell);
