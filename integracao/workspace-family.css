@@ -190,3 +190,30 @@
  #silm-integration-scene>.silm-assembly.silm-crystal>.silm-assembly-area>.silm-crystal-stage{border:1px solid CanvasText!important;box-shadow:none!important}
  #silm-integration-scene>.silm-assembly.silm-crystal>.silm-assembly-area>.silm-crystal-stage::before{display:none}
 }
+/* Tela expandida: remover a barra de navegação interna e a linha vazia do cabeçalho legado. */
+body.si-structure-expanded #si-workspace{padding:0!important}
+body.si-structure-expanded #si-workspace>.si-workspace-toolbar{display:none!important}
+body.si-structure-expanded #si-stage.si-scene-expanded{flex:1 1 0!important;min-height:0!important}
+body.si-structure-expanded #workspace-focus{padding:0!important;gap:0!important}
+body.si-structure-expanded #silm-integration-scene,
+body.si-structure-expanded #silm-integration-scene>.silm-laboratory{display:flex!important;flex:1 1 0!important;flex-direction:column!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;overflow:hidden!important}
+body.si-structure-expanded #silm-integration-scene>.silm-assembly.silm-crystal{display:flex!important;flex:1 1 0!important;flex-direction:column!important;flex-wrap:nowrap!important;grid-template-columns:none!important;grid-template-rows:none!important;gap:0!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;overflow:hidden!important}
+body.si-structure-expanded #silm-integration-scene>.silm-assembly.silm-crystal>.silm-assembly-area{display:grid!important;flex:1 1 0!important;grid-column:auto!important;grid-row:auto!important;place-items:center!important;width:100%!important;height:auto!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;overflow:hidden!important;padding:0!important}
+body.si-structure-expanded #silm-integration-scene>.silm-assembly.silm-crystal>.silm-assembly-area>.silm-crystal-stage{flex:none!important;aspect-ratio:1/1!important;width:var(--stage)!important;height:var(--stage)!important;max-width:100%!important;max-height:100%!important;min-width:0!important;min-height:0!important}
+body.si-structure-expanded #silm-scene-actionbar{flex:0 0 auto!important;min-height:52px!important;z-index:1501!important}
+
+/* Menu Mais: popover flutuante alinhado ao botão, fora do recorte da barra horizontal. */
+#silm-scene-actionbar .si-toolmenu-wrap{position:static!important;display:flex!important;flex:0 0 auto!important;align-items:center!important;margin-left:2px!important;padding:0!important;background:transparent!important}
+#silm-scene-actionbar #scene-menu-toggle{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;min-width:68px!important;min-height:36px!important;padding:5px 9px!important;white-space:nowrap!important}
+#scene-tools-menu.si-toolmenu{position:fixed;z-index:2400;display:grid;gap:4px;width:max-content;min-width:190px;max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);overflow:auto;padding:6px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);box-shadow:0 12px 34px rgb(0 0 0/.28);overscroll-behavior:contain}
+#scene-tools-menu.si-toolmenu[hidden]{display:none!important}
+#scene-tools-menu.si-toolmenu [role=menuitem]{display:flex;align-items:center;justify-content:flex-start;width:100%;min-width:0;min-height:40px;padding:8px 10px;border:0;border-radius:8px;background:transparent;color:var(--text);font:inherit;font-size:.82rem;text-align:left;white-space:nowrap;cursor:pointer}
+#scene-tools-menu.si-toolmenu [role=menuitem]:hover{background:var(--hover)}
+#scene-tools-menu.si-toolmenu [role=menuitem]:focus-visible{outline:2px solid var(--ring);outline-offset:-2px;background:var(--tint)}
+@media(max-width:900px){
+ #scene-tools-menu.si-toolmenu{min-width:176px}
+}
+@media(forced-colors:active){
+ #scene-tools-menu.si-toolmenu{border:1px solid CanvasText;box-shadow:none}
+ #scene-tools-menu.si-toolmenu [role=menuitem]:focus-visible{outline:2px solid Highlight}
+}
