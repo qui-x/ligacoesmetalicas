@@ -217,3 +217,51 @@ body.si-structure-expanded #silm-scene-actionbar{flex:0 0 auto!important;min-hei
  #scene-tools-menu.si-toolmenu{border:1px solid CanvasText;box-shadow:none}
  #scene-tools-menu.si-toolmenu [role=menuitem]:focus-visible{outline:2px solid Highlight}
 }
+
+/* Montagem livre — mesmo palco amplo e barra inferior do modo cristalino. */
+#silm-integration-scene>.silm-assembly:not(.silm-crystal){display:flex!important;flex:1 1 0!important;flex-flow:column nowrap!important;align-items:stretch!important;justify-content:stretch!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important;gap:0!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;overflow:hidden!important}
+#silm-integration-scene>.silm-assembly:not(.silm-crystal)>.silm-assembly-bar,
+#silm-integration-scene>.silm-assembly:not(.silm-crystal)>.silm-assembly-footer{display:none!important}
+#silm-integration-scene>.silm-assembly:not(.silm-crystal)>.silm-assembly-area{display:grid!important;position:relative!important;flex:1 1 0!important;grid-column:auto!important;grid-row:auto!important;place-items:center!important;align-self:stretch!important;width:100%!important;height:auto!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;overflow:hidden!important;padding:0!important;background:radial-gradient(ellipse at 50% 48%,color-mix(in srgb,var(--panel2) 34%,transparent) 0%,transparent 72%)!important}
+#silm-integration-scene>.silm-assembly:not(.silm-crystal)>.silm-assembly-area>.silm-assembly-stage{position:relative!important;flex:none!important;align-self:center!important;justify-self:center!important;box-sizing:border-box!important;aspect-ratio:1/1!important;width:var(--stage)!important;height:var(--stage)!important;max-width:100%!important;max-height:100%!important;min-width:0!important;min-height:0!important;overflow:hidden!important;border:1px solid color-mix(in srgb,var(--silm-soft-border) 78%,var(--accent) 22%)!important;border-radius:clamp(14px,1.4vw,22px)!important;background:radial-gradient(circle at 50% 43%,color-mix(in srgb,var(--panel2) 86%,var(--accent) 4%) 0%,var(--panel) 54%,var(--bg) 100%)!important;box-shadow:inset 0 0 0 1px rgb(255 255 255/.025),inset 0 16px 48px rgb(0 0 0/.12),0 18px 54px rgb(0 0 0/.12)!important}
+#silm-integration-scene>.silm-assembly:not(.silm-crystal)>.silm-assembly-area>.silm-assembly-stage::before{content:"";position:absolute;z-index:0;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(to right,color-mix(in srgb,var(--border) 70%,transparent) 1px,transparent 1px),linear-gradient(to bottom,color-mix(in srgb,var(--border) 70%,transparent) 1px,transparent 1px);background-size:8.3333% 8.3333%;mask-image:radial-gradient(ellipse at center,#000 22%,transparent 88%)}
+#silm-integration-scene>.silm-assembly:not(.silm-crystal)>.silm-assembly-area>.silm-assembly-stage::after{content:"";position:absolute;z-index:12;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 48px rgb(0 0 0/.12)}
+.silm-scene-caption{position:absolute;z-index:20;top:12px;left:14px;max-width:calc(100% - 28px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 9px;border:1px solid var(--border);border-radius:999px;background:color-mix(in srgb,var(--surface) 82%,transparent);color:var(--muted);font-size:.72rem;font-weight:750;letter-spacing:.02em;pointer-events:none}
+@media(max-width:900px){
+ #silm-integration-scene>.silm-assembly:not(.silm-crystal)>.silm-assembly-area{padding:0!important}
+ #silm-integration-scene>.silm-assembly:not(.silm-crystal)>.silm-assembly-area>.silm-assembly-stage{border-radius:12px!important}
+}
+@media(max-height:560px) and (orientation:landscape){
+ #silm-integration-scene>.silm-assembly:not(.silm-crystal)>.silm-assembly-area{padding:0!important}
+ #silm-integration-scene>.silm-assembly:not(.silm-crystal)>.silm-assembly-area>.silm-assembly-stage{border-radius:10px!important}
+}
+.silm-structure-manager{display:grid;gap:14px;min-width:0}
+.silm-structure-manager-intro{margin:0;color:var(--muted);font-size:.84rem;line-height:1.5}
+.silm-structure-manager-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.silm-structure-count{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.silm-structure-layout{min-height:36px;padding:5px 10px;font-size:.78rem}
+.silm-structure-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:12px;align-items:stretch;min-width:0}
+.silm-structure-cards[data-layout=list]{grid-template-columns:minmax(0,1fr)}
+.silm-structure-card{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;min-width:0;padding:12px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);overflow:hidden}
+.silm-structure-card[data-current=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.silm-structure-card-head{display:flex;align-items:center;gap:10px;min-width:0}
+.silm-structure-card-heading{flex:1;min-width:0}
+.silm-structure-title{margin:0;font-size:.98rem;line-height:1.3;overflow-wrap:anywhere}
+.silm-structure-status{flex:none;padding:3px 8px;border:1px solid var(--border);border-radius:999px;color:var(--muted);font-size:.68rem;font-weight:750;white-space:nowrap}
+.silm-structure-card[data-current=true] .silm-structure-status{border-color:var(--accent);color:var(--accent)}
+.silm-structure-card-meta{margin:0;color:var(--muted);font-size:.78rem;line-height:1.4}
+.silm-structure-preview{display:grid;place-items:center;min-width:0;height:144px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:radial-gradient(ellipse at center,var(--panel2),var(--bg))}
+.silm-structure-preview svg{display:block;width:100%;height:100%;max-height:144px}
+.silm-structure-card-actions{display:flex;flex-wrap:wrap;gap:6px}
+.silm-structure-card-actions button{flex:1 1 auto;min-height:38px;padding:6px 9px;font-size:.76rem}
+.silm-structure-remove{color:var(--danger)}
+.silm-structure-rename{display:flex;gap:6px;min-width:0}
+.silm-structure-rename input{box-sizing:border-box;flex:1;min-width:0;width:100%;min-height:38px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font:inherit}
+.silm-structure-rename button{min-height:38px;padding:5px 8px;font-size:.76rem}
+.silm-structure-empty{display:grid;justify-items:start;gap:8px;padding:20px;border:1px dashed var(--border);border-radius:var(--radius);background:var(--surface)}
+.silm-structure-empty h3,.silm-structure-empty p{margin:0}
+.silm-structure-empty p{color:var(--muted);font-size:.84rem;line-height:1.5}
+.silm-structure-empty button{min-height:40px}
+@media(max-width:900px){.silm-structure-cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}.silm-structure-card-actions button{min-height:42px}}
+@media(max-width:520px){.silm-structure-cards,.silm-structure-cards[data-layout=list]{grid-template-columns:minmax(0,1fr)}.silm-structure-card{padding:10px}.silm-structure-preview{height:126px}}
+@media(forced-colors:active){.silm-structure-card[data-current=true]{border:2px solid Highlight}.silm-structure-status{border:1px solid CanvasText}.silm-structure-preview{border:1px solid CanvasText}}

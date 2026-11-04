@@ -51,7 +51,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   unitCellButton.setAttribute('aria-pressed',String(r.unitCell));neighborsButton.setAttribute('aria-pressed',String(r.neighbors));
   neighborsButton.setAttribute('aria-label',r.neighbors?'Ocultar vizinhos':'Mostrar vizinhos');neighborsButton.title=r.neighbors?'Ocultar vizinhos':'Mostrar vizinhos';
  };
- scope.cleanup(()=>{if(quickHost){quickHost.replaceChildren();quickHost.hidden=true;}});
+ scope.cleanup(()=>{if(quickHost){quickHost.replaceChildren();quickHost.hidden=true;}const notes=document.getElementById('silm-structure-notes');if(notes)notes.replaceChildren();});
  const instructions=U.element('p','Selecione uma unidade (clique, toque ou Enter) para identificar seu centro e consultar vizinhos. Setas percorrem as unidades; Esc limpa a seleção.'+(note?' '+note:''),'silm-assembly-help');instructions.id='silm-assembly-help';
  const cameraHelp=U.element('p',mode3d?'Vista 3D: arraste para girar; J e L giram na horizontal, I e K na vertical e P alterna perspectiva/ortográfica. Shift + arrastar desloca; + e − aproximam; F enquadra; 0 restaura.':'Vista: + e − aproximam e afastam, F enquadra, C centraliza, 0 restaura e Shift + setas deslocam. Arraste o fundo para deslocar; no celular, use dois dedos para aproximar.','silm-camera-help');
  const legend=U.element('p',m.id==='HCP'?'Camadas A e B: empilhamento ABAB. Unidades da camada B têm anel interno tracejado. Na projeção Superior, a camada B aparece nos espaços entre os centros da camada A.':m.general?'Célula da ficha cristalográfica (grupo espacial '+m.spaceGroup+'), com posições geradas pelas operações de simetria registradas. O sólido continua em todas as direções: a célula é a unidade que se repete.':'O sólido continua em todas as direções: a célula é a unidade que se repete.','silm-crystal-legend');
@@ -76,7 +76,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  // Elétrons e propriedades mantêm seus controles completos no painel Ver; o palco recebe somente as camadas visuais.
  // 0.7.x: a sobreposição da experiência permanece sobre a cena; comandos ficam em Ver → Observar.
  const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:units});R.layer('properties',overlay.root);
- const notesHost=document.getElementById('silm-crystal-notes');
+ const notesHost=document.getElementById('silm-structure-notes');
  if(notesHost){notesHost.replaceChildren();SILM.createSceneNotes(notesHost,{scope,items:[instructions,cameraHelp,legend,electronLegend,cellStatus,kind]});}
  let deform=null,heatTimer=false,nearest=null,lastControls=0;const D=c=>deform?deform(c):c;
  /* 0.17.x: deformação contínua (SILM.deformation) — orientação de ensaio, elástico amortecido e deslizamento de planos

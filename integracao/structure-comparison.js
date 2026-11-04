@@ -17,120 +17,178 @@ SILM.referenceGeometry=e=>{
    (a investigação atual é substituída só depois da confirmação); barra inferior com as estruturas e "Nova estrutura".
    current(): metal da investigação atual; open(z): abre a estrutura no Foco; newStructure(): abre Montagem → Preparo.
    Remover (✕) tira a estrutura só desta lista (nada da investigação é apagado); a estrutura em foco não sai. */
-SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStructure=null,say=null})=>{
- const S=SILM,N=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;},svgNS='http://www.w3.org/2000/svg';
- let recent=storage.get('comparison.recent',[]);if(!Array.isArray(recent))recent=[];recent=recent.filter(z=>Number.isInteger(z)&&S.data.get(z)?.silmEligibility.status==='available').slice(0,6);
- let last=null,shownCurrent=null,property='none',level=0,showElectrons=true,moving=false,scopes=[],layers=[];
- let layout=storage.get('comparison.layout','grid');if(layout!=='list')layout='grid';
- const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.classList.contains('si-no-motion');
- function syncLayers(){const visible=!host.closest('[hidden]')&&location.hash.startsWith('#/ambiente');for(const item of layers)item.layer.update({...item.options,visible:visible&&showElectrons,motion:moving&&!reduced()});}
- new MutationObserver(syncLayers).observe(document.getElementById('workspace-overview'),{attributes:true,attributeFilter:['hidden']});window.addEventListener('hashchange',syncLayers);
- host.replaceChildren();host.classList.add('silm-comparison');
- // Faixa do título: "Estruturas recentes" à esquerda, ações à direita (como "Sua bancada" no SIAB).
- const head=N('div',null,'silm-overview-head'),title=host.closest('#workspace-overview')?.querySelector(':scope>h2')||N('h2','Estruturas recentes');head.append(title);
- const actions=N('div',null,'silm-comparison-actions');
- const electrons=N('button','Elétrons','secondary-btn');electrons.type='button';electrons.id='comparison-electrons';electrons.setAttribute('aria-pressed','true');electrons.title='Mostrar ou ocultar os elétrons deslocalizados';
- const motion=N('button','Movimento','secondary-btn');motion.type='button';motion.id='comparison-motion';motion.setAttribute('aria-pressed','false');motion.title='Ativar ou pausar o movimento eletrônico';
- const view=N('button','','secondary-btn');view.type='button';view.id='comparison-layout';view.title='Alternar entre grade e lista';
- electrons.onclick=()=>{showElectrons=!showElectrons;electrons.setAttribute('aria-pressed',String(showElectrons));syncLayers();};
- motion.onclick=()=>{moving=!moving;motion.setAttribute('aria-pressed',String(moving));syncLayers();};
- view.onclick=()=>{layout=layout==='grid'?'list':'grid';storage.set('comparison.layout',layout);applyLayout();};
- actions.append(electrons,motion,view);head.append(actions);
- title.tabIndex=-1;
- // Comparar uma propriedade: seletor, intensidade em botões segmentados (0 a 3) e Restaurar.
- const controls=N('div',null,'silm-comparison-controls');
- const propertyField=N('div',null,'silm-comparison-field');
- const label=N('label','Propriedade'),select=N('select',null,'silm-comparison-select');select.id='silm-comparison-property';label.htmlFor=select.id;
- for(const [id,name]of [['none','Referência'],...S.properties.ids.map(id=>[id,S.properties.catalog[id].title])]){const o=N('option',name);o.value=id;select.append(o);}
- propertyField.append(label,select);
- const intensityField=N('div',null,'silm-comparison-field');
- const amountLabel=N('span','Intensidade');amountLabel.id='silm-comparison-level-label';const amount=N('div',null,'silm-comparison-levels');amount.id='silm-comparison-level';amount.setAttribute('role','group');amount.setAttribute('aria-labelledby',amountLabel.id);
- const levelButtons=[0,1,2,3].map(v=>{const b=N('button',String(v),'secondary-btn');b.type='button';b.dataset.comparisonLevel=String(v);b.setAttribute('aria-label','Intensidade '+v+' de 3');b.setAttribute('aria-pressed',String(v===0));amount.append(b);return b;});
- const status=N('output','0/3','silm-comparison-level');status.setAttribute('aria-live','polite');intensityField.append(amountLabel,amount,status);
- const reset=N('button','Restaurar','secondary-btn silm-comparison-reset');reset.type='button';
- controls.append(propertyField,intensityField,reset);
- const limits=document.createElement('details');limits.className='silm-comparison-limits';
- limits.append(N('summary','Limites da comparação'),N('p','A intensidade é didática. As cenas não permitem classificar qual metal conduz ou deforma mais.'));
- // Menos texto: "Limites da comparação" (recolhido) fica na mesma linha dos controles; a dica saiu (o ✕ e o cartão dizem o que fazem).
- limits.querySelector('p').textContent='Até seis estruturas, cada uma com a sua referência e sem escala comum. A intensidade é didática: as cenas não permitem classificar qual metal conduz ou deforma mais.';controls.append(limits);
- const cards=N('div',null,'silm-comparison-cards');host.append(head,controls,cards);
- select.onchange=()=>{property=select.value;render();};
- const setLevel=v=>{level=v;status.textContent=level+'/3';for(const b of levelButtons)b.setAttribute('aria-pressed',String(Number(b.dataset.comparisonLevel)===v));};
- for(const b of levelButtons)b.onclick=()=>{setLevel(Number(b.dataset.comparisonLevel));render();};
- reset.onclick=()=>{property='none';select.value='none';setLevel(0);render();};
- function applyLayout(){cards.dataset.layout=layout;view.textContent=layout==='grid'?'Ver em lista':'Ver em grade';view.setAttribute('aria-label',layout==='grid'?'Ver em lista':'Ver em grade');}
- applyLayout();
- // Contador na aba "Visão geral" (como "Visão geral 2" no SIAB).
- function updateCount(){const tab=document.querySelector('[data-scene-view="overview"]');if(!tab)return;let badge=tab.querySelector('.si-tab-count');if(!badge){badge=N('span','','si-tab-count');tab.append(' ',badge);}badge.textContent=String(recent.length);badge.hidden=!recent.length;}
- // Barra inferior na Visão geral: as estruturas (ficha por metal) e "Nova estrutura" (como a bancada do SIAB).
- const strip=N('div',null,'silm-overview-strip');strip.setAttribute('role','group');strip.setAttribute('aria-label','Estruturas recentes');
- const stripLabel=N('div',null,'silm-overview-strip-label');const stripTitle=N('span','Estruturas'),stripCount=N('strong','0');stripLabel.append(stripTitle,stripCount);
- const chips=N('div',null,'silm-overview-chips');const add=N('button','+ Nova estrutura','button outline silm-overview-new');add.type='button';add.onclick=()=>newStructure?.();
- strip.append(stripLabel,chips,add);document.querySelector('#si-workspace .si-actionbar')?.append(strip);
- const structureCode=e=>{try{const g=S.referenceGeometry(e);return g?(g.canonical?(g.code||g.label):(g.label||g.code)):'';}catch{return '';}};
- async function openStructure(z){if(open)await open(z);}
- function removeStructure(z){const i=recent.indexOf(z);if(i<0||z===current())return;const next=recent.filter(v=>v!==z);if(!storage.set('comparison.recent',next))return;recent=next;render();
-  say?.(S.data.get(z).name+' removido da Visão geral. Ele volta à lista quando for investigado de novo.','info');
-  (cards.querySelectorAll('.silm-comparison-open')[Math.min(i,recent.length-1)]||title).focus();}
- function renderStrip(cur){chips.replaceChildren();stripCount.textContent=String(recent.length);
-  recent.forEach((z,i)=>{const e=S.data.get(z),b=N('button',null,'silm-overview-chip');b.type='button';b.setAttribute('aria-pressed',String(z===cur));
-   const sym=N('span',e.symbol,'silm-overview-chip-symbol');sym.setAttribute('aria-hidden','true');const txt=N('span');txt.append(N('strong',e.name),N('small',(i+1)+' · '+(structureCode(e)||'referência')));
-   b.append(sym,txt);b.setAttribute('aria-label',(i+1)+'. '+e.name+(z===cur?', em foco':'')+' — abrir no Foco');b.onclick=()=>openStructure(z);chips.append(b);});}
- /* Desenho do cartão como no Foco (03/11/2026, pedido do autor: "dê o mesmo foco que deu na parte de em foco"): esferas
-    com volume (o mesmo gradiente das unidades do Foco), menores e desenhadas antes quando estão mais ao fundo, com o
-    símbolo do metal; arestas da célula finas; sem texto além de "E" no campo. Fonte e referência ficam no nome acessível. */
- let gradientId=0;
- function draw(g,e,source){
-  const svg=document.createElementNS(svgNS,'svg');svg.setAttribute('viewBox','0 0 300 230');svg.setAttribute('role','img');
-  const eligible=S.properties.eligibility(e)[property],apply=property!=='none'&&eligible?.status!=='unavailable';
-  svg.setAttribute('aria-label',e.name+' — '+g.label+' — '+(property==='none'?'referência':S.properties.catalog[property].title+(apply?', intensidade '+level+' de 3 (qualitativa)':', indisponível: '+(eligible?.message||'nesta estrutura')))+(source?'. Fonte: '+source:''));
-  const transform=p=>apply&&property==='malleability'?S.properties.compress(p,g.center,level):apply&&property==='ductility'?S.properties.elongate(p,g.center,level):p;
-  const project=p=>{const q=p.map((v,i)=>v-g.center[i]);return [q[0]+.35*q[1],-q[2]+.3*q[1],q[1]];};
-  const fit=[...g.points,...g.edges.flat()].map(project),max=Math.max(1,...fit.flatMap(q=>[Math.abs(q[0]),Math.abs(q[1])]))*1.32;
-  const screen=p=>{const q=project(transform(p));return [150+q[0]*105/max,117+q[1]*105/max,q[2]];};
-  const shape=(tag,attrs,parent=svg)=>{const n=document.createElementNS(svgNS,tag);for(const [k,v]of Object.entries(attrs))n.setAttribute(k,v);parent.append(n);return n;};
-  const gid='silm-cmp-sphere-'+(++gradientId),defs=shape('defs',{}),grad=shape('radialGradient',{id:gid,cx:'34%',cy:'30%',r:'72%'},defs);
-  for(const [o,c]of [['0','#f3e7c2'],['.34','#d4b465'],['.74','#a8743b'],['1','#6e4a22']])shape('stop',{offset:o,'stop-color':c},grad);
-  for(const [a,b]of g.edges){const p=screen(a),q=screen(b);shape('line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],stroke:'currentColor','stroke-opacity':.35,'stroke-width':1.2,class:'silm-comparison-edge'});}
-  const pts=g.points.map(screen),ds=pts.map(p=>p[2]),dMin=Math.min(...ds),dSpan=Math.max(1e-9,Math.max(...ds)-dMin);
-  const xs=pts.map(p=>p[0]),min=Math.min(...xs),span=Math.max(1,Math.max(...xs)-min),R=Math.max(8,Math.min(17,60/Math.sqrt(pts.length)));
-  // Do fundo para a frente: as esferas da frente cobrem as de trás, como no Foco.
-  pts.map((p,i)=>({p,i,far:(p[2]-dMin)/dSpan})).sort((a,b)=>b.far-a.far).forEach(({p,far})=>{
-   const r=R*(1-.22*far),heat=apply&&property==='thermal'?Math.max(0,level/3-(p[0]-min)/span*.6):0;
-   shape('circle',{cx:p[0],cy:p[1],r,fill:`url(#${gid})`,stroke:'#2a2016','stroke-width':1,class:'silm-comparison-sphere'});
-   if(heat){shape('circle',{cx:p[0],cy:p[1],r,fill:`hsl(${45-45*heat} 90% 55%)`,'fill-opacity':(.25+.45*heat).toFixed(2)});shape('circle',{cx:p[0],cy:p[1],r:r+3+heat*4,fill:'none',stroke:'currentColor','stroke-dasharray':'2 3'});}
-   if(r>=10){const t=shape('text',{x:p[0],y:p[1],'text-anchor':'middle','dominant-baseline':'central','font-size':(r*.78).toFixed(1),'font-weight':800,fill:'#17181b',class:'silm-comparison-symbol'});t.textContent=e.symbol;}
-  });
-  const arrow=(x1,y1,x2,y2,color)=>{shape('line',{x1,y1,x2,y2,stroke:color,'stroke-width':2.2,'stroke-linecap':'round'});const a=Math.atan2(y2-y1,x2-x1),h=7;shape('polygon',{points:[[x2,y2],[x2-h*Math.cos(a-.45),y2-h*Math.sin(a-.45)],[x2-h*Math.cos(a+.45),y2-h*Math.sin(a+.45)]].map(q=>q.map(v=>v.toFixed(1)).join(',')).join(' '),fill:color});};
-  if(apply&&property==='electrical'&&level){arrow(118,12,182,12,'currentColor');const t=shape('text',{x:190,y:12,'dominant-baseline':'central','font-size':13,'font-weight':800,fill:'currentColor'});t.textContent='E';
-   for(let i=0;i<3;i++){const y=216;const x=110+i*40;arrow(x+level*5,y,x-level*5,y,'#168aad');}}
-  if(apply&&property==='luster'&&level)for(let i=0;i<level;i++){shape('line',{x1:20+i*20,y1:12,x2:100+i*20,y2:70,stroke:'#b69a51','stroke-width':2});shape('line',{x1:100+i*20,y1:70,x2:180+i*20,y2:12,stroke:'#b69a51','stroke-dasharray':'5 3'});}
-  return {svg,eligible,apply,centers:pts.map(p=>({x:p[0]/300,y:p[1]/230}))};
+SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStructure=null,say=null,confirm=null})=>{
+ const S=SILM,N=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined&&text!==null)n.textContent=text;if(cls)n.className=cls;return n;},NS='http://www.w3.org/2000/svg';
+ const KEY='structures.collection',MAX=30,copy=x=>JSON.parse(JSON.stringify(x));
+ const validRecord=r=>{
+  if(!r||typeof r!=='object'||typeof r.id!=='string'||typeof r.name!=='string'||!r.name.trim()||!r.snapshot||r.snapshot.investigation?.id!==r.id)return false;
+  const checked=S.validateScientificState(r.snapshot);
+  return checked.ok&&checked.value.investigation?.type==='free'&&checked.value.structure?.units?.length>0&&checked.value.metal?.atomicNumber===r.atomicNumber;
+ };
+ let raw=storage.get(KEY,[]),records=Array.isArray(raw)?raw.filter(validRecord):[];
+ let lastCurrent=null,layout=storage.get('structures.layout','grid');
+ if(!['grid','list'].includes(layout))layout='grid';
+ if(!Array.isArray(raw)||records.length!==raw.length)storage.set(KEY,records);
+ host.replaceChildren();host.classList.add('silm-structure-manager');
+ const page=host.closest('#workspace-overview'),pageTitle=page?.querySelector(':scope>h2');
+ if(pageTitle)pageTitle.textContent='Gerenciamento de estruturas';
+ if(page)page.setAttribute('aria-label','Gerenciamento de estruturas salvas');
+ const intro=N('p','Estruturas salvas nesta oficina. Selecione uma para continuar no Foco.','silm-structure-manager-intro');
+ const toolbar=N('div',null,'silm-structure-manager-toolbar');
+ const layoutButton=N('button',layout==='grid'?'Ver em lista':'Ver em grade','secondary-btn silm-structure-layout');layoutButton.type='button';
+ const count=N('span','0 estruturas','silm-structure-count');count.setAttribute('role','status');
+ toolbar.append(count,layoutButton);
+ const cards=N('div',null,'silm-structure-cards');host.append(intro,toolbar,cards);
+ const actionbar=document.querySelector('#si-workspace .si-actionbar');
+ const strip=N('div',null,'silm-overview-strip');strip.setAttribute('role','group');strip.setAttribute('aria-label','Estruturas salvas');
+ const stripLabel=N('div',null,'silm-overview-strip-label');stripLabel.append(N('span','Estruturas'),N('strong','0'));
+ const chips=N('div',null,'silm-overview-chips');
+ const add=N('button','+ Nova estrutura','button outline silm-overview-new');add.type='button';add.addEventListener('click',()=>newStructure?.());
+ strip.append(stripLabel,chips,add);actionbar?.append(strip);
+ const defaultName=state=>{
+  const e=S.data.get(state.metal.atomicNumber),structure=state.structure;
+  const label=structure.mode==='crystalline'?S.crystal.label(structure.crystallography?.structureType,e):'Montagem livre';
+  return (e?.name||'Estrutura')+' · '+label;
+ };
+ function persist(next){
+  if(!storage.set(KEY,next)){say?.('Não foi possível atualizar o gerenciamento de estruturas. Os dados anteriores foram preservados.','warning');return false;}
+  records=next;return true;
  }
- function render(){for(const scope of scopes)scope.destroy();scopes=[];layers=[];cards.replaceChildren();const cur=current();shownCurrent=cur;updateCount();renderStrip(cur);
-  if(!recent.length){cards.append(N('p','Inicie uma investigação para incluir a primeira estrutura.'));return;}
-  recent.forEach((z,i)=>{
-   const e=S.data.get(z),card=N('article',null,'silm-comparison-card');let g=null;try{g=S.referenceGeometry(e);}catch{}
-   const focused=z===cur;if(focused)card.dataset.current='true';
-   const index=N('span',String(i+1),'silm-comparison-index');index.setAttribute('aria-hidden','true');card.append(index);
-   if(focused){const badge=N('span','Em foco','silm-comparison-focus');card.append(badge);}
-   else{const del=N('button','✕','silm-comparison-remove');del.type='button';del.setAttribute('aria-label','Remover '+e.name+' da Visão geral');del.title='Remover da Visão geral';del.onclick=ev=>{ev.stopPropagation();removeStructure(z);};card.append(del);}
-   // O cartão inteiro abre a estrutura no Foco (botão transparente sobre o cartão; o nome acessível diz o que faz).
-   const go=N('button',null,'silm-comparison-open');go.type='button';go.setAttribute('aria-label',(focused?'Ver ':'Abrir ')+e.name+' ('+e.symbol+') no Foco'+(focused?' (em foco)':''));go.title=focused?'Ver no Foco':'Abrir no Foco';go.onclick=()=>openStructure(z);card.append(go);
-   const heading=N('header',null,'silm-comparison-card-heading');heading.append(N('h3',e.name+' ('+e.symbol+')'));
-   if(g){
-    let sourceTitle=g.source;try{sourceTitle=S.data.source(g.source)?.title||g.source;}catch(_){}
-    const code=g.canonical?(g.code||g.label):(g.label||g.code),pill=N('span',code,'silm-comparison-structure');pill.title=(g.label&&g.label!==code?g.label.charAt(0).toUpperCase()+g.label.slice(1)+'. ':'')+'Fonte: '+(sourceTitle||'não informada')+(g.canonical?'':'. Célula construída a partir dos sítios e da simetria registrados.');heading.append(pill);
-    const {svg,eligible,apply,centers}=draw(g,e,sourceTitle),stage=N('div',null,'silm-comparison-stage');stage.append(svg);card.append(stage);
-    const scope=SimCore.createScope();scopes.push(scope);const layer=S.createElectronLayer(stage,{scope,reducedMotion:reduced});layers.push({layer,options:{centers,spacing:.12,connect:true,field:apply&&property==='electrical'&&level>0}});
-    card.dataset.state=property==='none'?'reference':apply?'qualitative':'unavailable';
-    // Só a indisponibilidade aparece em texto (curto); o motivo fica no título e no nome acessível do desenho.
-    if(property!=='none'&&!apply){const chip=N('span','Indisponível','silm-comparison-card-state');chip.title=eligible?.message||'Indisponível nesta estrutura.';heading.append(chip);}
-   }else{card.dataset.state='no-geometry';const none=N('p','Geometria de referência indisponível.','silm-comparison-kind');card.append(none);}
-   card.append(heading);cards.append(card);
-  });
-  syncLayers();
+ function saveCurrent(state){
+  if(!state?.investigation||state.investigation.type!=='free'||!state.structure?.units?.length||!state.metal)return false;
+  const id=state.investigation.id,index=records.findIndex(r=>r.id===id),old=index>=0?records[index]:null,snapshot=copy(state);
+  const record={
+   id,
+   name:old?.customName?old.name:defaultName(state),
+   customName:!!old?.customName,
+   atomicNumber:state.metal.atomicNumber,
+   mode:state.structure.mode,
+   unitCount:state.structure.units.length,
+   createdAt:old?.createdAt||state.investigation.createdAt,
+   updatedAt:state.investigation.updatedAt||state.structure.updatedAt,
+   snapshot
+  };
+  if(old&&old.name===record.name&&old.mode===record.mode&&old.unitCount===record.unitCount&&JSON.stringify(old.snapshot)===JSON.stringify(snapshot))return false;
+  const next=[record,...records.filter(r=>r.id!==id)].slice(0,MAX);
+  return persist(next);
  }
- render();
- return {update(state){const z=state.metal?.atomicNumber;if(z&&z!==last){last=z;const next=[z,...recent.filter(v=>v!==z)].slice(0,6);if(storage.set('comparison.recent',next))recent=next;render();}else if((z||null)!==shownCurrent)render();},render};
+ function updateCount(cur){
+  const tab=document.querySelector('[data-scene-view="overview"]');
+  if(tab){let badge=tab.querySelector('.si-tab-count');if(!badge){badge=N('span','','si-tab-count');tab.append(' ',badge);}badge.textContent=String(records.length);badge.hidden=!records.length;}
+  count.textContent=records.length+' '+(records.length===1?'estrutura salva':'estruturas salvas');
+  stripLabel.lastElementChild.textContent=String(records.length);
+ }
+ function path(svg,d,attrs={}){
+  const p=document.createElementNS(NS,'path');p.setAttribute('d',d);for(const [k,v]of Object.entries(attrs))p.setAttribute(k,String(v));svg.append(p);return p;
+ }
+ let gradient=0;
+ function preview(record){
+  const state=record.snapshot,element=S.data.get(record.atomicNumber),structure=state.structure;
+  const svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox','0 0 300 190');svg.setAttribute('role','img');
+  svg.setAttribute('aria-label',record.name+', '+record.unitCount+' unidades, '+(record.mode==='crystalline'?'estrutura cristalina':'montagem livre'));
+  const defs=document.createElementNS(NS,'defs'),gid='silm-manager-sphere-'+(++gradient);
+  const grad=document.createElementNS(NS,'radialGradient');grad.id=gid;grad.setAttribute('cx','34%');grad.setAttribute('cy','28%');grad.setAttribute('r','76%');
+  for(const [offset,color]of [['0','#f3e7c2'],['.34','#d4b465'],['.74','#a8743b'],['1','#6e4a22']]){const stop=document.createElementNS(NS,'stop');stop.setAttribute('offset',offset);stop.setAttribute('stop-color',color);grad.append(stop);}
+  defs.append(grad);svg.append(defs);
+  const line=(x1,y1,x2,y2)=>{const l=document.createElementNS(NS,'line');for(const [k,v]of Object.entries({x1,y1,x2,y2}))l.setAttribute(k,String(v));l.setAttribute('stroke','currentColor');l.setAttribute('stroke-opacity','.35');l.setAttribute('stroke-width','1.2');svg.append(l);};
+  const sphere=(x,y,r)=>{
+   const c=document.createElementNS(NS,'circle');c.setAttribute('cx',String(x));c.setAttribute('cy',String(y));c.setAttribute('r',String(r));c.setAttribute('fill','url(#'+gid+')');c.setAttribute('stroke','#2a2016');c.setAttribute('stroke-width','1');svg.append(c);
+   if(r>=9){const t=document.createElementNS(NS,'text');t.setAttribute('x',String(x));t.setAttribute('y',String(y));t.setAttribute('text-anchor','middle');t.setAttribute('dominant-baseline','central');t.setAttribute('font-size',String(r*.82));t.setAttribute('font-weight','800');t.setAttribute('fill','#17181b');t.textContent=element.symbol;svg.append(t);}
+  };
+  if(structure.mode==='free'){
+   const radius=Math.max(8,Math.min(17,62/Math.sqrt(structure.units.length)));
+   for(const u of structure.units)sphere(22+u.position.x*256,17+u.position.y*156,radius);
+  }else{
+   let geometry=null;try{geometry=S.referenceGeometry(element);}catch{}
+   if(geometry){
+    const project=p=>{const q=p.map((v,i)=>v-geometry.center[i]);return [q[0]+.35*q[1],-q[2]+.3*q[1],q[1]];};
+    const all=[...geometry.points,...geometry.edges.flat()].map(project),xs=all.map(p=>p[0]),ys=all.map(p=>p[1]);
+    const span=Math.max(1,...xs)-Math.min(...xs),height=Math.max(1,...ys)-Math.min(...ys),scale=150/Math.max(span,height);
+    const screen=p=>{const q=project(p);return [150+(q[0]-(Math.min(...xs)+Math.max(...xs))/2)*scale,95-(q[1]-(Math.min(...ys)+Math.max(...ys))/2)*scale,q[2]];};
+    for(const [a,b]of geometry.edges){const p=screen(a),q=screen(b);line(p[0],p[1],q[0],q[1]);}
+    const points=geometry.points.map(screen),depth=points.map(p=>p[2]),lo=Math.min(...depth),hi=Math.max(...depth),spanDepth=Math.max(1e-9,hi-lo);
+    points.map(p=>({p,far:(p[2]-lo)/spanDepth})).sort((a,b)=>b.far-a.far).forEach(({p,far})=>sphere(p[0],p[1],Math.max(7,Math.min(16,58/Math.sqrt(points.length)))*(1-.18*far)));
+   }else{
+    const n=structure.units.length,radius=Math.max(7,Math.min(13,48/Math.sqrt(n)));
+    structure.units.forEach((_,i)=>{const a=i*2.399963,rr=12+Math.sqrt(i)*14;sphere(150+Math.cos(a)*rr,95+Math.sin(a)*rr,radius);});
+   }
+  }
+  return svg;
+ }
+ function setLayout(){
+  cards.dataset.layout=layout;layoutButton.textContent=layout==='grid'?'Ver em lista':'Ver em grade';
+  layoutButton.setAttribute('aria-label',layout==='grid'?'Ver estruturas em lista':'Ver estruturas em grade');
+ }
+ layoutButton.addEventListener('click',()=>{layout=layout==='grid'?'list':'grid';storage.set('structures.layout',layout);setLayout();});
+ function renderStrip(cur){
+  chips.replaceChildren();
+  records.forEach((record,index)=>{
+   const e=S.data.get(record.atomicNumber),chip=N('button',null,'silm-overview-chip');chip.type='button';
+   chip.setAttribute('aria-pressed',String(record.id===cur));
+   const symbol=N('span',e.symbol,'silm-overview-chip-symbol');symbol.setAttribute('aria-hidden','true');
+   const text=N('span',null);text.append(N('strong',record.name),N('small',(index+1)+' · '+e.symbol));
+   chip.append(symbol,text);chip.setAttribute('aria-label','Exibir '+record.name+' no Foco');
+   chip.addEventListener('click',()=>openRecord(record.id));chips.append(chip);
+  });
+ }
+ function saveName(id,value){
+  const name=value.trim().slice(0,100);if(!name){say?.('Informe um nome para a estrutura.','warning');return false;}
+  const next=records.map(r=>r.id===id?{...r,name,customName:true}:r);
+  return persist(next);
+ }
+ function editName(record,card,trigger){
+  const title=card.querySelector('.silm-structure-title'),form=N('form',null,'silm-structure-rename');
+  const input=N('input');input.type='text';input.maxLength=100;input.required=true;input.value=record.name;input.setAttribute('aria-label','Nome da estrutura');input.autocomplete='off';
+  const save=N('button','Salvar','button primary');save.type='submit';const cancel=N('button','Cancelar','button outline');cancel.type='button';
+  form.append(input,save,cancel);title.replaceWith(form);if(trigger)trigger.disabled=true;
+  cancel.addEventListener('click',render);
+  form.addEventListener('submit',event=>{event.preventDefault();if(saveName(record.id,input.value)){say?.('Nome da estrutura atualizado.','success');render();}});
+  input.focus();input.select();
+ }
+ async function removeRecord(record){
+  if(record.id===current())return;
+  const accepted=confirm?await confirm({title:'Remover estrutura salva?',description:'A estrutura será retirada do gerenciamento. A investigação atualmente aberta não será alterada.',confirmText:'Remover',cancelText:'Cancelar',destructive:true}):false;
+  if(!accepted)return;
+  const next=records.filter(r=>r.id!==record.id);if(persist(next)){say?.(record.name+' removida do gerenciamento.','info');render();}
+ }
+ async function openRecord(id){
+  const record=records.find(r=>r.id===id);if(!record||!open)return;
+  const ok=await open(copy(record));if(ok)render();
+ }
+ function renderCards(cur){
+  cards.replaceChildren();
+  if(!records.length){
+   const empty=N('div',null,'silm-structure-empty');empty.append(N('h3','Nenhuma estrutura salva'),N('p','Adicione unidades em Montagem. Cada estrutura criada aparece aqui com seu próprio nome e pode ser retomada no Foco.'));
+   const action=N('button','Abrir Montagem','button primary');action.type='button';action.addEventListener('click',()=>newStructure?.());empty.append(action);cards.append(empty);return;
+  }
+  for(const [index,record]of records.entries()){
+   const e=S.data.get(record.atomicNumber),card=N('article',null,'silm-structure-card');card.dataset.structureId=record.id;
+   if(record.id===cur)card.dataset.current='true';
+   const head=N('header',null,'silm-structure-card-head'),symbol=N('span',e.symbol,'silm-overview-chip-symbol');symbol.setAttribute('aria-hidden','true');
+   const heading=N('div',null,'silm-structure-card-heading'),title=N('h3',record.name,'silm-structure-title');heading.append(title);
+   const badge=N('span',record.id===cur?'Em foco':('Estrutura '+(index+1)),'silm-structure-status');head.append(symbol,heading,badge);card.append(head);
+   const info=N('p',null,'silm-structure-card-meta');
+   const kind=record.mode==='crystalline'?S.crystal.label(record.snapshot.structure.crystallography.structureType,e):'Montagem livre';
+   info.textContent=e.name+' ('+e.symbol+') · '+kind+' · '+record.unitCount+(record.unitCount===1?' unidade':' unidades');
+   card.append(info);
+   const figure=N('div',null,'silm-structure-preview');figure.append(preview(record));card.append(figure);
+   const actions=N('div',null,'silm-structure-card-actions');
+   const focus=N('button',record.id===cur?'Em foco':'Exibir no Foco',record.id===cur?'button outline':'button primary');focus.type='button';focus.disabled=record.id===cur;focus.addEventListener('click',()=>openRecord(record.id));
+   const rename=N('button','Renomear','button outline');rename.type='button';rename.addEventListener('click',()=>editName(record,card,rename));
+   const remove=N('button','Remover','button outline silm-structure-remove');remove.type='button';remove.disabled=record.id===cur;remove.title=record.id===cur?'A estrutura em foco não pode ser removida.':'Remover esta estrutura salva';remove.addEventListener('click',()=>removeRecord(record));
+   actions.append(focus,rename,remove);card.append(actions);cards.append(card);
+  }
+ }
+ function render(){
+  const cur=current();updateCount(cur);renderStrip(cur);renderCards(cur);setLayout();
+ }
+ function update(state){
+  const changed=saveCurrent(state),cur=current();
+  if(changed||cur!==lastCurrent){lastCurrent=cur;render();}
+ }
+ async function openFromStripOrCard(id){return openRecord(id);}
+ records.forEach(r=>r.updatedAt=r.updatedAt||r.createdAt||'');
+ records.sort((a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt)));
+ render();lastCurrent=current();
+ return {update,render,open:openFromStripOrCard,records:()=>copy(records)};
 };
