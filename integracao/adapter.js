@@ -90,7 +90,7 @@
  const tools=S.createIntegrationTools({model,host:$('silm-tools'),moduleHost:$('silm-module-choice'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
  const prepareMetal=z=>{if(routeUI?.session.open()||S.data.get(z)?.silmEligibility.status!=='available')return false;$('silm-metal').value=String(z);selected=String(z);schedule();return true;};
  const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,prepareMetal,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
- const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session,quickActions:experience.quickActions,refreshScene:()=>view?.update()});
+ const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session,quickActions:experience.quickActions,experienceInfo:experience.info,refreshScene:()=>view?.update()});
  routeUI=S.createRouteUI({model,storage,prepareMetal,view:()=>representation,onView:(value,{persist=true}={})=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);return persist?saveView():true;},schedule,say,onModule:m=>B.selectModule(m),selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
  const run={
   add(){
