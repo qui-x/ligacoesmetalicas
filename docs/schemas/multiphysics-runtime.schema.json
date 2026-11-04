@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:silm:schema:multiphysics-runtime:1.0.0",
   "title": "SILM Multiphysics Runtime State",
-  "description": "Metadados persistidos do último estado aceito de uma execução. Iterações provisórias não pertencem a este documento.",
+  "description": "Metadados persistidos do último estado aceito de uma execução. A coordenada pode ser tempo físico, incremento quase-estático, frequência ou tempo multiescala. Iterações provisórias não pertencem a este documento.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -12,13 +12,13 @@
     "experimentId",
     "definitionRevision",
     "status",
-    "acceptedTimeS",
     "acceptedStep",
     "geometry",
     "meshes",
     "fields",
     "domainReports",
-    "updatedAt"
+    "updatedAt",
+    "acceptedCoordinate"
   ],
   "properties": {
     "schemaId": {
@@ -47,10 +47,6 @@
         "rejected",
         "interrupted"
       ]
-    },
-    "acceptedTimeS": {
-      "type": "number",
-      "minimum": 0
     },
     "acceptedStep": {
       "type": "integer",
@@ -242,6 +238,95 @@
     "updatedAt": {
       "type": "string",
       "format": "date-time"
+    },
+    "acceptedCoordinate": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "timeS"
+          ],
+          "properties": {
+            "kind": {
+              "const": "time"
+            },
+            "timeS": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "incrementIndex",
+            "incrementCount",
+            "loadFactor"
+          ],
+          "properties": {
+            "kind": {
+              "const": "load-increment"
+            },
+            "incrementIndex": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "incrementCount": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "loadFactor": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "frequencyHz"
+          ],
+          "properties": {
+            "kind": {
+              "const": "frequency"
+            },
+            "frequencyHz": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "timeS",
+            "scaleMapId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "multiscale-time"
+            },
+            "timeS": {
+              "type": "number",
+              "minimum": 0
+            },
+            "scaleMapId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128
+            }
+          }
+        }
+      ]
     }
   }
 }
