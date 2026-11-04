@@ -884,7 +884,7 @@
             "enum": [
               "joule-heating",
               "optical-absorption",
-              "thermoelectric-conductivity",
+              "temperature-dependent-conductivity",
               "thermal-expansion",
               "deformed-geometry",
               "thermo-optic-response",
@@ -1029,7 +1029,36 @@
             },
             "uniqueItems": true
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "parameterized"
+                }
+              },
+              "required": [
+                "mode"
+              ]
+            },
+            "then": {
+              "required": [
+                "datasetRefs"
+              ],
+              "properties": {
+                "datasetRefs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 3
+                  },
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "timeControl": {
@@ -1151,7 +1180,9 @@
           },
           "then": {
             "required": [
-              "scaleMapId"
+              "scaleMapId",
+              "initialTimeS",
+              "finalTimeS"
             ]
           }
         }
