@@ -33,7 +33,7 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
  const page=host.closest('#workspace-overview'),pageTitle=page?.querySelector(':scope>h2');
  if(pageTitle)pageTitle.textContent='Gerenciamento de estruturas';
  if(page)page.setAttribute('aria-label','Gerenciamento de estruturas salvas');
- const intro=N('p','Estruturas salvas nesta oficina. Selecione uma para continuar no Foco.','silm-structure-manager-intro');
+ const intro=N('p','Selecione uma estrutura salva para continuar no Foco.','silm-structure-manager-intro');
  const toolbar=N('div',null,'silm-structure-manager-toolbar');
  const layoutButton=N('button',layout==='grid'?'Ver em lista':'Ver em grade','secondary-btn silm-structure-layout');layoutButton.type='button';
  const count=N('span','0 estruturas','silm-structure-count');count.setAttribute('role','status');
@@ -165,12 +165,17 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
    const e=S.data.get(record.atomicNumber),card=N('article',null,'silm-structure-card');card.dataset.structureId=record.id;
    if(record.id===cur)card.dataset.current='true';
    const head=N('header',null,'silm-structure-card-head'),symbol=N('span',e.symbol,'silm-overview-chip-symbol');symbol.setAttribute('aria-hidden','true');
-   const heading=N('div',null,'silm-structure-card-heading'),title=N('h3',record.name,'silm-structure-title');heading.append(title);
-   const badge=N('span',record.id===cur?'Em foco':('Estrutura '+(index+1)),'silm-structure-status');head.append(symbol,heading,badge);card.append(head);
-   const info=N('p',null,'silm-structure-card-meta');
+   const heading=N('div',null,'silm-structure-card-heading');
+   const title=N('h3',record.name,'silm-structure-title');heading.append(title);
+   const badge=N('span',record.id===cur?'Em foco':'Salva','silm-structure-status');
+   head.append(symbol,heading,badge);card.append(head);
    const kind=record.mode==='crystalline'?S.crystal.label(record.snapshot.structure.crystallography.structureType,e):'Montagem livre';
-   info.textContent=e.name+' ('+e.symbol+') · '+kind+' · '+record.unitCount+(record.unitCount===1?' unidade':' unidades');
-   card.append(info);
+   const details=N('dl',null,'silm-structure-card-details');
+   const detail=(label,value)=>{const item=N('div',null,'silm-structure-card-detail');item.append(N('dt',label),N('dd',value));details.append(item);};
+   detail('Metal',e.name+' ('+e.symbol+')');
+   detail('Modelo',kind);
+   detail('Unidades',String(record.unitCount));
+   card.append(details);
    const figure=N('div',null,'silm-structure-preview');figure.append(preview(record));card.append(figure);
    const actions=N('div',null,'silm-structure-card-actions');
    const focus=N('button',record.id===cur?'Em foco':'Exibir no Foco',record.id===cur?'button outline':'button primary');focus.type='button';focus.disabled=record.id===cur;focus.addEventListener('click',()=>openRecord(record.id));
@@ -179,7 +184,7 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
    actions.append(focus,rename,remove);card.append(actions);cards.append(card);
   }
  }
- function render(){
+  function render(){
   const cur=current();updateCount(cur);renderStrip(cur);renderCards(cur);setLayout();
  }
  function update(state){
