@@ -61,12 +61,10 @@
 .silm-layer-copy{display:grid;gap:3px;min-width:0}
 .silm-layer-copy strong{font-size:.84rem;font-weight:700}
 .silm-layer-copy small,.silm-layer-note{font-size:.76rem;line-height:1.45;color:var(--muted)}
-.silm-layer-row input{appearance:none;position:relative;width:42px;height:24px;min-width:42px;border:1px solid var(--border);border-radius:999px;background:var(--surface);cursor:pointer;transition:background .15s,border-color .15s}
-.silm-layer-row input::before{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .15s}
-.silm-layer-row input:checked{background:var(--accent);border-color:var(--accent)}
-.silm-layer-row input:checked::before{transform:translateX(18px);background:var(--surface)}
+.silm-layer-row input{appearance:none;width:42px;height:24px;min-width:42px;border:1px solid var(--border);border-radius:999px;background:radial-gradient(circle at 12px center,var(--muted) 0 8px,transparent 9px),var(--surface);cursor:pointer;transition:background .15s,border-color .15s}
+.silm-layer-row input:checked{background:radial-gradient(circle at 30px center,var(--surface) 0 8px,transparent 9px),var(--accent);border-color:var(--accent)}
 .silm-layer-row input:focus-visible{outline:3px solid var(--ring);outline-offset:3px}
-.silm-layer-row input:disabled{opacity:.45;cursor:not-allowed}.silm-layer-row input:disabled::before{background:var(--muted)}
+.silm-layer-row input:disabled{opacity:.45;cursor:not-allowed}
 .silm-layer-mode{display:grid;gap:8px;padding-top:10px;border-top:1px solid var(--border)}
 .silm-layer-mode>span{font-size:.82rem;font-weight:700}
 .silm-layer-segmented{display:flex;gap:7px}
