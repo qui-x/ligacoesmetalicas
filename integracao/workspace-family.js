@@ -150,7 +150,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienc
     const pending=names.join(' + ');
     propertyHelp.textContent='Seleção: '+pending+(multiSelectMode?' · toque em Aplicar seleção':' · solte Ctrl para aplicar');
    }else{
-    propertyHelp.textContent=multiSelectMode?'Selecione duas propriedades compatíveis e toque em Aplicar seleção.':'Ctrl + clique em duas propriedades e solte Ctrl para combinar.';
+    propertyHelp.textContent=multiSelectMode?'Selecione duas propriedades compatíveis e toque em Aplicar seleção.':touchCapable?'Toque em Selecionar várias para combinar propriedades.':'Ctrl + clique em duas propriedades e solte Ctrl para combinar.';
    }
    touchModeButton.setAttribute('aria-pressed',String(multiSelectMode));
    touchModeButton.textContent=multiSelectMode?'Seleção múltipla ativa':'Selecionar várias';
