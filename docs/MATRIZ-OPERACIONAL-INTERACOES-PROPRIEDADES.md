@@ -147,12 +147,22 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 - Não confundir refletância visível com emissividade térmica; a relação de Kirchhoff exige mesma faixa espectral e condições direcionais/polarização.
 - Manter T+O bloqueada como interação quantitativa até homologar absorção, propriedades térmicas, resposta óptica dependente de T e testes de conservação.
 
+**E + T + O**
+- Manter dois estímulos independentes: tensão/corrente DC e iluminação espectral. Não tratar o campo DC como campo da onda óptica.
+- Calcular Joule com JDC·EDC e absorção óptica com A·Pinc ou dissipação local do campo óptico; não duplicar a mesma perda entre absorptância, σ̃opt e ε̃''.
+- Somar q'''J e q'''opt na equação térmica, preservando a proveniência de cada fonte e a distribuição espacial.
+- Atualizar σDC(T) e a resposta óptica (n, κ, ε̃, R/A/Topt ou CTR) somente com funções/dados validados na mesma fase, amostra e faixa de temperatura.
+- Recalcular a geração Joule conforme controle por tensão ou corrente; a realimentação pode ter sinal diferente conforme o circuito e a função material.
+- Fechar separadamente o balanço elétrico de terminais, o balanço óptico R+A+Topt e o balanço térmico de energia armazenada/saída.
+- Usar temperatura única somente após equilíbrio elétron–rede válido; pulsos ultracurtos podem exigir modelo de duas temperaturas.
+- Manter E+T+O bloqueada como simulação quantitativa até homologar os três domínios e o residual global de energia.
+
 ## 5. Combinações de três e quatro famílias
 
 | Combinação | Encadeamento físico necessário | Liberação |
 |---|---|---|
 | E + T + M | Corrente → Joule → temperatura; temperatura e defeitos afetam resposta elétrica; temperatura e carregamento afetam deformação; deformação retorna ao estado elétrico | Objetivo principal da evolução multifísica, após validação dos pares |
-| E + T + O | Campo/corrente aquece; luz pode ser absorvida e aquecer; temperatura modifica resposta óptica e elétrica | Depende de dados térmicos, elétricos e ópticos |
+| E + T + O | Corrente DC gera Joule; luz gera calor apenas pela absorção; temperatura retroage em σDC(T) e R/A/Topt(λ,T) | Especificada em ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-OPTICO.md; bloqueada até fechar os balanços elétrico, óptico e térmico |
 | E + M + O | Deformação altera geometria/superfície e microestrutura; isso afeta resposta elétrica e reflexão | Depende de modelo microestrutural e óptico |
 | T + M + O | Temperatura altera dimensões e resposta mecânica; expansão/deformação altera superfície e reflexão | Parcialmente possível por geometria; resposta óptica quantitativa depende de dados |
 | E + T + M + O | Acoplamento de todos os campos e balanços, com retroalimentação temporal | Etapa avançada; não habilitar por simples soma de animações |
