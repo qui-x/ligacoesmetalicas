@@ -115,7 +115,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,experienc
   }
   const combinedActions=actionGroup(root,'Combinações estudadas · P7');
   const ability=id=>element?model.propertyAvailability(id):{ok:false,reason:'NO_STRUCTURE'};
-  const heatElectrical=!!(state.properties?.active==='electrical'&&experience.thermal?.combined&&experience.thermal?.on);
+  const heatElectrical=!!(state.properties?.active==='electrical'&&state.properties.electrical?.field&&experience.thermal?.combined&&experience.thermal?.on);
   const deformationElectrical=id=>state.properties?.active===id&&!!experience.drive?.deformField;
   const comboReason=(id)=>!crystal?'Requer uma estrutura cristalina organizada':!canExplore?'Disponível no módulo Explorar':!ability(id).ok?(SILM.properties.reasons[ability(id).reason]||'Experiência indisponível nesta estrutura'):'';
   actionButton(combinedActions,{id:'p7-heat-electrical',label:'Calor + corrente',path:actionIcons.thermal,pressed:heatElectrical,disabled:!canExplore||!crystal||!ability('electrical').ok,reason:comboReason('electrical'),hint:'Aplica uma fonte térmica à estrutura durante a condução elétrica. O aquecimento aumenta o espalhamento dos elétrons nas regiões quentes.',onClick:()=>{
