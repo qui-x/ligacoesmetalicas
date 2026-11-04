@@ -20,6 +20,7 @@ Os schemas JSON correspondentes estão em:
 - [Definição da experiência](schemas/multiphysics-experiment.schema.json)
 - [Estado de execução](schemas/multiphysics-runtime.schema.json)
 - [Snapshot de resultado](schemas/multiphysics-result.schema.json)
+- [Geometria macroscópica de referência](schemas/multiphysics-geometry.schema.json)
 
 A etapa A0 não cria solver, não altera a investigação clássica, não migra o armazenamento atual e não habilita acoplamentos na interface. Ela congela a forma como dados futuros deverão ser representados.
 
@@ -443,10 +444,11 @@ O exemplo abaixo é estrutural e ilustrativo. Os IDs de dados, geometria, modelo
     "referenceTemperatureK": 293.15,
     "geometry": {
       "geometryId": "geo-demo-001",
+      "geometryRevision": 1,
+      "geometrySchemaVersion": "1.0.0",
       "scale": "macroscopic",
       "coordinateUnit": "m",
-      "coordinateSystem": "cartesian-right-handed",
-      "surfaceModelId": "surface-demo-001"
+      "coordinateSystem": "cartesian-right-handed"
     }
   },
   "domains": {
@@ -477,16 +479,18 @@ O exemplo abaixo é estrutural e ilustrativo. Os IDs de dados, geometria, modelo
   ],
   "boundaries": [
     {
-      "id": "bc-electrical-demo",
+      "id": "bc-electrical-a",
       "domain": "electrical",
       "kind": "electrical-terminal-potential",
-      "modelId": "terminals-demo-001"
+      "modelId": "terminal-a-potential-demo",
+      "regionIds": ["reg-terminal-a"]
     },
     {
       "id": "bc-thermal-demo",
       "domain": "thermal",
       "kind": "thermal-temperature",
-      "modelId": "thermal-boundary-demo-001"
+      "modelId": "thermal-boundary-demo-001",
+      "regionIds": ["reg-thermal"]
     }
   ],
   "contacts": [],
@@ -574,3 +578,12 @@ Os dados de demonstração são apenas valores de forma para conferir a estrutur
 - \`integracao/metallic-experience.js\`: coordenação das APIs qualitativas atuais.
 
 **Próxima etapa depois de A0:** A1 — especificação da geometria macroscópica, regiões, terminais, superfícies e referencial de coordenadas da amostra.
+
+
+## 17. Integração com a geometria A1
+
+A geometria de referência agora é um ativo versionado independente, definido em [GEOMETRIA-MACROSCOPICA-AMOSTRA-MULTIFISICA.md](GEOMETRIA-MACROSCOPICA-AMOSTRA-MULTIFISICA.md) e validado por [multiphysics-geometry.schema.json](schemas/multiphysics-geometry.schema.json).
+
+A definição da experiência passa a fixar `geometryId`, `geometryRevision` e `geometrySchemaVersion`. Cada condição de contorno exige `regionIds`; contatos usam dois IDs de regiões. A1 mantém dimensões e seletores no ativo geométrico, evitando duplicar a geometria dentro da definição.
+
+**A0 + A1:** o contrato de dados identifica a revisão da geometria, e a geometria fornece as regiões topológicas às quais cada domínio pode se conectar. A próxima etapa é A2 — orquestrador e estado transacional de execução.
