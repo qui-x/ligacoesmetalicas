@@ -353,7 +353,7 @@ Ver [ARQUITETURA-OPERACIONAL-ACOPLAMENTO-MULTIFISICO.md](ARQUITETURA-OPERACIONAL
 - relógio físico, convergência, rollback e proveniência;
 - preservação dos motores qualitativos atuais e migração gradual.
 
-**Nova ordem de dependência:** A0 — contrato de dados, estados e schemas — está especificada em [CONTRATO-DADOS-ESTADOS-MULTIFISICO.md](CONTRATO-DADOS-ESTADOS-MULTIFISICO.md). Seguem A1 — geometria macroscópica — e A2 — orquestrador/estado transacional — antes do primeiro solver E+T. A matriz de combinações continua como especificação científica; a arquitetura define como integrá-las tecnicamente.
+**Ordem de dependência atual:** A0 — contrato de dados, estados e schemas — e A1 — geometria macroscópica e regiões — estão especificadas. A próxima etapa é A2 — orquestrador e estado transacional — antes do primeiro solver E+T. A matriz de combinações continua como especificação científica; a arquitetura define como integrá-las tecnicamente.
 
 
 ## 13. Contrato técnico A0
