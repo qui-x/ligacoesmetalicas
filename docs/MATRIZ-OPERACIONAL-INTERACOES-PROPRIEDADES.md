@@ -340,3 +340,17 @@ O comportamento atual de heatElectrical precisa ser revisado antes de qualquer r
 - Qual convenção de unidade e qual referência experimental serão adotadas quando o banco passar a conter valores por metal.
 
 **Decisão de segurança científica:** enquanto essas escolhas não estiverem fechadas e os parâmetros não estiverem homologados, esta matriz deve permanecer como especificação de estudo e não habilitar novas combinações no simulador.
+
+
+## 12. Arquitetura operacional do acoplamento
+
+A pesquisa de combinações passa agora para uma especificação de arquitetura, sem autorizar implementação física imediata. O contrato comum deverá separar definição da experiência, estado transitório de execução e snapshots aceitos; manter uma geometria física corrente com malhas específicas por domínio; e transferir campos por operadores explícitos e verificáveis.
+
+Ver [ARQUITETURA-OPERACIONAL-ACOPLAMENTO-MULTIFISICO.md](ARQUITETURA-OPERACIONAL-ACOPLAMENTO-MULTIFISICO.md), que consolida:
+- contratos de dados e estados E/T/M/O;
+- responsabilidade dos solvers e grafo de acoplamentos;
+- geometria, malhas e transferência de campos;
+- relógio físico, convergência, rollback e proveniência;
+- preservação dos motores qualitativos atuais e migração gradual.
+
+**Nova ordem de dependência:** congelar contrato e unidades (A0), geometria macroscópica (A1) e orquestrador/estado transacional (A2) antes do primeiro solver E+T. A matriz de combinações continua como especificação científica; a arquitetura define como integrá-las tecnicamente.
