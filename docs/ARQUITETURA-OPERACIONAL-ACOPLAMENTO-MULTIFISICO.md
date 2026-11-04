@@ -525,7 +525,7 @@ A arquitetura conceitual é detalhada em [CONTRATO-DADOS-ESTADOS-MULTIFISICO.md]
 
 A0 mantém intactos `scientificSchemaVersion = 8` e `silm-documents-v1`. Também distingue coordenadas de progresso por tempo físico, incremento de carga, frequência e escala múltipla. Os schemas definem a estrutura local; validações entre documentos e validação física permanecem responsabilidades do futuro validador semântico e dos solvers.
 
-**Estado:** A0 especificada; nenhum código de runtime alterado. Próxima etapa: A1 — geometria macroscópica, regiões, terminais, superfícies e referencial.
+**Estado:** A0 e A1 especificadas; nenhum código de runtime alterado. Próxima etapa: A2 — orquestrador, estado transacional e ciclo de execução.
 
 
 ## 20. Geometria macroscópica A1
