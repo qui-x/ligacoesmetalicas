@@ -513,4 +513,16 @@ Esta arquitetura operacionaliza, sem substituir, as especificações físicas:
 - [Acoplamento E+M+O](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md)
 - [Acoplamento T+M+O](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md)
 
-**Conclusão:** a próxima entrega de engenharia deverá ser A0 — contrato de dados e estados — e não a ativação simultânea dos quatro fenômenos na interface.
+**Conclusão:** A0 — contrato de dados e estados — foi especificada em documento e schemas JSON separados. A próxima entrega de engenharia será A1 — geometria macroscópica da amostra.
+
+## 19. Contrato técnico A0
+
+A arquitetura conceitual é detalhada em [CONTRATO-DADOS-ESTADOS-MULTIFISICO.md](CONTRATO-DADOS-ESTADOS-MULTIFISICO.md). O contrato técnico define três schemas independentes, todos na versão 1.0.0:
+
+- [Definição da experiência](schemas/multiphysics-experiment.schema.json)
+- [Estado de execução](schemas/multiphysics-runtime.schema.json)
+- [Snapshot de resultado](schemas/multiphysics-result.schema.json)
+
+A0 mantém intactos `scientificSchemaVersion = 8` e `silm-documents-v1`. Também distingue coordenadas de progresso por tempo físico, incremento de carga, frequência e escala múltipla. Os schemas definem a estrutura local; validações entre documentos e validação física permanecem responsabilidades do futuro validador semântico e dos solvers.
+
+**Estado:** A0 especificada; nenhum código de runtime alterado. Próxima etapa: A1 — geometria macroscópica, regiões, terminais, superfícies e referencial.
