@@ -269,6 +269,15 @@
           item.geometryRevision === field.geometryRevision);
         if (!mesh) return fail('FIELD_MESH_MISMATCH', { fieldId: field.fieldId });
       }
+      const runtimeFieldIds = (input.runtime.fields || []).map(field => field.fieldId);
+      const fieldGeometryRevisions = [...new Set(input.fields.map(field => field.geometryRevision))];
+      if (runtimeFieldIds.length !== ids.size || runtimeFieldIds.some(fieldId => !ids.has(fieldId)) ||
+          fieldGeometryRevisions.length !== 1 || input.runtime.geometry?.revision !== fieldGeometryRevisions[0] ||
+          input.snapshot.runId !== input.runId || input.snapshot.definitionRevision !== input.runtime.definitionRevision ||
+          JSON.stringify(input.snapshot.coordinate) !== JSON.stringify(input.runtime.acceptedCoordinate) ||
+          input.checkpoint.runId !== input.runId || input.checkpoint.geometry?.revision !== input.runtime.geometry.revision) {
+        return fail('COMMIT_STATE_MISMATCH');
+      }
       for (const field of input.fields) {
         if (!input.snapshot.fieldRefs.includes(field.fieldId) || field.runId && field.runId !== input.runId) return fail('FIELD_REFERENCE_INVALID');
       }
@@ -360,8 +369,9 @@
       }
       const snapshot = await getSnapshot(runId, runtime.lastAcceptedSnapshotId);
       if (!snapshot || snapshot.accepted !== true || snapshot.converged !== true ||
-          snapshot.definitionRevision !== runtime.definitionRevision) return fail('LAST_SNAPSHOT_INVALID');
+          snapshot.definitionRevision !== runtime.definitionRevision || !Array.isArray(snapshot.fieldRefs)) return fail('LAST_SNAPSHOT_INVALID');
       const fields = runtime.fields || [];
+      if (!Array.isArray(fields) || !Array.isArray(loaded.fields) || !Array.isArray(runtime.meshes)) return fail('RUNTIME_FIELD_SET_INVALID');
       const fieldIds = fields.map(field => field.fieldId);
       if (!fields.length || new Set(fieldIds).size !== fieldIds.length ||
           snapshot.fieldRefs.length !== fieldIds.length ||
