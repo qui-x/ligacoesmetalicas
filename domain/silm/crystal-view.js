@@ -242,8 +242,10 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  function createNode(u){
   const node=U.element('button',null,'silm-unit silm-crystal-unit');node.type='button';node.dataset.unitId=u.id;node.tabIndex=-1;node.setAttribute('aria-describedby','silm-assembly-help');
   const core=U.element('span',element.symbol,'silm-unit-core');core.setAttribute('aria-hidden','true');const tag=U.element('span','','silm-site-label');tag.setAttribute('aria-hidden','true');
+  // Identificação de centros é uma camada própria de Observar; não depende dos rótulos auxiliares de Camadas.
+  const centerTag=U.element('span','','silm-observer-center-tag');centerTag.setAttribute('aria-hidden','true');centerTag.hidden=true;
   // O corpo guarda o tamanho visual da esfera; o botão em volta cresce até 24 px na tela (alvo de toque, WCAG 2.5.8).
-  const body=U.element('span',null,'silm-unit-body');body.setAttribute('aria-hidden','true');body.append(core,tag);node.append(body);units.append(node);return node;
+  const body=U.element('span',null,'silm-unit-body');body.setAttribute('aria-hidden','true');body.append(core,tag);node.append(body,centerTag);units.append(node);return node;
  }
  const projectionName=()=>RP.LABELS[rep2.projection()]||RP.LABELS.isometric;
  const orientationNow=()=>layout?.orientation||null;
@@ -264,7 +266,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   syncProjectionPicker(selectValue);root.dataset.projection=mode3d?'3d':proj;root.dataset.viewMode=mode3d?'3d':'2d';
   if(perspectiveButton){const on=cam3.projection==='perspective';perspectiveButton.setAttribute('aria-pressed',String(on));perspectiveButton.setAttribute('aria-label',on?'Perspectiva (ligada)':'Perspectiva (desligada: ortográfica)');}
   const calcMark=calcOptions?.marks?.()||null;root.dataset.calc=calcMark?.mode||'';
-  root.dataset.view=r.view;root.dataset.labels=String(r.labels||observer?.centers===true);root.dataset.cell=String(r.unitCell);root.dataset.observerCenters=String(observer?.centers===true);
+  root.dataset.view=r.view;root.dataset.labels=String(r.labels);root.dataset.cell=String(r.unitCell);root.dataset.observerCenters=String(observer?.centers===true);
   for(const [id,node]of nodes)if(!list.some(u=>u.id===id)){node.remove();nodes.delete(id);}
   const selected=r.selectedUnitId,selectedUnit=selected?list.find(u=>u.id===selected):null,neighbors=r.neighbors&&selectedUnit?g.neighbors(selectedUnit.site):null,neighborKeys=new Set(neighbors?.list.map(x=>x.key)||[]);
   // Cena estável (sem vizinhos nem margem de rede): a câmera, e não o layout, enquadra o que estiver visível.
@@ -283,6 +285,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    // Ordem dentro da camada da estrutura: profundidade; a selecionada fica por cima (o anel de seleção vem da camada própria).
    node.style.zIndex=String(selected===u.id?200:10+Math.round((1-p.depth)*100));node.__depthScale=dscale(p);node.style.setProperty('--depth-scale',node.__depthScale.toFixed(3));node.style.setProperty('--depth-fade',(1-.22*p.depth).toFixed(3));
    node.dataset.role=info.role;node.dataset.layer=info.layer||'';node.dataset.placement=u.placement;node.querySelector('.silm-site-label').textContent=calcMark?.mode==='fractions'?(shares[info.role]||''):(shortRole[info.role]||'');
+   const centerTag=node.querySelector('.silm-observer-center-tag');centerTag.textContent='M'+(i+1)+(shortRole[info.role]?' · '+shortRole[info.role]:'');centerTag.hidden=!observer?.centers;
    // Rede durante a deformação: a amostra é uma fatia fina; unidades da célula fora dela ficam esmaecidas.
    if(specimen&&r.view==='lattice'&&DF&&!DF.inSlab(g,g.site(u.site).cart))node.dataset.outside='';else delete node.dataset.outside;
    {const k=specimen&&DF?DF.block(DF.system(g),g.site(u.site).cart,active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0):0;if(k%2)node.dataset.block='odd';else delete node.dataset.block;}
