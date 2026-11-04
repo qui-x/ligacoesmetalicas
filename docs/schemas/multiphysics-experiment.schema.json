@@ -1,0 +1,1322 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:silm:schema:multiphysics-experiment:1.0.0",
+  "title": "SILM Multiphysics Experiment Definition",
+  "description": "Definição de uma experiência multifísica parameterizada ou quantitativa. Não representa projetos qualitativos legados.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "schemaVersion",
+    "id",
+    "revision",
+    "createdAt",
+    "updatedAt",
+    "evidenceMode",
+    "sample",
+    "domains",
+    "couplings",
+    "boundaries",
+    "contacts",
+    "timeControl",
+    "solver",
+    "datasetRefs"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "silm.multiphysics.experiment-definition"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^exp-[A-Za-z0-9-]{12,80}$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evidenceMode": {
+      "enum": [
+        "parameterized",
+        "quantitative"
+      ]
+    },
+    "legacyInvestigationId": {
+      "type": "string",
+      "pattern": "^inv-[A-Za-z0-9-]{12,80}$"
+    },
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "materialId",
+        "phaseId",
+        "referenceTemperatureK",
+        "geometry"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+        },
+        "materialId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+        },
+        "phaseId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+        },
+        "atomicNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 118
+        },
+        "symbol": {
+          "type": "string",
+          "pattern": "^[A-Z][a-z]?$"
+        },
+        "referenceTemperatureK": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "geometry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "geometryId",
+            "scale",
+            "coordinateUnit",
+            "coordinateSystem",
+            "surfaceModelId"
+          ],
+          "properties": {
+            "geometryId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            },
+            "scale": {
+              "const": "macroscopic"
+            },
+            "coordinateUnit": {
+              "const": "m"
+            },
+            "coordinateSystem": {
+              "const": "cartesian-right-handed"
+            },
+            "surfaceModelId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            },
+            "dimensionsM": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "lengthM": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "widthM": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "thicknessM": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            },
+            "orientation": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          }
+        }
+      }
+    },
+    "domains": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "electrical": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "control",
+            "terminalModelId",
+            "contactModelId",
+            "conductivityDatasetId"
+          ],
+          "properties": {
+            "control": {
+              "enum": [
+                "voltage",
+                "current"
+              ]
+            },
+            "voltageV": {
+              "type": "number",
+              "minimum": 0
+            },
+            "currentA": {
+              "type": "number",
+              "minimum": 0
+            },
+            "terminalModelId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            },
+            "contactModelId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            },
+            "conductivityDatasetId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "control": {
+                    "const": "voltage"
+                  }
+                },
+                "required": [
+                  "control"
+                ]
+              },
+              "then": {
+                "required": [
+                  "voltageV"
+                ],
+                "not": {
+                  "required": [
+                    "currentA"
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "control": {
+                    "const": "current"
+                  }
+                },
+                "required": [
+                  "control"
+                ]
+              },
+              "then": {
+                "required": [
+                  "currentA"
+                ],
+                "not": {
+                  "required": [
+                    "voltageV"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "thermal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "regime",
+            "boundaryModelId"
+          ],
+          "properties": {
+            "regime": {
+              "enum": [
+                "single-temperature",
+                "two-temperature"
+              ]
+            },
+            "initialTemperatureK": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "initialElectronTemperatureK": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "initialLatticeTemperatureK": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "boundaryModelId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            },
+            "thermalDatasetId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            },
+            "twoTemperatureDatasetId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "regime": {
+                    "const": "single-temperature"
+                  }
+                },
+                "required": [
+                  "regime"
+                ]
+              },
+              "then": {
+                "required": [
+                  "initialTemperatureK",
+                  "thermalDatasetId"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "initialElectronTemperatureK"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "initialLatticeTemperatureK"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "twoTemperatureDatasetId"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "regime": {
+                    "const": "two-temperature"
+                  }
+                },
+                "required": [
+                  "regime"
+                ]
+              },
+              "then": {
+                "required": [
+                  "initialElectronTemperatureK",
+                  "initialLatticeTemperatureK",
+                  "twoTemperatureDatasetId"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "initialTemperatureK"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "thermalDatasetId"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "mechanical": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "control",
+            "constraint",
+            "direction",
+            "boundaryModelId",
+            "constitutiveDatasetId"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "tension",
+                "compression",
+                "shear"
+              ]
+            },
+            "control": {
+              "enum": [
+                "force",
+                "stress",
+                "displacement",
+                "strain"
+              ]
+            },
+            "constraint": {
+              "enum": [
+                "free",
+                "supported",
+                "restrained"
+              ]
+            },
+            "direction": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "forceN": {
+              "type": "number",
+              "minimum": 0
+            },
+            "stressPa": {
+              "type": "number",
+              "minimum": 0
+            },
+            "displacementM": {
+              "type": "number"
+            },
+            "strain": {
+              "type": "number"
+            },
+            "boundaryModelId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            },
+            "constitutiveDatasetId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "control": {
+                    "const": "force"
+                  }
+                },
+                "required": [
+                  "control"
+                ]
+              },
+              "then": {
+                "required": [
+                  "forceN"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "stressPa"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "displacementM"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "strain"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "control": {
+                    "const": "stress"
+                  }
+                },
+                "required": [
+                  "control"
+                ]
+              },
+              "then": {
+                "required": [
+                  "stressPa"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "forceN"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "displacementM"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "strain"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "control": {
+                    "const": "displacement"
+                  }
+                },
+                "required": [
+                  "control"
+                ]
+              },
+              "then": {
+                "required": [
+                  "displacementM"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "forceN"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "stressPa"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "strain"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "control": {
+                    "const": "strain"
+                  }
+                },
+                "required": [
+                  "control"
+                ]
+              },
+              "then": {
+                "required": [
+                  "strain"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "forceN"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "stressPa"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "displacementM"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "optical": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "incidenceAngleRad",
+            "polarization",
+            "boundaryModelId",
+            "opticalDatasetId"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "probe",
+                "pump-probe",
+                "single-beam"
+              ]
+            },
+            "incidenceAngleRad": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1.5707963267948966
+            },
+            "polarization": {
+              "enum": [
+                "s",
+                "p",
+                "unpolarized"
+              ]
+            },
+            "boundaryModelId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            },
+            "opticalDatasetId": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            },
+            "probeSource": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "wavelengthM",
+                "irradianceWPerM2"
+              ],
+              "properties": {
+                "wavelengthM": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "irradianceWPerM2": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "pulseDurationS": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "repetitionRateHz": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "beamRadiusM": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            },
+            "pumpSource": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "wavelengthM",
+                "irradianceWPerM2"
+              ],
+              "properties": {
+                "wavelengthM": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "irradianceWPerM2": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "pulseDurationS": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "repetitionRateHz": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "beamRadiusM": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            },
+            "singleBeamSource": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "wavelengthM",
+                "irradianceWPerM2"
+              ],
+              "properties": {
+                "wavelengthM": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "irradianceWPerM2": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "pulseDurationS": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "repetitionRateHz": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "beamRadiusM": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "mode": {
+                    "const": "probe"
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              },
+              "then": {
+                "required": [
+                  "probeSource"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "pumpSource"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "singleBeamSource"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "mode": {
+                    "const": "pump-probe"
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              },
+              "then": {
+                "required": [
+                  "pumpSource",
+                  "probeSource"
+                ],
+                "not": {
+                  "required": [
+                    "singleBeamSource"
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "mode": {
+                    "const": "single-beam"
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              },
+              "then": {
+                "required": [
+                  "singleBeamSource"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "probeSource"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "pumpSource"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "couplings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "from",
+          "to",
+          "mechanism",
+          "lawId",
+          "mappingId",
+          "datasetRefs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "from": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "domain",
+              "field"
+            ],
+            "properties": {
+              "domain": {
+                "enum": [
+                  "electrical",
+                  "thermal",
+                  "mechanical",
+                  "optical"
+                ]
+              },
+              "field": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+              }
+            }
+          },
+          "to": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "domain",
+              "input"
+            ],
+            "properties": {
+              "domain": {
+                "enum": [
+                  "electrical",
+                  "thermal",
+                  "mechanical",
+                  "optical"
+                ]
+              },
+              "input": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+              }
+            }
+          },
+          "mechanism": {
+            "enum": [
+              "joule-heating",
+              "optical-absorption",
+              "thermoelectric-conductivity",
+              "thermal-expansion",
+              "deformed-geometry",
+              "thermo-optic-response",
+              "elasto-optic-response"
+            ]
+          },
+          "lawId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "mappingId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "datasetRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "boundaries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "domain",
+          "kind",
+          "modelId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "domain": {
+            "enum": [
+              "electrical",
+              "thermal",
+              "mechanical",
+              "optical"
+            ]
+          },
+          "kind": {
+            "enum": [
+              "electrical-terminal-potential",
+              "electrical-terminal-current",
+              "thermal-temperature",
+              "thermal-heat-flux",
+              "thermal-convection",
+              "thermal-radiation",
+              "mechanical-displacement",
+              "mechanical-traction",
+              "optical-incident-field"
+            ]
+          },
+          "modelId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "datasetRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "contacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "regionAId",
+          "regionBId",
+          "modelId",
+          "mode"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "regionAId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "regionBId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "modelId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "mode": {
+            "enum": [
+              "ideal",
+              "parameterized"
+            ]
+          },
+          "datasetRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "timeControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "regime"
+      ],
+      "properties": {
+        "regime": {
+          "enum": [
+            "quasi-static",
+            "transient",
+            "harmonic",
+            "multiscale"
+          ]
+        },
+        "initialTimeS": {
+          "type": "number",
+          "minimum": 0
+        },
+        "finalTimeS": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "initialStepS": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "minimumStepS": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maximumStepS": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "frequencyHz": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "loadIncrements": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "scaleMapId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "regime": {
+                "const": "transient"
+              }
+            },
+            "required": [
+              "regime"
+            ]
+          },
+          "then": {
+            "required": [
+              "initialTimeS",
+              "finalTimeS",
+              "initialStepS",
+              "minimumStepS",
+              "maximumStepS"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "regime": {
+                "const": "harmonic"
+              }
+            },
+            "required": [
+              "regime"
+            ]
+          },
+          "then": {
+            "required": [
+              "frequencyHz"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "regime": {
+                "const": "quasi-static"
+              }
+            },
+            "required": [
+              "regime"
+            ]
+          },
+          "then": {
+            "required": [
+              "loadIncrements"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "regime": {
+                "const": "multiscale"
+              }
+            },
+            "required": [
+              "regime"
+            ]
+          },
+          "then": {
+            "required": [
+              "scaleMapId"
+            ]
+          }
+        }
+      ]
+    },
+    "solver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "couplingStrategy"
+      ],
+      "properties": {
+        "couplingStrategy": {
+          "enum": [
+            "staggered",
+            "iterative"
+          ]
+        },
+        "maximumCouplingIterations": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 10000
+        },
+        "relativeTolerance": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 0.1
+        },
+        "relaxationFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "couplingStrategy": {
+                "const": "iterative"
+              }
+            },
+            "required": [
+              "couplingStrategy"
+            ]
+          },
+          "then": {
+            "required": [
+              "maximumCouplingIterations",
+              "relativeTolerance",
+              "relaxationFactor"
+            ]
+          }
+        }
+      ]
+    },
+    "datasetRefs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "datasetId",
+          "datasetVersion",
+          "propertyId",
+          "materialId",
+          "phaseId",
+          "sourceId",
+          "evidence",
+          "unit"
+        ],
+        "properties": {
+          "datasetId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "datasetVersion": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$"
+          },
+          "propertyId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "materialId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "phaseId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "sourceId": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"
+          },
+          "evidence": {
+            "enum": [
+              "measured",
+              "calculated",
+              "fitted"
+            ]
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "temperatureRangeK": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "pressureRangePa": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "uncertainty": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "value",
+              "unit"
+            ],
+            "properties": {
+              "value": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "method": {
+                "type": "string",
+                "maxLength": 300
+              }
+            }
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 4000
+    }
+  }
+}
