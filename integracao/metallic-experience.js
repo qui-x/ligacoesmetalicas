@@ -1,12 +1,15 @@
 'use strict';
 /* Liga os componentes científicos SILM à plataforma, sem criar outro estado ou motor. */
 SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMetal,allows=()=>true})=>{
- const S=SILM,P=S.properties,U=SimCore.ExperienceUI,scope=SimCore.createScope();
+ const S=SILM,registry=S.engineAdapters;
+ const api=id=>{const binding=registry?.resolve(id);if(!binding?.ok)throw new Error('API SILM indisponível: '+id+' ('+(binding?.reason||'adapter ausente')+').');return binding.api;};
+ const P=api('properties.eligibility-catalog'),D=api('deformation.qualitative-slip'),T=api('thermal.qualitative-diffusion'),V=api('drive.stimulus-controller'),Data=api('data.reference-catalog');
+ const U=SimCore.ExperienceUI,scope=SimCore.createScope();
  const editable=()=>model.state.module.active==='explorar';
  // 0.17.x: deformação contínua — o mesmo controlador da cena (um por modelo).
- const deform=()=>S.deformation?.controller(model,{reducedMotion:reduced})||null;
- const thermal=()=>S.thermal?.controller(model,{reducedMotion:reduced})||null;
- const drive=()=>S.drive?.controller(model)||null;
+ const deform=()=>D?.controller(model,{reducedMotion:reduced})||null;
+ const thermal=()=>T?.controller(model,{reducedMotion:reduced})||null;
+ const drive=()=>V?.controller(model)||null;
  const change=patch=>{if(!editable())return;const ok=model.setPropertyParams(patch);if(ok)schedule();return ok;};
  const actions={
   start(id){if(!allows(id)||!editable())return;const r=model.startProperty(id);if(!r.ok)say(P.reasons[r.reason]||'Organize uma estrutura cristalina para esta experiência.','warning');schedule();},
@@ -23,7 +26,7 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   restore(){deform()?.setLoad(0);drive()?.setDeformField(false);model.restoreProperty();const t=thermal();if(t){t.setHeating(false);t.reset();}schedule();},end(){deform()?.setLoad(0);model.endProperty();schedule();}
  };
  // Uma leitura do estado por atualização (model.state devolve uma cópia completa).
- const info=()=>{const st=model.state;return {deformation:deform()?.reading()||null,thermal:thermal()?.reading()||null,drive:drive()?.reading()||null,state:st,eligibility:P.eligibility(st.metal?S.data.get(st.metal.atomicNumber):null),editable:st.module.active==='explorar',reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}};};
+ const info=()=>{const st=model.state;return {deformation:deform()?.reading()||null,thermal:thermal()?.reading()||null,drive:drive()?.reading()||null,state:st,eligibility:P.eligibility(st.metal?Data.get(st.metal.atomicNumber):null),editable:st.module.active==='explorar',reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}};};
  const controls=S.createPropertyControls(document.getElementById('silm-properties'),{scope,info,actions,prefix:'silm-panel-property'});
  // Painel: até 10 atualizações por segundo durante a animação (a cena atualiza a cada quadro).
  {const c=deform();let lastPanel=0,pending=0;const run=()=>{pending=0;lastPanel=performance.now();controls.update();};
@@ -33,7 +36,7 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
  const dialog=document.getElementById('silm-periodic-dialog'),body=document.getElementById('silm-periodic-body'),trigger=document.getElementById('silm-open-periodic');let tableScope;
  trigger.addEventListener('click',()=>{
   tableScope?.destroy();tableScope=SimCore.createScope();body.replaceChildren();
-  S.createPeriodicTable(body,{scope:tableScope,state:{selection:Number(document.getElementById('silm-metal').value)||29,query:''},onSelect:e=>prepareMetal(e.atomicNumber),onInvestigate:async e=>{dialog.close();await selectMetal(e.atomicNumber);},onSources:e=>{const text=S.data.sourceIds(e).map(id=>{const s=S.data.source(id);return s?s.institution+' — '+s.title:id;}).join('\n');document.getElementById('silm-periodic-sources').textContent=text;}});
+  S.createPeriodicTable(body,{scope:tableScope,state:{selection:Number(document.getElementById('silm-metal').value)||29,query:''},onSelect:e=>prepareMetal(e.atomicNumber),onInvestigate:async e=>{dialog.close();await selectMetal(e.atomicNumber);},onSources:e=>{const text=Data.sourceIds(e).map(id=>{const s=Data.source(id);return s?s.institution+' — '+s.title:id;}).join('\n');document.getElementById('silm-periodic-sources').textContent=text;}});
   document.getElementById('silm-periodic-sources').textContent='';dialog.showModal();
  });
  document.getElementById('silm-close-periodic').addEventListener('click',()=>dialog.close());
@@ -43,10 +46,11 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
 SILM.renderIntegrationMetalData=(host,e,state)=>{
  const S=SILM,el=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
  const row=(dl,label,text)=>{dl.append(el('dt',label),el('dd',text));};
- const structure=S.data.structure(e),dl=el('dl');
+ const registry=S.engineAdapters,Data=registry.resolve('data.reference-catalog').api,Calculations=registry.resolve('calculation.formula-service').api,Properties=registry.resolve('properties.eligibility-catalog').api;
+ const structure=Data.structure(e),dl=el('dl');
  row(dl,'Metal',e.name+' ('+e.symbol+') · Z = '+e.atomicNumber);
  row(dl,'Estrutura de referência',structure?.label||structure?.type||'Não homologada');
- row(dl,'Massa molar',(S.calculation.tabulated(e,'M')?.display||'Sem massa molar homologada'));
+ row(dl,'Massa molar',(Calculations.tabulated(e,'M')?.display||'Sem massa molar homologada'));
  row(dl,'Configuração eletrônica do átomo isolado',e.electronConfiguration.display+' · Dado tabelado');
  row(dl,'Modelo de valência',e.valenceModel.display+' · '+e.valenceModel.convention);
  row(dl,'Unidades na cena',String(state.structure?.units.length||0));
@@ -55,8 +59,8 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
  for(const [key,label]of [['temperature','Temperatura de referência'],['pressure','Pressão de referência'],['phase','Fase de referência']]){const d=condition?.[key];if(d)row(dl,label,d.display||String(d.value)+' '+(d.unit||''));}
  host.append(dl);
  const heading=el('h3','Propriedades do metal');host.append(heading);
- for(const id of S.properties.ids){const ref=S.properties.data(e,id),p=el('p');p.textContent=S.properties.catalog[id].title+': '+(ref?(ref.display??ref.value)+' '+ref.unit+' · '+(ref.kind==='CALCULATED'?'Calculado pelo SILM':'Dado tabelado'):(['electrical','thermal'].includes(id)?'Sem valor numérico homologado; experiência qualitativa conforme elegibilidade.':'Experiência qualitativa; não representa uma medida numérica da amostra.'));host.append(p);}
+ for(const id of Properties.ids){const ref=Properties.data(e,id),p=el('p');p.textContent=Properties.catalog[id].title+': '+(ref?(ref.display??ref.value)+' '+ref.unit+' · '+(ref.kind==='CALCULATED'?'Calculado pelo SILM':'Dado tabelado'):(['electrical','thermal'].includes(id)?'Sem valor numérico homologado; experiência qualitativa conforme elegibilidade.':'Experiência qualitativa; não representa uma medida numérica da amostra.'));host.append(p);}
  const sources=el('details');sources.append(el('summary','Fontes e condições'));
- for(const id of S.data.sourceIds(e)){const s=S.data.source(id);if(!s)continue;const p=el('p',s.institution+' — '+s.title+(s.year?' ('+s.year+')':''));if(s.url){const a=el('a','Consultar fonte');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';p.append(document.createTextNode(' · '),a);}sources.append(p);}
+ for(const id of Data.sourceIds(e)){const s=Data.source(id);if(!s)continue;const p=el('p',s.institution+' — '+s.title+(s.year?' ('+s.year+')':''));if(s.url){const a=el('a','Consultar fonte');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';p.append(document.createTextNode(' · '),a);}sources.append(p);}
  if(condition?.notes)sources.append(el('p',condition.notes));host.append(sources);
 };

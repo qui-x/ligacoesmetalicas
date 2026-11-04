@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.5';
 // BUILD muda com o conteúdo de qualquer arquivo do cache (scripts/sw-build-id.cjs): o navegador instala a versão nova.
-const BUILD='c7fa7574c453';
+const BUILD='fe2b06f8e7c1';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "./",
@@ -61,6 +61,8 @@ const FILES=[
   "domain/silm/measure-view.js",
   "domain/silm/periodic-table.js",
   "integracao/metallic-experience.js",
+  "domain/silm/engine-adapters.js",
+  "domain/silm/engine-catalog.js",
   "integracao/scientific-tools.js",
   "domain/silm/routes.js",
   "domain/silm/missions.js",
