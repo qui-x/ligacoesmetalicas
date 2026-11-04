@@ -3,7 +3,7 @@
 
   const SILM = (root.SILM = root.SILM || {});
   const DOMAINS = Object.freeze(['electrical', 'thermal', 'mechanical', 'optical']);
-  const clone = value => value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+  const clone = value => value === undefined ? undefined : (typeof root.structuredClone === 'function' ? root.structuredClone(value) : JSON.parse(JSON.stringify(value)));
   const freezeDeep = value => {
     if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
     Object.freeze(value);
