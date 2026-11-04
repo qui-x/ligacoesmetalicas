@@ -22,7 +22,7 @@
     return Object.freeze({
       async createRun(record) {
         if (runs.has(record.runId)) return failure('RUN_ALREADY_EXISTS');
-        const stored = clone({ ...record, storageRevision: 0, snapshots: [], fields: [], events: [] });
+        const stored = clone({ ...record, storageRevision: 0, snapshots: [], fields: [], fieldBlocks: [], meshes: [], events: [] });
         if (record.event) stored.events.push(clone(record.event));
         runs.set(record.runId, stored);
         return { ok: true, storageRevision: 0 };
@@ -48,7 +48,7 @@
 
       async commitStep({
         runId, expectedStorageRevision, expectedAcceptedStep, expectedSnapshotId,
-        runtime, checkpoint, snapshot, fields, event
+        runtime, checkpoint, snapshot, fields, fieldBlocks, event
       }) {
         const current = runs.get(runId);
         if (!current) return failure('RUN_NOT_FOUND');
@@ -72,6 +72,8 @@
         next.checkpoint = clone(checkpoint);
         next.snapshots.push(clone(snapshot));
         next.fields.push(...clone(fields || []));
+        next.fieldBlocks.push(...clone(fieldBlocks || []));
+        next.meshes = [...new Map([...(next.meshes || []), ...(clone(runtime.meshes || []))].map(mesh => [mesh.meshId + '|' + mesh.geometryRevision, mesh])).values()];
         next.storageRevision += 1;
         if (event) next.events.push(clone(event));
         runs.set(runId, next);
@@ -345,6 +347,8 @@
 
         const fields = run.domainIds.flatMap(domain => clone(domainResults[domain].fields || []));
         fields.push(...clone(transferResult.fields || []));
+        const fieldBlocks = run.domainIds.flatMap(domain => clone(domainResults[domain].fieldBlocks || []));
+        fieldBlocks.push(...clone(transferResult.fieldBlocks || []));
         const geometryRevisions = [...new Set(run.domainIds.flatMap(domain => {
           const value = domainResults[domain].geometryRevision;
           return Number.isInteger(value) ? [value] : [];
@@ -353,7 +357,7 @@
         const geometryRevision = geometryRevisions[0] ?? run.runtime.geometry.revision;
         const candidate = {
           runId: run.runId, stepAttemptId: attemptId, baseAcceptedStep, baseSnapshotId,
-          coordinate, domainResults: clone(domainResults), fields: clone(fields),
+          coordinate, domainResults: clone(domainResults), fields: clone(fields), fieldBlocks: clone(fieldBlocks),
           observables: run.domainIds.flatMap(domain => clone(domainResults[domain].observables || [])),
           balances: run.domainIds.flatMap(domain => clone(domainResults[domain].balances || [])).concat(clone(transferResult.balances || [])),
           transferReports: clone(transferResult.reports || []), geometryRevision,
@@ -365,7 +369,7 @@
         const gate = await validateCandidate({ candidate: clone(candidate), definition: run.definition, manifest: run.manifest });
         assertActive();
         if (!gate?.ok) throw new Error(gate?.reason || 'CANDIDATE_REJECTED');
-        if (!fields.length || fields.some(field => !field.fieldId || !run.domainIds.includes(field.domain) || !field.meshId || field.geometryRevision !== geometryRevision || !finite(field.timeS) || !field.unit || !field.storageRef || !/^[a-f0-9]{64}$/.test(field.checksum || ''))) {
+        if (!fields.length || fields.length !== fieldBlocks.length || fields.some(field => !field.fieldId || !run.domainIds.includes(field.domain) || !field.meshId || field.geometryRevision !== geometryRevision || !finite(field.timeS) || !field.unit || !field.storageRef || !/^[a-f0-9]{64}$/.test(field.checksum || ''))) {
           throw new Error('CANDIDATE_FIELDS_INVALID');
         }
 
@@ -407,7 +411,7 @@
         const committed = await store.commitStep({
           runId: run.runId, expectedStorageRevision: run.storageRevision,
           expectedAcceptedStep: baseAcceptedStep, expectedSnapshotId: baseSnapshotId,
-          runtime: nextRuntime, checkpoint, snapshot, fields, event: auditEvent
+          runtime: nextRuntime, checkpoint, snapshot, fields, fieldBlocks, event: auditEvent
         });
         if (!committed.ok) throw new Error(committed.reason || 'STORAGE_FAILURE');
 
