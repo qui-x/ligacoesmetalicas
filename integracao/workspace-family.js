@@ -41,7 +41,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null})=>{
   const scene=document.querySelector('#silm-integration-scene .silm-assembly');if(!scene)return;
   scene.dataset.layerCenters=layerState.centers?'normal':'dim';scene.dataset.layerLabels=layerState.labels?'on':'off';
   scene.dataset.layerProperty=layerState.property?'on':'off';scene.dataset.layerLegend=layerState.legend?'on':'off';
-  for(const notes of scene.querySelectorAll('.silm-scene-notes'))notes.hidden=!layerState.legend;
+  for(const notes of document.querySelectorAll('#silm-crystal-notes .silm-scene-notes'))notes.hidden=!layerState.legend;
   for(const overlay of scene.querySelectorAll('.silm-property-overlay'))overlay.hidden=!layerState.property;
  }
  function layerChanged(key,value){layerState[key]=!!value;persistLayerState();applyLayerPresentation();renderViewers();}
