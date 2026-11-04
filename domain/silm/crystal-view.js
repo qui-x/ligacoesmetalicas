@@ -106,7 +106,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  });
  scope.listen(document,'pointerdown',event=>{if(!projectionMenu.hidden&&!projectionMenu.contains(event.target)&&!projection.contains(event.target))closeProjectionMenu();});
  const repositionProjectionMenu=()=>positionProjectionMenu();
- scope.listen(window,'resize',repositionProjectionMenu);scope.listen(window,'scroll',repositionProjectionMenu,true);
+ scope.listen(window,'resize',repositionProjectionMenu);scope.listen(window,'scroll',repositionProjectionMenu,{capture:true});
  if(window.visualViewport){scope.listen(window.visualViewport,'resize',repositionProjectionMenu);scope.listen(window.visualViewport,'scroll',repositionProjectionMenu);}
  scope.cleanup(()=>projectionMenu.remove());
  const syncQuickControls=r=>{
