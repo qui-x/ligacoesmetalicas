@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.5';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='overview-geometry-contract-20261104';
+const BUILD='observer-icon-actions-20261104';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "./",
