@@ -98,7 +98,7 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 | E + T | Tensão OU corrente; condição térmica; fronteiras térmicas | Dissipação Joule aquece a amostra; temperatura altera a resistividade/condutividade; transporte térmico remove/distribui calor | Prioridade 1, com balanço energético |
 | E + M | Condição elétrica; tração ou compressão; geometria e apoios | Deformação muda geometria e pode criar defeitos/dislocações que alteram a resistividade | Prioridade 2; primeiro qualitativo e separado de eletroplasticidade |
 | E + O | Condição elétrica DC; espectro, incidência e polarização da luz; função dielétrica/resposta óptica espectral | Origem eletrônica compartilhada, mas respostas em frequências distintas; refletância via Fresnel a partir de n(λ), κ(λ) ou ε̃(ω) | Especificada em ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md; implementação bloqueada até dados espectrais homologados |
-| T + M | Gradiente/fonte térmica; carregamento mecânico; apoios | Expansão térmica e variação da resposta mecânica com temperatura; restrição pode gerar tensão térmica | Prioridade 1 |
+| T + M | Temperatura inicial/gradiente/fonte; carregamento mecânico; apoios e propriedades dependentes de T | Expansão, tensão térmica e resposta mecânica dependente da temperatura | Especificada em ESPECIFICACAO-ACOPLAMENTO-TERMOMECANICO.md; quantitativo bloqueado sem dados e validação |
 | T + O | Espectro/irradiância, R+A+Topt, perfil de absorção, propriedades térmicas, fronteiras e R(λ,T) ou CTR | Absorção óptica gera fonte térmica; difusão muda T; temperatura realimenta refletância/absorção | Especificada em ESPECIFICACAO-ACOPLAMENTO-TERMO-OPTICO.md; bloqueada até homologar dados e balanços |
 | M + O | Carregamento mecânico; superfície; iluminação | Atualização geométrica das normais; alteração intrínseca elasto-óptica apenas com dados de tensão/deformação | Especificada; geometria primeiro, extensão intrínseca parametrizada e bloqueada sem dados |
 
@@ -156,6 +156,16 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 - Não confundir refletância visível com emissividade térmica; a relação de Kirchhoff exige mesma faixa espectral e condições direcionais/polarização.
 - Manter T+O bloqueada como interação quantitativa até homologar absorção, propriedades térmicas, resposta óptica dependente de T e testes de conservação.
 
+**T + M + O**
+- Compartilhar um único campo de temperatura e uma única geometria deformada entre os domínios térmico, mecânico e óptico.
+- Separar a mudança geométrica da reflexão (forma, normais e topografia) da mudança intrínseca por termorrefletância (CTR ou R(λ,T)).
+- Distinguir luz de prova, bomba + prova e feixe único; somente a potência absorvida é fonte térmica.
+- Atualizar a refletância/absorptância conforme T e a superfície, sem contar duas vezes a mesma perda óptica.
+- A expansão uniforme e livre de uma superfície plana não deve produzir rotação artificial da normal; gradientes e restrições podem deformar a superfície.
+- Calor plástico fica desligado até homologar o coeficiente Taylor–Quinney para material, taxa e estado; não usar β universal.
+- Manter a mudança de fase, oxidação, fluência e dano fora da primeira versão.
+- Especificação completa: [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md).
+
 **E + T + O**
 - Manter dois estímulos independentes: tensão/corrente DC e iluminação espectral. Não tratar o campo DC como campo da onda óptica.
 - Calcular Joule com JDC·EDC e absorção óptica com A·Pinc ou dissipação local do campo óptico; não duplicar a mesma perda entre absorptância, σ̃opt e ε̃''.
@@ -173,7 +183,7 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 | E + T + M | Corrente → Joule → temperatura; temperatura e defeitos afetam resposta elétrica; temperatura e carregamento afetam deformação; deformação retorna ao estado elétrico | Objetivo principal da evolução multifísica, após validação dos pares |
 | E + T + O | Corrente DC gera Joule; luz gera calor apenas pela absorção; temperatura retroage em σDC(T) e R/A/Topt(λ,T) | Especificada em ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-OPTICO.md; bloqueada até fechar os balanços elétrico, óptico e térmico |
 | E + M + O | Deformação compartilhada altera geometria elétrica, microestrutura e superfície; pode alterar a resposta óptica intrínseca com coeficientes específicos | Especificada em [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md); bloqueada quantitativamente até validar geometria, resistividade e óptica |
-| T + M + O | Temperatura altera dimensões e resposta mecânica; expansão/deformação altera superfície e reflexão | Parcialmente possível por geometria; resposta óptica quantitativa depende de dados |
+| T + M + O | Um único campo térmico altera dimensões e propriedades mecânicas; geometria atual modifica reflexão e temperatura altera R(λ,T)/CTR; luz absorvida pode realimentar T | Especificada em [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md); bloqueada quantitativamente até homologar mecânica, óptica, absorção e balanços |
 | E + T + M + O | Acoplamento de todos os campos e balanços, com retroalimentação temporal | Etapa avançada; não habilitar por simples soma de animações |
 
 A prioridade de desenvolvimento é **E + T + M**. A óptica pode participar da experiência por geometria de reflexão, mas o acoplamento espectral quantitativo exige uma camada científica própria.
@@ -289,7 +299,8 @@ O comportamento atual de heatElectrical precisa ser revisado antes de qualquer r
 3. **T + M:** incluir expansão e restrição térmica, sem inventar propriedades por metal.
 4. **M + O:** refletir mudanças geométricas da superfície.
 5. **E + M:** separar contribuição geométrica e microestrutural para resistividade; manter eletroplasticidade bloqueada.
-6. **E + M + O e O quantitativa:** compartilhar uma única geometria deformada; validar resistência geométrica/microestrutural e reflexão local; liberar elasto-óptica apenas com dados específicos. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md).
+6. **E + M + O:** compartilhar uma única geometria deformada; validar resistência geométrica/microestrutural e reflexão local. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md).
+7. **T + M + O:** integrar campo térmico, resposta mecânica, superfície deformada e termorrefletância; distinguir probe, pump–probe e feixe único, fechar balanços e validar o caminho fototérmico. Ver [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md).
 7. **E + T + M:** integrar os três campos com avanço temporal e testes de conservação/estabilidade.
 
 ## 11. Decisões que ainda precisam ser aprovadas
