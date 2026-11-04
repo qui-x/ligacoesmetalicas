@@ -30,7 +30,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  const rep2=representation||{camera:()=>null,saveCamera:()=>{}};
  const statusLabel={empty:'Vazia',assembling:'Em construção',assembled:'Concluída pelo usuário'};
  const root=U.element('section',null,'silm-assembly');root.dataset.editable=String(editable);root.setAttribute('aria-labelledby','silm-assembly-title');
- const title=U.element('h1',element.name+' — montagem livre','sr-only');title.id='silm-assembly-title';
+ const title=U.element('h1',element.name+' — montagem livre','sr-only');title.id='silm-assembly-title';title.tabIndex=-1;
  const quickHost=document.getElementById('silm-view-quick-actions'),cameraHost=document.getElementById('silm-view-controls');
  if(quickHost){quickHost.hidden=false;quickHost.replaceChildren();}
  if(cameraHost)cameraHost.replaceChildren();

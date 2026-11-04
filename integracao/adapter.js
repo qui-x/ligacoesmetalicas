@@ -77,7 +77,8 @@
   if(routeUI?.session.open()){say('Encerre a atividade em curso para navegar entre estruturas salvas.','info');return false;}
   const checked=S.validateScientificState(record?.snapshot);
   if(!checked.ok||checked.value.investigation?.id!==record.id){say('A estrutura salva está inválida ou incompatível.','warning');return false;}
-  if(model.state.investigation?.id!==record.id){
+  const activeSnapshot=model.state;
+  if(JSON.stringify(activeSnapshot)!==JSON.stringify(checked.value)){
    const restored=model.restore(checked.value,{allowLegacy:false});
    if(!restored.ok){say('Não foi possível restaurar esta estrutura.','warning');return false;}
    selected=String(checked.value.metal.atomicNumber);$('silm-metal').value=selected;

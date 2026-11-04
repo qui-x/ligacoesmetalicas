@@ -136,11 +136,11 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
   const next=records.map(r=>r.id===id?{...r,name,customName:true}:r);
   return persist(next);
  }
- function editName(record,card){
+ function editName(record,card,trigger){
   const title=card.querySelector('.silm-structure-title'),form=N('form',null,'silm-structure-rename');
   const input=N('input');input.type='text';input.maxLength=100;input.required=true;input.value=record.name;input.setAttribute('aria-label','Nome da estrutura');input.autocomplete='off';
   const save=N('button','Salvar','button primary');save.type='submit';const cancel=N('button','Cancelar','button outline');cancel.type='button';
-  form.append(input,save,cancel);title.replaceWith(form);
+  form.append(input,save,cancel);title.replaceWith(form);if(trigger)trigger.disabled=true;
   cancel.addEventListener('click',render);
   form.addEventListener('submit',event=>{event.preventDefault();if(saveName(record.id,input.value)){say?.('Nome da estrutura atualizado.','success');render();}});
   input.focus();input.select();
@@ -174,7 +174,7 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
    const figure=N('div',null,'silm-structure-preview');figure.append(preview(record));card.append(figure);
    const actions=N('div',null,'silm-structure-card-actions');
    const focus=N('button',record.id===cur?'Em foco':'Exibir no Foco',record.id===cur?'button outline':'button primary');focus.type='button';focus.disabled=record.id===cur;focus.addEventListener('click',()=>openRecord(record.id));
-   const rename=N('button','Renomear','button outline');rename.type='button';rename.addEventListener('click',()=>editName(record,card));
+   const rename=N('button','Renomear','button outline');rename.type='button';rename.addEventListener('click',()=>editName(record,card,rename));
    const remove=N('button','Remover','button outline silm-structure-remove');remove.type='button';remove.disabled=record.id===cur;remove.title=record.id===cur?'A estrutura em foco não pode ser removida.':'Remover esta estrutura salva';remove.addEventListener('click',()=>removeRecord(record));
    actions.append(focus,rename,remove);card.append(actions);cards.append(card);
   }
