@@ -187,6 +187,7 @@ A matriz considera quatro famílias físicas: elétrica (E), térmica (T), mecâ
 | E + T + O | corrente DC gera Joule; iluminação gera calor pela absorção; T altera resposta DC e óptica | muito alta: dois domínios de excitação, três fontes/saídas energéticas, realimentação σDC(T) e R/A/Topt(λ,T); balanço global |
 | E + M + O | uma deformação comum altera geometria/resistência, microestrutura e superfície/reflexão; a resposta óptica intrínseca pode ser sensível à tensão | muito alta: geometria compartilhada, resistividade microestrutural, contatos e óptica espectral; ver [especificação E+M+O](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md) |
 | T + M + O | um campo T altera expansão e resposta mecânica; a geometria atual altera a reflexão e R(λ,T)/CTR altera o sinal óptico; absorção pode realimentar T | muito alta: campo térmico, mecânica com propriedades T-dependentes, superfície/normal, termorrefletância, absorção e balanços; ver [especificação T+M+O](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md) |
+| E + T + M + O | E DC e O óptico excitam regimes distintos; Joule e absorção alimentam T; T modifica E/M/O; M altera geometria, contatos e microestrutura que retroalimentam E/T/O | extrema: estado comum {u,V,T,campo óptico}, transferência conservativa entre malhas, possível TTM, solver iterativo e quatro balanços; ver [especificação E+T+M+O](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO-OPTICO.md) |
 
 **Quatro famílias E + T + M + O:** fisicamente possível em um problema multifísico específico, mas não deve ser um “modo geral” do SILM sem dados, equações, condições de contorno e validação dos quatro campos.
 
@@ -195,6 +196,8 @@ A matriz considera quatro famílias físicas: elétrica (E), térmica (T), mecâ
 **Especificação T + M + O:** [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md). A primeira etapa usa expansão e reflexão geométricas; termorrefletância, absorção fototérmica e plasticidade dependente de temperatura exigem dados e balanços validados.
 
 **Especificação E + T + M:** [ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md). Integra potencial/corrente, Joule, temperatura e deslocamento/deformação; contatos e calor plástico são extensões com dados próprios, e a solução quantitativa exige convergência do estado {u,V,T}.
+
+**Especificação E + T + M + O:** [ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO-OPTICO.md). Integra os quatro campos, separa DC e óptica, absorção e Joule, e define quando usar temperatura única ou TTM; a liberação quantitativa exige convergência, transferência conservativa e fechamento dos quatro balanços.
 
 ---
 
@@ -244,6 +247,7 @@ Os coeficientes didáticos atuais não devem ser apresentados como propriedades 
 - E + T + O com fontes Joule e fototérmica integradas e resposta espectral dependente de temperatura.
 - E + M + O com uma geometria deformada compartilhada entre os domínios elétrico e óptico; a extensão elasto-óptica exige dados específicos. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md).
 - T + M + O com campo térmico, equilíbrio mecânico, superfície deformada e termorrefletância integrados; o modo fototérmico exige absorção e fechamento dos balanços. Ver [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md).
+- E + T + M + O como etapa de integração avançada: solver dos quatro campos, óptica como leitura/fonte, estado comum, possível TTM e balanços independentes; não ativar antes dos pares/trios. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO-OPTICO.md).
 - Combinações com O em escala espectral e de superfície, após validação dos pares e trios.
 - Estado multiaxial combinando compressão, tração e cisalhamento.
 
@@ -273,6 +277,7 @@ Regras:
 | E + M | deformação muda resistividade por defeitos/geométrica; desligar campo não apaga deformação plástica; sem alegar eletroplasticidade |
 | T + M | expansão livre não cria tensão térmica indevida; restrição cria tensão; efeito da temperatura é compatível com dados/modelo |
 | T + M + O | expansão e restrições atualizam a superfície; reflexão usa normal atual; termorrefletância calibrada; somente absorção gera calor; energia óptica/térmica fecha sem dupla contagem |
+| E + T + M + O | Joule e absorção são fontes distintas; DC e óptica usam propriedades distintas; geometria/contatos/superfície atualizados; TTM quando necessário; quatro balanços e convergência |
 | E + T + M | conservação de energia, consistência dos campos e estabilidade do passo de tempo |
 | Touch/desktop | seleção múltipla, aplicação/cancelamento, mesma semântica por teclado/toque, foco, movimento reduzido e sem ativação parcial |
 
