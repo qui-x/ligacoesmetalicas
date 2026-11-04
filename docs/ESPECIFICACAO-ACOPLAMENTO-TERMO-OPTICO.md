@@ -56,6 +56,14 @@ Pabs = A(λ,T,θ,pol,stack) · Pinc
 Qabs = ∫ Pabs(t) dt
 ```
 
+Para uma fonte de banda larga, a potência absorvida deve ser integrada sobre o espectro e a área iluminada (com a distribuição espacial/temporal da fonte):
+
+```text
+Pabs(t) = ∫área ∫λ A(λ,T,θ,pol,stack) Iinc(λ,x,y,t) dλ dA
+```
+
+A fração espectral não deve ser substituída por um único valor médio sem ponderação pela fonte. Em todos os casos, o perfil volumétrico deve satisfazer `∫volume q'''opt dV = Pabs`.
+
 A absorptância depende do comprimento de onda, temperatura, ângulo, polarização, composição, fase, espessura, substrato, camadas superficiais e rugosidade. Em uma amostra de várias camadas, não se deve usar automaticamente `A=1−R`: a transmissão e as reflexões internas podem ser relevantes.
 
 A refletância e a absorptância também podem mudar durante o aquecimento. Se `A` for atualizada com a temperatura, a fonte térmica precisa usar o valor atualizado no mesmo passo de acoplamento, respeitando o balanço de energia.
@@ -121,7 +129,11 @@ Para uma interface entre duas camadas com condutância térmica de contato `G`:
 
 ```
 q''int = G (T1 − T2)
+q''conv = h (Ts − Tamb)
+q''rad = ε σSB (Ts⁴ − Tsur⁴)
 ```
+
+As expressões de convecção e radiação são aproximações de superfície; `ε` e `σSB` devem ser definidos com unidades e condições adequadas, e as temperaturas radiativas são absolutas (K). Para radiação espectral/seletiva, usar emissividade espectral e angular compatível, não um valor total genérico.
 
 Não supor contato térmico perfeito entre filme e substrato se a resistência de interface for relevante. Não aplicar convecção ou radiação por padrão sem declarar os coeficientes/condições.
 
@@ -308,17 +320,19 @@ O passo de tempo deve respeitar a estabilidade do método de integração térmi
 
 A simulação deve permitir pausa, reinício e desligar a bomba. Após desligar a bomba, a temperatura retorna ao equilíbrio definido pelas condições de contorno; não pode permanecer acima do ambiente indefinidamente se houver caminhos de dissipação ativos.
 
+Para excitação periódica com frequência angular `Ω`, a escala de penetração térmica aproximada em meio homogêneo é `μth = √(2 ath/Ω)`, com `ath = k/(ρ cp)`. Ela ajuda a escolher espessura, frequência e domínio térmico, mas não substitui a solução para uma geometria multicamada.
+
 ## 8. Auditoria do SILM atual
 
 ### 8.1 Térmica
 
-O motor térmico atual é uma propagação discreta e qualitativa entre vizinhos da rede exibida. O catálogo de propriedades informa que o coeficiente é didático, comum a todos os metais, sem calor específico tabelado, sem escala de tempo física e sem comparação de condutividade entre metais. A experiência não resolve a equação térmica contínua com geometria macroscópica, profundidade de absorção, interface ou condições completas de troca térmica.
+O motor térmico atual é uma propagação discreta e qualitativa entre vizinhos da rede exibida. O catálogo em `domain/silm/properties.js` informa que o coeficiente é didático, comum a todos os metais, sem calor específico tabelado, sem escala de tempo física e sem comparação de condutividade entre metais. O controlador `domain/silm/thermal.js` propaga valores normalizados entre vizinhos da estrutura exibida. A experiência não resolve a equação térmica contínua com geometria macroscópica, profundidade de absorção, interface ou condições completas de troca térmica.
 
 O motor térmico não pode receber uma energia luminosa como potência física sem antes adicionar escala, capacidade térmica, dissipação e balanço dimensional. Um valor normalizado atual não é joule nem kelvin.
 
 ### 8.2 Óptica
 
-A experiência de brilho usa uma lanterna geométrica e a lei de reflexão especular. Não consulta dados espectrais de absorptância, refletância, transmitância, n(λ,T), κ(λ,T) ou CTR. A intensidade de iluminação atual não está calibrada em W/m².
+A experiência de brilho usa a lanterna geométrica e o controlador angular de `domain/silm/drive.js`, além da narrativa em `domain/silm/properties.js`, para demonstrar a lei de reflexão especular. Não consulta dados espectrais de absorptância, refletância, transmitância, n(λ,T), κ(λ,T) ou CTR. A intensidade de iluminação atual não está calibrada em W/m².
 
 Portanto, o brilho visual atual não pode gerar aquecimento fototérmico quantitativo nem revelar a mudança de refletância do metal com a temperatura.
 
@@ -473,7 +487,8 @@ Não exibir todos esses campos sempre. Ocultar parâmetros não aplicáveis, mas
 - [ ] Para amostra passiva, `R+A+Topt=1` dentro da tolerância.
 - [ ] Para amostra opaca, `Topt≈0` só quando a condição estiver justificada.
 - [ ] `Pabs=A·Pinc` respeita unidade e geometria.
-- [ ] Perfil `q'''opt` integra para a potência absorvida, sem duplicação.
+- [ ] Perfil `q'''opt` integra para a potência absorvida, sem duplicação: `∫volume q'''opt dV = Pabs`.
+- [ ] Para espectro de banda larga, R, A e Topt são ponderadas pela distribuição espectral e espacial da fonte.
 - [ ] Para filmes/multicamadas, interferência e absorção por camada são consideradas quando relevantes.
 - [ ] Alterar λ, polarização, ângulo, temperatura ou stack atualiza a absorção de acordo com os dados/modelo.
 
@@ -482,6 +497,7 @@ Não exibir todos esses campos sempre. Ocultar parâmetros não aplicáveis, mas
 - [ ] Com `A=0`, a fonte fototérmica é zero.
 - [ ] Desligar a bomba interrompe a entrada óptica, mas não zera instantaneamente a temperatura.
 - [ ] Com fronteiras dissipativas, a amostra retorna ao equilíbrio definido.
+- [ ] Fluxos de interface, convecção e radiação têm sinais, unidades e temperaturas consistentes.
 - [ ] Com fronteira isolada, energia acumulada é conservada após a fonte desligada (salvo outros termos explicitados).
 - [ ] A fonte integra para a energia absorvida.
 - [ ] Energia residual `Ein−Eout−ΔU` fica dentro da tolerância numérica.
