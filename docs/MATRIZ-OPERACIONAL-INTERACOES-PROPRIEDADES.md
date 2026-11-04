@@ -195,9 +195,22 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 | E + T + O | Corrente DC gera Joule; luz gera calor apenas pela absorção; temperatura retroage em σDC(T) e R/A/Topt(λ,T) | Especificada em ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-OPTICO.md; bloqueada até fechar os balanços elétrico, óptico e térmico |
 | E + M + O | Deformação compartilhada altera geometria elétrica, microestrutura e superfície; pode alterar a resposta óptica intrínseca com coeficientes específicos | Especificada em [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md); bloqueada quantitativamente até validar geometria, resistividade e óptica |
 | T + M + O | Um único campo térmico altera dimensões e propriedades mecânicas; geometria atual modifica reflexão e temperatura altera R(λ,T)/CTR; luz absorvida pode realimentar T | Especificada em [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md); bloqueada quantitativamente até homologar mecânica, óptica, absorção e balanços |
-| E + T + M + O | Acoplamento de todos os campos e balanços, com retroalimentação temporal | Etapa avançada; não habilitar por simples soma de animações |
+| E + T + M + O | Estado comum {u,V,T,campo óptico}; Joule + absorção; propriedades elétricas/mecânicas/ópticas T- e deformação-dependentes; geometria/contatos/superfície atualizados; balanços e solver iterativo | Especificada em [ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO-OPTICO.md); quantitativo bloqueado até validar solver, dados, transferência entre malhas e quatro balanços |
 
-A prioridade de desenvolvimento é **E + T + M**. A óptica pode participar da experiência por geometria de reflexão, mas o acoplamento espectral quantitativo exige uma camada científica própria.
+### 5.1 Regras para o acoplamento integral E + T + M + O
+
+- Os quatro domínios usam uma mesma amostra, geometria atual e relógio físico; não somar animações ou estados independentes.
+- Separar condução elétrica DC e campo óptico na frequência da luz; σDC não substitui n(λ), κ(λ), ε̃(ω) ou σ̃(ω).
+- Joule (J·E) e absorção óptica são fontes diferentes. Só a potência óptica absorvida aquece; não duplicar A·Pinc e perda EM local.
+- Atualizar T → E/M/O e M → E/O na mesma configuração. Geometria, terminais, contatos, normais, área iluminada e superfície precisam ser consistentes.
+- Escolher temperatura única ou TTM conforme a escala temporal; pulsos ultracurtos podem exigir Te/Tl e fonte óptica no subsistema eletrônico.
+- Distinguir efeito geométrico da reflexão, termorrefletância e elasto-óptica. Cada caminho intrínseco exige dados espectrais próprios.
+- Calor plástico, atrito e perdas de contato são extensões com parâmetros calibrados; não usar β universal e não contar energia duas vezes.
+- Acoplamento sequencial é aceito apenas se o erro for demonstrado. Realimentação forte exige iteração/convergência e atualização de geometria/malha.
+- Fechar separadamente balanços elétrico, óptico, térmico e mecânico, além do residual global. Manter eletroplasticidade atérmica e mudança de fase desabilitadas.
+- Especificação completa: [ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO-OPTICO.md).
+
+A prioridade de desenvolvimento continua sendo validar os pares e trios, começando pelo E + T + M. O acoplamento integral E + T + M + O é a etapa avançada posterior, não uma extensão automática dos quatro ícones.
 
 ## 6. Contrato do painel único de condições
 
@@ -295,6 +308,7 @@ O comportamento atual de heatElectrical precisa ser revisado antes de qualquer r
 - [ ] Restrição térmica produz resposta compatível com o modelo.
 - [ ] Mudança de forma/superfície afeta a reflexão geométrica sem inventar cor.
 - [ ] T + M + O compartilha o campo térmico e a geometria atual; termorrefletância é calibrada, absorção gera fonte sem dupla contagem e os balanços óptico/térmico fecham.
+- [ ] E + T + M + O usa estado comum, campos DC/óptico distintos, solver convergente e balanços elétrico, óptico, térmico e mecânico fechados.
 - [ ] Resultados qualitativos não são apresentados como medições.
 
 ### 9.2 Interface e estado
@@ -315,6 +329,7 @@ O comportamento atual de heatElectrical precisa ser revisado antes de qualquer r
 6. **E + M + O:** compartilhar uma única geometria deformada; validar resistência geométrica/microestrutural e reflexão local. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md).
 7. **T + M + O:** integrar campo térmico, resposta mecânica, superfície deformada e termorrefletância; distinguir probe, pump–probe e feixe único, fechar balanços e validar o caminho fototérmico. Ver [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md).
 8. **E + T + M:** integrar {u,V,T} com atualização de geometria/contatos, fontes Joule e plástica separadas, iteração/convergência e balanços elétrico, térmico e mecânico. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md).
+9. **E + T + M + O:** somente depois de validar todos os pares e trios, integrar o campo óptico/espectral, absorção, geometria da superfície, temperatura única/TTM e quatro balanços sob convergência. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO-OPTICO.md).
 
 ## 11. Decisões que ainda precisam ser aprovadas
 
