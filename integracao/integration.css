@@ -832,3 +832,124 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
 }
 @media(prefers-reduced-motion:reduce){#silm-comparison-items .silm-comparison-card{transition:none}}
 @media(forced-colors:active){.silm-comparison-index,.silm-comparison-focus,.si-tab-count,.silm-overview-chip,.silm-comparison-remove{border:1px solid CanvasText}.silm-comparison-card[data-current=true],.silm-overview-chip[aria-pressed=true]{outline:2px solid Highlight}}
+
+
+/* Visão geral — gerenciamento de estruturas em largura total, com hierarquia de leitura.
+   O #silm-comparison-items continua com .si-overview-grid da Base SI; sem esta sobrescrita,
+   a grade externa reservava uma coluna de 160 px e comprimía o gerenciamento inteiro. */
+#workspace-overview.si-overview-view{
+ display:flex!important;flex:1 1 auto;flex-direction:column;align-items:stretch;gap:12px;
+ width:100%;height:100%;min-width:0;min-height:100%;overflow-x:hidden;overflow-y:auto;
+ padding:clamp(18px,2.2vw,34px);
+}
+#workspace-overview.si-overview-view>h2{
+ flex:none;margin:0;font-size:clamp(1.2rem,1.65vw,1.55rem);line-height:1.2;letter-spacing:-.02em;
+}
+#workspace-overview.si-overview-view>#silm-comparison-items.si-overview-grid.silm-structure-manager{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-auto-flow:row;
+ align-content:start;align-self:stretch;justify-items:stretch;gap:10px;
+ width:100%;max-width:1480px;min-width:0;margin:0 auto;padding:0;
+}
+#silm-comparison-items .silm-structure-manager-intro{
+ max-width:720px;margin:0;color:var(--muted);font-size:.86rem;line-height:1.45;
+}
+#silm-comparison-items .silm-structure-manager-toolbar{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;
+ min-height:42px;padding:0 0 9px;border-bottom:1px solid var(--border);
+}
+#silm-comparison-items .silm-structure-count{font-size:.8rem;font-weight:700;color:var(--muted)}
+#silm-comparison-items .silm-structure-layout{min-height:36px;padding:5px 11px}
+#silm-comparison-items .silm-structure-cards{
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));
+ align-items:stretch;justify-content:start;gap:14px;min-width:0;width:100%;
+}
+#silm-comparison-items .silm-structure-card{
+ display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:12px;
+ min-width:0;padding:15px;border:1px solid var(--border);border-radius:14px;
+ background:linear-gradient(155deg,color-mix(in srgb,var(--surface) 94%,var(--accent) 6%),var(--surface));
+ box-shadow:0 5px 16px rgb(0 0 0/.08);overflow:hidden;
+}
+#silm-comparison-items .silm-structure-card[data-current=true]{
+ border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent),0 6px 20px rgb(0 0 0/.1);
+}
+#silm-comparison-items .silm-structure-card-head{display:flex;align-items:center;gap:11px;min-width:0}
+#silm-comparison-items .silm-structure-card-head .silm-overview-chip-symbol{
+ width:42px;height:42px;font-size:.95rem;background:var(--bg);
+}
+#silm-comparison-items .silm-structure-card-heading{flex:1 1 auto;min-width:0}
+#silm-comparison-items .silm-structure-title{
+ display:block;margin:0;font-size:1.04rem;line-height:1.25;font-weight:780;
+ overflow:hidden;overflow-wrap:normal;word-break:normal;hyphens:none;
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+}
+#silm-comparison-items .silm-structure-status{
+ flex:none;padding:4px 9px;border:1px solid var(--border);border-radius:999px;
+ color:var(--muted);background:var(--bg);font-size:.7rem;font-weight:750;white-space:nowrap;
+}
+#silm-comparison-items .silm-structure-card[data-current=true] .silm-structure-status{
+ border-color:var(--accent);color:var(--accent);
+}
+#silm-comparison-items .silm-structure-card-details{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;min-width:0;margin:0;
+}
+#silm-comparison-items .silm-structure-card-detail{
+ display:grid;align-content:start;gap:3px;min-width:0;padding:8px 9px;
+ border:1px solid var(--border);border-radius:9px;background:color-mix(in srgb,var(--bg) 78%,var(--surface));
+}
+#silm-comparison-items .silm-structure-card-detail dt{
+ margin:0;color:var(--muted);font-size:.65rem;font-weight:800;letter-spacing:.055em;text-transform:uppercase;
+}
+#silm-comparison-items .silm-structure-card-detail dd{
+ margin:0;color:var(--text);font-size:.78rem;font-weight:650;line-height:1.25;
+ overflow-wrap:anywhere;
+}
+#silm-comparison-items .silm-structure-preview{
+ display:grid;place-items:center;width:100%;height:clamp(150px,19vh,210px);
+ min-width:0;margin:0;border:1px solid var(--border);border-radius:11px;overflow:hidden;
+ background:radial-gradient(ellipse at 50% 46%,var(--panel2,var(--surface)),var(--bg) 80%);
+}
+#silm-comparison-items .silm-structure-preview svg{display:block;width:100%;height:100%;max-height:210px}
+#silm-comparison-items .silm-structure-card-actions{
+ display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:7px;min-width:0;
+}
+#silm-comparison-items .silm-structure-card-actions button{
+ min-width:0;min-height:40px;padding:7px 9px;font-size:.76rem;white-space:nowrap;
+}
+#silm-comparison-items .silm-structure-card-actions button:disabled{opacity:.55}
+#silm-comparison-items .silm-structure-remove{color:var(--danger)}
+#silm-comparison-items .silm-structure-rename{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+#silm-comparison-items .silm-structure-rename input{flex:1 1 150px;min-width:0}
+#silm-comparison-items .silm-structure-empty{
+ display:grid;justify-items:start;gap:9px;width:100%;padding:22px;
+ border:1px dashed var(--border);border-radius:12px;background:var(--surface);
+}
+#silm-comparison-items .silm-structure-empty h3,#silm-comparison-items .silm-structure-empty p{margin:0}
+#silm-comparison-items .silm-structure-empty p{max-width:620px;color:var(--muted);font-size:.86rem;line-height:1.5}
+#si-workspace[data-view-mode=overview] .si-actionbar>.silm-overview-strip{gap:12px}
+#si-workspace[data-view-mode=overview] .silm-overview-strip-label{min-width:92px}
+#si-workspace[data-view-mode=overview] .silm-overview-chip{max-width:min(32vw,300px)}
+#si-workspace[data-view-mode=overview] .silm-overview-chip>span:last-child{min-width:0;overflow:hidden}
+#si-workspace[data-view-mode=overview] .silm-overview-chip strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:900px){
+ #workspace-overview.si-overview-view{padding:14px 12px 18px}
+ #silm-comparison-items .silm-structure-cards{grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:10px}
+ #silm-comparison-items .silm-structure-card{padding:12px}
+ #silm-comparison-items .silm-structure-card-actions button{min-height:42px}
+ #si-workspace[data-view-mode=overview] .si-actionbar>.silm-overview-strip{gap:8px}
+}
+@media(max-width:560px){
+ #silm-comparison-items .silm-structure-cards{grid-template-columns:minmax(0,1fr)}
+ #silm-comparison-items .silm-structure-card-details{gap:5px}
+ #silm-comparison-items .silm-structure-card-detail{padding:7px 6px}
+ #silm-comparison-items .silm-structure-card-detail dd{font-size:.72rem}
+ #silm-comparison-items .silm-structure-card-actions{grid-template-columns:1fr 1fr}
+ #silm-comparison-items .silm-structure-card-actions button:first-child{grid-column:1/-1}
+ #silm-comparison-items .silm-structure-card-actions button{white-space:normal}
+ #si-workspace[data-view-mode=overview] .silm-overview-strip-label{display:none}
+ #si-workspace[data-view-mode=overview] .silm-overview-chip{max-width:220px}
+}
+@media(forced-colors:active){
+ #silm-comparison-items .silm-structure-card{border:1px solid CanvasText}
+ #silm-comparison-items .silm-structure-card[data-current=true]{border:2px solid Highlight}
+ #silm-comparison-items .silm-structure-card-detail{border:1px solid CanvasText}
+}
