@@ -237,6 +237,7 @@ Os coeficientes didáticos atuais não devem ser apresentados como propriedades 
 ### Nível 3 — multifísica avançada
 - E + T + M acoplados no mesmo passo de tempo.
 - E + T + O com fontes Joule e fototérmica integradas e resposta espectral dependente de temperatura.
+- E + M + O com uma geometria deformada compartilhada entre os domínios elétrico e óptico; a extensão elasto-óptica exige dados específicos. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md).
 - Combinações com O em escala espectral e de superfície, após validação dos pares e trios.
 - Estado multiaxial combinando compressão, tração e cisalhamento.
 
