@@ -354,3 +354,34 @@ body.si-structure-expanded #silm-scene-actionbar{flex:0 0 auto!important;min-hei
 .silm-observer-action-note{margin:0;color:var(--muted);font-size:.75rem;line-height:1.45}
 @media(max-width:520px){.silm-observer-action-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.silm-observer-action{min-height:64px}}
 @media(forced-colors:active){.silm-observer-action[aria-pressed=true]{border:2px solid Highlight}.silm-observer-action:disabled{opacity:.65}}
+
+/* Seleção múltipla de propriedades: Ctrl + clique no desktop e modo explícito em telas touch. */
+.silm-observer-selection-tools{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;min-width:0}
+.silm-observer-selection-status{flex:1 1 100%;min-width:0;margin:0;color:var(--muted);font-size:.72rem;line-height:1.4}
+.silm-observer-select-mode,.silm-observer-selection-command{
+ min-height:32px;padding:5px 10px;border:1px solid var(--border);border-radius:8px;
+ background:var(--surface);color:var(--text);font:inherit;font-size:.72rem;font-weight:750;cursor:pointer
+}
+.silm-observer-select-mode[aria-pressed=true],.silm-observer-selection-command:not(:disabled):hover{
+ border-color:var(--accent);background:var(--tint);color:var(--accent)
+}
+.silm-observer-selection-command:disabled{opacity:.4;cursor:not-allowed}
+.silm-observer-select-mode:focus-visible,.silm-observer-selection-command:focus-visible{
+ outline:2px solid var(--ring);outline-offset:2px
+}
+.silm-observer-action[data-multi-selected=true]{
+ outline:2px dashed var(--accent);outline-offset:2px;border-style:dashed
+}
+.silm-observer-action[data-multi-selected=true] .silm-observer-action-label{font-weight:850}
+.silm-observer-selection-tools button[hidden]{display:none!important}
+@media(max-width:520px){
+ .silm-observer-selection-tools{gap:6px}
+ .silm-observer-selection-status{flex-basis:100%}
+ .silm-observer-select-mode,.silm-observer-selection-command{min-height:38px}
+}
+@media(forced-colors:active){
+ .silm-observer-action[data-multi-selected=true]{outline:2px dashed Highlight;border:1px dashed Highlight}
+ .silm-observer-select-mode[aria-pressed=true],.silm-observer-selection-command:not(:disabled):hover{
+  border:2px solid Highlight;color:Highlight
+ }
+}
