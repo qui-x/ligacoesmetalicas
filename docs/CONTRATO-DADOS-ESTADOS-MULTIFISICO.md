@@ -279,6 +279,8 @@ O runtime guarda o último passo aceito. Inclui:
 
 Iterações provisórias ficam na memória ou em área temporária. Não sobrescrevem o estado aceito.
 
+A coordenada aceita não é sempre tempo: o runtime usa `acceptedCoordinate` com um discriminador `kind`. Os tipos são `time` (transiente, com `timeS` físico), `load-increment` (quase-estático, com índice, total e fator de carga), `frequency` (harmônico, com `frequencyHz`) e `multiscale-time` (tempo físico associado a `scaleMapId`). Não usar pseudotempo de carga como se fosse segundo.
+
 ### 8.2 Snapshot de resultado
 
 Um snapshot publicado exige:
@@ -334,6 +336,8 @@ Verificar referências a experiência/revisão, run, geometria, malha, campos, d
 ### 10.4 Validação física
 
 Verificar dimensionalidade, faixas dos materiais, condições de fronteira, balanços, critérios de estabilidade, convergência e adequação do modelo. Passar no JSON Schema não significa que a experiência seja fisicamente válida.
+
+Verificações semânticas complementares obrigatórias: `minimumStepS ≤ initialStepS ≤ maximumStepS`; `finalTimeS > initialTimeS`; extremos das faixas de datasets em ordem; direção mecânica normalizada no referencial declarado; regiões de contato distintas; domínios de origem/destino presentes; campo/entrada existentes; fronteira pertencente ao domínio indicado; IDs referenciados resolvidos com versão compatível; índices de carga não excedem o total; e intervalo temporal tem início menor que o fim.
 
 #### Regras semânticas obrigatórias
 
@@ -538,6 +542,7 @@ Os dados de demonstração são apenas valores de forma para conferir a estrutur
 - [ ] Datasets exigem versão, fonte, material, fase, evidência e unidade.
 - [ ] Arestas de acoplamento declaram mecanismo, lei e mapeamento.
 - [ ] Runtime aponta apenas para estado aceito.
+- [ ] Coordenadas de tempo, carga e frequência não são confundidas.
 - [ ] Resultados são imutáveis e ligados à revisão da definição.
 - [ ] A versão 8 atual permanece inalterada.
 - [ ] O envelope \`silm-documents-v1\` permanece inalterado.
