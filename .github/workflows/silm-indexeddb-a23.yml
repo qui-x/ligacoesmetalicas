@@ -1,0 +1,73 @@
+name: SILM — IndexedDB A2.3
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - study/silm-coupled-properties-transport-20261104
+    paths:
+      - "domain/silm/multiphysics/indexeddb-store.js"
+      - "tests/multiphysics-indexeddb-*.html"
+      - "tests/run-indexeddb-browser-tests.mjs"
+      - ".github/workflows/silm-indexeddb-a23.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  browser-tests:
+    name: IndexedDB suites — ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser:
+          - chromium
+          - firefox
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
+      PLAYWRIGHT_MODULE: ${{ runner.temp }}/silm-playwright/node_modules/playwright
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Playwright runner
+        run: npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.56.1
+
+      - name: Install browser
+        run: "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright install --with-deps \"$BROWSER_NAME\""
+
+      - name: Start isolated static server
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-http.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/silm-http.pid"
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent "$BASE_URL/tests/multiphysics-indexeddb-browser.html" > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-http.log"
+          exit 1
+
+      - name: Run A2.2 and A2.3 browser suites
+        run: node tests/run-indexeddb-browser-tests.mjs
+
+      - name: Stop static server
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/silm-http.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/silm-http.pid")" 2>/dev/null || true
+          fi
