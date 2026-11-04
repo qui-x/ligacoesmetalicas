@@ -2,7 +2,7 @@
 /* Comparação de referências: geometria documental separada das medições da bancada. */
 SILM.referenceGeometry=e=>{
  const r=e?.structures?.find(x=>x.id===e.referenceStructure);if(!r||r.conditions?.phase?.value!=='solid')return null;
- const known=SILM.crystal.geometry(e);if(known)return {points:known.cell.map(x=>x.cart),edges:known.edges(),center:known.center,label:known.model.general?known.model.label:known.model.name,code:known.model.general?known.model.label:known.model.code,source:r.sourceId,canonical:true};
+ const known=SILM.crystal.geometry(e);if(known)return {points:known.cell.map(x=>x.cart),edges:known.edges(),center:known.center,label:known.model.general?known.model.label:known.model.name,code:known.model.general?known.model.label:known.model.code,structureType:known.model.id,model:known.model,source:r.sourceId,canonical:true};
  const sites=SILM.crystal.expandSites(r.fractionalSites);if(r.type==='DHCP'&&sites.length!==4)return null;
  const p=r.latticeParameters,v=k=>p[k]?.value,rad=Math.PI/180,a=v('a'),b=v('b'),c=v('c'),alpha=v('alpha')*rad,beta=v('beta')*rad,gamma=v('gamma')*rad;
  if(![a,b,c,alpha,beta,gamma].every(Number.isFinite)||Math.min(a,b,c)<=0||Math.abs(Math.sin(gamma))<1e-8)return null;
@@ -10,7 +10,8 @@ SILM.referenceGeometry=e=>{
  const L=[[a,0,0],[b*Math.cos(gamma),b*Math.sin(gamma),0],[cx,cy,Math.sqrt(cz2)]],cart=f=>[0,1,2].map(i=>f.reduce((n,x,j)=>n+x*L[j][i],0));
  const corners=[0,1].flatMap(x=>[0,1].flatMap(y=>[0,1].map(z=>[x,y,z]))),edges=[];
  for(let i=0;i<8;i++)for(let j=i+1;j<8;j++)if(corners[i].filter((v,k)=>v!==corners[j][k]).length===1)edges.push([cart(corners[i]),cart(corners[j])]);
- return {points:sites.map(cart),edges,center:cart([.5,.5,.5]),label:r.label||r.type,code:r.type||'Referência',source:r.sourceId,canonical:false};
+ const structureType=SILM.crystal.typeByDatabase[r.type]||r.type;
+ return {points:sites.map(cart),edges,center:cart([.5,.5,.5]),label:r.label||r.type,code:r.type||'Referência',structureType,source:r.sourceId,canonical:false};
 };
 /* Visão geral como "Sua bancada" do SIAB (03/11/2026, pedido do autor): título e ações na mesma faixa, contador na aba,
    cartões numerados com "Em foco", desenho à esquerda e informações à direita; tocar num cartão abre a estrutura no Foco
@@ -121,7 +122,8 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
    }
   }else{
    let geometry=null;try{geometry=S.referenceGeometry(element);}catch{}
-   const expected=structure.crystallography?.structureType;if(geometry&&expected&&geometry.model?.id!==expected)geometry=null;
+   const expected=structure.crystallography?.structureType,actual=geometry?.structureType??geometry?.model?.id;
+   if(geometry&&expected&&actual!==expected)geometry=null;
    if(geometry&&geometry.points?.length&&geometry.edges?.length){
     const project=p=>{const q=p.map((v,i)=>v-geometry.center[i]);return [q[0]+.35*q[1],-q[2]+.3*q[1],q[1]];};
     const all=[...geometry.points,...geometry.edges.flat()].map(project);
