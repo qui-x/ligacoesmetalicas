@@ -163,7 +163,7 @@ A matriz considera quatro famílias físicas: elétrica (E), térmica (T), mecâ
 | E + T | transporte de carga e calor; espalhamento térmico; Joule | distinguir aquecimento externo, Joule e gradiente imposto; incluir κₑ e κL | P7 parcial: corrente + fonte térmica externa |
 | E + M (compressão) | defeitos de deformação afetam espalhamento elétrico | campo/terminais, compressão, taxa, temperatura e deformação | P7 qualitativa existente |
 | E + M (tração) | defeitos de deformação afetam espalhamento elétrico | campo/terminais, tração, taxa, temperatura e deformação | P7 qualitativa existente |
-| E + O | resposta óptica eletrônica relacionada à resposta elétrica | n,k ou ε(ω), espectro, polarização, ângulo | não implementada |
+| E + O | resposta eletrônica comum em frequências distintas; refletância calculada a partir da resposta óptica espectral | n(λ), κ(λ) ou ε̃(ω), espectro, polarização, ângulo, superfície e fase | especificada em ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md; não implementada |
 | T + M (compressão) | temperatura altera escoamento/ductilidade; expansão e tensão térmica | fonte/gradiente, apoios, αT, E(T), escoamento(T), taxa | não implementada |
 | T + M (tração) | temperatura altera resistência/ductilidade durante tração | fonte/gradiente, apoios, αT, E(T), curva tensão–deformação(T) | não implementada |
 | T + O | absorção luminosa aquece a superfície | irradiância, espectro, absorptividade e condução para o interior | não implementada |
@@ -219,7 +219,7 @@ Os coeficientes didáticos atuais não devem ser apresentados como propriedades 
 
 ### Nível 2 — depende de dados e estudo adicional
 - Seebeck, Peltier e Thomson (exigem coeficientes termoelétricos e condições de junção/gradiente).
-- E + O por constantes ópticas e resposta espectral.
+- E + O por constantes ópticas e resposta espectral; a condutividade DC não substitui σ̃(ω), e efeitos de aquecimento exigem E + T + O. Ver `docs/ESPECIFICACAO-ACOPLAMENTO-ELETRO-OPTICO.md`.
 - Eletroplasticidade além de Joule (campo/corrente, pulsos, temperatura controlada, mecanismo microestrutural e fonte).
 - Comparação entre metais (condutividades, resistividade, capacidade térmica, expansão, propriedades mecânicas, dados ópticos), sempre com valor, unidade, condição e fonte.
 
