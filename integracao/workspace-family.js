@@ -142,7 +142,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
     const chosen=selectedProperties.has(id),active=state.properties?.active===id;
     button.dataset.multiSelected=String(chosen);
     button.setAttribute('aria-pressed',String(chosen||active));
-    button.title=chosen?'Selecionada para análise conjunta: '+propertyLabels[id]:button.disabled&&why?why:'Ctrl (ou ⌘) + clique para selecionar junto com outra propriedade.';
+    button.title=chosen?'Selecionada para análise conjunta: '+propertyLabels[id]:button.disabled&&button.dataset.disabledReason?button.dataset.disabledReason:'Ctrl (ou ⌘) + clique para selecionar junto com outra propriedade.';
    }
    const names=[...selectedProperties].map(id=>propertyLabels[id]);
    if(names.length){
@@ -212,6 +212,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
     clearPropertySelection();
     quickActions?.toggleProperty?.(id);refreshScene();renderViewers();
    }});
+   button.dataset.disabledReason=why;
    propertyButtons.set(id,button);
   }
   syncPropertySelection();
