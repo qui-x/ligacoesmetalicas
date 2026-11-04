@@ -47,7 +47,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
   add=quickButton('silm-quick-add-unit','Adicionar unidade','M12 5v14M5 12h14',()=>actions.add(),true);
   if(organize)organizeButton=quickButton('silm-quick-organize','Organizar estrutura','M4 4h16v16H4zM4 10h16M10 4v16',()=>organize.run());
  }else if(canExplore())quickButton('silm-quick-explore','Montar em Explorar','M4 12h16M12 4v16',onExplore);
- scope.cleanup(()=>{if(quickHost){quickHost.replaceChildren();quickHost.hidden=true;}if(cameraHost)cameraHost.replaceChildren();});
+ scope.cleanup(()=>{if(quickHost){quickHost.replaceChildren();quickHost.hidden=true;}if(cameraHost)cameraHost.replaceChildren();const notes=document.getElementById('silm-structure-notes');if(notes)notes.replaceChildren();});
  const area=U.element('div',null,'silm-assembly-area'),stage=U.element('div',null,'silm-assembly-stage');stage.id='silm-assembly-stage';
  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 100 100');svg.setAttribute('aria-hidden','true');svg.classList.add('silm-assembly-collective');
  const collective=document.createElementNS(svg.namespaceURI,'g');svg.append(collective);
