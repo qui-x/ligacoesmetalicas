@@ -26,6 +26,12 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
   return checked.ok&&checked.value.investigation?.type==='free'&&checked.value.structure?.units?.length>0&&checked.value.metal?.atomicNumber===r.atomicNumber;
  };
  let raw=storage.get(KEY,[]),records=Array.isArray(raw)?raw.filter(validRecord):[];
+ let normalizedNames=false;
+ for(const record of records)if(!record.customName){
+  const element=S.data.get(record.atomicNumber),defaultLabel=element?.name;
+  if(defaultLabel&&record.name!==defaultLabel){record.name=defaultLabel;normalizedNames=true;}
+ }
+ if(normalizedNames)storage.set(KEY,records);
  let lastCurrent=null,layout=storage.get('structures.layout','grid');
  if(!['grid','list'].includes(layout))layout='grid';
  if(!Array.isArray(raw)||records.length!==raw.length)storage.set(KEY,records);
