@@ -359,3 +359,10 @@ Ver [ARQUITETURA-OPERACIONAL-ACOPLAMENTO-MULTIFISICO.md](ARQUITETURA-OPERACIONAL
 ## 13. Contrato técnico A0
 
 Consultar [CONTRATO-DADOS-ESTADOS-MULTIFISICO.md](CONTRATO-DADOS-ESTADOS-MULTIFISICO.md) e os schemas versionados da definição, runtime e resultados em [docs/schemas](schemas/). O contrato preserva o schema científico clássico 8 e o envelope durável `silm-documents-v1`; não converte controles didáticos em condições físicas. A etapa A0 foi concluída como especificação, sem alteração do runtime.
+
+
+## 14. Geometria macroscópica A1
+
+A geometria de referência foi definida em [GEOMETRIA-MACROSCOPICA-AMOSTRA-MULTIFISICA.md](GEOMETRIA-MACROSCOPICA-AMOSTRA-MULTIFISICA.md), com [schema geométrico](schemas/multiphysics-geometry.schema.json). A definição experimental fixa a revisão da geometria e cada condição de contorno aponta para `regionIds`, não para índices de malha.
+
+O primeiro corpo de prova é um prisma retangular parametrizado em metros. A geometria cristalina não é usada como forma macroscópica. A próxima etapa técnica é A2 — orquestrador e estado transacional.
