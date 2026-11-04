@@ -166,6 +166,17 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 - Manter a mudança de fase, oxidação, fluência e dano fora da primeira versão.
 - Especificação completa: [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md).
 
+**E + T + M**
+- Resolver ou iterar os campos {u,V,T} na mesma amostra; não concatenar três animações independentes.
+- Calcular Joule por J·E e distribuir a energia de forma conservativa entre os volumes/contatos; manter fonte externa separada.
+- Atualizar σe(T) e a resposta mecânica (α(T), C(T), σy(T), τc(T)) somente com dados materiais válidos.
+- A deformação deve atualizar geometria, L/A, volume, terminais e contatos; separar efeito geométrico, microestrutural, piezoresistivo e de interface.
+- Não contar dissipação de contato duas vezes entre Joule volumétrico, contato e calor externo.
+- Calor plástico q̇plastic = β σ:ε̇p fica desligado até calibração específica; trabalho armazenado e calor dissipado permanecem separados.
+- A influência de corrente mediada por Joule/temperatura não é, por si só, eletroplasticidade. Manter efeitos atérmicos bloqueados sem controles térmicos pareados e evidência.
+- O acoplamento quantitativo exige convergência do estado {u,V,T} e fechamento dos balanços elétrico, térmico e mecânico.
+- Especificação completa: [ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md).
+
 **E + T + O**
 - Manter dois estímulos independentes: tensão/corrente DC e iluminação espectral. Não tratar o campo DC como campo da onda óptica.
 - Calcular Joule com JDC·EDC e absorção óptica com A·Pinc ou dissipação local do campo óptico; não duplicar a mesma perda entre absorptância, σ̃opt e ε̃''.
@@ -180,7 +191,7 @@ A relação geométrica da reflexão especular pode ser demonstrada sem dados po
 
 | Combinação | Encadeamento físico necessário | Liberação |
 |---|---|---|
-| E + T + M | Corrente → Joule → temperatura; temperatura e defeitos afetam resposta elétrica; temperatura e carregamento afetam deformação; deformação retorna ao estado elétrico | Objetivo principal da evolução multifísica, após validação dos pares |
+| E + T + M | Potencial/corrente, q̇J, T, propriedades mecânicas T-dependentes, deformação, geometria e contatos atualizados; dissipação plástica opcional | Especificada em [ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md); bloqueada quantitativamente até validar {u,V,T}, contatos e balanços elétrico, térmico e mecânico |
 | E + T + O | Corrente DC gera Joule; luz gera calor apenas pela absorção; temperatura retroage em σDC(T) e R/A/Topt(λ,T) | Especificada em ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-OPTICO.md; bloqueada até fechar os balanços elétrico, óptico e térmico |
 | E + M + O | Deformação compartilhada altera geometria elétrica, microestrutura e superfície; pode alterar a resposta óptica intrínseca com coeficientes específicos | Especificada em [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md); bloqueada quantitativamente até validar geometria, resistividade e óptica |
 | T + M + O | Um único campo térmico altera dimensões e propriedades mecânicas; geometria atual modifica reflexão e temperatura altera R(λ,T)/CTR; luz absorvida pode realimentar T | Especificada em [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md); bloqueada quantitativamente até homologar mecânica, óptica, absorção e balanços |
@@ -278,6 +289,7 @@ O comportamento atual de heatElectrical precisa ser revisado antes de qualquer r
 - [ ] As fronteiras térmicas e mecânicas são explícitas.
 - [ ] E + T fecha o balanço de energia dentro da tolerância numérica definida.
 - [ ] Joule desaparece quando a corrente/densidade de corrente é zero.
+- [ ] E+T+M usa um estado comum {u,V,T}; potência terminal fecha com Joule de volume/contato, o balanço térmico fecha e trabalho mecânico não é contado duas vezes.
 - [ ] Temperatura afeta a resposta elétrica apenas por relação documentada.
 - [ ] Expansão livre não gera tensão térmica espúria.
 - [ ] Restrição térmica produz resposta compatível com o modelo.
@@ -302,7 +314,7 @@ O comportamento atual de heatElectrical precisa ser revisado antes de qualquer r
 5. **E + M:** separar contribuição geométrica e microestrutural para resistividade; manter eletroplasticidade bloqueada.
 6. **E + M + O:** compartilhar uma única geometria deformada; validar resistência geométrica/microestrutural e reflexão local. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-MECANICO-OPTICO.md).
 7. **T + M + O:** integrar campo térmico, resposta mecânica, superfície deformada e termorrefletância; distinguir probe, pump–probe e feixe único, fechar balanços e validar o caminho fototérmico. Ver [ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md](ESPECIFICACAO-ACOPLAMENTO-TERMO-MECANICO-OPTICO.md).
-8. **E + T + M:** integrar os três campos com avanço temporal e testes de conservação/estabilidade.
+8. **E + T + M:** integrar {u,V,T} com atualização de geometria/contatos, fontes Joule e plástica separadas, iteração/convergência e balanços elétrico, térmico e mecânico. Ver [ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md](ESPECIFICACAO-ACOPLAMENTO-ELETRO-TERMO-MECANICO.md).
 
 ## 11. Decisões que ainda precisam ser aprovadas
 
