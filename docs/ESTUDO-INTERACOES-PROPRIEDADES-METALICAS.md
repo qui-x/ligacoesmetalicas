@@ -179,7 +179,7 @@ A matriz considera quatro famílias físicas: elétrica (E), térmica (T), mecâ
 
 **M + M (maleabilidade + ductilidade):** não deve ser oferecida como par comum de propriedades. São modos de solicitação diferentes. Uma combinação de compressão e tração em eixos diferentes é fisicamente possível, mas exige um ensaio multiaxial, não dois botões de propriedade independentes.
 
-### Combinações de três famílias
+### Combinações de três e quatro famílias
 
 | Combinação | Fenômeno principal | Complexidade / requisito |
 |---|---|---|
