@@ -265,3 +265,20 @@
  .silm-workshop-micro-mode .silm-workshop-micro-composition-tools{grid-column:1;grid-row:4;gap:5px}
  .silm-workshop-micro-composition-key{flex-basis:100%}
 }
+
+/* Preserva o palco alto no desktop: um único trilho de instrumentos, rolável se necessário. */
+@media(min-width:1101px){
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar:has(.silm-workshop-micro-composition-tools){
+  display:flex;flex-wrap:nowrap;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:thin;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar:has(.silm-workshop-micro-composition-tools) .silm-workshop-micro-status{
+  flex:1 1 185px;min-width:185px;margin-right:0;order:0;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar:has(.silm-workshop-micro-composition-tools) .silm-workshop-micro-dimension{
+  flex:0 1 180px;min-width:135px;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-composition-tools{
+  flex:0 0 auto;grid-column:auto;flex-wrap:nowrap;border-top:0;border-left:1px solid var(--border);padding:0 0 0 8px;
+ }
+ .silm-workshop-micro-composition-key{max-width:145px}
+}
