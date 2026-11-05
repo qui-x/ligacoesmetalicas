@@ -27,7 +27,6 @@ jobs:
     env:
       BROWSER_NAME: ${{ matrix.browser }}
       BASE_URL: http://127.0.0.1:8765
-      PLAYWRIGHT_MODULE: ${{ runner.temp }}/silm-playwright/node_modules/playwright
 
     steps:
       - name: Checkout branch
@@ -44,7 +43,9 @@ jobs:
           python-version: "3.x"
 
       - name: Install Playwright runner
-        run: npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-playwright/node_modules/playwright" >> "$GITHUB_ENV"
 
       - name: Install browser
         run: "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright install --with-deps \"$BROWSER_NAME\""
