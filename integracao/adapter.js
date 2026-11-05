@@ -151,7 +151,10 @@
  function renderScene(){
   const state=model.state,e=element(),key=e?state.investigation.id+':'+e.atomicNumber+':'+state.module.active+':'+(state.structure?.mode||'empty')+':'+(state.structure?.mode==='crystalline'?representation.viewMode:'2d'):'none';
   if(viewKey!==key){placeExpansionButton(false);scope?.destroy();scope=null;view=null;viewKey=key;$('silm-integration-scene').replaceChildren();
-   if(!e){/* Descoberta por elemento renderizada no painel de contexto da Oficina. */}
+   if(!e){
+    // Fallback para a Oficina anterior caso o módulo de aplicações não carregue.
+    if(!S.workshop)emptyState({title:'Oficina vazia',text:['Abra ','Montagem → Preparo',' para escolher um metal. Depois adicione unidades e organize a estrutura.'],actions:[['Abrir Montagem',()=>openLeft('preparo'),'primary'],['Começar com o cobre',async()=>{$('silm-metal').value='29';selected='29';await start();}],['Montagens prontas',()=>{location.hash='#/montagens';}],['Tabela periódica',()=>$('silm-open-periodic').click()]]});
+   }
    else if(!state.structure)emptyState({title:'Estrutura de '+e.name+' vazia',text:state.module.active==='explorar'?['Use ','Adicionar unidade',' para montar a estrutura de '+e.name+'. Depois organize segundo a estrutura de referência.']:['A estrutura ainda não foi montada. Volte ao módulo ','Explorar',' para adicionar unidades.'],actions:state.module.active==='explorar'&&(!routeUI.session.open()||routeUI.canBuild())?[['Adicionar unidade',()=>run.add(),'primary'],['Abrir Montagem',()=>openLeft('objetos')]]:[['Abrir Montagem',()=>openLeft('modulo'),'primary']]});
    else if(state.structure){
     scope=SimCore.createScope();const common={scope,model,element:e,actions:run,reducedMotion:reduced,representation:rep,observer:workspaceFamily.observer,moduleTitle:{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active],measure:tools.measure,calc:tools.calc,properties:experience.scene};
@@ -207,6 +210,9 @@
  function ensureWorkshopCrystal(){
   const e=element();if(!e)return {ok:false,reason:'NO_METAL'};
   const eligibility=S.crystal.eligibility(e);if(eligibility.status!=='available')return {ok:false,reason:eligibility.reasonCode||'STRUCTURE_UNAVAILABLE'};
+  const structure=model.state.structure;
+  const needsBuild=!structure||!structure.units?.length||structure.mode==='free';
+  if(needsBuild&&routeUI?.session.open()&&!routeUI.canBuild())return {ok:false,reason:'ACTIVITY_LOCKED'};
   if(!model.state.structure)model.beginAssembly();
   if(!model.state.structure?.units?.length){const added=model.addUnit();if(!added?.ok)return added||{ok:false,reason:'ADD_UNIT_FAILED'};}
   if(model.state.structure?.mode==='free'){const organized=model.organize();if(!organized?.ok)return organized;}
@@ -215,13 +221,14 @@
  function setWorkshopScale(level){
   if(!Number.isInteger(level)||level<1||level>4||!element())return false;
   if(level>=3){
-   const ready=ensureWorkshopCrystal();if(!ready.ok){say(S.crystal.reasons[ready.reason]||'A estrutura cristalina não está disponível.', 'warning');workshopScale=2;updateWorkshopContext();return false;}
-   const first=model.state.structure?.units?.[0]||null;
-   if(!model.setCrystalRepresentation({view:'lattice',unitCell:true,neighbors:level===4,selectedUnitId:level===4&&first?first.id:null}))return false;
+   const ready=ensureWorkshopCrystal();if(!ready.ok){const message=ready.reason==='ACTIVITY_LOCKED'?'A atividade atual não permite preparar outra estrutura cristalina.':(S.crystal.reasons[ready.reason]||'A estrutura cristalina não está disponível.');say(message,'warning');workshopScale=2;updateWorkshopContext();return false;}
+   const units=model.state.structure?.units||[],first=units[0]||null,currentId=model.state.structure?.crystallography?.representation?.selectedUnitId;
+   const center=level===4?(units.find(unit=>unit.id===currentId)||first):units.find(unit=>unit.id===currentId)||null;
+   if(!model.setCrystalRepresentation({view:'lattice',unitCell:true,neighbors:level===4,selectedUnitId:center?.id||null}))return false;
    workshopScale=level;schedule();
    requestAnimationFrame(()=>requestAnimationFrame(()=>{
     ($('silm-assembly-stage')||$('silm-integration-scene'))?.scrollIntoView({behavior:reduced()?'auto':'smooth',block:'center'});
-    if(level===3)view?.renderer?.fit?.();if(level===4&&first)view?.focusUnit?.(first.id);
+    if(level===3)view?.renderer?.fit?.();if(level===4&&center)view?.focusUnit?.(center.id);
    }));
   }else{workshopScale=level;updateWorkshopContext();}
   return true;
@@ -230,28 +237,38 @@
   if(!item||!S.workshop.get(item.id))return false;
   const previousAtomicNumber=element()?.atomicNumber??null,previousWorkshopSelectionId=workshopSelectionId,previousWorkshopScale=workshopScale;
   workshopSelectionId=item.id;workshopScale=1;updateWorkshopContext();
-  const started=await start();
+  const started=await start({preserveWorkshop:true});
   if(!started){if(previousAtomicNumber!==null){selected=String(previousAtomicNumber);$('silm-metal').value=selected;}workshopSelectionId=previousWorkshopSelectionId;workshopScale=previousWorkshopScale;updateWorkshopContext();return false;}
-  const ready=ensureWorkshopCrystal();
-  if(ready.ok){model.setCrystalRepresentation({view:'lattice',unitCell:true,neighbors:false,selectedUnitId:null});workshopScale=3;}
-  else say(S.crystal.reasons[ready.reason]||'A investigação foi iniciada; a montagem livre continua disponível.','info');
-  schedule();return true;
+  // A investigação começa no contexto macroscópico. A rede só é construída ao avançar para a escala 3.
+  workshopScale=1;updateWorkshopContext();schedule();return true;
+ }
+ function updateWorkshopViewport(investigationActive){
+  const showCrystal=!!investigationActive&&workshopScale>=3;
+  const stage=$('si-stage'),scene=$('silm-integration-scene'),actionbar=$('silm-scene-actionbar');
+  if(stage){stage.classList.toggle('silm-workshop-context-only',!showCrystal);stage.dataset.workshopScale=showCrystal?String(workshopScale):'context';}
+  if(scene)scene.hidden=!showCrystal;
+  if(actionbar)actionbar.hidden=!showCrystal;
+  if(!showCrystal&&stage?.classList.contains('si-scene-expanded'))setStageExpanded(false,{restoreFocus:false});
+  if(showCrystal)requestAnimationFrame(()=>view?.update());
  }
  function updateWorkshopContext(){
   const host=$('silm-workshop-context');if(!host||!S.workshop)return;
   const active=element(),candidate=S.data.get(Number(selected||$('silm-metal')?.value));
   if(active&&candidate&&candidate.atomicNumber!==active.atomicNumber){
+   updateWorkshopViewport(true);
    const key='pending:'+candidate.atomicNumber+':'+active.atomicNumber;
    if(host.dataset.key!==key){host.dataset.key=key;host.hidden=false;S.workshop.renderDiscovery(host,{element:candidate,notice:'A investigação atual de '+active.name+' permanece preservada. Escolher uma aplicação solicitará a troca antes de iniciar a nova investigação.',onOpenPeriodic:()=>$('silm-open-periodic')?.click(),onContinue:()=>{selected=String(active.atomicNumber);$('silm-metal').value=selected;workshopSelectionId=null;workshopScale=1;schedule();openLeft('preparo');},onInvestigate:investigateWorkshopReference,onStartDirect:()=>start()});}
    return;
   }
   if(!active){
+   updateWorkshopViewport(false);
    const key='discover:'+String(candidate?.atomicNumber||'none');
    if(host.dataset.key===key)return;
    host.dataset.key=key;host.hidden=false;
    S.workshop.renderDiscovery(host,{element:candidate,onOpenPeriodic:()=>$('silm-open-periodic')?.click(),onContinue:()=>openLeft('preparo'),onInvestigate:investigateWorkshopReference,onStartDirect:()=>start()});
    return;
   }
+  updateWorkshopViewport(true);
   if(workshopSelectionId&&S.workshop.get(workshopSelectionId)?.atomicNumber!==active.atomicNumber)workshopSelectionId=null;
   const item=S.workshop.get(workshopSelectionId);
   const chosen=item?.atomicNumber===active.atomicNumber?item:null;
@@ -296,10 +313,11 @@
   routeUI.render();workspaceFamily.update();storageStatus();
   const replacement=restoreControl?$(restoreControl):null;if(focused&&!focused.isConnected&&replacement?.getClientRects().length)replacement.focus({preventScroll:true});
  }
- async function start(){
+ async function start({preserveWorkshop=false}={}){
   if(routeUI.session.open())return;
   const z=Number($('silm-metal').value);
   if(model.state.investigation){const accepted=await B.confirmDialog({title:'Iniciar outra investigação?',description:'A investigação atual será substituída neste ambiente. Exporte-a em Dados se desejar guardá-la.',confirmText:'Iniciar',cancelText:'Cancelar'});if(!accepted)return;}
+  if(!preserveWorkshop){workshopSelectionId=null;workshopScale=1;}
   if(model.begin(z)){model.beginAssembly();say('Investigação iniciada com '+S.data.get(z).name+'.','success');return true;}return false;
  }
  async function clear(){

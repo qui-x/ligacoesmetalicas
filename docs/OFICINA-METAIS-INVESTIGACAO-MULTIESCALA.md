@@ -8,8 +8,9 @@
 1. Selecionar um metal na Tabela Periódica.
 2. Usar **Ver aplicações** para abrir a curadoria sem iniciar ou substituir uma investigação.
 3. Escolher um componente que contenha o elemento.
-4. **Investigar componente** inicia a investigação científica existente e prepara a estrutura cristalina quando elegível.
-5. O painel preserva objeto, componente e materiais associados enquanto a cena científica mostra a estrutura.
+4. **Investigar componente** inicia a investigação científica existente na escala do objeto, sem construir a rede antes da hora.
+5. Ao avançar para a escala 3, a estrutura cristalina é preparada pelo motor existente; a escala 4 destaca um centro e seus vizinhos.
+6. O painel preserva objeto, componente e materiais associados enquanto a cena científica aparece apenas nas escalas 3–4.
 6. As escalas 1–4 mudam a observação, não trocam o metal nem criam um segundo estado físico.
 
 O botão legado **Iniciar investigação** mantém o início direto. Montagem livre, Explorar/Medir/Calcular, montagens prontas, roteiros, missões e instrumentos continuam nos fluxos originais.
@@ -27,10 +28,10 @@ Os cartões distinguem o componente que contém o elemento dos demais materiais.
 
 | Escala | Representação | Comportamento |
 |---|---|---|
-| 1 | Objeto e componente | Localiza a peça que contém o metal. |
+| 1 | Objeto e componente | Localiza a peça que contém o metal; é o ponto de entrada da investigação. |
 | 2 | Microestrutura | Esquema didático de grãos, não uma metalografia medida. |
-| 3 | Rede e célula unitária | Geometria cristalográfica existente no banco do SILM. |
-| 4 | Ambiente atômico | Um centro selecionado e vizinhos destacados na mesma rede. |
+| 3 | Rede e célula unitária | A rede é preparada sob demanda pela geometria cristalográfica existente no banco do SILM. |
+| 4 | Ambiente atômico | Um centro selecionado e vizinhos destacados na mesma rede; trocar o foco não reinicia a amostra. |
 
 ## Não regressão
 
@@ -39,6 +40,8 @@ Os cartões distinguem o componente que contém o elemento dos demais materiais.
 - Iniciar diretamente pela Tabela Periódica continua disponível. Se uma investigação já estiver ativa, selecionar outro metal mostra a nova curadoria como pendente; a troca só ocorre após a confirmação existente, e o cancelamento retorna ao metal que já estava em estudo.
 - A escolha de componente cria contexto didático, não composição exata nem outro metal.
 - Organização cristalina usa elegibilidade e métodos existentes; se indisponível, montagem livre permanece.
+- Escalas 1/2 mantêm o contexto do objeto e ocultam o palco cristalino; as escalas 3/4 revelam a cena existente, sem substituir motores ou estado científico.
+- A rede é montada somente no avanço à escala 3, não no clique inicial do objeto.
 - Escalas 3/4 alteram somente representação (vista, célula, centro e vizinhos).
 - Zoom/scroll não alteram coordenadas, medições, cálculos ou relógio físico.
 - O painel fica fora do renderizador para que trocar referência não reconstrua a cena.

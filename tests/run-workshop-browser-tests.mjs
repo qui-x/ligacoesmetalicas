@@ -43,14 +43,31 @@ try {
 
   await page.waitForFunction(() => {
     const state = window.SILMIntegration?.snapshot?.();
-    return state?.metal?.atomicNumber === 29 && state?.structure?.mode === "crystalline" && state.structure.units.length > 0;
+    return state?.metal?.atomicNumber === 29 && !!state?.investigation;
   }, undefined, { timeout: 30000 });
+  assert.equal(await page.locator(".silm-workshop-scale").nth(0).getAttribute("aria-pressed"), "true", "A investigação não começou na escala do objeto.");
+  const initial = await page.evaluate(() => window.SILMIntegration.snapshot());
+  assert.notEqual(initial.structure?.mode, "crystalline", "A rede foi construída antes da escala 3.");
+  assert.equal(await page.locator("#silm-integration-scene").isVisible(), false, "A cena cristalina apareceu antes do zoom.");
+
+  await page.locator(".silm-workshop-scale").nth(1).click();
+  assert.equal(await page.locator(".silm-workshop-scale").nth(1).getAttribute("aria-pressed"), "true", "A escala 2 não foi ativada.");
+  assert.equal(await page.locator("#silm-integration-scene").isVisible(), false, "A cena cristalina apareceu na escala microestrutural.");
+
+  await page.locator(".silm-workshop-scale").nth(2).click();
+  await page.waitForFunction(() => {
+    const state = window.SILMIntegration.snapshot();
+    return state.structure?.mode === "crystalline" && state.structure.units.length > 0 &&
+      state.structure.crystallography.representation.neighbors === false;
+  }, undefined, { timeout: 30000 });
+  assert.equal(await page.locator("#silm-integration-scene").isVisible(), true, "A cena cristalina não apareceu na escala 3.");
 
   await page.locator(".silm-workshop-scale").nth(3).click();
   await page.waitForFunction(() => {
     const representation = window.SILMIntegration.snapshot().structure?.crystallography?.representation;
     return representation?.neighbors === true && !!representation.selectedUnitId;
   }, undefined, { timeout: 15000 });
+  const centerBeforeSwitch = await page.evaluate(() => window.SILMIntegration.snapshot().structure.crystallography.representation.selectedUnitId);
 
   await openPeriodicTable(page);
   await chooseElementAndAction(page, 26, "explore");
@@ -65,6 +82,7 @@ try {
   state = await page.evaluate(() => window.SILMIntegration.snapshot());
   assert.equal(state.metal.atomicNumber, 29, "Cancelar a troca alterou o metal da investigação.");
   assert.equal(state.structure.crystallography.representation.neighbors, true, "Cancelar a troca perdeu o ambiente atômico.");
+  assert.equal(state.structure.crystallography.representation.selectedUnitId, centerBeforeSwitch, "Cancelar a troca perdeu o centro de observação.");
   await context.close();
 
   const legacyContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });

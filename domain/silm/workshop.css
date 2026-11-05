@@ -28,3 +28,11 @@
 @media(prefers-reduced-motion:reduce){.silm-workshop-context *{scroll-behavior:auto!important;transition:none!important}}
 
 .silm-workshop-pending-notice{margin:2px 0;padding:10px 12px;border-left:3px solid var(--accent,#ba7c42);background:color-mix(in srgb,var(--accent,#ba7c42) 8%,transparent);border-radius:0 8px 8px 0;font-size:.82rem;line-height:1.45}
+
+/* Nas escalas 1–2, a Oficina ocupa o palco; a rede aparece somente a partir da escala 3. */
+#si-stage.silm-workshop-context-only{flex:0 0 auto!important;min-height:0!important;overflow:visible!important;background:transparent!important}
+#si-stage.silm-workshop-context-only #workspace-focus{height:auto!important;min-height:0!important;overflow:visible!important;padding:8px 12px 12px!important}
+#si-stage.silm-workshop-context-only #silm-workshop-context{width:100%;max-width:1500px;margin:0 auto}
+#si-stage.silm-workshop-context-only #silm-integration-scene,
+#si-stage.silm-workshop-context-only #silm-scene-actionbar{display:none!important}
+#si-stage:not(.silm-workshop-context-only) #silm-workshop-context{margin-bottom:10px}
