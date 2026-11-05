@@ -83,6 +83,39 @@ async function test(viewport){
  await page.locator('.silm-workshop-scale').nth(0).click();
  assert.equal(await page.locator('.silm-workshop-photo img').first().isVisible(),true,'Imagem realista da escala 1 foi perdida');
  assert.equal(await page.locator('.silm-workshop-reference > :first-child').getAttribute('aria-label'),'Escalas de investigação','As quatro escalas saíram do topo na escala 1.');
+
+ // Visão geral: o mesmo estado validado deve continuar em lista e grade.
+ // Confere estilo computado, não apenas o texto do alternador.
+ await page.locator('.silm-workshop-scale').nth(2).click();
+ await page.waitForFunction(()=>window.SILMIntegration?.snapshot?.()?.structure?.units?.length>0,undefined,{timeout:15000});
+ await page.locator('[data-scene-view="overview"]').click();
+ const overview=page.locator('#workspace-overview');
+ await overview.waitFor({state:'visible'});
+ const manager=page.locator('#silm-comparison-items');
+ const cards=manager.locator('.silm-structure-cards'),entries=cards.locator('.silm-structure-card');
+ assert.ok(await entries.count()>0,'Nenhuma estrutura válida foi apresentada na Visão geral.');
+ const preview=entries.first().locator('.silm-structure-preview svg');
+ assert.equal(await preview.isVisible(),true,'A prévia da estrutura não está visível.');
+ assert.ok(await preview.locator('circle').count()>0,'A prévia cristalina não desenhou unidades.');
+ const computed=async()=>cards.evaluate(node=>{
+  const st=getComputedStyle(node);return {layout:node.dataset.layout,columns:st.gridTemplateColumns.split(/\s+/).filter(Boolean).length,first:node.querySelector('.silm-structure-card')?.getBoundingClientRect().width,full:node.getBoundingClientRect().width};
+ });
+ let shown=await computed();
+ assert.equal(shown.layout,'grid','O gerenciador não abriu em grade.');
+ if(viewport.width>1100)assert.ok(shown.columns>=2,'Modo grade não distribui os cartões por colunas.');
+ await manager.getByRole('button',{name:'Ver estruturas em lista'}).click();
+ shown=await computed();
+ assert.equal(shown.layout,'list','O botão não selecionou o modo lista.');
+ assert.equal(shown.columns,1,'Modo lista permanece com múltiplas colunas por sobreposição de CSS.');
+ assert.equal(await entries.first().locator('.silm-structure-preview svg').isVisible(),true,'Prévia desapareceu no modo lista.');
+ await manager.getByRole('button',{name:'Ver estruturas em grade'}).click();
+ shown=await computed();
+ assert.equal(shown.layout,'grid','O botão não retornou ao modo grade.');
+ if(viewport.width>1100)assert.ok(shown.columns>=2,'O modo grade não restaurou as colunas.');
+ assert.equal(await entries.first().locator('.silm-structure-preview svg').isVisible(),true,'Prévia desapareceu no modo grade.');
+ await page.locator('[data-scene-view="focus"]').click();
+ assert.equal(await page.locator('#workspace-focus').isVisible(),true,'Trocar lista/grade quebrou o retorno ao Foco.');
+
  await page.getByRole('button',{name:'4 · Ambiente atômico'}).click();
  const units=page.locator('.silm-crystal-unit'),status=page.locator('.silm-lattice-status output');
  await units.first().waitFor({state:'visible'});

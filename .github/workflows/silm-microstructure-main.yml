@@ -6,6 +6,8 @@ on:
       - "domain/silm/microstructure-view.js"
       - "domain/silm/workshop.js"
       - "domain/silm/workshop.css"
+      - "integracao/integration.css"
+      - "integracao/structure-comparison.js"
       - "index.html"
       - "sw.js"
       - "tests/run-workshop-micro-main.mjs"
