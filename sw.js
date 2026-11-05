@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.8';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='oficina-redes-imagens-20261105';
+const BUILD='oficina-microampliada-20261105';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "assets/workshop/motor.webp",
@@ -66,6 +66,7 @@ const FILES=[
   "domain/silm/assembly-view.js",
   "domain/silm/crystal-view.js",
   "domain/silm/lattice-navigation.js",
+  "domain/silm/microstructure-view.js",
   "domain/silm/workshop.js",
   "domain/silm/workshop.css",
   "domain/silm/electron-view.js",

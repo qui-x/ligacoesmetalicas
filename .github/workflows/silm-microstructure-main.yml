@@ -1,0 +1,62 @@
+name: SILM — Microestrutura na main
+on:
+  push:
+    branches: [main]
+    paths:
+      - "domain/silm/microstructure-view.js"
+      - "domain/silm/workshop.js"
+      - "domain/silm/workshop.css"
+      - "index.html"
+      - "sw.js"
+      - "tests/run-workshop-micro-main.mjs"
+      - ".github/workflows/silm-microstructure-main.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  microstructure:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox]
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Sintaxe do visualizador e da Oficina
+        run: |
+          node --check domain/silm/microstructure-view.js
+          node --check domain/silm/workshop.js
+          node --check tests/run-workshop-micro-main.mjs
+      - name: Instalar Playwright
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-playwright/node_modules/playwright" >> "$GITHUB_ENV"
+      - name: Instalar navegador
+        run: "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright install --with-deps \"$BROWSER_NAME\""
+      - name: Iniciar servidor
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-http.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/silm-http.pid"
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent "$BASE_URL/index.html" > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-http.log"
+          exit 1
+      - name: Testar microestrutura em desktop e celular
+        run: node tests/run-workshop-micro-main.mjs
+      - name: Encerrar servidor
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/silm-http.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/silm-http.pid")" 2>/dev/null || true
+          fi
