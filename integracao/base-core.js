@@ -335,13 +335,6 @@ var BaseDemoSI;
         pref = value;
         const root = document.documentElement;
         BaseDemoSI.configureFeedback(pref.sound, pref.vibrate);
-        const theme = pref.dark ? "escuro" : "claro";
-        BaseDemoSI.applyTheme(theme);
-        menuGet("theme-choice")?.setAttribute("data-from-menu", theme);
-        const selector = menuGet("theme-choice");
-        if (selector)
-            selector.value = theme;
-        BaseDemoSI.storage.write("theme", theme);
         root.classList.toggle("si-highcontrast", pref.contrast);
         root.classList.toggle("si-large-spacing", pref.spacing);
         root.classList.toggle("si-no-motion", pref.motion);
@@ -351,7 +344,7 @@ var BaseDemoSI;
         root.style.fontSize = pref.font === 1 ? "" : `${16 * pref.font}px`;
         root.style.setProperty("--si-font-factor", String(pref.font));
         document.body.classList.toggle("si-projector-mode", pref.projector);
-        for (const [id, v] of [["si-dark", pref.dark], ["si-contrast", pref.contrast], ["si-letter-spacing", pref.spacing], ["si-motion", pref.motion], ["si-intro", pref.intro], ["si-simple", pref.simple], ["si-projector", pref.projector]])
+        for (const [id, v] of [["si-dark", root.dataset.theme === "escuro"], ["si-contrast", pref.contrast], ["si-letter-spacing", pref.spacing], ["si-motion", pref.motion], ["si-intro", pref.intro], ["si-simple", pref.simple], ["si-projector", pref.projector]])
             checkbox(id, v);
         const output = menuGet("si-font-output");
         if (output)
@@ -390,6 +383,11 @@ var BaseDemoSI;
         root.dataset.siIntro = pref.intro ? "on" : "off";
     }
     function updatePref(key, value) {
+        if (key === "dark") {
+            const theme = value ? "escuro" : "claro";
+            BaseDemoSI.applyTheme(theme);
+            BaseDemoSI.storage.write("theme", theme);
+        }
         menuPreferences({ ...pref, [key]: value });
         if (!BaseDemoSI.storage.write(prefKey, JSON.stringify(pref)))
             BaseDemoSI.notify("Preferência aplicada nesta sessão. O navegador bloqueou o armazenamento.", "warning");
@@ -583,9 +581,8 @@ var BaseDemoSI;
         catch {
             pref = { ...prefDefault };
         }
-        const theme = BaseDemoSI.normalizeTheme(BaseDemoSI.storage.read("theme"));
-        if (theme !== "sistema")
-            pref.dark = theme === "escuro";
+        const storedTheme = BaseDemoSI.storage.read("theme");
+        BaseDemoSI.applyTheme(storedTheme ? BaseDemoSI.normalizeTheme(storedTheme) : (pref.dark ? "escuro" : "claro"));
         menuPreferences(pref);
         // Apenas na abertura sem destino indicado é aplicada a tela inicial.
         if (!window.location.hash || window.location.hash === "#/")
@@ -631,7 +628,7 @@ var BaseDemoSI;
             if (v !== "none")
                 BaseDemoSI.notify("Simulação aproximada de visão de cores ativada. Consulte também os rótulos textuais.", "info");
         });
-        menuGet("si-a11y-reset")?.addEventListener("click", () => { menuPreferences({ ...prefDefault }); BaseDemoSI.storage.write(prefKey, JSON.stringify(pref)); BaseDemoSI.notify("Preferências de acessibilidade restauradas.", "success"); });
+        menuGet("si-a11y-reset")?.addEventListener("click", () => { updatePref("dark", prefDefault.dark); menuPreferences({ ...prefDefault }); BaseDemoSI.storage.write(prefKey, JSON.stringify(pref)); BaseDemoSI.notify("Preferências de acessibilidade restauradas.", "success"); });
         menuGet("si-drawer-install")?.addEventListener("click", () => { BaseDemoSI.closeNavigationDrawer(false); menuGet("distribution-install")?.click(); });
         menuGet("si-drawer-tour")?.addEventListener("click", startWorkspaceTour);
         menuGet("si-guide-open")?.addEventListener("click", () => { BaseDemoSI.closeNavigationDrawer(false); window.location.hash = "#/manual"; BaseDemoSI.notify("Consulte as orientações de acessibilidade e os recursos para mediação em sala.", "info"); });
@@ -717,6 +714,10 @@ var BaseDemoSI;
             window.matchMedia?.("(prefers-color-scheme: dark)").matches);
         document.documentElement.dataset.theme = dark ? "escuro" : "claro";
         document.documentElement.dataset.themePreference = theme;
+        const selector = document.getElementById("theme-choice");
+        const toggle = document.getElementById("si-dark");
+        if (selector) selector.value = theme;
+        if (toggle) toggle.checked = !!dark;
     }
     BaseDemoSI.applyTheme = applyTheme;
     function setupPreferences() {
@@ -739,8 +740,8 @@ var BaseDemoSI;
         });
         const media = window.matchMedia?.("(prefers-color-scheme: dark)");
         media?.addEventListener?.("change", () => {
-            if (preference === "sistema")
-                applyTheme(preference);
+            if (document.documentElement.dataset.themePreference === "sistema")
+                applyTheme("sistema");
         });
     }
     BaseDemoSI.setupPreferences = setupPreferences;

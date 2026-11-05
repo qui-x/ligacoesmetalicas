@@ -8,7 +8,7 @@
  // Endereço com que o SILM foi aberto: a tela inicial escolhida só vale para a abertura sem destino, como no SIAB.
  const entryHash=location.hash,specificEntry=!!entryHash&&!['#','#/'].includes(entryHash);
  const startupChoice=()=>{const v=B.storage.read('startup.choice');return v==='inicio'||v==='ambiente'?v:null;};
- B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.15.8',
+ B.manifest=Object.freeze({...B.manifest,id:'silm-base-integration',name:'SILM',shortName:'SILM',version:'0.15.9',
   routes:[...B.manifest.routes.filter(route=>['inicio','ambiente','manual','configuracoes','sobre','roteiros','relatorios','aprender','missoes','caderno','professor'].includes(route.id)).map(route=>({...route,subtitle:route.id==='ambiente'?'Oficina dos Metais':route.title})),
    {id:'montagens',title:'Montagens prontas',subtitle:'Montagens prontas'},{id:'atividade',title:'Atividade',subtitle:'Atividade do professor'}]});
  // Etapas 9 e 11: "Montagens prontas" e "Atividade" (link do aluno) são telas do SILM que a lista fixa de rotas da Base não conhece.
@@ -247,10 +247,15 @@
   // A investigação começa no contexto macroscópico. A rede só é construída ao avançar para a escala 3.
   model.setWorkshopContext(item.id,1);workshopScale=1;updateWorkshopContext();schedule();return true;
  }
+ function activeWorkshopScale(saved){
+  if(saved?.scale>=1&&saved.scale<=4&&(saved.scale!==1||workshopSelectionId||S.workshop.list(element().atomicNumber).length))return saved.scale;
+  const structure=model.state.structure;
+  return structure?.mode==='crystalline'?(structure.crystallography.representation.neighbors?4:3):0;
+ }
  function updateWorkshopViewport(investigationActive){
-  const showCrystal=!!investigationActive&&(!workshopSelectionId||workshopScale>=3);
+  const showCrystal=!!investigationActive&&(workshopScale===0||workshopScale>=3);
   const stage=$('si-stage'),scene=$('silm-integration-scene'),actionbar=$('silm-scene-actionbar');
-  if(stage){stage.classList.toggle('silm-workshop-context-only',!showCrystal);stage.dataset.workshopScale=showCrystal?String(workshopScale):'context';}
+  if(stage){stage.classList.toggle('silm-workshop-context-only',!showCrystal);stage.dataset.workshopScale=showCrystal?String(workshopScale||'free'):'context';}
   if(scene)scene.hidden=!showCrystal;
   if(actionbar)actionbar.hidden=!showCrystal;
   if(!showCrystal&&stage?.classList.contains('si-scene-expanded'))setStageExpanded(false,{restoreFocus:false});
@@ -263,7 +268,7 @@
   if(active&&candidate&&candidate.atomicNumber!==active.atomicNumber){
    const saved=model.state.metadata.workshop;
   workshopSelectionId=saved&&S.workshop.get(saved.referenceId)?.atomicNumber===active.atomicNumber?saved.referenceId:null;
-  workshopScale=Number.isInteger(saved?.scale)&&saved.scale>=1&&saved.scale<=4?saved.scale:1;
+  workshopScale=activeWorkshopScale(saved);
   updateWorkshopViewport(true);
    const key='pending:'+candidate.atomicNumber+':'+active.atomicNumber;
    if(host.dataset.key!==key){host.dataset.key=key;host.hidden=false;S.workshop.renderDiscovery(host,{element:candidate,notice:'A investigação atual de '+active.name+' permanece preservada. Escolher uma aplicação solicitará a troca antes de iniciar a nova investigação.',onOpenPeriodic:()=>$('silm-open-periodic')?.click(),onContinue:()=>{selected=String(active.atomicNumber);$('silm-metal').value=selected;workshopSelectionId=null;workshopScale=1;schedule();openLeft('preparo');},onInvestigate:investigateWorkshopReference,onStartDirect:()=>start()});}
@@ -279,7 +284,7 @@
   }
   const saved=model.state.metadata.workshop;
   workshopSelectionId=saved&&S.workshop.get(saved.referenceId)?.atomicNumber===active.atomicNumber?saved.referenceId:null;
-  workshopScale=Number.isInteger(saved?.scale)&&saved.scale>=1&&saved.scale<=4?saved.scale:1;
+  workshopScale=activeWorkshopScale(saved);
   updateWorkshopViewport(true);
   if(workshopSelectionId&&S.workshop.get(workshopSelectionId)?.atomicNumber!==active.atomicNumber)workshopSelectionId=null;
   const item=S.workshop.get(workshopSelectionId);

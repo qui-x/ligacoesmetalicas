@@ -83,6 +83,23 @@ async function test(viewport){
  await page.locator('.silm-workshop-scale').nth(0).click();
  assert.equal(await page.locator('.silm-workshop-photo img').first().isVisible(),true,'Imagem realista da escala 1 foi perdida');
  assert.equal(await page.locator('.silm-workshop-reference > :first-child').getAttribute('aria-label'),'Escalas de investigação','As quatro escalas saíram do topo na escala 1.');
+ await page.getByRole('button',{name:'4 · Ambiente atômico'}).click();
+ const units=page.locator('.silm-crystal-unit'),status=page.locator('.silm-lattice-status output');
+ await units.first().waitFor({state:'visible'});
+ const sites=()=>units.evaluateAll(nodes=>nodes.map(n=>n.dataset.site));
+ const original=await sites();
+ for(const [axis,letter] of ['a','b','c'].entries()){
+  await page.getByRole('button',{name:'Avançar uma célula no eixo '+letter}).click();
+  const expected=original.map(key=>{
+   const [cell,basis]=key.split('|'),coords=cell.split(',').map(Number);
+   coords[axis]++;return coords.join(',')+'|'+basis;
+  });
+  assert.deepEqual(await sites(),expected,'A célula inteira deve se deslocar pelo eixo '+letter);
+  await page.getByRole('button',{name:'Recuar uma célula no eixo '+letter}).click();
+  assert.deepEqual(await sites(),original);
+ }
+ assert.match(await status.textContent(),/Célula \[0, 0, 0\]/);
+ assert.equal(await page.locator('#silm-scene-actionbar .silm-lattice-nav').count(),1);
  assert.deepEqual(errors,[],'Erros JavaScript: '+errors.join('; '));
  await context.close();
 }

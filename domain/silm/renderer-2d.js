@@ -43,10 +43,13 @@ SILM.renderer2d=(()=>{
  const svgRoot=cls=>{const s=document.createElementNS(NS,'svg');s.setAttribute('aria-hidden','true');s.setAttribute('class',cls);return s;};
  const svgEl=(parent,tag,attrs,text=null)=>{const n=document.createElementNS(NS,tag);for(const [k,v]of Object.entries(attrs))n.setAttribute(k,String(v));if(text!==null)n.textContent=text;parent.append(n);return n;};
 
- function createStage(stage,{scope,area=null,readOnly=false,idPrefix='silm',camera:initial=null,reducedMotion=()=>false,announce=()=>{},describe=null,
+ function createStage(stage,{scope,area=null,viewport=stage,readOnly=false,idPrefix='silm',camera:initial=null,reducedMotion=()=>false,announce=()=>{},describe=null,
   onCamera=null,onBackgroundTap=null,onUnitTap=null,onUnitPress=null,items=()=>[],focusPoint=null,canArrowPan=()=>true,onReset=null,toolbar=!readOnly,
   ownsUnitDrag=false,onGestureStart=null,toggleHost=null,toolbarHost=null,onOrbit=null,extraButtons=null}={}){
   const U=SimCore.ExperienceUI;
+  // O mundo usa uma escala isotrópica; a janela de entrada pode ser retangular.
+  let spanX=1,spanY=1;
+  const windowBounds=()=>({x0:(1-spanX)/2,y0:(1-spanY)/2,x1:(1+spanX)/2,y1:(1+spanY)/2});
   let cam=R.sanitizeCamera(initial||R.camera()),interest={x0:0,y0:0,x1:1,y1:1},margin=0,size=0,dragMode='pan';
   stage.classList.add('silm-stage');stage.dataset.renderer='2d';if(readOnly)stage.dataset.readonly='';
   const order=[],listeners={camera:new Set(),resize:new Set()};
@@ -133,7 +136,17 @@ SILM.renderer2d=(()=>{
   /* Foco fora da vista (Tab, setas, leitor de tela): a câmera desloca o mínimo para mostrar o item; o palco nunca rola. */
   function ensureVisible(p){
    if(!p)return false;const v=toView(cam,p),m=Math.min(.4,.06+(p.r||0)*cam.zoom);let dx=0,dy=0;
-   if(v.x<m)dx=m-v.x;else if(v.x>1-m)dx=1-m-v.x;if(v.y<m)dy=m-v.y;else if(v.y>1-m)dy=1-m-v.y;
+   const w=windowBounds();
+   if(v.x<w.x0+m)dx=w.x0+m-v.x;else if(v.x>w.x1-m)dx=w.x1-m-v.x;
+   if(v.y<w.y0+m)dy=w.y0+m-v.y;else if(v.y>w.y1-m)dy=w.y1-m-v.y;
+   return dx||dy?setCamera(panBy(cam,dx,dy),{animate:true}):false;
+  }
+  // Mantém a célula inteira à vista se ela couber no zoom escolhido pelo usuário.
+  function revealBounds(b,focus,r) {
+   const visible=windowBounds(),lo=toView(cam,{x:b.x0-r,y:b.y0-r}),hi=toView(cam,{x:b.x1+r,y:b.y1+r});
+   if(hi.x-lo.x>spanX||hi.y-lo.y>spanY)return ensureVisible({...focus,r});
+   const shift=(min,max,start,end)=>min<start?start-min:max>end?end-max:0;
+   const dx=shift(lo.x,hi.x,visible.x0,visible.x1),dy=shift(lo.y,hi.y,visible.y0,visible.y1);
    return dx||dy?setCamera(panBy(cam,dx,dy),{animate:true}):false;
   }
   // Foco por Tab ou leitor de tela rola o palco (overflow hidden): volta a zero, porque a inversa da câmera não conta rolagem.
@@ -141,7 +154,9 @@ SILM.renderer2d=(()=>{
   /* ---------- palco quadrado: posições normalizadas independem do tamanho da tela ---------- */
   let frame=0;
   function measure(){frame=0;const host=area||stage.parentElement;if(!host)return;const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;   // oculto (outra rota, tela cheia): ignora 0×0
-   const next=Math.max(160,Math.floor(Math.min(w,h))-2);if(next===size)return;size=next;stage.style.setProperty('--stage',size+'px');area?.style.setProperty('--stage',size+'px');for(const fn of listeners.resize)fn(size);}
+   const next=Math.max(1,Math.floor(Math.min(w,h))-2),sx=viewport===stage?1:w/next,sy=viewport===stage?1:h/next;
+   if(next===size&&spanX===sx&&spanY===sy)return;
+   size=next;spanX=sx;spanY=sy;stage.style.setProperty('--stage',size+'px');area?.style.setProperty('--stage',size+'px');for(const fn of listeners.resize)fn(size);}
   const schedule=()=>{if(!frame)frame=requestAnimationFrame(measure);};
   if(area||stage.parentElement){if(window.ResizeObserver)scope.observe(new ResizeObserver(schedule),area||stage.parentElement);else scope.listen(window,'resize',schedule);}
   scope.cleanup(()=>{if(frame)cancelAnimationFrame(frame);frame=0;});
@@ -155,8 +170,8 @@ SILM.renderer2d=(()=>{
   if(!readOnly){
    const pointers=new Map();let pan=null,pinch=null,press=null,swallowUntil=0,pointerAt=0;
    const ignore=e=>e.target.closest?.('.silm-camera')||e.button>0;
-   const capture=id=>{try{stage.setPointerCapture(id);}catch(_){}};
-   scope.listen(stage,'pointerdown',e=>{
+   const capture=id=>{try{viewport.setPointerCapture(id);}catch(_){}};
+   scope.listen(viewport,'pointerdown',e=>{
     pointerAt=performance.now();swallowUntil=0;   // um novo toque nunca é engolido
     if(ignore(e))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,type:e.pointerType});
     // Segundo dedo: pinça. A vista cancela o arrasto da unidade que o primeiro dedo tenha começado (nada se move).
@@ -173,9 +188,9 @@ SILM.renderer2d=(()=>{
     if(!unit)capture(e.pointerId);
    });
    // O clique que o navegador gera ao fim de um deslocamento não seleciona nada (Enter e Espaço têm detail 0 e passam).
-   scope.listen(stage,'click',e=>{if(e.detail>0&&performance.now()<swallowUntil){swallowUntil=0;e.stopPropagation();e.preventDefault();}},{capture:true});
-   scope.listen(stage,'focusin',e=>{const node=e.target.closest?.('[data-unit-id]');if(!node||performance.now()-pointerAt<800)return;const it=items().find(i=>i.id===node.dataset.unitId);if(it)ensureVisible(it);});
-   scope.listen(stage,'pointermove',e=>{
+   scope.listen(viewport,'click',e=>{if(e.detail>0&&performance.now()<swallowUntil){swallowUntil=0;e.stopPropagation();e.preventDefault();}},{capture:true});
+   scope.listen(viewport,'focusin',e=>{const node=e.target.closest?.('[data-unit-id]');if(!node||performance.now()-pointerAt<800)return;const it=items().find(i=>i.id===node.dataset.unitId);if(it)ensureVisible(it);});
+   scope.listen(viewport,'pointermove',e=>{
     const p=pointers.get(e.pointerId);if(p){p.x=e.clientX;p.y=e.clientY;}
     if(pinch&&pointers.size>=2){const [a,b]=[...pointers.values()],d=Math.hypot(a.x-b.x,a.y-b.y)||1,mid=viewPoint({clientX:(a.x+b.x)/2,clientY:(a.y+b.y)/2});
      let next=zoomAt(pinch.cam,d/pinch.d,pinch.mid);next=panBy(next,mid.x-pinch.mid.x,mid.y-pinch.mid.y);setCamera(next,{settled:false});return;}
@@ -190,7 +205,7 @@ SILM.renderer2d=(()=>{
     if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);
     if(pinch){if(pointers.size<2){pinch=null;if(pan?.orbit&&pan.moved)onOrbit?.(0,0,'end');pan=null;press=null;settle('Vista: zoom '+zoomText()+'.');}return;}
     const wasPress=press&&press.pointerId===e.pointerId?press:null;press=null;
-    if(pan&&e.pointerId===pan.pointerId){const moved=pan.moved,orbit=pan.orbit;pan=null;delete stage.dataset.panning;delete stage.dataset.orbiting;try{stage.releasePointerCapture(e.pointerId);}catch(_){}
+    if(pan&&e.pointerId===pan.pointerId){const moved=pan.moved,orbit=pan.orbit;pan=null;delete stage.dataset.panning;delete stage.dataset.orbiting;try{viewport.releasePointerCapture(e.pointerId);}catch(_){}
      if(moved&&orbit){swallowUntil=performance.now()+400;onOrbit?.(0,0,'end');return;}
      if(moved){swallowUntil=performance.now()+400;settle('Vista deslocada.');return;}
      if(!commit)return;
@@ -198,9 +213,9 @@ SILM.renderer2d=(()=>{
      onBackgroundTap?.(clientToScene(e),e);}
    };
    gesture.pinching=()=>!!pinch;
-   scope.listen(stage,'pointerup',e=>end(e,true));scope.listen(stage,'pointercancel',e=>end(e,false));scope.listen(stage,'lostpointercapture',e=>{if(pan&&e.pointerId===pan.pointerId)end(e,false);});
-   scope.listen(stage,'contextmenu',e=>{if(pan||pinch)e.preventDefault();});
-   scope.listen(stage,'wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();setCamera(zoomAt(cam,Math.exp(-clamp(e.deltaY,-60,60)*.006),viewPoint(e)),{settled:false});scheduleSettle(()=>'Vista: zoom '+zoomText()+'.');},{passive:false});
+   scope.listen(viewport,'pointerup',e=>end(e,true));scope.listen(viewport,'pointercancel',e=>end(e,false));scope.listen(viewport,'lostpointercapture',e=>{if(pan&&e.pointerId===pan.pointerId)end(e,false);});
+   scope.listen(viewport,'contextmenu',e=>{if(pan||pinch)e.preventDefault();});
+   scope.listen(viewport,'wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();setCamera(zoomAt(cam,Math.exp(-clamp(e.deltaY,-60,60)*.006),viewPoint(e)),{settled:false});scheduleSettle(()=>'Vista: zoom '+zoomText()+'.');},{passive:false});
    const keyHost=area||stage;
    scope.listen(keyHost,'keydown',e=>{
     if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey||/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName))return;const k=e.key;let done=true;
@@ -223,7 +238,7 @@ SILM.renderer2d=(()=>{
    const box=U.element('div',null,'silm-labels-layer');box.setAttribute('aria-hidden','true');layer('labels',box);
    return Object.freeze({root:box,update(list=[]){box.replaceChildren();if(!size)return;const placed=[];
     for(const it of list){if(!it.text)continue;const v=toView(cam,it),rr=(it.r||0)*cam.zoom*size,x=v.x*size+rr*.55,y=v.y*size+rr*.55,w=String(it.text).length*7+10,h=17;
-     if(x<0||y<0||x+w>size||y+h>size)continue;if(placed.some(p=>x<p.x+p.w&&p.x<x+w&&y<p.y+p.h&&p.y<y+h))continue;placed.push({x,y,w,h});
+     const window=windowBounds();if(x<window.x0*size||y<window.y0*size||x+w>window.x1*size||y+h>window.y1*size)continue;if(placed.some(p=>x<p.x+p.w&&p.x<x+w&&y<p.y+p.h&&p.y<y+h))continue;placed.push({x,y,w,h});
      const tag=U.element('span',String(it.text),'silm-scene-label'+(it.className?' '+it.className:''));tag.style.left=x+'px';tag.style.top=y+'px';if(it.key)tag.dataset.key=it.key;box.append(tag);}}});
   }
   /* Diagnóstico (testes): câmera, caixa de interesse, camadas e transformações. setCamera é só representação (o mesmo
@@ -231,10 +246,10 @@ SILM.renderer2d=(()=>{
   Object.defineProperty(stage,'silmRenderer',{configurable:true,value:Object.freeze({snapshot:()=>({camera:{...cam},interest:{...interest},margin,size,layers:[...stage.children].map(el=>el.dataset?.layer).filter(Boolean)}),
    toClient:p=>sceneToClient(p),toScene:v=>toScene(cam,v),toView:p=>toView(cam,p),setCamera:c=>setCamera({...cam,mode:'free',...c})})});
   measure();apply();describeNow();
-  return Object.freeze({stage,layer,selectionLayer,labelsLayer,get camera(){return {...cam};},setCamera,setInterest,fit:fitNow,zoomBy:zoomStep,center:centerNow,reset:resetNow,ensureVisible,setDragMode,get dragMode(){return dragMode;},
+  return Object.freeze({stage,layer,selectionLayer,labelsLayer,get camera(){return {...cam};},setCamera,setInterest,fit:fitNow,zoomBy:zoomStep,center:centerNow,reset:resetNow,ensureVisible,revealBounds,setDragMode,get dragMode(){return dragMode;},
    get pinching(){return gesture.pinching();},descriptionId:description?.id||null,
    toView:p=>toView(cam,p),toScene:v=>toScene(cam,v),clientToScene,sceneToClient,get size(){return size;},describe:describeNow,
-   visible:()=>{const a=toScene(cam,{x:0,y:0}),b=toScene(cam,{x:1,y:1});return {x0:a.x,y0:a.y,x1:b.x,y1:b.y};},
+   visible:()=>{const w=windowBounds(),a=toScene(cam,{x:w.x0,y:w.y0}),b=toScene(cam,{x:w.x1,y:w.y1});return {x0:a.x,y0:a.y,x1:b.x,y1:b.y};},
    onCamera:fn=>{listeners.camera.add(fn);return()=>listeners.camera.delete(fn);},onResize:fn=>{listeners.resize.add(fn);return()=>listeners.resize.delete(fn);}});
  }
  return Object.freeze({LAYERS,toView,toScene,boundsOf,fit,zoomAt,panBy,limit,hit,createStage,svgEl,svgRoot});

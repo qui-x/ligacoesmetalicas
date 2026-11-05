@@ -8,3 +8,17 @@
 :root[data-theme=escuro]{--danger:#ffb4ab;--silm-electron:#5fe3ff;--silm-electron-edge:#06202a;--silm-heat:#ff7a3d;--silm-light:#fff1b8;--silm-measure:#edca7b;--silm-measure-ink:#16181c}
 :root.si-highcontrast{--bg:#000;--surface:#050505;--panel:#050505;--panel2:#171717;--text:#fff;--muted:#ddd;--secondary:#ddd;--border:#fff;--silm-soft-border:#fff;--tint:#171717;--accent:#ffeb3b;--accent-ink:#000;--scientific-accent:#fff;--ring:#00ffff;--silm-electron:#00ffff;--silm-electron-edge:#000;--silm-heat:#fff;--silm-light:#ff0;--silm-bronze:#ff0;--silm-measure:#ff0;--silm-measure-ink:#000}
 @media(forced-colors:active){:root,:root[data-theme],:root.si-highcontrast{--bg:Canvas;--surface:Canvas;--panel:Canvas;--panel2:Canvas;--text:CanvasText;--muted:CanvasText;--secondary:CanvasText;--accent:LinkText;--accent-ink:Canvas;--scientific-accent:CanvasText;--ring:Highlight;--border:ButtonText;--silm-bronze:CanvasText;--silm-electron:CanvasText;--silm-electron-edge:Canvas;--silm-heat:CanvasText;--silm-light:CanvasText}}
+
+:root{color-scheme:light;--silm-metal-shine:#fff9db;--silm-metal-mid:#d1af65;--silm-metal-shade:#936e37;--silm-metal-ink:#20180a}
+:root[data-theme=escuro]{color-scheme:dark;--silm-metal-shine:#fff1c9;--silm-metal-mid:#c6a158;--silm-metal-shade:#8d672e}
+:root.si-highcontrast{color-scheme:dark}
+.silm-crystal-unit .silm-unit-core{color:var(--silm-metal-ink);border-color:var(--silm-metal-shade);background:radial-gradient(circle at 34% 30%,var(--silm-metal-shine),var(--silm-metal-mid) 60%,var(--silm-metal-shade))}
+.silm-crystal-unit[data-lit] .silm-unit-core{background:radial-gradient(circle at 38% 22%,var(--silm-light),var(--silm-metal-shine) 32%,var(--silm-metal-mid) 75%,var(--silm-metal-shade))}
+.silm-cell-edges line{stroke-width:1.35;stroke-dasharray:5 3}
+:root.si-highcontrast .silm-crystal-unit .silm-unit-core{background:var(--panel);border:2px solid var(--text);color:var(--text);filter:none}
+:root.si-highcontrast .silm-cell-edges line{stroke:var(--accent);stroke-width:2;opacity:1}
+:root.si-highcontrast .silm-neighbor-ghosts circle{stroke:var(--ring)}
+@media(forced-colors:active){
+ .silm-crystal-unit .silm-unit-core,.silm-crystal-unit[data-lit] .silm-unit-core{background:Canvas;color:CanvasText;border:2px solid CanvasText}
+ .silm-cell-edges line{stroke:CanvasText}
+}
