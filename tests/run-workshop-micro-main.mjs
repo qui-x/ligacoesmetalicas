@@ -20,16 +20,31 @@ async function test(viewport){
  await page.locator('.silm-workshop-scale').nth(1).click();
  const viewer=page.locator('.silm-workshop-micro-viewer');
  await viewer.waitFor({state:'visible'});
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true',undefined,{timeout:15000});
  assert.equal(await page.locator('.silm-workshop-reference > :first-child').getAttribute('aria-label'),'Escalas de investigação','A navegação de escalas deve ficar no topo da área de exibição.');
  const rectangle=await viewer.locator('.silm-workshop-micro-viewport').boundingBox();
  assert.ok(rectangle&&rectangle.height>=290,'A microestrutura está pequena demais');
  if(viewport.width>800)assert.ok(rectangle.width>650,'Palco central não está ampliado');
  else assert.ok(rectangle.width>=260&&rectangle.width<=viewport.width,'A largura da microestrutura excede o celular');
+ const frame=viewer.locator('.silm-workshop-micro-viewport'),map=viewer.locator('.silm-workshop-micro-map');
+ const ratio=await page.evaluate(()=>{const f=document.querySelector('.silm-workshop-micro-viewport'),s=f.querySelector('svg'),r=f.getBoundingClientRect(),v=s.viewBox.baseVal;return {frame:r.width/r.height,map:v.width/v.height};});
+ assert.ok(Math.abs(ratio.frame-ratio.map)<.05,'Desenho não preenche o quadro na proporção correta.');
+ const nav=await page.locator('.silm-workshop-reference > .silm-workshop-scales').boundingBox();
+ const toolbar=await viewer.locator('.silm-workshop-micro-toolbar').boundingBox();
+ const image=await frame.boundingBox();
+ assert.ok(nav&&toolbar&&image&&image.y>=nav.y+nav.height-2&&toolbar.y>=image.y+image.height-2,'Os controles devem ficar abaixo do desenho e as escalas no topo.');
+ if(viewport.width>800){
+  assert.ok(image.height>=390,'A área central ficou baixa no desktop.');
+  assert.ok(toolbar.y+toolbar.height<=viewport.height-8,'Os controles inferiores ficaram fora da janela desktop.');
+ }
+ assert.equal(await viewer.getByText('Tamanho real: indisponível (sem escala em µm)').isVisible(),true,'Leitura de dimensão sem calibração ausente.');
+ assert.ok(await viewer.getByRole('button',{name:'Ampliar microestrutura'}).isVisible(),'O zoom inferior não ficou acessível.');
  const grains=viewer.locator('.silm-micro-grain');
  assert.ok(await grains.count()>=45,'Faltam grãos para observação');
  await grains.nth(25).click();
  assert.equal(await viewer.locator('svg').getAttribute('data-selected-grain'),'26','Destaque de grão falhou');
  assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),1,'Seleção não aplica padrão estrutural ao grão.');
+ assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/Grão 26 · área no desenho: .*% \(ilustrativa\)/,'Área relativa ilustrativa não foi exibida.');
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  await viewer.getByRole('button',{name:'Ampliar microestrutura'}).click();
  assert.equal(await viewer.locator('svg').getAttribute('data-zoom'),'1.25','Zoom não funciona');
@@ -90,6 +105,7 @@ async function test(viewport){
 }
 try{
  await test({width:1440,height:1000});
+ await test({width:1600,height:900});
  await test({width:390,height:844});
  console.log('APROVADO — '+browserName+': microestrutura ampliada, zoom, grãos, celular, estado científico e fotos legadas.');
 }finally{await browser.close();}

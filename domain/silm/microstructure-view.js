@@ -3,7 +3,8 @@ window.SILM=window.SILM||{};
 /* Escala 2: mapa vetorial didático de grãos, independente da rede cristalina.
    Não representa EBSD, metalografia medida, fases, textura ou tamanho de grão de um elemento específico. */
 SILM.microstructure=(()=>{
- const NS='http://www.w3.org/2000/svg',W=1000,H=620,CX=W/2,CY=H/2;
+ const NS='http://www.w3.org/2000/svg',H=620;
+ let W=1000,CX=W/2,CY=H/2;
  const svgNode=(name,attrs={})=>{const n=document.createElementNS(NS,name);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,String(v));return n;};
  const node=(tag,cls='',txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;};
  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
@@ -19,12 +20,19 @@ SILM.microstructure=(()=>{
   }
   return out;
  }
- const sites=(()=>{const pts=[];let seed=139712;
+ // Desenha um campo de grãos na razão real do painel, sem esticar o SVG.
+ let polygons=[];
+ function makeField(aspect){
+  const ratio=clamp(aspect,.5,5),rows=Math.max(5,Math.round(Math.sqrt(60/ratio))),cols=Math.max(6,Math.round(rows*ratio));
+  W=H*ratio;CX=W/2;CY=H/2;
+  const sites=[];let seed=139712;
   const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
-  for(let row=0;row<6;row++)for(let col=0;col<9;col++)pts.push({x:(col+.5+(rnd()-.5)*.65)*W/9,y:(row+.5+(rnd()-.5)*.65)*H/6});
-  return pts;
- })();
- const polygons=sites.map((s,i)=>{let poly=[[0,0],[W,0],[W,H],[0,H]];for(let j=0;j<sites.length;j++){if(i!==j)poly=bisect(poly,s,sites[j]);if(!poly.length)break;}return poly;});
+  for(let row=0;row<rows;row++)for(let col=0;col<cols;col++)
+   sites.push({x:(col+.5+(rnd()-.5)*.65)*W/cols,y:(row+.5+(rnd()-.5)*.65)*H/rows});
+  polygons=sites.map((s,i)=>{let poly=[[0,0],[W,0],[W,H],[0,H]];for(let j=0;j<sites.length;j++){if(j!==i)poly=bisect(poly,s,sites[j]);if(!poly.length)break;}return poly;});
+ }
+ const grainArea=poly=>Math.abs(poly.reduce((sum,p,i)=>{const q=poly[(i+1)%poly.length];return sum+p[0]*q[1]-q[0]*p[1];},0))/2;
+ makeField(W/H);
  let serial=0;
  function create({element,item=null}={}){
   const section=node('section','silm-workshop-micro-viewer'),viewport=node('div','silm-workshop-micro-viewport');
@@ -36,15 +44,20 @@ SILM.microstructure=(()=>{
    pattern.append(svgNode('path',{d:'M 0 0 V 22',stroke:'currentColor','stroke-opacity':'.13','stroke-width':1.35}));defs.append(pattern);}
   svg.append(defs);
   const plane=svgNode('g',{'class':'silm-micro-plane'});svg.append(plane);
-  const paths=[],cells=[];
+  let paths=[],cells=[];
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
-  const status=node('span','silm-workshop-micro-status','Nenhum grão destacado');
+  const status=node('span','silm-workshop-micro-status','Selecione um grão · área do desenho: —');
+  const dimension=node('span','silm-workshop-micro-dimension','Tamanho real: indisponível (sem escala em µm)');
   status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');
   const choose=i=>{chosen=i;paths.forEach((p,j)=>{p.classList.toggle('is-selected',j===i);p.setAttribute('aria-pressed',String(j===i));cells[j]?.classList.toggle('is-selected',j===i);});
-   status.textContent='Grão ilustrativo '+(i+1)+' destacado · sem dimensão ou fase medida';
+   const share=grainArea(polygons[i])/(W*H)*100;
+   status.textContent='Grão '+(i+1)+' · área no desenho: '+share.toLocaleString('pt-BR',{maximumFractionDigits:1,minimumFractionDigits:1})+'% (ilustrativa)';
    svg.setAttribute('data-selected-grain',String(i+1));
   };
-  polygons.forEach((poly,i)=>{
+  function drawGrains(){
+   paths=[];cells=[];plane.replaceChildren();
+   svg.setAttribute('viewBox','0 0 '+W.toFixed(2)+' '+H);
+   polygons.forEach((poly,i)=>{
    if(poly.length<3)return;
    const d='M'+poly.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')+' Z';
    const g=svgNode('g',{'class':'silm-micro-cell'}),p=svgNode('path',{d,'class':'silm-micro-grain',tabindex:0,role:'button','aria-label':'Destacar grão ilustrativo '+(i+1),'aria-pressed':'false'});
@@ -52,7 +65,11 @@ SILM.microstructure=(()=>{
    p.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(i);}});
    const hatch=svgNode('path',{d,'class':'silm-micro-hatching',fill:'url(#'+uid+'-pattern-'+(i%4)+')','pointer-events':'none'});
    g.append(p,hatch);plane.append(g);paths[i]=p;cells[i]=g;
-  });
+   });
+   if(chosen>=polygons.length)chosen=polygons.length-1;
+   if(chosen>=0)choose(chosen);else status.textContent='Selecione um grão · área do desenho: —';
+   offsetX=0;offsetY=0;update();svg.dataset.mapReady='true';
+  }
   const toolbar=node('div','silm-workshop-micro-toolbar'),zoomLabel=node('output','silm-workshop-micro-zoom','100%');
   zoomLabel.setAttribute('aria-label','Ampliação da microestrutura');
   function update(){
@@ -64,13 +81,9 @@ SILM.microstructure=(()=>{
   }
   const setZoom=z=>{zoom=clamp(Math.round(z*4)/4,1,4);if(zoom===1){offsetX=0;offsetY=0;}update();};
   const button=(name,txt,action)=>{const b=node('button','silm-workshop-micro-control',txt);b.type='button';b.setAttribute('aria-label',name);b.addEventListener('click',action);return b;};
-  toolbar.append(
-   button('Reduzir microestrutura','−',()=>setZoom(zoom-.25)),
-   zoomLabel,
-   button('Ampliar microestrutura','+',()=>setZoom(zoom+.25)),
-   button('Ajustar microestrutura ao quadro','Ajustar',()=>setZoom(1)),
-   status
-  );
+  const zoomControls=node('div','silm-workshop-micro-zoom-tools');
+  zoomControls.append(button('Reduzir microestrutura','−',()=>setZoom(zoom-.25)),zoomLabel,button('Ampliar microestrutura','+',()=>setZoom(zoom+.25)),button('Ajustar microestrutura ao quadro','Ajustar',()=>setZoom(1)));
+  toolbar.append(status,dimension,zoomControls);
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
   svg.addEventListener('pointerdown',e=>{if(zoom<=1||e.button!==0)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};suppressClick=false;svg.setPointerCapture(e.pointerId);});
   svg.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;
@@ -85,9 +98,12 @@ SILM.microstructure=(()=>{
   };
   svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);
   viewport.append(svg);
-  const note=node('p','silm-workshop-micro-caveat','Grãos ilustrativos · Use Tab e Enter para destacar um grão. Não é metalografia medida.');
+  const note=node('p','silm-workshop-micro-caveat','Grãos ilustrativos · área relativa ao desenho, não é medida experimental de tamanho em micrômetros.');
   section.append(viewport,toolbar,note);
-  update();return section;
+  let lastAspect=0;
+  const resize=()=>{const rect=viewport.getBoundingClientRect();if(rect.width<2||rect.height<2)return;const ratio=rect.width/rect.height;if(Math.abs(ratio-lastAspect)<.025)return;lastAspect=ratio;makeField(ratio);drawGrains();};
+  if(typeof ResizeObserver==='function'){const observer=new ResizeObserver(resize);observer.observe(viewport);}else requestAnimationFrame(resize);
+  drawGrains();update();return section;
  }
  return Object.freeze({create});
 })();
