@@ -25,7 +25,7 @@ SILM.electronTransport=Object.freeze({scatter:t=>1+3*Math.max(0,Math.min(1,t)),d
  defectScatter:d=>1+1.2*Math.max(0,Math.min(1,d)),defectDrift:d=>1/(1+.6*Math.max(0,Math.min(1,d))),
  /* Intensidade do campo (P3): a deriva média é proporcional a ela (0,6 = deriva das versões anteriores). */
  drive:i=>Math.max(0,Math.min(1,i))});
-SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
+SILM.createElectronLayer=(stage,{scope,viewport=stage,before=null,reducedMotion=()=>false})=>{
  const L=SILM.electronLayerLimits;
  const canvas=document.createElement('canvas');canvas.className='silm-electron-canvas';canvas.setAttribute('aria-hidden','true');canvas.hidden=true;
  stage.insertBefore(canvas,before);
@@ -61,8 +61,10 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
  }
  function readColors(){const cs=getComputedStyle(stage);colors={fill:cs.getPropertyValue('--silm-electron').trim()||'#5fe3ff',edge:cs.getPropertyValue('--silm-electron-edge').trim()||'#06202a'};}
  function resize(){
-  const w=stage.clientWidth,h=stage.clientHeight,ratio=Math.min(2,window.devicePixelRatio||1);if(!w||!h)return;
-  if(w===width&&h===height&&ratio===dpr)return;width=w;height=h;dpr=ratio;canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
+  const w=stage.clientWidth,h=stage.clientHeight,screenW=viewport.clientWidth,screenH=viewport.clientHeight,ratio=Math.min(2,window.devicePixelRatio||1);if(!w||!h)return;
+  if(w===width&&h===height&&ratio===dpr&&canvas.width===Math.round(screenW*ratio)&&canvas.height===Math.round(screenH*ratio))return;
+  width=w;height=h;dpr=ratio;canvas.width=Math.round(screenW*dpr);canvas.height=Math.round(screenH*dpr);
+  if(viewport!==stage){canvas.style.width=screenW+'px';canvas.style.height=screenH+'px';canvas.style.left=(w-screenW)/2+'px';canvas.style.top=(h-screenH)/2+'px';}
   reconcile();draw();
  }
  function reconcile(){
@@ -75,7 +77,7 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
   g2.setTransform(1,0,0,1,0,0);g2.clearRect(0,0,canvas.width,canvas.height);if(!visible||!width)return;
   if(!colors)readColors();const r=Math.max(2.2,Math.min(3.6,width*.0085))*dpr;
   g2.fillStyle=colors.fill;g2.strokeStyle=colors.edge;g2.lineWidth=1.3*dpr;
-  const sx=width*dpr*cam.zoom,sy=height*dpr*cam.zoom,ox=(.5-cam.x*cam.zoom)*width*dpr,oy=(.5-cam.y*cam.zoom)*height*dpr;
+  const sx=width*dpr*cam.zoom,sy=height*dpr*cam.zoom,ox=canvas.width/2-cam.x*sx,oy=canvas.height/2-cam.y*sy;
   for(const p of particles){g2.beginPath();g2.arc(ox+p.x*sx,oy+p.y*sy,r,0,Math.PI*2);g2.fill();g2.stroke();}
  }
  function step(dt){
@@ -127,11 +129,13 @@ SILM.createElectronLayer=(stage,{scope,before=null,reducedMotion=()=>false})=>{
   if(!effectiveMotion())return;
   for(let k=0;k<4;k++){const a=k*Math.PI/2+rng()*.6;particles.push({x:position.x+Math.cos(a)*radius*.35,y:position.y+Math.sin(a)*radius*.35,a,hold:.25});}
  }
- if(window.ResizeObserver)scope.observe(new ResizeObserver(()=>resize()),stage);
+ if(window.ResizeObserver){scope.observe(new ResizeObserver(resize),stage);if(viewport!==stage)scope.observe(new ResizeObserver(resize),viewport);}
  scope.listen(document,'visibilitychange',()=>sync());
  const media=matchMedia('(prefers-reduced-motion: reduce)');scope.listen(media,'change',()=>sync());
- const watcher=new MutationObserver(()=>{readColors();sync();if(!effectiveMotion())draw();});
- watcher.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-contrast','data-motion']});
+ const refreshAppearance=()=>{readColors();sync();if(!effectiveMotion())draw();};
+ scope.listen(matchMedia('(forced-colors: active)'),'change',refreshAppearance);
+ const watcher=new MutationObserver(refreshAppearance);
+ watcher.observe(document.documentElement,{attributes:true,attributeFilter:['class','data-theme','data-contrast','data-motion']});
  scope.cleanup(()=>{watcher.disconnect();if(frame)cancelAnimationFrame(frame);frame=0;particles=[];});
  // Diagnóstico somente leitura (testes): não expõe nem aceita estado científico.
  Object.defineProperty(canvas,'silmElectrons',{value:Object.freeze({snapshot:()=>({visible,running:!!frame,heat,drive,defects,motion:effectiveMotion(),field,wraps,count:visible?particles.length:0,target:target(),frames,cost,radius,centers:centers.length,bridges:bridges.length,

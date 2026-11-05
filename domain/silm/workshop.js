@@ -71,18 +71,21 @@ SILM.workshop=(()=>{
   }else{
    const top=node('div','silm-workshop-reference-top'),art=node('div','silm-workshop-reference-art');
    if(item){art.innerHTML=visual(item.visual,1);top.append(art);}
-   const summary=node('div','silm-workshop-reference-summary');summary.append(node('p','silm-workshop-eyebrow','OBJETO E COMPOSIÇÃO'),node('h2','','Investigando '+element.name));
-  if(item){summary.append(node('p','silm-workshop-selected-title',item.title+' · '+item.component),node('p','silm-workshop-material','Material do componente: '+item.material),node('p','silm-workshop-card-note',item.explanation));
+   const summary=node('div','silm-workshop-reference-summary'),heading=node('h2','');
+   heading.append(node('span','silm-workshop-prefix','Investigando '),document.createTextNode(element.name));
+   summary.append(node('p','silm-workshop-eyebrow','OBJETO E COMPOSIÇÃO'),heading);
+  if(item){const component=node('p','silm-workshop-selected-title',item.title);component.append(node('span','silm-workshop-component-long',' · '+item.component));summary.append(component,node('p','silm-workshop-material','Material do componente: '+item.material),node('p','silm-workshop-card-note',item.explanation));
    const ul=node('ul','silm-workshop-composition');for(const [name,role]of item.composition){const li=node('li','');li.append(node('strong','',name),node('span','',role));ul.append(li);}const details=node('details','silm-workshop-materials');details.append(node('summary','','Composição e fonte'),ul,node('p','silm-workshop-caveat',item.caveat));
    const source=node('a','','Fonte da aplicação');source.target='_blank';source.rel='noopener noreferrer';
    const sources={12:'https://periodic-table.rsc.org/element/12/magnesium',29:'https://periodic-table.rsc.org/element/29/copper',57:'https://periodic-table.rsc.org/element/57/lanthanum'};
    source.href=sources[item.atomicNumber]||(item.id==='ferro-transformador'?'https://www.thyssenkrupp-steel.com/en/industries/energy/energy.html':'https://worldsteel.org/about-steel/what-is-steel/');
    details.append(source);summary.append(details,node('p','silm-workshop-caveat','A rede representa o elemento de referência. A peça pode conter outras fases e materiais.'));
-  }else summary.append(node('p','silm-workshop-intro','Associe uma aplicação cotidiana para manter o vínculo entre o objeto e a organização interna. A investigação atual permanece preservada.'));
-  const table=node('button','button outline','Tabela Periódica');table.type='button';table.addEventListener('click',onOpenPeriodic);summary.append(table);top.append(summary);s.append(top);
+  }else if(scale===1)summary.append(node('p','silm-workshop-intro','Escolha um objeto para observar o componente metálico.'));
+  const table=node('button','button outline');table.setAttribute('aria-label','Tabela Periódica');table.append(node('span','','Tabela'),node('span','silm-workshop-table-long',' Periódica'));table.type='button';table.addEventListener('click',onOpenPeriodic);summary.append(table);top.append(summary);s.append(top);
   }
   const scales=node('div','silm-workshop-scales');scales.setAttribute('role','group');scales.setAttribute('aria-label','Escalas de investigação');
-  for(const [i,label]of ['Objeto e componente','Microestrutura','Rede e célula','Ambiente atômico'].entries()){const b=node('button','silm-workshop-scale',String(i+1)+' · '+label);b.type='button';b.setAttribute('aria-pressed',String(scale===i+1));b.addEventListener('click',()=>onScale(i+1));scales.append(b);}s.insertBefore(scales,s.firstChild);
+  for(const [i,label]of ['Objeto e componente','Microestrutura','Rede e célula','Ambiente atômico'].entries()){const name=String(i+1)+' · '+label,b=node('button','silm-workshop-scale');
+   b.setAttribute('aria-label',name);b.title=name;b.append(node('span','silm-workshop-scale-long',name),node('span','silm-workshop-scale-short',['Objeto','Grãos','Rede','Átomo'][i]));b.type='button';if(i===0&&!item&&!items.length){b.disabled=true;b.title='Sem objeto de referência cadastrado para '+element.name;}b.setAttribute('aria-pressed',String(scale===i+1));b.addEventListener('click',()=>onScale(i+1));scales.append(b);}s.insertBefore(scales,s.firstChild);
   if(scale!==2)s.append(node('p','silm-workshop-scale-note',scale===2?'Esquema de grãos didático; não representa uma metalografia medida.':scale===3?'A rede e a célula unitária estão na área científica abaixo. A escala visual não altera os parâmetros cristalográficos.':scale===4?'Um centro está selecionado e os vizinhos destacados pertencem à mesma rede. Selecione outro átomo diretamente na cena.':'O componente permanece identificado enquanto a visualização se aproxima; o zoom não troca o material.'));
   if(scale!==2&&items.some(other=>other.id!==item?.id)){const alt=node('div','silm-workshop-alternatives'),row=node('div','silm-workshop-alternative-list');alt.append(node('h3','','Outras aplicações com '+element.name));
    for(const other of items){if(other.id===item?.id)continue;const b=node('button','silm-workshop-alternative',other.title);b.type='button';b.addEventListener('click',()=>onChoose(other));row.append(b);}alt.append(row);s.append(alt);}

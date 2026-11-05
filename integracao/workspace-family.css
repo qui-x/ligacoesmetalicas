@@ -160,10 +160,19 @@
    A vista cristalina agora usa uma única coluna e recebe a altura útil completa. */
 #silm-integration-scene.silm-laboratory{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;align-items:stretch!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;overflow:hidden!important}
 #silm-integration-scene>.silm-assembly.silm-crystal{display:flex!important;flex:1 1 0!important;flex-flow:column nowrap!important;align-items:stretch!important;justify-content:stretch!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important;gap:0!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;overflow:hidden!important}
-#silm-integration-scene>.silm-assembly.silm-crystal>.silm-assembly-area{display:grid!important;position:relative!important;flex:1 1 0!important;grid-column:auto!important;grid-row:auto!important;place-items:center!important;align-self:stretch!important;width:100%!important;height:auto!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;overflow:hidden!important;padding:0!important;background:radial-gradient(ellipse at 50% 48%,color-mix(in srgb,var(--panel2) 34%,transparent) 0%,transparent 72%)!important}
-#silm-integration-scene>.silm-assembly.silm-crystal>.silm-assembly-area>.silm-crystal-stage{position:relative!important;flex:none!important;align-self:center!important;justify-self:center!important;box-sizing:border-box!important;aspect-ratio:1/1!important;width:var(--stage)!important;height:var(--stage)!important;max-width:100%!important;max-height:100%!important;min-width:0!important;min-height:0!important;overflow:hidden!important;border:1px solid color-mix(in srgb,var(--silm-soft-border) 78%,var(--accent) 22%)!important;border-radius:clamp(14px,1.4vw,22px)!important;background:radial-gradient(circle at 50% 43%,color-mix(in srgb,var(--panel2) 86%,var(--accent) 4%) 0%,var(--panel) 54%,var(--bg) 100%)!important;box-shadow:inset 0 0 0 1px rgb(255 255 255/.025),inset 0 16px 48px rgb(0 0 0/.12),0 18px 54px rgb(0 0 0/.12)!important}
-#silm-integration-scene>.silm-assembly.silm-crystal>.silm-assembly-area>.silm-crystal-stage::before{content:"";position:absolute;z-index:0;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(to right,color-mix(in srgb,var(--border) 70%,transparent) 1px,transparent 1px),linear-gradient(to bottom,color-mix(in srgb,var(--border) 70%,transparent) 1px,transparent 1px);background-size:8.3333% 8.3333%;mask-image:radial-gradient(ellipse at center,#000 22%,transparent 88%)}
-#silm-integration-scene>.silm-assembly.silm-crystal>.silm-assembly-area>.silm-crystal-stage::after{content:"";position:absolute;z-index:12;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 48px rgb(0 0 0/.12)}
+#silm-integration-scene>.silm-assembly.silm-crystal>.silm-assembly-area{
+ display:grid!important;position:relative;flex:1 1 0!important;place-items:center;align-self:stretch;
+ width:100%;min-width:0;min-height:0;overflow:clip!important;padding:0;
+ border:1px solid var(--border);border-radius:12px;touch-action:none;user-select:none;
+ background:radial-gradient(ellipse at center,var(--panel2),var(--bg));
+}
+#silm-integration-scene>.silm-assembly.silm-crystal>.silm-assembly-area>.silm-crystal-stage{
+ position:relative!important;box-sizing:border-box;width:var(--stage)!important;height:var(--stage)!important;
+ overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+}
+#si-stage:not(.silm-workshop-context-only) #silm-integration-scene.silm-laboratory:has(.silm-crystal){padding:0!important}
+#si-stage:not(.silm-workshop-context-only) #silm-workshop-context{margin-bottom:0}
+.silm-crystal-stage>svg.silm-stage-layer{overflow:visible}
 #silm-integration-scene>.silm-assembly.silm-crystal .silm-stage-layer{z-index:1}
 #silm-integration-scene>.silm-assembly.silm-crystal .silm-stage-layer[data-layer=lattice]{z-index:2}
 #silm-integration-scene>.silm-assembly.silm-crystal .silm-stage-layer[data-layer=unitCell]{z-index:3}
@@ -266,31 +275,10 @@ body.si-structure-expanded #silm-scene-actionbar{flex:0 0 auto!important;min-hei
 @media(max-width:520px){.silm-structure-cards,.silm-structure-cards[data-layout=list]{grid-template-columns:minmax(0,1fr)}.silm-structure-card{padding:10px}.silm-structure-preview{height:126px}}
 @media(forced-colors:active){.silm-structure-card[data-current=true]{border:2px solid Highlight}.silm-structure-status{border:1px solid CanvasText}.silm-structure-preview{border:1px solid CanvasText}}
 
-/* Menu nativo de projeções: esquema claro explícito para evitar texto claro sobre lista branca. */
-.silm-quick-projection{color-scheme:light}
-.silm-quick-projection select{
- color:#202329!important;-webkit-text-fill-color:#202329;
- background-color:#fff!important;color-scheme:light;
+/* Os menus nativos também recebem a aparência efetiva da Oficina. */
+.silm-quick-projection select,.silm-lattice-nav :is(select,option,optgroup){
+ color:var(--text);background-color:var(--surface);color-scheme:inherit;
 }
-.silm-quick-projection select optgroup{
- color:#604515!important;background-color:#fff!important;font-weight:800;
-}
-.silm-quick-projection select option{
- color:#202329!important;background-color:#fff!important;font-weight:500;
-}
-.silm-quick-projection select option:checked{
- color:#17191d!important;background-color:#dfc16e!important;
-}
-.silm-quick-projection select option:disabled{
- color:#777d86!important;-webkit-text-fill-color:#777d86;opacity:1!important;
-}
-@media(forced-colors:active){
- .silm-quick-projection select{color:FieldText!important;background:Field!important}
- .silm-quick-projection select optgroup,.silm-quick-projection select option{color:CanvasText!important;background:Canvas!important}
- .silm-quick-projection select option:checked{color:HighlightText!important;background:Highlight!important}
- .silm-quick-projection select option:disabled{color:GrayText!important}
-}
-
 /* Seletor de projeção próprio do SILM: menu sempre acompanha grafite/ouro e mantém contraste. */
 .silm-quick-projection{position:relative;color:var(--text)}
 .silm-projection-trigger{

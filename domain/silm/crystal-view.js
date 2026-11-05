@@ -109,7 +109,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const kind=U.element('p','Representação didática: esferas reduzidas, sem escala física absoluta; proporções da célula a partir dos parâmetros tabelados.','silm-assembly-kind');
  let layout=null,scene=null,selectedPoint=null,unitItems=[],fitKey=null;
  let perspectiveButton=null,orbitLive=null,orbitFrame=0,orbiting=false,lastPreset=null;
- const R=RD.createStage(stage,{scope,area,idPrefix:'silm',camera:rep2.camera(cameraKey),reducedMotion,announce:text=>SimCore.notifications.announce(text),
+ const R=RD.createStage(stage,{scope,area,viewport:area,idPrefix:'silm',camera:rep2.camera(cameraKey),reducedMotion,announce:text=>SimCore.notifications.announce(text),
   describe:()=>sceneDescription(),onCamera:c=>rep2.saveCamera(cameraKey,c),items:()=>unitItems,focusPoint:()=>selectedPoint,canArrowPan:()=>true,
   onUnitTap:id=>unitAction(id),onReset:()=>{if(mode3d){orbitLive=null;rep2.setCamera3D({preset:'3d',yaw:null,pitch:null},{silent:true});render();}else if(rep2.projection()!=='isometric')rep2.setProjection('isometric');},toolbarHost:cameraHost,
   onOrbit:mode3d?(dx,dy,phase)=>orbit(dx,dy,phase):null,
@@ -121,7 +121,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const latticeLayer=group(latticeSvg,'silm-lattice'),planeLayer=group(cellSvg,'silm-cell-planes'),cellLayer=group(cellSvg,'silm-cell-edges'),ghostLayer=group(ghostSvg,'silm-neighbor-ghosts');
  R.layer('lattice',latticeSvg,{camera:true});R.layer('unitCell',cellSvg,{camera:true});R.layer('neighbors',ghostSvg,{camera:true});R.layer('structure',units,{camera:true});
  // 0.6.x: a distribuição eletrônica acompanha a rede; o contorno da célula não é parede.
- const electronLayer=SILM.createElectronLayer(stage,{scope,before:units,reducedMotion});R.layer('electrons',electronLayer.canvas);
+ const electronLayer=SILM.createElectronLayer(stage,{scope,viewport:area,before:units,reducedMotion});R.layer('electrons',electronLayer.canvas);
  // Elétrons e propriedades mantêm seus controles completos no painel Ver; o palco recebe somente as camadas visuais.
  // 0.7.x: a sobreposição da experiência permanece sobre a cena; comandos ficam em Ver → Observar.
  const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:units});R.layer('properties',overlay.root);
@@ -151,11 +151,22 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const heater=U.element('div',null,'silm-heat-handle');heater.hidden=true;heater.tabIndex=0;heater.setAttribute('role','button');stage.append(heater);
  let heaterDrag=null;
  const toggleHeat=()=>propertyOptions?.toggleHeat?.();
- const moveSource=(dx,dy)=>{const s=thermalCtl?.source;if(!s)return;thermalCtl.setSource({x:Math.max(0,Math.min(1,s.x+dx)),y:Math.max(0,Math.min(1,s.y+dy))});render();};
- scope.listen(heater,'pointerdown',e=>{if(!thermalCtl)return;e.preventDefault();e.stopPropagation();try{heater.setPointerCapture(e.pointerId);}catch{}heaterDrag={x:e.clientX,y:e.clientY,id:e.pointerId,moved:false,start:{...thermalCtl.source}};heater.dataset.dragging='';});
+ function nearestPoint(points,p){
+  let best=0,distance=Infinity;
+  points.forEach((q,i)=>{const d=Math.hypot(q.x-p.x,q.y-p.y);if(d<distance){distance=d;best=i;}});
+  return best;
+ }
+ function moveHeatTo(point){
+  if(!scene?.heatViewSites)return;
+  const i=nearestPoint(scene.heatViewSites,point),v=scene.heatViewSites[i],r=scene.heatRefSites[i];
+  thermalCtl.setSource({x:Math.max(0,Math.min(1,r.x+point.x-v.x)),y:Math.max(0,Math.min(1,r.y+point.y-v.y))});
+  render();
+ }
+ const moveSource=(dx,dy)=>{const p=scene?.heatPoint;if(p)moveHeatTo({x:p.x+dx,y:p.y+dy});};
+ scope.listen(heater,'pointerdown',e=>{if(!scene?.heatPoint)return;e.preventDefault();e.stopPropagation();try{heater.setPointerCapture(e.pointerId);}catch{}heaterDrag={x:e.clientX,y:e.clientY,id:e.pointerId,moved:false,start:scene.heatPoint};heater.dataset.dragging='';});
  scope.listen(heater,'pointermove',e=>{if(!heaterDrag||e.pointerId!==heaterDrag.id)return;e.stopPropagation();const dx=e.clientX-heaterDrag.x,dy=e.clientY-heaterDrag.y;if(!heaterDrag.moved&&Math.hypot(dx,dy)<6)return;heaterDrag.moved=true;
-  // Da tela para a cena: a câmera aplica zoom e deslocamento; a escala do palco é o seu tamanho em pixels.
-  const z=R.camera.zoom||1,size=R.size||stage.clientWidth||300;thermalCtl.setSource({x:Math.max(0,Math.min(1,heaterDrag.start.x+dx/(size*z))),y:Math.max(0,Math.min(1,heaterDrag.start.y+dy/(size*z)))});render();});
+  const size=(R.size||stage.clientWidth||300)*(R.camera.zoom||1);
+  moveHeatTo({x:heaterDrag.start.x+dx/size,y:heaterDrag.start.y+dy/size});});
  const heaterUp=e=>{if(!heaterDrag||(e&&e.pointerId!==heaterDrag.id))return;const tap=!heaterDrag.moved;heaterDrag=null;delete heater.dataset.dragging;if(tap&&e?.type==='pointerup')toggleHeat();};
  for(const type of ['pointerup','pointercancel','lostpointercapture'])scope.listen(heater,type,heaterUp);
  scope.listen(heater,'keydown',e=>{const step={ArrowLeft:[-.04,0],ArrowRight:[.04,0],ArrowUp:[0,-.04],ArrowDown:[0,.04]}[e.key];if(step){e.preventDefault();e.stopPropagation();moveSource(...step);}else if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();toggleHeat();}});
@@ -213,16 +224,21 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const SHARE={BCC:{corner:'1/8',body:'1'},FCC:{corner:'1/8',face:'1/2'},HCP:{'base-vertex':'1/6','base-center':'1/2',interior:'1'},general:{corner:'1/8',edge:'1/4',face:'1/2',interior:'1'}};
  const shares=SHARE[m.general?'general':m.id];
  /* Par de centros em contato (vizinhos mais próximos), para o destaque de raio e empacotamento. */
- function contactPair(list){const byKey=new Map(list.map(u=>[X.key(u.site),u])),corner=list.find(u=>g.role(u.site).role==='corner'||g.role(u.site).role==='base-vertex')||list[0];if(!corner)return null;
+ function contactPair(list){const byKey=new Map(list.map(u=>[X.key(u.site),u])),corner=list.find(u=>g.role(u.referenceSite||u.site).role==='corner'||g.role(u.referenceSite||u.site).role==='base-vertex')||list[0];if(!corner)return null;
   const near=g.neighbors(corner.site).list.find(n=>byKey.has(n.key));return near?[corner,byKey.get(near.key)]:null;}
  const svgEl=(tag,attrs)=>{const el=document.createElementNS(NS,tag);for(const [k,v]of Object.entries(attrs))el.setAttribute(k,String(v));return el;};
  // O cursor percorre o mesmo recorte e a mesma projeção utilizados pelas propriedades.
- const navigator=SILM.createLatticePanel({geometry:g,scope,initialKey:rep2.latticeFocus?.(),onFocus(site){
+ const initialStructure=model.state.structure;
+ const initialUnit=initialStructure.units.find(u=>u.id===initialStructure.crystallography.representation.selectedUnitId);
+ const navigator=SILM.createLatticePanel({geometry:g,scope,initialKey:rep2.latticeFocus?.()||(initialUnit&&X.key(initialUnit.site)),initialAnchor:initialUnit?.site,onFocus(site,anchor){
+  const unit=model.state.structure.units.find(u=>X.key(u.site)===anchor.key);
   rep2.setLatticeFocus?.(site.key);
-  const point=layout.project(D(site.cart));
-  R.setCamera({...R.camera,mode:'free',x:point.x,y:point.y,zoom:Math.max(1.35,R.camera.zoom)});
+  if(layout)R.setCamera({...R.camera,mode:'free'},{settled:false});
+  if(unit&&model.state.structure.crystallography.representation.selectedUnitId!==unit.id)actions.select(unit.id);
   render();
+  if(layout)R.revealBounds(RD.boundsOf(scene.drawn),layout.project(D(site.cart)),unitFraction*.72);
  }});
+ const cellCart=cart=>scene?.rep.view==='lattice'?navigator.cursor.displayCart(cart):cart;
  root.insertBefore(navigator.status,area);
  // Os comandos acompanham a câmera inclusive na vista expandida.
  if(cameraHost)cameraHost.after(navigator.root);
@@ -255,33 +271,13 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   navigator.root.append(control);
  }
 
- const cursorLayer=group(ghostSvg,'silm-nav-cursor');
- const cursorMark=svgEl('circle',{class:'silm-nav-center',r:2.5});
- cursorLayer.append(cursorMark);
- let cursorKey='',cursorNeighbors=[];
- function drawCursor(visible,showNeighbors){
-  navigator.root.hidden=!visible;
-  navigator.status.hidden=!visible;
-  cursorLayer.style.display=visible?'':'none';
-  if(!visible)return;
-  const cursor=navigator.cursor,site=cursor.site;
-  const center=layout.project(D(site.cart));
-  cursorMark.setAttribute('cx',center.x*100);cursorMark.setAttribute('cy',center.y*100);
-  const key=site.key+'|'+showNeighbors;
-  if(cursorKey!==key){
-   cursorKey=key;
-   cursorNeighbors=showNeighbors?cursor.shell.list.map(neighbor=>({neighbor,mark:svgEl('circle',{class:'silm-nav-neighbor',r:1.6})})):[];
-   cursorLayer.replaceChildren(cursorMark,...cursorNeighbors.map(x=>x.mark));
-  }
-  for(const {neighbor,mark}of cursorNeighbors){const point=layout.project(D(neighbor.cart));mark.setAttribute('cx',point.x*100);mark.setAttribute('cy',point.y*100);}
- }
  const pt=p=>{const q=layout.project(D(p));return {x:q.x*100,y:q.y*100,depth:q.depth};};
  /* Escala de profundidade: no 2D e na ortográfica, a pista da 0.5.x; na perspectiva, o fator da própria projeção. */
  const dscale=q=>layout?.perspective?Math.max(.5,Math.min(1.7,q.size)):1.08-.16*q.depth;
  function drawCell(forced){
   cellLayer.replaceChildren();planeLayer.replaceChildren();if(!scene.rep.unitCell&&!forced)return;
-  for(const [a,b]of g.edges()){const p=pt(a),q=pt(b);cellLayer.append(svgEl('line',{x1:p.x,y1:p.y,x2:q.x,y2:q.y,'data-back':String((p.depth+q.depth)/2>.55)}));}
-  if(m.id==='HCP'){const h=g.vectors[2][2];for(const z of [0,h]){const ring=[0,1,2,3,4,5].map(k=>{const a=g.vectors[0][0];return pt([a*Math.cos(k*Math.PI/3),a*Math.sin(k*Math.PI/3),z]);});planeLayer.append(svgEl('polygon',{points:ring.map(p=>p.x+','+p.y).join(' ')}));}}
+  for(const [a,b]of g.edges()){const p=pt(cellCart(a)),q=pt(cellCart(b));cellLayer.append(svgEl('line',{x1:p.x,y1:p.y,x2:q.x,y2:q.y,'data-back':String((p.depth+q.depth)/2>.55)}));}
+  if(m.id==='HCP'){const h=g.vectors[2][2];for(const z of [0,h]){const ring=[0,1,2,3,4,5].map(k=>{const a=g.vectors[0][0];return pt(cellCart([a*Math.cos(k*Math.PI/3),a*Math.sin(k*Math.PI/3),z]));});planeLayer.append(svgEl('polygon',{points:ring.map(p=>p.x+','+p.y).join(' ')}));}}
  }
  /* Rede extensa em janela: só os sítios perto da área visível (com esmaecimento a partir do centro da vista) e no
     máximo 260 círculos. O sólido continua; a rede desenhada não é infinita nem é estado científico. */
@@ -290,8 +286,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   if(scene.rep.view!=='lattice')return [];const {w,c:cv}=view,pad=.06,occupied=new Set(scene.list.map(u=>X.key(u.site))),reach=.62/view.zoom;
   // Na deformação, a rede vira a amostra: todos os sítios do bloco, sem esmaecimento, deslizando com as unidades.
   const sys=specimen&&DF?DF.system(g):null,pr=scene.pr||{},n=pr?.active==='malleability'?pr.malleability.compression:pr?.active==='ductility'?pr.ductility.elongation:0;
-  const out=[];for(const s of (specimen&&DF?DF.specimen(g):g.lattice())){if(occupied.has(s.key))continue;const q=layout.project(D(s.cart));if(specimen){out.push({q,fade:1,block:DF.block(sys,s.cart,n)});continue;}const T=scene.heatTemps?.get(s.key);if(q.x<w.x0-pad||q.x>w.x1+pad||q.y<w.y0-pad||q.y>w.y1+pad)continue;
-   const fade=Math.max(0,1-Math.hypot(q.x-cv.x,q.y-cv.y)/reach);if(fade<=.04)continue;out.push({q,fade:T===undefined?fade:Math.max(fade,.7),heat:T,key:s.key});}
+  const out=[];for(const s of (specimen&&DF?DF.specimen(g):navigator.cursor.contextSites)){if(occupied.has(s.key))continue;const q=layout.project(D(s.cart));if(specimen){out.push({q,fade:1,block:DF.block(sys,s.cart,n)});continue;}const T=scene.heatTemps?.get(s.key);if(q.x<w.x0-pad||q.x>w.x1+pad||q.y<w.y0-pad||q.y>w.y1+pad)continue;
+   const fade=Math.max(.07,1-Math.hypot(q.x-cv.x,q.y-cv.y)/reach);out.push({q,fade:T===undefined?fade:Math.max(fade,.7),heat:T,key:s.key});}
   out.sort((a,b)=>b.fade-a.fade);return out.slice(0,LATTICE_CAP);
  }
  function drawLattice(sites){
@@ -319,7 +315,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    (scene.heatAside?' Nesta projeção, a região aquecida (contorno tracejado) não fica à esquerda; a experiência é a mesma da vista isométrica.':'');
  }
  function render(){
-  const S=model.state,s=S.structure;if(!s||s.mode!=='crystalline')return;const r=s.crystallography.representation,list=s.units,pr=S.properties,active=pr?.active||null;const alignNow=(mode3d?'3d':rep2.projection())+'|'+(pr?.startedAt||'');if(alignNow!==alignKey){alignKey=alignNow;align=camAngles(rep2.projection());}
+  const S=model.state,s=S.structure;if(!s||s.mode!=='crystalline')return;const r=s.crystallography.representation,baseUnits=s.units,pr=S.properties,active=pr?.active||null;const alignNow=(mode3d?'3d':rep2.projection())+'|'+(pr?.startedAt||'');if(alignNow!==alignKey){alignKey=alignNow;align=camAngles(rep2.projection());}
+  const list=r.view==='lattice'?baseUnits.map(u=>({...u,referenceSite:u.site,site:navigator.cursor.displaySite(u.site)})):baseUnits;
   deformCtl?.sync();const live=deformCtl?.transform(align)||null;deform=live||P.deformer(S,g,align);const deforming=!!live||(!!deform&&['malleability','ductility'].includes(active));specimen=deforming;
   const proj=rep2.projection(),cam3=mode3d?{...rep2.camera3D(),...(orbitLive||{})}:null,selectValue=mode3d?(cam3.preset&&cam3.preset!=='3d'?'3d-'+cam3.preset:'3d'):proj;
   syncProjectionPicker(selectValue);root.dataset.projection=mode3d?'3d':proj;root.dataset.viewMode=mode3d?'3d':'2d';
@@ -330,8 +327,11 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const selected=r.selectedUnitId,selectedUnit=selected?list.find(u=>u.id===selected):null,neighbors=r.neighbors&&selectedUnit?g.neighbors(selectedUnit.site):null,neighborKeys=new Set(neighbors?.list.map(x=>x.key)||[]);
   // Cena estável (sem vizinhos nem margem de rede): a câmera, e não o layout, enquadra o que estiver visível.
   // Durante a deformação, a cena enquadra também a amostra orientada e as formas extremas (sem "respirar" a cada quadro).
-  const extra=deforming&&!mode3d?deformFit(list,proj,r.view,active)||[]:[],fitCarts=[...g.cell.map(c=>c.cart),...(g.corners||[]),...list.map(u=>g.site(u.site).cart),...extra];
-  if(mode3d){try{layout=X.layout3D(g,fitCarts,cam3);}catch(error){rep2.fail3D(error);layout=X.layoutFor(g,fitCarts,{margin:.12,projection:proj});}}
+  const extra=deforming&&!mode3d?deformFit(baseUnits,proj,r.view,active)||[]:[],fitCarts=[...g.cell.map(c=>c.cart),...(g.corners||[]),...baseUnits.map(u=>g.site(u.site).cart),...extra];
+  if(mode3d){try{
+   const center=r.view==='lattice'?navigator.cursor.displayCart(g.center):g.center;
+   const refFit=r.view==='lattice'?fitCarts.map(cart=>navigator.cursor.displayCart(cart)):fitCarts;
+   layout=X.layout3D({...g,center},refFit,cam3);}catch(error){rep2.fail3D(error);layout=X.layoutFor(g,fitCarts,{margin:.12,projection:proj});}}
   else layout=X.layoutFor(g,fitCarts,{margin:.12,projection:proj});
   // Distância entre vizinhos: fixa para a geometria (calculada uma vez, não a cada quadro).
   const d=nearest??=g.neighbors(g.cell[0]).distances[0];unitFraction=Math.min(.11,Math.max(.045,d*layout.scale*.3));stage.style.setProperty('--unit-size',(unitFraction*100).toFixed(3)+'%');
@@ -339,7 +339,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const drawn=list.map(u=>layout.project(D(g.site(u.site).cart)));
   list.forEach((u,i)=>{
    let node=nodes.get(u.id);if(!node){node=createNode(u);nodes.set(u.id,node);}
-   const p=drawn[i],info=g.role(u.site);
+   const p=drawn[i],info=g.role(u.referenceSite||u.site);node.dataset.site=X.key(u.site);
    if(!node.dataset.animating){node.style.left=(p.x*100)+'%';node.style.top=(p.y*100)+'%';}
    // Ordem dentro da camada da estrutura: profundidade; a selecionada fica por cima (o anel de seleção vem da camada própria).
    node.style.zIndex=String(selected===u.id?200:10+Math.round((1-p.depth)*100));node.__depthScale=dscale(p);node.style.setProperty('--depth-scale',node.__depthScale.toFixed(3));node.style.setProperty('--depth-fade',(1-.22*p.depth).toFixed(3));
@@ -361,32 +361,36 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    if(sys)for(let i=0;i<n;i++){const t=DF.trace(sys,i,half);if(!t)continue;const a=pt(t[0]),b=pt(t[1]);planeLayer.append(svgEl('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:'silm-slip-plane'}));}
    scene.slipCount=n;}
   else{scene.slipCount=0;drawCell(calcMark?.mode==='edges');}
-  ghostLayer.replaceChildren();const ghosts=[];
-  if(neighbors){const occupied=new Set(list.map(u=>X.key(u.site)));for(const n of neighbors.list)if(!occupied.has(n.key)){const q=layout.project(D(n.cart));ghosts.push(q);ghostLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*50*dscale(q)}));}}
+  ghostLayer.replaceChildren();
+  if(neighbors){const occupied=new Set(list.map(u=>X.key(u.site)));for(const n of neighbors.list)if(!occupied.has(n.key)){const q=layout.project(D(n.cart));ghostLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*50*dscale(q)}));}}
   // Caixa de interesse da câmera: estrutura desenhada (com a deformação da propriedade e os vizinhos visíveis).
-  const cellDrawn=[...g.cell.map(c=>c.cart),...(g.corners||[])].map(p=>layout.project(D(p)));
+  const cellDrawn=[...g.cell.map(c=>c.cart),...(g.corners||[])].map(p=>layout.project(D(cellCart(p))));
   // Trocar a projeção ou a vista (Célula/Rede) reenquadra; mostrar vizinhos ou deformar mantém a câmera do usuário.
   const presetKey=mode3d?(cam3.preset||lastPreset||'3d'):'',key=(mode3d?'3d:'+presetKey:proj)+'|'+r.view+(deforming?'|deformação':''),refit=fitKey!==null&&fitKey!==key&&R.camera.mode!=='fit';fitKey=key;if(mode3d&&cam3.preset)lastPreset=cam3.preset;
   if(refit)R.setCamera({...R.camera,mode:'fit'},{settled:false});
-  const box=mode3d?{x0:.08,y0:.08,x1:.92,y1:.92}:extra.length?RD.boundsOf(extra.map(c=>layout.project(c))):RD.boundsOf([...cellDrawn,...drawn,...ghosts]),boxMargin=mode3d?.08:extra.length?.17:r.view==='lattice'?.3:.12;
+  const box=extra.length?RD.boundsOf(extra.map(c=>layout.project(c))):RD.boundsOf([...cellDrawn,...drawn]),boxMargin=extra.length?.17:.12;
   R.setInterest(box,{margin:boxMargin});if(refit)rep2.saveCamera(cameraKey,R.camera);
   sizeSymbols();
   // Calor e níveis: sempre sobre a projeção de referência (isométrica, congelada), para que a vista nunca mude a experiência.
-  const refLayout=X.layout(g,[...g.cell.map(c=>c.cart),...(g.corners||[]),...list.map(u=>g.site(u.site).cart)].map(D),{margin:.12});
+  const refLayout=X.layout(g,[...g.cell.map(c=>c.cart),...(g.corners||[]),...baseUnits.map(u=>g.site(u.site).cart)].map(D),{margin:.12});
   const refCentres=list.map(u=>refLayout.project(D(g.site(u.site).cart))),refSpacing=d*refLayout.scale;
   // Calor + corrente (0.17.x): a mesma fonte de calor também na condutividade elétrica (transitória, sem gravar).
   const continuous=!!thermalCtl&&(active==='thermal'||active==='electrical');let heated=active==='thermal'&&(pr.thermal.heating||pr.thermal.stage>0),levels=[],sources=[],temps=null;
   if(continuous){
    // Grafo: as unidades e, na vista Rede, a rede extensa — com os vizinhos imediatos pela distância da geometria do banco.
-   const sites=[...list.map(u=>g.site(u.site)),...(r.view==='lattice'?g.lattice().filter(s=>!list.some(u=>X.key(u.site)===s.key)):[])],ids=sites.map(s=>s.key);
+   const assembled=new Set(baseUnits.map(u=>X.key(u.site)));
+   const sites=[...baseUnits.map(u=>g.site(u.site)),...(r.view==='lattice'?g.lattice().filter(s=>!assembled.has(s.key)):[])],ids=sites.map(s=>s.key);
    thermalCtl.setGraph(r.view+'|'+ids.join(';'),sites.map(s=>s.cart),d,ids);
-   const proj=sites.map(s=>layout.project(D(s.cart)));
+   const proj=sites.map(s=>refLayout.project(s.cart));
+   scene.heatRefSites=proj;scene.heatViewSites=sites.map(s=>layout.project(D(s.cart)));
    // Posição inicial: sobre a unidade mais à esquerda da célula (sempre visível), como a região aquecida das versões anteriores.
    if(!thermalCtl.source){const units=proj.slice(0,list.length),left=units.reduce((a,p)=>p.x<a.x?p:a,units[0]);thermalCtl.setSource({x:left.x,y:left.y});}
-   const src=thermalCtl.source,reach=Math.max(unitFraction*.9,d*layout.scale*.6),near=proj.map((p,i)=>[i,Math.hypot(p.x-src.x,p.y-src.y)]).filter(([,dd])=>dd<=reach).map(([i])=>i);
+   const src=thermalCtl.source,reach=Math.max(.04,d*refLayout.scale*.6),near=proj.map((p,i)=>[i,Math.hypot(p.x-src.x,p.y-src.y)]).filter(([,dd])=>dd<=reach).map(([i])=>i);
    if(!near.length){const best=proj.map((p,i)=>[i,Math.hypot(p.x-src.x,p.y-src.y)]).sort((a,b)=>a[1]-b[1])[0];if(best&&best[1]<=reach*2)near.push(best[0]);}
+   const index=nearestPoint(proj,src),v=scene.heatViewSites[index];
+   scene.heatPoint={x:v.x+src.x-proj[index].x,y:v.y+src.y-proj[index].y};
    thermalCtl.sync();const heatOn=thermalCtl.reading().on;thermalCtl.setPinned(heatOn?near:[]);temps=thermalCtl.temperatures();heated=active==='thermal'||[...temps.values()].some(v=>v>.01);scene.heatOn=heatOn;
-   const pinned=new Set(heatOn?near:[]);levels=list.map(u=>TH.level(temps.get(X.key(u.site))||0));sources=list.map((u,i)=>pinned.has(i));scene.heatTemps=temps;
+   const pinned=new Set(heatOn?near.map(i=>ids[i]):[]);levels=list.map(u=>TH.level(temps.get(X.key(u.site))||0));sources=list.map(u=>pinned.has(X.key(u.site)));scene.heatTemps=temps;
   }else{scene.heatTemps=null;if(heated){levels=P.heat(refCentres,refSpacing,pr.thermal.stage);sources=P.heatSources(refCentres);}}
   const lit=new Set(),surface=[];if(active==='luster'){const zs=list.map(u=>g.site(u.site).cart[2]),top=Math.max(...zs);list.forEach((u,i)=>{if(zs[i]>=top-.05){surface.push(i);if(pr.luster.light)lit.add(u.id);}});}scene.surfaceIdx=surface;
   // As fontes (região aquecida) ficam marcadas em qualquer projeção; a faixa "calor" só aparece onde elas estiverem à esquerda.
@@ -410,7 +414,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // Deriva média relativa (seta "elétrons (média)"): calor e defeitos reduzem; a intensidade do campo aumenta.
   scene.driftFactor=ET?(centersT.reduce((a,c)=>a+ET.drift(c.t),0)/Math.max(1,centersT.length))*ET.defectDrift(defects):1;
   electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:centersT,spacing:d*layout.scale,connect:false,drive:driveCtl?.intensity??.6,defects});
-  drawCursor(r.view==='lattice',r.neighbors);
+  navigator.root.hidden=navigator.status.hidden=r.view!=='lattice';
   if(r.view==='lattice'){
    const effects=[];
    if(active)effects.push(P.catalog[active].title);
@@ -427,7 +431,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   root.dataset.property=active||'';scheduleHeat(pr);
   const narrative=active?P.narrative(active,pr[active],{reduced:reducedMotion(),electronsVisible:shownElectrons}):null;
   root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;
-  const inCell=list.filter(u=>g.cellKeys.has(X.key(u.site))).length,added=list.filter(u=>u.placement==='crystallographic').length;
+  const inCell=baseUnits.filter(u=>g.cellKeys.has(X.key(u.site))).length,added=list.filter(u=>u.placement==='crystallographic').length;
   // Indicador compacto (0.8.x): estrutura e, quando houver, a propriedade em estudo.
   meta.textContent=(m.general?m.label+' · '+m.spaceGroup:m.code+' · '+m.name)+' · '+list.length+' unidades'+(added?' ('+added+' completadas pelo SILM)':'')+(active?' · '+P.catalog[active].title+' em estudo':'');
   meta.title=meta.textContent;   // 0.9.1: texto integral quando o celular limita a duas linhas
@@ -461,7 +465,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    plates={x0:(Math.min(...xs)-rr)*100,x1:(Math.max(...xs)+rr)*100,top:(Math.min(...ys)-rr)*100,bottom:(Math.max(...ys)+rr)*100};}
   // Fonte de calor (contínuo): na posição escolhida; ligada (contorno cheio) ou desligada (tracejado).
   const heaterOn=!!scene.continuousHeat&&!!thermalCtl?.source&&scene.module==='explorar';heater.hidden=!heaterOn;
-  if(heaterOn){const v=R.toView(thermalCtl.source),on=!!scene.heatOn;heater.style.left=Math.max(2,Math.min(98,v.x*100))+'%';heater.style.top=Math.max(2,Math.min(98,v.y*100))+'%';
+  if(heaterOn){const v=R.toView(scene.heatPoint),on=!!scene.heatOn;heater.style.left=Math.max(2,Math.min(98,v.x*100))+'%';heater.style.top=Math.max(2,Math.min(98,v.y*100))+'%';
    if(heater.dataset.on!==String(on)){heater.dataset.on=String(on);heater.setAttribute('aria-pressed',String(on));heater.setAttribute('aria-label','Fonte de calor: '+(on?'ligada':'desligada'));heater.title='Toque para '+(on?'desligar':'ligar')+'; arraste para mover. Teclado: Enter liga e desliga, setas movem.';}}
   const canPress=!!plates&&scene.module==='explorar';handle.hidden=!canPress;
   if(canPress){handle.style.left=Math.max(4,Math.min(96,(plates.x0+plates.x1)/2))+'%';handle.style.top=Math.max(3,Math.min(97,plates.top-2))+'%';handle.dataset.mode=reading.active;
@@ -474,20 +478,20 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // A deformação só existe em Explorar: sem medição em curso, nada a ler (evita cópias do estado a cada quadro).
   if(measureOverlay&&scene.deforming)measureOverlay.update({});
   else if(measureOverlay){const marks=measureOptions.marks();root.dataset.measuring=String(!!measureOptions.pickActive());
-   if(marks){const pts=marks.points.map(p=>{const site=p.site||list.find(u=>u.id===p.unitId)?.site;if(!site)return null;const q=view(layout.project(D(g.site(site).cart)));return {x:q.x,y:q.y,label:p.label};}).filter(Boolean);
+   if(marks){const pts=marks.points.map(p=>{const site=p.site?(scene.rep.view==='lattice'?navigator.cursor.displaySite(p.site):p.site):list.find(u=>u.id===p.unitId)?.site;if(!site)return null;const q=view(layout.project(D(g.site(site).cart)));return {x:q.x,y:q.y,label:p.label};}).filter(Boolean);
     measureOverlay.update(pts.length===marks.points.length?{points:pts,kind:marks.kind,text:marks.text}:{});measureText=marks.spoken||'';}
    else measureOverlay.update({});}
   if(calcOverlay){if(!measureText&&calcMark?.mode==='contact'){const pair=contactPair(list);calcOverlay.update(pair?{mode:'contact',points:pair.map(u=>view(layout.project(D(g.site(u.site).cart)))),text:'d = 2r'}:{});}else calcOverlay.update({});}
   scene.measureText=measureText;
   // Calcular (c/a no HC): rótulos a e c junto das arestas correspondentes da célula.
-  const edgeLabels=[];if(calcMark?.mode==='edges'&&m.id==='HCP'){const a0=layout.project(D([0,0,0])),a1=layout.project(D(g.vectors[0])),c1=layout.project(D(g.vectors[2]));edgeLabels.push({x:(a0.x+a1.x)/2,y:(a0.y+a1.y)/2,r:0,text:'a',className:'silm-edge-label',key:'a'},{x:(a0.x+c1.x)/2,y:(a0.y+c1.y)/2,r:0,text:'c',className:'silm-edge-label',key:'c'});}
+  const edgeLabels=[];if(calcMark?.mode==='edges'&&m.id==='HCP'){const a0=layout.project(D(cellCart([0,0,0]))),a1=layout.project(D(cellCart(g.vectors[0]))),c1=layout.project(D(cellCart(g.vectors[2])));edgeLabels.push({x:(a0.x+a1.x)/2,y:(a0.y+a1.y)/2,r:0,text:'a',className:'silm-edge-label',key:'a'},{x:(a0.x+c1.x)/2,y:(a0.y+c1.y)/2,r:0,text:'c',className:'silm-edge-label',key:'c'});}
   labels.update(edgeLabels);
   selection.update(selected&&selectedPoint?[{x:selectedPoint.x,y:selectedPoint.y,r:unitFraction/2*(1.08-.16*selectedPoint.depth)}]:[]);
  }
  scope.listen(window,'silm:observer-presentation-changed',render);
  let windowTimer=0;
  R.onCamera(()=>{sizeSymbols();paint();if(windowTimer)clearTimeout(windowTimer);windowTimer=setTimeout(()=>{windowTimer=0;updateWindow();paint();},140);});
- R.onResize(()=>{sizeSymbols();paint();});
+ R.onResize(()=>{if(scene?.drawn)updateWindow();sizeSymbols();paint();});
  scope.cleanup(()=>{if(windowTimer)clearTimeout(windowTimer);windowTimer=0;});
  /* Transição curta da montagem livre para os sítios; com redução de movimento, estado final direto.
     animateFrom: posições no palco (frações), convertidas para a cena pela câmera desta vista. */
@@ -514,7 +518,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  function unitAction(id){const current=model.state.structure?.crystallography?.representation.selectedUnitId;
   if(measureOptions?.pickActive()){focusId=id;measureOptions.onPick(id);return;}   // com instrumento ativo, o clique (ou Enter) escolhe o ponto
   const unit=model.state.structure.units.find(unit=>unit.id===id);
-  if(unit&&scene?.rep.view==='lattice'&&current!==id)navigator.visit(g.site(unit.site));
+  if(unit&&scene?.rep.view==='lattice'&&current!==id){navigator.visit(navigator.cursor.displaySite(unit.site),unit.site);return;}
   actions.select(current===id?null:id);}
  /* Com as margens de toque, os botões podem se sobrepor: no clique de ponteiro vale a unidade de centro mais próximo
     (a da frente quando o ponto cai em mais de uma esfera), como no toque central do renderizador. Enter e Espaço
