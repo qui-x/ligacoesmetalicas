@@ -29,18 +29,18 @@ SILM.microstructure=(()=>{
  function create({element,item=null}={}){
   const section=node('section','silm-workshop-micro-viewer'),viewport=node('div','silm-workshop-micro-viewport');
   section.setAttribute('aria-label','Microestrutura ampliada: visualização didática de grãos');
-  const svg=svgNode('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'xMidYMid meet',role:'img','aria-label':'Policristal didático ampliado: grãos e seus contornos; não é micrografia experimental'});
+  const svg=svgNode('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'xMidYMid meet',role:'group','aria-label':'Policristal didático ampliado: percorra os grãos com Tab e destaque com Enter; não é micrografia experimental'});
   svg.classList.add('silm-workshop-micro-map');svg.setAttribute('data-zoom','1');
   const defs=svgNode('defs'),uid='silm-micro-'+(++serial);
   for(let p=0;p<4;p++){const pattern=svgNode('pattern',{id:uid+'-pattern-'+p,patternUnits:'userSpaceOnUse',width:22,height:22,patternTransform:'rotate('+(p*37+12)+')'});
    pattern.append(svgNode('path',{d:'M 0 0 V 22',stroke:'currentColor','stroke-opacity':'.13','stroke-width':1.35}));defs.append(pattern);}
   svg.append(defs);
   const plane=svgNode('g',{'class':'silm-micro-plane'});svg.append(plane);
-  const paths=[];
+  const paths=[],cells=[];
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
   const status=node('span','silm-workshop-micro-status','Nenhum grão destacado');
-  status.setAttribute('aria-live','polite');
-  const choose=i=>{chosen=i;paths.forEach((p,j)=>{p.classList.toggle('is-selected',j===i);p.setAttribute('aria-pressed',String(j===i));});
+  status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');
+  const choose=i=>{chosen=i;paths.forEach((p,j)=>{p.classList.toggle('is-selected',j===i);p.setAttribute('aria-pressed',String(j===i));cells[j]?.classList.toggle('is-selected',j===i);});
    status.textContent='Grão ilustrativo '+(i+1)+' destacado · sem dimensão ou fase medida';
    svg.setAttribute('data-selected-grain',String(i+1));
   };
@@ -51,7 +51,7 @@ SILM.microstructure=(()=>{
    p.style.setProperty('--grain-tone',(16+(i*17)%30)+'%');p.addEventListener('click',()=>{if(!suppressClick)choose(i);});
    p.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(i);}});
    const hatch=svgNode('path',{d,'class':'silm-micro-hatching',fill:'url(#'+uid+'-pattern-'+(i%4)+')','pointer-events':'none'});
-   g.append(p,hatch);plane.append(g);paths[i]=p;
+   g.append(p,hatch);plane.append(g);paths[i]=p;cells[i]=g;
   });
   const toolbar=node('div','silm-workshop-micro-toolbar'),zoomLabel=node('output','silm-workshop-micro-zoom','100%');
   zoomLabel.setAttribute('aria-label','Ampliação da microestrutura');
@@ -85,7 +85,7 @@ SILM.microstructure=(()=>{
   };
   svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);
   viewport.append(svg);
-  const note=node('p','silm-workshop-micro-caveat','Grãos e contornos ilustrativos · sem escala de medição, orientação cristalográfica ou metalografia específica');
+  const note=node('p','silm-workshop-micro-caveat','Grãos ilustrativos · Use Tab e Enter para destacar um grão. Não é metalografia medida.');
   section.append(viewport,toolbar,note);
   update();return section;
  }

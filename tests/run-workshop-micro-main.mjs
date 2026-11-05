@@ -20,6 +20,7 @@ async function test(viewport){
  await page.locator('.silm-workshop-scale').nth(1).click();
  const viewer=page.locator('.silm-workshop-micro-viewer');
  await viewer.waitFor({state:'visible'});
+ assert.equal(await page.locator('.silm-workshop-reference > :first-child').getAttribute('aria-label'),'Escalas de investigação','A navegação de escalas deve ficar no topo da área de exibição.');
  const rectangle=await viewer.locator('.silm-workshop-micro-viewport').boundingBox();
  assert.ok(rectangle&&rectangle.height>=290,'A microestrutura está pequena demais');
  if(viewport.width>800)assert.ok(rectangle.width>650,'Palco central não está ampliado');
@@ -28,6 +29,7 @@ async function test(viewport){
  assert.ok(await grains.count()>=45,'Faltam grãos para observação');
  await grains.nth(25).click();
  assert.equal(await viewer.locator('svg').getAttribute('data-selected-grain'),'26','Destaque de grão falhou');
+ assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),1,'Seleção não aplica padrão estrutural ao grão.');
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  await viewer.getByRole('button',{name:'Ampliar microestrutura'}).click();
  assert.equal(await viewer.locator('svg').getAttribute('data-zoom'),'1.25','Zoom não funciona');
@@ -35,8 +37,37 @@ async function test(viewport){
  assert.equal(await viewer.locator('svg').getAttribute('data-zoom'),'1','Ajuste ao quadro não funciona');
  assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'Zoom modificou o estado científico');
  assert.equal(await page.locator('#silm-integration-scene').isVisible(),false,'Rede cristalina apareceu na escala 2');
+ if(viewport.width>800){
+  const frame=viewer.locator('.silm-workshop-micro-viewport'),grain=viewer.locator('.silm-micro-grain.is-selected');
+  await page.locator('#nav-toggle').click();
+  await page.locator('#si-a11y-toggle').click();
+  await page.locator('#si-dark').uncheck({force:true});
+  await page.waitForFunction(()=>document.documentElement.dataset.theme==='claro');
+  const light=await frame.evaluate(n=>getComputedStyle(n).backgroundColor);
+  await page.locator('#si-dark').check({force:true});
+  await page.waitForFunction(()=>document.documentElement.dataset.theme==='escuro');
+  const dark=await frame.evaluate(n=>getComputedStyle(n).backgroundColor);
+  assert.notEqual(light,dark,'O fundo da microestrutura não acompanha os temas claro e escuro.');
+  await page.locator('#si-contrast').check({force:true});
+  assert.equal(await page.evaluate(()=>document.documentElement.classList.contains('si-highcontrast')),true,'Alto contraste não aplicado.');
+  const outline=await grain.evaluate(n=>getComputedStyle(n).strokeDasharray);
+  assert.notEqual(outline,'none','O destaque do grão depende apenas de cor.');
+  await page.locator('#si-vision-select').selectOption('deuteranopia');
+  assert.equal(await page.evaluate(()=>document.documentElement.classList.contains('si-color-deuteranopia')),true,'Preferência de visão de cores não aplicada.');
+  await page.locator('#si-vision-select').selectOption('acromatopsia');
+  assert.equal(await page.evaluate(()=>document.documentElement.classList.contains('si-color-acromatopsia')),true,'Simulação acromática não aplicada.');
+  await page.locator('#si-font-plus').click();
+  assert.ok(await page.evaluate(()=>parseFloat(getComputedStyle(document.documentElement).fontSize)>16),'Ampliação de texto não refletida.');
+  await page.locator('#si-motion').check({force:true});
+  assert.equal(await page.evaluate(()=>document.documentElement.classList.contains('si-no-motion')),true,'Redução de movimentos não aplicada.');
+  assert.equal(await viewer.isVisible(),true,'A microestrutura sumiu após mudança das preferências.');
+  assert.equal(await page.locator('.silm-workshop-reference > :first-child').getAttribute('aria-label'),'Escalas de investigação','Os controles de escala mudaram de lugar ao aplicar acessibilidade.');
+  await page.locator('#si-a11y-reset').click();
+  await page.locator('#nav-toggle').click();
+ }
  await page.locator('.silm-workshop-scale').nth(0).click();
  assert.equal(await page.locator('.silm-workshop-photo img').first().isVisible(),true,'Imagem realista da escala 1 foi perdida');
+ assert.equal(await page.locator('.silm-workshop-reference > :first-child').getAttribute('aria-label'),'Escalas de investigação','As quatro escalas saíram do topo na escala 1.');
  assert.deepEqual(errors,[],'Erros JavaScript: '+errors.join('; '));
  await context.close();
 }

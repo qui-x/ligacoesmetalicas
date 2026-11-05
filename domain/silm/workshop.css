@@ -82,23 +82,51 @@
 .silm-workshop-micro-heading h2{margin:0;font-size:clamp(1rem,1.8vw,1.3rem)}
 .silm-workshop-micro-component{margin:0;color:var(--muted,#627487);font-size:.78rem;overflow-wrap:anywhere}
 .silm-workshop-micro-viewer{display:flex;flex-direction:column;min-width:0;gap:7px}
-.silm-workshop-micro-viewport{height:clamp(320px,64vh,720px);min-width:0;overflow:hidden;border:1px solid var(--border,#d9e1e8);border-radius:12px;background:color-mix(in srgb,var(--surface-raised,#f8fafc) 88%,var(--silm-metal,#54738b))}
+.silm-workshop-micro-viewport{height:clamp(320px,64vh,720px);min-width:0;overflow:hidden;border:1px solid var(--border);border-radius:12px;background:var(--panel2,var(--surface))}
 .silm-workshop-micro-map{display:block;width:100%;height:100%;user-select:none;touch-action:pan-y;cursor:crosshair}
 .silm-workshop-micro-viewport.is-zoomed .silm-workshop-micro-map{touch-action:none;cursor:grab}
 .silm-workshop-micro-viewport.is-zoomed .silm-workshop-micro-map:active{cursor:grabbing}
-.silm-micro-grain{fill:color-mix(in srgb,var(--silm-metal,#54738b) var(--grain-tone,20%),var(--surface-raised,#f8fafc));stroke:var(--si-text,var(--text,#172a3a));stroke-opacity:.6;stroke-width:2.6;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;outline:none}
+.silm-micro-grain{fill:color-mix(in srgb,var(--text) var(--grain-tone,20%),var(--surface));stroke:var(--text);stroke-opacity:.9;stroke-width:2.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;outline:none}
 .silm-micro-hatching{opacity:.6}
-.silm-micro-grain:hover,.silm-micro-grain:focus-visible{stroke:var(--accent,#ba7c42);stroke-width:5;stroke-opacity:1}
-.silm-micro-grain.is-selected{fill:color-mix(in srgb,var(--accent,#ba7c42) 36%,var(--surface-raised,#f8fafc));stroke:var(--accent,#ba7c42);stroke-width:6;stroke-opacity:1}
+.silm-micro-grain:hover,.silm-micro-grain:focus-visible{stroke:var(--ring);stroke-width:5;stroke-opacity:1;stroke-dasharray:9 4}
+.silm-micro-grain.is-selected{fill:color-mix(in srgb,var(--accent) 40%,var(--surface));stroke:var(--accent);stroke-width:6;stroke-opacity:1;stroke-dasharray:11 4}
 .silm-workshop-micro-toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}
-.silm-workshop-micro-control{min-width:44px;min-height:40px;padding:5px 12px;font:inherit;font-weight:700;border:1px solid var(--border,#d9e1e8);border-radius:8px;background:var(--surface-raised,#f8fafc);color:inherit;cursor:pointer}
+.silm-workshop-micro-control{min-width:44px;min-height:40px;padding:5px 12px;font:inherit;font-weight:700;border:1px solid var(--border,#d9e1e8);border-radius:8px;background:var(--surface);color:var(--text);cursor:pointer}
 .silm-workshop-micro-control:focus-visible{outline:3px solid var(--focus,#3478b8);outline-offset:2px}
 .silm-workshop-micro-zoom{min-width:48px;text-align:center;font-size:.88rem;font-variant-numeric:tabular-nums}
 .silm-workshop-micro-status{margin-right:auto;order:-1;font-size:.78rem;color:var(--muted,#627487)}
 .silm-workshop-micro-caveat{margin:0;font-size:.7rem;color:var(--muted,#627487);line-height:1.4}
-.silm-workshop-micro-mode .silm-workshop-scales{margin-top:4px}
+.silm-workshop-reference>.silm-workshop-scales{margin:0 0 8px;position:relative;z-index:1}
+.silm-workshop-micro-mode .silm-workshop-scales{margin:0 0 4px}
 @media(max-width:560px){
  .silm-workshop-micro-viewport{height:clamp(290px,56dvh,520px)}
  .silm-workshop-micro-status{flex-basis:100%;order:1}
  .silm-workshop-micro-heading .button{min-height:38px}
+}
+
+
+/* Contrato de acessibilidade da escala 2: o estado visual deriva dos tokens gerais.
+   Contorno contínuo/tracejado, textura e anúncio textual identificam o grão sem depender da cor. */
+.silm-workshop-micro-map{color:var(--text)}
+.silm-workshop-micro-viewport{color:var(--text)}
+.silm-workshop-micro-control{min-height:44px;overflow-wrap:anywhere}
+.silm-micro-cell.is-selected .silm-micro-hatching{opacity:1}
+:root.si-highcontrast .silm-workshop-micro-viewport{background:var(--panel2);border:2px solid var(--text)}
+:root.si-highcontrast .silm-micro-grain{fill:var(--panel);stroke:var(--text);stroke-opacity:1;stroke-width:3.5}
+:root.si-highcontrast .silm-micro-grain.is-selected{fill:var(--tint);stroke:var(--accent);stroke-width:7;stroke-dasharray:10 5}
+:root.si-highcontrast .silm-micro-grain:focus-visible{stroke:var(--ring);stroke-width:7;stroke-dasharray:10 5}
+:root.si-highcontrast .silm-workshop-micro-control{border:2px solid var(--text);background:var(--surface);color:var(--text)}
+:root.si-highcontrast .silm-workshop-scale[aria-pressed=true]{border:2px solid var(--accent);outline:2px solid var(--accent);outline-offset:-4px}
+:root.si-no-motion .silm-workshop-micro-viewer *,
+:root.si-no-motion .silm-workshop-micro-scales{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media(prefers-reduced-motion:reduce){.silm-workshop-micro-viewer *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media(forced-colors:active){
+ .silm-workshop-micro-viewport{border:2px solid CanvasText;background:Canvas}
+ .silm-micro-grain{fill:Canvas;stroke:CanvasText;stroke-opacity:1;stroke-width:3.2}
+ .silm-micro-grain.is-selected{fill:Highlight;stroke:HighlightText;stroke-width:6;stroke-dasharray:10 5}
+ .silm-micro-grain:focus-visible{stroke:Highlight;stroke-width:7;stroke-dasharray:10 5}
+ .silm-micro-hatching{opacity:0}
+ .silm-workshop-micro-control{border:2px solid ButtonText;background:ButtonFace;color:ButtonText}
+ .silm-workshop-micro-control:focus-visible{outline:3px solid Highlight}
+ .silm-workshop-scale[aria-pressed=true]{border:2px solid Highlight;outline:2px solid Highlight;outline-offset:-4px}
 }
