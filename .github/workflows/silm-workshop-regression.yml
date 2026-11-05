@@ -11,6 +11,7 @@ on:
       - 'integracao/adapter.js'
       - 'index.html'
       - 'tests/workshop-explorer.test.mjs'
+      - 'tests/run-workshop-browser-tests.mjs'
       - '.github/workflows/silm-workshop-regression.yml'
   workflow_dispatch:
 permissions:
@@ -18,16 +19,55 @@ permissions:
 jobs:
   regression:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser:
+          - chromium
+          - firefox
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
       - name: Verificar sintaxe
         run: |
           node --check domain/silm/workshop.js
           node --check domain/silm/periodic-table.js
           node --check integracao/metallic-experience.js
           node --check integracao/adapter.js
+          node --check tests/run-workshop-browser-tests.mjs
       - name: Testar catálogo
         run: node --test tests/workshop-explorer.test.mjs
+      - name: Instalar Playwright
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-playwright/node_modules/playwright" >> "$GITHUB_ENV"
+      - name: Instalar navegador
+        run: "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright install --with-deps \"$BROWSER_NAME\""
+      - name: Iniciar servidor estático isolado
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-http.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/silm-http.pid"
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent "$BASE_URL/index.html" > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-http.log"
+          exit 1
+      - name: Testar Oficina de Metais no navegador
+        run: node tests/run-workshop-browser-tests.mjs
+      - name: Encerrar servidor estático
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/silm-http.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/silm-http.pid")" 2>/dev/null || true
+          fi
