@@ -39,7 +39,7 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
  const sources=U.button('Fontes',()=>{const e=D.get(state.selection);if(e)onSources(e);},scope,{id:prefix+'-sources'});actions.append(clear,investigate,explore,sources);foot.append(actions);root.append(foot);host.append(root);
  function update(){
   const e=D.get(state.selection);for(const [z,b]of buttons){b.setAttribute('aria-pressed',String(z===state.selection));b.classList.toggle('is-selected',z===state.selection);}
-  summary.replaceChildren();clear.disabled=!state.selection&&!input.value;sources.hidden=!e;investigate.hidden=!e||e.silmEligibility.status!=='available';investigate.disabled=!canInvestigate();explore.hidden=!e||e.silmEligibility.status!=='available';explore.disabled=!canInvestigate();
+  summary.replaceChildren();clear.disabled=!state.selection&&!input.value;sources.hidden=!e;investigate.hidden=!e||e.silmEligibility.status!=='available';investigate.disabled=!canInvestigate();explore.hidden=teacher||!e||e.silmEligibility.status!=='available';explore.disabled=!canInvestigate();
   if(!e){summary.append(U.element('p',teacher?'Escolha um elemento para apresentar à turma.':'Selecione um metal para iniciar uma investigação.'));return;}
   summary.append(U.element('strong',e.symbol+' · '+e.name+' · Z = '+e.atomicNumber),U.element('span',D.categoryLabel(e)));
   const ref=D.structure(e);summary.append(U.element('span',e.silmEligibility.status==='available'?'Disponível · '+(ref?.label||''):D.reason(e)));
