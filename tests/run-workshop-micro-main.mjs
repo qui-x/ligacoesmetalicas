@@ -63,7 +63,7 @@ async function test(viewport){
   assert.equal(await viewer.isVisible(),true,'A microestrutura sumiu após mudança das preferências.');
   assert.equal(await page.locator('.silm-workshop-reference > :first-child').getAttribute('aria-label'),'Escalas de investigação','Os controles de escala mudaram de lugar ao aplicar acessibilidade.');
   await page.locator('#si-a11y-reset').click();
-  await page.locator('#nav-toggle').click();
+  await page.locator('#si-nav-close').click();
  }
  await page.locator('.silm-workshop-scale').nth(0).click();
  assert.equal(await page.locator('.silm-workshop-photo img').first().isVisible(),true,'Imagem realista da escala 1 foi perdida');
