@@ -64,7 +64,7 @@ SILM.microstructure=(()=>{
   const selectionLabel=i=>{
    if(materialFocus){
     const constituent=materialPart(materialFocus);
-    return 'Grão '+(i+1)+' · '+constituent.name+' ('+constituent.symbol+') na '+material.label+
+    return 'Grão '+(i+1)+' · '+constituent.name+' ('+constituent.symbol+') · material: '+material.label+
      ' · composição deste grão não medida';
    }
    if(compositionMode){
