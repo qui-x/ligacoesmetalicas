@@ -54,6 +54,22 @@ async function test(viewport){
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-selected-grain'),'26','Destaque de grão falhou');
  assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),1,'Seleção não aplica padrão estrutural ao grão.');
  assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/Grão 26 · área no desenho: .*% \(ilustrativa\)/,'Área relativa ilustrativa não foi exibida.');
+ // Parte 5: o mapa A–B e seus tons são só apresentação, com simulação rotulada.
+ const mapMode=viewer.getByRole('button',{name:'Alternar mapa ilustrativo de liga A–B'});
+ assert.equal(await mapMode.count(),1,'Ligas precisam oferecer mapa ilustrativo seletivo.');
+ const scientificBefore=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
+ await mapMode.click();
+ assert.equal(await map.getAttribute('data-composition-focus'),'A','A ativação deve iniciar no elemento didático A.');
+ assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/predominância simulada:/,'A seleção não declarou composição ilustrativa.');
+ assert.match(await viewer.locator('.silm-workshop-micro-caveat').textContent(),/SIMULAÇÃO/,'O modelo não está rotulado como simulação.');
+ const selectedElement=viewer.getByRole('button',{name:'Exibir concentração simulada do elemento B'});
+ await selectedElement.click();
+ assert.equal(await map.getAttribute('data-composition-focus'),'B','Trocar o elemento em foco não alterou o mapa.');
+ assert.equal(await selectedElement.getAttribute('aria-pressed'),'true','Controle do elemento perdeu estado acessível.');
+ assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/elemento B/,'Selecionar grão não informa o elemento em foco.');
+ await mapMode.click();
+ assert.equal(await map.getAttribute('data-composition-focus'),null,'Voltar a grãos não limpou mapa de composição.');
+ assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),scientificBefore,'O mapa ilustrativo alterou o estado científico.');
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  await viewer.getByRole('button',{name:'Ampliar microestrutura'}).click();
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-zoom'),'1.25','Zoom não funciona');
