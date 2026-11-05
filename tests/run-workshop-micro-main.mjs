@@ -69,6 +69,22 @@ async function test(viewport){
  assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/elemento B/,'Selecionar grão não informa o elemento em foco.');
  await mapMode.click();
  assert.equal(await map.getAttribute('data-composition-focus'),null,'Voltar a grãos não limpou mapa de composição.');
+ // A família de aço tem Fe e C; esses dados não identificam a química de um grão.
+ const iron=viewer.getByRole('button',{name:'Consultar Ferro na família de liga'});
+ assert.equal(await iron.count(),1,'Falta identificação real do elemento da liga.');
+ await iron.click();
+ assert.equal(await iron.getAttribute('aria-pressed'),'true');
+ assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/Ferro \(Fe\).*composição deste grão não medida/);
+ assert.match(await viewer.locator('.silm-workshop-micro-caveat').textContent(),/Sem mapa químico medido/);
+ assert.equal(await map.getAttribute('data-composition-focus'),null,'Elemento real sem EDS não deve ganhar cores de concentração.');
+ const carbon=viewer.getByRole('button',{name:'Consultar Carbono na família de liga'});
+ await carbon.click();
+ assert.equal(await iron.getAttribute('aria-pressed'),'false');
+ assert.equal(await carbon.getAttribute('aria-pressed'),'true');
+ assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/Carbono \(C\).*não medida/);
+ await carbon.click();
+ assert.equal(await carbon.getAttribute('aria-pressed'),'false');
+
  assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),scientificBefore,'O mapa ilustrativo alterou o estado científico.');
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  await viewer.getByRole('button',{name:'Ampliar microestrutura'}).click();
