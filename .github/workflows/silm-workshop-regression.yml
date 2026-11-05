@@ -1,0 +1,33 @@
+name: SILM — regressão da Oficina de Metais
+on:
+  push:
+    branches:
+      - 'study/silm-coupled-properties-transport-*'
+    paths:
+      - 'domain/silm/workshop.js'
+      - 'domain/silm/workshop.css'
+      - 'domain/silm/periodic-table.js'
+      - 'integracao/metallic-experience.js'
+      - 'integracao/adapter.js'
+      - 'index.html'
+      - 'tests/workshop-explorer.test.mjs'
+      - '.github/workflows/silm-workshop-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verificar sintaxe
+        run: |
+          node --check domain/silm/workshop.js
+          node --check domain/silm/periodic-table.js
+          node --check integracao/metallic-experience.js
+          node --check integracao/adapter.js
+      - name: Testar catálogo
+        run: node --test tests/workshop-explorer.test.mjs

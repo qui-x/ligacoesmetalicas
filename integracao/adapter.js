@@ -29,7 +29,7 @@
   requestAnimationFrame(()=>{const page=document.querySelector('#conteudo > [data-view="'+selected+'"]');if(!page||page.contains(document.activeElement))return;const heading=[...page.querySelectorAll('h1,h2')].find(h=>h.getClientRects().length);if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}});
  };
  let lastRoute=null;
- let view=null,scope=null,viewKey='',pending=false,ready=false,selected=null,focusAfterRender=null;
+ let view=null,scope=null,viewKey='',pending=false,ready=false,selected=null,focusAfterRender=null;\n let workshopSelectionId=null,workshopScale=1;
  let routeUI=null;
  const allows=tool=>!routeUI||routeUI.session.allows(tool);
  let representation=S.representation.defaults(null),invalidSavedState=false,unavailable3D=false;
@@ -88,7 +88,7 @@
  }
  const comparison=S.createStructureComparison({storage,host:$('silm-comparison-items'),current:()=>model.state.structure?.units?.length?model.state.investigation?.id:null,open:openStructure,newStructure:()=>{showFocus();openLeft('preparo');},say,confirm:options=>B.confirmDialog(options)});
  const tools=S.createIntegrationTools({model,host:$('silm-tools'),moduleHost:$('silm-module-choice'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
- const prepareMetal=z=>{if(routeUI?.session.open()||S.data.get(z)?.silmEligibility.status!=='available')return false;$('silm-metal').value=String(z);selected=String(z);schedule();return true;};
+ const prepareMetal=z=>{if(routeUI?.session.open()||S.data.get(z)?.silmEligibility.status!=='available')return false;$('silm-metal').value=String(z);selected=String(z);workshopSelectionId=null;workshopScale=1;schedule();return true;};
  const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,prepareMetal,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
  const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session,quickActions:experience.quickActions,refreshScene:()=>view?.update()});
  routeUI=S.createRouteUI({model,storage,prepareMetal,view:()=>representation,onView:(value,{persist=true}={})=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);return persist?saveView():true;},schedule,say,onModule:m=>B.selectModule(m),selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
@@ -150,7 +150,7 @@
  function renderScene(){
   const state=model.state,e=element(),key=e?state.investigation.id+':'+e.atomicNumber+':'+state.module.active+':'+(state.structure?.mode||'empty')+':'+(state.structure?.mode==='crystalline'?representation.viewMode:'2d'):'none';
   if(viewKey!==key){placeExpansionButton(false);scope?.destroy();scope=null;view=null;viewKey=key;$('silm-integration-scene').replaceChildren();
-   if(!e)emptyState({title:'Oficina vazia',text:['Abra ','Montagem → Preparo',' para escolher um metal. Depois adicione unidades e organize a estrutura.'],actions:[['Abrir Montagem',()=>openLeft('preparo'),'primary'],['Começar com o cobre',async()=>{$('silm-metal').value='29';selected='29';await start();}],['Montagens prontas',()=>{location.hash='#/montagens';}],['Tabela periódica',()=>$('silm-open-periodic').click()]]});
+   if(!e){/* Descoberta por elemento renderizada no painel de contexto da Oficina. */}
    else if(!state.structure)emptyState({title:'Estrutura de '+e.name+' vazia',text:state.module.active==='explorar'?['Use ','Adicionar unidade',' para montar a estrutura de '+e.name+'. Depois organize segundo a estrutura de referência.']:['A estrutura ainda não foi montada. Volte ao módulo ','Explorar',' para adicionar unidades.'],actions:state.module.active==='explorar'&&(!routeUI.session.open()||routeUI.canBuild())?[['Adicionar unidade',()=>run.add(),'primary'],['Abrir Montagem',()=>openLeft('objetos')]]:[['Abrir Montagem',()=>openLeft('modulo'),'primary']]});
    else if(state.structure){
     scope=SimCore.createScope();const common={scope,model,element:e,actions:run,reducedMotion:reduced,representation:rep,observer:workspaceFamily.observer,moduleTitle:{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active],measure:tools.measure,calc:tools.calc,properties:experience.scene};
@@ -203,6 +203,58 @@
   }
  }
 
+ function ensureWorkshopCrystal(){
+  const e=element();if(!e)return {ok:false,reason:'NO_METAL'};
+  const eligibility=S.crystal.eligibility(e);if(eligibility.status!=='available')return {ok:false,reason:eligibility.reasonCode||'STRUCTURE_UNAVAILABLE'};
+  if(!model.state.structure)model.beginAssembly();
+  if(!model.state.structure?.units?.length){const added=model.addUnit();if(!added?.ok)return added||{ok:false,reason:'ADD_UNIT_FAILED'};}
+  if(model.state.structure?.mode==='free'){const organized=model.organize();if(!organized?.ok)return organized;}
+  return model.state.structure?.mode==='crystalline'?{ok:true}:{ok:false,reason:'CRYSTAL_NOT_READY'};
+ }
+ function setWorkshopScale(level){
+  if(!Number.isInteger(level)||level<1||level>4||!element())return false;
+  if(level>=3){
+   const ready=ensureWorkshopCrystal();if(!ready.ok){say(S.crystal.reasons[ready.reason]||'A estrutura cristalina não está disponível.', 'warning');workshopScale=2;updateWorkshopContext();return false;}
+   const first=model.state.structure?.units?.[0]||null;
+   if(!model.setCrystalRepresentation({view:'lattice',unitCell:true,neighbors:level===4,selectedUnitId:level===4&&first?first.id:null}))return false;
+   workshopScale=level;schedule();
+   requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    ($('silm-assembly-stage')||$('silm-integration-scene'))?.scrollIntoView({behavior:reduced()?'auto':'smooth',block:'center'});
+    if(level===3)view?.renderer?.fit?.();if(level===4&&first)view?.focusUnit?.(first.id);
+   }));
+  }else{workshopScale=level;updateWorkshopContext();}
+  return true;
+ }
+ async function investigateWorkshopReference(item){
+  if(!item||!S.workshop.get(item.id))return false;
+  workshopSelectionId=item.id;workshopScale=1;updateWorkshopContext();
+  const started=await start();if(!started){workshopSelectionId=null;workshopScale=1;updateWorkshopContext();return false;}
+  const ready=ensureWorkshopCrystal();
+  if(ready.ok){model.setCrystalRepresentation({view:'lattice',unitCell:true,neighbors:false,selectedUnitId:null});workshopScale=3;}
+  else say(S.crystal.reasons[ready.reason]||'A investigação foi iniciada; a montagem livre continua disponível.','info');
+  schedule();return true;
+ }
+ function updateWorkshopContext(){
+  const host=$('silm-workshop-context');if(!host||!S.workshop)return;
+  const active=element();
+  if(!active){
+   const candidate=S.data.get(Number(selected||$('silm-metal')?.value));
+   const key='discover:'+String(candidate?.atomicNumber||'none');
+   if(host.dataset.key===key)return;
+   host.dataset.key=key;host.hidden=false;
+   S.workshop.renderDiscovery(host,{element:candidate,onOpenPeriodic:()=>$('silm-open-periodic')?.click(),onContinue:()=>openLeft('preparo'),onInvestigate:investigateWorkshopReference,onStartDirect:()=>start()});
+   return;
+  }
+  if(workshopSelectionId&&S.workshop.get(workshopSelectionId)?.atomicNumber!==active.atomicNumber)workshopSelectionId=null;
+  const item=S.workshop.get(workshopSelectionId);
+  const chosen=item?.atomicNumber===active.atomicNumber?item:null;
+  const key='active:'+active.atomicNumber+':'+(chosen?.id||'')+':'+workshopScale;
+  if(host.dataset.key===key)return;
+  host.dataset.key=key;host.hidden=false;
+  S.workshop.renderReference(host,{element:active,item:chosen,items:S.workshop.list(active.atomicNumber),scale:workshopScale,
+   onChoose:next=>{workshopSelectionId=next.id;workshopScale=1;updateWorkshopContext();},
+   onScale:setWorkshopScale,onOpenPeriodic:()=>$('silm-open-periodic')?.click()});
+ }
  function text(id,value){if($(id))$(id).textContent=value;}
  function render(){
   const focused=document.activeElement,restoreControl=focused?.closest('#silm-tools,#silm-module-choice,#silm-history')?focused.id:null;
@@ -213,7 +265,7 @@
   expandButton.title=$('si-stage').classList.contains('si-scene-expanded')?'Recolher estrutura (Escape)':expandable?'Expandir a estrutura cristalina configurada':'Organize uma estrutura cristalina para habilitar a visualização expandida.';
   if(!expandable&&$('si-stage').classList.contains('si-scene-expanded'))setStageExpanded(false);
   if(representation.investigationId!==(state.investigation?.id??null))representation=S.representation.defaults(state.investigation?.id??null);
-  tools.render();experience.update();renderScene();if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
+  tools.render();experience.update();updateWorkshopContext();renderScene();if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
   text('silm-summary',e?e.name+' · '+units(n)+' · '+(s?.mode==='crystalline'?'estrutura cristalina':'montagem livre'):'Nenhuma investigação iniciada.');
   // Resumo em pares rótulo/valor, como o resumo da bancada do SIAB (só leitura do estado; nada é recalculado aqui).
   const list=$('silm-summary-list');if(list){const exp=routeUI?.experiment?.();const rows=e?[...(exp&&!routeUI.session.open()?[['Roteiro',exp.title]]:[]),['Metal',e.name+' ('+e.symbol+')'],['Estrutura',s?.mode==='crystalline'?S.crystal.label(s.crystallography?.structureType,e):'Montagem livre'],['Unidades',String(n)],['Módulo',{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active]],['Medições',String(state.measurements?.length||0)],['Cálculos',String(state.calculations?.length||0)]]:[];

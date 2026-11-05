@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import vm from 'node:vm';
+const source=await readFile(new URL('../domain/silm/workshop.js',import.meta.url),'utf8');
+const elements=new Map([[12,{atomicNumber:12}],[26,{atomicNumber:26}],[29,{atomicNumber:29}],[57,{atomicNumber:57}]]);
+const window={SILM:{data:{get:z=>elements.get(z)||null}}};
+vm.runInNewContext(source,{window,SILM:window.SILM},{filename:'domain/silm/workshop.js'});
+const workshop=window.SILM.workshop;
+test('cobre, ferro, magnésio e lantânio possuem referências',()=>{assert.equal(workshop.valid(),true);for(const z of [12,26,29,57])assert.ok(workshop.list(z).length>0);});
+test('todas as referências identificam componente, material, composição e ressalva',()=>{const ids=new Set();for(const x of workshop.references){assert.equal(ids.has(x.id),false);ids.add(x.id);assert.ok(elements.has(x.atomicNumber));assert.ok(x.component);assert.ok(x.material);assert.ok(x.composition.length>=2);assert.ok(x.explanation);assert.ok(x.caveat);}});
+test('a busca por elemento nunca mistura aplicações',()=>{for(const z of [12,26,29,57])assert.ok(workshop.list(z).every(x=>x.atomicNumber===z));});
+test('IDs desconhecidos retornam null',()=>assert.equal(workshop.get('inexistente'),null));
