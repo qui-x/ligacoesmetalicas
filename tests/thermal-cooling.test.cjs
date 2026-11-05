@@ -6,9 +6,10 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'domain', 'silm', 'thermal.js'), 'utf8');
-const window = {};
+const window = {SILM:{}};
 vm.runInNewContext(source, {
   window,
+  SILM: window.SILM,
   console,
   Float64Array,
   Map,

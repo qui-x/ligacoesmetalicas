@@ -72,7 +72,7 @@ SILM.createDurableStorage=({backend,prefix='silm-base-integration:',onStatus=()=
  return Object.freeze(port);
 };
 SILM.protectScientificModel=(model,storage,{onFailure=()=>{}}={})=>{
- const changes=new Set(['begin','setModule','resetInvestigation','close','setStatus','restore','beginAssembly','addUnit','moveUnit','undo','clearStructure','setAssistance','setAssemblyStatus','organize','restoreFree','setCrystalRepresentation','activateElectrons','setElectronRepresentation','startProperty','setPropertyParams','restoreProperty','endProperty','addMeasurement','removeMeasurement','clearMeasurements','addCalculation','removeCalculation','clearCalculations','load']);
+ const changes=new Set(['begin','setWorkshopContext','setModule','resetInvestigation','close','setStatus','restore','beginAssembly','addUnit','moveUnit','undo','clearStructure','setAssistance','setAssemblyStatus','organize','restoreFree','setCrystalRepresentation','activateElectrons','setElectronRepresentation','startProperty','setPropertyParams','restoreProperty','endProperty','addMeasurement','removeMeasurement','clearMeasurements','addCalculation','removeCalculation','clearCalculations','load']);
  const objectResults=new Set(['restore','addUnit','moveUnit','undo','organize','startProperty','addMeasurement','addCalculation','load']);
  const wrapped={};
  return new Proxy({},{get(_target,key){

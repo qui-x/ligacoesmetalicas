@@ -216,6 +216,65 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  function contactPair(list){const byKey=new Map(list.map(u=>[X.key(u.site),u])),corner=list.find(u=>g.role(u.site).role==='corner'||g.role(u.site).role==='base-vertex')||list[0];if(!corner)return null;
   const near=g.neighbors(corner.site).list.find(n=>byKey.has(n.key));return near?[corner,byKey.get(near.key)]:null;}
  const svgEl=(tag,attrs)=>{const el=document.createElementNS(NS,tag);for(const [k,v]of Object.entries(attrs))el.setAttribute(k,String(v));return el;};
+ // O cursor percorre o mesmo recorte e a mesma projeção utilizados pelas propriedades.
+ const navigator=SILM.createLatticePanel({geometry:g,scope,initialKey:rep2.latticeFocus?.(),onFocus(site){
+  rep2.setLatticeFocus?.(site.key);
+  const point=layout.project(D(site.cart));
+  R.setCamera({...R.camera,mode:'free',x:point.x,y:point.y,zoom:Math.max(1.35,R.camera.zoom)});
+  render();
+ }});
+ root.insertBefore(navigator.status,area);
+ // Os comandos acompanham a câmera inclusive na vista expandida.
+ if(cameraHost)cameraHost.after(navigator.root);
+ else root.append(navigator.root);
+ scope.cleanup(()=>navigator.root.remove());
+ // Reutiliza os comandos de Observar e as mesmas restrições científicas em cada referência.
+ if(propertyOptions?.quickActions&&model.state.module.active==='explorar'){
+  const choices=[
+   ['electrons','Mar de elétrons',[]],
+   ['electrical','Campo elétrico',['electrical']],['thermal','Fonte de calor',['thermal']],
+   ['malleability','Compressão',['malleability']],['ductility','Tração',['ductility']],['luster','Luz',['luster']],
+   ['heatElectrical','Campo elétrico + calor externo',['electrical','thermal']],
+   ['malleabilityElectrical','Compressão + campo elétrico',['malleability','electrical']],
+   ['ductilityElectrical','Tração + campo elétrico',['ductility','electrical']]
+  ];
+  const control=document.createElement('select');control.setAttribute('aria-label','Aplicar estímulo na rede');control.className='silm-lattice-stimulus';
+  const prompt=document.createElement('option');prompt.value='';prompt.textContent='Estímulos';control.append(prompt);
+  for(const [id,label,required]of choices){
+   const option=document.createElement('option');option.value=id;option.textContent=label;
+   option.disabled=required.some(prop=>!propertyOptions.canStudy(prop));
+   control.append(option);
+  }
+  scope.listen(control,'change',()=>{
+   const choice=choices.find(([id])=>id===control.value);control.value='';
+   if(!choice||model.state.module.active!=='explorar'||choice[2].some(prop=>!propertyOptions.canStudy(prop)))return;
+   if(choice[0]==='electrons')propertyOptions.quickActions.toggleElectrons();
+   else if(choice[2].length===2)propertyOptions.quickActions.activateCombination(choice[0]);
+   else propertyOptions.quickActions.toggleProperty(choice[0]);
+  });
+  navigator.root.append(control);
+ }
+
+ const cursorLayer=group(ghostSvg,'silm-nav-cursor');
+ const cursorMark=svgEl('circle',{class:'silm-nav-center',r:2.5});
+ cursorLayer.append(cursorMark);
+ let cursorKey='',cursorNeighbors=[];
+ function drawCursor(visible,showNeighbors){
+  navigator.root.hidden=!visible;
+  navigator.status.hidden=!visible;
+  cursorLayer.style.display=visible?'':'none';
+  if(!visible)return;
+  const cursor=navigator.cursor,site=cursor.site;
+  const center=layout.project(D(site.cart));
+  cursorMark.setAttribute('cx',center.x*100);cursorMark.setAttribute('cy',center.y*100);
+  const key=site.key+'|'+showNeighbors;
+  if(cursorKey!==key){
+   cursorKey=key;
+   cursorNeighbors=showNeighbors?cursor.shell.list.map(neighbor=>({neighbor,mark:svgEl('circle',{class:'silm-nav-neighbor',r:1.6})})):[];
+   cursorLayer.replaceChildren(cursorMark,...cursorNeighbors.map(x=>x.mark));
+  }
+  for(const {neighbor,mark}of cursorNeighbors){const point=layout.project(D(neighbor.cart));mark.setAttribute('cx',point.x*100);mark.setAttribute('cy',point.y*100);}
+ }
  const pt=p=>{const q=layout.project(D(p));return {x:q.x*100,y:q.y*100,depth:q.depth};};
  /* Escala de profundidade: no 2D e na ortográfica, a pista da 0.5.x; na perspectiva, o fator da própria projeção. */
  const dscale=q=>layout?.perspective?Math.max(.5,Math.min(1.7,q.size)):1.08-.16*q.depth;
@@ -351,6 +410,17 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // Deriva média relativa (seta "elétrons (média)"): calor e defeitos reduzem; a intensidade do campo aumenta.
   scene.driftFactor=ET?(centersT.reduce((a,c)=>a+ET.drift(c.t),0)/Math.max(1,centersT.length))*ET.defectDrift(defects):1;
   electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:centersT,spacing:d*layout.scale,connect:false,drive:driveCtl?.intensity??.6,defects});
+  drawCursor(r.view==='lattice',r.neighbors);
+  if(r.view==='lattice'){
+   const effects=[];
+   if(active)effects.push(P.catalog[active].title);
+   if(active==='electrical'&&thermalCtl?.reading().on)effects.push('aquecimento externo');
+   if((active==='malleability'||active==='ductility')&&driveCtl?.reading().deformField)effects.push('campo elétrico');
+   if(shownElectrons)effects.push('elétrons deslocalizados');
+   const local=scene.heatTemps?.get(navigator.cursor.site.key);
+   const info=effects.join(' + ')+(local==null?'':' · aquecimento local '+Math.round(100*local)+'% da escala didática');
+   if(navigator.reading.textContent!==info)navigator.reading.textContent=info;
+  }
   drawAxes();
   // Durante a animação da deformação, os controles e o texto são atualizados até 10 vezes por segundo (o desenho, a cada quadro).
   const busy=deforming&&!!deformCtl&&(r=>r.load>0||r.sliding||Math.abs(r.strain)>1e-3||(r.orient>1e-4&&r.orient<1-1e-4))(deformCtl.reading()),tNow=performance.now();
@@ -443,6 +513,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  if(mode3d)scope.listen(area,'keydown',e=>{if((e.key==='p'||e.key==='P')&&!e.altKey&&!e.ctrlKey&&!e.metaKey&&!/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)){e.preventDefault();perspectiveButton?.click();}});
  function unitAction(id){const current=model.state.structure?.crystallography?.representation.selectedUnitId;
   if(measureOptions?.pickActive()){focusId=id;measureOptions.onPick(id);return;}   // com instrumento ativo, o clique (ou Enter) escolhe o ponto
+  const unit=model.state.structure.units.find(unit=>unit.id===id);
+  if(unit&&scene?.rep.view==='lattice'&&current!==id)navigator.visit(g.site(unit.site));
   actions.select(current===id?null:id);}
  /* Com as margens de toque, os botões podem se sobrepor: no clique de ponteiro vale a unidade de centro mais próximo
     (a da frente quando o ponto cai em mais de uma esfera), como no toque central do renderizador. Enter e Espaço

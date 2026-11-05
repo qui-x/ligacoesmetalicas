@@ -41,6 +41,7 @@ SILM.representation=(()=>{
  function sanitize(v,investigationId=null){
   const out=defaults(investigationId);
   if(!v||typeof v!=='object'||(v.version!==1&&v.version!==VERSION)||v.investigationId!==investigationId)return out;
+  if(typeof v.latticeFocus==='string'&&/^-?\d,-?\d,-?\d\|\d{1,3}$/.test(v.latticeFocus))out.latticeFocus=v.latticeFocus;
   if(PROJECTIONS.includes(v.projection))out.projection=v.projection;
   for(const k of ['free','crystal','crystal3d'])out.cameras[k]=sanitizeCamera(v.cameras?.[k]);
   if(v.version===VERSION){if(VIEW_MODES.includes(v.viewMode))out.viewMode=v.viewMode;out.camera3D=sanitizeCamera3D(v.camera3D);}   // versão 1: modo 2D, câmera 3D padrão

@@ -1,7 +1,7 @@
 'use strict';
 window.SILM=window.SILM||{};
 /* Um componente, dois contextos. O callback de investigação é a única escrita científica. */
-SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSources,onSelect=()=>{},canInvestigate=()=>true,toolbar=null})=>{
+SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSources,onSelect=()=>{},onExplore=()=>{},canInvestigate=()=>true,toolbar=null})=>{
  const U=SimCore.ExperienceUI,D=SILM.data,sequence=++SILM.tableSequence,prefix='periodic-'+sequence;
  const root=U.element('section',null,'silm-periodic');root.dataset.context=teacher?'presentation':'investigation';
  const head=U.element('header',null,'periodic-heading'),title=U.element('h1','Tabela Periódica');title.id=prefix+'-title';title.tabIndex=-1;
@@ -35,10 +35,11 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
  const summary=U.element('div',null,'periodic-summary');summary.id=prefix+'-summary';summary.setAttribute('aria-live','polite');foot.append(summary);
  const actions=U.element('div',null,'periodic-actions');const clear=U.button('Limpar destaque',()=>{state.selection=null;state.query='';input.value='';updateSearch(false);update();input.focus();},scope,{id:prefix+'-clear'});
  const investigate=U.button(teacher?'Investigar este metal':'Iniciar investigação',()=>{const e=D.get(state.selection);if(e?.silmEligibility.status==='available'&&canInvestigate())return onInvestigate(e);},scope,{id:prefix+'-investigate',primary:true});
- const sources=U.button('Fontes',()=>{const e=D.get(state.selection);if(e)onSources(e);},scope,{id:prefix+'-sources'});actions.append(clear,investigate,sources);foot.append(actions);root.append(foot);host.append(root);
+ const explore=U.button('Ver aplicações',()=>{const e=D.get(state.selection);if(e?.silmEligibility.status==='available'&&canInvestigate())return onExplore(e);},scope,{id:prefix+'-explore'});
+ const sources=U.button('Fontes',()=>{const e=D.get(state.selection);if(e)onSources(e);},scope,{id:prefix+'-sources'});actions.append(clear,investigate,explore,sources);foot.append(actions);root.append(foot);host.append(root);
  function update(){
   const e=D.get(state.selection);for(const [z,b]of buttons){b.setAttribute('aria-pressed',String(z===state.selection));b.classList.toggle('is-selected',z===state.selection);}
-  summary.replaceChildren();clear.disabled=!state.selection&&!input.value;sources.hidden=!e;investigate.hidden=!e||e.silmEligibility.status!=='available';investigate.disabled=!canInvestigate();
+  summary.replaceChildren();clear.disabled=!state.selection&&!input.value;sources.hidden=!e;investigate.hidden=!e||e.silmEligibility.status!=='available';investigate.disabled=!canInvestigate();explore.hidden=teacher||!e||e.silmEligibility.status!=='available';explore.disabled=!canInvestigate();
   if(!e){summary.append(U.element('p',teacher?'Escolha um elemento para apresentar à turma.':'Selecione um metal para iniciar uma investigação.'));return;}
   summary.append(U.element('strong',e.symbol+' · '+e.name+' · Z = '+e.atomicNumber),U.element('span',D.categoryLabel(e)));
   const ref=D.structure(e);summary.append(U.element('span',e.silmEligibility.status==='available'?'Disponível · '+(ref?.label||''):D.reason(e)));
