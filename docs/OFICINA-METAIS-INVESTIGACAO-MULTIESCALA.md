@@ -51,3 +51,13 @@ Os cartões distinguem o componente que contém o elemento dos demais materiais.
 `tests/workshop-explorer.test.mjs` valida cobertura, IDs únicos, integridade dos campos de aplicação e filtragem por elemento. O workflow executa sintaxe e testes em pushes à branch de estudo.
 
 Ainda requer verificação visual em navegador: tabela → aplicações → componente → investigação; responsividade; troca de referências; escalas 3/4; montagem livre, medidas, cálculos e atividades orientadas.
+
+
+## Escala 2 — visualização microestrutural ampliada (fase inicial)
+- O pequeno esquema estático da escala 2 foi substituído por um palco vetorial ampliado de grãos e contornos.
+- Zoom de 100% a 400% (passos de 25%), ajuste ao quadro, roda do mouse e deslocamento por arraste quando ampliado; grãos podem ser destacados por clique ou teclado.
+- Cabeçalho e legendas compactos; composição detalhada permanece acessível na escala 1, sem repetir blocos de texto ao observar os grãos.
+- O diagrama é **deliberadamente genérico**, com regiões de Voronoi ilustrativas; **não** é micrografia real, EBSD, medida de tamanho de grão, mapa de fases nem descrição de microestrutura específica de Fe, Cu, Mg ou qualquer outra liga.
+- O mesmo mapa ilustrativo pode ser exibido para os metais investigáveis, até que referências experimentais específicas sejam verificadas e homologadas; não usar variação estética como alegação científica.
+- A interação visual não altera o snapshot científico, a composição, a rede cristalográfica, o centro selecionado, os instrumentos ou o relógio.
+- Critérios de regressão: campo amplo no desktop e mobile; destaque de grão; zoom e retorno; escalas 3/4 e investigação direta intactas.

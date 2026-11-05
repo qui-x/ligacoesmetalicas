@@ -5,6 +5,7 @@ on:
       - 'study/silm-coupled-properties-transport-*'
     paths:
       - 'domain/silm/workshop.js'
+      - 'domain/silm/microstructure-view.js'
       - 'domain/silm/workshop.css'
       - 'domain/silm/periodic-table.js'
       - 'integracao/metallic-experience.js'
@@ -39,6 +40,7 @@ jobs:
           python-version: '3.x'
       - name: Verificar sintaxe
         run: |
+          node --check domain/silm/microstructure-view.js
           node --check domain/silm/workshop.js
           node --check domain/silm/periodic-table.js
           node --check integracao/metallic-experience.js
