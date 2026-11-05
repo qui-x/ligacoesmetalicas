@@ -282,3 +282,31 @@
  }
  .silm-workshop-micro-composition-key{max-width:145px}
 }
+
+/* Parte 5 — informação da família de liga; grãos ficam sem falsa composição colorida. */
+.silm-workshop-micro-mode .silm-workshop-micro-material-tools{
+ grid-column:1/-1;display:flex;align-items:center;gap:5px;min-width:0;flex-wrap:wrap;
+ border-top:1px solid var(--border);padding-top:6px;
+}
+.silm-workshop-micro-material-label{font-size:.76rem;color:var(--text);font-weight:650;white-space:nowrap}
+.silm-workshop-micro-material-tools .silm-workshop-micro-control{min-height:44px;min-width:44px;padding:5px 9px;font-size:.78rem}
+.silm-workshop-micro-material-tools .silm-workshop-micro-control[aria-pressed="true"]{
+ border:2px solid var(--accent);outline:2px solid var(--ring,var(--accent));outline-offset:-4px;
+}
+@media(min-width:1101px){
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar:has(.silm-workshop-micro-material-tools){
+  display:flex;flex-wrap:nowrap;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:thin;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar:has(.silm-workshop-micro-material-tools) .silm-workshop-micro-status{
+  flex:1 1 180px;min-width:180px;margin:0;order:0;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar:has(.silm-workshop-micro-material-tools) .silm-workshop-micro-dimension{
+  flex:0 1 160px;min-width:120px;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-material-tools{
+  border-top:0;border-left:1px solid var(--border);padding:0 0 0 8px;flex:0 0 auto;grid-column:auto;flex-wrap:nowrap;
+ }
+}
+@media(max-width:620px){
+ .silm-workshop-micro-mode .silm-workshop-micro-material-tools{grid-column:1;grid-row:5;gap:5px}
+}
