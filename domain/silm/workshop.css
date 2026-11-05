@@ -164,3 +164,41 @@
 }
 :root.si-highcontrast .silm-workshop-micro-mode .silm-workshop-micro-toolbar{border:2px solid var(--text)}
 @media(forced-colors:active){.silm-workshop-micro-mode .silm-workshop-micro-toolbar{background:Canvas;color:CanvasText;border:2px solid CanvasText}}
+
+
+/* Escala 2 — três áreas estáveis: escalas superiores, campo visual ampliado e
+   controles inferiores. O contexto científico e as escalas 3–4 não são alterados. */
+.silm-workshop-micro-mode .silm-workshop-micro-viewer{
+ display:grid;
+ grid-template-columns:minmax(0,1fr);
+ grid-template-rows:minmax(310px,1fr) auto auto;
+ gap:7px;
+ min-width:0;
+ height:clamp(468px,calc(100dvh - 395px),780px);
+}
+.silm-workshop-micro-mode .silm-workshop-micro-viewport{
+ box-sizing:border-box;
+ grid-row:1;
+ width:100%;max-width:100%;
+ height:100%;
+ min-height:0;
+}
+.silm-workshop-micro-mode .silm-workshop-micro-toolbar{
+ grid-row:2;
+ min-width:0;
+ align-self:end;
+}
+.silm-workshop-micro-mode .silm-workshop-micro-caveat{grid-row:3;margin:0;line-height:1.25}
+.silm-workshop-micro-mode .silm-workshop-micro-zoom-tools{min-height:44px}
+.silm-workshop-micro-mode .silm-workshop-micro-control{min-height:44px}
+@media(max-width:620px){
+ .silm-workshop-micro-mode .silm-workshop-micro-viewer{
+  grid-template-rows:minmax(255px,1fr) auto auto;
+  height:clamp(410px,calc(100dvh - 400px),650px);
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar{align-self:end}
+ .silm-workshop-micro-mode .silm-workshop-micro-zoom-tools{justify-content:flex-end}
+}
+@media(max-height:690px) and (min-width:621px){
+ .silm-workshop-micro-mode .silm-workshop-micro-viewer{height:clamp(395px,calc(100dvh - 300px),650px)}
+}

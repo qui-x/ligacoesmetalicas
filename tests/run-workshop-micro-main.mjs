@@ -32,8 +32,13 @@ async function test(viewport){
  const nav=await page.locator('.silm-workshop-reference > .silm-workshop-scales').boundingBox();
  const toolbar=await viewer.locator('.silm-workshop-micro-toolbar').boundingBox();
  const image=await frame.boundingBox();
- assert.ok(nav&&toolbar&&image&&toolbar.y>=nav.y+nav.height-2&&image.y>=toolbar.y+toolbar.height-2,'Leitura e zoom devem ficar entre as escalas e o desenho.');
+ assert.ok(nav&&toolbar&&image&&image.y>=nav.y+nav.height-2&&toolbar.y>=image.y+image.height-2,'Os controles devem ficar abaixo do desenho e as escalas no topo.');
+ if(viewport.width>800){
+  assert.ok(image.height>=390,'A área central ficou baixa no desktop.');
+  assert.ok(toolbar.y+toolbar.height<=viewport.height-8,'Os controles inferiores ficaram fora da janela desktop.');
+ }
  assert.equal(await viewer.getByText('Tamanho real: indisponível (sem escala em µm)').isVisible(),true,'Leitura de dimensão sem calibração ausente.');
+ assert.ok(await viewer.getByRole('button',{name:'Ampliar microestrutura'}).isVisible(),'O zoom inferior não ficou acessível.');
  const grains=viewer.locator('.silm-micro-grain');
  assert.ok(await grains.count()>=45,'Faltam grãos para observação');
  await grains.nth(25).click();

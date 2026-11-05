@@ -99,7 +99,7 @@ SILM.microstructure=(()=>{
   svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);
   viewport.append(svg);
   const note=node('p','silm-workshop-micro-caveat','Grãos ilustrativos · área relativa ao desenho, não é medida experimental de tamanho em micrômetros.');
-  section.append(toolbar,viewport,note);
+  section.append(viewport,toolbar,note);
   let lastAspect=0;
   const resize=()=>{const rect=viewport.getBoundingClientRect();if(rect.width<2||rect.height<2)return;const ratio=rect.width/rect.height;if(Math.abs(ratio-lastAspect)<.025)return;lastAspect=ratio;makeField(ratio);drawGrains();};
   if(typeof ResizeObserver==='function'){const observer=new ResizeObserver(resize);observer.observe(viewport);}else requestAnimationFrame(resize);
