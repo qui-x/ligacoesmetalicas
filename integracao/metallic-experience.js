@@ -25,6 +25,19 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   light:()=>change({light:!model.state.properties.luster.light}),
   restore(){deform()?.setLoad(0);drive()?.setDeformField(false);model.restoreProperty();const t=thermal();if(t){t.setHeating(false);t.reset();}schedule();},end(){deform()?.setLoad(0);model.endProperty();schedule();}
  };
+ function propertyState(id){
+  const st=model.state,primary=st.properties.active;
+  if(primary===id)return {active:true,combined:false};
+  if(id==='electrical'&&(primary==='malleability'||primary==='ductility')){
+   const active=!!drive()?.reading()?.deformField;
+   return {active,combined:active};
+  }
+  if(id==='thermal'&&primary==='electrical'){
+   const active=!!thermal()?.reading()?.on;
+   return {active,combined:active};
+  }
+  return {active:false,combined:false};
+ }
  function toggleElectrons(){
   if(!editable())return false;
   const current=model.state.electrons;
@@ -85,7 +98,7 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   }
   schedule();return true;
  }
- const quickActions=Object.freeze({toggleElectrons,toggleProperty,activateCombination});
+ const quickActions=Object.freeze({toggleElectrons,toggleProperty,activateCombination,propertyState});
  // Uma leitura do estado por atualização (model.state devolve uma cópia completa).
  const info=()=>{const st=model.state;return {deformation:deform()?.reading()||null,thermal:thermal()?.reading()||null,drive:drive()?.reading()||null,state:st,eligibility:P.eligibility(st.metal?Data.get(st.metal.atomicNumber):null),editable:st.module.active==='explorar',reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}};};
  const controls=S.createPropertyControls(document.getElementById('silm-properties'),{scope,info,actions,prefix:'silm-panel-property'});
