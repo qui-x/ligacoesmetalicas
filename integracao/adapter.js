@@ -29,7 +29,8 @@
   requestAnimationFrame(()=>{const page=document.querySelector('#conteudo > [data-view="'+selected+'"]');if(!page||page.contains(document.activeElement))return;const heading=[...page.querySelectorAll('h1,h2')].find(h=>h.getClientRects().length);if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}});
  };
  let lastRoute=null;
- let view=null,scope=null,viewKey='',pending=false,ready=false,selected=null,focusAfterRender=null;\n let workshopSelectionId=null,workshopScale=1;
+ let view=null,scope=null,viewKey='',pending=false,ready=false,selected=null,focusAfterRender=null;
+ let workshopSelectionId=null,workshopScale=1;
  let routeUI=null;
  const allows=tool=>!routeUI||routeUI.session.allows(tool);
  let representation=S.representation.defaults(null),invalidSavedState=false,unavailable3D=false;
