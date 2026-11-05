@@ -11,6 +11,18 @@ SILM.workshop=(()=>{
  {id:'lantanio-bateria',atomicNumber:57,title:'Bateria recarregável NiMH',context:'Pilhas recarregáveis e módulos de bateria',component:'Liga armazenadora de hidrogênio no eletrodo negativo',material:'Liga à base de níquel com terras raras, podendo conter lantânio',visual:'battery',composition:[['Lantânio e outras terras raras','presentes em algumas formulações de mischmetal'],['Níquel','base comum da liga armazenadora de hidrogênio'],['Cobalto, manganês ou alumínio','adições possíveis conforme a formulação'],['Outros materiais','eletrodo positivo, eletrólito, separador e invólucro']],explanation:'O lantânio pode integrar a liga do eletrodo negativo. A bateria reúne ainda outros eletrodos, eletrólito, separador e invólucro.',caveat:'As ligas AB5 e as misturas de terras raras variam; nem toda NiMH contém a mesma quantidade de lantânio.'},
  {id:'lantanio-isqueiro',atomicNumber:57,title:'Pedra de isqueiro',context:'Isqueiros mecânicos e acendedores',component:'Liga pirofórica raspada pela roda',material:'Liga de terras raras com ferro, podendo conter lantânio',visual:'lighter',composition:[['Lantânio e cério','podem integrar a mistura de terras raras'],['Outras terras raras','dependem da formulação'],['Ferro','componente comum da liga pirofórica'],['Aço e polímeros','roda, corpo e demais partes']],explanation:'A pedra não é lantânio puro. É uma liga pirofórica de terras raras e ferro; o isqueiro acrescenta roda de aço e outros materiais.',caveat:'Formulações comerciais variam e precisam ser verificadas para um produto específico.'}
  ]);
+ /* Composição da FAMÍLIA tecnológica, nunca química medida de grãos.
+    'possivel' sinaliza elementos dependentes da liga/grau. */
+ const MICRO_CHEM=Object.freeze({
+  'cobre-motor':{label:'Fio condutor de cobre',kind:'material',constituents:[{symbol:'Cu',name:'Cobre',role:'condutor',certainty:'base'}],note:'O motor contém outros materiais; eles não são constituintes demonstrados deste fio.'},
+  'cobre-latao':{label:'Latão (família Cu–Zn)',kind:'alloy-family',constituents:[{symbol:'Cu',name:'Cobre',role:'base da liga',certainty:'base'},{symbol:'Zn',name:'Zinco',role:'elemento de liga',certainty:'base'}],note:'A proporção Cu/Zn e as fases dependem do tipo de latão; nenhum mapa químico por grão foi fornecido.'},
+  'ferro-parafuso':{label:'Aço (família Fe–C)',kind:'alloy-family',constituents:[{symbol:'Fe',name:'Ferro',role:'base da liga',certainty:'base'},{symbol:'C',name:'Carbono',role:'elemento de liga não metálico',certainty:'base'}],note:'A microestrutura do aço depende de composição e tratamento. Não é a do ferro puro.'},
+  'ferro-transformador':{label:'Aço elétrico (família Fe–Si)',kind:'alloy-family',constituents:[{symbol:'Fe',name:'Ferro',role:'base da liga',certainty:'base'},{symbol:'Si',name:'Silício',role:'elemento de liga',certainty:'base'}],note:'Composição e orientação de grãos dependem do grau de aço elétrico; bobinas são materiais separados.'},
+  'magnesio-notebook':{label:'Família de ligas de magnésio',kind:'alloy-family',constituents:[{symbol:'Mg',name:'Magnésio',role:'base da liga',certainty:'base'},{symbol:'Al',name:'Alumínio',role:'adição possível',certainty:'possible'},{symbol:'Zn',name:'Zinco',role:'adição possível',certainty:'possible'}],note:'Al e Zn são possíveis adições em certas ligas; o equipamento ilustrado não tem composição certificada.'},
+  'magnesio-veiculo':{label:'Família de ligas de magnésio para fundição',kind:'alloy-family',constituents:[{symbol:'Mg',name:'Magnésio',role:'base da liga',certainty:'base'},{symbol:'Al',name:'Alumínio',role:'adição possível',certainty:'possible'},{symbol:'Zn',name:'Zinco',role:'adição possível',certainty:'possible'},{symbol:'Mn',name:'Manganês',role:'adição possível',certainty:'possible'}],note:'Exemplos de elementos empregados em famílias distintas, não composição única comprovada da peça.'},
+  'lantanio-bateria':{label:'Família de ligas armazenadoras de H em eletrodos NiMH',kind:'alloy-family',constituents:[{symbol:'Ni',name:'Níquel',role:'constituinte da família de ligas',certainty:'base'},{symbol:'La',name:'Lantânio',role:'terra rara presente em certas formulações',certainty:'possible'}],note:'NiMH pode usar mistura de terras raras; nem toda célula contém lantânio. A imagem não documenta uma composição específica.'},
+  'lantanio-isqueiro':{label:'Família de ligas pirofóricas (ferrocério)',kind:'alloy-family',constituents:[{symbol:'Fe',name:'Ferro',role:'componente frequente',certainty:'base'},{symbol:'Ce',name:'Cério',role:'terra rara frequente',certainty:'possible'},{symbol:'La',name:'Lantânio',role:'terra rara possível',certainty:'possible'}],note:'Formulações variam; a pedra do isqueiro não é lantânio puro e não foi submetida a mapeamento químico.'}
+ });
  const BY_ID=new Map(REFERENCES.map(x=>[x.id,x]));
  const list=z=>REFERENCES.filter(x=>x.atomicNumber===Number(z));
  const get=id=>BY_ID.get(String(id))||null;
@@ -66,7 +78,7 @@ SILM.workshop=(()=>{
    titles.append(node('p','silm-workshop-micro-component',item?item.component+' · '+item.material:'Policristal didático · '+element.symbol));
    const table=node('button','button outline','Tabela Periódica');table.type='button';table.addEventListener('click',onOpenPeriodic);
    heading.append(titles,table);s.append(heading);
-   if(SILM.microstructure?.create)s.append(SILM.microstructure.create({element,item}));
+   if(SILM.microstructure?.create)s.append(SILM.microstructure.create({element,item,chemistry:MICRO_CHEM[item?.id]||null}));
    else{const fallback=node('div','silm-workshop-reference-art');fallback.innerHTML=MICRO;s.append(fallback);}
   }else{
    const top=node('div','silm-workshop-reference-top'),art=node('div','silm-workshop-reference-art');
@@ -92,5 +104,5 @@ SILM.workshop=(()=>{
   host.append(s);
  }
  if(!valid())throw new Error('Catálogo inicial da Oficina dos Metais inválido.');
- return Object.freeze({references:REFERENCES,list,get,valid,renderDiscovery,renderReference});
+ return Object.freeze({references:REFERENCES,microChemistry:MICRO_CHEM,list,get,valid,renderDiscovery,renderReference});
 })();
