@@ -155,6 +155,14 @@ SILM.createScientificState=()=>{
   history=[];replace(next);publish('investigation:created',previous);
   if(previous.metal?.atomicNumber!==z)emit?.('metal:changed',{previous:previous.metal,current:next.metal});return true;
  }
+ function setWorkshopContext(referenceId,scale){
+  if(!state.investigation||!Number.isInteger(scale)||scale<1||scale>4)return false;
+  if(referenceId!==null&&SILM.workshop?.get(referenceId)?.atomicNumber!==state.metal.atomicNumber)return false;
+  const previous=snapshot();
+  state.metadata.workshop={referenceId,scale};
+  publish('workshop:context',previous);
+  return true;
+ }
  function setModule(active){if(!SILM.scientificModules.includes(active))return false;if(state.module.active===active)return true;
   const previous=snapshot();state.module.active=active;if(state.investigation)state.investigation.updatedAt=now();publish('scientific:module-changed',previous);return true;
  }
@@ -359,7 +367,7 @@ SILM.createScientificState=()=>{
   const previous=snapshot();history=[];replace(result.value);persist();emit?.('investigation:restored',{previous,current:snapshot(),migrated:legacy,from:legacy?value.schemaVersion:8});return {ok:true,migrated:legacy,from:legacy?value.schemaVersion:8};
  }
  function connect(options){storage=options.storage;emit=options.emit;}
- return Object.freeze({get state(){return snapshot();},snapshot,connect,begin,setModule,resetInvestigation,close,setStatus,restore,
+ return Object.freeze({get state(){return snapshot();},snapshot,connect,begin,setWorkshopContext,setModule,resetInvestigation,close,setStatus,restore,
   checkpoint:()=>({state:snapshot(),history:JSON.parse(JSON.stringify(history))}),
   rollback(value){replace(JSON.parse(JSON.stringify(value.state)));history=JSON.parse(JSON.stringify(value.history));emit?.('investigation:updated',{current:snapshot(),change:'storage:rollback'});},
   beginAssembly,addUnit,moveUnit,undo,clearStructure,setAssistance,setAssemblyStatus,organize,restoreFree,setCrystalRepresentation,activateElectrons,setElectronRepresentation,startProperty,setPropertyParams,restoreProperty,endProperty,propertyAvailability,addMeasurement,removeMeasurement,clearMeasurements,measurementAvailability,addCalculation,removeCalculation,clearCalculations,calculationAvailability,

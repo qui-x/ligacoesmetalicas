@@ -1,9 +1,18 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.15.7';
+const VERSION='0.15.8';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='combined-property-active-icons-20261104';
+const BUILD='oficina-redes-imagens-20261105';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
+  "assets/workshop/motor.webp",
+  "assets/workshop/fitting.webp",
+  "assets/workshop/screw.webp",
+  "assets/workshop/transformer.webp",
+  "assets/workshop/laptop.webp",
+  "assets/workshop/wheel.webp",
+  "assets/workshop/battery.webp",
+  "assets/workshop/lighter.webp",
+
   "./",
   "index.html",
   "completo.html",
@@ -56,6 +65,9 @@ const FILES=[
   "domain/silm/renderer-2d.js",
   "domain/silm/assembly-view.js",
   "domain/silm/crystal-view.js",
+  "domain/silm/lattice-navigation.js",
+  "domain/silm/workshop.js",
+  "domain/silm/workshop.css",
   "domain/silm/electron-view.js",
   "domain/silm/property-view.js",
   "domain/silm/measure-view.js",

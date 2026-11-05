@@ -106,11 +106,13 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
  {const c=deform();let lastPanel=0,pending=0;const run=()=>{pending=0;lastPanel=performance.now();controls.update();};
   const tick=()=>{if(performance.now()-lastPanel>=100)run();else if(!pending)pending=setTimeout(run,100);};
   if(c)scope.cleanup(c.subscribe(tick));const t=thermal();if(t)scope.cleanup(t.subscribe(tick));const dv=drive();if(dv)scope.cleanup(dv.subscribe(tick));}
- const scene={advanceHeat:actions.advance,toggleHeat:()=>actions.heat(),toggleLight:()=>actions.light(),controls:(host,viewScope)=>S.createPropertyControls(host,{scope:viewScope,info,actions,prefix:'silm-scene-property',compact:true})};
+ const scene={quickActions,
+  canStudy:id=>editable()&&allows(id)&&model.propertyAvailability(id).ok,
+  advanceHeat:actions.advance,toggleHeat:()=>actions.heat(),toggleLight:()=>actions.light(),controls:(host,viewScope)=>S.createPropertyControls(host,{scope:viewScope,info,actions,prefix:'silm-scene-property',compact:true})};
  const dialog=document.getElementById('silm-periodic-dialog'),body=document.getElementById('silm-periodic-body'),trigger=document.getElementById('silm-open-periodic');let tableScope;
  trigger.addEventListener('click',()=>{
   tableScope?.destroy();tableScope=SimCore.createScope();body.replaceChildren();
-  S.createPeriodicTable(body,{scope:tableScope,state:{selection:Number(document.getElementById('silm-metal').value)||29,query:''},onSelect:e=>prepareMetal(e.atomicNumber),onInvestigate:async e=>{dialog.close();await selectMetal(e.atomicNumber);},onSources:e=>{const text=Data.sourceIds(e).map(id=>{const s=Data.source(id);return s?s.institution+' — '+s.title:id;}).join('\n');document.getElementById('silm-periodic-sources').textContent=text;}});
+  S.createPeriodicTable(body,{scope:tableScope,state:{selection:Number(document.getElementById('silm-metal').value)||29,query:''},onSelect:e=>prepareMetal(e.atomicNumber),onInvestigate:async e=>{dialog.close();await selectMetal(e.atomicNumber);},onExplore:e=>{prepareMetal(e.atomicNumber);dialog.close();},onSources:e=>{const text=Data.sourceIds(e).map(id=>{const s=Data.source(id);return s?s.institution+' — '+s.title:id;}).join('\n');document.getElementById('silm-periodic-sources').textContent=text;}});
   document.getElementById('silm-periodic-sources').textContent='';dialog.showModal();
  });
  document.getElementById('silm-close-periodic').addEventListener('click',()=>dialog.close());

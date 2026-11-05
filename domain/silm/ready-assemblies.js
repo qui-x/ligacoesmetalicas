@@ -22,6 +22,20 @@ window.SILM=window.SILM||{};
    objective:'Comece pela estrutura hexagonal compacta do magnésio.',
    steps:['Meça os parâmetros a e c.','Calcule a razão c/a e compare com o valor ideal.'],
    resources:['Medir: parâmetro de rede','Calcular: razão c/a']}
+,...[
+   ['manganes-cubica',25,'COMPLEX_CUBIC','Manganês · cúbica complexa'],
+   ['estanho-tetragonal',50,'TETRAGONAL','Estanho · tetragonal'],
+   ['bismuto-romboedrica',83,'RHOMBOHEDRAL','Bismuto · romboédrica'],
+   ['polonio-simples',84,'SC','Polônio · cúbica simples'],
+   ['netunio-ortorrombica',93,'ORTHORHOMBIC','Netúnio · ortorrômbica'],
+   ['plutonio-monoclinica',94,'MONOCLINIC','Plutônio · monoclínica'],
+   ['americio-dhc',95,'DHCP','Amerício · dupla hexagonal compacta']
+  ].map(([id,atomicNumber,expectedType,title])=>({
+   id,atomicNumber,expectedType,title,module:'explorar',
+   objective:'Explore a célula e a primeira vizinhança desta referência.',
+   steps:['Abra a rede e escolha um centro.','Percorra os vizinhos e observe as propriedades disponíveis.'],
+   resources:['Rede e célula','Navegar na rede','Propriedades disponíveis']
+  }))
  ].map(x=>Object.freeze({...x,steps:Object.freeze(x.steps),resources:Object.freeze(x.resources)})));
  const REASONS=Object.freeze({
   METAL_UNAVAILABLE:'O metal desta montagem não está disponível para investigação no banco do SILM.',
