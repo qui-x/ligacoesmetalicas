@@ -97,6 +97,42 @@ async function test(viewport){
  // Confere estilo computado, não apenas o texto do alternador.
  await page.locator('.silm-workshop-scale').nth(2).click();
  await page.waitForFunction(()=>window.SILMIntegration?.snapshot?.()?.structure?.units?.length>0,undefined,{timeout:15000});
+ // Faixa de ferramentas científicas: dimensões constantes e mesma linha
+ // nos estados normal e expandido; barra móvel preserva alvos e rolagem.
+ const sceneTools=page.locator('#silm-scene-actionbar');
+ await sceneTools.waitFor({state:'visible'});
+ const sampleSceneButtons=async()=>sceneTools.evaluate(bar=>{
+  const items=[...bar.querySelectorAll('#silm-view-quick-actions .silm-quick-icon,#silm-view-controls .silm-camera-btn,#silm-view-controls #si-expand-structure.si-structure-expand-in-camera')]
+   .filter(b=>!b.hidden&&getComputedStyle(b).display!=='none'&&b.getBoundingClientRect().width>0)
+   .map(b=>{const x=b.getBoundingClientRect();return {id:b.id,width:x.width,height:x.height,cy:x.y+x.height/2,aria:b.getAttribute('aria-label')};});
+  const rect=bar.getBoundingClientRect();
+  return {items,barHeight:rect.height,barBottom:rect.bottom,scrollable:bar.scrollWidth>bar.clientWidth};
+ });
+ let toolbarState=await sampleSceneButtons();
+ assert.ok(toolbarState.items.length>=6,'Faltam botões da câmera na faixa instrumental.');
+ assert.ok(toolbarState.items.every(b=>Math.abs(b.width-44)<1&&Math.abs(b.height-44)<1),'Botões instrumentais ficaram menores ou maiores do que 44 px.');
+ assert.ok(toolbarState.items.every(b=>Math.abs(b.cy-toolbarState.items[0].cy)<2),'Ícones de câmera perderam o alinhamento vertical.');
+ assert.ok(Math.abs(toolbarState.barHeight-60)<2,'A faixa científica não conservou uma altura fixa.');
+ if(viewport.width>900){
+  const expand=page.locator('#si-expand-structure');
+  assert.ok(await expand.isVisible(),'Botão expandir/recolher não aparece na faixa científica.');
+  assert.equal(await expand.isEnabled(),true,'A estrutura construída deveria permitir expansão.');
+  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
+  await expand.click();
+  await page.waitForFunction(()=>document.body.classList.contains('si-structure-expanded'));
+  assert.equal(await expand.getAttribute('aria-pressed'),'true','Estado expandido não está indicado.');
+  const expandedTools=await sampleSceneButtons();
+  assert.ok(expandedTools.items.every(b=>Math.abs(b.width-44)<1&&Math.abs(b.height-44)<1),'Expandir alterou o tamanho dos ícones.');
+  assert.ok(Math.abs(expandedTools.barHeight-toolbarState.barHeight)<1,'Expandir alterou a altura da faixa científica.');
+  assert.ok(expandedTools.barBottom<=viewport.height+2,'Barra inferior ultrapassou a janela.');
+  await expand.click();
+  await page.waitForFunction(()=>!document.body.classList.contains('si-structure-expanded'));
+  assert.equal(await expand.getAttribute('aria-pressed'),'false','O botão não voltou ao estado recolhido.');
+  assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'A expansão alterou dados científicos.');
+ }else{
+  assert.ok(toolbarState.scrollable,'Faixa móvel precisa rolar, nunca comprimir controles instrumentais.');
+ }
+
  await page.locator('[data-scene-view="overview"]').click();
  const overview=page.locator('#workspace-overview');
  await overview.waitFor({state:'visible'});
