@@ -9,6 +9,7 @@ on:
       - 'domain/silm/periodic-table.js'
       - 'integracao/metallic-experience.js'
       - 'integracao/adapter.js'
+      - 'domain/silm/assembly-view.js'
       - 'index.html'
       - 'tests/workshop-explorer.test.mjs'
       - 'tests/run-workshop-browser-tests.mjs'
@@ -42,6 +43,7 @@ jobs:
           node --check domain/silm/periodic-table.js
           node --check integracao/metallic-experience.js
           node --check integracao/adapter.js
+          node --check domain/silm/assembly-view.js
           node --check tests/run-workshop-browser-tests.mjs
       - name: Testar catálogo
         run: node --test tests/workshop-explorer.test.mjs
