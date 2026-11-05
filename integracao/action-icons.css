@@ -1,0 +1,15 @@
+/* SILM — ícones de ação. Traço temático e acessível, sem dependências de rede. */
+.silm-action-icon{display:block;flex:0 0 auto;width:1.15em;height:1.15em;min-width:18px;min-height:18px;pointer-events:none;color:inherit}
+button.silm-action--with-icon{display:inline-flex;align-items:center;justify-content:center;gap:.5em}
+button.silm-action--icon{display:inline-flex;align-items:center;justify-content:center;gap:0;min-inline-size:44px;min-block-size:44px;padding-inline:10px}
+button.silm-action--icon .silm-action-label{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;padding:0!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+button.silm-action--with-icon:focus-visible,button.silm-action--icon:focus-visible{outline:3px solid var(--ring,var(--accent,currentColor));outline-offset:2px}
+button.silm-action--with-icon:disabled,button.silm-action--icon:disabled{cursor:not-allowed}
+.silm-action-icon{transition:transform .14s ease}
+@media(hover:hover){button.silm-action--icon:hover:not(:disabled) .silm-action-icon{transform:scale(1.07)}}
+:root.si-no-motion .silm-action-icon{transition:none!important;transform:none!important}
+@media(prefers-reduced-motion:reduce){.silm-action-icon{transition:none!important;transform:none!important}}
+:root.si-simple-reading button.silm-action--icon{gap:.5em;white-space:normal}
+:root.si-simple-reading button.silm-action--icon .silm-action-label{position:static!important;width:auto!important;height:auto!important;margin:0!important;padding:0!important;overflow:visible!important;clip:auto!important;white-space:normal!important;border:0!important}
+@media(forced-colors:active){.silm-action-icon{stroke:ButtonText}button.silm-action--icon:focus-visible,button.silm-action--with-icon:focus-visible{outline:3px solid Highlight}}
+#silm-comparison-items .silm-structure-card-actions .silm-action--icon{justify-self:start}

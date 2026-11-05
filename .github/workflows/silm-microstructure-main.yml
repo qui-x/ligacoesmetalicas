@@ -8,6 +8,9 @@ on:
       - "domain/silm/workshop.css"
       - "integracao/integration.css"
       - "integracao/structure-comparison.js"
+      - "integracao/action-icons.js"
+      - "integracao/action-icons.css"
+      - "docs/ICONOGRAFIA-CONTROLES-SILM.md"
       - "index.html"
       - "sw.js"
       - "tests/run-workshop-micro-main.mjs"
@@ -37,6 +40,7 @@ jobs:
         run: |
           node --check domain/silm/microstructure-view.js
           node --check domain/silm/workshop.js
+          node --check integracao/action-icons.js
           node --check tests/run-workshop-micro-main.mjs
       - name: Instalar Playwright
         run: |

@@ -11,8 +11,17 @@ async function test(viewport){
  const res=await page.goto(base+'/index.html#/ambiente',{waitUntil:'load',timeout:45000});
  assert.ok(res?.ok(),'SILM não carregou');
  await page.waitForFunction(()=>window.SILMIntegration&&window.SILM?.microstructure?.create&&!document.querySelector('#silm-workshop-context')?.hidden,undefined,{timeout:45000});
+ await page.waitForFunction(()=>window.SILMActionIcons?.audit&&document.querySelector('#scene-undo > svg.silm-action-icon'),undefined,{timeout:15000});
+ const iconAudit=await page.evaluate(()=>SILMActionIcons.audit());
+ assert.ok(iconAudit.mapped>=12,'Ícones não foram aplicados aos controles existentes.');
+ assert.equal(await page.locator('#scene-undo').getAttribute('aria-label'),'Desfazer','Desfazer perdeu o nome acessível.');
+ assert.equal(await page.locator('#scene-undo > svg.silm-action-icon').getAttribute('aria-hidden'),'true','SVG de ação deve ser decorativo.');
+
  await page.locator('#silm-workshop-context').getByRole('button',{name:'Tabela Periódica'}).click();
  await page.locator('#silm-periodic-dialog').waitFor({state:'visible'});
+ await page.waitForFunction(()=>!!document.querySelector('#silm-close-periodic > svg.silm-action-icon'),undefined,{timeout:15000});
+ assert.equal(await page.locator('#silm-close-periodic').getAttribute('aria-label'),'Fechar tabela','Fechar tabela perdeu nome acessível.');
+
  await page.locator('#silm-periodic-dialog [data-z="26"]').click();
  await page.locator('#silm-periodic-dialog [id$="-explore"]').click();
  await page.locator('.silm-workshop-card').filter({hasText:'Parafuso de aço'}).getByRole('button',{name:'Investigar componente'}).click();
@@ -106,6 +115,9 @@ async function test(viewport){
  await manager.getByRole('button',{name:'Ver estruturas em lista'}).click();
  shown=await computed();
  assert.equal(shown.layout,'list','O botão não selecionou o modo lista.');
+ await page.waitForFunction(()=>document.querySelector('.silm-structure-layout')?.dataset.silmAction==='grid',undefined,{timeout:10000});
+ assert.equal(await manager.locator('.silm-structure-layout').getAttribute('aria-label'),'Ver estruturas em grade','Botão não atualiza o nome ao trocar modo.');
+
  assert.equal(shown.columns,1,'Modo lista permanece com múltiplas colunas por sobreposição de CSS.');
  assert.equal(await entries.first().locator('.silm-structure-preview svg').isVisible(),true,'Prévia desapareceu no modo lista.');
  const currentCard=cards.locator('.silm-structure-card[data-current="true"]');
@@ -138,6 +150,13 @@ async function test(viewport){
  await manager.getByRole('button',{name:'Ver estruturas em grade'}).click();
  shown=await computed();
  assert.equal(shown.layout,'grid','O botão não retornou ao modo grade.');
+ await page.waitForFunction(()=>document.querySelector('.silm-structure-layout')?.dataset.silmAction==='list',undefined,{timeout:10000});
+ assert.equal(await manager.locator('.silm-structure-layout').getAttribute('aria-label'),'Ver estruturas em lista','Botão não atualiza nome na grade.');
+ const actions=manager.locator('.silm-structure-card-actions button');
+ assert.equal(await actions.nth(1).getAttribute('data-silm-action'),'edit','Renomear sem ícone.');
+ assert.equal(await actions.nth(2).getAttribute('data-silm-action'),'trash','Remover sem ícone.');
+ assert.equal(await actions.nth(2).textContent(),'Remover','Remover perdeu o rótulo de segurança.');
+
  if(viewport.width>1100)assert.ok(shown.columns>=2,'O modo grade não restaurou as colunas.');
  assert.equal(await entries.first().locator('.silm-structure-preview svg').isVisible(),true,'Prévia desapareceu no modo grade.');
  await page.locator('[data-scene-view="focus"]').click();
