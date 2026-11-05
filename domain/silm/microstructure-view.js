@@ -32,6 +32,12 @@ SILM.microstructure=(()=>{
   polygons=sites.map((s,i)=>{let poly=[[0,0],[W,0],[W,H],[0,H]];for(let j=0;j<sites.length;j++){if(j!==i)poly=bisect(poly,s,sites[j]);if(!poly.length)break;}return poly;});
  }
  const grainArea=poly=>Math.abs(poly.reduce((sum,p,i)=>{const q=poly[(i+1)%poly.length];return sum+p[0]*q[1]-q[0]*p[1];},0))/2;
+ // Demonstração de composição A–B: números gerados apenas para tons visuais, NÃO são dados da liga real.
+ // A representação experimental exigirá micrografia e máscara de segmentação registradas com a fonte.
+ const isAlloy=item=>typeof item?.material==='string'&&/(?:liga|aço|latão|superliga)/i.test(item.material);
+ const demoA=i=>.17+.66*(((Math.imul(i+7,2654435761)>>>0)%997)/996);
+ const intensityName=v=>v>=.68?'alta':v>=.34?'intermediária':'baixa';
+ const demoTone=(v,focus)=>'hsl('+(focus==='A'?208:29)+' 70% '+Math.round(88-65*v)+'%)';
  makeField(W/H);
  let serial=0;
  function create({element,item=null}={}){
@@ -46,13 +52,42 @@ SILM.microstructure=(()=>{
   const plane=svgNode('g',{'class':'silm-micro-plane'});svg.append(plane);
   let paths=[],cells=[];
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
+  const showAlloyDemo=isAlloy(item);
+  let compositionMode=false,focusElement='A';
   const status=node('span','silm-workshop-micro-status','Selecione um grão · área do desenho: —');
   const dimension=node('span','silm-workshop-micro-dimension','Tamanho real: indisponível (sem escala em µm)');
   status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');
-  const choose=i=>{chosen=i;paths.forEach((p,j)=>{p.classList.toggle('is-selected',j===i);p.setAttribute('aria-pressed',String(j===i));cells[j]?.classList.toggle('is-selected',j===i);});
+  const selectionLabel=i=>{
+   if(compositionMode){
+    const a=demoA(i),v=focusElement==='A'?a:1-a;
+    const dominant=a>.55?'A':a<.45?'B':'nenhum claramente';
+    return 'Grão '+(i+1)+' · predominância simulada: '+dominant+
+     ' · incidência '+intensityName(v)+' do elemento '+focusElement+' (modelo didático)';
+   }
    const share=grainArea(polygons[i])/(W*H)*100;
-   status.textContent='Grão '+(i+1)+' · área no desenho: '+share.toLocaleString('pt-BR',{maximumFractionDigits:1,minimumFractionDigits:1})+'% (ilustrativa)';
-   svg.setAttribute('data-selected-grain',String(i+1));
+   return 'Grão '+(i+1)+' · área no desenho: '+share.toLocaleString('pt-BR',{maximumFractionDigits:1,minimumFractionDigits:1})+'% (ilustrativa)';
+  };
+  function updateStatus(){status.textContent=chosen>=0?selectionLabel(chosen):compositionMode?'Selecione um grão · mapa A–B simulado':'Selecione um grão · área do desenho: —';}
+  function paintComposition(){
+   if(compositionMode)svg.dataset.compositionFocus=focusElement;else delete svg.dataset.compositionFocus;
+   paths.forEach((p,i)=>{
+    if(!p)return;
+    if(compositionMode){
+     const a=demoA(i),v=focusElement==='A'?a:1-a;
+     p.style.setProperty('--map-fill',demoTone(v,focusElement));
+     p.setAttribute('aria-label','Selecionar grão ilustrativo '+(i+1)+', incidência '+intensityName(v)+' do elemento '+focusElement+' (simulação)');
+    }else{
+     p.style.removeProperty('--map-fill');
+     p.setAttribute('aria-label','Destacar grão ilustrativo '+(i+1));
+    }
+   });
+   svg.setAttribute('aria-label',compositionMode?
+    'Mapa fictício de liga A–B: mais escuro significa maior incidência RELATIVA do elemento selecionado, sem valores medidos. Selecione os grãos com Tab e Enter.':
+    'Policristal didático ampliado: percorra os grãos com Tab e destaque com Enter; não é micrografia experimental');
+  }
+  const choose=i=>{
+   chosen=i;paths.forEach((p,j)=>{p.classList.toggle('is-selected',j===i);p.setAttribute('aria-pressed',String(j===i));cells[j]?.classList.toggle('is-selected',j===i);});
+   updateStatus();svg.setAttribute('data-selected-grain',String(i+1));
   };
   function drawGrains(){
    paths=[];cells=[];plane.replaceChildren();
@@ -67,7 +102,8 @@ SILM.microstructure=(()=>{
    g.append(p,hatch);plane.append(g);paths[i]=p;cells[i]=g;
    });
    if(chosen>=polygons.length)chosen=polygons.length-1;
-   if(chosen>=0)choose(chosen);else status.textContent='Selecione um grão · área do desenho: —';
+   paintComposition();
+   if(chosen>=0)choose(chosen);else updateStatus();
    offsetX=0;offsetY=0;update();svg.dataset.mapReady='true';
   }
   const toolbar=node('div','silm-workshop-micro-toolbar'),zoomLabel=node('output','silm-workshop-micro-zoom','100%');
@@ -84,6 +120,29 @@ SILM.microstructure=(()=>{
   const zoomControls=node('div','silm-workshop-micro-zoom-tools');
   zoomControls.append(button('Reduzir microestrutura','−',()=>setZoom(zoom-.25)),zoomLabel,button('Ampliar microestrutura','+',()=>setZoom(zoom+.25)),button('Ajustar microestrutura ao quadro','Ajustar',()=>setZoom(1)));
   toolbar.append(status,dimension,zoomControls);
+  let chemistryHint=null;
+  if(showAlloyDemo){
+   const compositionTools=node('div','silm-workshop-micro-composition-tools');
+   const modeButton=button('Alternar mapa ilustrativo de liga A–B','Mapa A–B',()=>{compositionMode=!compositionMode;syncComposition();});
+   const buttonA=button('Exibir concentração simulada do elemento A','A',()=>{focusElement='A';syncComposition();});
+   const buttonB=button('Exibir concentração simulada do elemento B','B',()=>{focusElement='B';syncComposition();});
+   chemistryHint=node('span','silm-workshop-micro-composition-key','Mapa simulado · claro: menos, escuro: mais');
+   const syncComposition=()=>{
+    modeButton.setAttribute('aria-pressed',String(compositionMode));
+    buttonA.setAttribute('aria-pressed',String(compositionMode&&focusElement==='A'));
+    buttonB.setAttribute('aria-pressed',String(compositionMode&&focusElement==='B'));
+    buttonA.disabled=buttonB.disabled=!compositionMode;
+    paintComposition();updateStatus();
+    chemistryHint.hidden=!compositionMode;
+    if(note)note.textContent=compositionMode?
+     'SIMULAÇÃO de liga genérica A–B, não representa a composição do objeto real. Tons indicam incidência relativa, sem percentuais ou escala experimental.':
+     'Grãos ilustrativos · área relativa ao desenho, não é medida experimental de tamanho em micrômetros.';
+   };
+   compositionTools.append(modeButton,buttonA,buttonB,chemistryHint);
+   toolbar.append(compositionTools);
+   // O texto da nota será inicializado após os controles.
+   modeButton.setAttribute('aria-pressed','false');buttonA.disabled=true;buttonB.disabled=true;chemistryHint.hidden=true;
+  }
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
   svg.addEventListener('pointerdown',e=>{if(zoom<=1||e.button!==0)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};suppressClick=false;svg.setPointerCapture(e.pointerId);});
   svg.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;
