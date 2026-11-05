@@ -100,6 +100,19 @@ async function test(viewport){
  }
  assert.match(await status.textContent(),/Célula \[0, 0, 0\]/);
  assert.equal(await page.locator('#silm-scene-actionbar .silm-lattice-nav').count(),1);
+ await page.getByLabel('Aplicar estímulo na rede').selectOption('joule');
+ const step=page.getByRole('button',{name:'Avançar meio intervalo no efeito Joule'}),conditions=page.getByLabel('Condições do efeito Joule');
+ const reading=page.locator('.silm-lattice-status span');
+ await step.click();
+ await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span').textContent.includes(' · t 0,5 · '));
+ await conditions.selectOption('potential');
+ assert.match(await reading.textContent(),/Mapa: Potencial elétrico/);
+ await conditions.selectOption('current');
+ await conditions.selectOption('supply');
+ await step.click();
+ assert.match(await reading.textContent(),/corrente imposta.* · t 1 · U 0 · I 0 · P Joule 0/);
+ await conditions.selectOption('end');
+ assert.equal(await step.isVisible(),false);
  assert.deepEqual(errors,[],'Erros JavaScript: '+errors.join('; '));
  await context.close();
 }

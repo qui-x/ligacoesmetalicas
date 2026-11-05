@@ -232,3 +232,15 @@
   border-radius:.35rem;background:var(--surface);pointer-events:none;
  }
 }
+
+.silm-joule-controls:not([hidden]){display:inline-flex;align-items:center;gap:4px}
+.silm-joule-controls select{max-width:9rem}
+
+.silm-crystal[data-field-map=temperature]{--silm-field-color:var(--silm-heat)}
+.silm-crystal[data-field-map=potential]{--silm-field-color:var(--scientific-accent)}
+.silm-crystal[data-field-map=dissipation]{--silm-field-color:var(--accent)}
+.silm-crystal[data-field-map] .silm-crystal-unit[data-field-value]>.silm-unit-body::after{
+ content:"";position:absolute;inset:5%;border-radius:50%;border:3px solid color-mix(in srgb,var(--silm-field-color) var(--field-strength),transparent);
+}
+.silm-crystal[data-field-map=potential] .silm-crystal-unit[data-field-value]>.silm-unit-body::after{border-style:dashed}
+.silm-crystal[data-field-map=dissipation] .silm-crystal-unit[data-field-value]>.silm-unit-body::after{border-style:double;border-width:5px}

@@ -244,12 +244,16 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  if(cameraHost)cameraHost.after(navigator.root);
  else root.append(navigator.root);
  scope.cleanup(()=>navigator.root.remove());
+ const fieldNames={temperature:'Temperatura',potential:'Potencial elétrico',dissipation:'Dissipação Joule'};
+ let jouleControls=null,jouleSettings=null;
+ const formatRelative=value=>value.toLocaleString('pt-BR',{maximumFractionDigits:3});
  // Reutiliza os comandos de Observar e as mesmas restrições científicas em cada referência.
  if(propertyOptions?.quickActions&&model.state.module.active==='explorar'){
   const choices=[
    ['electrons','Mar de elétrons',[]],
    ['electrical','Campo elétrico',['electrical']],['thermal','Fonte de calor',['thermal']],
    ['malleability','Compressão',['malleability']],['ductility','Tração',['ductility']],['luster','Luz',['luster']],
+   ['joule','Efeito Joule · corrente e calor',['electrical','thermal']],
    ['heatElectrical','Campo elétrico + calor externo',['electrical','thermal']],
    ['malleabilityElectrical','Compressão + campo elétrico',['malleability','electrical']],
    ['ductilityElectrical','Tração + campo elétrico',['ductility','electrical']]
@@ -264,11 +268,22 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   scope.listen(control,'change',()=>{
    const choice=choices.find(([id])=>id===control.value);control.value='';
    if(!choice||model.state.module.active!=='explorar'||choice[2].some(prop=>!propertyOptions.canStudy(prop)))return;
-   if(choice[0]==='electrons')propertyOptions.quickActions.toggleElectrons();
+   if(choice[0]==='joule')propertyOptions.quickActions.beginJoule();
+   else if(choice[0]==='electrons')propertyOptions.quickActions.toggleElectrons();
    else if(choice[2].length===2)propertyOptions.quickActions.activateCombination(choice[0]);
    else propertyOptions.quickActions.toggleProperty(choice[0]);
   });
   navigator.root.append(control);
+  jouleControls=U.element('span',null,'silm-joule-controls');jouleControls.hidden=true;
+  jouleSettings=document.createElement('select');jouleSettings.setAttribute('aria-label','Condições do efeito Joule');
+  for(const [value,label] of [['','Condições Joule'],['voltage','Tensão imposta'],['current','Corrente imposta'],['ambient','Terminais à temperatura ambiente'],['insulated','Amostra isolada'],['supply','Ligar ou desligar alimentação'],['external','Ligar ou desligar calor externo'],['temperature','Ver temperatura'],['potential','Ver potencial elétrico'],['dissipation','Ver dissipação Joule'],['end','Encerrar efeito Joule']]){
+   const option=document.createElement('option');option.value=value;option.textContent=label;jouleSettings.append(option);
+  }
+  scope.listen(jouleSettings,'change',()=>{const action=jouleSettings.value;jouleSettings.value='';propertyOptions.quickActions.jouleAction(action);});
+  const step=U.element('button','Avançar 0,5');step.type='button';step.setAttribute('aria-label','Avançar meio intervalo no efeito Joule');
+  scope.listen(step,'click',()=>propertyOptions.quickActions.jouleAction('step'));
+  jouleControls.append(jouleSettings,step);navigator.root.append(jouleControls);
+
  }
 
  const pt=p=>{const q=layout.project(D(p));return {x:q.x*100,y:q.y*100,depth:q.depth};};
@@ -292,7 +307,10 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  }
  function drawLattice(sites){
   latticeLayer.replaceChildren();
-  for(const {q,fade,block,heat}of [...sites].sort((a,b)=>b.q.depth-a.q.depth))latticeLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*36*dscale(q),opacity:(.14+.42*fade).toFixed(3),...(block===undefined?{}:{class:block%2?'silm-specimen silm-block-odd':'silm-specimen'}),...(heat===undefined?{}:{style:'fill:color-mix(in srgb,var(--silm-heat) '+Math.round(heat*85)+'%,var(--silm-bronze))'})}));
+  for(const {q,fade,block,heat,key}of [...sites].sort((a,b)=>b.q.depth-a.q.depth)){
+   const value=scene.fieldMap?.get(key),fraction=value===undefined?heat:value/scene.fieldMax;
+   latticeLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*36*dscale(q),opacity:(.14+.42*fade).toFixed(3),...(block===undefined?{}:{class:block%2?'silm-specimen silm-block-odd':'silm-specimen'}),...(fraction===undefined?{}:{style:'fill:color-mix(in srgb,var(--silm-field-color,var(--silm-heat)) '+Math.round(fraction*85)+'%,var(--silm-bronze))'})}));
+  }
  }
  function createNode(u){
   const node=U.element('button',null,'silm-unit silm-crystal-unit');node.type='button';node.dataset.unitId=u.id;node.tabIndex=-1;node.setAttribute('aria-describedby','silm-assembly-help');
@@ -375,8 +393,19 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const refLayout=X.layout(g,[...g.cell.map(c=>c.cart),...(g.corners||[]),...baseUnits.map(u=>g.site(u.site).cart)].map(D),{margin:.12});
   const refCentres=list.map(u=>refLayout.project(D(g.site(u.site).cart))),refSpacing=d*refLayout.scale;
   // Calor + corrente (0.17.x): a mesma fonte de calor também na condutividade elétrica (transitória, sem gravar).
-  const continuous=!!thermalCtl&&(active==='thermal'||active==='electrical');let heated=active==='thermal'&&(pr.thermal.heating||pr.thermal.stage>0),levels=[],sources=[],temps=null;
-  if(continuous){
+  const coupled=propertyOptions?.jouleReading?.(S);
+  if(jouleControls)jouleControls.hidden=!coupled;
+  if(coupled)navigator.reading.setAttribute('aria-live','polite');
+  else navigator.reading.removeAttribute('aria-live');
+  if(coupled){root.dataset.fieldMap=coupled.layer;scene.fieldMap=coupled.values.profiles[coupled.layer];scene.fieldMax=Math.max(...scene.fieldMap.values(),1e-9);}
+  else delete root.dataset.fieldMap;
+  const continuous=!coupled&&!!thermalCtl&&(active==='thermal'||active==='electrical');let heated=active==='thermal'&&(pr.thermal.heating||pr.thermal.stage>0),levels=[],sources=[],temps=null;
+  if(coupled){
+   // A cor satura suavemente; a leitura numérica conserva a temperatura relativa calculada.
+   temps=new Map([...coupled.field].map(([k,t])=>[k,t/(1+t)]));
+   scene.heatTemps=temps;heated=coupled.values.maximum>0;
+   levels=list.map(u=>TH.level(temps.get(X.key(u.site))||0));sources=list.map(()=>false);
+  }else if(continuous){
    // Grafo: as unidades e, na vista Rede, a rede extensa — com os vizinhos imediatos pela distância da geometria do banco.
    const assembled=new Set(baseUnits.map(u=>X.key(u.site)));
    const sites=[...baseUnits.map(u=>g.site(u.site)),...(r.view==='lattice'?g.lattice().filter(s=>!assembled.has(s.key)):[])],ids=sites.map(s=>s.key);
@@ -394,7 +423,12 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   }else{scene.heatTemps=null;if(heated){levels=P.heat(refCentres,refSpacing,pr.thermal.stage);sources=P.heatSources(refCentres);}}
   const lit=new Set(),surface=[];if(active==='luster'){const zs=list.map(u=>g.site(u.site).cart[2]),top=Math.max(...zs);list.forEach((u,i)=>{if(zs[i]>=top-.05){surface.push(i);if(pr.luster.light)lit.add(u.id);}});}scene.surfaceIdx=surface;
   // As fontes (região aquecida) ficam marcadas em qualquer projeção; a faixa "calor" só aparece onde elas estiverem à esquerda.
-  list.forEach((u,i)=>{const node=nodes.get(u.id);if(heated){node.dataset.heat=String(levels[i]);if(temps)node.style.setProperty('--heat',(temps.get(X.key(u.site))||0).toFixed(3));node.setAttribute('aria-label',node.getAttribute('aria-label')+', energia térmica '+P.heatWord(levels[i])+(sources[i]?(continuous?', sob a fonte de calor':', na região aquecida'):''));}else{delete node.dataset.heat;node.style.removeProperty('--heat');}
+  list.forEach((u,i)=>{const node=nodes.get(u.id),k=X.key(u.site),value=scene.fieldMap?.get(k);
+   if(value!==undefined){
+    node.style.setProperty('--field-strength',Math.round(100*value/scene.fieldMax)+'%');node.dataset.fieldValue='';
+    node.setAttribute('aria-label',node.getAttribute('aria-label')+', '+fieldNames[coupled.layer]+' relativa '+formatRelative(value));
+   }else{delete node.dataset.fieldValue;node.style.removeProperty('--field-strength');}
+   if(heated&&(!coupled||value!==undefined)){node.dataset.heat=String(levels[i]);if(temps)node.style.setProperty('--heat',(temps.get(X.key(u.site))||0).toFixed(3));node.setAttribute('aria-label',node.getAttribute('aria-label')+', energia térmica '+P.heatWord(levels[i])+(sources[i]?(continuous?', sob a fonte de calor':', na região aquecida'):''));}else{delete node.dataset.heat;node.style.removeProperty('--heat');}
    if(sources[i])node.dataset.heatSource='';else delete node.dataset.heatSource;
    if(lit.has(u.id))node.dataset.lit='';else delete node.dataset.lit;});
   const sourcePts=drawn.filter((_,i)=>sources[i]),xs=drawn.map(p=>p.x),xMin=Math.min(...xs),xSpan=Math.max(1e-9,Math.max(...xs)-xMin);
@@ -422,7 +456,19 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    if((active==='malleability'||active==='ductility')&&driveCtl?.reading().deformField)effects.push('campo elétrico');
    if(shownElectrons)effects.push('elétrons deslocalizados');
    const local=scene.heatTemps?.get(navigator.cursor.site.key);
-   const info=effects.join(' + ')+(local==null?'':' · aquecimento local '+Math.round(100*local)+'% da escala didática');
+   let info=effects.join(' + ')+(local==null?'':' · aquecimento local '+Math.round(100*local)+'% da escala didática');
+   if(coupled){
+    const {input,values,field}=coupled,localT=field.get(navigator.cursor.site.key);
+    const parameters=[['t',values.time],['U',values.voltage],['I',values.current],['P Joule',values.power],['T média',values.mean]];
+    if(localT!==undefined)parameters.push(['T local',localT]);
+    info=['Efeito Joule · grandezas relativas',input.mode==='voltage'?'tensão imposta':'corrente imposta',
+     input.boundary==='ambient'?'terminais à temperatura ambiente':'amostra isolada',
+     ...(input.external?['calor externo ligado']:[]),...parameters.map(([label,val])=>label+' '+formatRelative(val))].join(' · ');
+    const fieldValue=scene.fieldMap.get(navigator.cursor.site.key);
+    info+=' · Mapa: '+fieldNames[coupled.layer];
+    if(fieldValue===undefined)info+=' · sítio fora da malha do ensaio';
+    else if(coupled.layer!=='temperature')info+=' local '+formatRelative(fieldValue);
+   }
    if(navigator.reading.textContent!==info)navigator.reading.textContent=info;
   }
   drawAxes();

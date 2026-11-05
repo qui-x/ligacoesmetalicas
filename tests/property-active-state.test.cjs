@@ -15,6 +15,7 @@ assert.ok(start >= 0 && end > start, 'o helper propertyState deve existir no mot
 const helperSource = experienceSource.slice(start, end);
 
 const sandbox = {
+  currentCoupling: () => null,
   model: { state: { properties: { active: null } } },
   drive: () => ({ reading: () => ({ deformField: false }) }),
   thermal: () => ({ reading: () => ({ on: false }) })
