@@ -108,6 +108,33 @@ async function test(viewport){
  assert.equal(shown.layout,'list','O botão não selecionou o modo lista.');
  assert.equal(shown.columns,1,'Modo lista permanece com múltiplas colunas por sobreposição de CSS.');
  assert.equal(await entries.first().locator('.silm-structure-preview svg').isVisible(),true,'Prévia desapareceu no modo lista.');
+ const currentCard=entries.locator('[data-current="true"]');
+ assert.equal(await currentCard.count(),1,'A estrutura atualmente em foco não está identificada na lista.');
+ assert.equal(await currentCard.locator('.silm-structure-status').textContent(),'Em foco','O estado de foco não está indicado.');
+ const layoutGeometry=await currentCard.evaluate(card=>{
+  const f=card.querySelector('.silm-structure-preview').getBoundingClientRect(),c=card.getBoundingClientRect();
+  const h=card.querySelector('.silm-structure-card-head').getBoundingClientRect();
+  const a=card.querySelector('.silm-structure-card-actions').getBoundingClientRect();
+  const svg=card.querySelector('.silm-structure-preview svg'),box=svg.viewBox.baseVal;
+  const dots=[...svg.querySelectorAll('circle')].map(n=>({
+   x:Number(n.getAttribute('cx')),y:Number(n.getAttribute('cy')),r:Number(n.getAttribute('r'))
+  })).filter(n=>[n.x,n.y,n.r].every(Number.isFinite));
+  const minX=Math.min(...dots.map(q=>q.x-q.r)),maxX=Math.max(...dots.map(q=>q.x+q.r));
+  const minY=Math.min(...dots.map(q=>q.y-q.r)),maxY=Math.max(...dots.map(q=>q.y+q.r));
+  return {fraction:f.width*f.height/(c.width*c.height),widthFraction:f.width/c.width,previewRight:f.right,
+   previewTop:f.top,headLeft:h.left,headTop:h.top,actionsTop:a.top,contentExtent:Math.max((maxX-minX)/box.width,(maxY-minY)/box.height)};
+ });
+ if(viewport.width>1100){
+  assert.ok(layoutGeometry.widthFraction>=.72,'A prévia na lista precisa ocupar pelo menos 72% da largura.');
+  assert.ok(layoutGeometry.fraction>=.68,'A prévia na lista precisa ocupar pelo menos 68% da área.');
+  assert.ok(layoutGeometry.headLeft>=layoutGeometry.previewRight-2&&layoutGeometry.actionsTop>=layoutGeometry.headTop,
+   'Informações e ações devem permanecer ao lado da prévia em desktop.');
+ }else{
+  assert.ok(layoutGeometry.fraction>=.50,'A prévia deve ser dominante também no modo lista do celular.');
+  assert.ok(layoutGeometry.previewTop>=layoutGeometry.headTop,'A identificação deve ficar acima da prévia em celular.');
+ }
+ assert.ok(layoutGeometry.contentExtent>=.75,'A estrutura desenhada está demasiadamente pequena dentro do SVG.');
+
  await manager.getByRole('button',{name:'Ver estruturas em grade'}).click();
  shown=await computed();
  assert.equal(shown.layout,'grid','O botão não retornou ao modo grade.');
