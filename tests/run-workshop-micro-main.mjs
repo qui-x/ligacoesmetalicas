@@ -51,14 +51,14 @@ async function test(viewport){
  const grains=viewer.locator('.silm-micro-grain');
  assert.ok(await grains.count()>=45,'Faltam grãos para observação');
  await grains.nth(25).click();
- assert.equal(await viewer.locator('svg').getAttribute('data-selected-grain'),'26','Destaque de grão falhou');
+ assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-selected-grain'),'26','Destaque de grão falhou');
  assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),1,'Seleção não aplica padrão estrutural ao grão.');
  assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/Grão 26 · área no desenho: .*% \(ilustrativa\)/,'Área relativa ilustrativa não foi exibida.');
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  await viewer.getByRole('button',{name:'Ampliar microestrutura'}).click();
- assert.equal(await viewer.locator('svg').getAttribute('data-zoom'),'1.25','Zoom não funciona');
+ assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-zoom'),'1.25','Zoom não funciona');
  await viewer.getByRole('button',{name:'Ajustar microestrutura ao quadro'}).click();
- assert.equal(await viewer.locator('svg').getAttribute('data-zoom'),'1','Ajuste ao quadro não funciona');
+ assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-zoom'),'1','Ajuste ao quadro não funciona');
  assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'Zoom modificou o estado científico');
  assert.equal(await page.locator('#silm-integration-scene').isVisible(),false,'Rede cristalina apareceu na escala 2');
  if(viewport.width>800){
