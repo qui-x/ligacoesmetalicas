@@ -228,10 +228,10 @@
  }
  async function investigateWorkshopReference(item){
   if(!item||!S.workshop.get(item.id))return false;
-  const previousAtomicNumber=element()?.atomicNumber??null;
+  const previousAtomicNumber=element()?.atomicNumber??null,previousWorkshopSelectionId=workshopSelectionId,previousWorkshopScale=workshopScale;
   workshopSelectionId=item.id;workshopScale=1;updateWorkshopContext();
   const started=await start();
-  if(!started){if(previousAtomicNumber!==null){selected=String(previousAtomicNumber);$('silm-metal').value=selected;}workshopSelectionId=null;workshopScale=1;updateWorkshopContext();return false;}
+  if(!started){if(previousAtomicNumber!==null){selected=String(previousAtomicNumber);$('silm-metal').value=selected;}workshopSelectionId=previousWorkshopSelectionId;workshopScale=previousWorkshopScale;updateWorkshopContext();return false;}
   const ready=ensureWorkshopCrystal();
   if(ready.ok){model.setCrystalRepresentation({view:'lattice',unitCell:true,neighbors:false,selectedUnitId:null});workshopScale=3;}
   else say(S.crystal.reasons[ready.reason]||'A investigação foi iniciada; a montagem livre continua disponível.','info');
