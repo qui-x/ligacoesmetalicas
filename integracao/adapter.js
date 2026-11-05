@@ -228,8 +228,10 @@
  }
  async function investigateWorkshopReference(item){
   if(!item||!S.workshop.get(item.id))return false;
+  const previousAtomicNumber=element()?.atomicNumber??null;
   workshopSelectionId=item.id;workshopScale=1;updateWorkshopContext();
-  const started=await start();if(!started){workshopSelectionId=null;workshopScale=1;updateWorkshopContext();return false;}
+  const started=await start();
+  if(!started){if(previousAtomicNumber!==null){selected=String(previousAtomicNumber);$('silm-metal').value=selected;}workshopSelectionId=null;workshopScale=1;updateWorkshopContext();return false;}
   const ready=ensureWorkshopCrystal();
   if(ready.ok){model.setCrystalRepresentation({view:'lattice',unitCell:true,neighbors:false,selectedUnitId:null});workshopScale=3;}
   else say(S.crystal.reasons[ready.reason]||'A investigação foi iniciada; a montagem livre continua disponível.','info');
@@ -237,9 +239,13 @@
  }
  function updateWorkshopContext(){
   const host=$('silm-workshop-context');if(!host||!S.workshop)return;
-  const active=element();
+  const active=element(),candidate=S.data.get(Number(selected||$('silm-metal')?.value));
+  if(active&&candidate&&candidate.atomicNumber!==active.atomicNumber){
+   const key='pending:'+candidate.atomicNumber+':'+active.atomicNumber;
+   if(host.dataset.key!==key){host.dataset.key=key;host.hidden=false;S.workshop.renderDiscovery(host,{element:candidate,notice:'A investigação atual de '+active.name+' permanece preservada. Escolher uma aplicação solicitará a troca antes de iniciar a nova investigação.',onOpenPeriodic:()=>$('silm-open-periodic')?.click(),onContinue:()=>{selected=String(active.atomicNumber);$('silm-metal').value=selected;workshopSelectionId=null;workshopScale=1;schedule();openLeft('preparo');},onInvestigate:investigateWorkshopReference,onStartDirect:()=>start()});}
+   return;
+  }
   if(!active){
-   const candidate=S.data.get(Number(selected||$('silm-metal')?.value));
    const key='discover:'+String(candidate?.atomicNumber||'none');
    if(host.dataset.key===key)return;
    host.dataset.key=key;host.hidden=false;
