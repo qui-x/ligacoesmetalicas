@@ -36,7 +36,7 @@ Os cartões distinguem o componente que contém o elemento dos demais materiais.
 
 - Não substituir estado científico, investigação, motores ou renderizador.
 - Seleção de elemento prepara a descoberta; **Ver aplicações** fecha a tabela e abre a curadoria.
-- Iniciar diretamente pela Tabela Periódica continua disponível.
+- Iniciar diretamente pela Tabela Periódica continua disponível. Se uma investigação já estiver ativa, selecionar outro metal mostra a nova curadoria como pendente; a troca só ocorre após a confirmação existente, e o cancelamento retorna ao metal que já estava em estudo.
 - A escolha de componente cria contexto didático, não composição exata nem outro metal.
 - Organização cristalina usa elegibilidade e métodos existentes; se indisponível, montagem livre permanece.
 - Escalas 3/4 alteram somente representação (vista, célula, centro e vizinhos).
