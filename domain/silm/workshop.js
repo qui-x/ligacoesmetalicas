@@ -36,10 +36,11 @@ SILM.workshop=(()=>{
   body.append(node('p','silm-workshop-eyebrow',item.context),node('h3','',item.title),node('p','silm-workshop-component-label','Componente: '+item.component),node('p','silm-workshop-material','Material: '+item.material),node('p','silm-workshop-card-note',item.explanation),node('p','silm-workshop-caveat',item.caveat));
   const b=node('button','button outline',label);b.type='button';b.addEventListener('click',()=>onAction(item));body.append(b);article.append(art,body);return article;
  }
- function renderDiscovery(host,{element,onOpenPeriodic=()=>{},onContinue=()=>{},onInvestigate=()=>{},onStartDirect=()=>{}}={}){
+ function renderDiscovery(host,{element,notice='',onOpenPeriodic=()=>{},onContinue=()=>{},onInvestigate=()=>{},onStartDirect=()=>{}}={}){
   host.replaceChildren();host.hidden=false;const s=node('section','silm-workshop-discovery');
   s.append(node('p','silm-workshop-eyebrow','OFICINA DOS METAIS · INVESTIGAÇÃO POR ELEMENTO'),node('h2','','Onde encontramos '+(element?.name||'um metal')+'?'),
    node('p','silm-workshop-intro',element?'Escolha um componente que contenha o elemento. O objeto completo reúne outros metais, ligas, isolantes e materiais.':'Comece selecionando um metal na Tabela Periódica.'));
+  if(notice)s.append(node('p','silm-workshop-pending-notice',notice));
   const actions=node('div','silm-workshop-discovery-actions'),table=node('button','button primary','Tabela Periódica'),free=node('button','button outline','Montagem livre');
   table.type='button';free.type='button';table.addEventListener('click',onOpenPeriodic);free.addEventListener('click',onContinue);actions.append(table,free);s.append(actions);
   if(!element){host.append(s);return;}
