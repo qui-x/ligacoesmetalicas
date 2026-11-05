@@ -108,7 +108,7 @@ async function test(viewport){
  assert.equal(shown.layout,'list','O botão não selecionou o modo lista.');
  assert.equal(shown.columns,1,'Modo lista permanece com múltiplas colunas por sobreposição de CSS.');
  assert.equal(await entries.first().locator('.silm-structure-preview svg').isVisible(),true,'Prévia desapareceu no modo lista.');
- const currentCard=entries.locator('[data-current="true"]');
+ const currentCard=cards.locator('.silm-structure-card[data-current="true"]');
  assert.equal(await currentCard.count(),1,'A estrutura atualmente em foco não está identificada na lista.');
  assert.equal(await currentCard.locator('.silm-structure-status').textContent(),'Em foco','O estado de foco não está indicado.');
  const layoutGeometry=await currentCard.evaluate(card=>{
