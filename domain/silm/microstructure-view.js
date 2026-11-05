@@ -40,7 +40,7 @@ SILM.microstructure=(()=>{
  const demoTone=(v,focus)=>'hsl('+(focus==='A'?208:29)+' 70% '+Math.round(88-65*v)+'%)';
  makeField(W/H);
  let serial=0;
- function create({element,item=null}={}){
+ function create({element,item=null,chemistry=null}={}){
   const section=node('section','silm-workshop-micro-viewer'),viewport=node('div','silm-workshop-micro-viewport');
   section.setAttribute('aria-label','Microestrutura ampliada: visualização didática de grãos');
   const svg=svgNode('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'xMidYMid meet',role:'group','aria-label':'Policristal didático ampliado: percorra os grãos com Tab e destaque com Enter; não é micrografia experimental'});
@@ -53,11 +53,20 @@ SILM.microstructure=(()=>{
   let paths=[],cells=[];
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
   const showAlloyDemo=isAlloy(item);
-  let compositionMode=false,focusElement='A';
+  // Elementos reais conhecidos para a FAMÍLIA da liga, não para os grãos simulados.
+  const material=chemistry&&Array.isArray(chemistry.constituents)&&chemistry.constituents.length?chemistry:null;
+  let compositionMode=false,focusElement='A',materialFocus=null,syncDemo=null;
+  let materialButtons=[];
+  const materialPart=symbol=>material?.constituents.find(x=>x.symbol===symbol)||null;
   const status=node('span','silm-workshop-micro-status','Selecione um grão · área do desenho: —');
   const dimension=node('span','silm-workshop-micro-dimension','Tamanho real: indisponível (sem escala em µm)');
   status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');
   const selectionLabel=i=>{
+   if(materialFocus){
+    const constituent=materialPart(materialFocus);
+    return 'Grão '+(i+1)+' · '+constituent.name+' ('+constituent.symbol+') na '+material.label+
+     ' · composição deste grão não medida';
+   }
    if(compositionMode){
     const a=demoA(i),v=focusElement==='A'?a:1-a;
     const dominant=a>.55?'A':a<.45?'B':'nenhum claramente';
@@ -67,7 +76,9 @@ SILM.microstructure=(()=>{
    const share=grainArea(polygons[i])/(W*H)*100;
    return 'Grão '+(i+1)+' · área no desenho: '+share.toLocaleString('pt-BR',{maximumFractionDigits:1,minimumFractionDigits:1})+'% (ilustrativa)';
   };
-  function updateStatus(){status.textContent=chosen>=0?selectionLabel(chosen):compositionMode?'Selecione um grão · mapa A–B simulado':'Selecione um grão · área do desenho: —';}
+  function updateStatus(){status.textContent=chosen>=0?selectionLabel(chosen):
+   materialFocus?'Selecione um grão · '+materialPart(materialFocus).name+' · composição local não medida':
+   compositionMode?'Selecione um grão · mapa A–B simulado':'Selecione um grão · área do desenho: —';}
   function paintComposition(){
    if(compositionMode)svg.dataset.compositionFocus=focusElement;else delete svg.dataset.compositionFocus;
    paths.forEach((p,i)=>{
@@ -123,7 +134,7 @@ SILM.microstructure=(()=>{
   let chemistryHint=null;
   if(showAlloyDemo){
    const compositionTools=node('div','silm-workshop-micro-composition-tools');
-   const modeButton=button('Alternar mapa ilustrativo de liga A–B','Mapa A–B',()=>{compositionMode=!compositionMode;syncComposition();});
+   const modeButton=button('Alternar mapa ilustrativo de liga A–B','Mapa A–B',()=>{compositionMode=!compositionMode;materialFocus=null;syncComposition();updateMaterialSelection();});
    const buttonA=button('Exibir concentração simulada do elemento A','A',()=>{focusElement='A';syncComposition();});
    const buttonB=button('Exibir concentração simulada do elemento B','B',()=>{focusElement='B';syncComposition();});
    chemistryHint=node('span','silm-workshop-micro-composition-key','Mapa simulado · claro: menos, escuro: mais');
@@ -136,12 +147,40 @@ SILM.microstructure=(()=>{
     chemistryHint.hidden=!compositionMode;
     if(note)note.textContent=compositionMode?
      'SIMULAÇÃO de liga genérica A–B, não representa a composição do objeto real. Tons indicam incidência relativa, sem percentuais ou escala experimental.':
+     materialFocus?material.label+' · '+material.note+' Nenhuma cor espacial ou teor por grão foi medido.':
      'Grãos ilustrativos · área relativa ao desenho, não é medida experimental de tamanho em micrômetros.';
    };
+   syncDemo=syncComposition;
    compositionTools.append(modeButton,buttonA,buttonB,chemistryHint);
    toolbar.append(compositionTools);
    // O texto da nota será inicializado após os controles.
    modeButton.setAttribute('aria-pressed','false');buttonA.disabled=true;buttonB.disabled=true;chemistryHint.hidden=true;
+  }
+  // Investigação da composição nominal de uma família tecnológica, nunca da química local do polígono.
+  function updateMaterialSelection(){
+   for(const b of materialButtons)b.setAttribute('aria-pressed',String(materialFocus===b.dataset.elementSymbol));
+  }
+  if(material){
+   const materialTools=node('div','silm-workshop-micro-material-tools');
+   materialTools.setAttribute('role','group');
+   materialTools.setAttribute('aria-label','Elementos da família do material');
+   materialTools.append(node('span','silm-workshop-micro-material-label','Constituintes:'));
+   for(const part of material.constituents){
+    const qualifier=part.certainty==='possible'?' (possível)':'';
+    const b=button('Consultar '+part.name+' na família de liga',part.symbol+qualifier,()=>{
+     materialFocus=materialFocus===part.symbol?null:part.symbol;
+     compositionMode=false;
+     if(syncDemo)syncDemo();else{paintComposition();updateStatus();}
+     updateMaterialSelection();
+     if(note)note.textContent=materialFocus?
+      material.label+' · '+part.name+': '+part.role+'. '+material.note+
+      ' Sem mapa químico medido, não se pode atribuir teor ou identidade elementar ao grão.':
+      'Grãos ilustrativos · área relativa ao desenho, não é medida experimental de tamanho em micrômetros.';
+    });
+    b.dataset.elementSymbol=part.symbol;b.setAttribute('aria-pressed','false');
+    materialButtons.push(b);materialTools.append(b);
+   }
+   toolbar.append(materialTools);
   }
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
   svg.addEventListener('pointerdown',e=>{if(zoom<=1||e.button!==0)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};suppressClick=false;svg.setPointerCapture(e.pointerId);});
