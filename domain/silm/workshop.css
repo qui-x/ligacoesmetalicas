@@ -153,3 +153,11 @@
  #si-stage:not(.silm-workshop-context-only) .silm-workshop-reference-summary .silm-workshop-selected-title{font-size:.75rem;line-height:1.2}
  #si-stage:not(.silm-workshop-context-only) #silm-integration-scene{flex:1 1 0!important;min-height:12rem!important}
 }
+@media(max-width:360px){
+ #si-stage .silm-crystal{position:relative}
+ #si-stage .silm-crystal .silm-lattice-status:not([hidden]){
+  position:absolute;inset:.2rem .25rem auto;z-index:12;justify-self:center;justify-content:center;
+  width:fit-content;max-width:calc(100% - .5rem);margin:auto;padding:.1rem .4rem;
+  border-radius:.35rem;background:var(--surface);pointer-events:none;
+ }
+}
