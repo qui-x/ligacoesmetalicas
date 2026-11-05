@@ -232,3 +232,36 @@
   border-radius:.35rem;background:var(--surface);pointer-events:none;
  }
 }
+
+/* Parte 5 — mapa demonstrativo de composicao A-B: a cor não cria novos dados científicos. */
+.silm-workshop-micro-mode .silm-workshop-micro-composition-tools{
+ grid-column:1/-1;display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;
+ padding-top:6px;border-top:1px solid var(--border);
+}
+.silm-workshop-micro-composition-tools .silm-workshop-micro-control{
+ min-width:44px;min-height:44px;padding:4px 10px;
+}
+.silm-workshop-micro-composition-tools .silm-workshop-micro-control[aria-pressed="true"]{
+ outline:2px solid var(--accent);outline-offset:-3px;
+}
+.silm-workshop-micro-composition-key{
+ font-size:.73rem;color:var(--text);overflow-wrap:anywhere;
+}
+.silm-workshop-micro-map[data-composition-focus] .silm-micro-grain{fill:var(--map-fill)}
+.silm-workshop-micro-map[data-composition-focus] .silm-micro-grain.is-selected{
+ stroke:var(--ring,var(--accent));stroke-width:6;stroke-dasharray:11 4;
+}
+:root.si-highcontrast .silm-workshop-micro-map[data-composition-focus] .silm-micro-grain{
+ fill:var(--panel)!important;stroke:var(--text);stroke-opacity:1;
+}
+:root.si-highcontrast .silm-workshop-micro-map[data-composition-focus] .silm-micro-grain.is-selected{
+ stroke:var(--accent);stroke-width:7;stroke-dasharray:10 5;
+}
+@media(forced-colors:active){
+ .silm-workshop-micro-map[data-composition-focus] .silm-micro-grain{fill:Canvas!important;stroke:CanvasText}
+ .silm-workshop-micro-map[data-composition-focus] .silm-micro-grain.is-selected{fill:Highlight!important;stroke:HighlightText}
+}
+@media(max-width:620px){
+ .silm-workshop-micro-mode .silm-workshop-micro-composition-tools{grid-column:1;grid-row:4;gap:5px}
+ .silm-workshop-micro-composition-key{flex-basis:100%}
+}
