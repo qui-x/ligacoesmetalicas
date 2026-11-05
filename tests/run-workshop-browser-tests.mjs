@@ -1,3 +1,4 @@
+// Fluxo E2E da Oficina: descoberta por elemento, troca protegida e compatibilidade do início direto.
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
