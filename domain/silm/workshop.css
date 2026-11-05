@@ -130,3 +130,37 @@
  .silm-workshop-micro-control:focus-visible{outline:3px solid Highlight}
  .silm-workshop-scale[aria-pressed=true]{border:2px solid Highlight;outline:2px solid Highlight;outline-offset:-4px}
 }
+
+
+/* A escala 2 ocupa a largura efetiva do painel e traz leitura/zoom antes da imagem. */
+.silm-workshop-micro-mode .silm-workshop-micro-viewer{gap:7px;min-width:0}
+.silm-workshop-micro-mode .silm-workshop-micro-toolbar{
+ display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;
+ align-items:center;justify-content:stretch;gap:6px 12px;min-width:0;
+ min-height:44px;margin:0;padding:6px 8px;border:1px solid var(--border);
+ border-radius:10px;background:var(--panel2,var(--surface));color:var(--text);
+}
+.silm-workshop-micro-mode .silm-workshop-micro-status{
+ order:initial;min-width:0;max-width:none;margin:0;flex-basis:auto;
+ color:var(--text);font-size:.84rem;font-weight:700;line-height:1.35;overflow-wrap:anywhere;
+}
+.silm-workshop-micro-dimension{font-size:.78rem;line-height:1.35;color:var(--muted);overflow-wrap:anywhere}
+.silm-workshop-micro-zoom-tools{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:nowrap}
+.silm-workshop-micro-mode .silm-workshop-micro-viewport{
+ box-sizing:border-box;width:100%;max-width:100%;height:clamp(260px,calc(100dvh - 500px),520px);min-width:0;
+}
+.silm-workshop-micro-mode .silm-workshop-micro-map{width:100%;height:100%}
+@media(max-width:1100px){
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar{grid-template-columns:minmax(0,1fr) auto}
+ .silm-workshop-micro-dimension{grid-column:1;grid-row:2}
+ .silm-workshop-micro-zoom-tools{grid-column:2;grid-row:1 / span 2}
+}
+@media(max-width:620px){
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar{grid-template-columns:minmax(0,1fr);gap:5px;padding:7px}
+ .silm-workshop-micro-mode .silm-workshop-micro-status{grid-column:1;grid-row:1;font-size:.79rem}
+ .silm-workshop-micro-dimension{grid-column:1;grid-row:2;font-size:.72rem}
+ .silm-workshop-micro-zoom-tools{grid-column:1;grid-row:3;justify-content:center;flex-wrap:wrap}
+ .silm-workshop-micro-mode .silm-workshop-micro-viewport{height:clamp(260px,calc(100dvh - 505px),460px)}
+}
+:root.si-highcontrast .silm-workshop-micro-mode .silm-workshop-micro-toolbar{border:2px solid var(--text)}
+@media(forced-colors:active){.silm-workshop-micro-mode .silm-workshop-micro-toolbar{background:Canvas;color:CanvasText;border:2px solid CanvasText}}
