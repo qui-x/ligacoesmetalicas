@@ -31,6 +31,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  const statusLabel={empty:'Vazia',assembling:'Em construção',assembled:'Concluída pelo usuário'};
  const root=U.element('section',null,'silm-assembly');root.dataset.editable=String(editable);root.setAttribute('aria-labelledby','silm-assembly-title');
  const title=U.element('h1',element.name+' — montagem livre','sr-only');title.id='silm-assembly-title';title.tabIndex=-1;
+  const meta=U.element('p','','sr-only');meta.id='silm-assembly-meta';
  const quickHost=document.getElementById('silm-view-quick-actions'),cameraHost=document.getElementById('silm-view-controls');
  if(quickHost){quickHost.hidden=false;quickHost.replaceChildren();}
  if(cameraHost)cameraHost.replaceChildren();
@@ -60,7 +61,7 @@ SILM.createAssemblyView=(host,{scope,model,element,editable,actions,note='',refe
  const cameraHelp=U.element('p','Vista: + e − aproximam e afastam, F enquadra, C centraliza, 0 restaura e Shift + setas deslocam (com unidade selecionada, Shift + seta é o passo fino). Arraste o fundo para deslocar; no celular, use dois dedos para aproximar. A câmera não muda as posições.','silm-camera-help');
  const feedback=U.element('p','','sr-only silm-assembly-feedback');feedback.id='silm-assembly-feedback';feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
  const crystalReason=U.element('p','','silm-assembly-reason');crystalReason.id='silm-assembly-crystal-reason';
- root.append(title,area,feedback);host.append(root);
+ root.append(title,meta,area,feedback);host.append(root);
  const notesHost=document.getElementById('silm-structure-notes');
  if(notesHost){notesHost.replaceChildren();SILM.createSceneNotes(notesHost,{scope,items:[instructions,cameraHelp,assist,kind,crystalReason]});}
  const caption=U.element('span',element.name+' · Montagem livre','silm-scene-caption');caption.setAttribute('aria-hidden','true');stage.append(caption);
