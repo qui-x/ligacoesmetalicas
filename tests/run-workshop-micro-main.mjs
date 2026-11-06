@@ -32,6 +32,10 @@ async function test(viewport){
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true',undefined,{timeout:15000});
  assert.equal(await page.locator('.silm-workshop-reference > :first-child').getAttribute('aria-label'),'Escalas de investigação','A navegação de escalas deve ficar no topo da área de exibição.');
  const rectangle=await viewer.locator('.silm-workshop-micro-viewport').boundingBox();
+ console.log('SILM_MICRO_LAYOUT',JSON.stringify(await viewer.evaluate(node=>{
+ const q=s=>{const e=node.querySelector(s);if(!e)return null;const cs=getComputedStyle(e),b=e.getBoundingClientRect();return {width:b.width,height:b.height,display:cs.display,computedHeight:cs.height,minHeight:cs.minHeight,maxHeight:cs.maxHeight,gridRows:cs.gridTemplateRows,overflowY:cs.overflowY};};
+ return {viewport:{width:innerWidth,height:innerHeight},viewer:q('.silm-workshop-micro-viewer'),frame:q('.silm-workshop-micro-viewport'),toolbar:q('.silm-workshop-micro-toolbar'),nav:q('.silm-workshop-scales')};
+ })));
  assert.ok(rectangle&&rectangle.height>=290,'A microestrutura está pequena demais');
  if(viewport.width>800)assert.ok(rectangle.width>650,'Palco central não está ampliado');
  else assert.ok(rectangle.width>=260&&rectangle.width<=viewport.width,'A largura da microestrutura excede o celular');
