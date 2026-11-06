@@ -232,3 +232,143 @@
   border-radius:.35rem;background:var(--surface);pointer-events:none;
  }
 }
+
+/* Parte 5 — mapa demonstrativo de composicao A-B: a cor não cria novos dados científicos. */
+.silm-workshop-micro-mode .silm-workshop-micro-composition-tools{
+ grid-column:1/-1;display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;
+ padding-top:6px;border-top:1px solid var(--border);
+}
+.silm-workshop-micro-composition-tools .silm-workshop-micro-control{
+ min-width:44px;min-height:44px;padding:4px 10px;
+}
+.silm-workshop-micro-composition-tools .silm-workshop-micro-control[aria-pressed="true"]{
+ outline:2px solid var(--accent);outline-offset:-3px;
+}
+.silm-workshop-micro-composition-key{
+ font-size:.73rem;color:var(--text);overflow-wrap:anywhere;
+}
+.silm-workshop-micro-map[data-composition-focus] .silm-micro-grain{fill:var(--map-fill)}
+.silm-workshop-micro-map[data-composition-focus] .silm-micro-grain.is-selected{
+ stroke:var(--ring,var(--accent));stroke-width:6;stroke-dasharray:11 4;
+}
+:root.si-highcontrast .silm-workshop-micro-map[data-composition-focus] .silm-micro-grain{
+ fill:var(--panel)!important;stroke:var(--text);stroke-opacity:1;
+}
+:root.si-highcontrast .silm-workshop-micro-map[data-composition-focus] .silm-micro-grain.is-selected{
+ stroke:var(--accent);stroke-width:7;stroke-dasharray:10 5;
+}
+@media(forced-colors:active){
+ .silm-workshop-micro-map[data-composition-focus] .silm-micro-grain{fill:Canvas!important;stroke:CanvasText}
+ .silm-workshop-micro-map[data-composition-focus] .silm-micro-grain.is-selected{fill:Highlight!important;stroke:HighlightText}
+}
+@media(max-width:620px){
+ .silm-workshop-micro-mode .silm-workshop-micro-composition-tools{grid-column:1;grid-row:4;gap:5px}
+ .silm-workshop-micro-composition-key{flex-basis:100%}
+}
+
+/* Preserva o palco alto no desktop: um único trilho de instrumentos, rolável se necessário. */
+@media(min-width:1101px){
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar:has(.silm-workshop-micro-composition-tools){
+  display:flex;flex-wrap:nowrap;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:thin;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar:has(.silm-workshop-micro-composition-tools) .silm-workshop-micro-status{
+  flex:1 1 185px;min-width:185px;margin-right:0;order:0;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar:has(.silm-workshop-micro-composition-tools) .silm-workshop-micro-dimension{
+  flex:0 1 180px;min-width:135px;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-composition-tools{
+  flex:0 0 auto;grid-column:auto;flex-wrap:nowrap;border-top:0;border-left:1px solid var(--border);padding:0 0 0 8px;
+ }
+ .silm-workshop-micro-composition-key{max-width:145px}
+}
+
+/* Parte 5 — informação da família de liga; grãos ficam sem falsa composição colorida. */
+.silm-workshop-micro-mode .silm-workshop-micro-material-tools{
+ grid-column:1/-1;display:flex;align-items:center;gap:5px;min-width:0;flex-wrap:wrap;
+ border-top:1px solid var(--border);padding-top:6px;
+}
+.silm-workshop-micro-material-label{font-size:.76rem;color:var(--text);font-weight:650;white-space:nowrap}
+.silm-workshop-micro-material-tools .silm-workshop-micro-control{min-height:44px;min-width:44px;padding:5px 9px;font-size:.78rem}
+.silm-workshop-micro-material-tools .silm-workshop-micro-control[aria-pressed="true"]{
+ border:2px solid var(--accent);outline:2px solid var(--ring,var(--accent));outline-offset:-4px;
+}
+@media(min-width:1101px){
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar:has(.silm-workshop-micro-material-tools){
+  display:flex;flex-wrap:nowrap;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:thin;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar:has(.silm-workshop-micro-material-tools) .silm-workshop-micro-status{
+  flex:1 1 180px;min-width:180px;margin:0;order:0;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar:has(.silm-workshop-micro-material-tools) .silm-workshop-micro-dimension{
+  flex:0 1 160px;min-width:120px;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-material-tools{
+  border-top:0;border-left:1px solid var(--border);padding:0 0 0 8px;flex:0 0 auto;grid-column:auto;flex-wrap:nowrap;
+ }
+}
+@media(max-width:620px){
+ .silm-workshop-micro-mode .silm-workshop-micro-material-tools{grid-column:1;grid-row:5;gap:5px}
+}
+
+/* SILM Parte 5 — figura experimental citada; sem sobreposição não calibrada. */
+.silm-experiment-viewer{display:flex;flex-direction:column;gap:8px;min-width:0;color:var(--text)}
+.silm-experiment-viewport{height:clamp(270px,calc(100dvh - 355px),680px);min-height:260px;max-height:720px;min-width:0;overflow:auto;border:1px solid var(--border);border-radius:12px;background:var(--panel2,var(--surface));display:grid;place-items:center}
+.silm-experiment-figure{margin:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;min-width:0;width:100%;height:100%;overflow:auto}
+.silm-experiment-image{display:block;max-width:100%;max-height:calc(100% - 2.7rem);width:auto;height:auto;object-fit:contain;transform-origin:center;transition:transform .15s}
+.silm-experiment-caption{font-size:.76rem;line-height:1.35;padding:3px 9px;color:var(--text);text-align:center;max-width:80ch}
+.silm-experiment-image[hidden],.silm-experiment-fallback[hidden]{display:none!important}
+.silm-experiment-fallback{text-align:center;padding:20px;max-width:55ch}
+.silm-experiment-fallback p{font-size:.82rem}
+.silm-experiment-controls{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;padding:7px 9px;min-width:0;max-width:100%;overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+.silm-experiment-figures,.silm-experiment-zoom-controls{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.silm-experiment-figures button[aria-pressed=true]{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:-3px}
+.silm-experiment-zoom{font-size:.8rem;min-width:44px;text-align:center}
+.silm-experiment-evidence{font-size:.79rem;line-height:1.4;display:flex;gap:4px 14px;align-items:center;flex-wrap:wrap;color:var(--text);max-height:120px;overflow:auto}
+.silm-experiment-evidence p{margin:0}
+.silm-experiment-badge{font-weight:750}
+.silm-experiment-warning{font-weight:600}
+.silm-experiment-source{font-weight:650;overflow-wrap:anywhere}
+.silm-experiment-license{font-size:.7rem;color:var(--muted)}
+@media(max-width:680px){
+ .silm-experiment-viewport{height:clamp(260px,calc(100dvh - 480px),500px)}
+ .silm-experiment-evidence{max-height:170px}
+ .silm-experiment-controls{scrollbar-width:thin}
+}
+:root.si-no-motion .silm-experiment-image{transition:none}
+@media(prefers-reduced-motion:reduce){.silm-experiment-image{transition:none}}
+:root.si-highcontrast .silm-experiment-viewport{border:2px solid var(--text)}
+@media(forced-colors:active){.silm-experiment-viewport{border:2px solid CanvasText}.silm-experiment-figures button[aria-pressed=true]{border:2px solid Highlight}}
+
+/* Parte 5 — Mobile: controles em faixa horizontal rolável, preservando o palco.
+   Evita cinco linhas de controles comprimindo a microestrutura para 255px. */
+@media(max-width:620px){
+ .silm-workshop-micro-mode .silm-workshop-micro-viewer{
+  height:clamp(480px,calc(100dvh - 365px),660px);
+  grid-template-rows:minmax(310px,1fr) auto auto;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-viewport{
+  height:100%;min-height:310px;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar{
+  display:flex;flex-wrap:nowrap;gap:7px;align-items:center;justify-content:flex-start;
+  min-height:54px;max-width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;
+  padding:6px 7px;overscroll-behavior-x:contain;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-status{
+  flex:0 0 205px;min-width:205px;max-width:205px;margin:0;order:0;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-dimension{
+  flex:0 0 170px;min-width:170px;grid-column:auto;grid-row:auto;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-zoom-tools{
+  flex:0 0 auto;grid-column:auto;grid-row:auto;justify-content:flex-start;flex-wrap:nowrap;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-composition-tools,
+ .silm-workshop-micro-mode .silm-workshop-micro-material-tools{
+  flex:0 0 auto;grid-column:auto;grid-row:auto;align-items:center;
+  border-top:0;border-left:1px solid var(--border);padding:0 0 0 8px;flex-wrap:nowrap;
+ }
+ .silm-workshop-micro-composition-key{max-width:145px;flex-basis:auto}
+ .silm-workshop-micro-material-label{white-space:nowrap}
+}

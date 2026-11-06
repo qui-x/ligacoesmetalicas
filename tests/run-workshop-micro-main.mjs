@@ -32,6 +32,10 @@ async function test(viewport){
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true',undefined,{timeout:15000});
  assert.equal(await page.locator('.silm-workshop-reference > :first-child').getAttribute('aria-label'),'Escalas de investigação','A navegação de escalas deve ficar no topo da área de exibição.');
  const rectangle=await viewer.locator('.silm-workshop-micro-viewport').boundingBox();
+ console.log('SILM_MICRO_LAYOUT',JSON.stringify(await viewer.evaluate(node=>{
+ const q=s=>{const e=node.querySelector(s);if(!e)return null;const cs=getComputedStyle(e),b=e.getBoundingClientRect();return {width:b.width,height:b.height,display:cs.display,computedHeight:cs.height,minHeight:cs.minHeight,maxHeight:cs.maxHeight,gridRows:cs.gridTemplateRows,overflowY:cs.overflowY};};
+ return {viewport:{width:innerWidth,height:innerHeight},viewer:q('.silm-workshop-micro-viewer'),frame:q('.silm-workshop-micro-viewport'),toolbar:q('.silm-workshop-micro-toolbar'),nav:q('.silm-workshop-scales')};
+ })));
  assert.ok(rectangle&&rectangle.height>=290,'A microestrutura está pequena demais');
  if(viewport.width>800)assert.ok(rectangle.width>650,'Palco central não está ampliado');
  else assert.ok(rectangle.width>=260&&rectangle.width<=viewport.width,'A largura da microestrutura excede o celular');
@@ -54,6 +58,38 @@ async function test(viewport){
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-selected-grain'),'26','Destaque de grão falhou');
  assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),1,'Seleção não aplica padrão estrutural ao grão.');
  assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/Grão 26 · área no desenho: .*% \(ilustrativa\)/,'Área relativa ilustrativa não foi exibida.');
+ // Parte 5: o mapa A–B e seus tons são só apresentação, com simulação rotulada.
+ const mapMode=viewer.getByRole('button',{name:'Alternar mapa ilustrativo de liga A–B'});
+ assert.equal(await mapMode.count(),1,'Ligas precisam oferecer mapa ilustrativo seletivo.');
+ const scientificBefore=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
+ await mapMode.click();
+ assert.equal(await map.getAttribute('data-composition-focus'),'A','A ativação deve iniciar no elemento didático A.');
+ assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/predominância simulada:/,'A seleção não declarou composição ilustrativa.');
+ assert.match(await viewer.locator('.silm-workshop-micro-caveat').textContent(),/SIMULAÇÃO/,'O modelo não está rotulado como simulação.');
+ const selectedElement=viewer.getByRole('button',{name:'Exibir concentração simulada do elemento B'});
+ await selectedElement.click();
+ assert.equal(await map.getAttribute('data-composition-focus'),'B','Trocar o elemento em foco não alterou o mapa.');
+ assert.equal(await selectedElement.getAttribute('aria-pressed'),'true','Controle do elemento perdeu estado acessível.');
+ assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/elemento B/,'Selecionar grão não informa o elemento em foco.');
+ await mapMode.click();
+ assert.equal(await map.getAttribute('data-composition-focus'),null,'Voltar a grãos não limpou mapa de composição.');
+ // A família de aço tem Fe e C; esses dados não identificam a química de um grão.
+ const iron=viewer.getByRole('button',{name:'Consultar Ferro na família de liga'});
+ assert.equal(await iron.count(),1,'Falta identificação real do elemento da liga.');
+ await iron.click();
+ assert.equal(await iron.getAttribute('aria-pressed'),'true');
+ assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/Ferro \(Fe\).*composição deste grão não medida/);
+ assert.match(await viewer.locator('.silm-workshop-micro-caveat').textContent(),/Sem mapa químico medido/);
+ assert.equal(await map.getAttribute('data-composition-focus'),null,'Elemento real sem EDS não deve ganhar cores de concentração.');
+ const carbon=viewer.getByRole('button',{name:'Consultar Carbono na família de liga'});
+ await carbon.click();
+ assert.equal(await iron.getAttribute('aria-pressed'),'false');
+ assert.equal(await carbon.getAttribute('aria-pressed'),'true');
+ assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/Carbono \(C\).*não medida/);
+ await carbon.click();
+ assert.equal(await carbon.getAttribute('aria-pressed'),'false');
+
+ assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),scientificBefore,'O mapa ilustrativo alterou o estado científico.');
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  await viewer.getByRole('button',{name:'Ampliar microestrutura'}).click();
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-zoom'),'1.25','Zoom não funciona');

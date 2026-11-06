@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "project": "SILM Parte 5",
+  "status": "research-curated-not-released",
+  "samples": [
+    {
+      "id": "al-si-rb-alloy3-metals-2023-1398",
+      "targetElement": "Rb",
+      "materialType": "alloy",
+      "alloyName": "Al–Si modificada com Rb — amostra Alloy 3",
+      "matrix": "Al",
+      "nominalFamily": "Al–12 wt% Si",
+      "compositionSource": "Tabela 1",
+      "measuredBulkComposition": {
+        "unit": "wt%",
+        "Si": 11.36,
+        "Rb": 0.0075,
+        "Fe": 0.2
+      },
+      "processing": "Liga fundida, tratada com RbNO3 e vazada em molde de areia-argila",
+      "microstructure": {
+        "kind": "experimental",
+        "method": "SEM–EDS",
+        "figures": [
+          "2",
+          "3"
+        ],
+        "mapAvailability": "elemental mapping in publication",
+        "characteristic": "Rubídio detectado em cristais de silício eutético modificado; distribuição relativamente homogênea na fase silício segundo os autores.",
+        "measuredGrainComposition": null,
+        "measuredGrainSizes": null,
+        "grainSegmentation": null,
+        "originalImagePath": null,
+        "calibratedImagePath": null,
+        "scale": {
+          "micrometersPerPixel": null,
+          "status": "not-calibrated"
+        },
+        "mapping": {
+          "aligned": false,
+          "perElementDataFiles": [],
+          "quantification": "qualitative-location-only"
+        },
+        "publishedCharacterization": {
+          "siEutecticMeanLengthMicrometers": null,
+          "secondaryDendriteArmSpacingMicrometers": 37,
+          "secondaryDendriteArmSpacingUncertaintyMicrometers": 9,
+          "lengthSource": "Tabela 2, Alloy 3",
+          "sourceFigure2d": "liga 3",
+          "siEutecticMeanLengthRangeMicrometers": {
+            "min": 0.36,
+            "max": 2.29
+          },
+          "siEutecticIndividualSizeRangeMicrometers": {
+            "min": 0.2,
+            "max": 7.6
+          },
+          "sourceClarification": "Tabela 2: numerador = faixa de tamanhos médios dos componentes, denominador = mínimo/máximo da amostra. 0,36 não é a média geral."
+        },
+        "figureLinks": [
+          {
+            "figure": "2",
+            "sourceURL": "https://www.mdpi.com/metals/metals-13-01398/article_deploy/html/images/metals-13-01398-g002.png",
+            "imageAvailability": "external-unverified"
+          },
+          {
+            "figure": "3a-b",
+            "sourceURL": "https://www.mdpi.com/metals/metals-13-01398/article_deploy/html/images/metals-13-01398-g003a.png",
+            "imageAvailability": "external-unverified"
+          },
+          {
+            "figure": "3c-d",
+            "sourceURL": "https://www.mdpi.com/metals/metals-13-01398/article_deploy/html/images/metals-13-01398-g003b.png",
+            "imageAvailability": "external-unverified"
+          }
+        ]
+      },
+      "source": {
+        "title": "Effect of Rubidium on Solidification Parameters, Structure and Operational Characteristics of Eutectic Al-Si Alloy",
+        "year": 2023,
+        "journal": "Metals",
+        "volume": 13,
+        "issue": 8,
+        "article": 1398,
+        "doi": "10.3390/met13081398",
+        "url": "https://www.mdpi.com/2075-4701/13/8/1398",
+        "authors": [
+          "Igor A. Petrov",
+          "Anastasiya D. Shlyaptseva",
+          "Alexandr P. Ryakhovsky",
+          "Elena V. Medvedeva",
+          "Victor V. Tcherdyntsev"
+        ],
+        "license": "Creative Commons Attribution 4.0 (CC BY 4.0)",
+        "licenseURL": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "display": {
+        "enabled": false,
+        "publicationPreview": true,
+        "calibrated": false,
+        "regionSelection": false,
+        "rights": "confirmed article CC BY 4.0, check third-party credit when reusing any figure",
+        "reason": "Prévia da publicação habilitada por URL externa; não existe ainda imagem local calibrada nem segmentação química por grão."
+      },
+      "warnings": [
+        "Teor 0,0075 wt% é da amostra global, NÃO da região/da fase",
+        "EDS qualitativo não permite derivar percentual de Rb em cada grão",
+        "Não utilizar a rede do Rb puro como estrutura da liga Al–Si",
+        "A fonte apresenta ampliação ×, mas não se deve convertê-la diretamente em µm/pixel.",
+        "A prévia usa recursos do servidor MDPI: o carregamento de imagens não foi confirmado."
+      ]
+    }
+  ],
+  "validationCriteria": [
+    "Fonte científica e amostra identificadas",
+    "Licença de reutilização confirmada",
+    "Escala do campo efetivamente calibrada",
+    "Mapas elementares associados à mesma região",
+    "Não converter composição global em composição de grão",
+    "Não usar dados de intensidade como porcentagem"
+  ]
+}
