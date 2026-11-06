@@ -42,11 +42,20 @@
           "quantification": "qualitative-location-only"
         },
         "publishedCharacterization": {
-          "siEutecticMeanLengthMicrometers": 0.36,
+          "siEutecticMeanLengthMicrometers": null,
           "secondaryDendriteArmSpacingMicrometers": 37,
           "secondaryDendriteArmSpacingUncertaintyMicrometers": 9,
           "lengthSource": "Tabela 2, Alloy 3",
-          "sourceFigure2d": "liga 3"
+          "sourceFigure2d": "liga 3",
+          "siEutecticMeanLengthRangeMicrometers": {
+            "min": 0.36,
+            "max": 2.29
+          },
+          "siEutecticIndividualSizeRangeMicrometers": {
+            "min": 0.2,
+            "max": 7.6
+          },
+          "sourceClarification": "Tabela 2: numerador = faixa de tamanhos médios dos componentes, denominador = mínimo/máximo da amostra. 0,36 não é a média geral."
         },
         "figureLinks": [
           {
