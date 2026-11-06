@@ -14,7 +14,7 @@ SILM.experimentalMicrostructure=(()=>{
    article:'https://www.mdpi.com/2075-4701/13/8/1398',
    license:'CC BY 4.0 — autoria Petrov, Shlyaptseva, Ryakhovsky, Medvedeva e Tcherdyntsev (2023).',
    measured:{Rb:0.0075,Si:11.36,Fe:0.20,unit:'% em massa da amostra global'},
-   siLength:'0,36 µm (média publicada para o silício eutético)',
+   siLength:'0,36–2,29 µm (faixa de médias dos componentes de Si eutético reportada para a liga 3)',
    sdas:'37 ± 9 µm (espaçamento entre braços dendríticos secundários)',
    methods:'Microscopia óptica, SEM–EDS e mapeamento elementar',
    chemistry:'Os autores detectaram Rb em baixa concentração associado ao silício eutético modificado; a evidência não determina o teor de Rb em cada grão.',
@@ -75,7 +75,7 @@ SILM.experimentalMicrostructure=(()=>{
   const headline=el('p','silm-experiment-badge','EXPERIMENTAL · FIGURA PUBLICADA · CALIBRAÇÃO NÃO HOMOLOGADA NO SILM');
   const paragraph=el('p','silm-experiment-explainer',sample.chemistry);
   const data=el('p','silm-experiment-values',
-   'Composição global: Rb 0,0075% · Si 11,36% (massa). Partícula eutética de Si: média '+sample.siLength+'. SDAS: '+sample.sdas+'.');
+   'Composição global: Rb 0,0075% · Si 11,36% (massa). Dimensões de Si eutético: '+sample.siLength+'. SDAS: '+sample.sdas+'.');
   const warning=el('p','silm-experiment-warning',
    'Ainda não é possível selecionar um grão real nesta figura para medir sua composição. Não há máscara de segmentação co-registrada nem calibração em µm/pixel validada. Ampliação × não é uma barra de escala.');
   const source=el('a','silm-experiment-source','Petrov e colaboradores · DOI '+sample.doi);
