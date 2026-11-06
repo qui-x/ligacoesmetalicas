@@ -116,7 +116,7 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
    const units=structure.units||[],positions=units.map(u=>u.position).filter(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y));
    if(positions.length){
     const xs=positions.map(p=>p.x),ys=positions.map(p=>p.y),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
-    const spanX=Math.max(1e-6,maxX-minX),spanY=Math.max(1e-6,maxY-minY),scale=Math.min(250/spanX,150/spanY);
+    const spanX=Math.max(1e-6,maxX-minX),spanY=Math.max(1e-6,maxY-minY),scale=Math.min(310/spanX,194/spanY);
     const cx=(minX+maxX)/2,cy=(minY+maxY)/2,radius=Math.max(9,Math.min(19,86/Math.sqrt(positions.length)));
     positions.forEach(p=>sphere(width/2+(p.x-cx)*scale,height/2-(p.y-cy)*scale,radius));
    }
@@ -132,7 +132,7 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
     const spanX=Math.max(1e-6,maxX-minX),spanY=Math.max(1e-6,maxY-minY);
     // Todas as prévias cristalográficas usam a mesma moldura e orientação, com escala
     // normalizada pela maior dimensão da célula, para permitir comparação visual direta.
-    const scale=Math.min(250/spanX,162/spanY);
+    const scale=Math.min(310/spanX,194/spanY);
     const centerX=(minX+maxX)/2,centerY=(minY+maxY)/2;
     const screen=p=>{const q=project(p);return [width/2+(q[0]-centerX)*scale,height/2-(q[1]-centerY)*scale,q[2]];};
     for(const [a,b]of geometry.edges){const p=screen(a),q=screen(b);line(p[0],p[1],q[0],q[1],.54);}

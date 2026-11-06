@@ -32,11 +32,11 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   if(!editable()||!allows('electrical')||!allows('thermal')||!model.propertyAvailability('electrical').ok||!model.propertyAvailability('thermal').ok)return false;
   if(currentCoupling(st))return true;
   const element=Data.get(st.metal.atomicNumber),net=S.electrothermal.buildNetwork(S.crystal.geometry(element)),run=S.electrothermal.createRun(net);
-  if(!run){say('A primeira vizinhança desta amostra não forma uma rede contínua entre os terminais.','warning');return false;}
+  if(!run){say('Esta geometria ainda não tem uma malha de ensaio validada para o efeito Joule.','warning');return false;}
   if(st.properties.active!=='electrical'&&!toggleProperty('electrical'))return false;
-  const t=thermal();t?.sync();t?.setHeating(false);
+  const t=thermal();t?.sync();t?.setHeating(false);t?.reset();
   if(!model.state.properties.electrical.field&&!change({field:true}))return false;
-  coupled={id:st.investigation.id,start:model.state.properties.startedAt,mode:'voltage',boundary:'ambient',external:false,layer:'temperature',run};
+  coupled={id:st.investigation.id,start:model.state.properties.startedAt,mode:'voltage',boundary:'ambient',external:false,layer:'temperature',run,net};
   schedule();return true;
  }
  function jouleAction(command){
@@ -61,12 +61,12 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   field(){const st=model.state,id=st.properties.active;if(id==='malleability'||id==='ductility'){const d=drive();if(d&&editable()){const on=!d.deformField;if(on&&!st.electrons?.representation.visible)model.activateElectrons?.();d.setDeformField(on);schedule();}return;}return change({field:!model.state.properties.electrical.field});},
   // Calor + corrente: na condutividade elétrica, a fonte de calor é transitória (controlador térmico, sem gravar).
   heat(){if(currentCoupling())return jouleAction('external');if(model.state.properties.active==='electrical'){const t=thermal();if(t&&editable()){t.setHeating(!t.reading().on);schedule();}return;}return change({heating:!model.state.properties.thermal.heating});},
-  advance(){const p=model.state.properties.thermal;if(p.heating&&p.stage<P.limits.heatStages)return change({stage:p.stage+1});},
+  advance(){if(currentCoupling())return jouleAction('step');const p=model.state.properties.thermal;if(p.heating&&p.stage<P.limits.heatStages)return change({stage:p.stage+1});},
   compress(){if(!editable())return;const c=deform();if(c){const ok=c.pulse();schedule();return ok;}const p=model.state.properties.malleability;if(p.compression<P.limits.compression)return change({compression:p.compression+1});},
   stretch(){if(!editable())return;const c=deform();if(c){const ok=c.pulse();schedule();return ok;}const p=model.state.properties.ductility;if(p.elongation<P.limits.elongation)return change({elongation:p.elongation+1});},
 
   light:()=>change({light:!model.state.properties.luster.light}),
-  restore(){coupled=null;deform()?.setLoad(0);drive()?.setDeformField(false);model.restoreProperty();const t=thermal();if(t){t.setHeating(false);t.reset();}schedule();},end(){coupled=null;deform()?.setLoad(0);model.endProperty();schedule();}
+  restore(){const session=currentCoupling();if(session){session.run=S.electrothermal.createRun(session.net);session.external=false;session.cache=null;model.restoreProperty();schedule();return;}coupled=null;deform()?.setLoad(0);drive()?.setDeformField(false);model.restoreProperty();const t=thermal();if(t){t.setHeating(false);t.reset();}schedule();},end(){coupled=null;deform()?.setLoad(0);model.endProperty();schedule();}
  };
  function propertyState(id){
   const st=model.state,primary=st.properties.active;
@@ -112,6 +112,7 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
  }
  function activateCombination(kind){
   if(!editable())return false;
+  if(kind==='joule')return beginJoule();
   const target={heatElectrical:'electrical',malleabilityElectrical:'malleability',ductilityElectrical:'ductility'}[kind];
   if(!target||!allows(target))return false;
   if(currentCoupling())coupled=null;
@@ -144,7 +145,7 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
  }
  const quickActions=Object.freeze({beginJoule,jouleAction,toggleElectrons,toggleProperty,activateCombination,propertyState});
  // Uma leitura do estado por atualização (model.state devolve uma cópia completa).
- const info=()=>{const st=model.state;return {deformation:deform()?.reading()||null,thermal:thermal()?.reading()||null,drive:drive()?.reading()||null,state:st,eligibility:P.eligibility(st.metal?Data.get(st.metal.atomicNumber):null),editable:st.module.active==='explorar',reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}};};
+ const info=()=>{const st=model.state;return {joule:jouleReading(st),deformation:deform()?.reading()||null,thermal:thermal()?.reading()||null,drive:drive()?.reading()||null,state:st,eligibility:P.eligibility(st.metal?Data.get(st.metal.atomicNumber):null),editable:st.module.active==='explorar',reduced:reduced(),availability(id){const r=model.propertyAvailability(id);return {ok:r.ok&&allows(id),message:P.reasons[r.reason]||'Prepare a estrutura para esta experiência.'};}};};
  const controls=S.createPropertyControls(document.getElementById('silm-properties'),{scope,info,actions,prefix:'silm-panel-property'});
  // Painel: até 10 atualizações por segundo durante a animação (a cena atualiza a cada quadro).
  {const c=deform();let lastPanel=0,pending=0;const run=()=>{pending=0;lastPanel=performance.now();controls.update();};
@@ -161,7 +162,7 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
  });
  document.getElementById('silm-close-periodic').addEventListener('click',()=>dialog.close());
  dialog.addEventListener('close',()=>{tableScope?.destroy();trigger.focus({preventScroll:true});});
- return {scene,quickActions,info,update(){controls.update();for(const id of P.ids){const b=document.getElementById('silm-panel-property-start-'+id);b.parentElement.hidden=!allows(id);}document.getElementById('silm-properties').hidden=!model.state.metal;document.getElementById('silm-property-caption').textContent=model.state.properties.active?P.catalog[model.state.properties.active].limitation:'As experiências qualitativas são distintas dos dados tabelados do metal.';}};
+ return {scene,quickActions,info,update(){controls.update();for(const id of P.ids){const b=document.getElementById('silm-panel-property-start-'+id);b.parentElement.hidden=!allows(id);}document.getElementById('silm-properties').hidden=!model.state.metal;document.getElementById('silm-property-caption').textContent=currentCoupling()?'Modelo didático em unidades relativas; parâmetros iguais entre metais, sem comparação quantitativa.':model.state.properties.active?P.catalog[model.state.properties.active].limitation:'As experiências qualitativas são distintas dos dados tabelados do metal.';}};
 };
 SILM.renderIntegrationMetalData=(host,e,state)=>{
  const S=SILM,el=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};

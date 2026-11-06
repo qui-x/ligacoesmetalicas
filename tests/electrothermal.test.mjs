@@ -38,6 +38,14 @@ test('intervalos inválidos preservam completamente a amostra',()=>{
  for(const c of [{...controls,level:NaN},{...controls,boundary:'erro'},{...controls,external:1}])assert.equal(r.advance(c,1),false);
  assert.equal(r.advance(controls,3),false);assert.deepEqual(r.observe(controls),before);
 });
+test('atingir o limite térmico recusa todo o intervalo, sem perder energia ou avançar o relógio',()=>{
+ const r=ET.createRun(chain),c={...controls,mode:'current'};let refused=false;
+ for(let n=0;n<100;n++){
+  const before=r.observe(c,true);
+  if(!r.advance(c,2)){assert.deepEqual(r.observe(c,true),before);refused=true;break;}
+ }
+ assert.ok(refused,'A faixa térmica didática precisa ter limite explícito.');
+});
 for(const ref of S.readyAssemblies.list())test('rede de '+ref.element.symbol+' usa vizinhos reais ou mantém o estudo indisponível',()=>{
  const g=S.crystal.geometry(ref.element),net=ET.buildNetwork(g);
  const supported=['Cu','Fe','Mg','Sn','Po','Am'].includes(ref.element.symbol);
@@ -45,4 +53,14 @@ for(const ref of S.readyAssemblies.list())test('rede de '+ref.element.symbol+' u
  const r=ET.createRun(net);assert.ok(r);assert.ok(r.advance(controls,.15));
  const obs=r.observe(controls);close(obs.power,obs.voltage*obs.current);assert.ok(obs.maximum>0);
  assert.equal(r.field().size,net.sites.length);assert.ok(r.field().has(g.cell[0].key));
+ const {profiles}=r.observe(controls,true),flux=new Float64Array(net.sites.length);
+ for(const {a,b,weight}of net.edges){
+  const ka=net.sites[a].key,kb=net.sites[b].key;
+  const G=weight/(1+.5*(profiles.temperature.get(ka)+profiles.temperature.get(kb))/2);
+  const current=G*(profiles.potential.get(ka)-profiles.potential.get(kb));flux[a]+=current;flux[b]-=current;
+ }
+ for(const i of net.inside)close(flux[i],0);
+ close([...flux].reduce((sum,v,i)=>sum+(net.terminal[i]===1?v:0),0),obs.current);
+ close([...flux].reduce((sum,v,i)=>sum+(net.terminal[i]===0?v:0),0),-obs.current);
+ close(obs.storedEnergy,obs.jouleEnergy+obs.externalEnergy-obs.removedEnergy);
 });

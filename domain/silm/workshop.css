@@ -235,6 +235,12 @@
 
 .silm-joule-controls:not([hidden]){display:inline-flex;align-items:center;gap:4px}
 .silm-joule-controls select{max-width:9rem}
+.silm-crystal[data-field-map] .silm-lattice-status{flex-wrap:nowrap;align-items:center;max-width:100%;min-width:0}
+.silm-crystal[data-field-map] .silm-lattice-status output{flex-shrink:0}
+.silm-crystal[data-field-map] .silm-lattice-status span{min-width:0;overflow-x:auto;white-space:nowrap;padding:3px 1px}
+.silm-crystal[data-field-map] .silm-lattice-status span:focus-visible{outline:2px solid var(--ring);outline-offset:-2px}
+.silm-joule-readings:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.35rem .8rem;font-size:.85rem}
+.silm-joule-readings dd{margin:0;font-variant-numeric:tabular-nums}
 
 .silm-crystal[data-field-map=temperature]{--silm-field-color:var(--silm-heat)}
 .silm-crystal[data-field-map=potential]{--silm-field-color:var(--scientific-accent)}

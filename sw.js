@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.15.9';
+const VERSION='0.15.10';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='oficina-efeito-joule-didatico-20261105';
+const BUILD='oficina-joule-integrado-20261106';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "assets/workshop/motor.webp",
@@ -48,6 +48,7 @@ const FILES=[
   "integracao/integration.css",
   "integracao/silm-theme.css",
   "integracao/workspace-family.css",
+  "integracao/action-icons.css",
   "integracao/base-core.js",
   "integracao/compat.js",
   "domain/silm/data/bundle.js",
@@ -92,6 +93,7 @@ const FILES=[
   "integracao/durable-storage.js",
   "integracao/structure-comparison.js",
   "integracao/adapter.js",
+  "integracao/action-icons.js",
   "domain/silm/abertura/silm-intro-v3.css",
   "domain/silm/abertura/silm-intro-v3.js",
   "integracao/pwa.js",

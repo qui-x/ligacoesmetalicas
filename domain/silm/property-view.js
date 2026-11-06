@@ -18,10 +18,17 @@ SILM.createPropertyOverlay=(stage,{before=null}={})=>{
  const fieldG=group('silm-field-indicator'),forceG=group('silm-force-indicator'),heatG=group('silm-heat-source'),lightG=group('silm-light-beam');
  const arrow=(g,x1,y1,x2,y2,cls)=>el('line',{x1,y1,x2,y2,class:cls,'marker-end':'url(#'+uid+'-head)'},g);
  stage.insertBefore(svg,before);
- function update({field=false,intensity=null,drift=null,fieldY=4.5,beam=null,force=null,level=0,plates=null,load=0,heat=false,light=null,heatX=0}={}){
+ function update({field=false,coupled=null,intensity=null,drift=null,fieldY=4.5,beam=null,force=null,level=0,plates=null,load=0,heat=false,light=null,heatX=0}={}){
   for(const g of [fieldG,forceG,heatG,lightG])g.replaceChildren();
   // 0.17.x: seta E com comprimento pela intensidade; seta da deriva média pela intensidade × (calor, defeitos).
-  if(field&&intensity!==null){const H=5+25*intensity,Ld=4+14*intensity*(drift??1);arrow(fieldG,50-H,fieldY,50+H,fieldY,'silm-field-arrow');el('text',{x:Math.min(97,50+H+5),y:fieldY+1.5,class:'silm-overlay-label'},fieldG,'E');
+  if(coupled){
+   // Terminais em x mínimo (+) e x máximo (0), sem confundir U imposto com campo local.
+   const U=coupled.voltage,I=coupled.current,H=5+25*U/(1+U),Ld=4+14*I/(1+I);
+   el('text',{x:50-H-3,y:fieldY+1.5,class:'silm-overlay-label'},fieldG,'+');
+   el('text',{x:50+H+2,y:fieldY+1.5,class:'silm-overlay-label'},fieldG,'0');
+   el('text',{x:50,y:fieldY+1.5,'text-anchor':'middle',class:'silm-overlay-label'},fieldG,'U (rel.)');
+   if(I>0){arrow(fieldG,50+Ld,96,50-Ld,96,'silm-drift-arrow');el('text',{x:Math.min(80,50+Ld+2),y:97.4,class:'silm-overlay-label silm-overlay-small'},fieldG,'elétrons (qualitativo)');}
+  }else if(field&&intensity!==null){const H=5+25*intensity,Ld=4+14*intensity*(drift??1);arrow(fieldG,50-H,fieldY,50+H,fieldY,'silm-field-arrow');el('text',{x:Math.min(97,50+H+5),y:fieldY+1.5,class:'silm-overlay-label'},fieldG,'E');
    arrow(fieldG,50+Ld,96,50-Ld,96,'silm-drift-arrow');el('text',{x:Math.min(80,50+Ld+2),y:97.4,class:'silm-overlay-label silm-overlay-small'},fieldG,'elétrons (média)');}
   else if(field){arrow(fieldG,32,4.5,68,4.5,'silm-field-arrow');el('text',{x:73,y:6,class:'silm-overlay-label'},fieldG,'E');
    arrow(fieldG,64,96,40,96,'silm-drift-arrow');el('text',{x:66,y:97.4,class:'silm-overlay-label silm-overlay-small'},fieldG,'elétrons (média)');}
@@ -51,7 +58,10 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  const U=SimCore.ExperienceUI,P=SILM.properties,box=U.element('div',null,'silm-property-controls'+(compact?' silm-property-compact':''));box.setAttribute('role','group');box.setAttribute('aria-label','Propriedades metálicas');
  const head=U.element('p','','silm-property-title'),status=U.element('p','','silm-property-status');status.id=prefix+'-status';
  const row=U.element('div',null,'silm-property-actions'),list=U.element('div',null,'silm-property-list');
- box.append(head,row,status,list);container.append(box);
+ const readings=U.element('dl',null,'silm-joule-readings');readings.hidden=true;
+ const quantities=[['resistance','Resistência equivalente'],['maximum','Temperatura máxima'],['jouleEnergy','Energia gerada por Joule'],['externalEnergy','Energia da fonte externa'],['storedEnergy','Energia armazenada'],['removedEnergy','Energia removida']];
+ const valuesByKey=new Map(quantities.map(([key,label])=>{const value=U.element('dd','');readings.append(U.element('dt',label),value);return [key,value];}));
+ box.append(head,row,status,readings,list);container.append(box);
  const button=(id,label,run,opts={})=>{const b=SILM.actionButton(label,run,scope,{id:prefix+'-'+id,...opts});return b;};
  const B={field:button('field','Aplicar campo elétrico',()=>actions.field(),{primary:true}),heat:button('heat','Aquecer região',()=>actions.heat(),{primary:true}),advance:button('advance','Avançar propagação',()=>actions.advance()),
   compress:button('compress','Aplicar compressão',()=>actions.compress(),{primary:true}),stretch:button('stretch','Alongar',()=>actions.stretch(),{primary:true}),light:button('light','Incidir luz',()=>actions.light(),{primary:true}),
@@ -60,7 +70,8 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  const reasons=Object.fromEntries(P.ids.map(id=>{const r=U.element('span','','silm-property-reason');r.id=prefix+'-reason-'+id;starts[id].setAttribute('aria-describedby',r.id);return [id,r];}));
  for(const id of P.ids){const item=U.element('div',null,'silm-property-item');item.append(starts[id],reasons[id]);list.append(item);}
  function update(){
-  const {state,eligibility,editable,reduced,availability}=info(),pr=state.properties,active=pr?.active;
+  const {state,eligibility,editable,reduced,availability,joule}=info(),pr=state.properties,active=pr?.active;
+  readings.hidden=!joule||compact;
   box.dataset.active=active||'';list.hidden=!!active||compact;row.hidden=!active;
   if(!active){head.textContent=compact?'':'Escolha uma propriedade para investigar.';status.textContent=compact?'':'Uma experiência por vez; as experiências não alteram a estrutura científica.';
    for(const id of P.ids){const el=eligibility[id],able=availability(id),ok=el.status!=='unavailable'&&able.ok&&editable;starts[id].setAttribute('aria-disabled',String(!ok));
@@ -68,6 +79,20 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
    return;}
   const p=pr[active],L=P.limits;head.textContent=P.catalog[active].title;
   const show=(...ids)=>{for(const [k,b]of Object.entries(B))b.hidden=!ids.includes(k);};
+  if(joule){
+   const {input,values}=joule,format=n=>n.toLocaleString('pt-BR',{maximumFractionDigits:3});
+   head.textContent='Condutividade elétrica e térmica · efeito Joule';
+   show('field','heat','advance','restore','end');
+   B.field.textContent=p.field?'Desligar alimentação':'Ligar alimentação';
+   B.field.setAttribute('aria-pressed',String(p.field));
+   B.heat.textContent=input.external?'Desligar calor externo':'Ligar calor externo';
+   B.heat.setAttribute('aria-pressed',String(input.external));
+   B.advance.textContent='Avançar meio intervalo';
+   for(const key of ['field','heat','advance','restore','end'])B[key].setAttribute('aria-disabled',String(!editable));
+   status.textContent='Grandezas relativas · t '+format(values.time)+' · potência Joule '+format(values.power)+' · temperatura média '+format(values.mean)+'. O tempo avança pelos controles da experiência.';
+   for(const [key,value]of valuesByKey)value.textContent=format(values[key]);
+   return;
+  }
   // Calor + corrente (0.17.x): na estrutura cristalina, a condutividade elétrica também tem a fonte de calor.
   const combined=active==='electrical'&&!!info().thermal?.combined;
   if(combined){B.heat.textContent=info().thermal.on?'Desligar fonte de calor':'Ligar fonte de calor';B.heat.setAttribute('aria-pressed',String(!!info().thermal.on));}

@@ -280,7 +280,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    const option=document.createElement('option');option.value=value;option.textContent=label;jouleSettings.append(option);
   }
   scope.listen(jouleSettings,'change',()=>{const action=jouleSettings.value;jouleSettings.value='';propertyOptions.quickActions.jouleAction(action);});
-  const step=U.element('button','Avançar 0,5');step.type='button';step.setAttribute('aria-label','Avançar meio intervalo no efeito Joule');
+  const step=U.element('button','Avançar 0,5');step.type='button';step.setAttribute('aria-label','Avançar meio intervalo no efeito Joule');step.title='Avançar meio intervalo no efeito Joule';step.classList.add('silm-joule-step');
   scope.listen(step,'click',()=>propertyOptions.quickActions.jouleAction('step'));
   jouleControls.append(jouleSettings,step);navigator.root.append(jouleControls);
 
@@ -308,7 +308,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  function drawLattice(sites){
   latticeLayer.replaceChildren();
   for(const {q,fade,block,heat,key}of [...sites].sort((a,b)=>b.q.depth-a.q.depth)){
-   const value=scene.fieldMap?.get(key),fraction=value===undefined?heat:value/scene.fieldMax;
+   const value=scene.fieldMap?.get(key),fraction=value===undefined?heat:value/(1+value);
    latticeLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*36*dscale(q),opacity:(.14+.42*fade).toFixed(3),...(block===undefined?{}:{class:block%2?'silm-specimen silm-block-odd':'silm-specimen'}),...(fraction===undefined?{}:{style:'fill:color-mix(in srgb,var(--silm-field-color,var(--silm-heat)) '+Math.round(fraction*85)+'%,var(--silm-bronze))'})}));
   }
  }
@@ -395,9 +395,10 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // Calor + corrente (0.17.x): a mesma fonte de calor também na condutividade elétrica (transitória, sem gravar).
   const coupled=propertyOptions?.jouleReading?.(S);
   if(jouleControls)jouleControls.hidden=!coupled;
-  if(coupled)navigator.reading.setAttribute('aria-live','polite');
-  else navigator.reading.removeAttribute('aria-live');
-  if(coupled){root.dataset.fieldMap=coupled.layer;scene.fieldMap=coupled.values.profiles[coupled.layer];scene.fieldMax=Math.max(...scene.fieldMap.values(),1e-9);}
+  if(coupled){navigator.reading.setAttribute('aria-live','polite');navigator.reading.tabIndex=0;}
+  else{navigator.reading.removeAttribute('aria-live');navigator.reading.removeAttribute('tabindex');}
+  scene.coupled=coupled;
+  if(coupled){root.dataset.fieldMap=coupled.layer;scene.fieldMap=coupled.values.profiles[coupled.layer];}
   else delete root.dataset.fieldMap;
   const continuous=!coupled&&!!thermalCtl&&(active==='thermal'||active==='electrical');let heated=active==='thermal'&&(pr.thermal.heating||pr.thermal.stage>0),levels=[],sources=[],temps=null;
   if(coupled){
@@ -425,7 +426,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // As fontes (região aquecida) ficam marcadas em qualquer projeção; a faixa "calor" só aparece onde elas estiverem à esquerda.
   list.forEach((u,i)=>{const node=nodes.get(u.id),k=X.key(u.site),value=scene.fieldMap?.get(k);
    if(value!==undefined){
-    node.style.setProperty('--field-strength',Math.round(100*value/scene.fieldMax)+'%');node.dataset.fieldValue='';
+    node.style.setProperty('--field-strength',Math.round(100*value/(1+value))+'%');node.dataset.fieldValue='';
     node.setAttribute('aria-label',node.getAttribute('aria-label')+', '+fieldNames[coupled.layer]+' relativa '+formatRelative(value));
    }else{delete node.dataset.fieldValue;node.style.removeProperty('--field-strength');}
    if(heated&&(!coupled||value!==undefined)){node.dataset.heat=String(levels[i]);if(temps)node.style.setProperty('--heat',(temps.get(X.key(u.site))||0).toFixed(3));node.setAttribute('aria-label',node.getAttribute('aria-label')+', energia térmica '+P.heatWord(levels[i])+(sources[i]?(continuous?', sob a fonte de calor':', na região aquecida'):''));}else{delete node.dataset.heat;node.style.removeProperty('--heat');}
@@ -447,7 +448,9 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const centersT=[...drawn.map((q,i)=>({x:q.x,y:q.y,t:tOf(X.key(list[i].site))})),...electronSites.map(s=>({x:s.q.x,y:s.q.y,t:tOf(s.key)}))];
   // Deriva média relativa (seta "elétrons (média)"): calor e defeitos reduzem; a intensidade do campo aumenta.
   scene.driftFactor=ET?(centersT.reduce((a,c)=>a+ET.drift(c.t),0)/Math.max(1,centersT.length))*ET.defectDrift(defects):1;
-  electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:centersT,spacing:d*layout.scale,connect:false,drive:driveCtl?.intensity??.6,defects});
+  // Pista visual da corrente total calculada: não representa trajetórias locais nem velocidade em SI.
+  const currentFactor=coupled?coupled.values.current/(1+coupled.values.current):null;
+  electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:centersT,spacing:d*layout.scale,connect:false,drive:driveCtl?.intensity??.6,defects,currentFactor});
   navigator.root.hidden=navigator.status.hidden=r.view!=='lattice';
   if(r.view==='lattice'){
    const effects=[];
@@ -459,7 +462,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    let info=effects.join(' + ')+(local==null?'':' · aquecimento local '+Math.round(100*local)+'% da escala didática');
    if(coupled){
     const {input,values,field}=coupled,localT=field.get(navigator.cursor.site.key);
-    const parameters=[['t',values.time],['U',values.voltage],['I',values.current],['P Joule',values.power],['T média',values.mean]];
+    const parameters=[['t',values.time],['U',values.voltage],['I',values.current],['R',values.resistance],['P Joule',values.power],['T média',values.mean]];
     if(localT!==undefined)parameters.push(['T local',localT]);
     info=['Efeito Joule · grandezas relativas',input.mode==='voltage'?'tensão imposta':'corrente imposta',
      input.boundary==='ambient'?'terminais à temperatura ambiente':'amostra isolada',
@@ -475,14 +478,14 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // Durante a animação da deformação, os controles e o texto são atualizados até 10 vezes por segundo (o desenho, a cada quadro).
   const busy=deforming&&!!deformCtl&&(r=>r.load>0||r.sliding||Math.abs(r.strain)>1e-3||(r.orient>1e-4&&r.orient<1-1e-4))(deformCtl.reading()),tNow=performance.now();
   root.dataset.property=active||'';scheduleHeat(pr);
-  const narrative=active?P.narrative(active,pr[active],{reduced:reducedMotion(),electronsVisible:shownElectrons}):null;
+  const narrative=active&&!coupled?P.narrative(active,pr[active],{reduced:reducedMotion(),electronsVisible:shownElectrons}):null;
   root.dataset.electrons=shownElectrons?'visible':'hidden';electronLegend.hidden=!shownElectrons;
   const inCell=baseUnits.filter(u=>g.cellKeys.has(X.key(u.site))).length,added=list.filter(u=>u.placement==='crystallographic').length;
   // Indicador compacto (0.8.x): estrutura e, quando houver, a propriedade em estudo.
   meta.textContent=(m.general?m.label+' · '+m.spaceGroup:m.code+' · '+m.name)+' · '+list.length+' unidades'+(added?' ('+added+' completadas pelo SILM)':'')+(active?' · '+P.catalog[active].title+' em estudo':'');
   meta.title=meta.textContent;   // 0.9.1: texto integral quando o celular limita a duas linhas
   paint();
-  stage.setAttribute('aria-label',structureName+'. '+(r.view==='lattice'?'Vista da rede extensa':'Vista da célula')+'; célula unitária '+(r.unitCell?'visível':'oculta')+'. '+inCell+' unidades na célula desenhada.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica; '+(moving?'movimento visual ativo.':'representação estática.'):'')+(narrative&&JSON.stringify(pr[active])!==JSON.stringify(P.defaults[active])?' '+P.catalog[active].title+': '+narrative.action+' '+narrative.observation:'')+(scene.measureText?' '+scene.measureText:''));
+  stage.setAttribute('aria-label',structureName+'. '+(r.view==='lattice'?'Vista da rede extensa':'Vista da célula')+'; célula unitária '+(r.unitCell?'visível':'oculta')+'. '+inCell+' unidades na célula desenhada.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica; '+(moving?'movimento visual ativo.':'representação estática.'):'')+(coupled?' Ensaio Joule em grandezas relativas; os elétrons são uma pista visual da corrente total, não trajetórias locais calculadas.':'')+(narrative&&JSON.stringify(pr[active])!==JSON.stringify(P.defaults[active])?' '+P.catalog[active].title+': '+narrative.action+' '+narrative.observation:'')+(scene.measureText?' '+scene.measureText:''));
   cellStatus.textContent='Célula unitária '+(r.unitCell?'visível':'oculta')+(observer?.centers?' · centros identificados':'');
   R.describe();
  }
@@ -502,7 +505,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const lampOn=!!beam&&scene.module==='explorar';lantern.hidden=!lampOn;
   if(lampOn){lantern.style.left=beam.lantern.x+'%';lantern.style.top=beam.lantern.y+'%';lantern.dataset.on=String(beam.on);lantern.setAttribute('aria-valuenow',String(beam.angle));lantern.setAttribute('aria-valuetext',beam.angle+' graus da normal, luz '+(beam.on?'acesa':'apagada'));lantern.title='Arraste para mudar o ângulo; toque para '+(beam.on?'apagar':'acender')+'. Teclado: setas mudam o ângulo, Enter acende e apaga.';}
   const knobOn=!!driveCtl&&!!scene.fieldOn&&scene.module==='explorar';fieldKnob.hidden=!knobOn;
-  if(knobOn){const I=driveCtl.intensity;fieldKnob.style.left=(55+25*I)+'%';fieldKnob.style.top=fieldY+'%';fieldKnob.setAttribute('aria-valuenow',String(Math.round(I*100)));fieldKnob.setAttribute('aria-valuetext',Math.round(I*100)+' %');}
+  if(knobOn){const I=driveCtl.intensity;fieldKnob.style.left=(55+25*I)+'%';fieldKnob.style.top=fieldY+'%';fieldKnob.setAttribute('aria-valuenow',String(Math.round(I*100)));fieldKnob.setAttribute('aria-valuetext',Math.round(I*100)+' %');
+   fieldKnob.setAttribute('aria-label',scene.coupled?(scene.coupled.input.mode==='voltage'?'Tensão imposta':'Corrente imposta')+' (escala relativa)':'Intensidade do campo elétrico');}
   let light=null;if(!beam&&scene.lit.size){const tops=list.map((u,i)=>[u,drawn[i]]).filter(([u])=>scene.lit.has(u.id)).map(([,c])=>c),mean={x:tops.reduce((a,c)=>a+c.x,0)/tops.length,y:tops.reduce((a,c)=>a+c.y,0)/tops.length},v=R.toView(mean);light={x:v.x*100,y:v.y*100};}   // centro da face superior
   const sourceX=scene.heatSources.length?Math.min(...scene.heatSources.map(p=>p.x)):Math.min(...drawn.map(p=>p.x)),left=R.toView({x:sourceX-unitFraction,y:.5}).x;
   // Prensa (compressão) ou garras (tração) nas faces de cima e de baixo da amostra, acompanhando a forma a cada quadro.
@@ -518,7 +522,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    const comp=reading.active==='malleability',pct=Math.round(reading.load*100),word=reading.regime==='plastic'?'regime plástico':reading.regime==='elastic'?'regime elástico':'sem força';
    handle.setAttribute('aria-label',comp?'Prensa: força de compressão':'Garra: força de tração');handle.title=(comp?'Arraste a prensa para baixo':'Arraste a garra para cima')+' para aplicar a força; solte para retirar. Teclado: setas, Home solta.';
    if(handle.getAttribute('aria-valuenow')!==String(pct)){handle.setAttribute('aria-valuenow',String(pct));handle.setAttribute('aria-valuetext',pct+' %, '+word);}}
-  overlay.update({field:!!scene.fieldOn,intensity:driveCtl?.intensity??null,drift:scene.driftFactor,fieldY,beam,force:active==='malleability'?'compress':active==='ductility'?'stretch':null,level:active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0,plates,load:reading?.active?reading.load:0,heat:active==='thermal'&&pr.thermal.heating&&!scene.heatAside&&!scene.continuousHeat,light,heatX:Math.max(0,Math.min(.8,left-.05))*100});
+  overlay.update({field:!!scene.fieldOn,coupled:scene.coupled?.values,intensity:driveCtl?.intensity??null,drift:scene.driftFactor,fieldY,beam,force:active==='malleability'?'compress':active==='ductility'?'stretch':null,level:active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0,plates,load:reading?.active?reading.load:0,heat:active==='thermal'&&pr.thermal.heating&&!scene.heatAside&&!scene.continuousHeat,light,heatX:Math.max(0,Math.min(.8,left-.05))*100});
   const view=p=>{const v=R.toView(p);return {x:v.x,y:v.y};};
   let measureText='';
   // A deformação só existe em Explorar: sem medição em curso, nada a ler (evita cópias do estado a cada quadro).
