@@ -1,5 +1,7 @@
 name: SILM — Microestrutura na main
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [main, feat/silm-atlas-metais-microestruturas-20261105]
     paths:
