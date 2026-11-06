@@ -1,9 +1,10 @@
 name: SILM — Microestrutura na main
 on:
   push:
-    branches: [main]
+    branches: [main, feat/silm-atlas-metais-microestruturas-20261105]
     paths:
       - "domain/silm/microstructure-view.js"
+      - "domain/silm/microstructure-experimental.js"
       - "domain/silm/workshop.js"
       - "domain/silm/workshop.css"
       - "integracao/integration.css"
@@ -14,6 +15,9 @@ on:
       - "index.html"
       - "sw.js"
       - "tests/run-workshop-micro-main.mjs"
+      - "tests/microchemistry-source-guards.test.cjs"
+      - "tests/microstructure-experimental-source.test.cjs"
+      - "docs/atlas-microestruturas-amostras-curadas.json"
       - ".github/workflows/silm-microstructure-main.yml"
   workflow_dispatch:
 permissions:
@@ -39,9 +43,12 @@ jobs:
       - name: Sintaxe do visualizador e da Oficina
         run: |
           node --check domain/silm/microstructure-view.js
+          node --check domain/silm/microstructure-experimental.js
           node --check domain/silm/workshop.js
           node --check integracao/action-icons.js
           node --check tests/run-workshop-micro-main.mjs
+          node tests/microchemistry-source-guards.test.cjs
+          node tests/microstructure-experimental-source.test.cjs
       - name: Instalar Playwright
         run: |
           npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
