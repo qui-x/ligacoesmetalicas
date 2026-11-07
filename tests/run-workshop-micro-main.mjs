@@ -198,7 +198,7 @@ async function test(viewport){
  await page.locator('[data-scene-view="focus"]').click();
  assert.equal(await page.locator('#workspace-focus').isVisible(),true,'Trocar lista/grade quebrou o retorno ao Foco.');
 
- await page.getByRole('button',{name:'4 · Ambiente atômico'}).click();
+ await page.locator('.silm-workshop-scale[data-scale="4"]').click();
  const units=page.locator('.silm-crystal-unit'),status=page.locator('.silm-lattice-status output');
  await units.first().waitFor({state:'visible'});
  const sites=()=>units.evaluateAll(nodes=>nodes.map(n=>n.dataset.site));
