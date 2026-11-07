@@ -93,6 +93,21 @@ test('Fontes candidatas não homologam micrografias nem porcentagens artificiais
  assert.equal(coverage.coverage.elementsPendingSpecificLead,
   coverage.records.filter(x=>!x.microstructure.experimentalCandidateLeadIDs.length).length);
 });
+test('Alcance bibliográfico 65/65 não implica micrografias homologadas',()=>{
+ assert.equal(coverage.coverage.candidateStudyRecords,65);
+ assert.equal(coverage.coverage.elementsWithCandidateLeads,65);
+ assert.equal(coverage.coverage.elementsPendingSpecificLead,0);
+ assert.equal(coverage.coverage.experimentalMicrostructureDatasetsIntegrated,0);
+ assert.equal(coverage.coverage.elementalMetalGrainDatasetsValidatedAndIntegrated,0);
+ for(const r of coverage.records)
+  assert.ok(r.microstructure.experimentalCandidateLeadIDs.length>=1,r.symbol+' sem referência');
+ const ra=coverage.experimentalLeads.find(x=>x.id==='ra-in-barite-apt-2016');
+ const ac=coverage.experimentalLeads.find(x=>x.id==='ac-spion-theranostic-2025');
+ const po=coverage.experimentalLeads.find(x=>x.id==='po-archival-film-photomicrograph-1946');
+ assert.match(ra.evidenceScope,/no-metal-grain-map/);
+ assert.match(ac.evidenceScope,/no-elemental-metal-grains/);
+ assert.match(po.recordStatus,/not-independently-verified/);
+});
 test('Matriz legível e índice computável possuem a mesma cobertura e as mesmas fontes',()=>{
  const md=read('docs/SILM-MATRIZ-65-ELEMENTOS-APLICACAO-REDE-MICROESTRUTURA.md');
  const counts=[
