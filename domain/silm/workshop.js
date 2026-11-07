@@ -112,9 +112,25 @@ SILM.workshop=(()=>{
   const table=node('button','button outline');table.setAttribute('aria-label','Tabela Periódica');table.append(node('span','','Tabela'),node('span','silm-workshop-table-long',' Periódica'));table.type='button';table.addEventListener('click',onOpenPeriodic);summary.append(table);top.append(summary);s.append(top);
   }
   const scales=node('div','silm-workshop-scales');scales.setAttribute('role','group');scales.setAttribute('aria-label','Escalas de investigação');
-  for(const [i,label]of ['Objeto e componente','Microestrutura','Rede e célula','Ambiente atômico'].entries()){const name=String(i+1)+' · '+label,b=node('button','silm-workshop-scale');
-   b.setAttribute('aria-label',name);b.title=name;b.append(node('span','silm-workshop-scale-long',name),node('span','silm-workshop-scale-short',['Objeto','Grãos','Rede','Átomo'][i]));b.type='button';if(i===0&&!item&&!items.length){b.disabled=true;b.title='Sem objeto de referência cadastrado para '+element.name;}b.setAttribute('aria-pressed',String(scale===i+1));b.addEventListener('click',()=>onScale(i+1));scales.append(b);}s.insertBefore(scales,s.firstChild);
-  if(scale!==2)s.append(node('p','silm-workshop-scale-note',scale===2?'Esquema de grãos didático; não representa uma metalografia medida.':scale===3?'A rede e a célula unitária estão na área científica abaixo. A escala visual não altera os parâmetros cristalográficos.':scale===4?'Um centro está selecionado e os vizinhos destacados pertencem à mesma rede. Selecione outro átomo diretamente na cena.':'O componente permanece identificado enquanto a visualização se aproxima; o zoom não troca o material.'));
+  // A escala altera o que é observado no mesmo ensaio, não inicia outro experimento.
+  const steps=[
+   ['Objeto e componente','Objeto','Identificar o componente metálico e sua aplicação.'],
+   ['Microestrutura','Grãos','Observar os grãos e as regiões do material.'],
+   ['Rede e célula','Rede','Investigar a estrutura e os efeitos coletivos das propriedades.'],
+   ['Centro metálico','Centro','Acompanhar os efeitos das mesmas propriedades no centro metálico selecionado.']
+  ];
+  for(const [i,[label,short,description]]of steps.entries()){
+   const name=String(i+1)+' · '+label,b=node('button','silm-workshop-scale');
+   b.type='button';b.dataset.scale=String(i+1);
+   b.setAttribute('aria-label',name+' — '+description);
+   b.title=name+' — '+description;
+   b.append(node('span','silm-workshop-scale-long',name),node('span','silm-workshop-scale-short',short));
+   if(i===0&&!item&&!items.length){b.disabled=true;b.title='Sem objeto de referência cadastrado para '+element.name;}
+   b.setAttribute('aria-pressed',String(scale===i+1));
+   b.addEventListener('click',()=>onScale(i+1));scales.append(b);
+  }
+  s.insertBefore(scales,s.firstChild);
+  if(scale!==2)s.append(node('p','silm-workshop-scale-note',scale===3?'A rede e a célula unitária mostram os efeitos coletivos. Selecione um centro para aprofundar a mesma investigação.':scale===4?'O centro selecionado pertence à rede: observe nele a resposta local dos estímulos aplicados à estrutura.':'O componente permanece identificado enquanto a visualização se aproxima; a mudança de escala não troca o material.'));
   if(scale!==2&&items.some(other=>other.id!==item?.id)){const alt=node('div','silm-workshop-alternatives'),row=node('div','silm-workshop-alternative-list');alt.append(node('h3','','Outras aplicações com '+element.name));
    for(const other of items){if(other.id===item?.id)continue;const b=node('button','silm-workshop-alternative',other.title);b.type='button';b.addEventListener('click',()=>onChoose(other));row.append(b);}alt.append(row);s.append(alt);}
   host.append(s);

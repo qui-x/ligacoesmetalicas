@@ -1,0 +1,43 @@
+name: SILM — Proveniência dos scripts TrueEBSD do cobre
+on:
+  push:
+    branches:
+      - design/silm-rede-ambiente-atomico-parte6
+    paths:
+      - 'research/microstructure/audit_copper_mtex_sources.py'
+      - 'tests/test_copper_mtex_source_provenance.py'
+      - 'tests/test_copper_mtex_provenance_snapshot.py'
+      - 'research/microstructure/copper-mtex-source-verified.json'
+      - '.github/workflows/silm-copper-mtex-sources.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare-published-scripts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testes sem rede e conferência da sintaxe
+        run: |
+          python -m py_compile research/microstructure/audit_copper_mtex_sources.py tests/test_copper_mtex_source_provenance.py
+          python tests/test_copper_mtex_source_provenance.py
+          python research/microstructure/audit_copper_mtex_sources.py --self-test
+      - name: Conferir apenas os scripts MATLAB pequenos (<64 KiB cada)
+        run: |
+          python research/microstructure/audit_copper_mtex_sources.py --out "$RUNNER_TEMP/silm-cu-mtex-provenance.json"
+      - name: Confrontar o registro vivo com a evidência revisada e a licença declarada
+        run: |
+          python tests/test_copper_mtex_provenance_snapshot.py \
+            --live "$RUNNER_TEMP/silm-cu-mtex-provenance.json"
+      - name: Publicar apenas hashes e presença de funções, nunca o código dos autores
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-copper-mtex-scripts-metadata-only
+          path: ${{ runner.temp }}/silm-cu-mtex-provenance.json
+          if-no-files-found: warn
+          retention-days: 14

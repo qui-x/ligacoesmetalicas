@@ -1,0 +1,54 @@
+name: SILM — Auditoria Scalmalloy (pré-homologação)
+on:
+  push:
+    branches:
+      - design/silm-rede-ambiente-atomico-parte6
+    paths:
+      - 'research/microstructure/audit_scalmalloy_csv.py'
+      - 'research/microstructure/scalmalloy-ebsd-preliminary-stats.json'
+      - '.github/workflows/silm-scalmalloy-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-aluminum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Conferir sintaxe e integridade de CSV originais
+        run: |
+          python -m py_compile research/microstructure/audit_scalmalloy_csv.py
+          python research/microstructure/audit_scalmalloy_csv.py
+      - name: Conferir se as estatísticas versionadas coincidem com os CSV originais
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          audit=json.loads(pathlib.Path("/tmp/silm-al-ebsd-review/scalmalloy-csv-schema-audit.json").read_text())
+          expect=json.loads(pathlib.Path("research/microstructure/scalmalloy-ebsd-preliminary-stats.json").read_text())
+          assert len(audit["files"])==len(expect["conditions"])==3
+          assert expect["validation"]["automaticallyUseInSimulator"] is False
+          assert expect["validation"]["threeMD5Matched"] is True
+          assert sum(x["phaseCounts"].get("Aluminium",0) for x in audit["files"])==expect["aluminiumRows"]
+          assert sum(x["rawGrainRecords"] for x in audit["files"])==expect["allPhaseRows"]
+          for desired in expect["conditions"]:
+              row=next(x for x in audit["files"] if x["file"]==desired["file"])
+              assert row["verifiedMD5"]==desired["md5"]
+              assert row["rawGrainRecords"]==desired["rawGrainRecords"]
+              assert row["phaseCounts"].get("Aluminium",0)==desired["Aluminium"]["n"]
+              assert row["phaseCounts"].get("Zero Solution",0)==desired["zeroSolution"]
+              for name,value in desired["Aluminium"].items():
+                  assert row["ECDbyPhase"]["Aluminium"][name]==value,(desired["file"],name)
+          print("OK: resumo do SILM corresponde às medições EBSD originais.")
+          PY
+      - name: Publicar resultado para revisão de unidades e colunas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-scalmalloy-csv-review-not-homologated
+          path: /tmp/silm-al-ebsd-review/scalmalloy-csv-schema-audit.json
+          retention-days: 14
+          if-no-files-found: warn

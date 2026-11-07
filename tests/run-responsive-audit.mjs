@@ -140,6 +140,54 @@ try{
  browser=await playwright[browserName].launch({headless:true});
  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
  page=await context.newPage();
+ // Instrumentação de diagnóstico sem mascarar falhas de ResizeObserver.
+ // Captura a origem dos observadores, alvos e callbacks que antecedem a falha.
+ if(browserName==='webkit'&&process.env.SILM_RESIZE_TRACE==='1'){
+  await page.addInitScript(()=>{
+   const Native=window.ResizeObserver;
+   if(typeof Native!=='function')return;
+   const trace={created:[],events:[],errors:[],current:null};
+   window.__silmResizeTrace=trace;
+   let nextId=0;
+   const describe=e=>{
+    if(!e)return 'null';
+    return (e.tagName||'')+'#'+(e.id||'')+'.'+String(e.className?.baseVal??e.className??'').slice(0,80);
+   };
+   window.ResizeObserver=class SILMDiagnosticResizeObserver extends Native{
+    constructor(callback){
+     const id=++nextId;
+     const stack=(new Error('ResizeObserver origem')).stack?.slice(0,1100);
+     trace.created.push({id,stack});
+     super((entries,observer)=>{
+      trace.current=id;
+      const record={
+       id,at:Math.round(performance.now()),width:innerWidth,height:innerHeight,
+       hash:location.hash,targets:entries.map(e=>({
+        node:describe(e.target),
+        width:Math.round(e.contentRect.width),height:Math.round(e.contentRect.height)
+       }))
+      };
+      trace.events.push(record);
+      if(trace.events.length>80)trace.events.shift();
+      try{callback(entries,observer);}
+      finally{trace.current=null;}
+     });
+     this.__silmId=id;
+    }
+    observe(target,options){
+     const item=trace.created.find(x=>x.id===this.__silmId);
+     if(item){item.targets=item.targets||[];item.targets.push(describe(target));}
+     return super.observe(target,options);
+    }
+   };
+   window.addEventListener('error',e=>{
+    if(/ResizeObserver/.test(e.message||'')){
+     trace.errors.push({at:Math.round(performance.now()),message:e.message,phase:location.hash,
+      last:trace.events.slice(-12)});
+    }
+   },true);
+  });
+ }
  page.on('pageerror',e=>scriptErrors.push(e.message));
  const response=await page.goto(base+'/index.html#/ambiente',{waitUntil:'load',timeout:45000});
  if(!response?.ok())throw new Error('SILM não abriu: HTTP '+response?.status());
@@ -167,6 +215,15 @@ try{
  await page.locator('.silm-workshop-micro-viewer').waitFor({state:'visible'});
  for(const [name,w,h] of sizes)await inspect('micro',name,w,h);
 
+ if(browserName==='webkit'&&process.env.SILM_RESIZE_TRACE==='1'){
+  const trace=await page.evaluate(()=>window.__silmResizeTrace||null);
+  if(trace){
+   writeFileSync(join(dir,'resizeobserver-trace.json'),JSON.stringify(trace,null,2));
+   console.log('DIAGNOSTICO_RESIZEOBSERVER '+JSON.stringify({
+    created:trace.created,errors:trace.errors,lastCallbacks:trace.events.slice(-30)
+   }));
+  }
+ }
  // Problemas do ResizeObserver também reprovam a auditoria: nunca escondê-los
  // como avisos, mesmo quando a interface ainda parece funcionar.
  for(const err of scriptErrors){

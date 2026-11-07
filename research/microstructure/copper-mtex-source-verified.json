@@ -1,0 +1,60 @@
+{
+  "schema": "silm.copper-mtex-script-provenance-reviewed.v1",
+  "reviewDate": "2026-11-07",
+  "sourceDOI": "10.5281/zenodo.16902083",
+  "specimen": "P1700",
+  "zenodoPublishedScript": {
+    "filename": "example_copper.m",
+    "sizeBytes": 23908,
+    "md5PublishedAndCalculated": "d6ddfa176463c989ee9721ea1f2ec8b4",
+    "sha256Calculated": "76354919ba6d5c89f73778839aef2acf58944c5b805cff83c844ff2e3374de07",
+    "url": "https://zenodo.org/records/16902083/files/example_copper.m?download=1"
+  },
+  "pinnedGitHubScript": {
+    "repository": "vtvivian/mtex-trueEbsd",
+    "refCommit": "c831df4843336c94983b1e897ccd409ea78634c5",
+    "sizeBytes": 26798,
+    "md5Calculated": "50e0bfb79bdd997c31f0d0ad17835b42",
+    "sha256Calculated": "853d7dd5d3dd94a20411638e5f17465b2e87aea8c487cc59a632014c7e26f31e",
+    "url": "https://raw.githubusercontent.com/vtvivian/mtex-trueEbsd/c831df4843336c94983b1e897ccd409ea78634c5/examples/example_copper.m"
+  },
+  "sourceVersionsByteIdentical": false,
+  "procedureNotes": {
+    "bothScriptVersionsMention": [
+      "pixelSizeMatch",
+      "calcShifts",
+      "undistort",
+      "calcGrains",
+      "boundaryContours"
+    ],
+    "bothScriptVersionsMentionTrueEbsd2": false,
+    "mtexWebsiteDocumentsTrueEbsd2": true,
+    "behavioralEquivalence": "not-evaluated",
+    "mtexReferenceURL": "https://mtex-toolbox.github.io/example_copper_2.html"
+  },
+  "zenodoLicenseEvidence": {
+    "endpoint": "https://zenodo.org/api/records/16902083",
+    "field": "metadata.license.id",
+    "value": "cc-by-4.0",
+    "rightsFieldInSameAPI": null,
+    "licenseReference": "https://creativecommons.org/licenses/by/4.0/",
+    "recordLicenseDeclared": true,
+    "fileScopeAndExternalRightsConfirmed": false,
+    "derivativeRedistributionApprovedBySILM": false
+  },
+  "auditRun": "https://github.com/qui-x/ligacoesmetalicas/actions/runs/42343191699",
+  "rawExperimentalDataRedistributed": false,
+  "originalMatlabCodeRedistributed": false,
+  "correctedExperimentalMapProcessed": false,
+  "scientificHomologation": false,
+  "noncommentStructuralComparison": {
+    "noncommentSequencesIdentical": false,
+    "noncommentLineEdits": {
+      "insertedNoncommentLines": 16,
+      "deletedNoncommentLines": 0,
+      "replacedOldNoncommentLines": 58,
+      "replacedNewNoncommentLines": 117
+    },
+    "limitation": "Line-oriented structural comparison; cannot infer MATLAB behavior or scientific equivalence."
+  }
+}

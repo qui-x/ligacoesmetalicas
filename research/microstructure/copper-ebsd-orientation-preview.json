@@ -1,0 +1,79 @@
+{
+  "schema": "silm.experimental-copper-ebsd-orientation-preview.v1",
+  "date": "2026-11-07",
+  "source": "https://doi.org/10.5281/zenodo.16902083",
+  "validation": "exploratory-orientation-graph-uncorrected-EBSD-not-MTEX-TrueEBSD",
+  "checksum": "ffe617d5cb3d2e4ed1a5e3b7d27d6e11",
+  "specimen": "P1700",
+  "sourceDataStage": "/1/EBSD/Data Phase+Euler",
+  "sample": {
+    "x0Pixel": 435,
+    "y0Pixel": 193,
+    "widthPx": 160,
+    "heightPx": 160,
+    "xStepMicrometers": 0.1,
+    "yStepMicrometers": 0.1,
+    "indexedCuPixels": 23114,
+    "unindexedPixels": 2486
+  },
+  "method": {
+    "orientationConvention": "intrinsic Bunge ZXZ radians",
+    "crystalSymmetry": "cubic O, 24 proper rotations",
+    "neighborhood": "4-connected EBSD pixels",
+    "thresholdsDegrees": [
+      5,
+      10,
+      15
+    ],
+    "inclusion": "connected Cu regions >=5 pixels, exclude crop-border-connected regions",
+    "missing": "TrueEBSD distortion correction, BSE void mask, fill of unindexed points, comparison with original MTEX"
+  },
+  "results": [
+    {
+      "thresholdDegrees": 5,
+      "phaseNeighborPairs": 43092,
+      "withinThresholdPairs": 41760,
+      "allCuRegionsIncludingTinyAndBorder": 185,
+      "candidateRegions": 89,
+      "medianEquivalentCircleDiameterMicrometers": 0.797885,
+      "quartilesMicrometers": [
+        0.517088,
+        1.51388
+      ],
+      "maxMicrometers": 3.755994
+    },
+    {
+      "thresholdDegrees": 10,
+      "phaseNeighborPairs": 43092,
+      "withinThresholdPairs": 41760,
+      "allCuRegionsIncludingTinyAndBorder": 185,
+      "candidateRegions": 89,
+      "medianEquivalentCircleDiameterMicrometers": 0.797885,
+      "quartilesMicrometers": [
+        0.517088,
+        1.51388
+      ],
+      "maxMicrometers": 3.755994
+    },
+    {
+      "thresholdDegrees": 15,
+      "phaseNeighborPairs": 43092,
+      "withinThresholdPairs": 41760,
+      "allCuRegionsIncludingTinyAndBorder": 185,
+      "candidateRegions": 89,
+      "medianEquivalentCircleDiameterMicrometers": 0.797885,
+      "quartilesMicrometers": [
+        0.517088,
+        1.51388
+      ],
+      "maxMicrometers": 3.755994
+    }
+  ],
+  "interpretation": "The three thresholds yielded identical connectivity on this one cropped region and this algorithm; this does not establish global threshold-insensitivity or ASTM grain size.",
+  "workflow": "https://github.com/qui-x/ligacoesmetalicas/actions/runs/42340480951",
+  "artifact": "silm-copper-ebsd-review-not-homologated",
+  "script": "research/microstructure/preview_copper_grains.py",
+  "readyToPublishMap": false,
+  "quantitativeMicrostructureApproved": false,
+  "rightsApprovedForImageRedistribution": false
+}
