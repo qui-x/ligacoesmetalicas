@@ -66,6 +66,46 @@ async function test(viewport){
  assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'Zoom modificou o estado científico');
  assert.equal(await page.locator('#silm-integration-scene').isVisible(),false,'Rede cristalina apareceu na escala 2');
 
+ // Gerador esquemático: a semente e o perfil controlam o desenho,
+ // mas a tela e a câmera não podem mudar os polígonos.
+ assert.equal(await viewer.getAttribute('data-synthetic-seed'),'139712','Semente inicial incorreta.');
+ assert.equal(await viewer.getAttribute('data-synthetic-profile'),'equiaxial','Perfil inicial incorreto.');
+ const signature=async()=>viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
+  nodes.slice(0,12).map(n=>n.getAttribute('d')).join('|'));
+ const originalField=await signature();
+ await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).click();
+ const formations=viewer.locator('dialog.silm-micro-generator-dialog');
+ await formations.waitFor({state:'visible'});
+ await formations.getByLabel('Forma dos grãos').selectOption('elongated');
+ await formations.getByLabel('Semente reproduzível').fill('424242');
+ await formations.getByRole('button',{name:'Gerar formação com a semente informada'}).click();
+ assert.equal(await viewer.getAttribute('data-synthetic-seed'),'424242');
+ assert.equal(await viewer.getAttribute('data-synthetic-profile'),'elongated');
+ const elongatedField=await signature();
+ assert.notEqual(elongatedField,originalField,'Perfil e semente não alteraram a formação.');
+ await formations.getByRole('button',{name:'Fechar configurações de formação'}).click();
+ const resized={width:Math.max(320,viewport.width-71),height:viewport.height};
+ await page.setViewportSize(resized);
+ await page.waitForFunction(()=>{
+  const n=document.querySelector('.silm-workshop-micro-map');
+  const r=n?.getBoundingClientRect(),v=n?.viewBox.baseVal;
+  return !!r&&!!v&&r.height>0&&Math.abs(v.width/v.height-r.width/r.height)<.02;
+ },undefined,{timeout:10000});
+ assert.equal(await signature(),elongatedField,'Redimensionamento alterou os grãos esquemáticos.');
+ assert.equal(await viewer.getAttribute('data-synthetic-seed'),'424242','Redimensionamento alterou a semente.');
+ await page.setViewportSize(viewport);
+ await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).click();
+ await formations.getByRole('button',{name:'Gerar formação com a semente informada'}).click();
+ assert.equal(await signature(),elongatedField,'Mesma semente e perfil não reproduzem a formação.');
+ await formations.getByRole('button',{name:'Gerar nova variação reproduzível'}).click();
+ assert.notEqual(await viewer.getAttribute('data-synthetic-seed'),'424242','Nova variação não altera semente.');
+ assert.notEqual(await signature(),elongatedField,'Nova variação não altera a geometria.');
+ await formations.getByRole('button',{name:'Restaurar formação padrão'}).click();
+ assert.equal(await signature(),originalField,'Restaurar padrão não reproduz o primeiro desenho.');
+ await formations.getByRole('button',{name:'Fechar configurações de formação'}).click();
+ assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'Formações alteraram propriedades ou estado científico.');
+
+
  // Mapa importado: contornos e calibração declarados, SEM fração de fase ou composição.
  assert.ok(await page.evaluate(()=>!!SILM.microstructureData?.validate),'Validador de microestruturas não foi carregado.');
  const sample={
