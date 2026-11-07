@@ -56,7 +56,7 @@ Um modelo ilustrativo é aceito pedagogicamente se as **afirmações** estiverem
 
 - [MTEX — Grain Reconstruction](https://mtex-toolbox.github.io/GrainReconstruction.html): mostra que limiar de desorientação, tratamento de `notIndexed`, `minPixel` e alisamento afetam contagens e contornos. Essas regras justificam **não** chamar o Voronoi de EBSD ou grão quantificado.
 - [MTEX — Advanced Grain Reconstruction](https://mtex-toolbox.github.io/GrainReconstructionAdvanced.html): separa células, conectividade e regiões; sustenta a distinção entre métodos de segmentação.
-- [ASTM E112](https://www.astm.org/e0112-25e01.html) e [ASTM E1382](https://www.astm.org/e1382-97r23.html): métodos normativos de determinação de tamanho de grão; consultar sempre a edição efetiva no procedimento aprovado, sem atribuir um número ASTM ao esquema.
+- [ASTM E112-25e1](https://store.astm.org/e0112-25e01.html) e [ASTM E1382-97(2023)](https://store.astm.org/standards/e1382): métodos normativos de determinação de tamanho de grão; a E112 trata de métodos comparativo, planimétrico e de interceptos; a E1382 trata da análise semiautomática e automática e explicita fontes de erro ligadas a amostragem, preparo e detecção dos contornos. Consultar sempre a edição efetiva no procedimento aprovado, sem atribuir um número ASTM ao esquema.
 - Matriz interna de 65 elementos: [`coverage-65.json`](../research/microstructure/coverage-65.json) e a matriz documental dos 65; os 67 estudos são **candidatos** e podem incluir ligas, compostos ou técnicas que não medem grãos do metal puro.
 - Protocolo de prevenção de métricas falsas: [`SILM-MICROESTRUTURA-DADOS-QUANTITATIVOS.md`](SILM-MICROESTRUTURA-DADOS-QUANTITATIVOS.md).
 
