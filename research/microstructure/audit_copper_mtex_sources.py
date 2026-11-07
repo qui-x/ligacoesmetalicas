@@ -69,11 +69,31 @@ def script_info(source: bytes):
 def rights_view(obj):
     record = obj if isinstance(obj, dict) else {}
     metadata = record.get("metadata") or {}
+    legacy = metadata.get("license")
+    license_id = legacy.get("id") if isinstance(legacy, dict) else None
+    structured_rights = metadata.get("rights")
+    if not license_id and isinstance(structured_rights, list):
+        for item in structured_rights:
+            candidate = item.get("id") if isinstance(item, dict) else None
+            if candidate:
+                license_id = candidate
+                break
     return {
-        "rightsAsReported": metadata.get("rights"),
-        "legacyLicenseAsReported": metadata.get("license"),
+        "rightsAsReported": structured_rights,
+        "legacyLicenseAsReported": legacy,
+        "declaredLicenseId": license_id,
+        "declaredLicenseReference": (
+            "https://creativecommons.org/licenses/by/4.0/"
+            if license_id == "cc-by-4.0" else None
+        ),
         "accessAsReported": record.get("access"),
-        "rightsDecision": "PENDING human review, never auto-approve image/data derivatives"
+        "rightsDecision": (
+            "PENDING file-scope/attribution/external-rights review; record declares CC BY 4.0"
+            if license_id == "cc-by-4.0" else
+            "PENDING human review; explicit reusable-license scope not established"
+        ),
+        "fileRightsAudited": False,
+        "derivativeRightsApproved": False
     }
 
 
