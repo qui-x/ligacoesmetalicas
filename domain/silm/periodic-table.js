@@ -60,18 +60,50 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
   }else if(event.key==='Home')target=D.elements[0];else if(event.key==='End')target=D.elements[117];else return;
   event.preventDefault();if(target){buttons.get(target.atomicNumber).focus();buttons.get(target.atomicNumber).scrollIntoView({block:'nearest',inline:'nearest'});}
  });
- const resize=()=>{if(!root.isConnected)return;const min=26,gap=4;
-  const width=scroll.clientWidth-30,wide=(width-20-18*gap)/18;let cell=Math.max(min,wide);
+ // WebKit: mutações de --periodic-cell alteram o tamanho da própria região
+ // observada. Nunca escrever CSS nem alternar a dica no callback do ResizeObserver.
+ // Dimensionar no frame seguinte e somente quando o valor calculado mudou.
+ let resizeFrame=0,hintFrame=0;
+ const resize=()=>{
+  if(!root.isConnected)return;
+  const min=26,gap=4,width=scroll.clientWidth-30;
+  const wide=(width-20-18*gap)/18;
+  let cell=Math.max(min,wide);
   if(root.closest('.silm-presentation.is-expanded,.silm-laboratory')){
-   // Onze linhas: cabeçalho de 20 px, separador de 8 px e nove linhas de elementos.
-   // Descontar os dez intervalos e o padding real evita overflow por poucos pixels no tablet.
-   const style=getComputedStyle(scroll),padding=(parseFloat(style.paddingTop)||0)+(parseFloat(style.paddingBottom)||0);
-   const tall=(scroll.clientHeight-padding-20-8-10*gap-2)/9/1.13;cell=Math.max(min,Math.min(wide,tall));
+   const style=getComputedStyle(scroll);
+   const padding=(parseFloat(style.paddingTop)||0)+(parseFloat(style.paddingBottom)||0);
+   const tall=(scroll.clientHeight-padding-20-8-10*gap-2)/9/1.13;
+   cell=Math.max(min,Math.min(wide,tall));
   }
-  const size=Math.max(min,Math.min(96,cell));root.style.setProperty('--periodic-cell',size+'px');root.dataset.density=size<34?'tiny':size<46?'compact':'full';requestAnimationFrame(()=>{scrollHint.hidden=scroll.scrollWidth<=scroll.clientWidth+1;});
+  const size=Math.max(min,Math.min(96,cell));
+  const previous=parseFloat(root.style.getPropertyValue('--periodic-cell'));
+  if(!Number.isFinite(previous)||Math.abs(previous-size)>.1)
+   root.style.setProperty('--periodic-cell',size+'px');
+  const density=size<34?'tiny':size<46?'compact':'full';
+  if(root.dataset.density!==density)root.dataset.density=density;
+  if(!hintFrame)hintFrame=requestAnimationFrame(()=>{
+   hintFrame=0;
+   if(!root.isConnected)return;
+   const hidden=scroll.scrollWidth<=scroll.clientWidth+1;
+   if(scrollHint.hidden!==hidden)scrollHint.hidden=hidden;
+  });
  };
- if(window.ResizeObserver){const observer=new ResizeObserver(resize);scope.observe(observer,scroll);}scope.listen(window,'resize',resize);scope.on('theme:changed',resize);
- update();if(state.query)updateSearch(false);else status.textContent='118 elementos · grupos 1–18 · use as setas para navegar entre elementos.';resize();
+ const scheduleResize=()=>{
+  if(resizeFrame)return;
+  resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;resize();});
+ };
+ if(window.ResizeObserver){
+  const observer=new ResizeObserver(scheduleResize);
+  scope.observe(observer,scroll);
+ }
+ scope.listen(window,'resize',scheduleResize);
+ scope.on('theme:changed',scheduleResize);
+ scope.cleanup(()=>{
+  if(resizeFrame)cancelAnimationFrame(resizeFrame);
+  if(hintFrame)cancelAnimationFrame(hintFrame);
+  resizeFrame=0;hintFrame=0;
+ });
+ update();if(state.query)updateSearch(false);else status.textContent='118 elementos · grupos 1–18 · use as setas para navegar entre elementos.';scheduleResize();
  return {root,title,inspect,resize,refresh:update,input,buttons,destroy:()=>root.remove()};
 };
 SILM.tableSequence=0;
