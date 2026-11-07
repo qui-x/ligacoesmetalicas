@@ -1,0 +1,40 @@
+name: SILM — Auditoria Cu EBSD (pré-homologação)
+on:
+  push:
+    branches:
+      - design/silm-rede-ambiente-atomico-parte6
+    paths:
+      - 'research/microstructure/audit_copper_ebsd.py'
+      - '.github/workflows/silm-copper-ebsd-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-copper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preparar dependências HDF5
+        run: |
+          python -m pip install --disable-pip-version-check 'h5py>=3.11,<4' 'numpy>=1.26,<3'
+      - name: Validar script e regras básicas
+        run: |
+          python -m py_compile research/microstructure/audit_copper_ebsd.py
+          python research/microstructure/audit_copper_ebsd.py --self-test
+      - name: Conferir MD5 e metadados EBSD do Cu policristalino
+        run: |
+          python research/microstructure/audit_copper_ebsd.py --out "$RUNNER_TEMP/silm-cu-audit" --cache "$RUNNER_TEMP/silm-cu-raw"
+      - name: Publicar somente auditoria textual e metadados não homologados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-copper-ebsd-review-not-homologated
+          path: |
+            ${{ runner.temp }}/silm-cu-audit/copper-h5oina-audit.json
+            ${{ runner.temp }}/silm-cu-audit/copper-h5oina-audit.md
+          if-no-files-found: warn
+          retention-days: 14
