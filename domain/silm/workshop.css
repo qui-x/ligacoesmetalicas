@@ -347,3 +347,238 @@
 .silm-micro-generator-dialog select,.silm-micro-generator-dialog input[type=number]{box-sizing:border-box;max-width:100%;width:100%;min-height:44px;font:inherit;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)}
 .silm-micro-generator-dialog .silm-micro-data-actions{gap:6px}
 .silm-micro-generator-dialog .silm-micro-data-actions button{min-height:44px}
+
+
+/* SILM R08 · Quatro escalas, um só contrato de espaço e navegação.
+   Toda alteração de escala usa a mesma faixa superior de quatro alvos.
+   As escalas 1/2 tornam a área central flexível, sem impor altura de janela
+   a painéis de montagem e sem deixar a figura restrita a um card pequeno. */
+#si-stage .silm-workshop-reference>.silm-workshop-scales{
+ display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+ gap:clamp(3px,.55vw,7px);width:100%;min-width:0;
+ margin:0 0 5px;overflow:visible;
+}
+#si-stage .silm-workshop-reference>.silm-workshop-scales .silm-workshop-scale{
+ box-sizing:border-box;min-width:0;min-height:44px;
+ padding:4px clamp(2px,.45vw,9px);
+ overflow-wrap:normal;white-space:normal;line-height:1.15;
+}
+@media(max-width:900px){
+ #si-stage .silm-workshop-scales .silm-workshop-scale-long{display:none}
+ #si-stage .silm-workshop-scales .silm-workshop-scale-short{display:inline}
+}
+#si-stage.silm-workshop-context-only{
+ display:flex!important;flex:1 1 0!important;height:auto!important;
+ min-width:0!important;min-height:0!important;overflow:hidden!important;
+}
+#si-stage.silm-workshop-context-only #workspace-focus{
+ box-sizing:border-box;display:flex!important;flex:1 1 auto!important;
+ flex-direction:column!important;width:100%;height:100%!important;
+ min-height:0!important;min-width:0!important;
+ overflow-x:hidden!important;overflow-y:auto!important;
+ padding:clamp(4px,.65vw,9px)!important;
+ overscroll-behavior:contain;
+}
+#si-stage.silm-workshop-context-only #silm-workshop-context{
+ box-sizing:border-box;display:flex;flex-direction:column;
+ flex:1 1 auto;min-width:0;min-height:0;width:100%;max-width:none;
+ margin:0 auto;
+}
+#si-stage.silm-workshop-context-only .silm-workshop-reference{
+ box-sizing:border-box;display:flex;flex-direction:column;
+ flex:1 1 auto;min-width:0;min-height:0;width:100%;max-width:none;
+ padding:clamp(4px,.65vw,10px);gap:5px;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-top:has(.silm-workshop-atlas-photo){
+ display:grid;flex:1 1 auto;min-height:0;
+ grid-template-columns:minmax(0,3.2fr) minmax(190px,1fr);
+ align-items:stretch;gap:clamp(6px,.75vw,13px);
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-art:has(.silm-workshop-atlas-photo){
+ box-sizing:border-box;min-height:0;height:100%;max-height:none;min-width:0;
+ padding:clamp(2px,.55vw,7px);overflow:hidden;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-atlas-photo{
+ flex:1 1 0;min-height:0;height:100%;gap:3px;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-atlas-photo img{
+ box-sizing:border-box;flex:1 1 0;width:100%;height:100%;max-height:none;
+ min-height:0;object-fit:contain;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary{
+ box-sizing:border-box;align-content:start;min-height:0;min-width:0;
+ gap:clamp(4px,.5vw,7px);
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-scale-note{
+ margin:0;font-size:.73rem;line-height:1.3;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-mode{
+ gap:5px;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading{
+ flex:0 0 auto;gap:5px;min-width:0;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading h2{font-size:clamp(.9rem,1.4vw,1.17rem)}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer{
+ display:grid;flex:1 1 auto;min-height:0;
+ grid-template-columns:minmax(0,1fr);
+ grid-template-rows:minmax(0,1fr) auto auto;
+ height:auto;max-height:none;gap:4px;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewport{
+ grid-row:1;box-sizing:border-box;
+ height:100%;min-height:0;max-height:none;
+ width:100%;max-width:100%;border-radius:7px;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar{
+ grid-row:2;min-height:44px;align-self:stretch;margin:0;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-caveat{
+ grid-row:3;font-size:.68rem;line-height:1.25;margin:0;
+}
+#si-stage:is([data-workshop-scale="3"],[data-workshop-scale="4"]):not(.silm-workshop-context-only) #silm-workshop-context{
+ box-sizing:border-box;width:100%;max-width:none;margin:0 0 3px;
+}
+#si-stage:is([data-workshop-scale="3"],[data-workshop-scale="4"]):not(.silm-workshop-context-only) .silm-workshop-reference{
+ box-sizing:border-box;display:flex;flex-direction:column;
+ gap:2px;padding:3px 6px;
+}
+#si-stage:is([data-workshop-scale="3"],[data-workshop-scale="4"]) .silm-workshop-reference-summary{
+ min-width:0;gap:3px 8px;
+}
+#si-stage:is([data-workshop-scale="3"],[data-workshop-scale="4"]) .silm-workshop-scale-note{
+ /* O contexto permanece disponível aos leitores de tela, sem gastar
+    altura vertical permanente em uma cena de exploração. */
+ position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+ overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+@media(max-width:760px){
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-top:has(.silm-workshop-atlas-photo){
+  grid-template-columns:minmax(0,1fr);
+  grid-template-rows:minmax(0,1fr) auto;
+  min-height:0;gap:4px;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary{
+  display:flex;flex-wrap:wrap;align-items:center;gap:3px 7px;
+  padding:2px 1px;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary .silm-workshop-eyebrow,
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary .silm-workshop-card-note,
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary .silm-workshop-material{
+  display:none;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary h2{
+  font-size:1rem;line-height:1.2;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary .silm-workshop-selected-title{
+  flex:1 1 40%;min-width:0;font-size:.78rem;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary>.button{
+  margin-inline-start:auto;min-height:44px;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art:has(.silm-workshop-atlas-photo){
+  min-height:min(38dvh,260px);
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-photo figcaption{
+  font-size:.67rem;padding:1px 3px;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer{
+  min-height:min(48dvh,320px);
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar{
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:2px 5px;padding:4px;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-status{
+  grid-column:1;grid-row:1;line-height:1.25;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-dimension{
+  grid-column:1;grid-row:2;line-height:1.2;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools{
+  grid-column:2;grid-row:1/span 2;justify-content:flex-end;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-component{
+  display:none;
+ }
+ #si-stage:is([data-workshop-scale="3"],[data-workshop-scale="4"]) #workspace-focus{
+  padding:4px!important;
+ }
+ #si-stage:is([data-workshop-scale="3"],[data-workshop-scale="4"]) .silm-workshop-reference{
+  gap:2px;padding:2px 3px;
+ }
+ #si-stage:is([data-workshop-scale="3"],[data-workshop-scale="4"]) .silm-workshop-reference-summary{
+  font-size:.75rem;
+ }
+}
+@media(max-height:510px) and (orientation:landscape){
+ #si-stage.silm-workshop-context-only #workspace-focus{
+  overflow-y:auto!important;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art:has(.silm-workshop-atlas-photo){
+  min-height:180px;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer{
+  min-height:255px;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-component{
+  display:none;
+ }
+}
+@media(forced-colors:active){
+ #si-stage .silm-workshop-scale[aria-pressed=true]{outline:3px solid Highlight}
+}
+
+
+/* R08b · O cabeçalho e as ferramentas nunca podem esmagar a imagem do grão.
+   Em telas baixas, a região de conteúdo rola; a imagem não cai a 2 px. */
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer{
+ flex:0 0 auto;
+ height:clamp(440px,calc(100dvh - 330px),740px);
+ min-height:440px;
+ grid-template-rows:minmax(270px,1fr) auto auto;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewport{
+ min-height:270px;
+}
+@media(max-width:760px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  grid-template-rows:auto auto auto;gap:3px;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-status{
+  grid-column:1;grid-row:1;font-size:.77rem;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-dimension{
+  grid-column:1;grid-row:2;font-size:.7rem;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools{
+  box-sizing:border-box;grid-column:1;grid-row:3;
+  display:flex;justify-content:flex-start;flex-wrap:nowrap;
+  overflow-x:auto;overscroll-behavior-x:contain;
+  max-width:100%;min-width:0;min-height:44px;scrollbar-width:thin;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools>*{
+  flex:0 0 auto;
+ }
+}
+@media(min-width:761px) and (min-height:600px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer{
+  min-height:520px;
+  height:clamp(520px,calc(100dvh - 320px),800px);
+  grid-template-rows:minmax(410px,1fr) auto auto;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewport{min-height:410px}
+}
+@media(max-height:510px) and (orientation:landscape){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer{
+  height:365px;min-height:365px;
+  grid-template-rows:minmax(240px,1fr) auto auto;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewport{min-height:240px}
+}
+
+/* No retrato, os textos resumidos ficam disponíveis ao abrir Composição e fonte. */
+.silm-workshop-detail-material,.silm-workshop-detail-note{
+ margin:5px 0;font-size:.78rem;line-height:1.4;color:var(--text);
+}
