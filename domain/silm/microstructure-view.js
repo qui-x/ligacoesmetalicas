@@ -243,6 +243,9 @@ SILM.microstructure=(()=>{
     const sample=node('p','','Amostra: '+SILM.microstructureStudies.describe(study)+
      (study.technique?' · Técnica: '+study.technique:''));
     const note=node('p','',study.caveat);
+    const topics=SILM.microstructureStudies.topicLabels(study);
+    const topicLine=topics.length?node('p','silm-micro-study-topics',
+     'Aspectos investigados na fonte: '+topics.join(', ')+'.'):null;
     const limit=node('p','silm-micro-study-limit',SILM.microstructureStudies.caveat(study));
     if(study.review?.includes('not-independently-verified')){
      limit.textContent+=' Documento original ainda não conferido de forma independente.';
@@ -251,7 +254,9 @@ SILM.microstructure=(()=>{
     if(/^https:\/\//.test(study.url)){
      link.href=study.url;link.target='_blank';link.rel='noopener noreferrer';
     }else link.hidden=true;
-    entry.append(title,sample,note,limit,link);
+    entry.append(title,sample);
+    if(topicLine)entry.append(topicLine);
+    entry.append(note,limit,link);
     items.append(entry);
    });
    collection.append(summary,description,items);
