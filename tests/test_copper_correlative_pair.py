@@ -34,6 +34,10 @@ def metadata():
                              "heldOutLandmarks": heldout},
             "correctedExportProvenance": "SYNTHETIC ONLY",
             "trueEbsdVersion": "SYNTHETIC-FIXTURE-NOT-TRUEEBSD",
+            "matlabVersion": "SYNTHETIC NO MATLAB",
+            "mtexVersion": "SYNTHETIC NO MTEX",
+            "referenceScript": {"kind": "zenodo-published",
+                                "sha256": corr.allowed_script_shas()["zenodo-published"]},
             "voidMask": {"method": "registered-BSE-threshold", "source": "artificial-BSE",
                          "threshold": 0.8},
             "segmentation": {"rawAlgorithm": "SYNTHETIC connected graph",
@@ -85,6 +89,15 @@ def run_test():
     assert score["rawEdgeCount"] > 0 and score["correctedEdgeCount"] > 0
     assert "grain_id" not in result and "bse_void" not in result
 
+    altered = copy.deepcopy(m)
+    altered["referenceScript"]["sha256"] = "0" * 64
+    must_fail(lambda: corr.analyze(altered, a, b), "SHA256")
+    altered = copy.deepcopy(m)
+    altered["referenceScript"]["kind"] = "unreviewed-source"
+    must_fail(lambda: corr.analyze(altered, a, b), "SHA256")
+    altered = copy.deepcopy(m)
+    altered["mtexVersion"] = ""
+    must_fail(lambda: corr.analyze(altered, a, b), "MTEX")
     altered = copy.deepcopy(m)
     altered["registration"]["samePhysicalFrame"] = False
     must_fail(lambda: corr.analyze(altered, a, b), "registration")
