@@ -1,0 +1,62 @@
+# SILM — Parte 7 | Verificação metodológica de Cu EBSD versus MTEX/TrueEBSD
+
+**Data da revisão:** 07/11/2026. **Natureza:** conferência documental e especificação de testes sintéticos; **não constitui homologação científica de contornos nem autorização de redistribuição.**
+
+## Ponto de retomada
+
+A pesquisa já deixou de ser apenas bibliográfica. O arquivo original `copper29.h5oina`, DOI [10.5281/zenodo.16902083](https://doi.org/10.5281/zenodo.16902083), foi obtido num runner efêmero e conferido por MD5 (`ffe617d5cb3d2e4ed1a5e3b7d27d6e11`). Não foi publicado na PWA. Há [auditoria HDF5](SILM-PROTOCOLO-CU-EBSD-CONTORNOS-2026-11.md) e [prévia orientacional](../research/microstructure/copper-ebsd-orientation-preview.json).
+
+### O que efetivamente foi medido/inspecionado
+
+| Estágio | Extensão | Identidade do dado | Interpretação permitida |
+|---|---|---|---|
+| EBSD original | 1031 × 547 = 563.957 pontos; passo 0,1 µm | 511.713 índices Cu; 52.244 não indexados | Grade, indexação e escala **da aquisição bruta**, não composição ou grãos homologados |
+| Prévia SILM | 160 × 160 pixels centrais, 23.114 pontos Cu | 89 regiões candidatas com ≥5 pixels, excluídas as que tocam a borda; ECD mediano ≈0,798 µm | Conectividade orientacional exploratória **do recorte bruto**; não estimativa ASTM nem média da amostra |
+| Exemplo MTEX publicado | Mapa **corrigido e reamostrado** após TrueEBSD; a documentação exibe 1082 × 2018 e 2.356 grãos Cu sob parâmetros próprios | Regiões reconstruídas após alinhamento, reclassificação de vazios e preenchimento/fechamento de rede | Resultado **de outro estágio de processamento**, não denominador válido para comparar diretamente com as 89 regiões do recorte |
+
+**Erro a evitar:** os números 89 e 2.356 NÃO medem o mesmo objeto experimental ou campo. Não calcular razão, porcentagem de cobertura nem discrepância quantitativa a partir deles. O mapa MTEX corrigido tem dimensão e amostragem diferentes do HDF5 de aquisição.
+
+## Sequência científica a reproduzir ou comparar
+
+A documentação de referência [MTEX — TrueEBSD grain boundary voids in a copper polycrystal](https://mtex-toolbox.github.io/example_copper_2.html) e o [exemplo dos autores](https://github.com/vtvivian/mtex-trueEbsd/blob/main/examples/example_copper.m) demonstram as operações que faltam à prévia SILM:
+
+1. Verificar a importação do Oxford `.h5oina`, incluindo se há conjuntos brutos e pós-processados e qual versão é usada.
+2. Confirmar orientação Bunge/ZXZ, simetria própria cúbica e referência amostra/cristal, **não apenas** coincidência dos rótulos Euler.
+3. Registrar/alinha EBSD, FSD e BSE/SEM na sequência TrueEBSD; quantificar transformações e possíveis mudanças na malha. **Não aplicar a mesma grade do arquivo bruto ao mapa corrigido sem revisão.**
+4. Distinguir pixels sem indexação de vazios identificados na imagem BSE. A classe `voids` no exemplo é fundamentada pelo BSE, não por todos os zeros da fase EBSD.
+5. Reconstruir grãos com `calcGrains` e limiar de 10°, identificando no procedimento o uso de `minPixel` e `alpha` para preservar ou fechar os vazios; aplicar regras coerentes de borda.
+6. Só comparar distribuições ECD/área **em um mesmo campo e estágio**, com mesma escala, critérios de inclusão, referência espacial e tratamento de regiões parciais.
+
+Na documentação MTEX consultada, os vazios são inicialmente preservados com `'alpha',0,'minPixel',5`; para fechar a rede de grãos sobre vazios usa-se `'alpha',6,'minPixel',5`. Isso não equivale ao grafo atual de quatro vizinhos com `Phase == 1`, mesmo quando ambos aplicam 10°.
+
+## Verificação independente e regressão
+
+Um teste sintético pode verificar as regras matemáticas **sem usar nem redistribuir o material original**:
+
+- identidade e simetria cúbica de orientações, bem como desorientação conhecida de 8°;
+- numa grade artificial calibrada de 20 × 20 pixels, uma ilha interna orientada 8° em relação à matriz deve permanecer região independente em 5° e unir-se à matriz a partir de 10°;
+- célula sem indexação na ilha não deve ser tratada como fase de cobre;
+- a região matriz que toca a borda não entra na estimativa de ECD interno;
+- filtros geométricos e ausência de homologação devem permanecer explícitos.
+
+O teste não valida aquisição, registro TrueEBSD, polígonos reais, licença ou estatísticas de um espécime; confirma apenas invariantes básicos do algoritmo em um campo artificial controlado.
+
+## Licenciamento e separação de estados
+
+O registro do Zenodo indica acesso aberto, porém o campo de licença não estabelece uma permissão explícita suficiente para a publicação de imagens/derivados na versão da fonte inspecionada. A auditoria do SILM registrou `rights: []`; **não confundir acesso ao arquivo com licença de redistribuição**. Antes de qualquer mapa real distribuído, esclarecer e registrar autorização, atribuição e condições de derivados por fonte.
+
+Até cumprir esses critérios, os dados reais permanecem em `research/` e o PR [#73](https://github.com/qui-x/ligacoesmetalicas/pull/73) permanece **draft**. A `main` só mantém o que já foi integrado e validado anteriormente; não ativar o conjunto experimental em `Grãos`, `Medir` ou `Calcular`.
+
+## Próximos critérios de aceite verificáveis
+
+- [x] MD5, número de pontos, fases, passo e identidade da amostra conferidos no HDF5.
+- [x] Prévia de conectividade orientacional registrada com limitações explícitas.
+- [x] Diferenças metodológicas entre aquisição bruta, recorte SILM e mapa TrueEBSD documentadas.
+- [ ] Executar testes sintéticos de limiares, simetria e borda em CI.
+- [ ] Selecionar recorte coincidente antes/depois de TrueEBSD e manter as transformações auditáveis.
+- [ ] Confrontar segmentações e estatísticas com mesmo recorte, escala, máscara de vazios e parâmetros de grão.
+- [ ] Documentar erro/uncerteza e política de grãos de borda, sem reinterpretar ECD individual como número ASTM.
+- [ ] Confirmar a licença de reutilização de mapas/imagens/derivados, incluindo atribuição.
+- [ ] Somente então considerar visualização experimental com proveniência visível.
+
+**Fontes primárias:** [Zenodo](https://zenodo.org/records/16902083); [documentação MTEX](https://mtex-toolbox.github.io/example_copper_2.html); [código de exemplo TrueEBSD](https://github.com/vtvivian/mtex-trueEbsd/blob/main/examples/example_copper.m).
