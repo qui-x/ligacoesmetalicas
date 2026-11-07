@@ -121,6 +121,18 @@ async function test(viewport){
  await viewer.getByRole('button',{name:'Abrir dados segmentados'}).click();
  const importDialog=viewer.locator('.silm-micro-data-dialog');
  await importDialog.waitFor({state:'visible'});
+ const evidencePanel=importDialog.locator('.silm-micro-didactic-evidence');
+ assert.equal(await evidencePanel.getAttribute('data-evidence-level'),'D0-schematic-conceptual',
+  'A geometria didática não deve parecer uma amostra experimental.');
+ assert.match(await evidencePanel.innerText(),/Rede de referência:/,
+  'A evidência deve apresentar a cristalografia, separadamente do grão ilustrativo.');
+ assert.match(await evidencePanel.innerText(),/Contexto de aplicação no atlas:/,
+  'A aplicação tecnológica deve ser contextualizada, sem confundir liga com metal puro.');
+ assert.match(await evidencePanel.innerText(),/Estudos candidatos não são parâmetros do gerador/,
+  'Não se deve inferir forma de grão a partir de fonte bibliográfica não homologada.');
+ const crystalURL=await evidencePanel.getByRole('link',{name:'Consultar fonte cristalográfica'}).getAttribute('href');
+ assert.match(crystalURL,/^https:\/\//,'Falta URL rastreável da estrutura de referência.');
+ assert.equal(await viewer.getAttribute('data-didactic-evidence-level'),'D0-schematic-conceptual');
  await importDialog.locator('input[type=file]').setInputFiles({
   name:'amostra-de-teste.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(sample))
  });
