@@ -93,6 +93,27 @@ test('Fontes candidatas não homologam micrografias nem porcentagens artificiais
  assert.equal(coverage.coverage.elementsPendingSpecificLead,
   coverage.records.filter(x=>!x.microstructure.experimentalCandidateLeadIDs.length).length);
 });
+test('Matriz legível e índice computável possuem a mesma cobertura e as mesmas fontes',()=>{
+ const md=read('docs/SILM-MATRIZ-65-ELEMENTOS-APLICACAO-REDE-MICROESTRUTURA.md');
+ const counts=[
+  ['Registros de estudos/fontes candidatos para microestrutura',coverage.coverage.candidateStudyRecords],
+  ['Elementos associados a pelo menos um estudo ou dataset candidato',coverage.coverage.elementsWithCandidateLeads],
+  ['Elementos sem fonte específica candidata confirmada na triagem',coverage.coverage.elementsPendingSpecificLead]
+ ];
+ for(const [label,num] of counts)
+  assert.ok(md.includes('| '+label+' | **'+num+'** |'),'Resumo da pesquisa desatualizado: '+label);
+ for(const entry of coverage.experimentalLeads){
+  assert.ok(md.includes('\\`'+entry.id+'\\`')||md.includes('`'+entry.id+'`'),'Referência ausente na tabela: '+entry.id);
+  assert.ok(md.includes(entry.url),'URL da fonte ausente: '+entry.id);
+ }
+ for(const record of coverage.records){
+  const row=md.split('\\n').find(line=>line.startsWith('| '+record.atomicNumber+' | **'+record.symbol+'**'));
+  assert.ok(row,'Elemento sem linha: '+record.symbol);
+  const expected=record.microstructure.experimentalCandidateLeadIDs;
+  for(const id of expected)assert.ok(row.includes('['+id+']('),'Referência '+id+' não mapeada em '+record.symbol);
+  if(!expected.length)assert.ok(row.includes('**Pendente**'),record.symbol+' sem indicação de lacuna.');
+ }
+});
 test('Matéria documentada também engloba elementos sem fonte micrográfica específica',()=>{
  const md=read('docs/SILM-MATRIZ-65-ELEMENTOS-APLICACAO-REDE-MICROESTRUTURA.md');
  for(const el of coverage.records){
