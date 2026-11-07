@@ -97,12 +97,17 @@ SILM.microstructure=(()=>{
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
   svg.addEventListener('pointerdown',e=>{
    if(e.button!==0||!viewport.classList.contains('is-pannable'))return;
+   // Capturar somente APÓS iniciar o arraste: capturar no pointerdown
+   // redirecionaria o click para o SVG e impediria selecionar o grão.
    drag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
-   suppressClick=false;svg.setPointerCapture(e.pointerId);
+   suppressClick=false;
   });
   svg.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;
    const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
-   if(Math.abs(dx)+Math.abs(dy)>2)drag.moved=true;
+   if(Math.abs(dx)+Math.abs(dy)>2&&!drag.moved){
+    drag.moved=true;
+    if(!svg.hasPointerCapture(e.pointerId))svg.setPointerCapture(e.pointerId);
+   }
    const r=svg.getBoundingClientRect(),v=svg.viewBox.baseVal;
    const factor=Math.min(r.width/v.width,r.height/v.height)||1;
    offsetX+=dx/factor;offsetY+=dy/factor;drag.x=e.clientX;drag.y=e.clientY;update();
