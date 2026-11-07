@@ -1,0 +1,120 @@
+// Regressão das quatro escalas SILM: espaço útil, navegação, estado e foco.
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {join} from 'node:path';
+const require=createRequire(import.meta.url);
+const browserName=process.env.BROWSER_NAME||'chromium';
+const base=process.env.BASE_URL||'http://127.0.0.1:8765';
+const playwright=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const dir=join('reports','quatro-escalas',browserName);mkdirSync(dir,{recursive:true});
+const sizes=[
+ ['celular-320',320,568],['celular-390',390,844],['celular-414',414,896],
+ ['paisagem-curta',844,390],['tablet-retrato',768,1024],['tablet-paisagem',1024,768],
+ ['notebook',1366,768],['desktop',1440,900],['full-hd',1920,1080]
+];
+const metrics=[];
+const browser=await playwright[browserName].launch({headless:true});
+async function sample(page){
+ return page.evaluate(()=>{
+  const stage=document.querySelector('#si-stage');
+  const ref=stage.querySelector('.silm-workshop-reference');
+  const nav=ref?.querySelector('.silm-workshop-scales');
+  const buttons=nav?[...nav.querySelectorAll('button')]:[];
+  const art=ref?.querySelector('.silm-workshop-reference-art');
+  const image=art?.querySelector('img');
+  const micro=ref?.querySelector('.silm-workshop-micro-viewport');
+  const tools=ref?.querySelector('.silm-workshop-micro-toolbar');
+  const scene=stage.querySelector('.silm-crystal .silm-assembly-area');
+  const stageCanvas=stage.querySelector('.silm-crystal-stage');
+  const action=document.querySelector('#silm-scene-actionbar');
+  const q=n=>{if(!n)return null;const r=n.getBoundingClientRect();return{
+   left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};
+  return {
+   viewport:[innerWidth,innerHeight],scale:stage.dataset.workshopScale,
+   documentWidth:document.documentElement.scrollWidth,
+   stage:q(stage),reference:q(ref),nav:q(nav),buttons:buttons.map(q),
+   art:q(art),image:q(image),imageLoaded:!!image&&image.complete&&image.naturalWidth>0,
+   micro:q(micro),microTools:q(tools),scene:q(scene),stageCanvas:q(stageCanvas),
+   action:q(action),
+   focusScroll:stage.querySelector('#workspace-focus')?.scrollHeight||0,
+   focusClient:stage.querySelector('#workspace-focus')?.clientHeight||0
+  };
+ });
+}
+const errors=[];
+try{
+ const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
+ const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
+ const response=await page.goto(base+'/index.html#/ambiente',{waitUntil:'load',timeout:45000});
+ assert.ok(response?.ok(),'SILM não abriu');
+ await page.waitForFunction(()=>window.SILM?.workshop?.valid()&&!document.querySelector('#silm-workshop-context')?.hidden);
+ const table=page.locator('#silm-workshop-context').getByRole('button',{name:'Tabela Periódica'});
+ await table.click();
+ await page.locator('#silm-periodic-dialog [data-z="29"]').click();
+ await page.locator('#silm-periodic-dialog [id$="-explore"]').click();
+ await page.locator('.silm-workshop-card[data-reference-id="atlas-cu"]').getByRole('button',{name:'Investigar componente'}).click();
+ await page.waitForFunction(()=>window.SILMIntegration?.snapshot?.()?.metal?.atomicNumber===29);
+ const scientific=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
+ for(const [label,width,height] of sizes){
+  await page.setViewportSize({width,height});
+  for(const scale of [1,2,3,4]){
+   const target=page.locator('.silm-workshop-scale[data-scale="'+scale+'"]');
+   await target.waitFor({state:'visible'});
+   await target.click();
+   await page.waitForFunction(n=>document.querySelector('#si-stage')?.dataset.workshopScale===String(n),scale);
+   if(scale===2)await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
+   await page.waitForTimeout(90);
+   const m=await sample(page);metrics.push({label,...m});
+   assert.equal(m.scale,String(scale),label+': escala errada');
+   assert.ok(m.documentWidth<=width+6,label+': rolagem global horizontal '+m.documentWidth+'/'+width);
+   assert.ok(m.stage&&m.stage.width>=Math.min(width-36,240),label+': palco comprimido');
+   assert.ok(m.nav&&m.buttons.length===4,label+': navegação de quatro escalas ausente');
+   assert.ok(m.buttons.every(x=>x.height>=43.5),label+': botões de escala menores que 44 px');
+   assert.ok(m.buttons.every(x=>Math.abs(x.top-m.buttons[0].top)<3),
+    label+': navegação quebrou em mais de uma linha na escala '+scale);
+   assert.ok(m.buttons.every(x=>x.left>=m.nav.left-3&&x.right<=m.nav.right+3),
+    label+': escala fora dos limites do palco');
+   assert.ok(m.nav.top<=m.stage.bottom &&m.nav.bottom<=m.stage.bottom+5,
+    label+': navegação de escala saiu da região central');
+   if(scale===1){
+    assert.ok(m.imageLoaded,label+': imagem macro não carregou');
+    assert.ok(m.art&&m.art.width>=Math.min(250,m.stage.width*.65),
+     label+': imagem macro comprimida '+JSON.stringify(m.art));
+    if(width>=1000&&height>=600)assert.ok(m.art.width>=m.reference.width*.58,
+     label+': imagem ocupa menos de 58% da largura do cartão macro');
+    if(height>=550)assert.ok(m.art.height>=Math.min(175,m.stage.height*.27),
+     label+': visual macro verticalmente pequeno');
+   }
+   if(scale===2){
+    assert.ok(m.micro&&m.micro.width>=Math.min(260,m.stage.width*.75),
+     label+': largura da microestrutura ficou pequena');
+    assert.ok(m.microTools&&m.microTools.top>=m.micro.bottom-4,
+     label+': controles não estão abaixo do desenho');
+    if(height>=550)assert.ok(m.micro.height>=Math.min(190,m.stage.height*.36),
+     label+': visualização de grãos verticalmente comprimida '+JSON.stringify(m));
+   }
+   if(scale>=3){
+    assert.ok(m.scene&&m.stageCanvas,
+     label+': rede/centro sem visualização científica');
+    assert.ok(m.scene.width>=Math.min(240,m.stage.width*.50),
+     label+': rede/centro usa pouca largura');
+    assert.ok(m.action&&m.action.height>=40,
+     label+': faixa instrumental sumiu');
+   }
+  }
+  if(['celular-390','paisagem-curta','desktop'].includes(label)){
+   await page.screenshot({path:join(dir,label+'-centro.jpg'),type:'jpeg',quality:70,animations:'disabled'});
+  }
+ }
+ assert.deepEqual(errors,[],errors.join('; '));
+ // Mudanças de escala não devem alterar a identidade e módulo científicos.
+ const after=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
+ assert.equal(JSON.parse(after).metal.atomicNumber,29,'Trocar a escala mudou o metal');
+ assert.equal(JSON.parse(scientific).metal.atomicNumber,29,'Metal inicial incorreto');
+ console.log('OK '+browserName+': 4 escalas x '+sizes.length+' tamanhos, navegação e áreas visuais revisadas');
+ await context.close();
+}finally{
+ writeFileSync(join(dir,'metricas.json'),JSON.stringify(metrics,null,2)+'\n');
+ await browser.close();
+}
