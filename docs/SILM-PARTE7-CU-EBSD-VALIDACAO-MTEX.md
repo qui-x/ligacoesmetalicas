@@ -42,6 +42,22 @@ O primeiro recorte no centro gerou 89 candidatos no EBSD bruto. Como esse result
 
 Este estudo permite localizar **heterogeneidade entre regiões escolhidas**, mas não fornece distribuição homologada de tamanho de grão nem comparação quantitativa direta com os 2.356 grãos do mapa alinhado MTEX.
 
+### Resultados reais da primeira execução espacial
+
+A execução [Actions #42342190496](https://github.com/qui-x/ligacoesmetalicas/actions/runs/42342190496) concluiu com sucesso. Ela confirmou o MD5 original e o recorte central previamente registrado. A tabela abaixo relaciona **somente resumos** para o critério de 10° (quatro vizinhos e exclusão de regiões menores que cinco pixels ou conectadas à borda do recorte):
+
+| Janela na aquisição bruta | Posição inicial (x,y) em pixels | Pontos indexados Cu | Regiões candidatas | Mediana ECD das candidatas (µm) |
+|---|---:|---:|---:|---:|
+| Superior esquerda | (0, 0) | 22.772 | 103 | 0,930485 |
+| Superior direita | (871, 0) | 23.654 | 91 | 0,704673 |
+| Centro | (435, 193) | 23.114 | 89 | 0,797885 |
+| Inferior esquerda | (0, 387) | 23.012 | 110 | 0,805824 |
+| Inferior direita | (871, 387) | 23.065 | 152 | 0,789865 |
+
+A contagem de regiões varia de **89 a 152** entre janelas deliberadamente escolhidas; as medianas ECD da janela variam de **0,704673 a 0,930485 µm** no limiar de 10°. Com 5° e 15°, as amplitudes das medianas são, respectivamente, 0,700126–0,913054 µm e 0,704673–0,944070 µm. Ao contrário da janela central, alguns outros recortes alteraram ligeiramente a contagem quando variou o limiar: por exemplo, superior esquerda **104 → 101** candidatos entre 5° e 15°. Assim, a insensibilidade de um recorte não se generaliza ao mapa.
+
+Estes valores **não autorizam** estimar a distribuição completa de tamanhos dos grãos, fração de fase, porcentagem de Cu, média ASTM ou intervalo de confiança. A contagem de pontos indexados é dado instrumental de EBSD, não porcentagem química. Os arquivos brutos, micrografias e contornos experimentais continuam fora do repositório e da PWA. A reexecução com validação de Euler não indexado em [Actions #42342295716](https://github.com/qui-x/ligacoesmetalicas/actions/runs/42342295716) concluiu todas as etapas com sucesso.
+
 ### Controle da versão do procedimento MTEX
 
 A [página técnica MTEX](https://mtex-toolbox.github.io/example_copper_2.html) mostra a cadeia **Band Contrast → FSD → BSE**, com `trueEbsd2`, reamostragem em aproximadamente 0,050355 µm e residual da correção. A página separa `voids` com limiar BSE `0.8` somente na área efetivamente coberta e usa `calcGrains(...,'angle',10*degree,'alpha',0,'minPixel',5)` e depois `'alpha',6` para fechar a rede de contornos. Já o `example_copper.m` publicado no repositório dos autores exemplifica um percurso que inclui preenchimento de posições sem indexação e reconstrução de limites. São **implementações/versionamentos a registrar separadamente**, não pressupor que produzem mapas idênticos.
@@ -73,7 +89,7 @@ Até cumprir esses critérios, os dados reais permanecem em `research/` e o PR [
 - [x] Diferenças metodológicas entre aquisição bruta, recorte SILM e mapa TrueEBSD documentadas.
 - [x] Executar testes sintéticos de limiares, simetria e borda em CI — etapa aprovada em [Actions #42341238547](https://github.com/qui-x/ligacoesmetalicas/actions/runs/42341238547); auditoria EBSD real prossegue separadamente.
 - [ ] Selecionar recorte coincidente antes/depois de TrueEBSD e manter as transformações auditáveis.
-- [ ] Executar auditoria de sensibilidade espacial de cinco recortes no runner e interpretar os resultados, sem inferir representatividade.
+- [x] Auditoria de cinco recortes e interpretação cautelosa: [Actions #42342295716](https://github.com/qui-x/ligacoesmetalicas/actions/runs/42342295716) (sucesso); resultados resumidos acima, sem homologação ou extrapolação.
 - [ ] Confrontar segmentações e estatísticas com mesmo recorte, escala, máscara de vazios e parâmetros de grão.
 - [ ] Documentar erro/uncerteza e política de grãos de borda, sem reinterpretar ECD individual como número ASTM.
 - [ ] Confirmar a licença de reutilização de mapas/imagens/derivados, incluindo atribuição.
