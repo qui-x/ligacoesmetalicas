@@ -29,6 +29,25 @@ A documentação de referência [MTEX — TrueEBSD grain boundary voids in a cop
 
 Na documentação MTEX consultada, os vazios são inicialmente preservados com `'alpha',0,'minPixel',5`; para fechar a rede de grãos sobre vazios usa-se `'alpha',6,'minPixel',5`. Isso não equivale ao grafo atual de quatro vizinhos com `Phase == 1`, mesmo quando ambos aplicam 10°.
 
+## Sensibilidade espacial — etapa exploratória executável
+
+O primeiro recorte no centro gerou 89 candidatos no EBSD bruto. Como esse resultado não demonstra a representatividade da amostra, a etapa seguinte [`audit_copper_spatial_sensitivity.py`](../research/microstructure/audit_copper_spatial_sensitivity.py) examina cinco janelas **disjuntas e pré-definidas de 160 × 160 pixels** (cantos e centro da aquisição). Elas não são uma amostra aleatória, não sustentam inferência populacional e não substituem uma segmentação MTEX corrigida.
+
+- O script confere novamente o **MD5 do arquivo completo** e aborta diante de divergência; o script anterior continua a auditar o HDF5, fases e passos.
+- Cada janela reconstrói regiões conectadas apenas entre pixels Cu com orientação indexada, usando as 24 rotações de simetria cúbica e limiares 5/10/15°.
+- Compara **amplitudes descritivas entre janelas** (contagem de regiões e intervalo entre medianas ECD por janela). Não denominar essas amplitudes erro, incerteza padrão, intervalo de confiança ou representatividade.
+- Faz regressão do recorte central contra o [resultado já versionado](../research/microstructure/copper-ebsd-orientation-preview.json), para não mudar silenciosamente contagem, escala ou método.
+- Os pontos não indexados **não são convertidos automaticamente em vazios** e a interpretação de índice Cu não equivale a concentração química; tampouco o limiar de conexão substitui `calcGrains`.
+- Os únicos artefatos produzidos pelo workflow são relatórios/JSON agregados em armazenamento temporário. **Não publicar** mapa, máscara de pixels, micrografia original, vetores de contorno, orientações de Euler ou derivados.
+
+Este estudo permite localizar **heterogeneidade entre regiões escolhidas**, mas não fornece distribuição homologada de tamanho de grão nem comparação quantitativa direta com os 2.356 grãos do mapa alinhado MTEX.
+
+### Controle da versão do procedimento MTEX
+
+A [página técnica MTEX](https://mtex-toolbox.github.io/example_copper_2.html) mostra a cadeia **Band Contrast → FSD → BSE**, com `trueEbsd2`, reamostragem em aproximadamente 0,050355 µm e residual da correção. A página separa `voids` com limiar BSE `0.8` somente na área efetivamente coberta e usa `calcGrains(...,'angle',10*degree,'alpha',0,'minPixel',5)` e depois `'alpha',6` para fechar a rede de contornos. Já o `example_copper.m` publicado no repositório dos autores exemplifica um percurso que inclui preenchimento de posições sem indexação e reconstrução de limites. São **implementações/versionamentos a registrar separadamente**, não pressupor que produzem mapas idênticos.
+
+As incertezas de alinhamento relatadas na página MTEX (residuais dos ajustes) são **do estudo corrigido**, não medidas do SILM. Qualquer comparação posterior terá de usar o mesmo quadro espacial após transformação, mesma máscara BSE, convenção de orientação, política de borda, método de `calcGrains` e referência de escala. O workflow espacial presente não executa essas etapas.
+
 ## Verificação independente e regressão
 
 Um teste sintético pode verificar as regras matemáticas **sem usar nem redistribuir o material original**:
@@ -54,6 +73,7 @@ Até cumprir esses critérios, os dados reais permanecem em `research/` e o PR [
 - [x] Diferenças metodológicas entre aquisição bruta, recorte SILM e mapa TrueEBSD documentadas.
 - [x] Executar testes sintéticos de limiares, simetria e borda em CI — etapa aprovada em [Actions #42341238547](https://github.com/qui-x/ligacoesmetalicas/actions/runs/42341238547); auditoria EBSD real prossegue separadamente.
 - [ ] Selecionar recorte coincidente antes/depois de TrueEBSD e manter as transformações auditáveis.
+- [ ] Executar auditoria de sensibilidade espacial de cinco recortes no runner e interpretar os resultados, sem inferir representatividade.
 - [ ] Confrontar segmentações e estatísticas com mesmo recorte, escala, máscara de vazios e parâmetros de grão.
 - [ ] Documentar erro/uncerteza e política de grãos de borda, sem reinterpretar ECD individual como número ASTM.
 - [ ] Confirmar a licença de reutilização de mapas/imagens/derivados, incluindo atribuição.
