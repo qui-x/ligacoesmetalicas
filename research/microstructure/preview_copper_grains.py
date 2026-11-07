@@ -49,7 +49,7 @@ def self_test():
         "ZXZ", [[.21, 1.1, 2.8]]).as_quat())[0])) < 10
     print("OK: quaternion/intrinsic ZXZ e 24 simetrias cúbicas verificadas.")
 
-def run(input_file, width=160, height=160):
+def run(input_file, width=160, height=160, x0_pixel=None, y0_pixel=None):
     with h5py.File(input_file, "r") as f:
         x_cells = int(np.ravel(f[HEADER + "/X Cells"][()])[0])
         y_cells = int(np.ravel(f[HEADER + "/Y Cells"][()])[0])
@@ -65,7 +65,17 @@ def run(input_file, width=160, height=160):
                 and np.isclose(x[x_cells], x[0], atol=.015)
                 and np.isclose(abs(y[x_cells] - y[0]), y_step, atol=.015)):
             raise ValueError("X/Y scan ordering not compatible with simple row-major grid.")
-        x0, y0 = (x_cells - width)//2, (y_cells - height)//2
+        if (x0_pixel is None) != (y0_pixel is None):
+            raise ValueError("Both x0_pixel and y0_pixel must be provided together.")
+        if x0_pixel is None:
+            x0, y0 = (x_cells - width)//2, (y_cells - height)//2
+        else:
+            if not all(isinstance(v, (int, np.integer)) and not isinstance(v, (bool, np.bool_))
+                       for v in (x0_pixel, y0_pixel)):
+                raise ValueError("Crop offsets must be integer pixel coordinates.")
+            x0, y0 = int(x0_pixel), int(y0_pixel)
+            if x0 < 0 or y0 < 0 or x0 + width > x_cells or y0 + height > y_cells:
+                raise ValueError("Crop offsets exceed EBSD map bounds.")
         phase = f[SOURCE + "/Phase"][:].reshape(y_cells, x_cells)
         angle = f[SOURCE + "/Euler"][:].reshape(y_cells, x_cells, 3)
     sub_phase = phase[y0:y0 + height, x0:x0 + width].reshape(-1)
