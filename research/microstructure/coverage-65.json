@@ -13,9 +13,9 @@
     "specificSchematicMicrostructureAssets": 20,
     "experimentalCrystalReferences": 65,
     "experimentalMicrostructureDatasetsIntegrated": 0,
-    "candidateStudyRecords": 45,
-    "elementsWithCandidateLeads": 45,
-    "elementsPendingSpecificLead": 20
+    "candidateStudyRecords": 62,
+    "elementsWithCandidateLeads": 62,
+    "elementsPendingSpecificLead": 3
   },
   "interpretationPolicy": {
     "crystalReference": "Experimental structure of a reference element, not proof of the application's microstructure.",
@@ -938,6 +938,352 @@
       "rawFilesAudited": false,
       "licenseAudited": false,
       "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "k-deposit-3d-cryofib-2023",
+      "dataset": "Potássio metálico eletrodepositado em diferentes suportes",
+      "elements": [
+        "K"
+      ],
+      "specimenClass": "elemental-metal-electrode-deposit",
+      "technique": "cryo-EM+cryo-FIB+synchrotron-nanotomography",
+      "supports": [
+        "metal-deposit-morphology",
+        "dendrite-porosity",
+        "three-dimensional-deposit-geometry"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/36893078/",
+      "comment": "Caracterização de depósitos e interfaces do eletrodo de K, NÃO grãos do metal maciço selado; não transferir tamanho de poro a dimensão cristalina.",
+      "evidenceScope": "elemental-metal-deposit-not-bulk-grain-map",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "rb-zero-nanoparticles-tem-2022",
+      "dataset": "Nanopartículas de rubídio metálico dispersas",
+      "elements": [
+        "Rb"
+      ],
+      "specimenClass": "elemental-metal-nanoparticles",
+      "technique": "TEM+XRD+EDS",
+      "supports": [
+        "nanoparticle-morphology",
+        "particle-size-distribution"
+      ],
+      "url": "https://www.ams.org.cn/EN/10.11900/0412.1961.2021.00001",
+      "comment": "Nanopartículas/morfologia em dispersão; não mapa de contornos de grãos de um lingote sólido de Rb.",
+      "evidenceScope": "elemental-metal-nanoparticles-not-grain-map",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "tc-metal-tem-nanoscale-2008",
+      "dataset": "Tecnécio metálico e dióxido de tecnécio em TEM",
+      "elements": [
+        "Tc"
+      ],
+      "specimenClass": "metal-and-oxide-comparative",
+      "technique": "TEM+STEM+HRTEM+EDS+XRD",
+      "supports": [
+        "metal-particle-morphology",
+        "metal-nanoscale-lattice"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/19053332/",
+      "comment": "Experimento distingue Tc metal de TcO2; metal nanométrico não equivale ao radiofármaco de Tc-99m ilustrado.",
+      "evidenceScope": "metal-nanoscale-not-quantified-grain-distribution",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "cs-halide-metal-clusters-2017",
+      "dataset": "Aglomerados metálicos de Cs associados a filmes de haletos de césio",
+      "elements": [
+        "Cs"
+      ],
+      "specimenClass": "metal-clusters-on-halide",
+      "technique": "SEM+TEM+XRD",
+      "supports": [
+        "metallic-cluster-morphology",
+        "halide-grain-boundary-evolution"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S1658365517300067",
+      "comment": "Os grãos observados são de CsCl/CsBr/CsI; os agregados Cs(0) são partículas na interface. NÃO dados granulométricos de Cs metálico puro.",
+      "evidenceScope": "compound-grains-plus-metal-clusters-no-metal-grain-map",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "eu-yb-zero-nanoparticles-2025",
+      "dataset": "Nanopartículas metálicas Eu(0) e Yb(0)",
+      "elements": [
+        "Eu",
+        "Yb"
+      ],
+      "specimenClass": "elemental-metal-nanoparticles",
+      "technique": "TEM+HRTEM+FT+particle-histogram",
+      "supports": [
+        "metal-nanoparticle-size",
+        "lattice-fringes",
+        "nanoparticle-crystallinity"
+      ],
+      "url": "https://pubs.rsc.org/en/content/articlehtml/2025/tc/d5tc02776d",
+      "comment": "Metal Eu(0) e Yb(0) como nanopartículas nanométricas. Não representar grãos de volume nem a estrutura de um fósforo ou fibra óptica do atlas.",
+      "evidenceScope": "elemental-metal-nanoparticles-not-bulk-grains",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "gd-metal-wire-ebsd-2022",
+      "dataset": "Metal gadolínio laminado, trefilado e recozido",
+      "elements": [
+        "Gd"
+      ],
+      "specimenClass": "elemental-metal",
+      "technique": "EBSD+IPF+grain-size-characterization",
+      "supports": [
+        "grain-size-by-condition",
+        "grain-orientation",
+        "recrystallization"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S2238785422017215",
+      "comment": "Grãos reais do metal Gd em diferentes estados; não equivalem ao agente de contraste de RM (quelato) do atlas. Processo precisa acompanhar qualquer número.",
+      "evidenceScope": "elemental-metal-experimental-grains",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ho-nanocrystalline-diffraction-2016",
+      "dataset": "Metal hólmio nano e policristalino",
+      "elements": [
+        "Ho"
+      ],
+      "specimenClass": "elemental-metal",
+      "technique": "XRD+neutron-scattering+magnetometry",
+      "supports": [
+        "crystallite-size",
+        "magnetic-spin-structure",
+        "annealing-dependent-coarsening"
+      ],
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4815875/",
+      "comment": "Média de cristalitos (~33 nm) inferida por difração no material nanocristalino; NÃO segmentação EBSD nem tamanho ASTM de grão de película Ho:YAG.",
+      "evidenceScope": "metal-nanocrystallite-size-no-ebsd-map",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "er-metal-rolling-ebsd-2022",
+      "dataset": "Metal érbio laminado a frio e recozido",
+      "elements": [
+        "Er"
+      ],
+      "specimenClass": "elemental-metal",
+      "technique": "EBSD+optical-microscopy+XRD",
+      "supports": [
+        "grain-size-by-deformation",
+        "texture",
+        "recrystallization"
+      ],
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8880798/",
+      "comment": "Medições reais do metal Er, mas não caracterizam fibra de sílica dopada com Er; condições de laminação/recozimento obrigatórias.",
+      "evidenceScope": "elemental-metal-experimental-grains",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "tm-epitaxial-thinfilm-2024",
+      "dataset": "Filmes epitaxiais de túlio metálico sobre SiC",
+      "elements": [
+        "Tm"
+      ],
+      "specimenClass": "elemental-metal-epitaxial-film",
+      "technique": "RHEED+XRD+magnetometry",
+      "supports": [
+        "film-orientation",
+        "epitaxial-structure",
+        "magnetic-layering"
+      ],
+      "url": "https://journals.aps.org/prmaterials/abstract/10.1103/PhysRevMaterials.8.054410",
+      "comment": "Filme epitaxial Tm(0001), não mapa policristalino de grãos ou fibra óptica dopada com Tm.",
+      "evidenceScope": "epitaxial-metal-film-not-grain-map",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "yb-metal-particlefilm-2011",
+      "dataset": "Filmes de nanopartículas metálicas de itérbio",
+      "elements": [
+        "Yb"
+      ],
+      "specimenClass": "elemental-metal-nanoparticle-film",
+      "technique": "AFM+X-ray-reflectivity",
+      "supports": [
+        "nanoparticle-size",
+        "film-structure"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21386617/",
+      "comment": "Filme de partículas Yb(0) majoritariamente CFC com alguma HC; não granulometria de fibra dopada com Yb.",
+      "evidenceScope": "elemental-metal-nanoparticle-film",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "lu-metal-si-stm-2017",
+      "dataset": "Camadas superficiais de lutécio metálico sobre Si(111)",
+      "elements": [
+        "Lu"
+      ],
+      "specimenClass": "elemental-metal-surface-film",
+      "technique": "STM+XPS+UPS",
+      "supports": [
+        "surface-nanoclusters",
+        "overlayer-morphology"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/abs/pii/S0039602817302595",
+      "comment": "Camada metálica Lu com aglomerados superficiais e sem siliceto detectado; não microestrutura volumétrica nem radiofármaco Lu-177.",
+      "evidenceScope": "metal-thin-film-surface-not-bulk-grains",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "os-zr-alloy-microstructure-2000",
+      "dataset": "Ligas Zr–Os com tratamento térmico",
+      "elements": [
+        "Os"
+      ],
+      "specimenClass": "alloy",
+      "technique": "optical-metallography+TEM+XRD",
+      "supports": [
+        "alloy-phase-morphology",
+        "phase-transformation"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S0925838899006428",
+      "comment": "Microestrutura de liga Zr–Os, não estrutura granulométrica de metal Os puro ou a ponta de caneta ilustrada.",
+      "evidenceScope": "alloy-phases-not-elemental-metal-grains",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "tl-electrodeposit-sem-2015",
+      "dataset": "Depósitos de tálio metálico em eletrodo de carbono",
+      "elements": [
+        "Tl"
+      ],
+      "specimenClass": "elemental-metal-electrode-deposit",
+      "technique": "SEM+EDX",
+      "supports": [
+        "metallic-electrodeposit-morphology"
+      ],
+      "url": "https://onlinelibrary.wiley.com/doi/10.1155/2015/357514",
+      "comment": "Caracterização morfológica de Tl(0) eletrodepositado, não grãos de cristais ópticos ou detectores contendo Tl.",
+      "evidenceScope": "metal-deposit-morphology-not-bulk-grain-size",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "th-thu-alloy-metallography-2016",
+      "dataset": "Tório metálico e ligas Th–U como fundidos",
+      "elements": [
+        "Th"
+      ],
+      "specimenClass": "elemental-metal-and-alloy",
+      "technique": "optical-metallography+SEM+XRD+TEM",
+      "supports": [
+        "as-cast-metal-grains",
+        "alloy-phase-topology"
+      ],
+      "url": "https://channeli.in/media/faculty_biodata/papers/dfb4c855-239e-4308-a4d9-36891d7dbe95.pdf",
+      "comment": "Estudo experimental contém microestrutura do tório inicial e da liga Th-U; o objeto do atlas é óxido histórico, não metal Th puro; verificar direitos do artigo.",
+      "evidenceScope": "elemental-metal-and-alloy-grains",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "pa-metal-tem-eels-2018",
+      "dataset": "Microestrutura de amostra metálica histórica de protactínio",
+      "elements": [
+        "Pa"
+      ],
+      "specimenClass": "archival-elemental-metal-sample",
+      "technique": "TEM+EELS+SAED",
+      "supports": [
+        "metal-versus-oxide-domains",
+        "crystalline-domains"
+      ],
+      "url": "https://publications.jrc.ec.europa.eu/repository/handle/JRC113665",
+      "comment": "JRC avaliou domínios metálicos e oxidados em amostra arquivada; SEM/Ebsd de grãos não reportado no resumo. Sem pertinência direta a objeto cotidiano.",
+      "evidenceScope": "historic-metal-sample-crystalline-domains",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "np-stainless-zr-metal-alloy-2000",
+      "dataset": "Neptúnio em matriz metálica de aço inoxidável–Zr",
+      "elements": [
+        "Np"
+      ],
+      "specimenClass": "actinide-bearing-steel-alloy",
+      "technique": "SEM+TEM+neutron-diffraction",
+      "supports": [
+        "actinide-partitioning",
+        "alloy-phase-characterization"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/abs/pii/S0022311500000027",
+      "comment": "Neptúnio é constituinte minoritário da liga; NÃO micrografia do metal Np isolado nem da amostra selada conceitual.",
+      "evidenceScope": "alloy-containing-actinide-no-elemental-grains",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "am-mox-ceramography-2009",
+      "dataset": "Ceramografia de combustível de óxidos mistos contendo Am",
+      "elements": [
+        "Am"
+      ],
+      "specimenClass": "americium-containing-ceramic-oxide",
+      "technique": "ceramography+EPMA",
+      "supports": [
+        "ceramic-porosity",
+        "americium-distribution"
+      ],
+      "url": "https://research.tcu.ac.jp/en/publications/microstructure-and-elemental-distribution-of-americium-containing/",
+      "comment": "Morfologia de cerâmica MOX e distribuição de Am; NÃO grãos do metal Am nem os componentes selados de detector de fumaça.",
+      "evidenceScope": "oxide-ceramic-containing-actinide-no-metal-grains",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
     }
   ],
   "records": [
@@ -1167,8 +1513,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "k-deposit-3d-cryofib-2023"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1651,8 +1999,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "rb-zero-nanoparticles-tem-2022"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1883,8 +2233,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "tc-metal-tem-nanoscale-2008"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2151,8 +2503,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "cs-halide-metal-clusters-2017"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2417,8 +2771,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "eu-yb-zero-nanoparticles-2025"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2453,8 +2809,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "gd-metal-wire-ebsd-2022"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2565,8 +2923,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "ho-nanocrystalline-diffraction-2016"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2601,8 +2961,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "er-metal-rolling-ebsd-2022"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2637,8 +2999,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "tm-epitaxial-thinfilm-2024"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2673,8 +3037,11 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "eu-yb-zero-nanoparticles-2025",
+          "yb-metal-particlefilm-2011"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2709,8 +3076,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "lu-metal-si-stm-2017"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2899,8 +3268,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "os-zr-alloy-microstructure-2000"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -3051,8 +3422,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "tl-electrodeposit-sem-2015"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -3273,8 +3646,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "th-thu-alloy-metallography-2016"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -3309,8 +3684,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "pa-metal-tem-eels-2018"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -3345,8 +3722,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "np-stainless-zr-metal-alloy-2000"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -3419,8 +3798,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "am-mox-ceramography-2009"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     }
