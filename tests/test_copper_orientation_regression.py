@@ -62,6 +62,21 @@ def check_synthetic_map() -> None:
         path = pathlib.Path(directory) / "only-synthetic-data.h5"
         make_synthetic_h5(path)
         result = preview.run(path, width=20, height=20)
+        specified = preview.run(path, width=20, height=20,
+                                x0_pixel=0, y0_pixel=0)
+        assert specified["crop"] == result["crop"], "Explicit origin changed legacy crop"
+        assert specified["results"] == result["results"], "Explicit origin altered measurements"
+        for kwargs in (
+            {"x0_pixel": 1, "y0_pixel": 0},
+            {"x0_pixel": -1, "y0_pixel": 0},
+            {"x0_pixel": 0},
+        ):
+            try:
+                preview.run(path, width=20, height=20, **kwargs)
+            except ValueError:
+                pass
+            else:
+                raise AssertionError("Invalid crop coordinates were accepted")
     by_degree = {item["thresholdDegrees"]: item for item in result["results"]}
     assert set(by_degree) == {5, 10, 15}
     assert all(item["indexedPixels"] == 399 for item in by_degree.values())
