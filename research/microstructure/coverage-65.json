@@ -13,9 +13,9 @@
     "specificSchematicMicrostructureAssets": 20,
     "experimentalCrystalReferences": 65,
     "experimentalMicrostructureDatasetsIntegrated": 0,
-    "candidateStudyRecords": 38,
-    "elementsWithCandidateLeads": 38,
-    "elementsPendingSpecificLead": 27
+    "candidateStudyRecords": 45,
+    "elementsWithCandidateLeads": 45,
+    "elementsPendingSpecificLead": 20
   },
   "interpretationPolicy": {
     "crystalReference": "Experimental structure of a reference element, not proof of the application's microstructure.",
@@ -793,6 +793,151 @@
       "rawFilesAudited": false,
       "licenseAudited": false,
       "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "li-na-cryo-ebsd-2024",
+      "dataset": "Li e Na metálicos em anodos de baterias de estado sólido",
+      "elements": [
+        "Li",
+        "Na"
+      ],
+      "specimenClass": "elemental-metal-electrode",
+      "technique": "cryo-FIB+EBSD",
+      "supports": [
+        "grain-orientation",
+        "grain-size",
+        "electrodeposition-evolution"
+      ],
+      "url": "https://www.nature.com/articles/s41563-024-02006-8",
+      "comment": "Material metálico caracterizado diretamente. O Na do estudo é ânodo, NÃO vapor em lâmpada; valores dependem das condições de deposição e preparação.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "v-toolsteel-2024",
+      "dataset": "Aços ferramenta com precipitados/carbonetos de vanádio",
+      "elements": [
+        "V",
+        "Fe",
+        "Cr"
+      ],
+      "specimenClass": "steel",
+      "technique": "SEM+EBSD+image-analysis",
+      "supports": [
+        "carbide-volume-fraction",
+        "phase-fraction",
+        "grain-boundaries"
+      ],
+      "url": "https://link.springer.com/article/10.1007/s11665-023-08762-z",
+      "comment": "Fração de carbonetos VC e matriz martensítica, não grãos de vanádio puro; amostra/processo de aço-ferramenta.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ru-ni-superalloy-tem-2025",
+      "dataset": "Superliga monocristalina de Ni contendo Ru sob oxidação",
+      "elements": [
+        "Ru",
+        "Ni"
+      ],
+      "specimenClass": "alloy",
+      "technique": "in-situ-TEM",
+      "supports": [
+        "ruthenium-rich-precipitate",
+        "oxide-evolution"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S0925838825018742",
+      "comment": "Aglomeração de regiões ricas em Ru em superliga. Não representam contatos elétricos Pt–Ru do atlas.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ni-cd-electrode-morphology",
+      "dataset": "Baterias Ni–Cd: fases dos materiais de eletrodo",
+      "elements": [
+        "Cd",
+        "Ni",
+        "Co",
+        "Fe"
+      ],
+      "specimenClass": "battery-composite",
+      "technique": "microscopy+XRD+chemical-analysis",
+      "supports": [
+        "electrode-phase-composition",
+        "particle-morphology"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/17166709/",
+      "comment": "Eletrodo industrial contém metais e hidróxidos; percentuais publicados são de constituintes do eletrodo, não teor de grão de Cd puro.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "re-superalloy-segregation-2025",
+      "dataset": "Rênio em contornos de baixo ângulo de superliga Ni",
+      "elements": [
+        "Re",
+        "Ni"
+      ],
+      "specimenClass": "alloy",
+      "technique": "EBSD+FIB+STEM+APT",
+      "supports": [
+        "grain-boundary-rhenium-segregation",
+        "creep-context"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S0925838825004876",
+      "comment": "Amostra de superliga solidificada, não rênio puro ou automaticamente a mesma pá de turbina ilustrada.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ir-rh-sparkplug-electrodes",
+      "dataset": "Eletrodos de vela Ir–Rh sob oxidação a 1100 °C",
+      "elements": [
+        "Ir",
+        "Rh"
+      ],
+      "specimenClass": "alloy",
+      "technique": "SEM+XPS",
+      "supports": [
+        "surface-morphology",
+        "oxidation",
+        "microstructure"
+      ],
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6804067/",
+      "comment": "Correspondência tecnológica elevada com vela de ignição: fios de Ir e Ir–Rh; SEM das superfícies, não distribuição representativa de grãos interiores.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "nb-highpurity-recrystallization",
+      "dataset": "Nióbio puro recozido de alta pureza, recristalização",
+      "elements": [
+        "Nb"
+      ],
+      "specimenClass": "elemental",
+      "technique": "EBSD",
+      "supports": [
+        "grain-boundary-distribution",
+        "recrystallization"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/abs/pii/S1044580325006709",
+      "comment": "Amostra de Nb para cavidades RF, não a mesma forma do tarugo ou superliga do atlas.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
     }
   ],
   "records": [
@@ -827,8 +972,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "li-na-cryo-ebsd-2024"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -901,8 +1048,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "li-na-cryo-ebsd-2024"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1171,8 +1320,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "v-toolsteel-2024"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1210,7 +1361,8 @@
         "experimentalCandidateLeadIDs": [
           "fe-316l-correlative",
           "fe-cr-cast-phases",
-          "in718-ebsd-3d"
+          "in718-ebsd-3d",
+          "v-toolsteel-2024"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1295,7 +1447,9 @@
           "pr-rich-magnet",
           "y-tb-nd-magnet",
           "la-electrical-steel",
-          "hadfield-railway-crossing"
+          "hadfield-railway-crossing",
+          "v-toolsteel-2024",
+          "ni-cd-electrode-morphology"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1336,7 +1490,8 @@
           "co-ta-superalloys",
           "nb-ni-co-mu-phases",
           "pr-rich-magnet",
-          "sm-co-magnet-thesis"
+          "sm-co-magnet-thesis",
+          "ni-cd-electrode-morphology"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1378,7 +1533,10 @@
           "fe-316l-correlative",
           "in718-ebsd-3d",
           "nb-ni-co-mu-phases",
-          "ni-bicrystal-pillar"
+          "ni-bicrystal-pillar",
+          "ru-ni-superalloy-tem-2025",
+          "ni-cd-electrode-morphology",
+          "re-superalloy-segregation-2025"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1647,7 +1805,8 @@
         "experimentalCandidateLeadIDs": [
           "in718-ebsd-3d",
           "nb-ni-co-mu-phases",
-          "nb-high-purity-grain-flux"
+          "nb-high-purity-grain-flux",
+          "nb-highpurity-recrystallization"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1760,8 +1919,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "ru-ni-superalloy-tem-2025"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1798,7 +1959,8 @@
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
           "rh-pt-core-shell-2025",
-          "rh-operando-hvem-2025"
+          "rh-operando-hvem-2025",
+          "ir-rh-sparkplug-electrodes"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1911,8 +2073,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "ni-cd-electrode-morphology"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2697,8 +2861,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "re-superalloy-segregation-2025"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2769,8 +2935,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "ir-rh-sparkplug-electrodes"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
