@@ -50,7 +50,8 @@ async function test(viewport){
  assert.ok(await viewer.getByRole('button',{name:'Ampliar microestrutura'}).isVisible(),'O zoom inferior não ficou acessível.');
  const grains=viewer.locator('.silm-micro-grain');
  assert.ok(await grains.count()>=45,'Faltam grãos para observação');
- await grains.nth(25).click();
+ await grains.nth(25).focus();
+ await grains.nth(25).press('Enter');
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-selected-grain'),'26','Destaque de grão falhou');
  assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),1,'Seleção não aplica padrão estrutural ao grão.');
  assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/Grão 26 selecionado · modelo esquemático/,'Seleção não identifica o grão sem medições inventadas.');
@@ -197,7 +198,8 @@ async function test(viewport){
  assert.equal(await viewer.getAttribute('data-microstructure-source'),'schematic','Mapa esquemático não foi restaurado.');
  assert.equal(await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).isEnabled(),true,'Restauração não reativou o gerador esquemático.');
  assert.ok(await viewer.locator('.silm-micro-grain').count()>=45,'Grãos ilustrativos não foram restaurados.');
- await viewer.locator('.silm-micro-grain').nth(25).click();
+ await viewer.locator('.silm-micro-grain').nth(25).focus();
+ await viewer.locator('.silm-micro-grain').nth(25).press('Enter');
  // A formação criada também persiste ao sair da escala 2 e voltar à mesma
  // investigação, sem se confundir com dados experimentais ou alterar ensaios.
  await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).click();
@@ -216,7 +218,8 @@ async function test(viewport){
  await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).click();
  await formations.getByRole('button',{name:'Restaurar formação padrão'}).click();
  await formations.getByRole('button',{name:'Fechar configurações de formação'}).click();
- await viewer.locator('.silm-micro-grain').nth(25).click();
+ await viewer.locator('.silm-micro-grain').nth(25).focus();
+ await viewer.locator('.silm-micro-grain').nth(25).press('Enter');
 
  if(viewport.width>800){
   const frame=viewer.locator('.silm-workshop-micro-viewport'),grain=viewer.locator('.silm-micro-grain.is-selected');
