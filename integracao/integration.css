@@ -1250,3 +1250,27 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
   grid-column:1 / -1;
  }
 }
+
+
+/* SILM responsividade R07 — o modal da Tabela tem apenas a região da
+   grade rolável; a janela e o conteúdo não rolam em direções concorrentes. */
+#silm-periodic-dialog[open]{
+ display:flex;flex-direction:column;box-sizing:border-box;gap:8px;
+ width:min(1120px,calc(100vw - 16px));max-width:calc(100vw - 16px);
+ height:min(92dvh,820px);max-height:calc(100dvh - 16px);
+ padding:clamp(8px,1.5vw,16px);overflow:hidden;
+}
+#silm-periodic-dialog>#silm-close-periodic{align-self:flex-end;flex:0 0 auto;min-height:44px}
+#silm-periodic-body{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;overflow:hidden}
+#silm-periodic-body>.silm-periodic{display:flex;flex:1 1 auto;height:100%;min-height:0;min-width:0}
+#silm-periodic-dialog .periodic-scroll{flex:1 1 auto;min-height:72px}
+#silm-periodic-sources{box-sizing:border-box;flex:0 1 auto;min-height:0;max-height:min(25dvh,160px);overflow:auto;margin:0}
+#silm-periodic-sources:empty{display:none}
+@media(max-width:600px){
+ #silm-periodic-dialog[open]{gap:5px;border-radius:10px}
+}
+@media(max-height:500px) and (orientation:landscape){
+ #silm-periodic-dialog[open]{height:calc(100dvh - 8px);max-height:calc(100dvh - 8px);padding:6px}
+ #silm-periodic-dialog .periodic-scroll{min-height:54px}
+ #silm-periodic-dialog .periodic-heading h1{font-size:1rem}
+}
