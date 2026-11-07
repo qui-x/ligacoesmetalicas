@@ -2091,7 +2091,23 @@
           "grainBoundarySegmentationValidated": false,
           "applicationMatchedSpecimenValidated": false,
           "readyToPublishImage": false,
-          "canParameterizeApprovedGenerator": false
+          "canParameterizeApprovedGenerator": false,
+          "orientationPreview": {
+            "sourceStudyId": "cu-polycrystal-ebsd",
+            "summary": "research/microstructure/copper-ebsd-orientation-preview.json",
+            "stage": "exploratory-raw-orientation-crop-not-homologated",
+            "cropPixels": [
+              160,
+              160
+            ],
+            "verifiedCuPixelsInCrop": 23114,
+            "thresholdDegrees": 10,
+            "candidateRegionsAfterSizeAndCropBorderFilter": 89,
+            "medianCandidateECDmicrometers": 0.797885,
+            "sourceTrueEBSDCorrectionsReproduced": false,
+            "fullFieldRepresentative": false,
+            "readyForSILMDisplay": false
+          }
         }
       }
     },
