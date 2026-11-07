@@ -12,12 +12,15 @@ O validador `research/microstructure/validate_copper_correlative_pair.py` **não
 
 - `--metadata`: JSON de proveniência com `schema=silm.copper-correlative-pair.v1`, espécime P1700, DOI original e MD5 do HDF5 de origem; etapas distintas `raw-EBSD-reprojected` e `MTEX-TrueEBSD-corrected`; `commonGrid` (tamanho `shapeYX`, resolução `pixelSizeMicrometersYX`, origem `originMicrometersYX`), versão do TrueEBSD e procedência da exportação.
 - `registration`: `samePhysicalFrame=true`, `appliedExternally=true`, método de corregistro diferente de `identity-assumed`, quadro físico de referência e SHA-256 do **registro externo da transformação retido para revisão**.
+- `registration.heldOutLandmarks`: pelo menos quatro pares de pontos de referência **não usados para ajustar o modelo**, identificados por `id`, `usedForFitting=false`, `rawRegisteredXYMicrometers` e `correctedRegisteredXYMicrometers`, ambos em [x,y] na mesma grade física. Os pontos devem estar no campo medido, cobrir metade da extensão em ambos os eixos e resultar em resíduo quadrático médio de até **1,5 pixel** e máximo de até **2 pixels**. Estes são **limiares conservadores de engenharia do SILM**, não tolerâncias normativas ou garantia de precisão científica do TrueEBSD.
 - `segmentation`: nome do algoritmo utilizado no bruto e no corrigido, limiares de desorientação e política de borda. Esta informação impede atribuir automaticamente todas as diferenças observadas à correção geométrica.
 - `voidMask`: origem BSE, processamento `registered-BSE-threshold` e limiar normalizado explícito. A máscara **não pode ser substituída pelos pixels EBSD sem indexação**.
 - `--raw-npz`: matrizes `grain_id` (inteiros, rótulos positivos para Cu), `indexed_cu` e `coverage` (booleanos).
 - `--corrected-npz`: as mesmas matrizes **na exata mesma grade já corregistrada**, mais `bse_void` (booleano) derivado do BSE registrado. Por segurança, carregar os NPZ com `allow_pickle=False`.
 
 As grades incompatíveis, rótulos inválidos, pontos de Cu fora da cobertura, máscara BSE sem procedência, origem/escala não declaradas, transformações não declaradas e hashes de origem inconsistentes devem ser recusados.
+
+**Importante:** nem o SHA-256 nem as coordenadas declaradas autenticam as transformações. O controle de resíduos detecta inconsistências grosseiras, mas os pontos ainda precisam ser inspecionados independentemente, com metodologia de obtenção e incerteza. É proibido alimentar o conjunto de validação com pontos usados no ajuste. Os resíduos calculados são da comparação sintética/fornecida no campo comum, e não os resíduos originais medidos pelo MTEX.
 
 **Importante:** o SHA-256 não valida a qualidade do alinhamento. A correção precisa ser confrontada com resíduos, pontos de referência independentes e/ou o próprio campo de deslocamento TrueEBSD. O validador não interpreta um hash como prova de transformação correta.
 
@@ -33,7 +36,7 @@ Os resultados mostram `registrationAssessment=metadata-declared; not independent
 ## Teste sintético e CI
 
 - `tests/test_copper_correlative_pair.py` cria duas grades artificiais 24×24 com limites deslocados em um pixel, uma célula sem indexação e um pixel de BSE fictício;
-- verifica aceitação somente com procedência completa, e recusa grades incompatíveis, máscara BSE sem fonte, hashes falsos, rótulos errados, coordenadas não justificadas e parâmetros ausentes;
+- verifica aceitação somente com procedência completa, e recusa grades incompatíveis, máscara BSE sem fonte, hashes falsos, rótulos errados, coordenadas não justificadas, parâmetros ausentes, pontos de ajuste usados indevidamente e resíduos excessivos;
 - a workflow independente `.github/workflows/silm-copper-correlative-contract.yml` instala apenas bibliotecas numéricas e **não baixa HDF5 nem arquivos MATLAB de 1,5 GB**;
 - os dados sintéticos são inteiramente fabricados e não devem ser apresentados como observações do material.
 
