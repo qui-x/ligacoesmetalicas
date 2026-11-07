@@ -31,6 +31,16 @@ Ações: selecionar um centro já pertencente à rede, acompanhar sua resposta r
 
 Configuração eletrônica tabelada, subníveis e afins, quando disponíveis, serão apresentados somente como **referência conceitual separada**, não como a distribuição eletrônica efetiva no metal.
 
+## 2.1. Decisão de representação visual — manter o nível atual
+
+**Decisão aprovada pelo autor:** preservar o nível de representação já utilizado pelo SILM para os centros metálicos. Não ampliar a visualização principal para um modelo nuclear de Rutherford, não representar prótons e nêutrons individualmente e não criar uma simulação de órbitas eletrônicas para os centros inseridos no sólido.
+
+- Manter a abstração de centro metálico no contexto cristalino, com as propriedades visuais e os controles já estabelecidos.
+- A diferenciação da escala 4 ocorrerá pelo **comportamento local diante dos estímulos aplicados à rede**, não por detalhamento subatômico.
+- Posição de referência, vibração, deslocamento, vizinhança e contexto eletrônico coletivo podem ser representados apenas quando respaldados pelo motor científico ou identificados como recursos didáticos.
+- Evitar novos botões, painéis e modos nucleares nesta etapa. A configuração eletrônica tabelada do átomo isolado permanece, quando pertinente, como **informação de referência**, não como uma reconstrução do núcleo na cena.
+- Preservar a visualização existente até que melhorias funcionais na resposta local sejam implementadas e validadas.
+
 ## 3. Matriz de comportamento por fenômeno
 
 | Condição aplicada na rede | Leitura no centro selecionado | Restrições científicas |
