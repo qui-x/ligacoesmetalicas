@@ -51,6 +51,20 @@ A auditoria [GitHub Actions #42340012964](https://github.com/qui-x/ligacoesmetal
 
 Resumo versionado em `research/microstructure/copper-ebsd-verified-metadata.json`. Inventário HDF5 original conferido está como artefato temporário do workflow, sem matrizes brutas.
 
+## Prévia orientacional experimental — resultados exploratórios
+
+Um segundo [workflow executado com sucesso](https://github.com/qui-x/ligacoesmetalicas/actions/runs/42340480951) usou novamente o HDF5 original com MD5 confirmado para reconstruir **regiões conectadas por orientação** num recorte de **160 × 160 pixels**, correspondente a ~**16 × 16 µm**. O código `research/microstructure/preview_copper_grains.py` utiliza Euler ZXZ em radianos, as 24 simetrias de rotação próprias do grupo cúbico e conectividade entre quatro vizinhos; opera somente nos pontos Copper (fase 1) do mapa EBSD bruto.
+
+| Limiar de desorientação entre vizinhos | Pontos Cu no recorte | Regiões Cu detectadas (incluindo pequenas/borda) | Regiões Cu ≥5 pixels, sem tocar a borda | Mediana ECD dessas regiões |
+|---|---:|---:|---:|---:|
+| 5° | 23.114 | 185 | **89** | 0,797885 µm |
+| **10°** (referência do exemplo MTEX) | 23.114 | 185 | **89** | 0,797885 µm |
+| 15° | 23.114 | 185 | **89** | 0,797885 µm |
+
+**Advertência obrigatória:** esses resultados têm caráter de **prévia de regiões orientacionais**, e NÃO são tamanho de grão científico homologado. As três condições produziram a mesma conectividade **nesse recorte, com esse procedimento específico**, mas isso não pode ser generalizado à amostra inteira ou a outros materiais. Os critérios de edição TrueEBSD e a máscara BSE ainda não foram reproduzidos, e o descarte de regiões tocando a borda do recorte difere de uma análise metalográfica completa.
+
+Não foram publicados pixels, imagens SEM, orientações individuais, contornos vetoriais ou máscara dos dados experimentais. Somente o resumo de regiões foi versionado em `research/microstructure/copper-ebsd-orientation-preview.json` para permitir auditoria científica. A licença de redistribuição das imagens segue pendente. Nenhuma nova formação baseada nesse resultado foi habilitada no SILM.
+
 ## Etapa seguinte — segmentação experimental, somente após validação
 
 O [exemplo original MATLAB](https://github.com/vtvivian/mtex-trueEbsd/blob/main/examples/example_copper.m) reconstrói grãos de cobre com `calcGrains(...,'angle',10*degree)`, mas **não usa somente esse limiar**: antes aplica TrueEBSD para alinhamento de imagens, corrige distorções, cria uma máscara para vazios a partir de BSE e preenche pontos sem indexação antes de calcular limites.
