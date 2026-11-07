@@ -16,6 +16,10 @@ spec.loader.exec_module(corr)
 
 
 def metadata():
+    origins = [(-9.95, -9.95), (-8.95, -9.95), (-9.95, -8.95), (-8.95, -8.95)]
+    heldout = [{"id": f"h{i}", "rawRegisteredXYMicrometers": [x, y],
+                "correctedRegisteredXYMicrometers": [x + .01, y],
+                "usedForFitting": False} for i, (x, y) in enumerate(origins)]
     return {"schema": "silm.copper-correlative-pair.v1", "specimen": "P1700",
             "sourceDOI": "10.5281/zenodo.16902083",
             "rawSourceMD5": corr.RAW_MD5,
@@ -26,7 +30,8 @@ def metadata():
             "registration": {"samePhysicalFrame": True, "appliedExternally": True,
                              "method": "synthetic-only-affine-fixture",
                              "referenceFrame": "artificial-fixed-frame",
-                             "evidenceSHA256": hashlib.sha256(b"SYNTHETIC TEST ONLY").hexdigest()},
+                             "evidenceSHA256": hashlib.sha256(b"SYNTHETIC TEST ONLY").hexdigest(),
+                             "heldOutLandmarks": heldout},
             "correctedExportProvenance": "SYNTHETIC ONLY",
             "trueEbsdVersion": "SYNTHETIC-FIXTURE-NOT-TRUEEBSD",
             "voidMask": {"method": "registered-BSE-threshold", "source": "artificial-BSE",
@@ -72,6 +77,8 @@ def run_test():
     assert result["rawPixelOrImageDataExported"] is False
     assert result["bseVoidPixelsWithinCorrectedCoverage"] == 1
     assert result["eligiblePixelsAfterMasks"] == 24 * 24 - 2
+    assert result["heldOutLandmarkQuality"]["declaredHeldOutLandmarkCount"] == 4
+    assert abs(result["heldOutLandmarkQuality"]["rmsResidualPixels"] - .2) < 1e-5
     score = result["edgeComparisonAtOneCommonPixel"]
     assert score["comparisonStatus"] == "descriptive-boundary-proximity-only"
     assert score["precision"] == score["recall"] == 1
@@ -99,6 +106,15 @@ def run_test():
     altered = copy.deepcopy(m)
     altered["segmentation"]["correctedThresholdDegrees"] = "10"
     must_fail(lambda: corr.analyze(altered, a, b), "threshold")
+    altered = copy.deepcopy(m)
+    altered["registration"]["heldOutLandmarks"] = []
+    must_fail(lambda: corr.analyze(altered, a, b), "held-out")
+    altered = copy.deepcopy(m)
+    altered["registration"]["heldOutLandmarks"][0]["usedForFitting"] = True
+    must_fail(lambda: corr.analyze(altered, a, b), "fitting")
+    altered = copy.deepcopy(m)
+    altered["registration"]["heldOutLandmarks"][0]["correctedRegisteredXYMicrometers"][0] += .13
+    must_fail(lambda: corr.analyze(altered, a, b), "residual")
     altered = copy.deepcopy(m)
     altered["rawSourceMD5"] = "fake"
     must_fail(lambda: corr.analyze(altered, a, b), "hash")
