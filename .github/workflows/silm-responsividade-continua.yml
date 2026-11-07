@@ -95,14 +95,14 @@ jobs:
         with:
           name: silm-responsividade-${{ matrix.browser }}
           path: reports/responsividade/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Guardar métricas visuais das quatro escalas
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: silm-quatro-escalas-${{ matrix.browser }}
           path: reports/quatro-escalas/${{ matrix.browser }}/
-          if-no-files-found: warn
-          retention-days: 14
           if-no-files-found: warn
           retention-days: 14
 
