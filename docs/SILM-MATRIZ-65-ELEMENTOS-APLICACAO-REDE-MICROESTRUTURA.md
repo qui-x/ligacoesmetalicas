@@ -12,9 +12,9 @@
 | Elementos com ilustração própria de aplicação no atlas | **65** |
 | Estruturas cristalinas de referência com origem experimental cadastrada | **65** |
 | Imagens esquemáticas específicas de microestrutura no atlas | **20** |
-| Registros de estudos/fontes candidatos para microestrutura | **62** |
-| Elementos associados a pelo menos um estudo ou dataset candidato | **62** |
-| Elementos sem fonte específica candidata confirmada na triagem | **3** |
+| Registros de estudos/fontes candidatos para microestrutura | **65** |
+| Elementos associados a pelo menos um estudo ou dataset candidato | **65** |
+| Elementos sem fonte específica candidata confirmada na triagem | **0** |
 | Microestruturas experimentais com arquivos, amostra, licença e calibração homologados **e incorporados** | **0** |
 
 **Os 65 já podem ser investigados quanto à estrutura de referência; os 65 NÃO estão cobertos por micrografias experimentais.** Todos têm um modelo geométrico didático próprio da interface (mesmo algoritmo), não uma reconstrução de amostras reais.
@@ -99,9 +99,9 @@ A estrutura cristalográfica provém de um registro experimental de referência 
 | 81 | **Tl** — Tálio | HC | Elementos ópticos e detectores especializados baseados em materiais contendo tálio (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | [tl-electrodeposit-sem-2015](#estudos-candidatos-verificados-em-páginas-de-origem) | P2 |
 | 82 | **Pb** — Chumbo | CFC | Bateria chumbo-ácido com placas de chumbo e materiais derivados (*Metal ou liga, conforme fabricação*) | Gerador esquemático; sem micrografia homologada | [pb-ca-sr-ba-grid-alloy](#estudos-candidatos-verificados-em-páginas-de-origem), [pb-bi-ca-battery-grid](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
 | 83 | **Bi** — Bismuto | RHOMBOHEDRAL | Cristal de bismuto com superfície iridescente por fina oxidação (*Material em dispositivo ou situação específica*) | Gerador esquemático; sem micrografia homologada | [sn-bi-solder-ebsd](#estudos-candidatos-verificados-em-páginas-de-origem), [pb-bi-ca-battery-grid](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
-| 84 | **Po** — Polônio | SC | Fonte alfa selada em dispositivo antiestático industrial — representação conceitual (*Referência selada ou especializada*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
-| 88 | **Ra** — Rádio | CCC | Tinta luminescente com compostos de rádio em mostradores de relógios históricos (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
-| 89 | **Ac** — Actínio | CFC | Frasco de radiofármaco com actínio-225 para terapia alfa direcionada (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 84 | **Po** — Polônio | SC | Fonte alfa selada em dispositivo antiestático industrial — representação conceitual (*Referência selada ou especializada*) | Gerador esquemático; sem micrografia homologada | [po-archival-film-photomicrograph-1946](#estudos-candidatos-verificados-em-páginas-de-origem) | P2 |
+| 88 | **Ra** — Rádio | CCC | Tinta luminescente com compostos de rádio em mostradores de relógios históricos (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | [ra-in-barite-apt-2016](#estudos-candidatos-verificados-em-páginas-de-origem) | P2 |
+| 89 | **Ac** — Actínio | CFC | Frasco de radiofármaco com actínio-225 para terapia alfa direcionada (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | [ac-spion-theranostic-2025](#estudos-candidatos-verificados-em-páginas-de-origem) | P2 |
 | 90 | **Th** — Tório | CFC | Camisa incandescente de lampião histórico contendo óxidos de tório (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | [th-thu-alloy-metallography-2016](#estudos-candidatos-verificados-em-páginas-de-origem) | P2 |
 | 91 | **Pa** — Protactínio | TETRAGONAL | Amostra hipotética de pesquisa radioquímica em recipiente laboratorial restrito (*Referência selada ou especializada*) | Gerador esquemático; sem micrografia homologada | [pa-metal-tem-eels-2018](#estudos-candidatos-verificados-em-páginas-de-origem) | P2 |
 | 93 | **Np** — Netúnio | ORTHORHOMBIC | Contenção de amostra para pesquisa nuclear com netúnio-237 (*Referência selada ou especializada*) | Gerador esquemático; sem micrografia homologada | [np-stainless-zr-metal-alloy-2000](#estudos-candidatos-verificados-em-páginas-de-origem) | P2 |
@@ -110,7 +110,7 @@ A estrutura cristalográfica provém de um registro experimental de referência 
 
 ## Estudos candidatos verificados em páginas de origem
 
-As páginas foram consultadas durante a pesquisa; **os arquivos experimentais brutos não foram auditados** e a existência de uma licença de publicação não implica, por si só, autorização para redistribuir as imagens.
+As páginas e resumos foram identificados; **os arquivos experimentais brutos não foram auditados** e uma publicação não implica autorização para redistribuir imagens ou dados. Alguns estudos tratam de compostos, ligas, nanopartículas ou filmes, não do metal puro.
 
 | Identificador | Elementos relacionados | Amostra efetiva | Método / possível uso | Fonte | Principal restrição |
 |---|---|---|---|---|---|
@@ -176,20 +176,22 @@ As páginas foram consultadas durante a pesquisa; **os arquivos experimentais br
 | `pa-metal-tem-eels-2018` | Pa | Microestrutura de amostra metálica histórica de protactínio | TEM+EELS+SAED / metal-versus-oxide-domains, crystalline-domains | [Página de origem](https://publications.jrc.ec.europa.eu/repository/handle/JRC113665) | JRC avaliou domínios metálicos e oxidados em amostra arquivada; SEM/Ebsd de grãos não reportado no resumo. Sem pertinência direta a objeto cotidiano. |
 | `np-stainless-zr-metal-alloy-2000` | Np | Neptúnio em matriz metálica de aço inoxidável–Zr | SEM+TEM+neutron-diffraction / actinide-partitioning, alloy-phase-characterization | [Página de origem](https://www.sciencedirect.com/science/article/abs/pii/S0022311500000027) | Neptúnio é constituinte minoritário da liga; NÃO micrografia do metal Np isolado nem da amostra selada conceitual. |
 | `am-mox-ceramography-2009` | Am | Ceramografia de combustível de óxidos mistos contendo Am | ceramography+EPMA / ceramic-porosity, americium-distribution | [Página de origem](https://research.tcu.ac.jp/en/publications/microstructure-and-elemental-distribution-of-americium-containing/) | Morfologia de cerâmica MOX e distribuição de Am; NÃO grãos do metal Am nem os componentes selados de detector de fumaça. |
+| `po-archival-film-photomicrograph-1946` | Po | Filme metálico histórico de polônio — fotomicrografia e difração | optical-photomicrograph+XRD / archival-film-surface-morphology, allotropy | [Página de origem](https://paperzz.com/doc/8181669/physical-properties-and-crystal-structure-of-polonium) | Transcrição de dissertação de Maxwell (Iowa State, 1946), que menciona fotomicrografia 100× do filme; repositório original e direitos ainda não confirmados. Sem dados EBSD, máscara ou escala para tamanhos de grão. |
+| `ra-in-barite-apt-2016` | Ra | Rádio incorporado em cristais de barita Ba–Ra–SO₄ | TEM+APT+EDS / host-crystal-morphology, radium-concentration-map | [Página de origem](https://www.mrs.org/meetings-events/annual-meetings/archive/meeting/presentations/view/2016-mrs-fall-meeting/2016-mrs-fall-meeting-2561028) | Estudo de grãos de barita com Ra incorporado; NÃO rádio metálico nem os pigmentos luminescentes históricos do atlas. Comunicação científica sem dataset de grãos auditado. |
+| `ac-spion-theranostic-2025` | Ac | Óxido de ferro nanoparticulado marcado com actínio-225 | nanoparticle-characterization+chemical-analysis / carrier-nanoparticle-characterization, radionuclide-distribution-context | [Página de origem](https://pubmed.ncbi.nlm.nih.gov/40561778/) | O metal actínio NÃO constitui os grãos: 225Ac é radionuclídeo ligado ao sistema de nanopartículas de óxido de ferro. Não fundamenta microestrutura do metal Ac puro. |
 
 ## Pendências e modalidades distintas de estudo
 
-Após esta rodada, **3 elementos** permanecem sem estudo microestrutural específico selecionado na matriz: **Po, Ra, Ac**.
+**Cobertura bibliográfica inicial: 65/65 elementos com ao menos uma referência associada. Cobertura experimental homologada/integrada: 0/65.** Essas contagens avaliam coisas diferentes. Há elementos com apenas registros de filmes, nanopartículas, compostos, ligas ou referências históricas; eles ainda não têm um conjunto de grãos metálicos quantitativamente aproveitável.
 
-Uma **fonte candidata** pode estudar um depósito, uma nanopartícula, uma superfície, um composto ou uma liga contendo o elemento — não necessariamente o sólido policristalino de metal puro. O número de candidatos mede **alcance documental**, não cobertura quantitativa.
+- **Gd e Er:** estudos EBSD diretamente com metal elementar, relevantes para condições de tratamento específicas, não para quelatos ou fibras dopadas do atlas.
+- **Ho:** tamanho de cristalito por difração, que não deve ser rotulado automaticamente como diâmetro de grão de metalografia.
+- **K, Rb, Cs, Eu, Tm, Yb e Lu:** depósitos, nanopartículas e filmes não podem parametrizar indiscriminadamente a microestrutura de metais maciços.
+- **Po:** a referência de fotomicrografia é histórica e sua imagem, proveniência e licença ainda exigem validação independente.
+- **Ra e Ac:** estudos de cristais hospedeiros contendo Ra e nanopartículas radiomarcadas com Ac-225 **não são micrografias de rádio nem de actínio metálicos**.
+- **Tc, Th, Pa, Np, Am, Os, Tl:** os registros variam entre metal, oxidação, ligas, cerâmicas e superfícies; manter a classe do espécime e não deduzir composições de grão.
 
-- **Po, Ra e Ac:** a busca desta rodada não identificou micrografia experimental publicamente verificável e aproveitável para grãos do metal puro. Manter apenas cristalografia de referência e esquema explicitamente didático, sem estatística de grãos.
-- **K, Rb e Cs:** foram identificados estudos de eletrodepósitos, nanopartículas ou filmes halogenados contendo agregados metálicos. Esses resultados não descrevem automaticamente grãos de amostras metálicas seladas.
-- **Eu, Yb, Tm e Lu:** estudos de nanopartículas e filmes finos não equivalem à microestrutura de materiais luminescentes ou fibras dopadas do atlas.
-- **Gd, Ho, Er:** há estudos diretamente com metal elementar, porém seus grãos/cristalitos e condições de amostra devem permanecer explícitos; o material da aplicação (quelato, laser, fibra óptica) é diferente.
-- **Tc, Th, Pa, Np e Am:** fontes experimentais com metal, domínios, ligas ou cerâmicas requerem licença e revisão especializada. Não confundir dados de liga/cerâmica com metal elementar nem converter a pesquisa em instruções de processamento de materiais radioativos.
-
-Para acompanhar a triagem por tipo de evidência e o motivo das rejeições, consultar `docs/SILM-BUSCA-MICROESTRUTURAS-ELEMENTOS-RESTANTES-2026-11-07.md`.
+**Próxima pendência real:** auditar material amostrado, arquivo bruto, licença, calibração, método e representatividade para poder homologar microestruturas. Ver também [busca dos 20 inicialmente pendentes](SILM-BUSCA-MICROESTRUTURAS-ELEMENTOS-RESTANTES-2026-11-07.md).
 
 ## Critérios obrigatórios antes de alterar o simulador
 
