@@ -577,3 +577,8 @@
  }
  #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewport{min-height:240px}
 }
+
+/* No retrato, os textos resumidos ficam disponíveis ao abrir Composição e fonte. */
+.silm-workshop-detail-material,.silm-workshop-detail-note{
+ margin:5px 0;font-size:.78rem;line-height:1.4;color:var(--text);
+}
