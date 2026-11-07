@@ -13,9 +13,9 @@
     "specificSchematicMicrostructureAssets": 20,
     "experimentalCrystalReferences": 65,
     "experimentalMicrostructureDatasetsIntegrated": 0,
-    "candidateStudyRecords": 28,
-    "elementsWithCandidateLeads": 29,
-    "elementsPendingSpecificLead": 36
+    "candidateStudyRecords": 38,
+    "elementsWithCandidateLeads": 38,
+    "elementsPendingSpecificLead": 27
   },
   "interpretationPolicy": {
     "crystalReference": "Experimental structure of a reference element, not proof of the application's microstructure.",
@@ -582,6 +582,217 @@
       "rawFilesAudited": false,
       "licenseAudited": false,
       "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "cu-be-contacts-c17000",
+      "dataset": "Liga Cu–Be C17000 para contatos e molas",
+      "elements": [
+        "Cu",
+        "Be"
+      ],
+      "specimenClass": "alloy",
+      "technique": "metallography+hardness",
+      "supports": [
+        "precipitation",
+        "microstructure",
+        "mechanical-strength"
+      ],
+      "url": "https://www.degruyterbrill.com/document/doi/10.1515/pm-2025-0033/html",
+      "comment": "Tratamento de Cu-Be para contatos elétricos; publicação, não micrografias brutas auditadas. Não inferir Be puro.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "al-sc-zr-afsd",
+      "dataset": "Al–Mg–Sc–Zr sob deposição por fricção",
+      "elements": [
+        "Al",
+        "Mg",
+        "Sc",
+        "Zr"
+      ],
+      "specimenClass": "alloy",
+      "technique": "EBSD+GOS",
+      "supports": [
+        "recrystallization",
+        "grain-morphology"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S1044580325008551",
+      "comment": "Al com Sc e Zr após processamento AFSD; não é necessariamente liga do quadro da bicicleta.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "hadfield-railway-crossing",
+      "dataset": "Aço manganês Hadfield em cruzamento ferroviário",
+      "elements": [
+        "Mn",
+        "Fe"
+      ],
+      "specimenClass": "steel",
+      "technique": "SEM+EBSD+XRD+nanoindentation",
+      "supports": [
+        "twins",
+        "grain-boundary-cracking",
+        "work-hardening"
+      ],
+      "url": "https://www.tribology.rs/journals/2024/2024-4/2024-4-08.html",
+      "comment": "Componente ferroviário real; liga Fe–Mn–C, não manganês ou ferro puros.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "pb-ca-sr-ba-grid-alloy",
+      "dataset": "Grades de bateria Pb–Ca–Sn–Al com Mg, Sr e Ba",
+      "elements": [
+        "Pb",
+        "Ca",
+        "Sn",
+        "Al",
+        "Mg",
+        "Sr",
+        "Ba"
+      ],
+      "specimenClass": "alloy",
+      "technique": "metallography+electrochemical-testing",
+      "supports": [
+        "grain-size",
+        "corrosion-response"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S2352152X24004936",
+      "comment": "Comparação de ligas de grade de bateria; Ba/Sr são adições, não seus compostos ilustrados no atlas.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "pb-bi-ca-battery-grid",
+      "dataset": "Grades de bateria Pb–Sn com Ca ou Bi",
+      "elements": [
+        "Pb",
+        "Sn",
+        "Ca",
+        "Bi"
+      ],
+      "specimenClass": "alloy",
+      "technique": "optical-microscopy+SEM+EDS+XRD",
+      "supports": [
+        "grain-size-trend",
+        "corrosion",
+        "alloy-composition"
+      ],
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11471156/",
+      "comment": "Estudo 2024 aberto sob CC BY; composição refere-se à liga ou aos produtos de corrosão, não a grãos de elemento puro.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ta-capacitor-porous-foil",
+      "dataset": "Folha de tântalo com revestimento poroso para capacitores",
+      "elements": [
+        "Ta"
+      ],
+      "specimenClass": "metal-oxide-composite",
+      "technique": "surface-microscopy+electrochemical-etching",
+      "supports": [
+        "pore-morphology",
+        "capacitance"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S2352492825014928",
+      "comment": "Morfologia porosa de eletrodo, não tamanho de grão cristalográfico de Ta.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "nb-high-purity-grain-flux",
+      "dataset": "Nióbio policristalino de cavidade RF",
+      "elements": [
+        "Nb"
+      ],
+      "specimenClass": "elemental",
+      "technique": "EBSD+magneto-optics",
+      "supports": [
+        "grain-size",
+        "grain-boundary",
+        "electrical-response"
+      ],
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7940417/",
+      "comment": "Estudo puro Nb com grãos 10–50 µm e >100 µm em condições especificadas; não amostra industrial de turbina.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "rh-pt-core-shell-2025",
+      "dataset": "Catalisadores Pt–Rh núcleo–casca em operação",
+      "elements": [
+        "Pt",
+        "Rh"
+      ],
+      "specimenClass": "nanoparticle-catalyst",
+      "technique": "SEM+spectromicroscopy",
+      "supports": [
+        "facet-orientation",
+        "oxide-distribution",
+        "nanoparticle-evolution"
+      ],
+      "url": "https://www.helmholtz-berlin.de/pubbin/news_seite?nid=31126&seitenid=80140&sprache=en",
+      "comment": "Partículas nanométricas Pt/Rh sobre suporte; não mapa de grãos de metal puro.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "pt-ceria-stem-2025",
+      "dataset": "Nanopartículas Pt/CeO₂ em STEM",
+      "elements": [
+        "Pt",
+        "Ce"
+      ],
+      "specimenClass": "supported-catalyst",
+      "technique": "STEM+computer-vision",
+      "supports": [
+        "nanoparticle-size",
+        "atomic-structure"
+      ],
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11926506/",
+      "comment": "Nanopartículas de Pt sobre óxido de cério. Ce está em ceria, não em metal elementar; CC BY-NC exige revisão da licença.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "rh-operando-hvem-2025",
+      "dataset": "Nanopartículas Rh sob redução de NO",
+      "elements": [
+        "Rh"
+      ],
+      "specimenClass": "nanoparticle-catalyst",
+      "technique": "HVEM+QMS",
+      "supports": [
+        "surface-oxidation",
+        "nanoparticle-morphology"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S1748013225000799",
+      "comment": "Dinâmica superficial de nanopartículas, não evolução de grão policristalino.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
     }
   ],
   "records": [
@@ -652,8 +863,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "cu-be-contacts-c17000"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -725,7 +938,9 @@
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
-          "mg-grain-ebsd-az31"
+          "mg-grain-ebsd-az31",
+          "al-sc-zr-afsd",
+          "pb-ca-sr-ba-grid-alloy"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -764,7 +979,9 @@
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
           "al-stem-boundary",
-          "al-ufg-ebsd-afm"
+          "al-ufg-ebsd-afm",
+          "al-sc-zr-afsd",
+          "pb-ca-sr-ba-grid-alloy"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -837,8 +1054,11 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "pb-ca-sr-ba-grid-alloy",
+          "pb-bi-ca-battery-grid"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -873,8 +1093,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "al-sc-zr-afsd"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1025,8 +1247,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "hadfield-railway-crossing"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1070,7 +1294,8 @@
           "in718-ebsd-3d",
           "pr-rich-magnet",
           "y-tb-nd-magnet",
-          "la-electrical-steel"
+          "la-electrical-steel",
+          "hadfield-railway-crossing"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1192,7 +1417,8 @@
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
           "cu-polycrystal-ebsd",
-          "zn-05cu-ebsd"
+          "zn-05cu-ebsd",
+          "cu-be-contacts-c17000"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1303,8 +1529,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "pb-ca-sr-ba-grid-alloy"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1378,7 +1606,8 @@
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
-          "ti-mo-zr-corrosion"
+          "ti-mo-zr-corrosion",
+          "al-sc-zr-afsd"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1417,7 +1646,8 @@
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
           "in718-ebsd-3d",
-          "nb-ni-co-mu-phases"
+          "nb-ni-co-mu-phases",
+          "nb-high-purity-grain-flux"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1566,8 +1796,11 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "rh-pt-core-shell-2025",
+          "rh-operando-hvem-2025"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1715,7 +1948,9 @@
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
-          "sn-bi-solder-ebsd"
+          "sn-bi-solder-ebsd",
+          "pb-ca-sr-ba-grid-alloy",
+          "pb-bi-ca-battery-grid"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1788,8 +2023,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "pb-ca-sr-ba-grid-alloy"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1863,7 +2100,8 @@
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
-          "nd-ce-dy-magnet"
+          "nd-ce-dy-magnet",
+          "pt-ceria-stem-2025"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -2382,7 +2620,8 @@
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
-          "co-ta-superalloys"
+          "co-ta-superalloys",
+          "ta-capacitor-porous-foil"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -2566,8 +2805,11 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "rh-pt-core-shell-2025",
+          "pt-ceria-stem-2025"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2677,8 +2919,11 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "pb-ca-sr-ba-grid-alloy",
+          "pb-bi-ca-battery-grid"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2714,7 +2959,8 @@
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
-          "sn-bi-solder-ebsd"
+          "sn-bi-solder-ebsd",
+          "pb-bi-ca-battery-grid"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
