@@ -107,7 +107,7 @@ test('Matriz legível e índice computável possuem a mesma cobertura e as mesma
   assert.ok(md.includes(entry.url),'URL da fonte ausente: '+entry.id);
  }
  for(const record of coverage.records){
-  const row=md.split('\\n').find(line=>line.startsWith('| '+record.atomicNumber+' | **'+record.symbol+'**'));
+  const row=md.split(String.fromCharCode(10)).find(line=>line.startsWith('| '+record.atomicNumber+' | **'+record.symbol+'**'));
   assert.ok(row,'Elemento sem linha: '+record.symbol);
   const expected=record.microstructure.experimentalCandidateLeadIDs;
   for(const id of expected)assert.ok(row.includes('['+id+']('),'Referência '+id+' não mapeada em '+record.symbol);
