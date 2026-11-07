@@ -1,6 +1,6 @@
 # SILM — Pré-auditoria de arquivos para o piloto Mg → Cu → Ni
 
-**Data:** 07/11/2026. **Estado:** metadados públicos revisados nos registros Zenodo; os arquivos originais **não foram baixados nem inspecionados**, hashes ainda não recalculados e licenças de reutilização não aprovadas.
+**Data inicial:** 07/11/2026. **Situação atualizada:** a pré-auditoria bibliográfica foi sucedida por uma auditoria efetiva das planilhas **AZ31_ML.xlsx** e **Mg1Al_ML.xlsx**, que confirmou hashes MD5 e estatísticas de 3.576 grãos após exclusões de borda. Ver [resultado real de Mg](SILM-AUDITORIA-EBSD-MG-RESULTADOS-REAIS.md) e [resultado real da fase Aluminium de Scalmalloy](SILM-AUDITORIA-EBSD-SCALMALLOY-RESULTADOS-REAIS.md). Os arquivos **Cu e Ni ainda não foram integralmente processados**. Licenças e homologação científica das fontes permanecem pendentes.
 
 Apenas a cristalografia dos elementos e a existência de amostras de literatura foram confirmadas na pesquisa precedente. Esta pré-auditoria apresenta um caminho **concreto** para construir perfis microestruturais fundamentados sem afirmar que a imagem de aplicação do atlas corresponde à amostra experimental.
 
