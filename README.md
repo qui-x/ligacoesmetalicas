@@ -53,6 +53,8 @@ Não é preciso instalar nada além do navegador: não há etapa de compilação
 4. Use **Dados** para ver as medições, os cálculos, o histórico, os dados do metal e o relatório.
 5. Use **Visão geral** para comparar as estruturas recentes e tocar numa delas para abri-la no Foco.
 
+Na escala **Ambiente atômico**, escolha **Estímulos → Efeito Joule** para estudar corrente e calor na mesma rede. **Condições Joule** reúne as opções; o botão de avanço calcula meio intervalo por toque. Em **Ver → Ações de observação**, selecionar elétrica e térmica com Ctrl inicia o mesmo ensaio. Os valores são relativos e o ensaio é temporário. [Modelo, condições e limites](docs/MODELO-DIDATICO-EFEITO-JOULE.md).
+
 ## 4. Onde ficam os seus dados
 
 Investigações, Caderno e relatórios ficam guardados **no próprio navegador**, no computador ou celular que você usa. Nada é enviado para servidores.

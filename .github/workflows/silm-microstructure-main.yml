@@ -15,6 +15,15 @@ on:
       - "sw.js"
       - "tests/run-workshop-micro-main.mjs"
       - ".github/workflows/silm-microstructure-main.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "domain/silm/**"
+      - "integracao/**"
+      - "tests/**"
+      - "index.html"
+      - "sw.js"
+      - ".github/workflows/silm-microstructure-main.yml"
   workflow_dispatch:
 permissions:
   contents: read
@@ -42,6 +51,8 @@ jobs:
           node --check domain/silm/workshop.js
           node --check integracao/action-icons.js
           node --check tests/run-workshop-micro-main.mjs
+      - name: Validar navegação e balanço eletrotérmico
+        run: node --test tests/*.test.*
       - name: Instalar Playwright
         run: |
           npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1

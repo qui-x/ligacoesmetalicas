@@ -491,7 +491,7 @@ body.si-structure-expanded #silm-scene-actionbar{
  border-radius:10px!important;
  line-height:1!important;
 }
-#silm-scene-actionbar .silm-lattice-nav button:last-child{
+#silm-scene-actionbar .silm-lattice-nav > button:last-child{
  width:auto!important;min-width:68px!important;flex:0 0 auto!important;padding-inline:10px!important;
 }
 #silm-scene-actionbar .silm-lattice-nav select{

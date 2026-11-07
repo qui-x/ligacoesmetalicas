@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
-const VERSION='0.15.9';
+const VERSION='0.15.10';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='silm-scene-toolbar-unified-20261105';
+const BUILD='oficina-joule-leituras-20261106';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "assets/workshop/motor.webp",
@@ -57,6 +57,7 @@ const FILES=[
   "domain/silm/crystal.js",
   "domain/silm/deformation.js",
   "domain/silm/thermal.js",
+  "domain/silm/electrothermal.js",
   "domain/silm/drive.js",
   "domain/silm/properties.js",
   "domain/silm/measurements.js",

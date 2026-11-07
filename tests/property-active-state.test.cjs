@@ -15,13 +15,15 @@ assert.ok(start >= 0 && end > start, 'o helper propertyState deve existir no mot
 const helperSource = experienceSource.slice(start, end);
 
 const sandbox = {
+  currentCoupling: () => null,
   model: { state: { properties: { active: null } } },
   drive: () => ({ reading: () => ({ deformField: false }) }),
   thermal: () => ({ reading: () => ({ on: false }) })
 };
 vm.runInNewContext(helperSource + '\nglobalThis.propertyState = propertyState;', sandbox);
 
-function readState(id, primary, { deformField = false, heating = false } = {}) {
+function readState(id, primary, { deformField = false, heating = false, coupled = false } = {}) {
+  sandbox.currentCoupling = () => coupled ? {} : null;
   sandbox.model.state = { properties: { active: primary } };
   sandbox.drive = () => ({ reading: () => ({ deformField }) });
   sandbox.thermal = () => ({ reading: () => ({ on: heating }) });
@@ -41,6 +43,11 @@ test('E + T mantém os dois ícones ativos somente enquanto o calor complementar
     { ...readState('thermal', 'electrical', { heating: false }) },
     { active: false, combined: false }
   );
+});
+
+test('Joule mantém E + T ativos após desligar a alimentação e sem calor externo', () => {
+  assert.deepEqual({ ...readState('electrical', 'electrical', { coupled: true }) }, { active: true, combined: false });
+  assert.deepEqual({ ...readState('thermal', 'electrical', { coupled: true }) }, { active: true, combined: true });
 });
 
 test('E + maleabilidade reconhece o campo transitório como propriedade complementar', () => {

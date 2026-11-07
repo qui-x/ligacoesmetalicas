@@ -101,6 +101,7 @@ window.SILMActionIcons=(()=>{
   // Não duplicar controles que já são iconográficos, como menu, acessibilidade,
   // barra da rede, projeção e botões de exibição atômica.
   if(button.querySelector('svg:not(.silm-action-icon),img,input,select'))return null;
+  if(button.matches('.silm-joule-step'))return {icon:'skip',mode:'icon',name:getName(button)};
   if(button.matches('.silm-workshop-scale,.silm-lattice-nav button,[role=tab],[role=option]'))return null;
   const text=button.textContent.trim().replace(/\s+/g,' ');
   let spec;

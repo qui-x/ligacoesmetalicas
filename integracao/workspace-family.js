@@ -13,7 +13,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  let multiSelectMode=false,ctrlSelectionPending=false,applyPendingSelection=null;
  const propertyLabels={electrical:'Condutividade elétrica',thermal:'Condutividade térmica',malleability:'Maleabilidade',ductility:'Ductilidade',luster:'Brilho metálico'};
  const propertyCombinations={
-  'electrical|thermal':'heatElectrical',
+  'electrical|thermal':'joule',
   'electrical|malleability':'malleabilityElectrical',
   'ductility|electrical':'ductilityElectrical'
  };

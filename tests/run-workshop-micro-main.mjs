@@ -215,6 +215,65 @@ async function test(viewport){
  }
  assert.match(await status.textContent(),/Célula \[0, 0, 0\]/);
  assert.equal(await page.locator('#silm-scene-actionbar .silm-lattice-nav').count(),1);
+ await page.getByLabel('Aplicar estímulo na rede').selectOption('joule');
+ const step=page.getByRole('button',{name:'Avançar meio intervalo no efeito Joule'}),conditions=page.getByLabel('Condições do efeito Joule');
+ const reading=page.locator('.silm-lattice-status span');
+ await step.locator('svg.silm-action-icon').waitFor({state:'visible'});
+ const stepBox=await step.boundingBox();
+ assert.ok(Math.abs(stepBox.width-44)<1&&Math.abs(stepBox.height-44)<1,'Avançar Joule deve manter o alvo de 44 px.');
+ await step.click();
+ await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span').textContent.includes(' · t 0,5 · '));
+ const value=async label=>Number((await reading.textContent()).split(' · '+label+' ')[1].split(' · ')[0].replace(',','.'));
+ const timeBeforeNavigation=await value('t');
+ await page.getByRole('button',{name:'Avançar uma célula no eixo a'}).click();
+ assert.equal(await value('t'),timeBeforeNavigation,'Navegar não deve avançar o ensaio.');
+ await page.getByRole('button',{name:'Recuar uma célula no eixo a'}).click();
+ await conditions.selectOption('potential');
+ assert.match(await reading.textContent(),/Mapa: Potencial elétrico/);
+ await conditions.selectOption('current');
+ const currentBefore=await value('I');
+ const electronFlow=()=>page.locator('.silm-electron-canvas').evaluate(n=>n.silmElectrons.snapshot().currentFactor);
+ const flowBefore=await electronFlow();
+ await step.click();
+ assert.equal(await value('I'),currentBefore,'A corrente imposta mudou com a temperatura.');
+ assert.equal(await electronFlow(),flowBefore,'A pista visual aplicou o efeito térmico duas vezes sob corrente imposta.');
+ const warm=await value('T média');
+ await conditions.selectOption('supply');
+ await step.click();
+ assert.match(await reading.textContent(),/corrente imposta.* · t 1,5 · U 0 · I 0 · R [\d,]+ · P Joule 0/);
+ assert.ok(await value('T média')<warm,'Desligar a fonte com terminais ao ambiente precisa permitir resfriamento.');
+ assert.equal(await electronFlow(),0);
+ await conditions.selectOption('readings');
+ const results=page.getByRole('dialog',{name:'Leituras do efeito Joule'});
+ await results.waitFor({state:'visible'});
+ const quantity=async key=>Number((await results.locator('[data-quantity="'+key+'"]').textContent()).replace(',','.'));
+ assert.equal(await quantity('power'),0);
+ const balance=await quantity('jouleEnergy')+await quantity('externalEnergy')-await quantity('removedEnergy')-await quantity('storedEnergy');
+ assert.ok(Math.abs(balance)<.00005,'Leituras de energia não fecham o balanço.');
+ await results.getByRole('button',{name:'Fechar leituras do efeito Joule'}).click();
+ // O evento close do dialog é enfileirado; aguardar o retorno do foco em ambos os motores.
+ await page.waitForFunction(()=>document.activeElement===document.querySelector('.silm-joule-controls select'),undefined,{timeout:5000});
+ await conditions.selectOption('restore');
+ await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span').textContent.includes(' · t 0 · '));
+ assert.equal(await value('T média'),0);
+ assert.equal(await value('I'),0);
+ assert.match(await reading.textContent(),/corrente imposta/,'Reiniciar mudou a condição elétrica.');
+ await conditions.selectOption('end');
+ assert.equal(await step.isVisible(),false);
+ assert.equal(await page.locator('.silm-crystal').getAttribute('data-field-map'),null,'Encerrar deixou o mapa acoplado na cena.');
+ if(viewport.width>1100){
+  await page.getByRole('button',{name:'Ver',exact:true}).click();
+  await page.getByRole('button',{name:'Ações de observação',exact:true}).click();
+  await page.keyboard.down('Control');
+  await page.locator('.silm-observer-action[data-action="property-electrical"]').click();
+  await page.locator('.silm-observer-action[data-action="property-thermal"]').click();
+  await page.keyboard.up('Control');
+  await step.waitFor({state:'visible'});
+  for(const id of ['electrical','thermal'])assert.equal(await page.locator('.silm-observer-action[data-action="property-'+id+'"]').getAttribute('aria-pressed'),'true','Soltar Ctrl desativou uma propriedade do par.');
+  await page.getByRole('button',{name:'Fechar painel',exact:true}).click();
+  assert.match(await reading.textContent(),/Efeito Joule.* · t 0 · /,'Ctrl + E + T não iniciou o mesmo ensaio.');
+  await conditions.selectOption('end');
+ }
  assert.deepEqual(errors,[],'Erros JavaScript: '+errors.join('; '));
  await context.close();
 }
@@ -222,5 +281,5 @@ try{
  await test({width:1440,height:1000});
  await test({width:1600,height:900});
  await test({width:390,height:844});
- console.log('APROVADO — '+browserName+': microestrutura ampliada, zoom, grãos, celular, estado científico e fotos legadas.');
+ console.log('APROVADO — '+browserName+': escalas, microestrutura, barra inferior, navegação da célula, Joule, seleção conjunta e resfriamento.');
 }finally{await browser.close();}
