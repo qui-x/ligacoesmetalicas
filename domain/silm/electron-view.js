@@ -131,7 +131,18 @@ SILM.createElectronLayer=(stage,{scope,viewport=stage,before=null,reducedMotion=
   if(!effectiveMotion())return;
   for(let k=0;k<4;k++){const a=k*Math.PI/2+rng()*.6;particles.push({x:position.x+Math.cos(a)*radius*.35,y:position.y+Math.sin(a)*radius*.35,a,hold:.25});}
  }
- if(window.ResizeObserver){scope.observe(new ResizeObserver(resize),stage);if(viewport!==stage)scope.observe(new ResizeObserver(resize),viewport);}
+ // Safari/WebKit: não modificar o tamanho do canvas durante a entrega de
+ // ResizeObserver. Reunir as notificações de stage e viewport no frame seguinte.
+ let resizeFrame=0;
+ const scheduleResize=()=>{
+  if(resizeFrame)return;
+  resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;resize();});
+ };
+ if(window.ResizeObserver){
+  scope.observe(new ResizeObserver(scheduleResize),stage);
+  if(viewport!==stage)scope.observe(new ResizeObserver(scheduleResize),viewport);
+ }else scope.listen(window,'resize',scheduleResize);
+ scope.cleanup(()=>{if(resizeFrame)cancelAnimationFrame(resizeFrame);resizeFrame=0;});
  scope.listen(document,'visibilitychange',()=>sync());
  const media=matchMedia('(prefers-reduced-motion: reduce)');scope.listen(media,'change',()=>sync());
  const refreshAppearance=()=>{readColors();sync();if(!effectiveMotion())draw();};
@@ -142,7 +153,7 @@ SILM.createElectronLayer=(stage,{scope,viewport=stage,before=null,reducedMotion=
  // Diagnóstico somente leitura (testes): não expõe nem aceita estado científico.
  Object.defineProperty(canvas,'silmElectrons',{value:Object.freeze({snapshot:()=>({visible,running:!!frame,heat,drive,defects,currentFactor,motion:effectiveMotion(),field,wraps,count:visible?particles.length:0,target:target(),frames,cost,radius,centers:centers.length,bridges:bridges.length,
   particles:visible?particles.map(p=>({x:p.x,y:p.y,dx:Math.cos(p.a),dy:Math.sin(p.a),vx:Math.cos(p.a)*(field?.75:1)-(field?.6:0),vy:Math.sin(p.a)*(field?.75:1)})):[],centerList:centers.map(c=>({...c})),camera:{...cam}})})});
- requestAnimationFrame(()=>resize());
+ scheduleResize();
  /* Câmera da representação: só o desenho muda (marcadores e centros continuam na cena). */
  function setCamera(c){if(!c)return;const next={zoom:c.zoom,x:c.x,y:c.y};if(next.zoom===cam.zoom&&next.x===cam.x&&next.y===cam.y)return;cam=next;if(!effectiveMotion()||document.hidden)draw();}
  return Object.freeze({canvas,update,incorporate,resize,setCamera,get running(){return !!frame;}});
