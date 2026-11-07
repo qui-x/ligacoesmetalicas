@@ -1,0 +1,183 @@
+# SILM — Matriz dos 65 elementos: aplicação, rede e microestrutura
+
+**Data da auditoria:** 07/11/2026. **Status:** pesquisa documental e triagem, sem homologação de micrografias nem modificação do motor de propriedades.
+
+**Fontes internas verificadas:** `domain/silm/data/bundle.js` e `domain/silm/metal-atlas.js` (branch main, hashes gravados em `research/microstructure/coverage-65.json`).
+
+## Resumo da cobertura
+
+| Critério | Situação |
+|---|---:|
+| Elementos disponíveis no SILM | **65** |
+| Elementos com ilustração própria de aplicação no atlas | **65** |
+| Estruturas cristalinas de referência com origem experimental cadastrada | **65** |
+| Imagens esquemáticas específicas de microestrutura no atlas | **20** |
+| Registros de estudos/fontes candidatos para microestrutura | **28** |
+| Elementos associados a pelo menos um estudo ou dataset candidato | **29** |
+| Elementos sem fonte específica candidata confirmada na triagem | **36** |
+| Microestruturas experimentais com arquivos, amostra, licença e calibração homologados **e incorporados** | **0** |
+
+**Os 65 já podem ser investigados quanto à estrutura de referência; os 65 NÃO estão cobertos por micrografias experimentais.** Todos têm um modelo geométrico didático próprio da interface (mesmo algoritmo), não uma reconstrução de amostras reais.
+
+A estrutura cristalográfica provém de um registro experimental de referência do elemento selecionado. Entretanto, uma **imagem de aplicação** pode mostrar outro material (liga, composto, fase ou revestimento). Para vincular as escalas **Objeto → Grãos → Rede → Centro**, deve haver uma *ponte de identidade de material e condição*, não apenas a presença do símbolo químico.
+
+## Classificação do tipo de material representado
+
+| Tipo da aplicação | Quantidade | Política |
+|---|---:|---|
+| Componente de metal elementar | 2 | Ainda confirmar pureza, processo e estado |
+| Metal ou liga, conforme fabricação | 8 | A composição e o processamento da liga precisam ser conhecidos |
+| Liga, intermetálico ou compósito | 20 | A composição e o processamento da liga precisam ser conhecidos |
+| Revestimento de metal | 4 | O metal do revestimento não é a microestrutura do substrato |
+| Catalisador sobre suporte | 3 | Partículas e suportes exigem modelo heterogêneo |
+| Composto, dopante ou cerâmica | 17 | Não representar a cerâmica/composto como rede metálica pura |
+| Referência selada ou especializada | 5 | Apresentação documental; não presumir um objeto cotidiano |
+| Material em dispositivo ou situação específica | 6 | Identificar fase e condição operacional |
+
+## Matriz por elemento
+
+**P0:** metais de maior retorno didático ou industrial para amostras rastreáveis. **P1:** famílias tecnológicas e ligas relevantes. **P2:** metais especializados, reativos, raros ou radioativos, nos quais pode ser necessário manter apenas estrutura documental. As prioridades são **operacionais**, não rankings de importância científica.
+
+**Fonte candidata** significa apenas que um estudo envolvendo o elemento foi localizado. Não significa que seu experimento corresponda à aplicação do atlas, ou que os arquivos estejam liberados para redistribuição.
+
+| Z | Elemento | Rede de referência | Material da aplicação / exemplo | Microestrutura | Estudos candidatos | Fila |
+|---:|---|---|---|---|---|:---:|
+| 3 | **Li** — Lítio | CCC | Pilha primária com ânodo de lítio metálico (*Componente de metal elementar*) | Esquema específico; sem micrografia homologada | **Pendente** | P1 |
+| 4 | **Be** — Berílio | HC | Contatos elásticos de conectores eletrônicos (*Liga, intermetálico ou compósito*) | Esquema específico; sem micrografia homologada | **Pendente** | P1 |
+| 11 | **Na** — Sódio | CCC | Lâmpada de vapor de sódio (*Material em dispositivo ou situação específica*) | Esquema específico; sem micrografia homologada | **Pendente** | P2 |
+| 12 | **Mg** — Magnésio | HC | Carcaça estrutural de notebook (*Liga, intermetálico ou compósito*) | Esquema específico; sem micrografia homologada | [mg-grain-ebsd-az31](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 13 | **Al** — Alumínio | CFC | Lata de bebida e folha de alumínio (*Metal ou liga, conforme fabricação*) | Esquema específico; sem micrografia homologada | [al-stem-boundary](#estudos-candidatos-verificados-em-páginas-de-origem), [al-ufg-ebsd-afm](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 19 | **K** — Potássio | CCC | Amostra de potássio metálico em ampola selada (*Referência selada ou especializada*) | Esquema específico; sem micrografia homologada | **Pendente** | P2 |
+| 20 | **Ca** — Cálcio | CFC | Grade metálica de bateria automotiva (*Liga, intermetálico ou compósito*) | Esquema específico; sem micrografia homologada | **Pendente** | P1 |
+| 21 | **Sc** — Escândio | HC | Quadro de bicicleta esportiva (*Liga, intermetálico ou compósito*) | Esquema específico; sem micrografia homologada | **Pendente** | P1 |
+| 22 | **Ti** — Titânio | HC | Armação metálica de óculos (*Metal ou liga, conforme fabricação*) | Esquema específico; sem micrografia homologada | [ti-mo-zr-corrosion](#estudos-candidatos-verificados-em-páginas-de-origem), [ti-mo-hf-biomedical](#estudos-candidatos-verificados-em-páginas-de-origem), [ti-ulc-inclusions](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 23 | **V** — Vanádio | CCC | Chave e conjunto de ferramentas de aço-liga (*Liga, intermetálico ou compósito*) | Esquema específico; sem micrografia homologada | **Pendente** | P1 |
+| 24 | **Cr** — Cromo | CCC | Torneira com acabamento cromado (*Revestimento de metal*) | Esquema específico; sem micrografia homologada | [fe-316l-correlative](#estudos-candidatos-verificados-em-páginas-de-origem), [fe-cr-cast-phases](#estudos-candidatos-verificados-em-páginas-de-origem), [in718-ebsd-3d](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 25 | **Mn** — Manganês | COMPLEX_CUBIC | Coração de cruzamento ferroviário (desvio de trilhos) (*Liga, intermetálico ou compósito*) | Esquema específico; sem micrografia homologada | **Pendente** | P1 |
+| 26 | **Fe** — Ferro | CCC | Vergalhões empregados na construção civil (*Liga, intermetálico ou compósito*) | Esquema específico; sem micrografia homologada | [fe-316l-correlative](#estudos-candidatos-verificados-em-páginas-de-origem), [fe-cr-cast-phases](#estudos-candidatos-verificados-em-páginas-de-origem), [nd-ce-dy-magnet](#estudos-candidatos-verificados-em-páginas-de-origem), [ti-ulc-inclusions](#estudos-candidatos-verificados-em-páginas-de-origem), [fe-multisteel-9-ebsd](#estudos-candidatos-verificados-em-páginas-de-origem), [in718-ebsd-3d](#estudos-candidatos-verificados-em-páginas-de-origem), [pr-rich-magnet](#estudos-candidatos-verificados-em-páginas-de-origem), [y-tb-nd-magnet](#estudos-candidatos-verificados-em-páginas-de-origem), [la-electrical-steel](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 27 | **Co** — Cobalto | HC | Ferramenta de usinagem de metal duro (*Liga, intermetálico ou compósito*) | Esquema específico; sem micrografia homologada | [co-ta-superalloys](#estudos-candidatos-verificados-em-páginas-de-origem), [nb-ni-co-mu-phases](#estudos-candidatos-verificados-em-páginas-de-origem), [pr-rich-magnet](#estudos-candidatos-verificados-em-páginas-de-origem), [sm-co-magnet-thesis](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 28 | **Ni** — Níquel | CFC | Conectores eletrônicos com revestimento contendo níquel (*Revestimento de metal*) | Esquema específico; sem micrografia homologada | [ni-pure-ebsd](#estudos-candidatos-verificados-em-páginas-de-origem), [fe-316l-correlative](#estudos-candidatos-verificados-em-páginas-de-origem), [in718-ebsd-3d](#estudos-candidatos-verificados-em-páginas-de-origem), [nb-ni-co-mu-phases](#estudos-candidatos-verificados-em-páginas-de-origem), [ni-bicrystal-pillar](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 29 | **Cu** — Cobre | CFC | Cabos e enrolamentos elétricos (*Componente de metal elementar*) | Esquema específico; sem micrografia homologada | [cu-polycrystal-ebsd](#estudos-candidatos-verificados-em-páginas-de-origem), [zn-05cu-ebsd](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 30 | **Zn** — Zinco | HC | Parafusos e chapas de aço galvanizados (*Revestimento de metal*) | Esquema específico; sem micrografia homologada | [zn-05cu-ebsd](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 37 | **Rb** — Rubídio | CCC | Amostra selada de rubídio metálico em ampola (*Referência selada ou especializada*) | Esquema específico; sem micrografia homologada | **Pendente** | P2 |
+| 38 | **Sr** — Estrôncio | CFC | Alto-falante com ímã cerâmico de ferrita de estrôncio (*Composto, dopante ou cerâmica*) | Esquema específico; sem micrografia homologada | **Pendente** | P2 |
+| 39 | **Y** — Ítrio | HC | Lâmpada LED branca com fósforo à base de granada de ítrio (*Composto, dopante ou cerâmica*) | Esquema específico; sem micrografia homologada | [y-tb-nd-magnet](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 40 | **Zr** — Zircônio | HC | Tubos de liga de zircônio em tecnologia nuclear (*Liga, intermetálico ou compósito*) | Gerador esquemático; sem micrografia homologada | [ti-mo-zr-corrosion](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 41 | **Nb** — Nióbio | CCC | Tarugo metálico de nióbio em contexto industrial e componente de turbina (*Metal ou liga, conforme fabricação*) | Gerador esquemático; sem micrografia homologada | [in718-ebsd-3d](#estudos-candidatos-verificados-em-páginas-de-origem), [nb-ni-co-mu-phases](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 42 | **Mo** — Molibdênio | CCC | Elemento de aquecimento em forno de alta temperatura (*Metal ou liga, conforme fabricação*) | Gerador esquemático; sem micrografia homologada | [ti-mo-zr-corrosion](#estudos-candidatos-verificados-em-páginas-de-origem), [ti-mo-hf-biomedical](#estudos-candidatos-verificados-em-páginas-de-origem), [in718-ebsd-3d](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 43 | **Tc** — Tecnécio | HC | Radiofármaco de tecnécio-99m em medicina nuclear (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 44 | **Ru** — Rutênio | HC | Contatos elétricos de liga platina–rutênio (*Liga, intermetálico ou compósito*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P1 |
+| 45 | **Rh** — Ródio | CFC | Monólito de conversor catalítico com catalisador contendo ródio (*Catalisador sobre suporte*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P1 |
+| 46 | **Pd** — Paládio | CFC | Monólito de conversor catalítico automotivo (*Catalisador sobre suporte*) | Gerador esquemático; sem micrografia homologada | [au-pd-tem](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 47 | **Ag** — Prata | CFC | Contato elétrico prateado e anel de prata (*Metal ou liga, conforme fabricação*) | Gerador esquemático; sem micrografia homologada | [ag-native-wire-ebsd](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 48 | **Cd** — Cádmio | HC | Bateria recarregável de níquel-cádmio em vista parcial (*Material em dispositivo ou situação específica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 50 | **Sn** — Estanho | TETRAGONAL | Solda de estanho em placa de circuito eletrônico (*Liga, intermetálico ou compósito*) | Gerador esquemático; sem micrografia homologada | [sn-bi-solder-ebsd](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 55 | **Cs** — Césio | CCC | Ampola selada de césio em laboratório próximo a relógio atômico (*Material em dispositivo ou situação específica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 56 | **Ba** — Bário | CCC | Válvula eletrônica a vácuo com material captador de gases à base de bário (*Material em dispositivo ou situação específica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 57 | **La** — Lantânio | DHCP | Eletrodo com liga armazenadora de hidrogênio em bateria NiMH (*Liga, intermetálico ou compósito*) | Gerador esquemático; sem micrografia homologada | [la-electrical-steel](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 58 | **Ce** — Cério | CFC | Pedra pirofórica de isqueiro (ferrocério) (*Liga, intermetálico ou compósito*) | Gerador esquemático; sem micrografia homologada | [nd-ce-dy-magnet](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 59 | **Pr** — Praseodímio | DHCP | Ímã de liga Nd–Pr–Fe–B aplicado em motor (*Liga, intermetálico ou compósito*) | Gerador esquemático; sem micrografia homologada | [pr-rich-magnet](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 60 | **Nd** — Neodímio | DHCP | Ímã Nd–Fe–B em alto-falante (*Liga, intermetálico ou compósito*) | Gerador esquemático; sem micrografia homologada | [nd-ce-dy-magnet](#estudos-candidatos-verificados-em-páginas-de-origem), [y-tb-nd-magnet](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 62 | **Sm** — Samário | RHOMBOHEDRAL | Ímãs Sm–Co para aplicações de temperatura elevada (*Liga, intermetálico ou compósito*) | Gerador esquemático; sem micrografia homologada | [sm-co-magnet-thesis](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 63 | **Eu** — Európio | CCC | Material fosforescente/luminescente vermelho dopado com európio (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 64 | **Gd** — Gadolínio | HC | Agente de contraste de RM contendo quelato de gadolínio (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P1 |
+| 65 | **Tb** — Térbio | HC | Fósforo luminescente verde ativado com íons Tb³⁺ (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | [y-tb-nd-magnet](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 66 | **Dy** — Disprósio | HC | Ímã Nd–Fe–B contendo Dy em motor elétrico (*Liga, intermetálico ou compósito*) | Gerador esquemático; sem micrografia homologada | [nd-ce-dy-magnet](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 67 | **Ho** — Hólmio | HC | Sistema de laser Ho:YAG para procedimentos técnicos e médicos (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 68 | **Er** — Érbio | HC | Amplificador óptico com fibra de sílica dopada com Er (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 69 | **Tm** — Túlio | HC | Laser de fibra dopada com Tm para cirurgia e medicina (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 70 | **Yb** — Itérbio | CFC | Laser de fibra dopada com Yb em corte de chapas (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 71 | **Lu** — Lutécio | HC | Radiofármaco contendo o radioisótopo lutécio-177 (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 72 | **Hf** — Háfnio | HC | Superliga à base de níquel contendo Hf em turbinas (*Liga, intermetálico ou compósito*) | Gerador esquemático; sem micrografia homologada | [ti-mo-hf-biomedical](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 73 | **Ta** — Tântalo | CCC | Capacitor eletrolítico com ânodo de tântalo e dielétrico Ta₂O₅ (*Material em dispositivo ou situação específica*) | Gerador esquemático; sem micrografia homologada | [co-ta-superalloys](#estudos-candidatos-verificados-em-páginas-de-origem) | P1 |
+| 74 | **W** — Tungstênio | CCC | Filamento de lâmpada incandescente de W e ferramenta de WC–Co (*Metal ou liga, conforme fabricação*) | Gerador esquemático; sem micrografia homologada | [w-heavy-alloy-contiguity](#estudos-candidatos-verificados-em-páginas-de-origem), [w-unalloyed-ebpbf](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 75 | **Re** — Rênio | HC | Pá de turbina em superliga de níquel contendo rênio (*Liga, intermetálico ou compósito*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P1 |
+| 76 | **Os** — Ósmio | HC | Ponta de caneta de liga dura contendo ósmio — uso especializado e histórico (*Liga, intermetálico ou compósito*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 77 | **Ir** — Irídio | CFC | Eletrodo de vela de ignição com irídio ou liga contendo irídio (*Metal ou liga, conforme fabricação*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P1 |
+| 78 | **Pt** — Platina | CFC | Conversor catalítico automotivo com camada superficial contendo platina (*Catalisador sobre suporte*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P1 |
+| 79 | **Au** — Ouro | CFC | Contatos e interconexões eletrônicas com ouro (*Revestimento de metal*) | Gerador esquemático; sem micrografia homologada | [au-polycrystal-ebsd](#estudos-candidatos-verificados-em-páginas-de-origem), [au-pd-tem](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 81 | **Tl** — Tálio | HC | Elementos ópticos e detectores especializados baseados em materiais contendo tálio (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 82 | **Pb** — Chumbo | CFC | Bateria chumbo-ácido com placas de chumbo e materiais derivados (*Metal ou liga, conforme fabricação*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P0 |
+| 83 | **Bi** — Bismuto | RHOMBOHEDRAL | Cristal de bismuto com superfície iridescente por fina oxidação (*Material em dispositivo ou situação específica*) | Gerador esquemático; sem micrografia homologada | [sn-bi-solder-ebsd](#estudos-candidatos-verificados-em-páginas-de-origem) | P0 |
+| 84 | **Po** — Polônio | SC | Fonte alfa selada em dispositivo antiestático industrial — representação conceitual (*Referência selada ou especializada*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 88 | **Ra** — Rádio | CCC | Tinta luminescente com compostos de rádio em mostradores de relógios históricos (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 89 | **Ac** — Actínio | CFC | Frasco de radiofármaco com actínio-225 para terapia alfa direcionada (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 90 | **Th** — Tório | CFC | Camisa incandescente de lampião histórico contendo óxidos de tório (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 91 | **Pa** — Protactínio | TETRAGONAL | Amostra hipotética de pesquisa radioquímica em recipiente laboratorial restrito (*Referência selada ou especializada*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 93 | **Np** — Netúnio | ORTHORHOMBIC | Contenção de amostra para pesquisa nuclear com netúnio-237 (*Referência selada ou especializada*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+| 94 | **Pu** — Plutônio | MONOCLINIC | Gerador termoelétrico de radioisótopos (RTG) em veículo de exploração espacial (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | [pu-metal-allotropes](#estudos-candidatos-verificados-em-páginas-de-origem) | P2 |
+| 95 | **Am** — Amerício | DHCP | Detector de fumaça por ionização com fonte interna selada de amerício-241 (*Composto, dopante ou cerâmica*) | Gerador esquemático; sem micrografia homologada | **Pendente** | P2 |
+
+## Estudos candidatos verificados em páginas de origem
+
+As páginas foram consultadas durante a pesquisa; **os arquivos experimentais brutos não foram auditados** e a existência de uma licença de publicação não implica, por si só, autorização para redistribuir as imagens.
+
+| Identificador | Elementos relacionados | Amostra efetiva | Método / possível uso | Fonte | Principal restrição |
+|---|---|---|---|---|---|
+| `mg-grain-ebsd-az31` | Mg | Mg–1Al e AZ31 | EBSD / grain-equivalent-diameter, neighbors, deformation | [Página de origem](https://zenodo.org/records/10225600) | 2.640 + 1.496 grãos medidos; não equivale à carcaça de notebook. |
+| `cu-polycrystal-ebsd` | Cu | Cobre policristalino | EBSD+SEM / grain-boundary, microstructure-image | [Página de origem](https://zenodo.org/records/16902083) | Mapa de cobre; não presume processo/têmpera de cabos. |
+| `ni-pure-ebsd` | Ni | Níquel puro | EBSD / grain-orientation, microstructure-image | [Página de origem](https://zenodo.org/records/21870683) | Quatro aquisições variam condições instrumentais; não representam revestimento. |
+| `zn-05cu-ebsd` | Zn, Cu | Zn–0,5Cu | EBSD+SEM+AFM / slip-system, grain-boundary | [Página de origem](https://zenodo.org/records/13143717) | Liga de Zn–Cu; não zinco galvanizado ou Cu puro. |
+| `al-stem-boundary` | Al | Alumínio — contornos de grão | STEM / grain-boundary-atomic-scale | [Página de origem](https://zenodo.org/records/10491520) | Contorno atômico particular; não tamanho médio de grão de latas. |
+| `fe-316l-correlative` | Fe, Cr, Ni | Aço inoxidável 316L | SEM+EBSD / grain-boundary, segmentation | [Página de origem](https://www.nature.com/articles/s41524-025-01801-4) | Aço 316L, não Fe/Cr/Ni puros; calibrar método com cuidado. |
+| `fe-cr-cast-phases` | Fe, Cr | Ferro fundido — 26 wt% Cr | SEM+phase-masks / phase-classification | [Página de origem](https://zenodo.org/records/21931379) | Máscaras de fase; não grãos nem distribuição atômica de Cr. |
+| `ti-mo-zr-corrosion` | Ti, Mo, Zr | Ligas Ti–12Mo, Ti–12Mo–5Zr | EBSD+SEM+TEM / orientation, microstructure-image | [Página de origem](https://zenodo.org/records/13903531) | Ligas biomédicas específicas, não amostras puras. |
+| `ti-mo-hf-biomedical` | Ti, Mo, Hf | Liga Ti–12Mo–5Hf | EBSD+SEM+TEM / microstructure-image, corrosion | [Página de origem](https://zenodo.org/records/19462164) | Liga biomédica; não superliga de Ni-Hf. |
+| `nd-ce-dy-magnet` | Nd, Ce, Dy, Fe | Ímã (Nd,Ce)–Fe–B com difusão de Dy | EPMA+MFM / microchemistry, magnetic-context | [Página de origem](https://www.sciencedirect.com/science/article/pii/S1002072124000292) | Composição dos ímãs não descreve microestruturas dos metais puros. |
+| `ti-ulc-inclusions` | Fe, Ti | Inclusões em aço Ti–ULC | SEM+BSE+EDS / inclusion-composition-wt-percent | [Página de origem](https://zenodo.org/records/20758431) | EDS de inclusões, não composição dos grãos de aço. |
+| `pu-metal-allotropes` | Pu | Plutônio — alótropos e propriedades | crystallography+mechanics / phase-transformation-context | [Página de origem](https://laro.lanl.gov/esploro/outputs/conferenceProceeding/Mechanical-Behavior-of-Alpha-Beta-and/9916364140803761) | Publicação, não mapa de grãos do dispositivo RTG. |
+| `fe-multisteel-9-ebsd` | Fe | Nove mapas EBSD de aços com fases transformadas | EBSD CTF / phase-classification, orientation | [Página de origem](https://doi.org/10.12763/RHWHD7) | Arquivos CTF e parâmetros de aquisição; aço, não Fe puro. Repositório declara CC0. |
+| `co-ta-superalloys` | Co, Ta | Superligas de Co com teores de Ta distintos | BSE+EDS+XRD / phase-area-fraction, compositional-map | [Página de origem](https://doi.org/10.17863/CAM.120624) | Dataset de ligas Co-Ta com frações de área (não teor de Ta puro). |
+| `w-heavy-alloy-contiguity` | W | Liga pesada de tungstênio: imagens BSE e análise geométrica | BSE-SEM+scripts / tungsten-phase-contiguity, particles | [Página de origem](https://doi.org/10.17632/hrpf6rr23p.1) | Fração e conectividade da fase rica em W; não grãos de W puro. |
+| `w-unalloyed-ebpbf` | W | Tungstênio puro por fusão de pó com feixe eletrônico | EBSD+metallography / grain-morphology, orientation | [Página de origem](https://www.sciencedirect.com/science/article/pii/S235217912500153X) | Artigo científico com microestrutura e processamento; arquivos brutos não verificados. |
+| `in718-ebsd-3d` | Ni, Fe, Cr, Nb, Mo | Superliga Inconel 718: EBSD tridimensional | 3D-EBSD+HR-DIC / grain-topology, orientation, deformation | [Página de origem](https://datadryad.org/dataset/doi%3A10.5061/dryad.83bk3j9sj) | Dados volumétricos de uma superliga, não de constituintes puros. Processamento precisa de infraestrutura. |
+| `nb-ni-co-mu-phases` | Nb, Ni, Co | Fases μ de Nb–Ni e Nb–Co | EBSD / phase-crystallography, pattern-matching | [Página de origem](https://zenodo.org/records/21703145) | Estudo de fases μ de ligas, não tamanho médio dos grãos elementares. |
+| `al-ufg-ebsd-afm` | Al | Al ultrafino: migração de contornos por fluência | EBSD+AFM+ACOM-TEM / grain-boundary, evolution | [Página de origem](https://zenodo.org/records/17190340) | Dados antes/depois do ensaio; não perfil genérico de microestrutura de latas. |
+| `au-polycrystal-ebsd` | Au | Ouro policristalino — orientação de superfície | EBSD+SECCM / grain-orientation, surface-electrochemistry | [Página de origem](https://pmc.ncbi.nlm.nih.gov/articles/PMC12415841/) | Artigo aberto, imagens/dados suplementares a auditar. Não equivalente ao revestimento eletrônico. |
+| `ag-native-wire-ebsd` | Ag | Prata nativa em fios de alta pureza | EBSD+optical+microprobe / twinning, grain-boundaries | [Página de origem](https://pmc.ncbi.nlm.nih.gov/articles/PMC5998055/) | Artigo com Ag >99,7 wt%, não microestrutura de contato elétrico; arquivos brutos não auditados. |
+| `sn-bi-solder-ebsd` | Sn, Bi | Solda Sn–Bi: precipitação e orientação | in-situ-EBSD+SEM / phase-transformation, texture | [Página de origem](https://spiral.imperial.ac.uk/entities/publication/3f2856ea-d46b-4e20-9334-120bce371a7b) | Artigo aberto (CC BY); não representa Sn nem Bi puros. |
+| `au-pd-tem` | Au, Pd | Nanoestrutura Au–Pd aquecida em TEM | in-situ-TEM / phase-separation-nanoscale | [Página de origem](https://zenodo.org/records/18554547) | Separação de fases em nanoestruturas de liga, não grãos de revestimento Au ou catalisador Pd. |
+| `pr-rich-magnet` | Pr, Fe, Co | Ímãs ricos em Pr–(Fe,Co)–B | SEM+phase-characterization / microstructure, phase-context | [Página de origem](https://www.sciencedirect.com/science/article/pii/S1359645423008467) | Estudo de ímã de Pr; ainda sem dados brutos ou direitos revisados. |
+| `sm-co-magnet-thesis` | Sm, Co | Ímãs sinterizados SmCo5 — processamento e propriedades | metallography / grain-phase-evolution, magnetism | [Página de origem](https://teses.usp.br/teses/disponiveis/3/3133/tde-28052025-142145/pt-br.html) | Tese USP com reserva explícita de direitos; não redistribuir imagens. |
+| `y-tb-nd-magnet` | Y, Tb, Nd, Fe | Ímãs (Y,RE)2Fe14B (RE=Nd,Tb) | SEM+BSE+EDS / elemental-maps, grain-boundary-phase | [Página de origem](https://doi.org/10.1016/j.rinp.2023.106417) | Mapas químicos mostram fases de ímãs, não microestrutura de Y/Tb metálicos. |
+| `la-electrical-steel` | La, Fe | Aço elétrico com adições de La | metallography+texture / grain-size-trend, texture | [Página de origem](https://www.sciencedirect.com/science/article/pii/S1002072112603494) | La atua na liga; artigo não valida microestrutura metálica de La puro. |
+| `ni-bicrystal-pillar` | Ni | Níquel bicristalino sob microcompressão | SEM+mechanical-CSV / grain-boundary-response, stress-strain | [Página de origem](https://zenodo.org/records/17725223) | Dados de bicristal de Ni sob compressão; não correspondem a filmes de níquel. |
+
+## Critérios obrigatórios antes de alterar o simulador
+
+1. **Identidade material:** registrar se o centro metálico e a rede da escala 3 pertencem ao *elemento puro* ou a uma fase efetivamente caracterizada da *liga/composto* do objeto da escala 1. A presença de um elemento em radiofármacos, fibras dopadas, lâmpadas, cerâmicas ou ímãs não comprova uma rede de átomos puros desse elemento no produto.
+2. **Microestrutura:** grãos, fases, precipitados, revestimentos e inclusões possuem dados e medidas diferentes. A cor só identifica composição local se vier de medição composicional registrada e calibrada; o tom do esquema é apenas gráfico.
+3. **Granulometria:** exigir escala em µm/pixel, contornos ou medição de interceptos, procedimento e representatividade. O diâmetro equivalente individual de uma seção 2D não é automaticamente o tamanho médio ASTM e não é a dimensão 3D do grão.
+4. **Fases e alotropia:** a estrutura atual de referência descreve uma fase e uma condição; temperaturas, pressão, transformações e composições específicas não podem ser extrapoladas por uma regra visual. Atenção especial a Fe, Sn, Mn, Ce, Bi e Pu.
+5. **Licenças:** COD oferece dados cristalográficos abertos, mas algumas fontes de micrografias estão sob assinatura ou licença restrita. Não importar fotos ou arquivos com direitos incompatíveis com o projeto.
+6. **Proveniência:** DOI/URL, material, composição, lote, processo, técnica, amostra, imagem, escala, máscara, incerteza e hash; preservar referências ao registro original e ao algoritmo de processamento.
+7. **Propriedades:** o botão de calor/corrente/deformação não poderá mudar morfologias de grãos de maneira aleatória e alegar transformação física; essa evolução exige modelo calibrado.
+8. **Honestidade:** quando não houver documentação, manter `Esquemática — sem dados experimentais de microestrutura para esta condição`, mesmo que a estrutura cristalina já seja válida.
+9. **Condições perigosas ou especializadas:** o atlas de elementos reativos e radioativos permanece documental, sem instruções de manuseio nem uso cotidiano fictício.
+
+## Próximos ciclos de pesquisa e implementação
+
+**Fase A — cobertura documental (esta matriz):** 65/65 mapeados com estrutura, aplicação, ressalva e estado da evidência. Os casos sem fontes específicas ficam registrados, não preenchidos com estimativas.
+
+**Fase B — caracterização por sistema material:**
+- P0: primeiro extrair amostras de **Mg (AZ31/Mg–1Al), Cu policristalino, Ni puro, Al, aço/Fe, Zn–Cu, Ti–Mo–Zr, W**. Fazer revisão de processo e comparabilidade com o produto do atlas.
+- Ligas e compostos de aplicações: construir registros separados para **aço** vs Fe, **ímãs Nd–Fe–B** vs Nd/Fe puros, **WC–Co** vs Co, **YAG/fósforos** vs Y/Tb/Gd, **superligas Ni–Cr–Ta** vs metais constituintes, **Sn–Bi/Ag** vs Sn puro.
+- Elementos sem micrografias públicas identificadas: ampliar em NIST MDR, COD para cristais (não grãos), Zenodo, repositórios institucionais, ASM Database (assinatura), literatura primária e arquivos de metalografia. **Não declarar cobertura percentual experimental antecipadamente**.
+
+**Fase C — integração experimental:** homologar pelo menos uma amostra com licença e contornos revisados. Incorporar metadados e visualização lado a lado, e então habilitar medições calibradas. Integrar a primeira distribuição ao gerador estatístico **sem substituir** a classe esquemática.
+
+**Fase D — expansão e governança:** repetir por família e condição, com testes que impeçam regressões e associações científicas falsas. Entradas de pesquisa sem arquivo validado nunca devem ativar números, gradientes de teor químico ou simulação temporal da microestrutura.
+
+## Fontes gerais e metodológicas
+
+- [NIST — Inorganic Crystal Structure Database](https://www.nist.gov/programs-projects/crystallographic-databases): estrutura cristalina experimental; base de assinatura para pesquisa adicional.
+- [Crystallography Open Database — COD](https://cod.psdi.ac.uk/): banco aberto de dados cristalográficos (CC0); não fornece micrografias de cada material.
+- [Materials Project](https://docs.materialsproject.org/methodology/materials-methodology/understanding-structures-and-properties-in-the-materials-project): dados calculados e estruturas de origem experimental/prototípica; resultados DFT não são microestrutura medida.
+- [OQMD — estruturas prototípicas](https://oqmd.org/documentation/structures): simulações termodinâmicas e tipos de célula, distintas da granulometria experimental.
+- [NIST Materials Data Repository](https://materialsdata.nist.gov/): metadados de materiais de múltiplas fontes; nível de revisão depende do provedor.
+- [ASM Micrograph Database](https://www.asminternational.org/online-databases/asm-micrograph-database/): milhares de micrografias com processamento e constituintes, porém acesso sob assinatura.
+- [Oxford Instruments — interpretação de dados EBSD](https://www.ebsd.com/ebsd-techniques/displaying-ebsd-data): tamanho, orientação, contornos, fases e textura; alertas sobre interpretação de seções 2D.
+- [ASTM E112](https://www.astm.org/e0112): tamanho médio de grão; [ASTM E562](https://www.astm.org/e0562): fração volumétrica de constituintes por contagem sistemática de pontos, sem inferência automática de composição.
+- [Índice legível por máquina](../research/microstructure/coverage-65.json): contrato `silm.microstructure-research-coverage.v1`, fontes e estados de evidência por elemento.
+
+**Nenhum conjunto de dados experimental foi incorporado automaticamente e nenhuma licença de imagem foi presumida.** Os 65 elementos estão cobertos pela **matriz de pesquisa**, não por 65 micrografias experimentais validadas.
