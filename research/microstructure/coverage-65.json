@@ -13,7 +13,7 @@
     "specificSchematicMicrostructureAssets": 20,
     "experimentalCrystalReferences": 65,
     "experimentalMicrostructureDatasetsIntegrated": 0,
-    "candidateStudyRecords": 65,
+    "candidateStudyRecords": 67,
     "elementsWithCandidateLeads": 65,
     "elementsPendingSpecificLead": 0,
     "elementalMetalGrainDatasetsValidatedAndIntegrated": 0,
@@ -813,11 +813,14 @@
         "electrodeposition-evolution"
       ],
       "url": "https://www.nature.com/articles/s41563-024-02006-8",
-      "comment": "Material metálico caracterizado diretamente. O Na do estudo é ânodo, NÃO vapor em lâmpada; valores dependem das condições de deposição e preparação.",
+      "comment": "Material metálico caracterizado diretamente. O Na do estudo é ânodo, NÃO vapor em lâmpada; valores dependem das condições de deposição e preparação. JLUdata lists license CC BY-NC-SA 4.0; commercial redistribution requires independent analysis of restrictions. Do not embed raw data automatically.",
       "recordStatus": "record-or-publication-page-verified",
       "rawFilesAudited": false,
       "licenseAudited": false,
-      "appSpecimenMatchVerified": false
+      "appSpecimenMatchVerified": false,
+      "rawDataRepository": "https://doi.org/10.22029/jlupub-18714",
+      "rawDataLicenseAsPublished": "CC BY-NC-SA 4.0",
+      "rawDataFileVolume": "many archives from MB to 71.4 GB; choose a reviewed small subset first"
     },
     {
       "id": "v-toolsteel-2024",
@@ -1348,6 +1351,50 @@
       "rawFilesAudited": false,
       "licenseAudited": false,
       "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "al-scalmalloy-ebsd-ved-csv-2025",
+      "dataset": "Scalmalloy com diferentes energias volumétricas no LPBF",
+      "elements": [
+        "Al",
+        "Mg",
+        "Sc",
+        "Zr"
+      ],
+      "specimenClass": "additively-manufactured-aluminum-alloy",
+      "technique": "EBSD grain-size CSV + CTF + EDS + porosity",
+      "supports": [
+        "grain-size-by-process",
+        "microstructure-morphology",
+        "nucleant-particle-EDS"
+      ],
+      "url": "https://zenodo.org/records/17085695",
+      "comment": "CSV de tamanho de grão em três energias (57,1 / 116,7 / 160 J/mm³), 5,0–7,4 MB, com MD5 publicado; condição de liga, porosidade e precipitados devem ser separados. Não é Al puro ou microestrutura genérica.",
+      "recordStatus": "primary-open-dataset-record-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "al-mn-annealed-ebsd-bse-2022",
+      "dataset": "Liga Al–Mn laminada e recozida em quatro estados",
+      "elements": [
+        "Al",
+        "Mn"
+      ],
+      "specimenClass": "thermomechanically-processed-aluminum-alloy",
+      "technique": "EBSD+BSE+image-registration",
+      "supports": [
+        "recovery-recrystallization",
+        "subgrain-morphology",
+        "particle-pinning"
+      ],
+      "url": "https://zenodo.org/records/7383087",
+      "comment": "Mapas 0 s, 175 °C, 300 °C, 325 °C; apenas o arquivo 300c.zip (~52 MB) é pequeno, os demais chegam a 13–16 GB. Processamento e direito de redistribuição pendentes.",
+      "recordStatus": "primary-open-dataset-record-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
     }
   ],
   "records": [
@@ -1499,7 +1546,8 @@
         "experimentalCandidateLeadIDs": [
           "mg-grain-ebsd-az31",
           "al-sc-zr-afsd",
-          "pb-ca-sr-ba-grid-alloy"
+          "pb-ca-sr-ba-grid-alloy",
+          "al-scalmalloy-ebsd-ved-csv-2025"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false,
@@ -1555,7 +1603,9 @@
           "al-stem-boundary",
           "al-ufg-ebsd-afm",
           "al-sc-zr-afsd",
-          "pb-ca-sr-ba-grid-alloy"
+          "pb-ca-sr-ba-grid-alloy",
+          "al-scalmalloy-ebsd-ved-csv-2025",
+          "al-mn-annealed-ebsd-bse-2022"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1670,7 +1720,8 @@
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
-          "al-sc-zr-afsd"
+          "al-sc-zr-afsd",
+          "al-scalmalloy-ebsd-ved-csv-2025"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1827,7 +1878,8 @@
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
-          "hadfield-railway-crossing"
+          "hadfield-railway-crossing",
+          "al-mn-annealed-ebsd-bse-2022"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -2194,7 +2246,8 @@
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
           "ti-mo-zr-corrosion",
-          "al-sc-zr-afsd"
+          "al-sc-zr-afsd",
+          "al-scalmalloy-ebsd-ved-csv-2025"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
