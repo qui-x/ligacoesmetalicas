@@ -1,0 +1,91 @@
+{
+  "schema": "silm.experimental-copper-ebsd-metadata-audit.v1",
+  "date": "2026-11-07",
+  "source": {
+    "doi": "10.5281/zenodo.16902083",
+    "url": "https://zenodo.org/records/16902083",
+    "authors": [
+      "Vivian Tong",
+      "Matthias Grabner",
+      "Manuel Petersmann"
+    ],
+    "recordType": "primary experimental EBSD/HDF5 + SEM images"
+  },
+  "original": {
+    "filename": "copper29.h5oina",
+    "sizeBytes": 163730279,
+    "publishedMD5": "ffe617d5cb3d2e4ed1a5e3b7d27d6e11",
+    "measuredMD5": "ffe617d5cb3d2e4ed1a5e3b7d27d6e11",
+    "hashMatches": true,
+    "workflow": "https://github.com/qui-x/ligacoesmetalicas/actions/runs/42340012964",
+    "artifact": "silm-copper-ebsd-review-not-homologated",
+    "auditor": "research/microstructure/audit_copper_ebsd.py"
+  },
+  "hdf5": {
+    "scanSource": "/1/EBSD",
+    "widthPx": 1031,
+    "heightPx": 547,
+    "xStepMicrometers": 0.1,
+    "yStepMicrometers": 0.1,
+    "fieldSpanMicrometers": {
+      "x": 103,
+      "y": 54.6
+    },
+    "pointsTotal": 563957,
+    "pointsCopperPhase": 511713,
+    "pointsNotIndexed": 52244,
+    "phaseIDCopper": 1,
+    "phaseIDUnindexed": 0,
+    "phaseName": "Copper",
+    "phaseCrystal": {
+      "latticeParametersAngstrom": [
+        3.6144,
+        3.6144,
+        3.6144
+      ],
+      "spaceGroupNumber": 225,
+      "laueGroupNumber": 11,
+      "crystalSystem": "cubic Fm-3m"
+    },
+    "channels": [
+      "/1/EBSD/Data/Phase",
+      "/1/EBSD/Data/Euler",
+      "/1/EBSD/Data/X",
+      "/1/EBSD/Data/Y",
+      "/1/EBSD/Data/Band Contrast"
+    ],
+    "eulerShape": [
+      563957,
+      3
+    ],
+    "eulerUnits": "radians according to Oxford h5oina specification",
+    "scanningRotationRadiansApprox": 3.1415927,
+    "metadataOnly": true
+  },
+  "sampleDescription": {
+    "specimenLabel": "P1700",
+    "acquisitionDate": "2023-01-17",
+    "notes": "Header reports 500 heat cycles; other preparation details present; not independently correlated with application objects",
+    "analysisLimit": "Device power-semiconductor copper metallization; not copper cable or pure-copper generic grain-size distribution"
+  },
+  "rights": {
+    "apiLicenseField": "no explicit license identifier returned by Zenodo metadata API",
+    "approvedForRedistribution": false,
+    "rawImagesPublishedInSILM": false
+  },
+  "status": {
+    "checksum": "confirmed",
+    "pixelCalibration": "confirmed",
+    "indexedPhaseCounts": "confirmed",
+    "grainBoundaries": "not-yet-segmented-or-validated",
+    "micrographsToSite": "not-permitted-without-license-review",
+    "experimentalSampleIntegrated": false,
+    "scientificHomologation": false
+  },
+  "methodReference": {
+    "sourceScript": "https://github.com/vtvivian/mtex-trueEbsd/blob/main/examples/example_copper.m",
+    "MTEXgrainThresholdDegrees": 10,
+    "sourcePipeline": "TrueEBSD alignment/distortion corrections + BSE void mask + fill unindexed points + symmetry-aware grain reconstruction",
+    "currentSILMStatus": "raw-input-audit-only; do not equate with MTEX processed results"
+  }
+}
