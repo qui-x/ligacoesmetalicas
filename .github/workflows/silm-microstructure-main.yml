@@ -5,6 +5,7 @@ on:
     paths:
       - "domain/silm/microstructure-data.js"
       - "domain/silm/microstructure-synthetic.js"
+      - "domain/silm/microstructure-study-context.js"
       - "domain/silm/microstructure-view.js"
       - "domain/silm/workshop.js"
       - "domain/silm/metal-atlas.js"
@@ -20,6 +21,7 @@ on:
       - "tests/run-workshop-micro-main.mjs"
       - "tests/microstructure-data.test.cjs"
       - "tests/microstructure-synthetic.test.cjs"
+      - "tests/microstructure-study-context.test.cjs"
       - "tests/microstructure-research-coverage.test.cjs"
       - "research/microstructure/**"
       - "docs/SILM-MATRIZ-65-ELEMENTOS-APLICACAO-REDE-MICROESTRUTURA.md"
@@ -61,6 +63,7 @@ jobs:
         run: |
           node --check domain/silm/microstructure-data.js
           node --check domain/silm/microstructure-synthetic.js
+          node --check domain/silm/microstructure-study-context.js
           node --check domain/silm/microstructure-view.js
           node --check domain/silm/workshop.js
           node --check domain/silm/metal-atlas.js
