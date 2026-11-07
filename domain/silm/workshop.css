@@ -305,6 +305,14 @@
 :is(.silm-micro-data-dialog,.silm-micro-generator-dialog) .silm-micro-import-help{font-size:.87rem;line-height:1.45;margin:0 0 14px}
 :is(.silm-micro-data-dialog,.silm-micro-generator-dialog) label{display:grid;gap:5px;font-weight:650;font-size:.88rem}
 :is(.silm-micro-data-dialog,.silm-micro-generator-dialog) input[type=file]{font:inherit;max-width:100%;min-width:0}
+.silm-micro-didactic-evidence{
+ display:grid;gap:6px;margin:0 0 14px;padding:10px 12px;
+ background:var(--panel2,var(--surface));border:1px solid var(--border);border-radius:8px;
+ font-size:.8rem;line-height:1.4;overflow-wrap:anywhere;
+}
+.silm-micro-didactic-evidence p{margin:0}
+.silm-micro-didactic-evidence a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.silm-micro-didactic-evidence a:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
 .silm-micro-import-report{font-size:.84rem;overflow-wrap:anywhere;line-height:1.45}
 :is(.silm-micro-data-dialog,.silm-micro-generator-dialog) a{font-size:.86rem;overflow-wrap:anywhere}
 .silm-micro-data-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:14px}
