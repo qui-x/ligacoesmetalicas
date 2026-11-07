@@ -137,11 +137,8 @@ SILM.microstructure=(()=>{
   };
   svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);
   viewport.append(svg);
-  const note=node('details','silm-workshop-micro-caveat silm-micro-reveal');
-  const noteSummary=node('summary','','✦ Não é bem assim... mas é como podemos nos aproximar.');
-  const noteDetails=node('p','',
-   'Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos. A cor é uma referência visual, não uma leitura química. Cada estudo descreve uma amostra e condição.');
-  note.append(noteSummary,noteDetails);
+  const note=node('p','silm-workshop-micro-caveat',
+   'Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.');
   // Mudanças de formação são explícitas. Redimensionar, ampliar ou mudar
   // o tema nunca regeneram os grãos, alteram a semente ou as propriedades.
   function applySchematic(options){
@@ -157,7 +154,7 @@ SILM.microstructure=(()=>{
    evidence.dataset.evidenceLevel='D0-schematic-conceptual';
    evidenceStatus.textContent='D0 · Modelo de grãos conceitual. A geometria é ilustrativa: não reproduz uma amostra medida nem a forma real dos grãos deste objeto.';
    dimension.textContent='Tamanho real: indisponível (sem escala em µm)';
-   noteDetails.textContent='Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos. A cor é uma referência visual, não uma leitura química. Cada estudo descreve uma amostra e condição.';
+   note.textContent='Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos. A cor é uma referência visual, não uma leitura química. Cada estudo descreve uma amostra e condição.';
    chosen=-1;zoom=1;offsetX=0;offsetY=0;
    drawGrains();persist();
    if(formationsButton)formationsButton.disabled=false;
@@ -322,7 +319,7 @@ SILM.microstructure=(()=>{
     evidenceStatus.textContent='Contornos importados · informações declaradas pelo arquivo, ainda não homologadas. A referência da rede não valida a amostra.';
     section.dataset.measurementStatus=sourceData.image.micrometersPerPixel===null?'uncalibrated':'provided-unverified';
     dimension.textContent=sourceData.image.micrometersPerPixel===null?'Escala física indisponível':'Escala declarada: '+sourceData.image.micrometersPerPixel.toLocaleString('pt-BR')+' µm/pixel';
-    noteDetails.textContent='Contornos importados sem homologação científica; medidas derivadas da segmentação/calibração declaradas, nunca composição ou fração de fase.';
+    note.textContent='Contornos importados sem homologação científica; medidas derivadas da segmentação/calibração declaradas, nunca composição ou fração de fase.';
     sourceLink.href=sourceData.source.url;sourceLink.hidden=false;
     report.textContent=sourceData.title+' · '+sourceData.grains.length+' grão(s) · '+sourceData.source.citation+' · '+sourceData.segmentation.method;
     drawGrains();
