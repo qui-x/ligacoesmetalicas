@@ -1300,9 +1300,9 @@
         "allotropy"
       ],
       "url": "https://paperzz.com/doc/8181669/physical-properties-and-crystal-structure-of-polonium",
-      "comment": "Transcrição de dissertação de Maxwell (Iowa State, 1946), que menciona fotomicrografia 100× do filme; repositório original e direitos ainda não confirmados. Sem dados EBSD, máscara ou escala para tamanhos de grão.",
+      "comment": "Transcrição secundária de dissertação Maxwell (1946) menciona fotomicrografia de filme metálico. A fonte primária, a imagem, a calibração e a licença ainda NÃO foram verificadas; não homologar grãos.",
       "evidenceScope": "historical-metal-photomicrograph-unverified-scan",
-      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "recordStatus": "secondary-transcription-original-archive-and-image-not-independently-verified",
       "rawFilesAudited": false,
       "licenseAudited": false,
       "appSpecimenMatchVerified": false
