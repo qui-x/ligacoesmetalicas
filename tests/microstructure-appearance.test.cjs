@@ -3,7 +3,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const sandbox={window:{SILM:{}}};
+const shared={};const sandbox={window:{SILM:shared},SILM:shared};
 vm.runInNewContext(read('domain/silm/metal-atlas.js'),sandbox);
 vm.runInNewContext(read('domain/silm/microstructure-appearance.js'),sandbox);
 vm.runInNewContext(read('domain/silm/microstructure-study-context.js'),sandbox);
