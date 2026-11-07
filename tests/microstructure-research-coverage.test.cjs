@@ -153,3 +153,22 @@ test('Cobre HDF5: dados calibrados não se confundem com grãos homologados',()=
  assert.equal(record.microstructure.experimentalAnalysis.readyToPublishImage,false);
  assert.equal(record.microstructure.experimentalSampleIntegrated,false);
 });
+
+test('Prévia orientacional Cu não se apresenta como imagem ou grão homologado',()=>{
+ const audit=JSON.parse(read('research/microstructure/copper-ebsd-verified-metadata.json'));
+ const preview=JSON.parse(read('research/microstructure/copper-ebsd-orientation-preview.json'));
+ const item=coverage.records.find(r=>r.symbol==='Cu');
+ assert.equal(preview.checksum,audit.original.measuredMD5);
+ assert.equal(preview.sample.indexedCuPixels+preview.sample.unindexedPixels,
+              preview.sample.widthPx*preview.sample.heightPx);
+ assert.equal(preview.results.length,3);
+ assert.deepEqual(preview.results.map(r=>r.thresholdDegrees),[5,10,15]);
+ assert.ok(preview.results.every(r=>r.candidateRegions<=r.allCuRegionsIncludingTinyAndBorder));
+ assert.equal(preview.validation,'exploratory-orientation-graph-uncorrected-EBSD-not-MTEX-TrueEBSD');
+ assert.equal(preview.quantitativeMicrostructureApproved,false);
+ assert.equal(preview.readyToPublishMap,false);
+ assert.equal(preview.rightsApprovedForImageRedistribution,false);
+ assert.equal(item.microstructure.experimentalAnalysis.orientationPreview.fullFieldRepresentative,false);
+ assert.equal(item.microstructure.experimentalAnalysis.orientationPreview.readyForSILMDisplay,false);
+ assert.equal(item.microstructure.experimentalSampleIntegrated,false);
+});
