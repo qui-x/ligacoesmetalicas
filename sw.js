@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.10';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='cores-granulares-didaticas-20261107';
+const BUILD='focus-overview-mobile-20261107';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "assets/workshop/motor.webp",
@@ -184,6 +184,7 @@ const FILES=[
   "integracao/structure-comparison.js",
   "integracao/adapter.js",
   "integracao/action-icons.js",
+  "integracao/toolbar-scroll.js",
   "domain/silm/abertura/silm-intro-v3.css",
   "domain/silm/abertura/silm-intro-v3.js",
   "integracao/pwa.js",
