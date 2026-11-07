@@ -250,3 +250,43 @@
 }
 .silm-crystal[data-field-map=potential] .silm-crystal-unit[data-field-value]>.silm-unit-body::after{border-style:dashed}
 .silm-crystal[data-field-map=dissipation] .silm-crystal-unit[data-field-value]>.silm-unit-body::after{border-style:double;border-width:5px}
+
+/* Atlas das 65 aplicações — exibição macro, cartões, foco central e acessibilidade. */
+.silm-workshop-card:has(.silm-workshop-atlas-photo){
+ grid-template-columns:minmax(150px,.95fr) minmax(0,1fr);
+}
+.silm-workshop-atlas-photo{display:flex;flex-direction:column;justify-content:center;gap:6px;min-width:0;height:100%;width:100%;}
+.silm-workshop-atlas-photo img{
+ display:block;max-width:100%;width:100%;height:auto;aspect-ratio:3/2;object-fit:contain;
+ background:var(--panel2,var(--surface));border-radius:10px;
+}
+.silm-workshop-reference-top:has(.silm-workshop-atlas-photo){
+ display:grid;grid-template-columns:minmax(0,2.3fr) minmax(220px,1fr);align-items:stretch;gap:10px;
+}
+.silm-workshop-reference-art:has(.silm-workshop-atlas-photo){
+ min-height:clamp(280px,49dvh,620px);padding:6px;min-width:0;
+}
+.silm-workshop-reference-art:has(.silm-workshop-atlas-photo) .silm-workshop-atlas-photo img{
+ flex:1 1 0;min-height:0;max-height:min(57dvh,580px);object-fit:contain;
+}
+.silm-workshop-atlas-photo figcaption{
+ font-size:.75rem;line-height:1.35;padding:2px 8px;color:var(--muted,#627487);font-weight:500;
+}
+.silm-workshop-micro-atlas-reference{margin-top:8px;border:1px solid var(--border);border-radius:9px;padding:8px;}
+.silm-workshop-micro-atlas-reference summary{font-size:.85rem;font-weight:650;cursor:pointer;min-height:44px;display:flex;align-items:center;}
+.silm-workshop-micro-atlas-reference img{display:block;width:100%;max-height:420px;object-fit:contain;}
+.silm-workshop-micro-atlas-reference figcaption{font-size:.8rem;line-height:1.4;color:var(--muted);}
+@media(max-width:760px){
+ .silm-workshop-reference-top:has(.silm-workshop-atlas-photo){
+  grid-template-columns:1fr;
+ }
+ .silm-workshop-reference-art:has(.silm-workshop-atlas-photo){min-height:230px;max-height:54dvh;}
+ .silm-workshop-reference-art:has(.silm-workshop-atlas-photo) .silm-workshop-atlas-photo img{
+  max-height:40dvh;
+ }
+}
+@media(max-width:560px){
+ .silm-workshop-card:has(.silm-workshop-atlas-photo){grid-template-columns:1fr;}
+ .silm-workshop-card:has(.silm-workshop-atlas-photo) .silm-workshop-art{padding:6px;}
+ .silm-workshop-card:has(.silm-workshop-atlas-photo) .silm-workshop-atlas-photo img{max-height:210px;}
+}

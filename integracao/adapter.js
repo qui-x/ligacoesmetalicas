@@ -288,7 +288,7 @@
   updateWorkshopViewport(true);
   if(workshopSelectionId&&S.workshop.get(workshopSelectionId)?.atomicNumber!==active.atomicNumber)workshopSelectionId=null;
   const item=S.workshop.get(workshopSelectionId);
-  const chosen=item?.atomicNumber===active.atomicNumber?item:null;
+  const chosen=item?.atomicNumber===active.atomicNumber?item:(S.workshop.list(active.atomicNumber).find(reference=>reference.atlasPath)||null);
   const key='active:'+active.atomicNumber+':'+(chosen?.id||'')+':'+workshopScale;
   if(host.dataset.key===key)return;
   host.dataset.key=key;host.hidden=false;

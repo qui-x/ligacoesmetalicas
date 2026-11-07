@@ -5,6 +5,8 @@ on:
     paths:
       - "domain/silm/microstructure-view.js"
       - "domain/silm/workshop.js"
+      - "domain/silm/metal-atlas.js"
+      - "assets/metal-atlas/**"
       - "domain/silm/workshop.css"
       - "integracao/integration.css"
       - "integracao/structure-comparison.js"
@@ -14,6 +16,7 @@ on:
       - "index.html"
       - "sw.js"
       - "tests/run-workshop-micro-main.mjs"
+      - "tests/run-atlas-applications.mjs"
       - ".github/workflows/silm-microstructure-main.yml"
   pull_request:
     branches: [main]
@@ -49,6 +52,8 @@ jobs:
         run: |
           node --check domain/silm/microstructure-view.js
           node --check domain/silm/workshop.js
+          node --check domain/silm/metal-atlas.js
+          node --check tests/run-atlas-applications.mjs
           node --check integracao/action-icons.js
           node --check tests/run-workshop-micro-main.mjs
       - name: Validar navegação e balanço eletrotérmico
@@ -70,7 +75,9 @@ jobs:
           cat "$RUNNER_TEMP/silm-http.log"
           exit 1
       - name: Testar microestrutura em desktop e celular
-        run: node tests/run-workshop-micro-main.mjs
+        run: |
+          node tests/run-workshop-micro-main.mjs
+          node tests/run-atlas-applications.mjs
       - name: Encerrar servidor
         if: always()
         run: |
