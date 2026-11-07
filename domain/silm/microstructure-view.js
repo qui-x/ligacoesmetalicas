@@ -3,8 +3,8 @@ window.SILM=window.SILM||{};
 /* Escala 2: mapa vetorial didático de grãos, independente da rede cristalina.
    Não representa EBSD, metalografia medida, fases, textura ou tamanho de grão de um elemento específico. */
 SILM.microstructure=(()=>{
- const NS='http://www.w3.org/2000/svg',H=620;
- let W=1000,CX=W/2,CY=H/2;
+ const NS='http://www.w3.org/2000/svg';
+ let W=1000,H=620,CX=W/2,CY=H/2;
  const svgNode=(name,attrs={})=>{const n=document.createElementNS(NS,name);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,String(v));return n;};
  const node=(tag,cls='',txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;};
  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
@@ -23,6 +23,7 @@ SILM.microstructure=(()=>{
  // Desenha um campo de grãos na razão real do painel, sem esticar o SVG.
  let polygons=[];
  function makeField(aspect){
+  H=620;
   const ratio=clamp(aspect,.5,5),rows=Math.max(5,Math.round(Math.sqrt(60/ratio))),cols=Math.max(6,Math.round(rows*ratio));
   W=H*ratio;CX=W/2;CY=H/2;
   const sites=[];let seed=139712;
@@ -47,13 +48,18 @@ SILM.microstructure=(()=>{
   const plane=svgNode('g',{'class':'silm-micro-plane'});svg.append(plane);
   let paths=[],cells=[];
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
+  let sourceData=null; // Mapa importado = análise de polígonos fornecidos, não homologação.
   const status=node('span','silm-workshop-micro-status','Selecione um grão · modelo esquemático');
   const dimension=node('span','silm-workshop-micro-dimension','Tamanho real: indisponível (sem escala em µm)');
   status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');
-  const choose=i=>{chosen=i;paths.forEach((p,j)=>{p.classList.toggle('is-selected',j===i);p.setAttribute('aria-pressed',String(j===i));cells[j]?.classList.toggle('is-selected',j===i);});
-   // O grão é identificável, mas sua área visual não representa fração de fase,
-   // concentração química, tamanho físico ou proporção medida de uma amostra.
-   status.textContent='Grão '+(i+1)+' selecionado · modelo esquemático';
+  const choose=i=>{
+   chosen=i;
+   paths.forEach((p,j)=>{p.classList.toggle('is-selected',j===i);p.setAttribute('aria-pressed',String(j===i));cells[j]?.classList.toggle('is-selected',j===i);});
+   if(sourceData){
+    const grain=sourceData.grains[i],area=grain?.areaMicrometers2;
+    const fmt=v=>v.toLocaleString('pt-BR',{maximumFractionDigits:3});
+    status.textContent='Grão '+grain.id+(area===null?' · sem calibração':' · área segmentada '+fmt(area)+' µm²')+' · dados importados não homologados';
+   }else status.textContent='Grão '+(i+1)+' selecionado · modelo esquemático';
    svg.setAttribute('data-selected-grain',String(i+1));
   };
   function drawGrains(){
@@ -62,14 +68,14 @@ SILM.microstructure=(()=>{
    polygons.forEach((poly,i)=>{
    if(poly.length<3)return;
    const d='M'+poly.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')+' Z';
-   const g=svgNode('g',{'class':'silm-micro-cell'}),p=svgNode('path',{d,'class':'silm-micro-grain',tabindex:0,role:'button','aria-label':'Destacar grão ilustrativo '+(i+1),'aria-pressed':'false'});
+   const g=svgNode('g',{'class':'silm-micro-cell'}),p=svgNode('path',{d,'class':'silm-micro-grain',tabindex:0,role:'button','aria-label':sourceData?'Selecionar grão segmentado '+sourceData.grains[i].id+' (dados importados não homologados)':'Destacar grão ilustrativo '+(i+1),'aria-pressed':'false'});
    p.style.setProperty('--grain-tone',(16+(i*17)%30)+'%');p.addEventListener('click',()=>{if(!suppressClick)choose(i);});
    p.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(i);}});
    const hatch=svgNode('path',{d,'class':'silm-micro-hatching',fill:'url(#'+uid+'-pattern-'+(i%4)+')','pointer-events':'none'});
    g.append(p,hatch);plane.append(g);paths[i]=p;cells[i]=g;
    });
    if(chosen>=polygons.length)chosen=polygons.length-1;
-   if(chosen>=0)choose(chosen);else status.textContent='Selecione um grão · modelo esquemático';
+   if(chosen>=0)choose(chosen);else status.textContent=sourceData?'Selecione um grão segmentado · dados importados não homologados':'Selecione um grão · modelo esquemático';
    offsetX=0;offsetY=0;update();svg.dataset.mapReady='true';
   }
   const toolbar=node('div','silm-workshop-micro-toolbar'),zoomLabel=node('output','silm-workshop-micro-zoom','100%');
@@ -101,14 +107,55 @@ SILM.microstructure=(()=>{
   svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);
   viewport.append(svg);
   const note=node('p','silm-workshop-micro-caveat','Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.');
-  section.append(viewport,toolbar,note);
+  // A importação é opcional e não altera o estado científico do SILM.
+  // O diálogo evita comprimir o quadro principal com metadados extensos.
+  const dataDialog=node('dialog','silm-micro-data-dialog'),dataTitle=node('h2','','Mapa segmentado');
+  const dataHelp=node('p','','Carregue um JSON com contornos de grãos e origem documentada. A procedência declarada não é verificada automaticamente pelo SILM.');
+  dataHelp.className='silm-micro-import-help';
+  const fileLabel=node('label','','Arquivo JSON de microestrutura');
+  const fileInput=node('input');fileInput.type='file';fileInput.accept='.json,application/json';fileInput.setAttribute('aria-label','Arquivo JSON de microestrutura');
+  fileLabel.append(fileInput);
+  const report=node('p','silm-micro-import-report','Nenhum mapa importado.');report.setAttribute('role','status');
+  const sourceLink=node('a','','Consultar origem declarada');sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';sourceLink.hidden=true;
+  const dialogActions=node('div','silm-micro-data-actions');
+  const reset=button('Retornar ao mapa didático','Repor esquema',()=>{
+   sourceData=null;section.dataset.microstructureSource='schematic';section.dataset.measurementStatus='unavailable';
+   dimension.textContent='Tamanho real: indisponível (sem escala em µm)';
+   note.textContent='Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.';
+   sourceLink.hidden=true;sourceLink.removeAttribute('href');report.textContent='Esquema didático restaurado.';
+   chosen=-1;lastAspect=0;zoom=1;makeField(viewport.clientWidth/Math.max(1,viewport.clientHeight));drawGrains();
+  });
+  const close=button('Fechar importação de dados','Fechar',()=>dataDialog.close());
+  dialogActions.append(reset,close);dataDialog.append(dataTitle,dataHelp,fileLabel,report,sourceLink,dialogActions);
+  fileInput.addEventListener('change',async()=>{
+   const file=fileInput.files?.[0];if(!file)return;
+   try{
+    if(file.size>1024*1024)throw new Error('Arquivo muito grande (limite de 1 MiB).');
+    const json=JSON.parse(await file.text());
+    const checked=SILM.microstructureData?.validate(json,element?.atomicNumber);
+    if(!checked?.ok)throw new Error(checked?.error||'Módulo de validação indisponível.');
+    sourceData=checked.data;
+    W=sourceData.image.widthPx;H=sourceData.image.heightPx;CX=W/2;CY=H/2;
+    polygons=sourceData.grains.map(g=>g.vertices);
+    chosen=-1;zoom=1;section.dataset.microstructureSource=sourceData.sourceKind;
+    section.dataset.measurementStatus=sourceData.image.micrometersPerPixel===null?'uncalibrated':'provided-unverified';
+    dimension.textContent=sourceData.image.micrometersPerPixel===null?'Escala física indisponível':'Escala declarada: '+sourceData.image.micrometersPerPixel.toLocaleString('pt-BR')+' µm/pixel';
+    note.textContent='Contornos importados sem homologação científica; medidas derivadas da segmentação/calibração declaradas, nunca composição ou fração de fase.';
+    sourceLink.href=sourceData.source.url;sourceLink.hidden=false;
+    report.textContent=sourceData.title+' · '+sourceData.grains.length+' grão(s) · '+sourceData.source.citation+' · '+sourceData.segmentation.method;
+    drawGrains();
+   }catch(error){report.textContent='Importação recusada: '+(error?.message||String(error));}
+   fileInput.value='';
+  });
+  zoomControls.append(button('Abrir dados segmentados','Dados',()=>dataDialog.showModal()));
+  section.append(viewport,toolbar,note,dataDialog);
   let lastAspect=0,resizeFrame=0;
   // Nunca modificar o SVG dentro da entrega de um ResizeObserver: no WebKit,
   // isso pode desencadear "ResizeObserver loop completed with undelivered notifications".
   // Coalescer notificações e redesenhar no frame seguinte preserva proporção
   // e evita que mudanças de viewBox alimentem o mesmo ciclo de observação.
   const resize=()=>{
-   if(!viewport.isConnected)return;
+   if(!viewport.isConnected||sourceData)return;
    const rect=viewport.getBoundingClientRect();
    if(rect.width<2||rect.height<2)return;
    const ratio=rect.width/rect.height;
