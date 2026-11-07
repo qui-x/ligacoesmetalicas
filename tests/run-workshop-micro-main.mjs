@@ -55,6 +55,15 @@ async function test(viewport){
  assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),1,'Seleção não aplica padrão estrutural ao grão.');
  assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/Grão 26 selecionado · modelo esquemático/,'Seleção não identifica o grão sem medições inventadas.');
  assert.equal(await viewer.getAttribute('data-microstructure-source'),'schematic','Proveniência geométrica do mapa não declarada.');
+ assert.equal(await viewer.getAttribute('data-appearance-palette'),'iron-ore',
+  'Ferro deve utilizar a paleta mineral simbólica explicitamente declarada.');
+ assert.equal(await viewer.getAttribute('data-appearance-basis'),'symbolic-mineral',
+  'O tom do ferro não deve ser classificado como cor experimental de metal puro.');
+ assert.ok(await viewer.locator('svg linearGradient[id*="material"]').count()>=4,
+  'Relevo didático deve usar gradientes SVG e manter o desenho vetorial.');
+ assert.equal(await page.getByText(/Não é bem assim/).count(),0,
+  'A metáfora de contexto da conversa não deve ser uma frase pública.');
+
  assert.equal(await viewer.getAttribute('data-measurement-status'),'unavailable','Medidas experimentais não devem estar disponíveis para esquema gerado.');
  assert.doesNotMatch(await viewer.locator('.silm-workshop-micro-status').textContent(),/\d+[,.]?\d*\s*%/,'O grão não deve exibir porcentagem de composição ou fração sem dados experimentais.');
  assert.match(await viewer.locator('.silm-workshop-micro-caveat').textContent(),/sem composição, fração de fase ou tamanho medidos/,'Aviso científico ausente para mapa esquemático.');
@@ -122,6 +131,11 @@ async function test(viewport){
  const importDialog=viewer.locator('.silm-micro-data-dialog');
  await importDialog.waitFor({state:'visible'});
  const evidencePanel=importDialog.locator('.silm-micro-didactic-evidence');
+ assert.match(await evidencePanel.innerText(),/Cores e relevo:/,
+  'A leitura cromática deve informar que a cor é ilustrativa.');
+ assert.match(await evidencePanel.innerText(),/não é a cor intrínseca do ferro metálico|não é a cor intrínseca/,
+  'Paleta Fe não pode ser confundida com a cor real de toda amostra.');
+
  assert.equal(await evidencePanel.getAttribute('data-evidence-level'),'D0-schematic-conceptual',
   'A geometria didática não deve parecer uma amostra experimental.');
  assert.match(await evidencePanel.innerText(),/Rede de referência:/,
