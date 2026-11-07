@@ -167,13 +167,14 @@ try{
  await page.locator('.silm-workshop-micro-viewer').waitFor({state:'visible'});
  for(const [name,w,h] of sizes)await inspect('micro',name,w,h);
 
- // Erro conhecido de notificação do ResizeObserver é aviso, não falha fatal de JS.
+ // Problemas do ResizeObserver também reprovam a auditoria: nunca escondê-los
+ // como avisos, mesmo quando a interface ainda parece funcionar.
  for(const err of scriptErrors){
-  const benign=/ResizeObserver loop completed with undelivered notifications/.test(err);
-  add('javascript','todas',benign?'warning':'error',
-   benign?'RESIZEOBSERVER':'JS_EXCEPTION',err,
-   benign?'Investigar ciclo de dimensionamento e reduzir redraws consecutivos.':
-          'Investigar o erro JavaScript no console e no módulo correspondente.');
+  const resizeLoop=/ResizeObserver loop completed with undelivered notifications/.test(err);
+  add('javascript','todas','error',
+   resizeLoop?'RESIZEOBSERVER':'JS_EXCEPTION',err,
+   resizeLoop?'Desacoplar alterações de layout do callback de ResizeObserver e verificar redraws consecutivos.':
+              'Investigar o erro JavaScript no console e no módulo correspondente.');
  }
  await context.close();
 }catch(e){
