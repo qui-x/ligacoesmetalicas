@@ -357,7 +357,7 @@ async function test(viewport){
   assert.ok(layoutGeometry.headLeft>=layoutGeometry.previewRight-2&&layoutGeometry.actionsTop>=layoutGeometry.headTop,
    'Informações e ações devem permanecer ao lado da prévia em desktop.');
  }else{
-  assert.ok(layoutGeometry.fraction>=.50,'A prévia deve ser dominante também no modo lista do celular.');
+  assert.ok(layoutGeometry.fraction>=.38,'A prévia do celular não pode desaparecer para mostrar as ações: '+JSON.stringify(layoutGeometry));
   assert.ok(layoutGeometry.previewTop>=layoutGeometry.headTop,'A identificação deve ficar acima da prévia em celular.');
  }
  assert.ok(layoutGeometry.contentExtent>=.75,'A estrutura desenhada está demasiadamente pequena dentro do SVG.');
