@@ -12,7 +12,10 @@
     "atlasIllustrations": 65,
     "specificSchematicMicrostructureAssets": 20,
     "experimentalCrystalReferences": 65,
-    "experimentalMicrostructureDatasetsIntegrated": 0
+    "experimentalMicrostructureDatasetsIntegrated": 0,
+    "candidateStudyRecords": 20,
+    "elementsWithCandidateLeads": 20,
+    "elementsPendingSpecificLead": 45
   },
   "interpretationPolicy": {
     "crystalReference": "Experimental structure of a reference element, not proof of the application's microstructure.",
@@ -259,6 +262,166 @@
       "rawFilesAudited": false,
       "licenseAudited": false,
       "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "fe-multisteel-9-ebsd",
+      "dataset": "Nove mapas EBSD de aços com fases transformadas",
+      "elements": [
+        "Fe"
+      ],
+      "specimenClass": "steel",
+      "technique": "EBSD CTF",
+      "supports": [
+        "phase-classification",
+        "orientation"
+      ],
+      "url": "https://doi.org/10.12763/RHWHD7",
+      "comment": "Arquivos CTF e parâmetros de aquisição; aço, não Fe puro. Repositório declara CC0.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "co-ta-superalloys",
+      "dataset": "Superligas de Co com teores de Ta distintos",
+      "elements": [
+        "Co",
+        "Ta"
+      ],
+      "specimenClass": "alloy",
+      "technique": "BSE+EDS+XRD",
+      "supports": [
+        "phase-area-fraction",
+        "compositional-map"
+      ],
+      "url": "https://doi.org/10.17863/CAM.120624",
+      "comment": "Dataset de ligas Co-Ta com frações de área (não teor de Ta puro).",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "w-heavy-alloy-contiguity",
+      "dataset": "Liga pesada de tungstênio: imagens BSE e análise geométrica",
+      "elements": [
+        "W"
+      ],
+      "specimenClass": "alloy",
+      "technique": "BSE-SEM+scripts",
+      "supports": [
+        "tungsten-phase-contiguity",
+        "particles"
+      ],
+      "url": "https://doi.org/10.17632/hrpf6rr23p.1",
+      "comment": "Fração e conectividade da fase rica em W; não grãos de W puro.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "w-unalloyed-ebpbf",
+      "dataset": "Tungstênio puro por fusão de pó com feixe eletrônico",
+      "elements": [
+        "W"
+      ],
+      "specimenClass": "elemental",
+      "technique": "EBSD+metallography",
+      "supports": [
+        "grain-morphology",
+        "orientation"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S235217912500153X",
+      "comment": "Artigo científico com microestrutura e processamento; arquivos brutos não verificados.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "in718-ebsd-3d",
+      "dataset": "Superliga Inconel 718: EBSD tridimensional",
+      "elements": [
+        "Ni",
+        "Fe",
+        "Cr",
+        "Nb",
+        "Mo"
+      ],
+      "specimenClass": "alloy",
+      "technique": "3D-EBSD+HR-DIC",
+      "supports": [
+        "grain-topology",
+        "orientation",
+        "deformation"
+      ],
+      "url": "https://datadryad.org/dataset/doi%3A10.5061/dryad.83bk3j9sj",
+      "comment": "Dados volumétricos de uma superliga, não de constituintes puros. Processamento precisa de infraestrutura.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "nb-ni-co-mu-phases",
+      "dataset": "Fases μ de Nb–Ni e Nb–Co",
+      "elements": [
+        "Nb",
+        "Ni",
+        "Co"
+      ],
+      "specimenClass": "intermetallic",
+      "technique": "EBSD",
+      "supports": [
+        "phase-crystallography",
+        "pattern-matching"
+      ],
+      "url": "https://zenodo.org/records/21703145",
+      "comment": "Estudo de fases μ de ligas, não tamanho médio dos grãos elementares.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "al-ufg-ebsd-afm",
+      "dataset": "Al ultrafino: migração de contornos por fluência",
+      "elements": [
+        "Al"
+      ],
+      "specimenClass": "elemental",
+      "technique": "EBSD+AFM+ACOM-TEM",
+      "supports": [
+        "grain-boundary",
+        "evolution"
+      ],
+      "url": "https://zenodo.org/records/17190340",
+      "comment": "Dados antes/depois do ensaio; não perfil genérico de microestrutura de latas.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "au-polycrystal-ebsd",
+      "dataset": "Ouro policristalino — orientação de superfície",
+      "elements": [
+        "Au"
+      ],
+      "specimenClass": "elemental",
+      "technique": "EBSD+SECCM",
+      "supports": [
+        "grain-orientation",
+        "surface-electrochemistry"
+      ],
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12415841/",
+      "comment": "Artigo aberto, imagens/dados suplementares a auditar. Não equivalente ao revestimento eletrônico.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
     }
   ],
   "records": [
@@ -440,7 +603,8 @@
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
-          "al-stem-boundary"
+          "al-stem-boundary",
+          "al-ufg-ebsd-afm"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -663,7 +827,8 @@
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
           "fe-316l-correlative",
-          "fe-cr-cast-phases"
+          "fe-cr-cast-phases",
+          "in718-ebsd-3d"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -740,7 +905,9 @@
           "fe-316l-correlative",
           "fe-cr-cast-phases",
           "nd-ce-dy-magnet",
-          "ti-ulc-inclusions"
+          "ti-ulc-inclusions",
+          "fe-multisteel-9-ebsd",
+          "in718-ebsd-3d"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -777,8 +944,11 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "co-ta-superalloys",
+          "nb-ni-co-mu-phases"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -815,7 +985,9 @@
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
           "ni-pure-ebsd",
-          "fe-316l-correlative"
+          "fe-316l-correlative",
+          "in718-ebsd-3d",
+          "nb-ni-co-mu-phases"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1075,8 +1247,11 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "in718-ebsd-3d",
+          "nb-ni-co-mu-phases"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1113,7 +1288,8 @@
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
           "ti-mo-zr-corrosion",
-          "ti-mo-hf-biomedical"
+          "ti-mo-hf-biomedical",
+          "in718-ebsd-3d"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -2022,8 +2198,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "co-ta-superalloys"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2058,8 +2236,11 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "w-heavy-alloy-contiguity",
+          "w-unalloyed-ebpbf"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2238,8 +2419,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "au-polycrystal-ebsd"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
