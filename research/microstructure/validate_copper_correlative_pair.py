@@ -15,6 +15,15 @@ from scipy.ndimage import distance_transform_edt
 
 RAW_MD5 = "ffe617d5cb3d2e4ed1a5e3b7d27d6e11"
 SCHEMA = "silm.copper-correlative-pair.v1"
+SOURCE_REFERENCE_MANIFEST = pathlib.Path(__file__).with_name("copper-mtex-source-verified.json")
+
+
+def allowed_script_shas():
+    documented = json.loads(SOURCE_REFERENCE_MANIFEST.read_text(encoding="utf-8"))
+    return {
+        "zenodo-published": documented["zenodoPublishedScript"]["sha256Calculated"],
+        "github-pinned": documented["pinnedGitHubScript"]["sha256Calculated"],
+    }
 
 
 def fail(message):
@@ -105,6 +114,14 @@ def validate_meta(meta):
         fail("SHA256 of retained transformation/registration evidence required")
     if not meta.get("correctedExportProvenance") or not meta.get("trueEbsdVersion"):
         fail("Corrected export and TrueEBSD version required")
+    reference = meta.get("referenceScript", {})
+    allowed = allowed_script_shas()
+    kind = reference.get("kind")
+    if kind not in allowed or reference.get("sha256") != allowed[kind]:
+        fail("Corrected map must name an audited MATLAB script and its exact SHA256")
+    for field in ("mtexVersion", "matlabVersion"):
+        if not isinstance(meta.get(field), str) or not meta[field].strip():
+            fail("MTEX and MATLAB versions must be declared")
     mask = meta.get("voidMask", {})
     if mask.get("method") != "registered-BSE-threshold" or not mask.get("source"):
         fail("Independent registered BSE mask provenance required")
@@ -201,6 +218,9 @@ def analyze(meta, raw, corrected):
             "registrationAssessment": "metadata-declared; not independently verified",
             "heldOutLandmarkQuality": residual,
             "segmentationMethods": meta["segmentation"],
+            "referenceScript": meta["referenceScript"],
+            "matlabVersion": meta["matlabVersion"],
+            "mtexVersion": meta["mtexVersion"],
             "causalAttribution": "not-possible: distortion correction and segmentation methods may differ",
             "cannotInfer": ["chemical concentration", "voids from unindexed EBSD",
                             "ASTM grain size", "volume fraction", "licence to reuse",
