@@ -1,0 +1,147 @@
+{
+  "schema": "silm.experimental-microstructure-audit.v1",
+  "study": "Yang, Vassilev-Galindo & Llorca (2024), npj Computational Materials",
+  "studyURL": "https://doi.org/10.1038/s41524-024-01212-x",
+  "source": "https://zenodo.org/records/10225600",
+  "dataDOI": "10.5281/zenodo.10225600",
+  "verification": {
+    "workflow": "https://github.com/qui-x/ligacoesmetalicas/actions/runs/42339051465",
+    "artifact": "silm-mg-ebsd-review-not-homologated",
+    "auditScript": "research/microstructure/audit_magnesium.py",
+    "checksumAlgorithm": "MD5 (Zenodo-published, byte-for-byte compared)",
+    "checksumBothMatched": true,
+    "publicationRowCountsMatched": true,
+    "independentScientificReview": false,
+    "licenseOriginalAPIRights": [],
+    "licenseThirdPartyIndex": "CC BY 4.0 reported in institutional research index; exact record rights not yet independently resolved",
+    "sourceRightsVerification": "pending"
+  },
+  "context": {
+    "technique": "2D EBSD",
+    "sizeMetric": "Equivalent circle diameter of pre-deformation grain",
+    "sizeUnit": "µm",
+    "filter": "Near_edge == 0",
+    "quantileMethod": "linear interpolation (n-1)",
+    "notRepresented": [
+      "true 3D grain size",
+      "ASTM E112 average grain size",
+      "grain polygons",
+      "chemical composition of grains",
+      "phase fractions",
+      "material specification of an everyday application"
+    ],
+    "approval": "preliminary-statistics-only"
+  },
+  "allGrains": 4136,
+  "retainedGrains": 3576,
+  "nearEdgeExcluded": 560,
+  "samples": [
+    {
+      "material": "AZ31",
+      "file": "AZ31_ML.xlsx",
+      "fileSizeBytes": 933575,
+      "md5": "1e67111dc62f6ff47a8d8e535a70e5cd",
+      "raw": 2640,
+      "excludedNearEdge": 339,
+      "excludedInvalid": 0,
+      "retained": 2301,
+      "size": {
+        "n": 2301,
+        "min": 1.633878,
+        "p05": 2.302373,
+        "p25": 4.104778,
+        "median": 6.269024,
+        "mean": 7.96653,
+        "p75": 9.647697,
+        "p95": 18.777147,
+        "max": 83.084702,
+        "sampleSD": 6.276096
+      },
+      "neighbors": {
+        "n": 2301,
+        "median": 5,
+        "mean": 5.757931,
+        "p25": 4,
+        "p75": 7
+      },
+      "groups": [
+        {
+          "loadingOrientation": 0,
+          "strainLevel": 0.06,
+          "n": 290,
+          "ecdMedian": 8.260705,
+          "ecdMean": 11.071436,
+          "p25": 4.467914,
+          "p75": 14.110026
+        },
+        {
+          "loadingOrientation": 45,
+          "strainLevel": 0.06,
+          "n": 593,
+          "ecdMedian": 7.196311,
+          "ecdMean": 9.216987,
+          "p25": 4.571909,
+          "p75": 10.774021
+        },
+        {
+          "loadingOrientation": 90,
+          "strainLevel": 0.06,
+          "n": 1418,
+          "ecdMedian": 5.784159,
+          "ecdMean": 6.808601,
+          "p25": 3.934708,
+          "p75": 8.699492
+        }
+      ]
+    },
+    {
+      "material": "Mg–1Al",
+      "file": "Mg1Al_ML.xlsx",
+      "fileSizeBytes": 527526,
+      "md5": "8e4bb43f636939ef4f39a74fb163bb51",
+      "raw": 1496,
+      "excludedNearEdge": 221,
+      "excludedInvalid": 0,
+      "retained": 1275,
+      "size": {
+        "n": 1275,
+        "min": 0.586933,
+        "p05": 5.174472,
+        "p25": 10.452222,
+        "median": 17.320852,
+        "mean": 18.430929,
+        "p75": 23.736538,
+        "p95": 36.93921,
+        "max": 115.013175,
+        "sampleSD": 10.558657
+      },
+      "neighbors": {
+        "n": 1275,
+        "median": 6,
+        "mean": 5.916863,
+        "p25": 4,
+        "p75": 7
+      },
+      "groups": [
+        {
+          "loadingOrientation": 90,
+          "strainLevel": 0.06,
+          "n": 811,
+          "ecdMedian": 18.209141,
+          "ecdMean": 19.466019,
+          "p25": 10.950316,
+          "p75": 25.037106
+        },
+        {
+          "loadingOrientation": 90,
+          "strainLevel": 0.1,
+          "n": 464,
+          "ecdMedian": 16.034458,
+          "ecdMean": 16.621752,
+          "p25": 10.231366,
+          "p75": 21.490833
+        }
+      ]
+    }
+  ]
+}
