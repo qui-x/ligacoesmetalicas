@@ -20,7 +20,13 @@
   },
   "sourceVersionsByteIdentical": false,
   "procedureNotes": {
-    "bothScriptVersionsMention": ["pixelSizeMatch", "calcShifts", "undistort", "calcGrains", "boundaryContours"],
+    "bothScriptVersionsMention": [
+      "pixelSizeMatch",
+      "calcShifts",
+      "undistort",
+      "calcGrains",
+      "boundaryContours"
+    ],
     "bothScriptVersionsMentionTrueEbsd2": false,
     "mtexWebsiteDocumentsTrueEbsd2": true,
     "behavioralEquivalence": "not-evaluated",
@@ -40,5 +46,15 @@
   "rawExperimentalDataRedistributed": false,
   "originalMatlabCodeRedistributed": false,
   "correctedExperimentalMapProcessed": false,
-  "scientificHomologation": false
+  "scientificHomologation": false,
+  "noncommentStructuralComparison": {
+    "noncommentSequencesIdentical": false,
+    "noncommentLineEdits": {
+      "insertedNoncommentLines": 16,
+      "deletedNoncommentLines": 0,
+      "replacedOldNoncommentLines": 58,
+      "replacedNewNoncommentLines": 117
+    },
+    "limitation": "Line-oriented structural comparison; cannot infer MATLAB behavior or scientific equivalence."
+  }
 }
