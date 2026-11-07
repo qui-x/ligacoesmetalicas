@@ -528,3 +528,52 @@
 @media(forced-colors:active){
  #si-stage .silm-workshop-scale[aria-pressed=true]{outline:3px solid Highlight}
 }
+
+
+/* R08b · O cabeçalho e as ferramentas nunca podem esmagar a imagem do grão.
+   Em telas baixas, a região de conteúdo rola; a imagem não cai a 2 px. */
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer{
+ flex:0 0 auto;
+ height:clamp(440px,calc(100dvh - 330px),740px);
+ min-height:440px;
+ grid-template-rows:minmax(270px,1fr) auto auto;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewport{
+ min-height:270px;
+}
+@media(max-width:760px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  grid-template-rows:auto auto auto;gap:3px;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-status{
+  grid-column:1;grid-row:1;font-size:.77rem;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-dimension{
+  grid-column:1;grid-row:2;font-size:.7rem;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools{
+  box-sizing:border-box;grid-column:1;grid-row:3;
+  display:flex;justify-content:flex-start;flex-wrap:nowrap;
+  overflow-x:auto;overscroll-behavior-x:contain;
+  max-width:100%;min-width:0;min-height:44px;scrollbar-width:thin;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools>*{
+  flex:0 0 auto;
+ }
+}
+@media(min-width:761px) and (min-height:600px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer{
+  min-height:520px;
+  height:clamp(520px,calc(100dvh - 320px),800px);
+  grid-template-rows:minmax(410px,1fr) auto auto;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewport{min-height:410px}
+}
+@media(max-height:510px) and (orientation:landscape){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer{
+  height:365px;min-height:365px;
+  grid-template-rows:minmax(240px,1fr) auto auto;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewport{min-height:240px}
+}
