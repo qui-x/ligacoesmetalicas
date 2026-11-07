@@ -5,6 +5,7 @@ on:
       - design/silm-rede-ambiente-atomico-parte6
     paths:
       - 'research/microstructure/validate_copper_correlative_pair.py'
+      - 'research/microstructure/copper-mtex-source-verified.json'
       - 'tests/test_copper_correlative_pair.py'
       - '.github/workflows/silm-copper-correlative-contract.yml'
   workflow_dispatch:
