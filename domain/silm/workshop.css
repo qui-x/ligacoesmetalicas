@@ -98,7 +98,7 @@
 .silm-workshop-micro-viewport.is-pannable .silm-workshop-micro-map{touch-action:none;cursor:grab}
 .silm-workshop-micro-viewport.is-pannable .silm-workshop-micro-map:active{cursor:grabbing}
 .silm-workshop-micro-viewport.is-zoomed .silm-workshop-micro-map:active{cursor:grabbing}
-.silm-micro-grain{fill:var(--silm-grain-fill,var(--panel2,var(--surface)));stroke:var(--silm-grain-edge,var(--text));stroke-opacity:.9;stroke-width:2.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;outline:none}
+.silm-micro-grain{fill:var(--silm-grain-fill,var(--panel2,var(--surface)));stroke:var(--silm-grain-edge,var(--text));stroke-opacity:.9;stroke-width:2.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;pointer-events:all;outline:none}
 .silm-micro-hatching{opacity:.32}
 .silm-micro-highlight{fill:none;stroke:rgba(255,255,255,.44);stroke-width:1.7;stroke-linejoin:round;vector-effect:non-scaling-stroke;opacity:.7;pointer-events:none}
 :root.si-highcontrast .silm-micro-highlight{display:none}
