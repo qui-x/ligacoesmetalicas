@@ -39,9 +39,9 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   coupled={id:st.investigation.id,start:model.state.properties.startedAt,mode:'voltage',boundary:'ambient',external:false,layer:'temperature',run,net};
   schedule();return true;
  }
- function jouleAction(command){
+ function jouleAction(command,origin=null){
   const session=currentCoupling();if(!session||!editable())return false;
-  if(command==='readings')return showJouleReadings();
+  if(command==='readings')return showJouleReadings(origin);
   if(command==='restore'){actions.restore();return true;}
   if(command==='end'){coupled=null;schedule();return true;}
   if(command==='step'){
@@ -56,10 +56,10 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   else return false;
   schedule();return true;
  }
- function showJouleReadings(){
+ function showJouleReadings(origin){
   const frame=jouleReading();if(!frame)return false;
   const {input,values}=frame,format=n=>n.toLocaleString('pt-BR',{maximumFractionDigits:5});
-  const previous=document.activeElement,dialog=U.element('dialog',null,'silm-dialog silm-about-dialog silm-joule-dialog');
+  const previous=origin||document.activeElement,dialog=U.element('dialog',null,'silm-dialog silm-about-dialog silm-joule-dialog');
   dialog.setAttribute('aria-labelledby','silm-joule-results-title');
   const heading=U.element('div',null,'silm-dialog-heading'),title=U.element('h2','Leituras do efeito Joule');title.id='silm-joule-results-title';
   const close=U.element('button','Fechar leituras','silm-dialog-close');close.type='button';close.setAttribute('aria-label','Fechar leituras do efeito Joule');

@@ -279,7 +279,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   for(const [value,label] of [['','Condições Joule'],['voltage','Tensão imposta'],['current','Corrente imposta'],['ambient','Terminais à temperatura ambiente'],['insulated','Amostra isolada'],['supply','Ligar ou desligar alimentação'],['external','Ligar ou desligar calor externo'],['temperature','Ver temperatura'],['potential','Ver potencial elétrico'],['dissipation','Ver dissipação Joule'],['readings','Leituras e balanço de energia'],['restore','Reiniciar ensaio'],['end','Encerrar efeito Joule']]){
    const option=document.createElement('option');option.value=value;option.textContent=label;jouleSettings.append(option);
   }
-  scope.listen(jouleSettings,'change',()=>{const action=jouleSettings.value;jouleSettings.value='';propertyOptions.quickActions.jouleAction(action);});
+  scope.listen(jouleSettings,'change',()=>{const action=jouleSettings.value;jouleSettings.value='';propertyOptions.quickActions.jouleAction(action,jouleSettings);});
   const step=U.element('button','Avançar 0,5');step.type='button';step.setAttribute('aria-label','Avançar meio intervalo no efeito Joule');step.title='Avançar meio intervalo no efeito Joule';step.classList.add('silm-joule-step');
   scope.listen(step,'click',()=>propertyOptions.quickActions.jouleAction('step'));
   jouleControls.append(jouleSettings,step);navigator.root.append(jouleControls);
