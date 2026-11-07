@@ -136,3 +136,20 @@ test('Matéria documentada também engloba elementos sem fonte micrográfica esp
  }
  assert.match(md,/sem micrografia homologada/);
 });
+
+test('Cobre HDF5: dados calibrados não se confundem com grãos homologados',()=>{
+ const evidence=JSON.parse(read('research/microstructure/copper-ebsd-verified-metadata.json'));
+ const record=coverage.records.find(x=>x.symbol==='Cu');
+ assert.equal(evidence.original.measuredMD5,evidence.original.publishedMD5);
+ assert.equal(evidence.original.hashMatches,true);
+ assert.equal(evidence.hdf5.widthPx*evidence.hdf5.heightPx,evidence.hdf5.pointsTotal);
+ assert.equal(evidence.hdf5.pointsCopperPhase+evidence.hdf5.pointsNotIndexed,evidence.hdf5.pointsTotal);
+ assert.equal(evidence.hdf5.pointsTotal,563957);
+ assert.equal(evidence.hdf5.phaseCrystal.spaceGroupNumber,225);
+ assert.equal(evidence.rights.approvedForRedistribution,false);
+ assert.equal(evidence.status.grainBoundaries,'not-yet-segmented-or-validated');
+ assert.equal(evidence.status.scientificHomologation,false);
+ assert.equal(record.microstructure.experimentalAnalysis.sourcePixels,evidence.hdf5.pointsTotal);
+ assert.equal(record.microstructure.experimentalAnalysis.readyToPublishImage,false);
+ assert.equal(record.microstructure.experimentalSampleIntegrated,false);
+});
