@@ -29,6 +29,7 @@ SILM.microstructure=(()=>{
   section.setAttribute('aria-label','Microestrutura ampliada: visualização didática de grãos sem medições experimentais');
   // Guardar proveniência explícita: a tesselação não autoriza porcentagens científicas.
   section.dataset.microstructureSource='schematic';section.dataset.measurementStatus='unavailable';
+  section.dataset.didacticEvidenceLevel='D0-schematic-conceptual';
   const svg=svgNode('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'xMidYMid meet',role:'group','aria-label':'Policristal didático ampliado: percorra os grãos com Tab e destaque com Enter; não é micrografia experimental'});
   svg.classList.add('silm-workshop-micro-map');svg.setAttribute('data-zoom','1');
   const defs=svgNode('defs'),uid='silm-micro-'+(++serial);
@@ -190,6 +191,37 @@ SILM.microstructure=(()=>{
   const dataDialog=node('dialog','silm-micro-data-dialog'),dataTitle=node('h2','','Mapa segmentado');
   const dataHelp=node('p','','Carregue um JSON com contornos de grãos e origem documentada. A procedência declarada não é verificada automaticamente pelo SILM.');
   dataHelp.className='silm-micro-import-help';
+  // Fundamentação por elemento: a evidência cristalográfica NÃO transforma
+  // tesselações didáticas em micrografias do produto ou do metal puro.
+  const refElement=SILM.data?.get?.(element?.atomicNumber)||element;
+  const crystal=refElement&&SILM.data?.structure?.(refElement);
+  const crystalSource=crystal?.sourceId?SILM.data?.source?.(crystal.sourceId):null;
+  const appReference=SILM.metalAtlas?.get?.(element?.atomicNumber);
+  const evidence=node('section','silm-micro-didactic-evidence');
+  evidence.setAttribute('aria-label','Fundamentação científica e limites da representação');
+  evidence.dataset.evidenceLevel='D0-schematic-conceptual';
+  evidence.append(
+   node('p','','D0 · Modelo de grãos conceitual. A geometria é ilustrativa: não reproduz uma amostra medida nem a forma real dos grãos deste objeto.'),
+   node('p','','Rede de referência: '+(crystal?.type||'não registrada')+
+    (crystal?.spaceGroupNumber?' · grupo espacial '+crystal.spaceGroupNumber:'')+
+    '. A fase e as condições de uma liga ou produto podem ser diferentes.')
+  );
+  const sourceURL=crystalSource?.url;
+  if(typeof sourceURL==='string'&&/^https:\/\//.test(sourceURL)){
+   const link=node('a','','Consultar fonte cristalográfica');
+   link.href=sourceURL;link.target='_blank';link.rel='noopener noreferrer';
+   evidence.append(link);
+  }
+  if(appReference){
+   evidence.append(node('p','','Contexto de aplicação no atlas: '+appReference.materialCategory+
+    '. '+appReference.caveat));
+   if(typeof appReference.referenceURL==='string'&&/^https:\/\//.test(appReference.referenceURL)){
+    const link=node('a','','Consultar referência da aplicação ilustrada');
+    link.href=appReference.referenceURL;link.target='_blank';link.rel='noopener noreferrer';
+    evidence.append(link);
+   }
+  }
+  evidence.append(node('p','','Dados experimentais de grãos, composição e tamanho físico: não homologados neste modelo. Estudos candidatos não são parâmetros do gerador.'));
   const fileLabel=node('label','','Arquivo JSON de microestrutura');
   const fileInput=node('input');fileInput.type='file';fileInput.accept='.json,application/json';fileInput.setAttribute('aria-label','Arquivo JSON de microestrutura');
   fileLabel.append(fileInput);
@@ -201,7 +233,7 @@ SILM.microstructure=(()=>{
    sourceLink.hidden=true;sourceLink.removeAttribute('href');report.textContent='Esquema didático restaurado.';
   });
   const close=button('Fechar importação de dados','Fechar',()=>dataDialog.close());
-  dialogActions.append(reset,close);dataDialog.append(dataTitle,dataHelp,fileLabel,report,sourceLink,dialogActions);
+  dialogActions.append(reset,close);dataDialog.append(dataTitle,dataHelp,evidence,fileLabel,report,sourceLink,dialogActions);
   fileInput.addEventListener('change',async()=>{
    const file=fileInput.files?.[0];if(!file)return;
    try{
