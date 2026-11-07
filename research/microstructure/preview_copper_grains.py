@@ -80,16 +80,20 @@ def run(input_file, width=160, height=160, x0_pixel=None, y0_pixel=None):
         angle = f[SOURCE + "/Euler"][:].reshape(y_cells, x_cells, 3)
     sub_phase = phase[y0:y0 + height, x0:x0 + width].reshape(-1)
     sub_euler = angle[y0:y0 + height, x0:x0 + width, :].reshape(-1, 3)
-    if not np.isfinite(sub_euler[sub_phase == 1]).all():
+    indexable = np.flatnonzero(sub_phase == 1)
+    if not np.isfinite(sub_euler[indexable]).all():
         raise ValueError("Invalid Euler measurements in indexed Cu points.")
-    all_q = Rotation.from_euler("ZXZ", sub_euler, degrees=False).as_quat()
+    # Never require meaningful Euler angles at unindexed pixels. Their values
+    # may be NaN in valid HDF5 acquisitions; those pixels cannot form Cu edges.
+    all_q = np.full((width * height, 4), np.nan, dtype=float)
+    all_q[indexable] = Rotation.from_euler(
+        "ZXZ", sub_euler[indexable], degrees=False).as_quat()
     positions = np.arange(width * height).reshape(height, width)
     u = np.concatenate([positions[:, :-1].reshape(-1), positions[:-1, :].reshape(-1)])
     v = np.concatenate([positions[:, 1:].reshape(-1), positions[1:, :].reshape(-1)])
     valid_pair = (sub_phase[u] == 1) & (sub_phase[v] == 1)
     connected_a, connected_b = u[valid_pair], v[valid_pair]
     angles = misorientation_deg(all_q[connected_a], all_q[connected_b])
-    indexable = np.flatnonzero(sub_phase == 1)
     results = []
     for threshold in (5, 10, 15):
         allow = angles <= threshold
