@@ -37,7 +37,16 @@ def run():
         assert not report["correctedExperimentalMapLoaded"]
         assert not report["rawArraysOrImagesRedistributed"]
         assert report["rights"]["rightsAsReported"] == []
+        assert report["rights"]["declaredLicenseId"] is None
         assert "PENDING" in report["rights"]["rightsDecision"]
+        licensed = mod.analyze(a, b, {"metadata": {"rights": [], "license": {"id": "cc-by-4.0"}}})
+        assert licensed["rights"]["declaredLicenseId"] == "cc-by-4.0"
+        assert licensed["rights"]["declaredLicenseReference"] == (
+            "https://creativecommons.org/licenses/by/4.0/"
+        )
+        assert licensed["rights"]["fileRightsAudited"] is False
+        assert licensed["rights"]["derivativeRightsApproved"] is False
+        assert "PENDING" in licensed["rights"]["rightsDecision"]
         must_fail(lambda: mod.analyze(b, a, None), "md5")
         assert mod.marker_summary(b"calcGrainsextended")["calcGrains"] is False
         assert mod.marker_summary(b"calcGrains")["calcGrains"] is True
