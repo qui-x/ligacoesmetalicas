@@ -543,3 +543,31 @@ body.si-structure-expanded #silm-scene-actionbar{
   box-shadow:inset 0 -2px Highlight!important;
  }
 }
+
+/* Parte 6 — a barra de ações continua em uma única faixa rolável.
+   Ícones não encolhem abaixo da área de toque e o palco não ganha rolagem lateral. */
+@media (max-width:900px){
+ #silm-scene-actionbar{
+  box-sizing:border-box!important;width:100%!important;max-width:100%!important;
+  min-width:0!important;overflow-x:auto!important;overflow-y:hidden!important;
+  justify-content:flex-start!important;flex-wrap:nowrap!important;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin;overscroll-behavior-x:contain;
+ }
+ #silm-scene-actionbar #silm-view-controls,
+ #silm-scene-actionbar #silm-view-quick-actions,
+ #silm-scene-actionbar .silm-lattice-nav{flex-shrink:0!important}
+ #silm-scene-actionbar #silm-view-controls #si-expand-structure.si-structure-expand-in-camera,
+ #silm-scene-actionbar #silm-view-quick-actions .silm-quick-icon,
+ #silm-scene-actionbar .silm-lattice-nav button{
+  box-sizing:border-box!important;flex:0 0 44px!important;
+  width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;
+ }
+ #silm-scene-actionbar #silm-view-controls .silm-camera-btn,
+ #silm-scene-actionbar #scene-menu-toggle{min-height:44px!important}
+ #silm-scene-actionbar .si-toolmenu-wrap{position:static!important;flex:0 0 auto!important}
+}
+@media (max-width:560px){
+ #silm-scene-actionbar .silm-lattice-nav>button:last-child{
+  width:auto!important;min-width:68px!important;flex:0 0 auto!important;
+ }
+}

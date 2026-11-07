@@ -290,3 +290,25 @@
  .silm-workshop-card:has(.silm-workshop-atlas-photo) .silm-workshop-art{padding:6px;}
  .silm-workshop-card:has(.silm-workshop-atlas-photo) .silm-workshop-atlas-photo img{max-height:210px;}
 }
+
+/* Parte 6 — telas de pouca altura não podem cortar a microestrutura e o zoom.
+   A rolagem é LOCAL à cena; a navegação inferior do aplicativo permanece fixa. */
+@media (max-height:700px){
+ body.route-ambiente #si-stage:has(.silm-workshop-micro-mode){
+  overflow-x:hidden!important;overflow-y:auto!important;
+  overscroll-behavior-y:contain;scrollbar-width:thin;
+ }
+ body.route-ambiente #si-stage:has(.silm-workshop-micro-mode) #workspace-focus{
+  height:auto!important;min-height:100%!important;overflow:visible!important;
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-viewer{
+  grid-template-rows:minmax(220px,1fr) auto auto;
+  height:clamp(345px,calc(100dvh - 330px),480px);
+ }
+}
+@media (max-width:620px) and (max-height:700px){
+ .silm-workshop-micro-mode .silm-workshop-micro-viewer{
+  grid-template-rows:minmax(210px,1fr) auto auto;
+  height:clamp(345px,calc(100dvh - 280px),470px);
+ }
+}

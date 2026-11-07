@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox]
+        browser: [chromium, firefox, webkit]
     env:
       BROWSER_NAME: ${{ matrix.browser }}
       BASE_URL: http://127.0.0.1:8765
@@ -56,6 +56,7 @@ jobs:
           node --check tests/run-atlas-applications.mjs
           node --check integracao/action-icons.js
           node --check tests/run-workshop-micro-main.mjs
+          node --check tests/run-responsive-matrix.mjs
       - name: Validar navegação e balanço eletrotérmico
         run: node --test tests/*.test.*
       - name: Instalar Playwright
@@ -78,6 +79,8 @@ jobs:
         run: |
           node tests/run-workshop-micro-main.mjs
           node tests/run-atlas-applications.mjs
+      - name: Auditar matriz de responsividade (12 dimensões)
+        run: node tests/run-responsive-matrix.mjs
       - name: Encerrar servidor
         if: always()
         run: |
