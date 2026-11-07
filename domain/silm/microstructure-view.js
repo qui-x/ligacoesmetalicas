@@ -59,7 +59,16 @@ SILM.microstructure=(()=>{
    const d='M'+poly.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')+' Z';
    const g=svgNode('g',{'class':'silm-micro-cell'}),p=svgNode('path',{d,'class':'silm-micro-grain',tabindex:0,role:'button','aria-label':sourceData?'Selecionar grão segmentado '+sourceData.grains[i].id+' (dados importados não homologados)':'Destacar grão ilustrativo '+(i+1),'aria-pressed':'false'});
    p.style.setProperty('--grain-tone',(16+(i*17)%30)+'%');p.addEventListener('click',()=>{if(!suppressClick)choose(i);});
-   p.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(i);}});
+   p.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(i);return;}
+    const step=55*(e.shiftKey?2:1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight'||e.key==='ArrowUp'||e.key==='ArrowDown'){
+     e.preventDefault();
+     offsetX+=e.key==='ArrowLeft'?-step:e.key==='ArrowRight'?step:0;
+     offsetY+=e.key==='ArrowUp'?-step:e.key==='ArrowDown'?step:0;
+     update();
+    }
+   });
    const hatch=svgNode('path',{d,'class':'silm-micro-hatching',fill:'url(#'+uid+'-pattern-'+(i%4)+')','pointer-events':'none'});
    g.append(p,hatch);plane.append(g);paths[i]=p;cells[i]=g;
    });
@@ -70,11 +79,15 @@ SILM.microstructure=(()=>{
   const toolbar=node('div','silm-workshop-micro-toolbar'),zoomLabel=node('output','silm-workshop-micro-zoom','100%');
   zoomLabel.setAttribute('aria-label','Ampliação da microestrutura');
   function update(){
-   offsetX=clamp(offsetX,-(zoom-1)*CX,(zoom-1)*CX);
-   offsetY=clamp(offsetY,-(zoom-1)*CY,(zoom-1)*CY);
+   const view=svg.viewBox.baseVal;
+   const maxX=Math.max(0,(zoom*W-view.width)/2);
+   const maxY=Math.max(0,(zoom*H-view.height)/2);
+   offsetX=clamp(offsetX,-maxX,maxX);
+   offsetY=clamp(offsetY,-maxY,maxY);
    plane.setAttribute('transform','translate('+(offsetX+CX)+' '+(offsetY+CY)+') scale('+zoom+') translate('+(-CX)+' '+(-CY)+')');
    svg.setAttribute('data-zoom',String(zoom));zoomLabel.value=Math.round(zoom*100)+'%';
    viewport.classList.toggle('is-zoomed',zoom>1);
+   viewport.classList.toggle('is-pannable',maxX>1||maxY>1);
   }
   const setZoom=z=>{zoom=clamp(Math.round(z*4)/4,1,4);if(zoom===1){offsetX=0;offsetY=0;}update();};
   const button=(name,txt,action)=>{const b=node('button','silm-workshop-micro-control',txt);b.type='button';b.setAttribute('aria-label',name);b.addEventListener('click',action);return b;};
@@ -82,11 +95,16 @@ SILM.microstructure=(()=>{
   zoomControls.append(button('Reduzir microestrutura','−',()=>setZoom(zoom-.25)),zoomLabel,button('Ampliar microestrutura','+',()=>setZoom(zoom+.25)),button('Ajustar microestrutura ao quadro','Ajustar',()=>setZoom(1)));
   toolbar.append(status,dimension,zoomControls);
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
-  svg.addEventListener('pointerdown',e=>{if(zoom<=1||e.button!==0)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};suppressClick=false;svg.setPointerCapture(e.pointerId);});
+  svg.addEventListener('pointerdown',e=>{
+   if(e.button!==0||!viewport.classList.contains('is-pannable'))return;
+   drag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
+   suppressClick=false;svg.setPointerCapture(e.pointerId);
+  });
   svg.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;
    const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
    if(Math.abs(dx)+Math.abs(dy)>2)drag.moved=true;
-   const r=svg.getBoundingClientRect(),factor=Math.min(r.width/W,r.height/H)||1;
+   const r=svg.getBoundingClientRect(),v=svg.viewBox.baseVal;
+   const factor=Math.min(r.width/v.width,r.height/v.height)||1;
    offsetX+=dx/factor;offsetY+=dy/factor;drag.x=e.clientX;drag.y=e.clientY;update();
   });
   const stop=e=>{if(!drag||e.pointerId!==drag.id)return;suppressClick=drag.moved;drag=null;
@@ -212,14 +230,14 @@ SILM.microstructure=(()=>{
    // recortá-la esconderia grãos e distorceria a leitura da amostra.
    if(sourceData){
     svg.setAttribute('viewBox','0 0 '+W+' '+H);
-    svg.dataset.mapReady='true';return;
+    update();svg.dataset.mapReady='true';return;
    }
    const ratio=clamp(rect.width/rect.height,.2,8),base=W/H;
    const boxW=ratio<base?H*ratio:W,boxH=ratio>base?W/ratio:H;
    svg.setAttribute('viewBox',[
     (W-boxW)/2,(H-boxH)/2,boxW,boxH
    ].map(n=>Number(n.toFixed(3))).join(' '));
-   svg.dataset.mapReady='true';
+   update();svg.dataset.mapReady='true';
   }
   let resizeFrame=0;
   const scheduleResize=()=>{
