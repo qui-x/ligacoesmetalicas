@@ -3,6 +3,7 @@ on:
   push:
     branches: [main]
     paths:
+      - "domain/silm/microstructure-data.js"
       - "domain/silm/microstructure-view.js"
       - "domain/silm/workshop.js"
       - "domain/silm/metal-atlas.js"
@@ -16,6 +17,7 @@ on:
       - "index.html"
       - "sw.js"
       - "tests/run-workshop-micro-main.mjs"
+      - "tests/microstructure-data.test.cjs"
       - "tests/run-atlas-applications.mjs"
       - ".github/workflows/silm-microstructure-main.yml"
   pull_request:
@@ -50,6 +52,7 @@ jobs:
           python-version: '3.x'
       - name: Sintaxe do visualizador e da Oficina
         run: |
+          node --check domain/silm/microstructure-data.js
           node --check domain/silm/microstructure-view.js
           node --check domain/silm/workshop.js
           node --check domain/silm/metal-atlas.js
