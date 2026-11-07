@@ -21,6 +21,56 @@ def fail(message):
     raise ValueError(message)
 
 
+def validate_heldout_landmarks(registration, grid, size):
+    """Check declared held-out paired landmarks in the common micron frame.
+
+    Detects gross inconsistencies, not measurement authenticity.
+    """
+    landmarks = registration.get("heldOutLandmarks", [])
+    if not isinstance(landmarks, list) or len(landmarks) < 4:
+        fail("At least 4 declared held-out registration landmarks are required")
+    stepy, stepx = grid["pixelSizeMicrometersYX"]
+    originy, originx = grid["originMicrometersYX"]
+    upperx = originx + (size[1] - 1) * stepx
+    uppery = originy + (size[0] - 1) * stepy
+    seen = set()
+    residuals = []
+    xs, ys = [], []
+    for landmark in landmarks:
+        key = landmark.get("id") if isinstance(landmark, dict) else None
+        if not isinstance(key, str) or not key.strip() or key in seen:
+            fail("Held-out landmarks require unique identifiers")
+        seen.add(key)
+        if landmark.get("usedForFitting") is not False:
+            fail("Registration landmarks used for fitting cannot validate alignment")
+        pair = []
+        for field in ("rawRegisteredXYMicrometers", "correctedRegisteredXYMicrometers"):
+            value = landmark.get(field)
+            if (not isinstance(value, list) or len(value) != 2 or
+                    any(type(v) not in (int, float) or not np.isfinite(v) for v in value)):
+                fail("Held-out landmark coordinates must be finite XY micrometers")
+            if not originx <= value[0] <= upperx or not originy <= value[1] <= uppery:
+                fail("Landmarks must lie within the same common physical grid")
+            pair.append(value)
+        raw, corrected = pair
+        xs.append(raw[0])
+        ys.append(raw[1])
+        residuals.append(float(np.hypot((raw[0] - corrected[0]) / stepx,
+                                        (raw[1] - corrected[1]) / stepy)))
+    if (max(xs) - min(xs) < 0.5 * (upperx - originx) or
+            max(ys) - min(ys) < 0.5 * (uppery - originy)):
+        fail("Held-out landmarks do not span the common physical field")
+    rms = float(np.sqrt(np.mean(np.square(residuals))))
+    maximum = max(residuals)
+    if rms > 1.5 or maximum > 2.0:
+        fail("Registered held-out landmark residuals exceed pixel-based tolerances")
+    return {"declaredHeldOutLandmarkCount": len(landmarks),
+            "rmsResidualPixels": round(rms, 6),
+            "maximumResidualPixels": round(maximum, 6),
+            "rmsLimitPixels": 1.5, "maximumLimitPixels": 2.0,
+            "caveat": "Declared landmark coordinates are not independently authenticated."}
+
+
 def validate_meta(meta):
     if meta.get("schema") != SCHEMA or meta.get("specimen") != "P1700":
         fail("Required schema / specimen P1700 missing")
@@ -68,7 +118,7 @@ def validate_meta(meta):
         value = segmentation.get(key)
         if type(value) not in (int, float) or not np.isfinite(value) or not 0 < value <= 60:
             fail("Valid misorientation thresholds for both maps are required")
-    return tuple(size)
+    return tuple(size), validate_heldout_landmarks(registration, grid, size)
 
 
 def load_map(path, require_bse=False):
@@ -119,7 +169,7 @@ def correspondence(a, b, radius_px=1):
 
 
 def analyze(meta, raw, corrected):
-    shape = validate_meta(meta)
+    shape, residual = validate_meta(meta)
     for label, arr in (("raw", raw["grain_id"]), ("corrected", corrected["grain_id"])):
         if arr.shape != shape:
             fail(f"{label} array does not match common physical grid")
@@ -149,6 +199,7 @@ def analyze(meta, raw, corrected):
             "edgeComparisonAtOneCommonPixel": measured,
             "experimentalValidation": "not-homologated",
             "registrationAssessment": "metadata-declared; not independently verified",
+            "heldOutLandmarkQuality": residual,
             "segmentationMethods": meta["segmentation"],
             "causalAttribution": "not-possible: distortion correction and segmentation methods may differ",
             "cannotInfer": ["chemical concentration", "voids from unindexed EBSD",
