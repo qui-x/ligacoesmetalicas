@@ -30,7 +30,11 @@ def metadata():
             "correctedExportProvenance": "SYNTHETIC ONLY",
             "trueEbsdVersion": "SYNTHETIC-FIXTURE-NOT-TRUEEBSD",
             "voidMask": {"method": "registered-BSE-threshold", "source": "artificial-BSE",
-                         "threshold": 0.8}}
+                         "threshold": 0.8},
+            "segmentation": {"rawAlgorithm": "SYNTHETIC connected graph",
+                             "correctedAlgorithm": "SYNTHETIC connected graph",
+                             "rawThresholdDegrees": 10, "correctedThresholdDegrees": 10,
+                             "borderPolicy": "SYNTHETIC all test pixels"}}
 
 
 def maps():
@@ -89,6 +93,12 @@ def run_test():
     altered = copy.deepcopy(m)
     altered["voidMask"] = {}
     must_fail(lambda: corr.analyze(altered, a, b), "BSE")
+    altered = copy.deepcopy(m)
+    altered["segmentation"] = {}
+    must_fail(lambda: corr.analyze(altered, a, b), "segmentation")
+    altered = copy.deepcopy(m)
+    altered["segmentation"]["correctedThresholdDegrees"] = "10"
+    must_fail(lambda: corr.analyze(altered, a, b), "threshold")
     altered = copy.deepcopy(m)
     altered["rawSourceMD5"] = "fake"
     must_fail(lambda: corr.analyze(altered, a, b), "hash")
