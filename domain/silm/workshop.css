@@ -292,23 +292,23 @@
 }
 
 /* Importação de contornos segmentados: metadados em modal, nunca sobre o palco. */
-.silm-micro-data-dialog{
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog){
  box-sizing:border-box;border:1px solid var(--border);border-radius:12px;
  color:var(--text);background:var(--surface);
  width:min(440px,calc(100vw - 24px));max-height:calc(100dvh - 24px);
  padding:clamp(12px,2vw,22px);overflow:auto;
 }
-.silm-micro-data-dialog::backdrop{background:rgba(0,0,0,.55)}
-.silm-micro-data-dialog h2{font-size:1.12rem;margin:0 0 8px}
-.silm-micro-data-dialog .silm-micro-import-help{font-size:.87rem;line-height:1.45;margin:0 0 14px}
-.silm-micro-data-dialog label{display:grid;gap:5px;font-weight:650;font-size:.88rem}
-.silm-micro-data-dialog input[type=file]{font:inherit;max-width:100%;min-width:0}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog)::backdrop{background:rgba(0,0,0,.55)}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) h2{font-size:1.12rem;margin:0 0 8px}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) .silm-micro-import-help{font-size:.87rem;line-height:1.45;margin:0 0 14px}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) label{display:grid;gap:5px;font-weight:650;font-size:.88rem}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) input[type=file]{font:inherit;max-width:100%;min-width:0}
 .silm-micro-import-report{font-size:.84rem;overflow-wrap:anywhere;line-height:1.45}
-.silm-micro-data-dialog a{font-size:.86rem;overflow-wrap:anywhere}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) a{font-size:.86rem;overflow-wrap:anywhere}
 .silm-micro-data-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:14px}
-.silm-micro-data-dialog :is(button,input):focus-visible{outline:3px solid var(--ring);outline-offset:2px}
-:root.si-highcontrast .silm-micro-data-dialog{border:2px solid var(--text)}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) :is(button,input):focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+:root.si-highcontrast :is(.silm-micro-data-dialog,.silm-micro-generator-dialog){border:2px solid var(--text)}
 @media(forced-colors:active){
- .silm-micro-data-dialog{border:2px solid CanvasText;color:CanvasText;background:Canvas}
- .silm-micro-data-dialog :is(button,input):focus-visible{outline:3px solid Highlight}
+ :is(.silm-micro-data-dialog,.silm-micro-generator-dialog){border:2px solid CanvasText;color:CanvasText;background:Canvas}
+ :is(.silm-micro-data-dialog,.silm-micro-generator-dialog) :is(button,input):focus-visible{outline:3px solid Highlight}
 }
