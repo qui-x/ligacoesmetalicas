@@ -26,12 +26,14 @@ async function check(v){
    const card=page.locator('.silm-workshop-card[data-reference-id="atlas-'+item.symbol+'"]');
    await card.waitFor({state:'visible',timeout:20000});
    const preview=card.locator('img');
+   await preview.scrollIntoViewIfNeeded();
    assert.match(await preview.getAttribute('src'),new RegExp('assets/metal-atlas/cotidiano/'+item.symbol+'-cotidiano\\.webp$'));
    await page.waitForFunction(sym=>{const i=document.querySelector('[data-reference-id="atlas-'+sym+'"] img');return i?.complete&&i.naturalWidth===960;},item.symbol,{timeout:15000});
    await card.getByRole('button',{name:'Investigar componente'}).click();
    await page.waitForFunction(z=>window.SILMIntegration?.snapshot?.()?.metal?.atomicNumber===z,item.z,{timeout:30000});
    const figure=page.locator('.silm-workshop-reference .silm-workshop-atlas-photo img');
    await figure.waitFor({state:'visible',timeout:20000});
+   await figure.scrollIntoViewIfNeeded();
    assert.equal(await figure.evaluate(i=>i.naturalWidth),960,item.symbol+' não carrega após investigação');
    assert.match(await figure.getAttribute('alt'),/Ilustração tecnológica/);
    assert.match(await page.locator('.silm-workshop-reference').textContent(),/Ilustração gerada por IA/);
