@@ -13,9 +13,10 @@
     "specificSchematicMicrostructureAssets": 20,
     "experimentalCrystalReferences": 65,
     "experimentalMicrostructureDatasetsIntegrated": 0,
-    "candidateStudyRecords": 62,
-    "elementsWithCandidateLeads": 62,
-    "elementsPendingSpecificLead": 3
+    "candidateStudyRecords": 65,
+    "elementsWithCandidateLeads": 65,
+    "elementsPendingSpecificLead": 0,
+    "elementalMetalGrainDatasetsValidatedAndIntegrated": 0
   },
   "interpretationPolicy": {
     "crystalReference": "Experimental structure of a reference element, not proof of the application's microstructure.",
@@ -23,7 +24,8 @@
     "syntheticMicrostructure": "Voronoi grain schematic, not experimental microscopy.",
     "candidateLead": "Published record found containing the element; raw files, calibration and image/sample match not audited.",
     "noPercentage": "No synthetic image color, area or relative tone can imply element concentration, phase fraction or measured grain size.",
-    "licensing": "Source-by-source permission and attribution required. No third-party images or raw data incorporated."
+    "licensing": "Source-by-source permission and attribution required. No third-party images or raw data incorporated.",
+    "rarityNote": "A study of a host compound, radiolabel, epitaxial film, or nanoparticle counts as a bibliographic candidate involving that element, NOT as a calibrated grain map of its pure metal."
   },
   "experimentalLeads": [
     {
@@ -1280,6 +1282,66 @@
       "url": "https://research.tcu.ac.jp/en/publications/microstructure-and-elemental-distribution-of-americium-containing/",
       "comment": "Morfologia de cerâmica MOX e distribuição de Am; NÃO grãos do metal Am nem os componentes selados de detector de fumaça.",
       "evidenceScope": "oxide-ceramic-containing-actinide-no-metal-grains",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "po-archival-film-photomicrograph-1946",
+      "dataset": "Filme metálico histórico de polônio — fotomicrografia e difração",
+      "elements": [
+        "Po"
+      ],
+      "specimenClass": "archival-elemental-metal-thin-film",
+      "technique": "optical-photomicrograph+XRD",
+      "supports": [
+        "archival-film-surface-morphology",
+        "allotropy"
+      ],
+      "url": "https://paperzz.com/doc/8181669/physical-properties-and-crystal-structure-of-polonium",
+      "comment": "Transcrição de dissertação de Maxwell (Iowa State, 1946), que menciona fotomicrografia 100× do filme; repositório original e direitos ainda não confirmados. Sem dados EBSD, máscara ou escala para tamanhos de grão.",
+      "evidenceScope": "historical-metal-photomicrograph-unverified-scan",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ra-in-barite-apt-2016",
+      "dataset": "Rádio incorporado em cristais de barita Ba–Ra–SO₄",
+      "elements": [
+        "Ra"
+      ],
+      "specimenClass": "radium-containing-mineral-solid-solution",
+      "technique": "TEM+APT+EDS",
+      "supports": [
+        "host-crystal-morphology",
+        "radium-concentration-map"
+      ],
+      "url": "https://www.mrs.org/meetings-events/annual-meetings/archive/meeting/presentations/view/2016-mrs-fall-meeting/2016-mrs-fall-meeting-2561028",
+      "comment": "Estudo de grãos de barita com Ra incorporado; NÃO rádio metálico nem os pigmentos luminescentes históricos do atlas. Comunicação científica sem dataset de grãos auditado.",
+      "evidenceScope": "radioelement-containing-mineral-no-metal-grain-map",
+      "recordStatus": "primary-paper-or-institutional-record-checked",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ac-spion-theranostic-2025",
+      "dataset": "Óxido de ferro nanoparticulado marcado com actínio-225",
+      "elements": [
+        "Ac"
+      ],
+      "specimenClass": "actinium-labeled-iron-oxide-nanoparticle",
+      "technique": "nanoparticle-characterization+chemical-analysis",
+      "supports": [
+        "carrier-nanoparticle-characterization",
+        "radionuclide-distribution-context"
+      ],
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40561778/",
+      "comment": "O metal actínio NÃO constitui os grãos: 225Ac é radionuclídeo ligado ao sistema de nanopartículas de óxido de ferro. Não fundamenta microestrutura do metal Ac puro.",
+      "evidenceScope": "radiolabel-on-nanoparticle-no-elemental-metal-grains",
       "recordStatus": "primary-paper-or-institutional-record-checked",
       "rawFilesAudited": false,
       "licenseAudited": false,
@@ -3538,8 +3600,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "po-archival-film-photomicrograph-1946"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -3574,8 +3638,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "ra-in-barite-apt-2016"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -3610,8 +3676,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "ac-spion-theranostic-2025"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
