@@ -11,10 +11,10 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
  const input=U.element('input');input.id=prefix+'-search';input.type='search';input.placeholder='Nome, símbolo ou Z';input.autocomplete='off';input.value=state.query||'';input.maxLength=80;
  const find=U.element('button','Localizar','secondary-btn');find.type='submit';searchBox.append(label,input,find);head.append(searchBox);if(toolbar)head.append(toolbar);root.append(head);
  const status=U.element('p','','periodic-status');status.id=prefix+'-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');input.setAttribute('aria-describedby',status.id);root.append(status);
- const scroll=U.element('div',null,'periodic-scroll');scroll.setAttribute('aria-label','Tabela completa. Role dentro desta região para ver todos os grupos.');
+ const scroll=U.element('div',null,'periodic-scroll');scroll.setAttribute('role','region');scroll.tabIndex=0;scroll.setAttribute('aria-label','Tabela Periódica, 118 elementos. Deslize horizontal ou verticalmente para percorrer todos os grupos.');
  const grid=U.element('div',null,'periodic-grid');scroll.append(grid);root.append(scroll);
  /* R06: em telas estreitas a Tabela completa não cabe com células tocáveis; a dica mostra que há mais grupos ao lado. */
- const scrollHint=U.element('p','Deslize a tabela para os lados para ver os grupos 1 a 18.','periodic-scroll-hint');scrollHint.hidden=true;root.append(scrollHint);
+ const scrollHint=U.element('p','Deslize para os lados para percorrer os grupos 1 a 18.','periodic-scroll-hint');scrollHint.id=prefix+'-scroll-hint';scrollHint.hidden=true;scroll.setAttribute('aria-describedby',scrollHint.id);root.append(scrollHint);
  const place=(node,row,column,span=1)=>{node.style.gridRow=String(row);node.style.gridColumn=String(column)+(span>1?' / span '+span:'');grid.append(node);};
  for(let g=1;g<=18;g++)place(U.element('span',String(g),'periodic-group'),1,g+1);
  for(let p=1;p<=7;p++)place(U.element('span',String(p),'periodic-period'),p+1,1);
@@ -46,10 +46,33 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
   if(e.classification.note)summary.append(U.element('small',e.classification.note));
   if(!canInvestigate()&&e.silmEligibility.status==='available')summary.append(U.element('small','Encerre a atividade atual para iniciar outra investigação.'));
  }
- function inspect(z,focus=false){state.selection=z;update();const selected=D.get(z);if(selected?.silmEligibility.status==='available'&&canInvestigate())onSelect(selected);if(focus){const b=buttons.get(z);b?.focus({preventScroll:true});b?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'auto'});}}
+ // Trazer uma célula para a área útil da grade sem deslocar o diálogo,
+ // as docas, a tela ou outro ancestral. scrollIntoView deslocava toda
+ // a cadeia de contêineres em telas pequenas e no WebKit.
+ function reveal(b){
+  if(!b||!scroll.isConnected)return;
+  const frame=scroll.getBoundingClientRect(),cell=b.getBoundingClientRect(),margin=8;
+  const left=frame.left+margin,right=frame.right-margin;
+  const top=frame.top+margin,bottom=frame.bottom-margin;
+  if(cell.left<left)scroll.scrollLeft+=cell.left-left;
+  else if(cell.right>right)scroll.scrollLeft+=cell.right-right;
+  if(cell.top<top)scroll.scrollTop+=cell.top-top;
+  else if(cell.bottom>bottom)scroll.scrollTop+=cell.bottom-bottom;
+ }
+ function inspect(z,focus=false){
+  state.selection=z;update();
+  const selected=D.get(z);
+  if(selected?.silmEligibility.status==='available'&&canInvestigate())onSelect(selected);
+  if(focus){const b=buttons.get(z);b?.focus({preventScroll:true});reveal(b);}
+ }
  function updateSearch(focus){state.query=input.value;const results=D.search(input.value);for(const [z,b]of buttons)b.classList.toggle('is-match',!!input.value.trim()&&results.some(e=>e.atomicNumber===z));
   status.textContent=input.value.trim()?(results.length?results.length+' resultado'+(results.length===1?'':'s')+'. '+D.label(results[0]):'Nenhum elemento encontrado. A tabela continua completa.'):'118 elementos · grupos 1–18 · use as setas para navegar entre elementos.';
-  if(input.value.trim()&&results.length){inspect(results[0].atomicNumber,focus);if(!focus)buttons.get(results[0].atomicNumber)?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'auto'});}else if(!input.value.trim()){update();}
+  // Digitar apenas destaca e localiza visualmente o resultado: a seleção
+  // científica só muda após Localizar/Enter ou toque no elemento.
+  if(input.value.trim()&&results.length){
+   if(focus)inspect(results[0].atomicNumber,true);
+   else reveal(buttons.get(results[0].atomicNumber));
+  }else if(!input.value.trim()){update();}
  }
  scope.listen(input,'input',()=>updateSearch(false));scope.listen(searchBox,'submit',event=>{event.preventDefault();updateSearch(true);});
  scope.listen(grid,'click',event=>{const b=event.target.closest('button[data-z]');if(b)inspect(Number(b.dataset.z));});
@@ -58,7 +81,9 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
    const horizontal=['ArrowLeft','ArrowRight'].includes(event.key),forward=['ArrowRight','ArrowDown'].includes(event.key),axis=horizontal?'column':'row',other=horizontal?'row':'column';
    target=D.elements.filter(n=>n.layout[other]===e.layout[other]&&(forward?n.layout[axis]>e.layout[axis]:n.layout[axis]<e.layout[axis])).sort((a,c)=>Math.abs(a.layout[axis]-e.layout[axis])-Math.abs(c.layout[axis]-e.layout[axis]))[0];
   }else if(event.key==='Home')target=D.elements[0];else if(event.key==='End')target=D.elements[117];else return;
-  event.preventDefault();if(target){buttons.get(target.atomicNumber).focus();buttons.get(target.atomicNumber).scrollIntoView({block:'nearest',inline:'nearest'});}
+  event.preventDefault();if(target){
+   const next=buttons.get(target.atomicNumber);next?.focus({preventScroll:true});reveal(next);
+  }
  });
  // WebKit: mutações de --periodic-cell alteram o tamanho da própria região
  // observada. Nunca escrever CSS nem alternar a dica no callback do ResizeObserver.
@@ -66,20 +91,21 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
  let resizeFrame=0,hintFrame=0;
  const resize=()=>{
   if(!root.isConnected)return;
-  const min=26,gap=4,width=scroll.clientWidth-30;
-  const wide=(width-20-18*gap)/18;
-  let cell=Math.max(min,wide);
-  if(root.closest('.silm-presentation.is-expanded,.silm-laboratory')){
-   const style=getComputedStyle(scroll);
-   const padding=(parseFloat(style.paddingTop)||0)+(parseFloat(style.paddingBottom)||0);
-   const tall=(scroll.clientHeight-padding-20-8-10*gap-2)/9/1.13;
-   cell=Math.max(min,Math.min(wide,tall));
-  }
-  const size=Math.max(min,Math.min(96,cell));
+  // Uma grade química não pode encolher abaixo de um alvo de toque razoável.
+  // Se não couber, a navegação ocorre *dentro* da tabela, sem reduzir todas
+  // as células ou aumentar a largura da página.
+  const min=44,gap=4,style=getComputedStyle(scroll);
+  const pad=(parseFloat(style.paddingLeft)||0)+(parseFloat(style.paddingRight)||0);
+  const available=Math.max(0,scroll.clientWidth-pad);
+  const gridFixed=20+18*gap; // eixo esquerdo + 18 espaços entre 19 colunas
+  const widthCell=(available-gridFixed)/18;
+  // A largura define a escala para evitar oscilações de layout causadas
+  // por barras de rolagem verticais ou variações da altura da janela.
+  const size=Math.max(min,Math.min(82,Math.floor(widthCell*2)/2));
   const previous=parseFloat(root.style.getPropertyValue('--periodic-cell'));
   if(!Number.isFinite(previous)||Math.abs(previous-size)>.1)
    root.style.setProperty('--periodic-cell',size+'px');
-  const density=size<34?'tiny':size<46?'compact':'full';
+  const density=size<48?'compact':'full';
   if(root.dataset.density!==density)root.dataset.density=density;
   if(!hintFrame)hintFrame=requestAnimationFrame(()=>{
    hintFrame=0;
