@@ -30,6 +30,14 @@ def run():
         report = mod.analyze(a, b, {"metadata": {"rights": [], "license": None},
                                      "access": {"record": "public"}})
         assert report["sameScriptBytes"] is False
+        assert report["noncommentStructuralComparison"]["noncommentSequencesIdentical"] is False
+        only_comments = mod.structural_comparison(
+            b"% first header\nalpha = 2;\n", b"% updated header\n\nalpha = 2;\n")
+        assert only_comments["noncommentSequencesIdentical"]
+        assert all(v == 0 for v in only_comments["editCounts"].values())
+        changed_logic = mod.structural_comparison(
+            b"% header\nalpha = 2;\n", b"% header\nalpha = 3;\n")
+        assert changed_logic["editCounts"]["replacedOldNoncommentLines"] == 1
         assert report["zenodo"]["proceduralMarkersPresence"]["calcGrains"]
         assert not report["github"]["proceduralMarkersPresence"]["calcGrains"]
         assert report["github"]["proceduralMarkersPresence"]["pixelSizeMatch"]
