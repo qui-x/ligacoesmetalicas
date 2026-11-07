@@ -208,6 +208,12 @@ SILM.microstructure=(()=>{
    if(!viewport.isConnected)return;
    const rect=viewport.getBoundingClientRect();
    if(rect.width<2||rect.height<2)return;
+   // A imagem/segmentação importada deve manter todo o campo disponível:
+   // recortá-la esconderia grãos e distorceria a leitura da amostra.
+   if(sourceData){
+    svg.setAttribute('viewBox','0 0 '+W+' '+H);
+    svg.dataset.mapReady='true';return;
+   }
    const ratio=clamp(rect.width/rect.height,.2,8),base=W/H;
    const boxW=ratio<base?H*ratio:W,boxH=ratio>base?W/ratio:H;
    svg.setAttribute('viewBox',[
