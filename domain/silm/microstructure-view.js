@@ -113,7 +113,7 @@ SILM.microstructure=(()=>{
    drawGrains();persist();
    if(formationsButton)formationsButton.disabled=false;
   }
-  const genDialog=node('dialog','silm-micro-data-dialog silm-micro-generator-dialog');
+  const genDialog=node('dialog','silm-micro-generator-dialog');
   const genTitle=node('h2','','Formações esquemáticas');
   const genHelp=node('p','silm-micro-import-help','Variações geométricas didáticas, não micrografias de um metal. A mesma semente e perfil reproduzem a mesma formação em qualquer tela.');
   const profileLabel=node('label','','Forma dos grãos'),profileSelect=node('select');
