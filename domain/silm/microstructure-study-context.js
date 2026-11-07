@@ -23,6 +23,40 @@
    return 'Material elementar na condição estudada';
   return 'Material relacionado ao elemento';
  };
+ const labels=Object.freeze({
+  'grain-equivalent-diameter':'diâmetro equivalente de grão',
+  'grain-boundary':'contornos de grão',
+  'grain-boundaries':'contornos de grão',
+  'grain-orientation':'orientações cristalográficas',
+  'grain-morphology':'morfologia de grãos',
+  'grain-size':'tamanho de grão',
+  'grain-size-by-condition':'tamanho de grão por condição',
+  'grain-size-by-deformation':'tamanho de grão após deformação',
+  'grain-size-by-process':'tamanho de grão por processamento',
+  'grain-size-trend':'variação de tamanho de grão',
+  'grain-topology':'topologia de grãos',
+  'grain-boundary-atomic-scale':'contornos em escala atômica',
+  'segmentation':'segmentação micrográfica',
+  'orientation':'orientação cristalográfica',
+  'texture':'textura cristalográfica',
+  'phase-classification':'identificação de fases',
+  'phase-fraction':'frações de fases',
+  'phase-area-fraction':'fração de área de fases',
+  'compositional-map':'mapeamento composicional',
+  'microchemistry':'microquímica',
+  'grain-phase-evolution':'evolução de grãos e fases',
+  'twinning':'maclação',
+  'recrystallization':'recristalização',
+  'deformation':'deformação',
+  'microstructure-image':'imagem microestrutural',
+  'microstructure':'microestrutura',
+  'grain-boundary-response':'resposta dos contornos',
+  'grain-boundary-distribution':'distribuição de contornos',
+  'recovery-recrystallization':'recuperação e recristalização',
+  'particle-pinning':'ancoragem por partículas'
+ });
+ const topicLabels=study=>Object.freeze([...new Set((study.topics||[])
+  .map(t=>labels[t]).filter(Boolean))].slice(0,4));
  const forElement=z=>{
   const ids=byAtomicNumber.get(Number(z))||[];
   return Object.freeze(ids.map(id=>byId.get(id)).filter(Boolean));
@@ -33,7 +67,7 @@
   sourceFile:'research/microstructure/coverage-65.json',
   studies:Object.freeze([...byId.values()]),
   atomicNumbers:Object.freeze([...byAtomicNumber.keys()]),
-  forElement,describe,
+  forElement,describe,topicLabels,
   caveat:study=>containsPureGrains(study)?
    'Esta referência não documenta grãos do metal puro em volume.':
    'A fonte não valida a geometria ilustrativa do SILM.',
