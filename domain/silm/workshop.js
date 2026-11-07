@@ -86,6 +86,16 @@ SILM.workshop=(()=>{
    heading.append(titles,table);s.append(heading);
    if(SILM.microstructure?.create)s.append(SILM.microstructure.create({element,item}));
    else{const fallback=node('div','silm-workshop-reference-art');fallback.innerHTML=MICRO;s.append(fallback);}
+   // A imagem do atlas é uma representação esquemática alternativa, nunca uma micrografia medida.
+   const atlasMicro=SILM.metalAtlas?.micro?.(element.atomicNumber);
+   if(atlasMicro){
+    const panel=node('details','silm-workshop-micro-atlas-reference'),toggle=node('summary','','Ver imagem esquemática do atlas (sem escala)');
+    const figure=node('figure','silm-workshop-photo'),img=node('img');
+    img.src=atlasMicro.path;img.width=960;img.height=640;img.loading='lazy';img.decoding='async';
+    img.alt='Modelo didático de grãos de '+element.name+'; não é micrografia experimental, sem escala em micrômetros';
+    figure.append(img,node('figcaption','','Modelo didático sem escala física. Não identifica fases ou composição de grãos; a estrutura científica do elemento é consultada separadamente.'));
+    panel.append(toggle,figure);s.append(panel);
+   }
   }else{
    const top=node('div','silm-workshop-reference-top'),art=node('div','silm-workshop-reference-art');
    if(item){art.innerHTML=visual(item,1);top.append(art);}
