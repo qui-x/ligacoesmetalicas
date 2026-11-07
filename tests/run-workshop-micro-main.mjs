@@ -150,6 +150,9 @@ async function test(viewport){
   'O texto deve explicar o vínculo indireto com o elemento.');
  assert.match(await studiesContext.innerText(),/Nenhum deles define os grãos deste desenho/,
   'Estudos candidatos não podem validar visualmente os polígonos.');
+ assert.ok(await studiesContext.getByText(/Aspectos investigados na fonte:/).count()>=1,
+  'O catálogo deve traduzir conceitos científicos documentados na fonte.');
+
  assert.equal(await studiesContext.locator('.silm-micro-study-entry a[href]').count(),relatedCount,
   'Toda referência deve manter uma URL para consulta independente.');
  assert.equal(await signature(),visualBeforeStudies,
