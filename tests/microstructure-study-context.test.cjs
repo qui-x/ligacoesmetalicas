@@ -45,6 +45,9 @@ test('material de liga, cerâmica, depósito e metal puro não se confundem',()=
  assert.match(ctx.describe(fe),/Liga/);
  assert.match(ctx.describe(cu),/elementar/);
  assert.match(ctx.caveat(cu),/não valida a geometria/);
+ assert.ok(ctx.topicLabels(cu).includes('contornos de grão'));
+ assert.ok(ctx.topicLabels(mg).includes('diâmetro equivalente de grão'));
+ assert.ok(!ctx.topicLabels(cu).some(s=>/\d+\s*µm|%/.test(s)));
  const radioactive=catalogue.experimentalLeads.find(s=>s.id==='ra-in-barite-apt-2016');
  assert.ok(radioactive);
  const mapped=ctx.studies.find(x=>x.id===radioactive.id);
