@@ -125,6 +125,7 @@ async function test(viewport){
   name:'amostra-de-teste.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(sample))
  });
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.measurementStatus==='provided-unverified');
+ assert.equal(await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).isDisabled(),true,'Um mapa importado não pode ser trocado silenciosamente por um esquema.');
  assert.equal(await viewer.locator('.silm-micro-grain').count(),1,'O mapa importado não alterou a segmentação.');
  await importDialog.getByRole('button',{name:'Fechar importação de dados'}).click();
  await viewer.locator('.silm-micro-grain').first().click();
@@ -135,7 +136,27 @@ async function test(viewport){
  await importDialog.getByRole('button',{name:'Retornar ao mapa didático'}).click();
  await importDialog.getByRole('button',{name:'Fechar importação de dados'}).click();
  assert.equal(await viewer.getAttribute('data-microstructure-source'),'schematic','Mapa esquemático não foi restaurado.');
+ assert.equal(await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).isEnabled(),true,'Restauração não reativou o gerador esquemático.');
  assert.ok(await viewer.locator('.silm-micro-grain').count()>=45,'Grãos ilustrativos não foram restaurados.');
+ await viewer.locator('.silm-micro-grain').nth(25).click();
+ // A formação criada também persiste ao sair da escala 2 e voltar à mesma
+ // investigação, sem se confundir com dados experimentais ou alterar ensaios.
+ await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).click();
+ await formations.getByLabel('Forma dos grãos').selectOption('elongated');
+ await formations.getByLabel('Semente reproduzível').fill('123456');
+ await formations.getByRole('button',{name:'Gerar formação com a semente informada'}).click();
+ const persistentGeometry=await signature();
+ await formations.getByRole('button',{name:'Fechar configurações de formação'}).click();
+ await page.locator('.silm-workshop-scale').nth(2).click();
+ await page.locator('.silm-workshop-scale').nth(1).click();
+ await viewer.waitFor({state:'visible'});
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
+ assert.equal(await viewer.getAttribute('data-synthetic-seed'),'123456','Semente perdida após navegar entre escalas.');
+ assert.equal(await viewer.getAttribute('data-synthetic-profile'),'elongated','Perfil perdido após navegar entre escalas.');
+ assert.equal(await signature(),persistentGeometry,'A formação mudou ao retornar à microestrutura.');
+ await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).click();
+ await formations.getByRole('button',{name:'Restaurar formação padrão'}).click();
+ await formations.getByRole('button',{name:'Fechar configurações de formação'}).click();
  await viewer.locator('.silm-micro-grain').nth(25).click();
 
  if(viewport.width>800){
