@@ -8,7 +8,7 @@ A seleção conjunta de condutividade elétrica e térmica inicia o mesmo ensaio
 - O botão com ícone de avanço calcula **0,5 intervalo relativo**. A animação eletrônica não governa o relógio do ensaio.
 - Desligar a alimentação zera corrente e Joule. A energia só diminui quando há saída de calor; uma amostra isolada conserva sua energia depois de desligar as fontes.
 - O controle na cena ajusta a condição elétrica escolhida. Os valores de U, I, R, potência e temperatura são relativos. Não são volts, ampères, ohms, watts, segundos ou graus.
-- O painel de propriedades mostra também temperatura máxima e energias gerada por Joule, fornecida externamente, armazenada e removida.
+- **Condições Joule → Leituras e balanço de energia** mostra também temperatura máxima e energias gerada por Joule, fornecida externamente, armazenada e removida. **Reiniciar ensaio** zera os campos e desliga as fontes, preservando a condição de contorno e o modo elétrico escolhidos.
 - O ensaio é temporário: restaurar volta ao estado inicial; encerrar, trocar a investigação ou recarregar descarta o campo calculado. O Caderno ainda não exporta este ensaio.
 
 ## Modelo declarado

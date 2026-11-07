@@ -276,7 +276,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   navigator.root.append(control);
   jouleControls=U.element('span',null,'silm-joule-controls');jouleControls.hidden=true;
   jouleSettings=document.createElement('select');jouleSettings.setAttribute('aria-label','Condições do efeito Joule');
-  for(const [value,label] of [['','Condições Joule'],['voltage','Tensão imposta'],['current','Corrente imposta'],['ambient','Terminais à temperatura ambiente'],['insulated','Amostra isolada'],['supply','Ligar ou desligar alimentação'],['external','Ligar ou desligar calor externo'],['temperature','Ver temperatura'],['potential','Ver potencial elétrico'],['dissipation','Ver dissipação Joule'],['end','Encerrar efeito Joule']]){
+  for(const [value,label] of [['','Condições Joule'],['voltage','Tensão imposta'],['current','Corrente imposta'],['ambient','Terminais à temperatura ambiente'],['insulated','Amostra isolada'],['supply','Ligar ou desligar alimentação'],['external','Ligar ou desligar calor externo'],['temperature','Ver temperatura'],['potential','Ver potencial elétrico'],['dissipation','Ver dissipação Joule'],['readings','Leituras e balanço de energia'],['restore','Reiniciar ensaio'],['end','Encerrar efeito Joule']]){
    const option=document.createElement('option');option.value=value;option.textContent=label;jouleSettings.append(option);
   }
   scope.listen(jouleSettings,'change',()=>{const action=jouleSettings.value;jouleSettings.value='';propertyOptions.quickActions.jouleAction(action);});

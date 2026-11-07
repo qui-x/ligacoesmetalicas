@@ -41,6 +41,8 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
  }
  function jouleAction(command){
   const session=currentCoupling();if(!session||!editable())return false;
+  if(command==='readings')return showJouleReadings();
+  if(command==='restore'){actions.restore();return true;}
   if(command==='end'){coupled=null;schedule();return true;}
   if(command==='step'){
    const frame=jouleReading();
@@ -53,6 +55,24 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   else if(['temperature','potential','dissipation'].includes(command))session.layer=command;
   else return false;
   schedule();return true;
+ }
+ function showJouleReadings(){
+  const frame=jouleReading();if(!frame)return false;
+  const {input,values}=frame,format=n=>n.toLocaleString('pt-BR',{maximumFractionDigits:5});
+  const previous=document.activeElement,dialog=U.element('dialog',null,'silm-dialog silm-about-dialog silm-joule-dialog');
+  dialog.setAttribute('aria-labelledby','silm-joule-results-title');
+  const heading=U.element('div',null,'silm-dialog-heading'),title=U.element('h2','Leituras do efeito Joule');title.id='silm-joule-results-title';
+  const close=U.element('button','Fechar leituras','silm-dialog-close');close.type='button';close.setAttribute('aria-label','Fechar leituras do efeito Joule');
+  close.addEventListener('click',()=>dialog.close());heading.append(title,close);
+  const conditions=U.element('p',(input.mode==='voltage'?'Tensão imposta':'Corrente imposta')+' · '+(input.boundary==='ambient'?'terminais à temperatura ambiente':'amostra isolada'));
+  const data=U.element('dl',null,'silm-joule-readings');
+  for(const [key,label]of [['time','Tempo'],['voltage','Tensão'],['current','Corrente'],['resistance','Resistência equivalente'],['power','Potência Joule'],['external','Potência externa'],['mean','Temperatura média'],['maximum','Temperatura máxima'],['jouleEnergy','Energia gerada por Joule'],['externalEnergy','Energia da fonte externa'],['storedEnergy','Energia armazenada'],['removedEnergy','Energia removida']]){
+   const value=U.element('dd',format(values[key]));value.dataset.quantity=key;data.append(U.element('dt',label),value);
+  }
+  const note=U.element('p','Grandezas relativas · ensaio temporário. Parâmetros didáticos iguais entre metais; sem comparação quantitativa.');
+  dialog.append(heading,conditions,data,note);document.body.append(dialog);
+  dialog.addEventListener('close',()=>{dialog.remove();if(previous?.isConnected)previous.focus({preventScroll:true});},{once:true});
+  dialog.showModal();return true;
  }
  const actions={
   start(id){if(!allows(id)||!editable())return;const r=model.startProperty(id);if(!r.ok)say(P.reasons[r.reason]||'Organize uma estrutura cristalina para esta experiência.','warning');schedule();},
