@@ -1,0 +1,98 @@
+{
+  "schema": "silm.experimental-microstructure-audit.v1",
+  "date": "2026-11-07",
+  "material": "Scalmalloy — liga Al baseada em processo de fabricação aditiva",
+  "source": "https://doi.org/10.5281/zenodo.17085695",
+  "sourceTitle": "Effects of Volumetric Energy Density on the Microstructure of Additively Manufactured Scalmalloy",
+  "technique": "EBSD grain-size exported CSV",
+  "phaseAnalyzed": "Aluminium",
+  "method": "Extract ECD from named column (µm) and distinguish Phase values; per-condition stats; do not mix Zero Solution into Aluminium",
+  "script": "research/microstructure/audit_scalmalloy_csv.py",
+  "workflow": "https://github.com/qui-x/ligacoesmetalicas/actions/runs/42339535737",
+  "artifact": "silm-scalmalloy-csv-review-not-homologated",
+  "validation": {
+    "threeMD5Matched": true,
+    "headerVerified": true,
+    "ECDUnit": "µm",
+    "grainAreaUnit": "µm²",
+    "licensedForRedistribution": "pending-specific-record-check",
+    "sampleProcessVerifiedFromArticle": false,
+    "edgeExclusionPossible": false,
+    "independentScientificReview": false,
+    "automaticallyUseInSimulator": false,
+    "assessment": "experimental-raw-export-derived-statistics-under-review"
+  },
+  "allPhaseRows": 157626,
+  "aluminiumRows": 157616,
+  "zeroSolutionRows": 10,
+  "conditions": [
+    {
+      "energyJperMM3": 57.1,
+      "file": "EBSD - 57.1Jmm-3 Grain Sizes.csv",
+      "fileSizeBytes": 5001800,
+      "md5": "64a02187e39d8ed1b765a3d599a7c5b9",
+      "rawGrainRecords": 44512,
+      "Aluminium": {
+        "n": 44512,
+        "min": 0.62,
+        "p05": 0.64,
+        "p25": 0.73,
+        "median": 0.9,
+        "mean": 1.231813,
+        "p75": 1.28,
+        "p95": 3.02,
+        "max": 18.67,
+        "sampleSD": 0.972731
+      },
+      "zeroSolution": 0
+    },
+    {
+      "energyJperMM3": 116.7,
+      "file": "EBSD - 116.7Jmm-3 Grain Sizes.csv",
+      "fileSizeBytes": 5223128,
+      "md5": "108dd6cb7d4089d6500e86e76a0d7089",
+      "rawGrainRecords": 46998,
+      "Aluminium": {
+        "n": 46998,
+        "min": 0.62,
+        "p05": 0.65,
+        "p25": 0.77,
+        "median": 0.94,
+        "mean": 1.133267,
+        "p75": 1.21,
+        "p95": 2.28,
+        "max": 20.48,
+        "sampleSD": 0.732786
+      },
+      "zeroSolution": 0
+    },
+    {
+      "energyJperMM3": 160,
+      "file": "EBSD - 160Jmm-3 Grain Sizes.csv",
+      "fileSizeBytes": 7428018,
+      "md5": "2f15e952a6efc71e450cff3c36fed185",
+      "rawGrainRecords": 66116,
+      "Aluminium": {
+        "n": 66106,
+        "min": 0.62,
+        "p05": 0.65,
+        "p25": 0.78,
+        "median": 0.96,
+        "mean": 1.127739,
+        "p75": 1.23,
+        "p95": 2.19,
+        "max": 18.19,
+        "sampleSD": 0.654773
+      },
+      "zeroSolution": 10
+    }
+  ],
+  "limitations": [
+    "Grain sizes are per indexed region of the Al phase in Scalmalloy, not grains of pure Al.",
+    "Near_edge flag is not present; border grains have not been excluded.",
+    "At least 10 entries are classified Zero Solution in the 160 J/mm3 export and are excluded from matrix phase measures.",
+    "No chemical composition, phase fraction, material strength or kinetics inferred from ECD distributions.",
+    "Median differences between process conditions do not establish causality without full experimental/method analysis.",
+    "Do not infer a distribution for a generic consumer object or use geometry as percentage of an element."
+  ]
+}
