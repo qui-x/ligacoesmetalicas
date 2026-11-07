@@ -1,0 +1,32 @@
+name: SILM — Auditoria Scalmalloy (pré-homologação)
+on:
+  push:
+    branches:
+      - design/silm-rede-ambiente-atomico-parte6
+    paths:
+      - 'research/microstructure/audit_scalmalloy_csv.py'
+      - '.github/workflows/silm-scalmalloy-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-aluminum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Conferir sintaxe e integridade de CSV originais
+        run: |
+          python -m py_compile research/microstructure/audit_scalmalloy_csv.py
+          python research/microstructure/audit_scalmalloy_csv.py
+      - name: Publicar resultado para revisão de unidades e colunas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-scalmalloy-csv-review-not-homologated
+          path: /tmp/silm-al-ebsd-review/scalmalloy-csv-schema-audit.json
+          retention-days: 14
+          if-no-files-found: warn
