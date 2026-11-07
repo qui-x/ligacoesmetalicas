@@ -311,6 +311,17 @@
  font-size:.8rem;line-height:1.4;overflow-wrap:anywhere;
 }
 .silm-micro-didactic-evidence p{margin:0}
+
+.silm-micro-study-context{border-top:1px solid var(--border);padding-top:6px;margin-top:4px;min-width:0}
+.silm-micro-study-context summary{cursor:pointer;font-weight:650;line-height:1.5;padding:5px 2px}
+.silm-micro-study-context summary:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.silm-micro-study-intro{padding:4px 0 8px}
+.silm-micro-study-items{display:grid;gap:8px;max-height:240px;overflow-y:auto;overscroll-behavior:contain}
+.silm-micro-study-entry{display:grid;gap:4px;padding:8px;border:1px solid var(--border);border-radius:7px;background:var(--surface)}
+.silm-micro-study-entry strong{font-size:.82rem}
+.silm-micro-study-entry .silm-micro-study-limit{font-style:italic;color:var(--muted,#627487)}
+.silm-micro-study-entry a{justify-self:start}
+
 .silm-micro-didactic-evidence a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
 .silm-micro-didactic-evidence a:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
 .silm-micro-import-report{font-size:.84rem;overflow-wrap:anywhere;line-height:1.45}
