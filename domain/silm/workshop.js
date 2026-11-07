@@ -11,10 +11,21 @@ SILM.workshop=(()=>{
  {id:'lantanio-bateria',atomicNumber:57,title:'Bateria recarregável NiMH',context:'Pilhas recarregáveis e módulos de bateria',component:'Liga armazenadora de hidrogênio no eletrodo negativo',material:'Liga à base de níquel com terras raras, podendo conter lantânio',visual:'battery',composition:[['Lantânio e outras terras raras','presentes em algumas formulações de mischmetal'],['Níquel','base comum da liga armazenadora de hidrogênio'],['Cobalto, manganês ou alumínio','adições possíveis conforme a formulação'],['Outros materiais','eletrodo positivo, eletrólito, separador e invólucro']],explanation:'O lantânio pode integrar a liga do eletrodo negativo. A bateria reúne ainda outros eletrodos, eletrólito, separador e invólucro.',caveat:'As ligas AB5 e as misturas de terras raras variam; nem toda NiMH contém a mesma quantidade de lantânio.'},
  {id:'lantanio-isqueiro',atomicNumber:57,title:'Pedra de isqueiro',context:'Isqueiros mecânicos e acendedores',component:'Liga pirofórica raspada pela roda',material:'Liga de terras raras com ferro, podendo conter lantânio',visual:'lighter',composition:[['Lantânio e cério','podem integrar a mistura de terras raras'],['Outras terras raras','dependem da formulação'],['Ferro','componente comum da liga pirofórica'],['Aço e polímeros','roda, corpo e demais partes']],explanation:'A pedra não é lantânio puro. É uma liga pirofórica de terras raras e ferro; o isqueiro acrescenta roda de aço e outros materiais.',caveat:'Formulações comerciais variam e precisam ser verificadas para um produto específico.'}
  ]);
- const BY_ID=new Map(REFERENCES.map(x=>[x.id,x]));
- const list=z=>REFERENCES.filter(x=>x.atomicNumber===Number(z));
+ // Um item real do catálogo visual para CADA metal habilitado; os oito estudos detalhados são preservados.
+ const ATLAS_REFERENCES=Object.freeze((SILM.metalAtlas?.entries||[]).map(entry=>Object.freeze({
+  id:'atlas-'+entry.symbol.toLowerCase(),atomicNumber:entry.atomicNumber,
+  title:entry.application,context:'ATLAS VISUAL · '+entry.name,
+  component:entry.application,material:entry.materialCategory,visual:'atlas',atlasPath:entry.path,
+  composition:[['Elemento investigado',entry.name+' ('+entry.symbol+')'],['Categoria do material',entry.materialCategory]],
+  explanation:'Aplicação tecnológica ilustrada; o equipamento pode conter outros metais, ligas ou compostos. A imagem não documenta a composição de uma amostra real.',
+  caveat:entry.caveat+' · Ilustração gerada por IA, não fotografia ou prova de composição.',
+  sourceURL:entry.referenceURL,atlasRecord:entry
+ })));
+ const ALL_REFERENCES=Object.freeze([...REFERENCES,...ATLAS_REFERENCES]);
+ const BY_ID=new Map(ALL_REFERENCES.map(x=>[x.id,x]));
+ const list=z=>ALL_REFERENCES.filter(x=>x.atomicNumber===Number(z));
  const get=id=>BY_ID.get(String(id))||null;
- const valid=()=>{const ids=new Set();for(const x of REFERENCES){if(!x.id||ids.has(x.id)||!Number.isInteger(x.atomicNumber)||!x.component||!x.material||!x.composition?.length||!x.caveat)return false;ids.add(x.id);}return true;};
+ const valid=()=>{const ids=new Set();for(const x of ALL_REFERENCES){if(!x.id||ids.has(x.id)||!Number.isInteger(x.atomicNumber)||!x.component||!x.material||!x.composition?.length||!x.caveat)return false;ids.add(x.id);}return true;};
  const SVG={
   motor:'<svg viewBox="0 0 180 112" role="img" aria-label="Esquema de motor elétrico"><rect x="28" y="25" width="112" height="62" rx="15"/><path d="M140 43h16v26h-16M28 43H15v26h13M51 25v62M117 25v62M72 32v48M94 32v48"/><circle cx="84" cy="56" r="23"/><circle cx="84" cy="56" r="8"/><path class="silm-workshop-highlight" d="M60 36q24-16 48 0M60 76q24 16 48 0"/></svg>',
   fitting:'<svg viewBox="0 0 180 112" role="img" aria-label="Esquema de conexão metálica"><path d="M28 42h27V30h70v12h27v28h-27v12H55V70H28z"/><path d="M55 30v52m70-52v52"/><path class="silm-workshop-highlight" d="M58 35h64v42H58z"/></svg>',
@@ -29,15 +40,22 @@ SILM.workshop=(()=>{
  const LATTICE='<svg viewBox="0 0 220 110" role="img" aria-label="Esquema de rede cristalina"><path d="M36 29 110 9l74 20v52l-74 20-74-20zM36 29l74 21 74-21M110 50v51"/><g class="silm-workshop-atoms"><circle cx="36" cy="29" r="5"/><circle cx="110" cy="9" r="5"/><circle cx="184" cy="29" r="5"/><circle cx="36" cy="81" r="5"/><circle cx="110" cy="101" r="5"/><circle cx="184" cy="81" r="5"/><circle cx="110" cy="50" r="7"/></g></svg>';
  const node=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;};
  const IMAGE_LABELS={motor:'Motor aberto com enrolamentos de cobre',fitting:'Conexão hidráulica de latão',screw:'Parafuso de aço com revestimento metálico',transformer:'Transformador com núcleo laminado e bobinas',laptop:'Notebook com a carcaça inferior removida',wheel:'Estrutura metálica de um volante',battery:'Pilhas NiMH com corte ilustrativo do eletrodo',lighter:'Isqueiro mecânico com pedra pirofórica'};
- const visual=(kind,scale)=>{
+ const escapeAttr=value=>String(value||'').replace(/[&"<>]/g,ch=>({'&':'&amp;','"':'&quot;','<':'&lt;','>':'&gt;'}[ch]));
+ const visual=(item,scale)=>{
   if(scale===2)return MICRO;
   if(scale>=3)return LATTICE;
+  if(item?.atlasPath){
+   const path=item.atlasPath;
+   if(!/^assets\/metal-atlas\/cotidiano\/[a-z]+-cotidiano\.webp$/.test(path))return LATTICE;
+   return '<figure class="silm-workshop-photo silm-workshop-atlas-photo"><img src="'+path+'" width="960" height="640" loading="lazy" decoding="async" alt="'+escapeAttr('Ilustração tecnológica para '+item.atlasRecord?.name+': '+item.component)+'"><figcaption>Ilustração gerada por IA · aplicação de '+escapeAttr(item.atlasRecord?.name)+' · composição do produto não certificada</figcaption></figure>';
+  }
+  const kind=item?.visual;
   if(!IMAGE_LABELS[kind])return LATTICE;
-  return '<figure class="silm-workshop-photo"><img src="assets/workshop/'+kind+'.webp" width="960" height="640" loading="lazy" decoding="async" alt="'+IMAGE_LABELS[kind]+'"><figcaption>Ilustração realista gerada por IA · referência genérica</figcaption></figure>';
+  return '<figure class="silm-workshop-photo"><img src="assets/workshop/'+kind+'.webp" width="960" height="640" loading="lazy" decoding="async" alt="'+escapeAttr(IMAGE_LABELS[kind])+'"><figcaption>Ilustração realista gerada por IA · referência genérica</figcaption></figure>';
  };
  function itemCard(item,onAction,label='Investigar componente'){
   const article=node('article','silm-workshop-card');article.dataset.referenceId=item.id;
-  const art=node('div','silm-workshop-art');art.innerHTML=visual(item.visual,1);
+  const art=node('div','silm-workshop-art');art.innerHTML=visual(item,1);
   const body=node('div','silm-workshop-card-body');
   body.append(node('p','silm-workshop-eyebrow',item.context),node('h3','',item.title),node('p','silm-workshop-component-label','Componente: '+item.component),node('p','silm-workshop-material','Material: '+item.material),node('p','silm-workshop-card-note',item.explanation),node('p','silm-workshop-caveat',item.caveat));
   const b=node('button','button outline',label);b.type='button';b.addEventListener('click',()=>onAction(item));body.append(b);article.append(art,body);return article;
@@ -70,7 +88,7 @@ SILM.workshop=(()=>{
    else{const fallback=node('div','silm-workshop-reference-art');fallback.innerHTML=MICRO;s.append(fallback);}
   }else{
    const top=node('div','silm-workshop-reference-top'),art=node('div','silm-workshop-reference-art');
-   if(item){art.innerHTML=visual(item.visual,1);top.append(art);}
+   if(item){art.innerHTML=visual(item,1);top.append(art);}
    const summary=node('div','silm-workshop-reference-summary'),heading=node('h2','');
    heading.append(node('span','silm-workshop-prefix','Investigando '),document.createTextNode(element.name));
    summary.append(node('p','silm-workshop-eyebrow','OBJETO E COMPOSIÇÃO'),heading);
@@ -78,7 +96,7 @@ SILM.workshop=(()=>{
    const ul=node('ul','silm-workshop-composition');for(const [name,role]of item.composition){const li=node('li','');li.append(node('strong','',name),node('span','',role));ul.append(li);}const details=node('details','silm-workshop-materials');details.append(node('summary','','Composição e fonte'),ul,node('p','silm-workshop-caveat',item.caveat));
    const source=node('a','','Fonte da aplicação');source.target='_blank';source.rel='noopener noreferrer';
    const sources={12:'https://periodic-table.rsc.org/element/12/magnesium',29:'https://periodic-table.rsc.org/element/29/copper',57:'https://periodic-table.rsc.org/element/57/lanthanum'};
-   source.href=sources[item.atomicNumber]||(item.id==='ferro-transformador'?'https://www.thyssenkrupp-steel.com/en/industries/energy/energy.html':'https://worldsteel.org/about-steel/what-is-steel/');
+   source.href=item.sourceURL||sources[item.atomicNumber]||(item.id==='ferro-transformador'?'https://www.thyssenkrupp-steel.com/en/industries/energy/energy.html':'https://worldsteel.org/about-steel/what-is-steel/');
    details.append(source);summary.append(details,node('p','silm-workshop-caveat','A rede representa o elemento de referência. A peça pode conter outras fases e materiais.'));
   }else if(scale===1)summary.append(node('p','silm-workshop-intro','Escolha um objeto para observar o componente metálico.'));
   const table=node('button','button outline');table.setAttribute('aria-label','Tabela Periódica');table.append(node('span','','Tabela'),node('span','silm-workshop-table-long',' Periódica'));table.type='button';table.addEventListener('click',onOpenPeriodic);summary.append(table);top.append(summary);s.append(top);
@@ -92,5 +110,5 @@ SILM.workshop=(()=>{
   host.append(s);
  }
  if(!valid())throw new Error('Catálogo inicial da Oficina dos Metais inválido.');
- return Object.freeze({references:REFERENCES,list,get,valid,renderDiscovery,renderReference});
+ return Object.freeze({references:ALL_REFERENCES,originalReferences:REFERENCES,atlasReferences:ATLAS_REFERENCES,list,get,valid,renderDiscovery,renderReference});
 })();
