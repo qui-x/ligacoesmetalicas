@@ -100,10 +100,28 @@ SILM.microstructure=(()=>{
   viewport.append(svg);
   const note=node('p','silm-workshop-micro-caveat','Grãos ilustrativos · área relativa ao desenho, não é medida experimental de tamanho em micrômetros.');
   section.append(viewport,toolbar,note);
-  let lastAspect=0;
-  const resize=()=>{const rect=viewport.getBoundingClientRect();if(rect.width<2||rect.height<2)return;const ratio=rect.width/rect.height;if(Math.abs(ratio-lastAspect)<.025)return;lastAspect=ratio;makeField(ratio);drawGrains();};
-  if(typeof ResizeObserver==='function'){const observer=new ResizeObserver(resize);observer.observe(viewport);}else requestAnimationFrame(resize);
-  drawGrains();update();return section;
+  let lastAspect=0,resizeFrame=0;
+  // Nunca modificar o SVG dentro da entrega de um ResizeObserver: no WebKit,
+  // isso pode desencadear "ResizeObserver loop completed with undelivered notifications".
+  // Coalescer notificações e redesenhar no frame seguinte preserva proporção
+  // e evita que mudanças de viewBox alimentem o mesmo ciclo de observação.
+  const resize=()=>{
+   if(!viewport.isConnected)return;
+   const rect=viewport.getBoundingClientRect();
+   if(rect.width<2||rect.height<2)return;
+   const ratio=rect.width/rect.height;
+   if(Math.abs(ratio-lastAspect)<.025)return;
+   lastAspect=ratio;makeField(ratio);drawGrains();
+  };
+  const scheduleResize=()=>{
+   if(resizeFrame)return;
+   resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;resize();});
+  };
+  if(typeof ResizeObserver==='function'){
+   const observer=new ResizeObserver(scheduleResize);
+   observer.observe(viewport);
+  }else window.addEventListener('resize',scheduleResize,{passive:true});
+  drawGrains();update();scheduleResize();return section;
  }
  return Object.freeze({create});
 })();
