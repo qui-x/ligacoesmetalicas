@@ -1,0 +1,2645 @@
+{
+  "schema": "silm.microstructure-research-coverage.v1",
+  "date": "2026-11-07",
+  "generatedFrom": {
+    "catalog": "domain/silm/data/bundle.js",
+    "catalogBlobSha": "151e25d0f9404c6b0232e56482a89d7aa882db04",
+    "atlas": "domain/silm/metal-atlas.js",
+    "atlasBlobSha": "4074b3b5ce63d86788ea00616a7129971e7e15b0"
+  },
+  "coverage": {
+    "investigableElements": 65,
+    "atlasIllustrations": 65,
+    "specificSchematicMicrostructureAssets": 20,
+    "experimentalCrystalReferences": 65,
+    "experimentalMicrostructureDatasetsIntegrated": 0
+  },
+  "interpretationPolicy": {
+    "crystalReference": "Experimental structure of a reference element, not proof of the application's microstructure.",
+    "application": "All current atlas assets are illustrations; conditions and composition of pictured product may differ from pure metal.",
+    "syntheticMicrostructure": "Voronoi grain schematic, not experimental microscopy.",
+    "candidateLead": "Published record found containing the element; raw files, calibration and image/sample match not audited.",
+    "noPercentage": "No synthetic image color, area or relative tone can imply element concentration, phase fraction or measured grain size.",
+    "licensing": "Source-by-source permission and attribution required. No third-party images or raw data incorporated."
+  },
+  "experimentalLeads": [
+    {
+      "id": "mg-grain-ebsd-az31",
+      "dataset": "Mg–1Al e AZ31",
+      "elements": [
+        "Mg"
+      ],
+      "specimenClass": "alloy",
+      "technique": "EBSD",
+      "supports": [
+        "grain-equivalent-diameter",
+        "neighbors",
+        "deformation"
+      ],
+      "url": "https://zenodo.org/records/10225600",
+      "comment": "2.640 + 1.496 grãos medidos; não equivale à carcaça de notebook.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "cu-polycrystal-ebsd",
+      "dataset": "Cobre policristalino",
+      "elements": [
+        "Cu"
+      ],
+      "specimenClass": "elemental",
+      "technique": "EBSD+SEM",
+      "supports": [
+        "grain-boundary",
+        "microstructure-image"
+      ],
+      "url": "https://zenodo.org/records/16902083",
+      "comment": "Mapa de cobre; não presume processo/têmpera de cabos.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ni-pure-ebsd",
+      "dataset": "Níquel puro",
+      "elements": [
+        "Ni"
+      ],
+      "specimenClass": "elemental",
+      "technique": "EBSD",
+      "supports": [
+        "grain-orientation",
+        "microstructure-image"
+      ],
+      "url": "https://zenodo.org/records/21870683",
+      "comment": "Quatro aquisições variam condições instrumentais; não representam revestimento.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "zn-05cu-ebsd",
+      "dataset": "Zn–0,5Cu",
+      "elements": [
+        "Zn",
+        "Cu"
+      ],
+      "specimenClass": "alloy",
+      "technique": "EBSD+SEM+AFM",
+      "supports": [
+        "slip-system",
+        "grain-boundary"
+      ],
+      "url": "https://zenodo.org/records/13143717",
+      "comment": "Liga de Zn–Cu; não zinco galvanizado ou Cu puro.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "al-stem-boundary",
+      "dataset": "Alumínio — contornos de grão",
+      "elements": [
+        "Al"
+      ],
+      "specimenClass": "elemental",
+      "technique": "STEM",
+      "supports": [
+        "grain-boundary-atomic-scale"
+      ],
+      "url": "https://zenodo.org/records/10491520",
+      "comment": "Contorno atômico particular; não tamanho médio de grão de latas.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "fe-316l-correlative",
+      "dataset": "Aço inoxidável 316L",
+      "elements": [
+        "Fe",
+        "Cr",
+        "Ni"
+      ],
+      "specimenClass": "alloy",
+      "technique": "SEM+EBSD",
+      "supports": [
+        "grain-boundary",
+        "segmentation"
+      ],
+      "url": "https://www.nature.com/articles/s41524-025-01801-4",
+      "comment": "Aço 316L, não Fe/Cr/Ni puros; calibrar método com cuidado.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "fe-cr-cast-phases",
+      "dataset": "Ferro fundido — 26 wt% Cr",
+      "elements": [
+        "Fe",
+        "Cr"
+      ],
+      "specimenClass": "alloy",
+      "technique": "SEM+phase-masks",
+      "supports": [
+        "phase-classification"
+      ],
+      "url": "https://zenodo.org/records/21931379",
+      "comment": "Máscaras de fase; não grãos nem distribuição atômica de Cr.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ti-mo-zr-corrosion",
+      "dataset": "Ligas Ti–12Mo, Ti–12Mo–5Zr",
+      "elements": [
+        "Ti",
+        "Mo",
+        "Zr"
+      ],
+      "specimenClass": "alloy",
+      "technique": "EBSD+SEM+TEM",
+      "supports": [
+        "orientation",
+        "microstructure-image"
+      ],
+      "url": "https://zenodo.org/records/13903531",
+      "comment": "Ligas biomédicas específicas, não amostras puras.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ti-mo-hf-biomedical",
+      "dataset": "Liga Ti–12Mo–5Hf",
+      "elements": [
+        "Ti",
+        "Mo",
+        "Hf"
+      ],
+      "specimenClass": "alloy",
+      "technique": "EBSD+SEM+TEM",
+      "supports": [
+        "microstructure-image",
+        "corrosion"
+      ],
+      "url": "https://zenodo.org/records/19462164",
+      "comment": "Liga biomédica; não superliga de Ni-Hf.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "nd-ce-dy-magnet",
+      "dataset": "Ímã (Nd,Ce)–Fe–B com difusão de Dy",
+      "elements": [
+        "Nd",
+        "Ce",
+        "Dy",
+        "Fe"
+      ],
+      "specimenClass": "intermetallic",
+      "technique": "EPMA+MFM",
+      "supports": [
+        "microchemistry",
+        "magnetic-context"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S1002072124000292",
+      "comment": "Composição dos ímãs não descreve microestruturas dos metais puros.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ti-ulc-inclusions",
+      "dataset": "Inclusões em aço Ti–ULC",
+      "elements": [
+        "Fe",
+        "Ti"
+      ],
+      "specimenClass": "steel-inclusions",
+      "technique": "SEM+BSE+EDS",
+      "supports": [
+        "inclusion-composition-wt-percent"
+      ],
+      "url": "https://zenodo.org/records/20758431",
+      "comment": "EDS de inclusões, não composição dos grãos de aço.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "pu-metal-allotropes",
+      "dataset": "Plutônio — alótropos e propriedades",
+      "elements": [
+        "Pu"
+      ],
+      "specimenClass": "elemental-or-alloy",
+      "technique": "crystallography+mechanics",
+      "supports": [
+        "phase-transformation-context"
+      ],
+      "url": "https://laro.lanl.gov/esploro/outputs/conferenceProceeding/Mechanical-Behavior-of-Alpha-Beta-and/9916364140803761",
+      "comment": "Publicação, não mapa de grãos do dispositivo RTG.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    }
+  ],
+  "records": [
+    {
+      "atomicNumber": 3,
+      "symbol": "Li",
+      "name": "Lítio",
+      "block": "s",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 293,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008542",
+        "sourceURL": "https://www.crystallography.net/cod/9008542.html"
+      },
+      "everydayAtlas": {
+        "application": "Pilha primária com ânodo de lítio metálico",
+        "materialCategoryAsPublished": "Metal (ânodo); célula contém outros materiais",
+        "materialClass": "elemental-metal-component",
+        "caveat": "Modelo ilustrativo de corte técnico; não representa uma célula comercial específica.",
+        "illustration": "assets/metal-atlas/cotidiano/li-cotidiano.webp",
+        "referenceURL": "https://technav.ieee.org/topic/lithium-batteries/",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/li-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 4,
+      "symbol": "Be",
+      "name": "Berílio",
+      "block": "s",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9012008",
+        "sourceURL": "https://www.crystallography.net/cod/9012008.html"
+      },
+      "everydayAtlas": {
+        "application": "Contatos elásticos de conectores eletrônicos",
+        "materialCategoryAsPublished": "Liga cobre–berílio, não berílio puro",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "Exemplo de aplicação de liga; microestrutura representa apenas um policristal didático de Be, não a liga.",
+        "illustration": "assets/metal-atlas/cotidiano/be-cotidiano.webp",
+        "referenceURL": "https://help.copper.fyi/hc/en-us/articles/360021414499-Copper-beryllium-CuCo1Ni1Be-CuCo2Be-CuNi2Be",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/be-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 11,
+      "symbol": "Na",
+      "name": "Sódio",
+      "block": "s",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 293,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008545",
+        "sourceURL": "https://www.crystallography.net/cod/9008545.html"
+      },
+      "everydayAtlas": {
+        "application": "Lâmpada de vapor de sódio",
+        "materialCategoryAsPublished": "Sódio confinado em dispositivo fechado",
+        "materialClass": "metal-in-functioning-device",
+        "caveat": "A lâmpada tem componentes e estados físicos distintos do sódio metálico de referência; microestrutura é de sólido esquemático.",
+        "illustration": "assets/metal-atlas/cotidiano/na-cotidiano.webp",
+        "referenceURL": "https://www.lamptech.co.uk/Spec%20Sheets/D%20SLP%20Thorn%20SOX35.htm",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/na-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 12,
+      "symbol": "Mg",
+      "name": "Magnésio",
+      "block": "s",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9012001",
+        "sourceURL": "https://www.crystallography.net/cod/9012001.html"
+      },
+      "everydayAtlas": {
+        "application": "Carcaça estrutural de notebook",
+        "materialCategoryAsPublished": "Liga de magnésio, não necessariamente Mg puro",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "A liga efetiva varia por equipamento; microestrutura não corresponde à carcaça ilustrada.",
+        "illustration": "assets/metal-atlas/cotidiano/mg-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/12/magnesium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/mg-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "mg-grain-ebsd-az31"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 13,
+      "symbol": "Al",
+      "name": "Alumínio",
+      "block": "p",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9012002",
+        "sourceURL": "https://www.crystallography.net/cod/9012002.html"
+      },
+      "everydayAtlas": {
+        "application": "Lata de bebida e folha de alumínio",
+        "materialCategoryAsPublished": "Alumínio comercial e suas ligas",
+        "materialClass": "variable-metal-or-alloy",
+        "caveat": "O metal usado na lata pode ser uma liga e apresentar microestrutura diferente do modelo genérico.",
+        "illustration": "assets/metal-atlas/cotidiano/al-cotidiano.webp",
+        "referenceURL": "https://www.aluminum.org/industries/packaging",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/al-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "al-stem-boundary"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 19,
+      "symbol": "K",
+      "name": "Potássio",
+      "block": "s",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9011970",
+        "sourceURL": "https://www.crystallography.net/cod/9011970.html"
+      },
+      "everydayAtlas": {
+        "application": "Amostra de potássio metálico em ampola selada",
+        "materialCategoryAsPublished": "Metal puro: referência laboratorial, não objeto cotidiano",
+        "materialClass": "specialized-sealed-or-lab",
+        "caveat": "Não há aplicação cotidiana representativa de K metálico; fertilizantes contêm compostos/íons, não o metal puro. Imagem didática, não fotografia de amostra verificada.",
+        "illustration": "assets/metal-atlas/cotidiano/k-cotidiano.webp",
+        "referenceURL": "https://www.mtm.kuleuven.be/periodic-table/data/fiches/info-k",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/k-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 20,
+      "symbol": "Ca",
+      "name": "Cálcio",
+      "block": "s",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9012731",
+        "sourceURL": "https://www.crystallography.net/cod/9012731.html"
+      },
+      "everydayAtlas": {
+        "application": "Grade metálica de bateria automotiva",
+        "materialCategoryAsPublished": "Liga chumbo–cálcio, não cálcio puro",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "Exemplo de liga; não confundir a microestrutura do cálcio metálico com a grade de chumbo–cálcio.",
+        "illustration": "assets/metal-atlas/cotidiano/ca-cotidiano.webp",
+        "referenceURL": "https://www.curtisinstruments.com/evbatterymonitoring/",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/ca-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 21,
+      "symbol": "Sc",
+      "name": "Escândio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010985",
+        "sourceURL": "https://www.crystallography.net/cod/9010985.html"
+      },
+      "everydayAtlas": {
+        "application": "Quadro de bicicleta esportiva",
+        "materialCategoryAsPublished": "Liga alumínio–escândio em aplicações específicas",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "Nem toda bicicleta de alumínio contém escândio; microestrutura didática do elemento não retrata a liga.",
+        "illustration": "assets/metal-atlas/cotidiano/sc-cotidiano.webp",
+        "referenceURL": "https://www.americanelements.com/6-american-elements-supplies-scandium-aluminum-alloy-to-sports-equipment-manufacturers",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/sc-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 22,
+      "symbol": "Ti",
+      "name": "Titânio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008517",
+        "sourceURL": "https://www.crystallography.net/cod/9008517.html"
+      },
+      "everydayAtlas": {
+        "application": "Armação metálica de óculos",
+        "materialCategoryAsPublished": "Titânio comercialmente puro ou liga contendo Ti",
+        "materialClass": "variable-metal-or-alloy",
+        "caveat": "A composição exata depende do fabricante; não inferir a microestrutura real do produto.",
+        "illustration": "assets/metal-atlas/cotidiano/ti-cotidiano.webp",
+        "referenceURL": "https://www.aao.org/eye-health/glasses-contacts/eyeglass-frame-materials",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/ti-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "ti-mo-zr-corrosion",
+          "ti-mo-hf-biomedical",
+          "ti-ulc-inclusions"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 23,
+      "symbol": "V",
+      "name": "Vanádio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9012770",
+        "sourceURL": "https://www.crystallography.net/cod/9012770.html"
+      },
+      "everydayAtlas": {
+        "application": "Chave e conjunto de ferramentas de aço-liga",
+        "materialCategoryAsPublished": "Aço contendo vanádio em composições específicas",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "Não é vanádio puro. A microestrutura da ferramenta tratada termicamente é distinta do policristal esquemático de V.",
+        "illustration": "assets/metal-atlas/cotidiano/v-cotidiano.webp",
+        "referenceURL": "https://www.alloy-artifacts.org/western-auto-supply.html",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/v-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 24,
+      "symbol": "Cr",
+      "name": "Cromo",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-5000220",
+        "sourceURL": "https://www.crystallography.net/cod/5000220.html"
+      },
+      "everydayAtlas": {
+        "application": "Torneira com acabamento cromado",
+        "materialCategoryAsPublished": "Camada superficial de cromo sobre substrato metálico (p. ex. latão)",
+        "materialClass": "metal-surface-coating",
+        "caveat": "Cromagem não significa que a peça é de Cr puro. A microestrutura do metal puro não representa o substrato nem as camadas reais.",
+        "illustration": "assets/metal-atlas/cotidiano/cr-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/24/chromium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/cr-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "fe-316l-correlative",
+          "fe-cr-cast-phases"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 25,
+      "symbol": "Mn",
+      "name": "Manganês",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "COMPLEX_CUBIC",
+        "spaceGroupNumber": 217,
+        "phaseLabel": "α-Mn",
+        "temperatureK": 298,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9011068",
+        "sourceURL": "https://www.crystallography.net/cod/9011068.html"
+      },
+      "everydayAtlas": {
+        "application": "Coração de cruzamento ferroviário (desvio de trilhos)",
+        "materialCategoryAsPublished": "Aço austenítico ao manganês — liga Fe–Mn–C",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "Aços ao manganês possuem fases/cristalografia próprias; a microestrutura do α-Mn puro não é a microestrutura da peça ferroviária.",
+        "illustration": "assets/metal-atlas/cotidiano/mn-cotidiano.webp",
+        "referenceURL": "https://onlinepubs.trb.org/Onlinepubs/trr/1986/1071/1071.pdf",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/mn-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 26,
+      "symbol": "Fe",
+      "name": "Ferro",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9006587",
+        "sourceURL": "https://www.crystallography.net/cod/9006587.html"
+      },
+      "everydayAtlas": {
+        "application": "Vergalhões empregados na construção civil",
+        "materialCategoryAsPublished": "Aço estrutural com ferro como base e carbono/elementos de liga",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "Vergalhões de aço não são ferro α puro; processamento e composição alteram a microestrutura.",
+        "illustration": "assets/metal-atlas/cotidiano/fe-cotidiano.webp",
+        "referenceURL": "https://worldsteel.org/about-steel/steel-facts/",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/fe-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "fe-316l-correlative",
+          "fe-cr-cast-phases",
+          "nd-ce-dy-magnet",
+          "ti-ulc-inclusions"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 27,
+      "symbol": "Co",
+      "name": "Cobalto",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-co",
+        "sourceURL": "https://www.webelements.com/cobalt/crystal_structure.html"
+      },
+      "everydayAtlas": {
+        "application": "Ferramenta de usinagem de metal duro",
+        "materialCategoryAsPublished": "Carboneto de tungstênio com ligante de cobalto (WC–Co)",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "A ferramenta é compósito; a geometria HC de Co puro não descreve o carboneto nem a microestrutura real do compósito.",
+        "illustration": "assets/metal-atlas/cotidiano/co-cotidiano.webp",
+        "referenceURL": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7142786/",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/co-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 28,
+      "symbol": "Ni",
+      "name": "Níquel",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 293,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9013024",
+        "sourceURL": "https://www.crystallography.net/cod/9013024.html"
+      },
+      "everydayAtlas": {
+        "application": "Conectores eletrônicos com revestimento contendo níquel",
+        "materialCategoryAsPublished": "Conector de base de cobre com subcamada de níquel em sistemas específicos de galvanização",
+        "materialClass": "metal-surface-coating",
+        "caveat": "Ni pode estar como subcamada não visível sob Au ou Sn; o acabamento aparente não comprova o metal usado.",
+        "illustration": "assets/metal-atlas/cotidiano/ni-cotidiano.webp",
+        "referenceURL": "https://ele.kyocera.com/en/technical/con_plating/",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/ni-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "ni-pure-ebsd",
+          "fe-316l-correlative"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 29,
+      "symbol": "Cu",
+      "name": "Cobre",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-nbs-539-v1",
+        "sourceURL": "https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular539v1.pdf"
+      },
+      "everydayAtlas": {
+        "application": "Cabos e enrolamentos elétricos",
+        "materialCategoryAsPublished": "Condutor de cobre comercial, com composição e têmpera dependentes do uso",
+        "materialClass": "elemental-metal-component",
+        "caveat": "A microestrutura do fio é influenciada por trefilação e tratamentos; grãos ilustrados não são medições do fio.",
+        "illustration": "assets/metal-atlas/cotidiano/cu-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/29/copper",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/cu-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "cu-polycrystal-ebsd",
+          "zn-05cu-ebsd"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 30,
+      "symbol": "Zn",
+      "name": "Zinco",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-nbs-539-v1",
+        "sourceURL": "https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular539v1.pdf"
+      },
+      "everydayAtlas": {
+        "application": "Parafusos e chapas de aço galvanizados",
+        "materialCategoryAsPublished": "Camada protetora de zinco sobre aço",
+        "materialClass": "metal-surface-coating",
+        "caveat": "O objeto é aço com revestimento de zinco; não equivale a uma peça maciça de Zn.",
+        "illustration": "assets/metal-atlas/cotidiano/zn-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/30/zinc",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/zn-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "zn-05cu-ebsd"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 37,
+      "symbol": "Rb",
+      "name": "Rubídio",
+      "block": "s",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 297,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9012879",
+        "sourceURL": "https://www.crystallography.net/cod/9012879.html"
+      },
+      "everydayAtlas": {
+        "application": "Amostra selada de rubídio metálico em ampola",
+        "materialCategoryAsPublished": "Metal elementar sob contenção protetora; referência de laboratório",
+        "materialClass": "specialized-sealed-or-lab",
+        "caveat": "Não existe objeto cotidiano representativo de Rb metálico. A imagem é ilustração, não comprovação de identidade, fase ou pureza de uma amostra.",
+        "illustration": "assets/metal-atlas/cotidiano/rb-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/37/rubidium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/rb-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 38,
+      "symbol": "Sr",
+      "name": "Estrôncio",
+      "block": "s",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9012726",
+        "sourceURL": "https://www.crystallography.net/cod/9012726.html"
+      },
+      "everydayAtlas": {
+        "application": "Alto-falante com ímã cerâmico de ferrita de estrôncio",
+        "materialCategoryAsPublished": "Ferrita de estrôncio (SrFe12O19), um composto cerâmico, NÃO estrôncio metálico",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "A estrutura da ferrita cerâmica não é a célula CFC do estrôncio metálico puro.",
+        "illustration": "assets/metal-atlas/cotidiano/sr-cotidiano.webp",
+        "referenceURL": "https://us.proterial.com/materials-products/permanent-magnets/ferrite/index.php",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/sr-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 39,
+      "symbol": "Y",
+      "name": "Ítrio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010984",
+        "sourceURL": "https://www.crystallography.net/cod/9010984.html"
+      },
+      "everydayAtlas": {
+        "application": "Lâmpada LED branca com fósforo à base de granada de ítrio",
+        "materialCategoryAsPublished": "YAG:Ce, composto luminescente de ítrio–alumínio e cério em determinados LEDs",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "Nem todo LED usa YAG:Ce; a estrutura do fósforo não é a HC do ítrio metálico.",
+        "illustration": "assets/metal-atlas/cotidiano/y-cotidiano.webp",
+        "referenceURL": "https://www.tandfonline.com/doi/full/10.1080/15980316.2016.1205527",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": "assets/metal-atlas/microestruturas/y-microestrutura-esquematica.webp",
+        "schematicCaveat": "Representação esquemática de contornos de grão, sem fase, concentração, escala experimental ou relação com o objeto ilustrado; não inferir estrutura real a partir do desenho.",
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 40,
+      "symbol": "Zr",
+      "name": "Zircônio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-zr",
+        "sourceURL": "https://www.webelements.com/zirconium/crystal_structure.html"
+      },
+      "everydayAtlas": {
+        "application": "Tubos de liga de zircônio em tecnologia nuclear",
+        "materialCategoryAsPublished": "liga_metalica",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "Amostra ilustrativa: ligas de Zr são utilizadas em revestimentos de combustível; tubos representados não são metal puro certificado.",
+        "illustration": "assets/metal-atlas/cotidiano/zr-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/40/zirconium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "ti-mo-zr-corrosion"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 41,
+      "symbol": "Nb",
+      "name": "Nióbio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008546",
+        "sourceURL": "https://www.crystallography.net/cod/9008546.html"
+      },
+      "everydayAtlas": {
+        "application": "Tarugo metálico de nióbio em contexto industrial e componente de turbina",
+        "materialCategoryAsPublished": "metal_elementar_ilustrado_e_aplicacao_em_liga",
+        "materialClass": "variable-metal-or-alloy",
+        "caveat": "O tarugo é ilustrativo; partes de turbina podem conter Nb em superligas, mas composição não foi analisada.",
+        "illustration": "assets/metal-atlas/cotidiano/nb-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/41/niobium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 42,
+      "symbol": "Mo",
+      "name": "Molibdênio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-nbs-539-v1",
+        "sourceURL": "https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular539v1.pdf"
+      },
+      "everydayAtlas": {
+        "application": "Elemento de aquecimento em forno de alta temperatura",
+        "materialCategoryAsPublished": "metal_ou_liga_em_resistencia",
+        "materialClass": "variable-metal-or-alloy",
+        "caveat": "Bobina ilustra uso de Mo em elementos térmicos; o dispositivo retratado não tem composição metalúrgica documentada.",
+        "illustration": "assets/metal-atlas/cotidiano/mo-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/42/molybdenum",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "ti-mo-zr-corrosion",
+          "ti-mo-hf-biomedical"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 43,
+      "symbol": "Tc",
+      "name": "Tecnécio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-1541062",
+        "sourceURL": "https://www.crystallography.net/cod/1541062.html"
+      },
+      "everydayAtlas": {
+        "application": "Radiofármaco de tecnécio-99m em medicina nuclear",
+        "materialCategoryAsPublished": "radiofarmaco",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "A aplicação mostra um radiofármaco contendo 99mTc, não tecnécio metálico maciço; o desenho é ilustrativo.",
+        "illustration": "assets/metal-atlas/cotidiano/tc-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/43/technetium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 44,
+      "symbol": "Ru",
+      "name": "Rutênio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008513",
+        "sourceURL": "https://www.crystallography.net/cod/9008513.html"
+      },
+      "everydayAtlas": {
+        "application": "Contatos elétricos de liga platina–rutênio",
+        "materialCategoryAsPublished": "liga",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "O rutênio integra uma liga resistente ao desgaste; o componente inteiro não é Ru puro.",
+        "illustration": "assets/metal-atlas/cotidiano/ru-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/44/ruthenium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 45,
+      "symbol": "Rh",
+      "name": "Ródio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008482",
+        "sourceURL": "https://www.crystallography.net/cod/9008482.html"
+      },
+      "everydayAtlas": {
+        "application": "Monólito de conversor catalítico com catalisador contendo ródio",
+        "materialCategoryAsPublished": "catalisador",
+        "materialClass": "catalytic-metal-on-support",
+        "caveat": "O ródio é componente catalítico do revestimento; o substrato cerâmico do monólito não é Rh metálico maciço.",
+        "illustration": "assets/metal-atlas/cotidiano/rh-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/45/rhodium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 46,
+      "symbol": "Pd",
+      "name": "Paládio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-nbs-539-v1",
+        "sourceURL": "https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular539v1.pdf"
+      },
+      "everydayAtlas": {
+        "application": "Monólito de conversor catalítico automotivo",
+        "materialCategoryAsPublished": "catalisador_aderido_a_suporte",
+        "materialClass": "catalytic-metal-on-support",
+        "caveat": "Pd pode integrar camada catalítica sobre monólito cerâmico; não significa que o monólito seja feito de Pd.",
+        "illustration": "assets/metal-atlas/cotidiano/pd-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/46/palladium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 47,
+      "symbol": "Ag",
+      "name": "Prata",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-nbs-539-v1",
+        "sourceURL": "https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular539v1.pdf"
+      },
+      "everydayAtlas": {
+        "application": "Contato elétrico prateado e anel de prata",
+        "materialCategoryAsPublished": "metal_e_liga",
+        "materialClass": "variable-metal-or-alloy",
+        "caveat": "Prata pode integrar contatos de dispositivos e joalheria; a composição do objeto ilustrado não foi certificada.",
+        "illustration": "assets/metal-atlas/cotidiano/ag-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/47/silver",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 48,
+      "symbol": "Cd",
+      "name": "Cádmio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008490",
+        "sourceURL": "https://www.crystallography.net/cod/9008490.html"
+      },
+      "everydayAtlas": {
+        "application": "Bateria recarregável de níquel-cádmio em vista parcial",
+        "materialCategoryAsPublished": "elemento_em_eletrodo_e_compostos",
+        "materialClass": "metal-in-functioning-device",
+        "caveat": "Baterias Ni–Cd empregam Cd e espécies contendo Cd nos eletrodos; a célula inteira não é Cd puro.",
+        "illustration": "assets/metal-atlas/cotidiano/cd-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/48/cadmium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 50,
+      "symbol": "Sn",
+      "name": "Estanho",
+      "block": "p",
+      "referenceCrystal": {
+        "type": "TETRAGONAL",
+        "spaceGroupNumber": 141,
+        "phaseLabel": "β-Sn",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9012005",
+        "sourceURL": "https://www.crystallography.net/cod/9012005.html"
+      },
+      "everydayAtlas": {
+        "application": "Solda de estanho em placa de circuito eletrônico",
+        "materialCategoryAsPublished": "liga_de_solda",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "As soldas modernas frequentemente são ligas à base de Sn; a junta ilustrada não tem composição certificada.",
+        "illustration": "assets/metal-atlas/cotidiano/sn-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/50/tin",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 55,
+      "symbol": "Cs",
+      "name": "Césio",
+      "block": "s",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-webelements-cs",
+        "sourceURL": "https://www.webelements.com/caesium/crystal_structure.html"
+      },
+      "everydayAtlas": {
+        "application": "Ampola selada de césio em laboratório próximo a relógio atômico",
+        "materialCategoryAsPublished": "metal_em_ampola_e_vapor_atomico",
+        "materialClass": "metal-in-functioning-device",
+        "caveat": "A amostra é ilustrativa; relógios atômicos estudam transições do Cs e não são inteiramente compostos pelo metal.",
+        "illustration": "assets/metal-atlas/cotidiano/cs-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/55/caesium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 56,
+      "symbol": "Ba",
+      "name": "Bário",
+      "block": "s",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9012729",
+        "sourceURL": "https://www.crystallography.net/cod/9012729.html"
+      },
+      "everydayAtlas": {
+        "application": "Válvula eletrônica a vácuo com material captador de gases à base de bário",
+        "materialCategoryAsPublished": "metal_em_filme_getter",
+        "materialClass": "metal-in-functioning-device",
+        "caveat": "Bário é empregado como getter em dispositivos de vácuo; válvula contém vidro, metal e outros materiais e a imagem não identifica sua composição.",
+        "illustration": "assets/metal-atlas/cotidiano/ba-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/56/barium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 57,
+      "symbol": "La",
+      "name": "Lantânio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "DHCP",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010986",
+        "sourceURL": "https://www.crystallography.net/cod/9010986.html"
+      },
+      "everydayAtlas": {
+        "application": "Eletrodo com liga armazenadora de hidrogênio em bateria NiMH",
+        "materialCategoryAsPublished": "liga",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "O lantânio pode estar na liga do eletrodo negativo; a bateria não é feita de La puro e a formulação varia.",
+        "illustration": "assets/metal-atlas/cotidiano/la-cotidiano.webp",
+        "referenceURL": "https://www.usgs.gov/media/images/potential-uses-rare-earth-elements-found-marine-minerals",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 58,
+      "symbol": "Ce",
+      "name": "Cério",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "γ-Ce",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010987",
+        "sourceURL": "https://www.crystallography.net/cod/9010987.html"
+      },
+      "everydayAtlas": {
+        "application": "Pedra pirofórica de isqueiro (ferrocério)",
+        "materialCategoryAsPublished": "liga",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "A pedra é uma liga pirofórica multicomponente, não um objeto de cério metálico puro.",
+        "illustration": "assets/metal-atlas/cotidiano/ce-cotidiano.webp",
+        "referenceURL": "https://www.usgs.gov/media/images/potential-uses-rare-earth-elements-found-marine-minerals",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "nd-ce-dy-magnet"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 59,
+      "symbol": "Pr",
+      "name": "Praseodímio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "DHCP",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010988",
+        "sourceURL": "https://www.crystallography.net/cod/9010988.html"
+      },
+      "everydayAtlas": {
+        "application": "Ímã de liga Nd–Pr–Fe–B aplicado em motor",
+        "materialCategoryAsPublished": "liga",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "O praseodímio está na fase de ímã permanente Nd–Pr–Fe–B, não é representado como metal isolado.",
+        "illustration": "assets/metal-atlas/cotidiano/pr-cotidiano.webp",
+        "referenceURL": "https://www.ncbi.nlm.nih.gov/books/NBK569667/table/ch15.t1/",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 60,
+      "symbol": "Nd",
+      "name": "Neodímio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "DHCP",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010989",
+        "sourceURL": "https://www.crystallography.net/cod/9010989.html"
+      },
+      "everydayAtlas": {
+        "application": "Ímã Nd–Fe–B em alto-falante",
+        "materialCategoryAsPublished": "liga",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "O ímã permanente é material intermetálico/multicomponente à base de Nd, Fe e B; não é Nd puro.",
+        "illustration": "assets/metal-atlas/cotidiano/nd-cotidiano.webp",
+        "referenceURL": "https://www.ncbi.nlm.nih.gov/books/NBK569667/table/ch15.t1/",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "nd-ce-dy-magnet"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 62,
+      "symbol": "Sm",
+      "name": "Samário",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "RHOMBOHEDRAL",
+        "spaceGroupNumber": 166,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9014498",
+        "sourceURL": "https://www.crystallography.net/cod/9014498.html"
+      },
+      "everydayAtlas": {
+        "application": "Ímãs Sm–Co para aplicações de temperatura elevada",
+        "materialCategoryAsPublished": "liga",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "Amostras ilustram ímãs de samário–cobalto, não samário metálico puro.",
+        "illustration": "assets/metal-atlas/cotidiano/sm-cotidiano.webp",
+        "referenceURL": "https://www.ncbi.nlm.nih.gov/books/NBK569667/table/ch15.t1/",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 63,
+      "symbol": "Eu",
+      "name": "Európio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010990",
+        "sourceURL": "https://www.crystallography.net/cod/9010990.html"
+      },
+      "everydayAtlas": {
+        "application": "Material fosforescente/luminescente vermelho dopado com európio",
+        "materialCategoryAsPublished": "composto_dopado",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "O európio atua como dopante/ativador luminescente num composto; pó vermelho e LED não representam metal Eu puro.",
+        "illustration": "assets/metal-atlas/cotidiano/eu-cotidiano.webp",
+        "referenceURL": "https://www.usgs.gov/media/images/potential-uses-rare-earth-elements-found-marine-minerals",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 64,
+      "symbol": "Gd",
+      "name": "Gadolínio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010991",
+        "sourceURL": "https://www.crystallography.net/cod/9010991.html"
+      },
+      "everydayAtlas": {
+        "application": "Agente de contraste de RM contendo quelato de gadolínio",
+        "materialCategoryAsPublished": "composto_quelado",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "Agentes de contraste são complexos/quelatos de Gd; o frasco não contém gadolínio metálico e não identifica marca ou produto real.",
+        "illustration": "assets/metal-atlas/cotidiano/gd-cotidiano.webp",
+        "referenceURL": "https://www.usgs.gov/media/images/potential-uses-rare-earth-elements-found-marine-minerals",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 65,
+      "symbol": "Tb",
+      "name": "Térbio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010992",
+        "sourceURL": "https://www.crystallography.net/cod/9010992.html"
+      },
+      "everydayAtlas": {
+        "application": "Fósforo luminescente verde ativado com íons Tb³⁺",
+        "materialCategoryAsPublished": "composto_dopado",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "O tom verde ilustra a emissão dos íons Tb³⁺; o produto e o hospedeiro não estão identificados por composição analítica.",
+        "illustration": "assets/metal-atlas/cotidiano/tb-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/65/terbium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 66,
+      "symbol": "Dy",
+      "name": "Disprósio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010993",
+        "sourceURL": "https://www.crystallography.net/cod/9010993.html"
+      },
+      "everydayAtlas": {
+        "application": "Ímã Nd–Fe–B contendo Dy em motor elétrico",
+        "materialCategoryAsPublished": "liga_intermetalica",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "A adição depende da formulação e do processamento; a imagem não determina teor nem localização de Dy.",
+        "illustration": "assets/metal-atlas/cotidiano/dy-cotidiano.webp",
+        "referenceURL": "https://www.energy.gov/sites/default/files/2023-07/doe-critical-material-assessment_07312023.pdf",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "nd-ce-dy-magnet"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 67,
+      "symbol": "Ho",
+      "name": "Hólmio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010994",
+        "sourceURL": "https://www.crystallography.net/cod/9010994.html"
+      },
+      "everydayAtlas": {
+        "application": "Sistema de laser Ho:YAG para procedimentos técnicos e médicos",
+        "materialCategoryAsPublished": "cristal_dopado",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "Feixe colorido é ilustrativo; a radiação principal do Ho:YAG está no infravermelho, não verde visível.",
+        "illustration": "assets/metal-atlas/cotidiano/ho-cotidiano.webp",
+        "referenceURL": "https://pubmed.ncbi.nlm.nih.gov/41276329/",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 68,
+      "symbol": "Er",
+      "name": "Érbio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010995",
+        "sourceURL": "https://www.crystallography.net/cod/9010995.html"
+      },
+      "everydayAtlas": {
+        "application": "Amplificador óptico com fibra de sílica dopada com Er",
+        "materialCategoryAsPublished": "fibra_dopada",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "Pontos rosados e fibras brilhantes são representações artísticas; a luz de telecomunicação é em torno de 1,55 µm e é invisível.",
+        "illustration": "assets/metal-atlas/cotidiano/er-cotidiano.webp",
+        "referenceURL": "https://www.coherent.com/web-resources/white-paper/rare-earth-doped-fiber-wp",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 69,
+      "symbol": "Tm",
+      "name": "Túlio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010996",
+        "sourceURL": "https://www.crystallography.net/cod/9010996.html"
+      },
+      "everydayAtlas": {
+        "application": "Laser de fibra dopada com Tm para cirurgia e medicina",
+        "materialCategoryAsPublished": "fibra_dopada",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "O feixe vermelho na ilustração é guia visual; a emissão terapêutica de Tm fica no infravermelho (~2 µm).",
+        "illustration": "assets/metal-atlas/cotidiano/tm-cotidiano.webp",
+        "referenceURL": "https://pubmed.ncbi.nlm.nih.gov/41276329/",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 70,
+      "symbol": "Yb",
+      "name": "Itérbio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010997",
+        "sourceURL": "https://www.crystallography.net/cod/9010997.html"
+      },
+      "everydayAtlas": {
+        "application": "Laser de fibra dopada com Yb em corte de chapas",
+        "materialCategoryAsPublished": "fibra_dopada",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "Centelhas provêm do processamento do material cortado; a radiação de laser Yb em torno de 1 µm é infravermelha.",
+        "illustration": "assets/metal-atlas/cotidiano/yb-cotidiano.webp",
+        "referenceURL": "https://www.coherent.com/web-resources/white-paper/rare-earth-doped-fiber-wp",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 71,
+      "symbol": "Lu",
+      "name": "Lutécio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9010998",
+        "sourceURL": "https://www.crystallography.net/cod/9010998.html"
+      },
+      "everydayAtlas": {
+        "application": "Radiofármaco contendo o radioisótopo lutécio-177",
+        "materialCategoryAsPublished": "radiofarmaco_composto",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "Ilustração de frasco de laboratório genérico, não medicamento, marca ou preparação verificada.",
+        "illustration": "assets/metal-atlas/cotidiano/lu-cotidiano.webp",
+        "referenceURL": "https://www.cancer.gov/about-cancer/treatment/drugs/lutetiumlu177-dotatate",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 72,
+      "symbol": "Hf",
+      "name": "Háfnio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-1539076",
+        "sourceURL": "https://www.crystallography.net/cod/1539076.html"
+      },
+      "everydayAtlas": {
+        "application": "Superliga à base de níquel contendo Hf em turbinas",
+        "materialCategoryAsPublished": "superliga",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "A turbina é uma referência tecnológica genérica; sua composição específica não é confirmada.",
+        "illustration": "assets/metal-atlas/cotidiano/hf-cotidiano.webp",
+        "referenceURL": "https://scrreen.eu/wp-content/uploads/2024/01/SCRREEN2_factsheets_HAFNIUM-update2.pdf",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "ti-mo-hf-biomedical"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 73,
+      "symbol": "Ta",
+      "name": "Tântalo",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-nbs-539-v1",
+        "sourceURL": "https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular539v1.pdf"
+      },
+      "everydayAtlas": {
+        "application": "Capacitor eletrolítico com ânodo de tântalo e dielétrico Ta₂O₅",
+        "materialCategoryAsPublished": "metal_e_oxido",
+        "materialClass": "metal-in-functioning-device",
+        "caveat": "Os valores impressos na carcaça da imagem são fictícios/ilustrativos e não qualificam um produto comercial.",
+        "illustration": "assets/metal-atlas/cotidiano/ta-cotidiano.webp",
+        "referenceURL": "https://www.dmtl.co.uk/images/files/Tantalum-Capacitors-Characteristics-and-Component.pdf",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 74,
+      "symbol": "W",
+      "name": "Tungstênio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9006486",
+        "sourceURL": "https://www.crystallography.net/cod/9006486.html"
+      },
+      "everydayAtlas": {
+        "application": "Filamento de lâmpada incandescente de W e ferramenta de WC–Co",
+        "materialCategoryAsPublished": "metal_e_composto",
+        "materialClass": "variable-metal-or-alloy",
+        "caveat": "Duas aplicações diferentes justapostas; WC e W metálico têm microestruturas diferentes.",
+        "illustration": "assets/metal-atlas/cotidiano/w-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/74/tungsten",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 75,
+      "symbol": "Re",
+      "name": "Rênio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008512",
+        "sourceURL": "https://www.crystallography.net/cod/9008512.html"
+      },
+      "everydayAtlas": {
+        "application": "Pá de turbina em superliga de níquel contendo rênio",
+        "materialCategoryAsPublished": "superliga",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "Imagem genérica de turbina; liga, concentração e tratamento térmico da peça ilustrada não foram determinados.",
+        "illustration": "assets/metal-atlas/cotidiano/re-cotidiano.webp",
+        "referenceURL": "https://www.usgs.gov/publications/rhenium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 76,
+      "symbol": "Os",
+      "name": "Ósmio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008510",
+        "sourceURL": "https://www.crystallography.net/cod/9008510.html"
+      },
+      "everydayAtlas": {
+        "application": "Ponta de caneta de liga dura contendo ósmio — uso especializado e histórico",
+        "materialCategoryAsPublished": "liga_metalica",
+        "materialClass": "alloy-intermetallic-composite",
+        "caveat": "Nem toda ponta comercial moderna contém ósmio; é um exemplo especializado, não identificação do produto retratado.",
+        "illustration": "assets/metal-atlas/cotidiano/os-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/76/osmium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 77,
+      "symbol": "Ir",
+      "name": "Irídio",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008470",
+        "sourceURL": "https://www.crystallography.net/cod/9008470.html"
+      },
+      "everydayAtlas": {
+        "application": "Eletrodo de vela de ignição com irídio ou liga contendo irídio",
+        "materialCategoryAsPublished": "metal_ou_liga_em_eletrodo",
+        "materialClass": "variable-metal-or-alloy",
+        "caveat": "O aspecto externo não certifica a composição real da ponta da vela.",
+        "illustration": "assets/metal-atlas/cotidiano/ir-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/77/iridium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 78,
+      "symbol": "Pt",
+      "name": "Platina",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-nbs-539-v1",
+        "sourceURL": "https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular539v1.pdf"
+      },
+      "everydayAtlas": {
+        "application": "Conversor catalítico automotivo com camada superficial contendo platina",
+        "materialCategoryAsPublished": "catalisador_em_suporte",
+        "materialClass": "catalytic-metal-on-support",
+        "caveat": "Composição de catalisadores varia; um conversor pode conter Pd e Rh, sem garantia de Pt na unidade ilustrada.",
+        "illustration": "assets/metal-atlas/cotidiano/pt-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/78/platinum",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 79,
+      "symbol": "Au",
+      "name": "Ouro",
+      "block": "d",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-nbs-539-v1",
+        "sourceURL": "https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular539v1.pdf"
+      },
+      "everydayAtlas": {
+        "application": "Contatos e interconexões eletrônicas com ouro",
+        "materialCategoryAsPublished": "revestimento_metalico",
+        "materialClass": "metal-surface-coating",
+        "caveat": "Dourado da imagem não confirma ouro na peça.",
+        "illustration": "assets/metal-atlas/cotidiano/au-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/79/gold",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 81,
+      "symbol": "Tl",
+      "name": "Tálio",
+      "block": "p",
+      "referenceCrystal": {
+        "type": "HC",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 297,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008519",
+        "sourceURL": "https://www.crystallography.net/cod/9008519.html"
+      },
+      "everydayAtlas": {
+        "application": "Elementos ópticos e detectores especializados baseados em materiais contendo tálio",
+        "materialCategoryAsPublished": "composto_ou_material_optico",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "Imagem ilustrativa de componentes ópticos; não permite inferir composição, cor de emissão ou pureza; tálio é altamente tóxico.",
+        "illustration": "assets/metal-atlas/cotidiano/tl-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/81/thallium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 82,
+      "symbol": "Pb",
+      "name": "Chumbo",
+      "block": "p",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298.15,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9012004",
+        "sourceURL": "https://www.crystallography.net/cod/9012004.html"
+      },
+      "everydayAtlas": {
+        "application": "Bateria chumbo-ácido com placas de chumbo e materiais derivados",
+        "materialCategoryAsPublished": "metal_e_compostos",
+        "materialClass": "variable-metal-or-alloy",
+        "caveat": "O invólucro plástico, eletrólito e terminais não são feitos integralmente de Pb; material tóxico.",
+        "illustration": "assets/metal-atlas/cotidiano/pb-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/82/lead",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 83,
+      "symbol": "Bi",
+      "name": "Bismuto",
+      "block": "p",
+      "referenceCrystal": {
+        "type": "RHOMBOHEDRAL",
+        "spaceGroupNumber": 166,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 298,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9009658",
+        "sourceURL": "https://www.crystallography.net/cod/9009658.html"
+      },
+      "everydayAtlas": {
+        "application": "Cristal de bismuto com superfície iridescente por fina oxidação",
+        "materialCategoryAsPublished": "metal_elementar_com_pelicula_superficial",
+        "materialClass": "metal-in-functioning-device",
+        "caveat": "O aspecto geométrico e as cores são ilustração estética; não é micrografia nem amostra medida.",
+        "illustration": "assets/metal-atlas/cotidiano/bi-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/83/bismuth",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 84,
+      "symbol": "Po",
+      "name": "Polônio",
+      "block": "p",
+      "referenceCrystal": {
+        "type": "SC",
+        "spaceGroupNumber": 221,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": 283,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-1509138",
+        "sourceURL": "https://www.crystallography.net/cod/1509138.html"
+      },
+      "everydayAtlas": {
+        "application": "Fonte alfa selada em dispositivo antiestático industrial — representação conceitual",
+        "materialCategoryAsPublished": "radioisotopo_em_fonte_selada",
+        "materialClass": "specialized-sealed-or-lab",
+        "caveat": "Imagem técnica ilustrada digitalmente, sem amostra real ou fonte em funcionamento; o polônio é altamente radioativo e tóxico.",
+        "illustration": "assets/metal-atlas/cotidiano/po-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/84/polonium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 88,
+      "symbol": "Ra",
+      "name": "Rádio",
+      "block": "s",
+      "referenceCrystal": {
+        "type": "CCC",
+        "spaceGroupNumber": 229,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-1509139",
+        "sourceURL": "https://www.crystallography.net/cod/1509139.html"
+      },
+      "everydayAtlas": {
+        "application": "Tinta luminescente com compostos de rádio em mostradores de relógios históricos",
+        "materialCategoryAsPublished": "composto_radioativo_em_revestimento_historico",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "Uso histórico abandonado por risco radiológico. Relógios antigos não devem ser abertos ou manipulados sem profissionais. Ilustração, não produto real.",
+        "illustration": "assets/metal-atlas/cotidiano/ra-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/88/radium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 89,
+      "symbol": "Ac",
+      "name": "Actínio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008458",
+        "sourceURL": "https://www.crystallography.net/cod/9008458.html"
+      },
+      "everydayAtlas": {
+        "application": "Frasco de radiofármaco com actínio-225 para terapia alfa direcionada",
+        "materialCategoryAsPublished": "radiofarmaco_radioativo",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "Ilustração, não produto real, amostra ou equipamento certificado; radiofármacos são produzidos e usados apenas em instituições habilitadas.",
+        "illustration": "assets/metal-atlas/cotidiano/ac-cotidiano.webp",
+        "referenceURL": "https://isotopes.gov/information/actinium-225",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 90,
+      "symbol": "Th",
+      "name": "Tório",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "CFC",
+        "spaceGroupNumber": 225,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008485",
+        "sourceURL": "https://www.crystallography.net/cod/9008485.html"
+      },
+      "everydayAtlas": {
+        "application": "Camisa incandescente de lampião histórico contendo óxidos de tório",
+        "materialCategoryAsPublished": "oxido_historico",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "Uso histórico; a cena não demonstra que a manta ilustrada tenha tório e não incentiva manusear mantas antigas.",
+        "illustration": "assets/metal-atlas/cotidiano/th-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/90/thorium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 91,
+      "symbol": "Pa",
+      "name": "Protactínio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "TETRAGONAL",
+        "spaceGroupNumber": 139,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-2310022",
+        "sourceURL": "https://www.crystallography.net/cod/2310022.html"
+      },
+      "everydayAtlas": {
+        "application": "Amostra hipotética de pesquisa radioquímica em recipiente laboratorial restrito",
+        "materialCategoryAsPublished": "referencia_laboratorial_conceitual",
+        "materialClass": "specialized-sealed-or-lab",
+        "caveat": "Cenário ilustrado; não se afirma ser fotografia de Pa, nem pureza, forma química, massa ou configuração real de armazenamento.",
+        "illustration": "assets/metal-atlas/cotidiano/pa-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/91/protactinium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 93,
+      "symbol": "Np",
+      "name": "Netúnio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "ORTHORHOMBIC",
+        "spaceGroupNumber": 62,
+        "phaseLabel": "α-Np",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008585",
+        "sourceURL": "https://www.crystallography.net/cod/9008585.html"
+      },
+      "everydayAtlas": {
+        "application": "Contenção de amostra para pesquisa nuclear com netúnio-237",
+        "materialCategoryAsPublished": "referencia_laboratorial_conceitual",
+        "materialClass": "specialized-sealed-or-lab",
+        "caveat": "Não representa uma amostra certificada ou manipulação liberada; o metal radioativo é restrito.",
+        "illustration": "assets/metal-atlas/cotidiano/np-cotidiano.webp",
+        "referenceURL": "https://periodic-table.rsc.org/element/93/neptunium",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 94,
+      "symbol": "Pu",
+      "name": "Plutônio",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "MONOCLINIC",
+        "spaceGroupNumber": 11,
+        "phaseLabel": "α-Pu",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008587",
+        "sourceURL": "https://www.crystallography.net/cod/9008587.html"
+      },
+      "everydayAtlas": {
+        "application": "Gerador termoelétrico de radioisótopos (RTG) em veículo de exploração espacial",
+        "materialCategoryAsPublished": "radioisotopo_em_composto",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "Ilustração tecnológica conceitual, não engenharia validada nem fotografia de um dispositivo específico.",
+        "illustration": "assets/metal-atlas/cotidiano/pu-cotidiano.webp",
+        "referenceURL": "https://science.nasa.gov/mission/mars-2020-perseverance/technology/mmrtg/",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [
+          "pu-metal-allotropes"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
+        "applicationMatchedSpecimenValidated": false
+      }
+    },
+    {
+      "atomicNumber": 95,
+      "symbol": "Am",
+      "name": "Amerício",
+      "block": "f",
+      "referenceCrystal": {
+        "type": "DHCP",
+        "spaceGroupNumber": 194,
+        "phaseLabel": "Fase de referência",
+        "temperatureK": null,
+        "evidenceType": "experimental",
+        "sourceId": "src-cod-9008524",
+        "sourceURL": "https://www.crystallography.net/cod/9008524.html"
+      },
+      "everydayAtlas": {
+        "application": "Detector de fumaça por ionização com fonte interna selada de amerício-241",
+        "materialCategoryAsPublished": "radioisotopo_em_fonte_selada",
+        "materialClass": "compound-dopant-or-ceramic",
+        "caveat": "A fonte não deve ser retirada, desmontada ou manipulada; imagem ilustrativa sem especificação de produto real.",
+        "illustration": "assets/metal-atlas/cotidiano/am-cotidiano.webp",
+        "referenceURL": "https://www.nrc.gov/regulations-legislation/fact-sheets-brochures/backgrounder-on-smoke-detectors",
+        "sourceType": "AI_GENERATED_TECHNOLOGICAL_ILLUSTRATION_NOT_EXPERIMENTAL",
+        "provenanceStatus": "registered-not-reverified-per-image"
+      },
+      "microstructure": {
+        "specificSchematicImage": null,
+        "schematicCaveat": null,
+        "interactiveSyntheticModel": "silm-voronoi-v1",
+        "experimentalSampleIntegrated": false,
+        "segmentedExperimentalMicrographIntegrated": false,
+        "quantitativeGrainDataVerified": false,
+        "experimentalCandidateLeadIDs": [],
+        "candidateReviewStatus": "search-needed",
+        "applicationMatchedSpecimenValidated": false
+      }
+    }
+  ]
+}
