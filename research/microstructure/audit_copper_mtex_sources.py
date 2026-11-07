@@ -67,11 +67,12 @@ def script_info(source: bytes):
 
 
 def rights_view(obj):
-    metadata = obj.get("metadata", {}) if isinstance(obj, dict) else {}
+    record = obj if isinstance(obj, dict) else {}
+    metadata = record.get("metadata") or {}
     return {
         "rightsAsReported": metadata.get("rights"),
         "legacyLicenseAsReported": metadata.get("license"),
-        "accessAsReported": obj.get("access"),
+        "accessAsReported": record.get("access"),
         "rightsDecision": "PENDING human review, never auto-approve image/data derivatives"
     }
 
