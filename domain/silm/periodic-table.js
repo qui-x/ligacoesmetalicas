@@ -14,7 +14,7 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
  const scroll=U.element('div',null,'periodic-scroll');scroll.setAttribute('role','region');scroll.tabIndex=0;scroll.setAttribute('aria-label','Tabela Periódica, 118 elementos. Deslize horizontal ou verticalmente para percorrer todos os grupos.');
  const grid=U.element('div',null,'periodic-grid');scroll.append(grid);root.append(scroll);
  /* R06: em telas estreitas a Tabela completa não cabe com células tocáveis; a dica mostra que há mais grupos ao lado. */
- const scrollHint=U.element('p','Deslize para os lados para percorrer os grupos 1 a 18.','periodic-scroll-hint');scrollHint.id=prefix+'-scroll-hint';scrollHint.hidden=true;scroll.setAttribute('aria-describedby',scrollHint.id);root.append(scrollHint);
+ const scrollHint=U.element('p','Deslize para os lados para percorrer os grupos 1 a 18.','periodic-scroll-hint');scrollHint.id=prefix+'-scroll-hint';scrollHint.hidden=false;scroll.setAttribute('aria-describedby',scrollHint.id);root.append(scrollHint);
  const place=(node,row,column,span=1)=>{node.style.gridRow=String(row);node.style.gridColumn=String(column)+(span>1?' / span '+span:'');grid.append(node);};
  for(let g=1;g<=18;g++)place(U.element('span',String(g),'periodic-group'),1,g+1);
  for(let p=1;p<=7;p++)place(U.element('span',String(p),'periodic-period'),p+1,1);
@@ -109,7 +109,7 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
   if(root.dataset.density!==density)root.dataset.density=density;
   if(!hintFrame)hintFrame=requestAnimationFrame(()=>{
    hintFrame=0;
-   if(!root.isConnected)return;
+   if(!root.isConnected||scroll.clientWidth<=0)return;
    const hidden=scroll.scrollWidth<=scroll.clientWidth+1;
    if(scrollHint.hidden!==hidden)scrollHint.hidden=hidden;
   });
