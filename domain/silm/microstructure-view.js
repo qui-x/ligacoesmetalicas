@@ -131,6 +131,9 @@ SILM.microstructure=(()=>{
    section.dataset.syntheticProfile=profile;
    section.dataset.microstructureSource='schematic';
    section.dataset.measurementStatus='unavailable';
+   section.dataset.didacticEvidenceLevel='D0-schematic-conceptual';
+   evidence.dataset.evidenceLevel='D0-schematic-conceptual';
+   evidenceStatus.textContent='D0 · Modelo de grãos conceitual. A geometria é ilustrativa: não reproduz uma amostra medida nem a forma real dos grãos deste objeto.';
    dimension.textContent='Tamanho real: indisponível (sem escala em µm)';
    note.textContent='Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.';
    chosen=-1;zoom=1;offsetX=0;offsetY=0;
@@ -200,8 +203,9 @@ SILM.microstructure=(()=>{
   const evidence=node('section','silm-micro-didactic-evidence');
   evidence.setAttribute('aria-label','Fundamentação científica e limites da representação');
   evidence.dataset.evidenceLevel='D0-schematic-conceptual';
+  const evidenceStatus=node('p','','D0 · Modelo de grãos conceitual. A geometria é ilustrativa: não reproduz uma amostra medida nem a forma real dos grãos deste objeto.');
   evidence.append(
-   node('p','','D0 · Modelo de grãos conceitual. A geometria é ilustrativa: não reproduz uma amostra medida nem a forma real dos grãos deste objeto.'),
+   evidenceStatus,
    node('p','','Rede de referência: '+(crystal?.type||'não registrada')+
     (crystal?.spaceGroupNumber?' · grupo espacial '+crystal.spaceGroupNumber:'')+
     '. A fase e as condições de uma liga ou produto podem ser diferentes.')
@@ -246,6 +250,9 @@ SILM.microstructure=(()=>{
     W=sourceData.image.widthPx;H=sourceData.image.heightPx;CX=W/2;CY=H/2;
     polygons=sourceData.grains.map(g=>g.vertices);
     chosen=-1;zoom=1;section.dataset.microstructureSource=sourceData.sourceKind;
+    section.dataset.didacticEvidenceLevel='imported-unverified';
+    evidence.dataset.evidenceLevel='imported-unverified';
+    evidenceStatus.textContent='Contornos importados · informações declaradas pelo arquivo, ainda não homologadas. A referência da rede não valida a amostra.';
     section.dataset.measurementStatus=sourceData.image.micrometersPerPixel===null?'uncalibrated':'provided-unverified';
     dimension.textContent=sourceData.image.micrometersPerPixel===null?'Escala física indisponível':'Escala declarada: '+sourceData.image.micrometersPerPixel.toLocaleString('pt-BR')+' µm/pixel';
     note.textContent='Contornos importados sem homologação científica; medidas derivadas da segmentação/calibração declaradas, nunca composição ou fração de fase.';
