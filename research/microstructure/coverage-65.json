@@ -16,7 +16,8 @@
     "candidateStudyRecords": 65,
     "elementsWithCandidateLeads": 65,
     "elementsPendingSpecificLead": 0,
-    "elementalMetalGrainDatasetsValidatedAndIntegrated": 0
+    "elementalMetalGrainDatasetsValidatedAndIntegrated": 0,
+    "preliminaryExperimentalStatisticalAudits": 1
   },
   "interpretationPolicy": {
     "crystalReference": "Experimental structure of a reference element, not proof of the application's microstructure.",
@@ -25,7 +26,8 @@
     "candidateLead": "Published record found containing the element; raw files, calibration and image/sample match not audited.",
     "noPercentage": "No synthetic image color, area or relative tone can imply element concentration, phase fraction or measured grain size.",
     "licensing": "Source-by-source permission and attribution required. No third-party images or raw data incorporated.",
-    "rarityNote": "A study of a host compound, radiolabel, epitaxial film, or nanoparticle counts as a bibliographic candidate involving that element, NOT as a calibrated grain map of its pure metal."
+    "rarityNote": "A study of a host compound, radiolabel, epitaxial film, or nanoparticle counts as a bibliographic candidate involving that element, NOT as a calibrated grain map of its pure metal.",
+    "experimentalAudit": "An experimental spreadsheet with matching checksum and computed percentiles is preliminary quantitative evidence for the specific alloy/sample; it does not certify a microstructure for the pure element or the application object."
   },
   "experimentalLeads": [
     {
@@ -1500,7 +1502,22 @@
           "pb-ca-sr-ba-grid-alloy"
         ],
         "candidateReviewStatus": "identified-not-audited",
-        "applicationMatchedSpecimenValidated": false
+        "applicationMatchedSpecimenValidated": false,
+        "experimentalAnalysis": {
+          "sourceStudyId": "mg-grain-ebsd-az31",
+          "validationStage": "source-files-md5-and-statistics-verified; scientific-approval-and-license-pending",
+          "summary": "research/microstructure/magnesium-ebsd-preliminary-stats.json",
+          "protocol": "research/microstructure/audit_magnesium.py",
+          "report": "docs/SILM-AUDITORIA-EBSD-MG-RESULTADOS-REAIS.md",
+          "sampleMaterials": [
+            "AZ31",
+            "Mg-1Al"
+          ],
+          "rawGrainCount": 4136,
+          "retainedAfterNearEdgeFilter": 3576,
+          "trueSpatialGrainMapAvailableFromTheseSpreadsheets": false,
+          "canParameterizeApprovedGenerator": false
+        }
       }
     },
     {
