@@ -5,6 +5,7 @@ on:
       - design/silm-rede-ambiente-atomico-parte6
     paths:
       - 'research/microstructure/audit_magnesium.py'
+      - 'research/microstructure/magnesium-ebsd-preliminary-stats.json'
       - '.github/workflows/silm-magnesium-audit.yml'
   workflow_dispatch:
 permissions:
@@ -26,6 +27,32 @@ jobs:
       - name: Conferir dados experimentais originais por MD5 e calcular estatísticas
         run: |
           python research/microstructure/audit_magnesium.py --out "$RUNNER_TEMP/silm-mg-audit" --cache "$RUNNER_TEMP/silm-mg-raw"
+      - name: Comparar estatísticas calculadas com o resumo científico versionado
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          source=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"silm-mg-audit"/"magnesium-audit.json").read_text())
+          reviewed=json.loads(pathlib.Path("research/microstructure/magnesium-ebsd-preliminary-stats.json").read_text())
+          assert source["status"]=="scientific-review-required-not-homologated"
+          assert reviewed["context"]["approval"]=="preliminary-statistics-only"
+          assert sum(d["retained"] for d in source["datasets"])==reviewed["retainedGrains"]
+          assert sum(d["excludedNearEdge"] for d in source["datasets"])==reviewed["nearEdgeExcluded"]
+          assert len(source["datasets"])==len(reviewed["samples"])==2
+          for expected in reviewed["samples"]:
+              original=next(x for x in source["datasets"] if x["file"]==expected["file"])
+              assert original["verifiedMD5"]==expected["md5"]
+              assert original["rawCount"]==expected["raw"]
+              assert original["retained"]==expected["retained"]
+              assert original["excludedNearEdge"]==expected["excludedNearEdge"]
+              for k in ("min","p05","p25","median","mean","p75","p95","max","sampleSD","n"):
+                  assert original["ECDmicrometers"][k]==expected["size"][k],(expected["file"],k)
+              assert len(original["conditionGroups"])==len(expected["groups"])
+              for actual, wanted in zip(original["conditionGroups"],expected["groups"]):
+                  assert actual["ECDmicrometers"]["n"]==wanted["n"]
+                  for key,sourcekey in [("ecdMedian","median"),("ecdMean","mean"),("p25","p25"),("p75","p75")]:
+                      assert actual["ECDmicrometers"][sourcekey]==wanted[key],(expected["file"],key)
+          print("OK: estatísticas no GitHub coincidem com os arquivos científicos originais auditados.")
+          PY
       - name: Publicar somente o relatório e dados estatísticos para revisão
         if: always()
         uses: actions/upload-artifact@v4
