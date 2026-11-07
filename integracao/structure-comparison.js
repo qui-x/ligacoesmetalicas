@@ -39,8 +39,10 @@ SILM.createStructureComparison=({storage,host,current=()=>null,open=null,newStru
  host.replaceChildren();host.classList.add('silm-structure-manager');
  const page=host.closest('#workspace-overview'),pageTitle=page?.querySelector(':scope>h2');
  if(pageTitle)pageTitle.textContent='Gerenciamento de estruturas';
- if(page)page.setAttribute('aria-label','Gerenciamento de estruturas salvas');
+ if(page){page.setAttribute('aria-label','Gerenciamento de estruturas salvas');page.tabIndex=0;}
  const intro=N('p','Selecione uma estrutura salva para continuar no Foco.','silm-structure-manager-intro');
+ intro.id='silm-overview-instructions';
+ if(page)page.setAttribute('aria-describedby',intro.id);
  const toolbar=N('div',null,'silm-structure-manager-toolbar');
  const layoutButton=N('button',layout==='grid'?'Ver em lista':'Ver em grade','secondary-btn silm-structure-layout');layoutButton.type='button';
  const count=N('span','0 estruturas','silm-structure-count');count.setAttribute('role','status');
