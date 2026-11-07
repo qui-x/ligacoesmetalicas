@@ -50,10 +50,24 @@ async function test(viewport){
  assert.ok(await viewer.getByRole('button',{name:'Ampliar microestrutura'}).isVisible(),'O zoom inferior não ficou acessível.');
  const grains=viewer.locator('.silm-micro-grain');
  assert.ok(await grains.count()>=45,'Faltam grãos para observação');
- await grains.nth(25).click();
+ await grains.nth(25).focus();
+ await grains.nth(25).press('Enter');
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-selected-grain'),'26','Destaque de grão falhou');
  assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),1,'Seleção não aplica padrão estrutural ao grão.');
- assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/Grão 26 · área no desenho: .*% \(ilustrativa\)/,'Área relativa ilustrativa não foi exibida.');
+ assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/Grão 26 selecionado · modelo esquemático/,'Seleção não identifica o grão sem medições inventadas.');
+ assert.equal(await viewer.getAttribute('data-microstructure-source'),'schematic','Proveniência geométrica do mapa não declarada.');
+ assert.equal(await viewer.getAttribute('data-appearance-palette'),'iron-ore',
+  'Ferro deve utilizar a paleta mineral simbólica explicitamente declarada.');
+ assert.equal(await viewer.getAttribute('data-appearance-basis'),'symbolic-mineral',
+  'O tom do ferro não deve ser classificado como cor experimental de metal puro.');
+ assert.ok(await viewer.locator('svg linearGradient[id*="material"]').count()>=4,
+  'Relevo didático deve usar gradientes SVG e manter o desenho vetorial.');
+ assert.equal(await page.getByText(/Não é bem assim/).count(),0,
+  'A metáfora de contexto da conversa não deve ser uma frase pública.');
+
+ assert.equal(await viewer.getAttribute('data-measurement-status'),'unavailable','Medidas experimentais não devem estar disponíveis para esquema gerado.');
+ assert.doesNotMatch(await viewer.locator('.silm-workshop-micro-status').textContent(),/\d+[,.]?\d*\s*%/,'O grão não deve exibir porcentagem de composição ou fração sem dados experimentais.');
+ assert.match(await viewer.locator('.silm-workshop-micro-caveat').textContent(),/sem composição, fração de fase ou tamanho medidos/,'Aviso científico ausente para mapa esquemático.');
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  await viewer.getByRole('button',{name:'Ampliar microestrutura'}).click();
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-zoom'),'1.25','Zoom não funciona');
@@ -61,6 +75,152 @@ async function test(viewport){
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-zoom'),'1','Ajuste ao quadro não funciona');
  assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'Zoom modificou o estado científico');
  assert.equal(await page.locator('#silm-integration-scene').isVisible(),false,'Rede cristalina apareceu na escala 2');
+
+ // Gerador esquemático: a semente e o perfil controlam o desenho,
+ // mas a tela e a câmera não podem mudar os polígonos.
+ assert.equal(await viewer.getAttribute('data-synthetic-seed'),'139712','Semente inicial incorreta.');
+ assert.equal(await viewer.getAttribute('data-synthetic-profile'),'equiaxial','Perfil inicial incorreto.');
+ const signature=async()=>viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
+  nodes.slice(0,12).map(n=>n.getAttribute('d')).join('|'));
+ const originalField=await signature();
+ await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).click();
+ const formations=viewer.locator('dialog.silm-micro-generator-dialog');
+ await formations.waitFor({state:'visible'});
+ await formations.getByLabel('Forma dos grãos').selectOption('elongated');
+ await formations.getByLabel('Semente reproduzível').fill('424242');
+ await formations.getByRole('button',{name:'Gerar formação com a semente informada'}).click();
+ assert.equal(await viewer.getAttribute('data-synthetic-seed'),'424242');
+ assert.equal(await viewer.getAttribute('data-synthetic-profile'),'elongated');
+ const elongatedField=await signature();
+ assert.notEqual(elongatedField,originalField,'Perfil e semente não alteraram a formação.');
+ await formations.getByRole('button',{name:'Fechar configurações de formação'}).click();
+ const resized={width:Math.max(320,viewport.width-71),height:viewport.height};
+ await page.setViewportSize(resized);
+ await page.waitForFunction(()=>{
+  const n=document.querySelector('.silm-workshop-micro-map');
+  const r=n?.getBoundingClientRect(),v=n?.viewBox.baseVal;
+  return !!r&&!!v&&r.height>0&&Math.abs(v.width/v.height-r.width/r.height)<.02;
+ },undefined,{timeout:10000});
+ assert.equal(await signature(),elongatedField,'Redimensionamento alterou os grãos esquemáticos.');
+ assert.equal(await viewer.getAttribute('data-synthetic-seed'),'424242','Redimensionamento alterou a semente.');
+ await page.setViewportSize(viewport);
+ await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).click();
+ await formations.getByRole('button',{name:'Gerar formação com a semente informada'}).click();
+ assert.equal(await signature(),elongatedField,'Mesma semente e perfil não reproduzem a formação.');
+ await formations.getByRole('button',{name:'Gerar nova variação reproduzível'}).click();
+ assert.notEqual(await viewer.getAttribute('data-synthetic-seed'),'424242','Nova variação não altera semente.');
+ assert.notEqual(await signature(),elongatedField,'Nova variação não altera a geometria.');
+ await formations.getByRole('button',{name:'Restaurar formação padrão'}).click();
+ assert.equal(await signature(),originalField,'Restaurar padrão não reproduz o primeiro desenho.');
+ await formations.getByRole('button',{name:'Fechar configurações de formação'}).click();
+ assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'Formações alteraram propriedades ou estado científico.');
+
+
+ // Mapa importado: contornos e calibração declarados, SEM fração de fase ou composição.
+ assert.ok(await page.evaluate(()=>!!SILM.microstructureData?.validate),'Validador de microestruturas não foi carregado.');
+ const sample={
+  schema:'silm.microstructure-map.v1',id:'teste-geometrico',title:'Teste sintético, não é amostra',
+  materialAtomicNumber:26,material:'Ferro fictício do teste',sourceKind:'literature-image',
+  source:{citation:'Fixture fictício, apenas para regressão',url:'https://example.org/fixture',
+   acquisitionMethod:'Contornos gerados manualmente para teste'},
+  image:{widthPx:100,heightPx:80,micrometersPerPixel:.5,
+   calibrationReference:'Calibração fictícia para verificação matemática'},
+  segmentation:{method:'Contorno manual fictício'},
+  grains:[{id:'g1',vertices:[[10,10],[30,10],[30,20],[10,20]]}]
+ };
+ await viewer.getByRole('button',{name:'Abrir dados segmentados'}).click();
+ const importDialog=viewer.locator('.silm-micro-data-dialog');
+ await importDialog.waitFor({state:'visible'});
+ const evidencePanel=importDialog.locator('.silm-micro-didactic-evidence');
+ assert.match(await evidencePanel.innerText(),/Cores e relevo:/,
+  'A leitura cromática deve informar que a cor é ilustrativa.');
+ assert.match(await evidencePanel.innerText(),/não é a cor intrínseca do ferro metálico|não é a cor intrínseca/,
+  'Paleta Fe não pode ser confundida com a cor real de toda amostra.');
+
+ assert.equal(await evidencePanel.getAttribute('data-evidence-level'),'D0-schematic-conceptual',
+  'A geometria didática não deve parecer uma amostra experimental.');
+ assert.match(await evidencePanel.innerText(),/Rede de referência:/,
+  'A evidência deve apresentar a cristalografia, separadamente do grão ilustrativo.');
+ assert.match(await evidencePanel.innerText(),/Contexto de aplicação no atlas:/,
+  'A aplicação tecnológica deve ser contextualizada, sem confundir liga com metal puro.');
+ assert.match(await evidencePanel.innerText(),/Estudos candidatos não são parâmetros do gerador/,
+  'Não se deve inferir forma de grão a partir de fonte bibliográfica não homologada.');
+ const crystalURL=await evidencePanel.getByRole('link',{name:'Consultar fonte cristalográfica'}).getAttribute('href');
+ assert.match(crystalURL,/^https:\/\//,'Falta URL rastreável da estrutura de referência.');
+ assert.equal(await viewer.getAttribute('data-didactic-evidence-level'),'D0-schematic-conceptual');
+ const studiesContext=evidencePanel.locator('details.silm-micro-study-context');
+ const relatedCount=await page.evaluate(()=>SILM.microstructureStudies.forElement(26).length);
+ assert.ok(relatedCount>=1,'Ferro não recebeu as referências relacionadas já catalogadas.');
+ assert.equal(await evidencePanel.getAttribute('data-catalogued-studies'),String(relatedCount),
+  'O número de estudos apresentados deve coincidir com o catálogo offline.');
+ assert.equal(await studiesContext.locator('.silm-micro-study-entry').count(),relatedCount,
+  'Os estudos do Fe precisam ser individuais, sem inventar material de amostra.');
+ assert.equal(await studiesContext.getAttribute('open'),null,
+  'Estudos devem iniciar recolhidos para preservar a organização da interface.');
+ const visualBeforeStudies=await signature();
+ await studiesContext.locator('summary').click();
+ assert.equal(await studiesContext.getAttribute('open'),'',
+  'A lista de estudos não expandiu via teclado ou clique.');
+ assert.match(await studiesContext.innerText(),/Estudos sobre materiais que contêm o elemento/,
+  'O texto deve explicar o vínculo indireto com o elemento.');
+ assert.match(await studiesContext.innerText(),/Nenhum deles define os grãos deste desenho/,
+  'Estudos candidatos não podem validar visualmente os polígonos.');
+ assert.ok(await studiesContext.getByText(/Aspectos investigados na fonte:/).count()>=1,
+  'O catálogo deve traduzir conceitos científicos documentados na fonte.');
+
+ assert.equal(await studiesContext.locator('.silm-micro-study-entry a[href]').count(),relatedCount,
+  'Toda referência deve manter uma URL para consulta independente.');
+ assert.equal(await signature(),visualBeforeStudies,
+  'Abrir o catálogo não pode alterar os contornos de grãos.');
+ assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,
+  'Abrir estudos não pode modificar o estado científico.');
+ await studiesContext.locator('summary').click();
+ await importDialog.locator('input[type=file]').setInputFiles({
+  name:'amostra-de-teste.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(sample))
+ });
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.measurementStatus==='provided-unverified');
+ assert.equal(await viewer.getAttribute('data-didactic-evidence-level'),'imported-unverified',
+  'Importação não pode herdar a classificação D0 do gerador.');
+ assert.match(await evidencePanel.innerText(),/informações declaradas pelo arquivo, ainda não homologadas/,
+  'A revisão dos contornos importados não pode ser pressuposta.');
+ assert.equal(await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).isDisabled(),true,'Um mapa importado não pode ser trocado silenciosamente por um esquema.');
+ assert.equal(await viewer.locator('.silm-micro-grain').count(),1,'O mapa importado não alterou a segmentação.');
+ await importDialog.getByRole('button',{name:'Fechar importação de dados'}).click();
+ await viewer.locator('.silm-micro-grain').first().click();
+ assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/área segmentada 50 µm².*não homologados/,'Área calibrada de teste ou aviso de procedência não aparece.');
+ assert.doesNotMatch(await viewer.locator('.silm-workshop-micro-status').textContent(),/%/,'Mapas importados não autorizam porcentagens de composição.');
+ assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'Importar mapa modificou o estado científico.');
+ await viewer.getByRole('button',{name:'Abrir dados segmentados'}).click();
+ await importDialog.getByRole('button',{name:'Retornar ao mapa didático'}).click();
+ await importDialog.getByRole('button',{name:'Fechar importação de dados'}).click();
+ assert.equal(await viewer.getAttribute('data-didactic-evidence-level'),'D0-schematic-conceptual',
+  'Ao restaurar o gerador, a classificação D0 deve ser recuperada.');
+ assert.equal(await viewer.getAttribute('data-microstructure-source'),'schematic','Mapa esquemático não foi restaurado.');
+ assert.equal(await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).isEnabled(),true,'Restauração não reativou o gerador esquemático.');
+ assert.ok(await viewer.locator('.silm-micro-grain').count()>=45,'Grãos ilustrativos não foram restaurados.');
+ await viewer.locator('.silm-micro-grain').nth(25).focus();
+ await viewer.locator('.silm-micro-grain').nth(25).press('Enter');
+ // A formação criada também persiste ao sair da escala 2 e voltar à mesma
+ // investigação, sem se confundir com dados experimentais ou alterar ensaios.
+ await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).click();
+ await formations.getByLabel('Forma dos grãos').selectOption('elongated');
+ await formations.getByLabel('Semente reproduzível').fill('123456');
+ await formations.getByRole('button',{name:'Gerar formação com a semente informada'}).click();
+ const persistentGeometry=await signature();
+ await formations.getByRole('button',{name:'Fechar configurações de formação'}).click();
+ await page.locator('.silm-workshop-scale').nth(2).click();
+ await page.locator('.silm-workshop-scale').nth(1).click();
+ await viewer.waitFor({state:'visible'});
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
+ assert.equal(await viewer.getAttribute('data-synthetic-seed'),'123456','Semente perdida após navegar entre escalas.');
+ assert.equal(await viewer.getAttribute('data-synthetic-profile'),'elongated','Perfil perdido após navegar entre escalas.');
+ assert.equal(await signature(),persistentGeometry,'A formação mudou ao retornar à microestrutura.');
+ await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).click();
+ await formations.getByRole('button',{name:'Restaurar formação padrão'}).click();
+ await formations.getByRole('button',{name:'Fechar configurações de formação'}).click();
+ await viewer.locator('.silm-micro-grain').nth(25).focus();
+ await viewer.locator('.silm-micro-grain').nth(25).press('Enter');
+
  if(viewport.width>800){
   const frame=viewer.locator('.silm-workshop-micro-viewport'),grain=viewer.locator('.silm-micro-grain.is-selected');
   await page.locator('#nav-toggle').click();
@@ -198,7 +358,7 @@ async function test(viewport){
  await page.locator('[data-scene-view="focus"]').click();
  assert.equal(await page.locator('#workspace-focus').isVisible(),true,'Trocar lista/grade quebrou o retorno ao Foco.');
 
- await page.getByRole('button',{name:'4 · Ambiente atômico'}).click();
+ await page.locator('.silm-workshop-scale[data-scale="4"]').click();
  const units=page.locator('.silm-crystal-unit'),status=page.locator('.silm-lattice-status output');
  await units.first().waitFor({state:'visible'});
  const sites=()=>units.evaluateAll(nodes=>nodes.map(n=>n.dataset.site));

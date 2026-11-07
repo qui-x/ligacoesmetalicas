@@ -1,0 +1,74 @@
+name: SILM — Prévia didática de grãos (3 navegadores)
+on:
+  push:
+    branches:
+      - feature/silm-microestrutura-cores-didaticas-20261107
+  pull_request:
+    branches: [main]
+    paths:
+      - 'domain/silm/microstructure-*'
+      - 'domain/silm/workshop.*'
+      - 'tests/microstructure-*'
+      - 'tests/run-workshop-micro-main.mjs'
+      - 'index.html'
+      - 'sw.js'
+      - '.github/workflows/silm-microstructure-visual-preview.yml'
+permissions:
+  contents: read
+concurrency:
+  group: silm-didatic-preview-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  didactic-preview:
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validar sintaxe das estruturas e integração
+        run: |
+          node --check domain/silm/microstructure-data.js
+          node --check domain/silm/microstructure-synthetic.js
+          node --check domain/silm/microstructure-study-context.js
+          node --check domain/silm/microstructure-appearance.js
+          node --check domain/silm/microstructure-view.js
+          node --check domain/silm/workshop.js
+          node --check sw.js
+          node --check tests/run-workshop-micro-main.mjs
+      - name: Testes de dados, acessibilidade e paridade operacional
+        run: node --test tests/*.test.*
+      - name: Preparar Playwright
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-playwright/node_modules/playwright" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright" install --with-deps "$BROWSER_NAME"
+      - name: Iniciar servidor local
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/server.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/server.pid"
+          for n in $(seq 1 30); do
+            if curl -sf "$BASE_URL/index.html" > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/server.log"
+          exit 1
+      - name: Verificar visualização, acessibilidade e responsividade no navegador
+        run: |
+          node tests/run-workshop-micro-main.mjs
+          node tests/run-atlas-applications.mjs
+      - name: Encerrar servidor local
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/server.pid" ]; then kill "$(cat "$RUNNER_TEMP/server.pid")" 2>/dev/null || true; fi

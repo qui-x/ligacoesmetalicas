@@ -19,7 +19,7 @@
 .silm-workshop-composition{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 16px;padding:0;margin:4px 0 0;list-style:none}
 .silm-workshop-composition li{display:flex;flex-direction:column;gap:2px;font-size:.78rem}.silm-workshop-composition li span{color:var(--muted,#627487)}
 .silm-workshop-scales{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:16px}
-.silm-workshop-scale{min-height:40px;border:1px solid var(--border,#d9e1e8);border-radius:9px;padding:7px;background:transparent;color:inherit;font:inherit;font-size:.78rem;font-weight:650;cursor:pointer}
+.silm-workshop-scale{min-height:44px;border:1px solid var(--border,#d9e1e8);border-radius:9px;padding:7px;background:transparent;color:inherit;font:inherit;font-size:.78rem;font-weight:650;cursor:pointer}
 .silm-workshop-scale[aria-pressed=true]{border-color:var(--accent,#ba7c42);background:color-mix(in srgb,var(--accent,#ba7c42) 12%,transparent);box-shadow:inset 0 0 0 1px var(--accent,#ba7c42)}
 .silm-workshop-scale:focus-visible,.silm-workshop-alternative:focus-visible{outline:3px solid var(--focus,#3478b8);outline-offset:2px}
 .silm-workshop-alternatives{margin-top:13px;padding-top:11px;border-top:1px solid var(--border,#d9e1e8)}.silm-workshop-alternatives h3{margin:0;font-size:.9rem}
@@ -95,9 +95,14 @@
 .silm-workshop-micro-viewport{height:clamp(320px,64vh,720px);min-width:0;overflow:hidden;border:1px solid var(--border);border-radius:12px;background:var(--panel2,var(--surface))}
 .silm-workshop-micro-map{display:block;width:100%;height:100%;user-select:none;touch-action:pan-y;cursor:crosshair}
 .silm-workshop-micro-viewport.is-zoomed .silm-workshop-micro-map{touch-action:none;cursor:grab}
+.silm-workshop-micro-viewport.is-pannable .silm-workshop-micro-map{touch-action:none;cursor:grab}
+.silm-workshop-micro-viewport.is-pannable .silm-workshop-micro-map:active{cursor:grabbing}
 .silm-workshop-micro-viewport.is-zoomed .silm-workshop-micro-map:active{cursor:grabbing}
-.silm-micro-grain{fill:color-mix(in srgb,var(--text) var(--grain-tone,20%),var(--surface));stroke:var(--text);stroke-opacity:.9;stroke-width:2.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;outline:none}
-.silm-micro-hatching{opacity:.6}
+.silm-micro-grain{fill:var(--silm-grain-fill,var(--panel2,var(--surface)));stroke:var(--silm-grain-edge,var(--text));stroke-opacity:.9;stroke-width:2.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;pointer-events:all;outline:none}
+.silm-micro-hatching{opacity:.32}
+.silm-micro-highlight{fill:none;stroke:rgba(255,255,255,.44);stroke-width:1.7;stroke-linejoin:round;vector-effect:non-scaling-stroke;opacity:.7;pointer-events:none}
+:root.si-highcontrast .silm-micro-highlight{display:none}
+@media(forced-colors:active){.silm-micro-highlight{display:none}}
 .silm-micro-grain:hover,.silm-micro-grain:focus-visible{stroke:var(--ring);stroke-width:5;stroke-opacity:1;stroke-dasharray:9 4}
 .silm-micro-grain.is-selected{fill:color-mix(in srgb,var(--accent) 40%,var(--surface));stroke:var(--accent);stroke-width:6;stroke-opacity:1;stroke-dasharray:11 4}
 .silm-workshop-micro-toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}
@@ -106,6 +111,12 @@
 .silm-workshop-micro-zoom{min-width:48px;text-align:center;font-size:.88rem;font-variant-numeric:tabular-nums}
 .silm-workshop-micro-status{margin-right:auto;order:-1;font-size:.78rem;color:var(--muted,#627487)}
 .silm-workshop-micro-caveat{margin:0;font-size:.7rem;color:var(--muted,#627487);line-height:1.4}
+.silm-micro-reveal{min-width:0;font-size:.76rem;line-height:1.45}
+.silm-micro-reveal summary{cursor:pointer;display:list-item;list-style-position:inside;max-width:100%;padding:2px 0;font-weight:650;overflow-wrap:anywhere}
+.silm-micro-reveal summary:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.silm-micro-reveal p{margin:4px 0 0;max-width:84ch;overflow-wrap:anywhere}
+.silm-micro-appearance-note{border-top:1px solid var(--border);padding-top:6px}
+
 .silm-workshop-reference>.silm-workshop-scales{margin:0 0 8px;position:relative;z-index:1}
 .silm-workshop-micro-mode .silm-workshop-scales{margin:0 0 4px}
 @media(max-width:560px){
@@ -217,7 +228,7 @@
  #si-stage:not(.silm-workshop-context-only) #workspace-focus{padding:4px!important}
  #si-stage:not(.silm-workshop-context-only) .silm-workshop-reference{padding:3px 4px}
  #si-stage:not(.silm-workshop-context-only) .silm-workshop-scales{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0;overflow:visible}
- #si-stage:not(.silm-workshop-context-only) .silm-workshop-scale{min-height:36px;padding:.15em;font-size:.82rem}
+ #si-stage:not(.silm-workshop-context-only) .silm-workshop-scale{min-height:44px;padding:.15em;font-size:.82rem}
  #si-stage:not(.silm-workshop-context-only) .silm-workshop-scale-short{display:inline}
  #si-stage:not(.silm-workshop-context-only) :is(.silm-workshop-scale-long,.silm-workshop-component-long,.silm-workshop-table-long,.silm-workshop-prefix){display:none}
  #si-stage:not(.silm-workshop-context-only) .silm-workshop-reference-summary{gap:.25rem .4rem}
@@ -290,3 +301,49 @@
  .silm-workshop-card:has(.silm-workshop-atlas-photo) .silm-workshop-art{padding:6px;}
  .silm-workshop-card:has(.silm-workshop-atlas-photo) .silm-workshop-atlas-photo img{max-height:210px;}
 }
+
+/* Importação de contornos segmentados: metadados em modal, nunca sobre o palco. */
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog){
+ box-sizing:border-box;border:1px solid var(--border);border-radius:12px;
+ color:var(--text);background:var(--surface);
+ width:min(440px,calc(100vw - 24px));max-height:calc(100dvh - 24px);
+ padding:clamp(12px,2vw,22px);overflow:auto;
+}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog)::backdrop{background:rgba(0,0,0,.55)}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) h2{font-size:1.12rem;margin:0 0 8px}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) .silm-micro-import-help{font-size:.87rem;line-height:1.45;margin:0 0 14px}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) label{display:grid;gap:5px;font-weight:650;font-size:.88rem}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) input[type=file]{font:inherit;max-width:100%;min-width:0}
+.silm-micro-didactic-evidence{
+ display:grid;gap:6px;margin:0 0 14px;padding:10px 12px;
+ background:var(--panel2,var(--surface));border:1px solid var(--border);border-radius:8px;
+ font-size:.8rem;line-height:1.4;overflow-wrap:anywhere;
+}
+.silm-micro-didactic-evidence p{margin:0}
+
+.silm-micro-study-context{border-top:1px solid var(--border);padding-top:6px;margin-top:4px;min-width:0}
+.silm-micro-study-context summary{cursor:pointer;font-weight:650;line-height:1.5;padding:5px 2px}
+.silm-micro-study-context summary:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.silm-micro-study-intro{padding:4px 0 8px}
+.silm-micro-study-items{display:grid;gap:8px;max-height:240px;overflow-y:auto;overscroll-behavior:contain}
+.silm-micro-study-entry{display:grid;gap:4px;padding:8px;border:1px solid var(--border);border-radius:7px;background:var(--surface)}
+.silm-micro-study-entry strong{font-size:.82rem}
+.silm-micro-study-entry .silm-micro-study-limit{font-style:italic;color:var(--muted,#627487)}
+.silm-micro-study-entry a{justify-self:start}
+
+.silm-micro-didactic-evidence a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.silm-micro-didactic-evidence a:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.silm-micro-import-report{font-size:.84rem;overflow-wrap:anywhere;line-height:1.45}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) a{font-size:.86rem;overflow-wrap:anywhere}
+.silm-micro-data-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:14px}
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) :is(button,input):focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+:root.si-highcontrast :is(.silm-micro-data-dialog,.silm-micro-generator-dialog){border:2px solid var(--text)}
+@media(forced-colors:active){
+ :is(.silm-micro-data-dialog,.silm-micro-generator-dialog){border:2px solid CanvasText;color:CanvasText;background:Canvas}
+ :is(.silm-micro-data-dialog,.silm-micro-generator-dialog) :is(button,input):focus-visible{outline:3px solid Highlight}
+}
+
+/* Gerador: controles acessíveis sem aumentar a altura permanente do palco. */
+.silm-micro-generator-dialog select,.silm-micro-generator-dialog input[type=number]{box-sizing:border-box;max-width:100%;width:100%;min-height:44px;font:inherit;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)}
+.silm-micro-generator-dialog .silm-micro-data-actions{gap:6px}
+.silm-micro-generator-dialog .silm-micro-data-actions button{min-height:44px}
