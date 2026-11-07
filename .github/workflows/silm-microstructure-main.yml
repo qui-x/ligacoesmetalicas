@@ -20,11 +20,16 @@ on:
       - "tests/run-workshop-micro-main.mjs"
       - "tests/microstructure-data.test.cjs"
       - "tests/microstructure-synthetic.test.cjs"
+      - "tests/microstructure-research-coverage.test.cjs"
+      - "research/microstructure/**"
+      - "docs/SILM-MATRIZ-65-ELEMENTOS-APLICACAO-REDE-MICROESTRUTURA.md"
       - "tests/run-atlas-applications.mjs"
       - ".github/workflows/silm-microstructure-main.yml"
   pull_request:
     branches: [main]
     paths:
+      - "research/microstructure/**"
+      - "docs/SILM-MATRIZ-65-ELEMENTOS-APLICACAO-REDE-MICROESTRUTURA.md"
       - "domain/silm/**"
       - "integracao/**"
       - "tests/**"
