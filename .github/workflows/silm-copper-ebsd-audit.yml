@@ -6,6 +6,7 @@ on:
     paths:
       - 'research/microstructure/audit_copper_ebsd.py'
       - 'research/microstructure/preview_copper_grains.py'
+      - 'research/microstructure/audit_copper_spatial_sensitivity.py'
       - 'tests/test_copper_orientation_regression.py'
       - '.github/workflows/silm-copper-ebsd-audit.yml'
   workflow_dispatch:
@@ -28,6 +29,7 @@ jobs:
           python -m py_compile research/microstructure/audit_copper_ebsd.py
           python research/microstructure/audit_copper_ebsd.py --self-test
           python research/microstructure/preview_copper_grains.py --self-test
+          python research/microstructure/audit_copper_spatial_sensitivity.py --self-test
       - name: Testar geometria sintética Cu (não representa amostra real)
         run: python tests/test_copper_orientation_regression.py
       - name: Conferir MD5 e metadados EBSD do Cu policristalino
@@ -36,6 +38,11 @@ jobs:
       - name: Prévia exploratória de orientação e regiões (não homologada)
         run: |
           python research/microstructure/preview_copper_grains.py --input "$RUNNER_TEMP/silm-cu-raw/copper29.h5oina" --output "$RUNNER_TEMP/silm-cu-audit/copper-orientation-preview.json"
+      - name: Analisar variação espacial entre cinco recortes do EBSD bruto
+        run: |
+          python research/microstructure/audit_copper_spatial_sensitivity.py \
+            --input "$RUNNER_TEMP/silm-cu-raw/copper29.h5oina" \
+            --output "$RUNNER_TEMP/silm-cu-audit/copper-spatial-sensitivity.json"
       - name: Publicar somente auditoria textual e metadados não homologados
         if: always()
         uses: actions/upload-artifact@v4
@@ -45,5 +52,6 @@ jobs:
             ${{ runner.temp }}/silm-cu-audit/copper-h5oina-audit.json
             ${{ runner.temp }}/silm-cu-audit/copper-h5oina-audit.md
             ${{ runner.temp }}/silm-cu-audit/copper-orientation-preview.json
+            ${{ runner.temp }}/silm-cu-audit/copper-spatial-sensitivity.json
           if-no-files-found: warn
           retention-days: 14
