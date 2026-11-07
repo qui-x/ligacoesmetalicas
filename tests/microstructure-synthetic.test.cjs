@@ -58,11 +58,11 @@ test('tesselação preenche o campo fixo sem buracos ou áreas negativas',()=>{
 test('parâmetros fora do contrato são rejeitados sem geração silenciosa',()=>{
  for(const seed of [-1,4294967296,NaN,3.5,'12',null]){
   assert.equal(generator.validSeed(seed),false);
-  assert.throws(()=>generator.generate({seed}),RangeError);
+  assert.throws(()=>generator.generate({seed}),/Semente/);
  }
  for(const profile of ['fantasia','EBSD','',null]){
   assert.equal(generator.validProfile(profile),false);
-  assert.throws(()=>generator.generate({profile}),RangeError);
+  assert.throws(()=>generator.generate({profile}),/Perfil/);
  }
  assert.equal(generator.validSeed(0),true);assert.equal(generator.validSeed(4294967295),true);
 });
