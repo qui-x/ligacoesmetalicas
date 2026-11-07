@@ -225,6 +225,38 @@ SILM.microstructure=(()=>{
     evidence.append(link);
    }
   }
+  // Estudos catalogados são contexto investigativo, nunca geometrias EBSD
+  // nem parâmetros de forma/tamanho dos polígonos. Exibir sob demanda.
+  const studies=SILM.microstructureStudies?.forElement?.(element?.atomicNumber)||[];
+  evidence.dataset.cataloguedStudies=String(studies.length);
+  if(studies.length){
+   const collection=node('details','silm-micro-study-context');
+   collection.setAttribute('aria-label','Estudos e técnicas catalogados para investigação');
+   const summary=node('summary','','Estudos relacionados ('+studies.length+') · contexto científico');
+   const description=node('p','silm-micro-study-intro',
+    'Estudos sobre materiais que contêm o elemento; podem envolver ligas, compostos ou outras amostras. Nenhum deles define os grãos deste desenho.');
+   const items=node('div','silm-micro-study-items');
+   studies.forEach(study=>{
+    const entry=node('article','silm-micro-study-entry');
+    entry.dataset.studyId=study.id;
+    const title=node('strong','',study.name);
+    const sample=node('p','','Amostra: '+SILM.microstructureStudies.describe(study)+
+     (study.technique?' · Técnica: '+study.technique:''));
+    const note=node('p','',study.caveat);
+    const limit=node('p','silm-micro-study-limit',SILM.microstructureStudies.caveat(study));
+    if(study.review?.includes('not-independently-verified')){
+     limit.textContent+=' Documento original ainda não conferido de forma independente.';
+    }
+    const link=node('a','','Consultar estudo original');
+    if(/^https:\/\//.test(study.url)){
+     link.href=study.url;link.target='_blank';link.rel='noopener noreferrer';
+    }else link.hidden=true;
+    entry.append(title,sample,note,limit,link);
+    items.append(entry);
+   });
+   collection.append(summary,description,items);
+   evidence.append(collection);
+  }
   evidence.append(node('p','','Dados experimentais de grãos, composição e tamanho físico: não homologados neste modelo. Estudos candidatos não são parâmetros do gerador.'));
   const fileLabel=node('label','','Arquivo JSON de microestrutura');
   const fileInput=node('input');fileInput.type='file';fileInput.accept='.json,application/json';fileInput.setAttribute('aria-label','Arquivo JSON de microestrutura');
