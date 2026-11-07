@@ -1,0 +1,38 @@
+name: SILM — Auditoria experimental Mg (pré-homologação)
+on:
+  push:
+    branches:
+      - design/silm-rede-ambiente-atomico-parte6
+    paths:
+      - 'research/microstructure/audit_magnesium.py'
+      - '.github/workflows/silm-magnesium-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  magnesium-audit:
+    name: Conferir planilhas Mg, MD5 e estatísticas de grãos
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validar sintaxe e funções básicas
+        run: |
+          python -m py_compile research/microstructure/audit_magnesium.py
+          python research/microstructure/audit_magnesium.py --self-test
+      - name: Conferir dados experimentais originais por MD5 e calcular estatísticas
+        run: |
+          python research/microstructure/audit_magnesium.py --out "$RUNNER_TEMP/silm-mg-audit" --cache "$RUNNER_TEMP/silm-mg-raw"
+      - name: Publicar somente o relatório e dados estatísticos para revisão
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-mg-ebsd-review-not-homologated
+          path: |
+            ${{ runner.temp }}/silm-mg-audit/magnesium-audit.json
+            ${{ runner.temp }}/silm-mg-audit/magnesium-audit.md
+          if-no-files-found: warn
+          retention-days: 14
