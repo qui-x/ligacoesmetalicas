@@ -39,7 +39,9 @@ def window_positions(grid_width: int, grid_height: int,
     if min(grid_width, grid_height, width, height) <= 0:
         raise ValueError("Grid and crop dimensions must be positive")
     if grid_width < 2 * width or grid_height < 2 * height:
-        raise ValueError("Cannot select five disjoint windows on this grid")
+        raise ValueError("Cannot separate corners on this grid")
+    if grid_width < 3 * width and grid_height < 3 * height:
+        raise ValueError("Center overlaps corners: neither axis fits three crops")
     x_right, y_bottom = grid_width - width, grid_height - height
     return {
         "upper_left": (0, 0),
@@ -178,12 +180,13 @@ def self_test():
         "lower_right": (340, 240),
     }
     assert window_positions(500, 400) == expected
-    try:
-        window_positions(300, 200)
-    except ValueError:
-        pass
-    else:
-        raise AssertionError("Disjoint sampling was incorrectly allowed")
+    for dimensions in ((300, 200), (330, 330)):
+        try:
+            window_positions(*dimensions)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("Disjoint sampling was incorrectly allowed")
     demo = {
         "a": {"results": [{"thresholdDegrees": 10,
                            "candidateRegionsNotOnCropBorder": 2,
