@@ -7,7 +7,6 @@ const shared={};const sandbox={window:{SILM:shared},SILM:shared};
 vm.runInNewContext(read('domain/silm/metal-atlas.js'),sandbox);
 vm.runInNewContext(read('domain/silm/microstructure-appearance.js'),sandbox);
 vm.runInNewContext(read('domain/silm/microstructure-study-context.js'),sandbox);
-const shared=sandbox.window.SILM;
 const atlas=shared.metalAtlas,appearance=shared.microstructureAppearance,context=shared.microstructureStudies;
 
 test('65 elementos recebem paleta com natureza da evidência explicitada',()=>{
