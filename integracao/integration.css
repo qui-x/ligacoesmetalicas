@@ -1274,3 +1274,81 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
  #silm-periodic-dialog .periodic-scroll{min-height:54px}
  #silm-periodic-dialog .periodic-heading h1{font-size:1rem}
 }
+
+
+/* R09 · Foco / Visão geral: no celular, toda estrutura continua acessível
+   pela rolagem vertical do gerenciador. A miniatura conserva proporção
+   legível sem ocupar quase toda a altura útil e esconder os comandos. */
+#workspace-overview.si-overview-view:not([hidden]){
+ box-sizing:border-box;
+ scroll-padding-block-end:clamp(32px,8dvh,100px);
+ overscroll-behavior-y:contain;
+ -webkit-overflow-scrolling:touch;
+}
+#silm-comparison-items .silm-structure-card-actions button{
+ scroll-margin-block-end:clamp(24px,6dvh,80px);
+}
+@media(max-width:600px){
+ #workspace-overview.si-overview-view:not([hidden]){
+  display:flex!important;flex:1 1 0!important;
+  min-height:0!important;max-height:100%!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  padding:clamp(8px,2vw,14px) clamp(8px,2.5vw,14px)
+    calc(24px + env(safe-area-inset-bottom,0px))!important;
+  gap:7px!important;
+ }
+ #workspace-overview.si-overview-view>h2{
+  font-size:clamp(1.05rem,4.6vw,1.3rem);
+  line-height:1.17;
+ }
+ #silm-comparison-items .silm-structure-manager-intro{
+  font-size:.78rem;line-height:1.3;max-width:42ch;
+ }
+ #silm-comparison-items .silm-structure-manager-toolbar{
+  gap:6px;min-height:42px;padding-bottom:5px;
+ }
+ #silm-comparison-items .silm-structure-cards{
+  gap:11px;
+ }
+ #silm-comparison-items .silm-structure-card{
+  box-sizing:border-box;
+  padding:clamp(7px,2vw,10px);gap:8px;min-height:0;
+  overflow:visible;
+ }
+ #silm-comparison-items .silm-structure-card-head{
+  min-height:44px;gap:6px;
+ }
+ #silm-comparison-items .silm-structure-preview,
+ #silm-comparison-items .silm-structure-cards[data-layout="list"] .silm-structure-preview,
+ #silm-comparison-items .silm-structure-cards[data-layout="grid"] .silm-structure-preview{
+  box-sizing:border-box;
+  display:grid;place-items:center;
+  width:100%;height:clamp(185px,calc((100vw - 52px)*.66),255px)!important;
+  min-height:0!important;max-height:255px!important;
+  flex:0 0 auto!important;
+  aspect-ratio:auto;overflow:hidden;
+ }
+ #silm-comparison-items .silm-structure-preview svg,
+ #silm-comparison-items .silm-structure-cards[data-layout="list"] .silm-structure-preview svg{
+  width:100%;height:100%;max-height:100%;max-width:100%;
+ }
+ #silm-comparison-items .silm-structure-card-actions,
+ #silm-comparison-items .silm-structure-cards[data-layout="list"] .silm-structure-card-actions{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;align-self:stretch;
+  padding-top:7px;
+ }
+ #silm-comparison-items .silm-structure-card-actions button,
+ #silm-comparison-items .silm-structure-cards[data-layout="list"] .silm-structure-card-actions button{
+  box-sizing:border-box;min-width:0;min-height:44px;
+  width:100%;white-space:normal;overflow-wrap:anywhere;
+ }
+ #silm-comparison-items .silm-structure-card-actions button:first-child,
+ #silm-comparison-items .silm-structure-cards[data-layout="list"] .silm-structure-card-actions button:first-child{
+  grid-column:1/-1;
+ }
+}
+@media(max-width:380px){
+ #silm-comparison-items .silm-structure-title{font-size:.87rem}
+ #silm-comparison-items .silm-structure-composition{font-size:.7rem;line-height:1.25}
+}
