@@ -100,7 +100,7 @@ SILM.microstructure=(()=>{
   };
   svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);
   viewport.append(svg);
-  const note=node('p','silm-workshop-micro-caveat','Grãos e tonalidades esquemáticos, sem escala física. Não representam concentração de elementos, fração de fase ou tamanho medido.');
+  const note=node('p','silm-workshop-micro-caveat','Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.');
   section.append(viewport,toolbar,note);
   let lastAspect=0,resizeFrame=0;
   // Nunca modificar o SVG dentro da entrega de um ResizeObserver: no WebKit,
