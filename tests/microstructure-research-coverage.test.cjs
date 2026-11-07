@@ -94,7 +94,7 @@ test('Fontes candidatas não homologam micrografias nem porcentagens artificiais
   coverage.records.filter(x=>!x.microstructure.experimentalCandidateLeadIDs.length).length);
 });
 test('Alcance bibliográfico 65/65 não implica micrografias homologadas',()=>{
- assert.equal(coverage.coverage.candidateStudyRecords,65);
+ assert.ok(coverage.coverage.candidateStudyRecords>=65,'O banco deve poder adicionar fontes sem limitar uma por elemento.');
  assert.equal(coverage.coverage.elementsWithCandidateLeads,65);
  assert.equal(coverage.coverage.elementsPendingSpecificLead,0);
  assert.equal(coverage.coverage.experimentalMicrostructureDatasetsIntegrated,0);
