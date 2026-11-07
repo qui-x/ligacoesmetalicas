@@ -33,7 +33,27 @@ def download(url, file):
                 out.write(part)
 
 
+def percentiles(data):
+    import math
+    import statistics
+    x = sorted(data)
+    if not x:
+        return None
+    def q(p):
+        at = (len(x) - 1) * p
+        index = int(at)
+        return round(x[index] + (x[min(index + 1, len(x) - 1)] - x[index]) * (at - index), 6)
+    return {
+        "n": len(x), "min": round(x[0], 6), "p05": q(.05),
+        "p25": q(.25), "median": q(.5), "mean": round(statistics.fmean(x), 6),
+        "p75": q(.75), "p95": q(.95), "max": round(x[-1], 6),
+        "sampleSD": round(statistics.stdev(x), 6) if len(x) > 1 else None
+    }
+
+
 def inspect(file):
+    import collections
+    import math
     raw = file.read_bytes()
     try:
         text = raw.decode("utf-8-sig")
@@ -51,22 +71,54 @@ def inspect(file):
     first = []
     widths = {}
     count = 0
+    invalid = 0
+    phases = collections.defaultdict(list)
+    phase_frequency = collections.Counter()
+    expected_headers = ("Id", "Phase", "Pixel Count", "Area", "Perimeter", "Equivalent Circle Diameter")
+    recognized = False
     for row in reader:
         count += 1
         widths[str(len(row))] = widths.get(str(len(row)), 0) + 1
         if len(first) < 12:
-            # Avoid unbounded strings or accidental spreadsheet formulas in output
             first.append([str(v)[:150] for v in row[:20]])
+        if count == 1:
+            recognized = row[:6] == list(expected_headers)
+            continue
+        if count == 2:
+            recognized = recognized and len(row) > 5 and row[3:6] == ["µm²", "µm", "µm"]
+            continue
+        if not recognized or len(row) < 6:
+            invalid += 1
+            continue
+        phase = row[1].strip()
+        phase_frequency[phase] += 1
+        try:
+            ecd = float(row[5].strip())
+            area = float(row[3].strip())
+            if not (math.isfinite(ecd) and ecd > 0 and math.isfinite(area) and area > 0):
+                raise ValueError("nonpositive area or ECD")
+            phases[phase].append(ecd)
+        except ValueError:
+            invalid += 1
         if count > 1000000:
             raise ValueError("CSV has more than one million records")
     if not first:
         raise ValueError("Empty CSV")
+    if not recognized:
+        raise ValueError("Grain size CSV has unexpected headers or ECD/area units")
     return {
         "encoding": encoding, "delimiter": repr(delimiter),
         "lineCount": count, "columnCountFrequency": widths,
-        "firstRowsForSchemaReview": first,
-        "quantitativeResultsComputed": False,
-        "reason": "Columns and units must be confirmed from acquisition method and original paper"
+        "firstRowsForSchemaReview": first[:3],
+        "headerVerified": True, "ECDunit": "µm", "areaUnit": "µm²",
+        "rawGrainRecords": count - 2,
+        "invalidOrNonpositiveECD": invalid,
+        "phaseCounts": dict(phase_frequency),
+        "ECDbyPhase": {phase: percentiles(values) for phase, values in phases.items()},
+        "nearEdgeFilter": "not possible: dataset export has no Near_edge column",
+        "quantitativeResultsComputed": True,
+        "quantitativeStatus": "computed-from-calibrated-export; pending independent method/segmentation review",
+        "limitations": "Area and ECD are extracted from the EBSD software's export; not chemical element percentages or ASTM mean grain size."
     }
 
 
