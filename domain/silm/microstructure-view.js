@@ -96,6 +96,72 @@ SILM.microstructure=(()=>{
   svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);
   viewport.append(svg);
   const note=node('p','silm-workshop-micro-caveat','Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.');
+  // Mudanças de formação são explícitas. Redimensionar, ampliar ou mudar
+  // o tema nunca regeneram os grãos, alteram a semente ou as propriedades.
+  function applySchematic(options){
+   generated=synthetic.generate(options);
+   seed=generated.seed;profile=generated.profile;
+   W=generated.width;H=generated.height;CX=W/2;CY=H/2;
+   polygons=generated.polygons;sourceData=null;
+   section.dataset.syntheticSeed=String(seed);
+   section.dataset.syntheticProfile=profile;
+   section.dataset.microstructureSource='schematic';
+   section.dataset.measurementStatus='unavailable';
+   dimension.textContent='Tamanho real: indisponível (sem escala em µm)';
+   note.textContent='Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.';
+   chosen=-1;zoom=1;offsetX=0;offsetY=0;
+   drawGrains();persist();
+   if(formationsButton)formationsButton.disabled=false;
+  }
+  const genDialog=node('dialog','silm-micro-data-dialog silm-micro-generator-dialog');
+  const genTitle=node('h2','','Formações esquemáticas');
+  const genHelp=node('p','silm-micro-import-help','Variações geométricas didáticas, não micrografias de um metal. A mesma semente e perfil reproduzem a mesma formação em qualquer tela.');
+  const profileLabel=node('label','','Forma dos grãos'),profileSelect=node('select');
+  profileSelect.setAttribute('aria-label','Forma dos grãos');
+  for(const [id,info] of Object.entries(synthetic.PROFILES)){
+   const option=node('option','',info.label);option.value=id;profileSelect.append(option);
+  }
+  profileLabel.append(profileSelect);
+  const seedLabel=node('label','','Semente reproduzível'),seedInput=node('input');
+  seedInput.type='number';seedInput.min='0';seedInput.max='4294967295';seedInput.step='1';
+  seedInput.inputMode='numeric';seedInput.setAttribute('aria-label','Semente reproduzível');
+  seedLabel.append(seedInput);
+  const genReport=node('p','silm-micro-import-report');
+  genReport.setAttribute('role','status');
+  const reflect=()=>{
+   profileSelect.value=profile;seedInput.value=String(seed);
+   genReport.textContent='Formação atual: '+synthetic.PROFILES[profile].label+' · semente '+seed+'. Não representa amostra medida.';
+  };
+  const genActions=node('div','silm-micro-data-actions');
+  const parseSeed=()=>{
+   const value=seedInput.value.trim();
+   if(!/^(0|[1-9][0-9]{0,9})$/.test(value)||!synthetic.validSeed(Number(value)))
+    throw new Error('Informe um inteiro de 0 a 4294967295.');
+   if(!synthetic.validProfile(profileSelect.value))throw new Error('Perfil geométrico inválido.');
+   return Number(value);
+  };
+  const generateForm=(next=false)=>{
+   try{
+    if(sourceData)throw new Error('Restaure primeiro o mapa esquemático em Dados.');
+    const requested=parseSeed();
+    applySchematic({seed:next?synthetic.nextSeed(requested):requested,profile:profileSelect.value});
+    reflect();
+   }catch(error){genReport.textContent='Formação não gerada: '+(error?.message||String(error));}
+  };
+  genActions.append(
+   button('Gerar formação com a semente informada','Gerar',()=>generateForm()),
+   button('Gerar nova variação reproduzível','Nova variação',()=>generateForm(true)),
+   button('Restaurar formação padrão','Padrão',()=>{
+    applySchematic({seed:synthetic.DEFAULT_SEED,profile:'equiaxial'});reflect();
+   }),
+   button('Fechar configurações de formação','Fechar',()=>genDialog.close())
+  );
+  genDialog.append(genTitle,genHelp,profileLabel,seedLabel,genReport,genActions);
+  reflect();
+  const formationsButton=button('Abrir gerador de formações de grãos','Formações',()=>{
+   reflect();genDialog.showModal();
+  });
+  formationsButton.title='Gerar variantes didáticas mantendo semente e perfil reproduzíveis';
   // A importação é opcional e não altera o estado científico do SILM.
   // O diálogo evita comprimir o quadro principal com metadados extensos.
   const dataDialog=node('dialog','silm-micro-data-dialog'),dataTitle=node('h2','','Mapa segmentado');
@@ -121,6 +187,7 @@ SILM.microstructure=(()=>{
     const checked=SILM.microstructureData?.validate(json,element?.atomicNumber);
     if(!checked?.ok)throw new Error(checked?.error||'Módulo de validação indisponível.');
     sourceData=checked.data;
+    formationsButton.disabled=true;
     W=sourceData.image.widthPx;H=sourceData.image.heightPx;CX=W/2;CY=H/2;
     polygons=sourceData.grains.map(g=>g.vertices);
     chosen=-1;zoom=1;section.dataset.microstructureSource=sourceData.sourceKind;
@@ -133,8 +200,8 @@ SILM.microstructure=(()=>{
    }catch(error){report.textContent='Importação recusada: '+(error?.message||String(error));}
    fileInput.value='';
   });
-  zoomControls.append(button('Abrir dados segmentados','Dados',()=>dataDialog.showModal()));
-  section.append(viewport,toolbar,note,dataDialog);
+  zoomControls.append(formationsButton,button('Abrir dados segmentados','Dados',()=>dataDialog.showModal()));
+  section.append(viewport,toolbar,note,genDialog,dataDialog);
   // A câmera ocupa o quadro em qualquer proporção sem alterar um só grão.
   // A vista efetua recorte central (não estica geometria nem reamostra a formação).
   function fitViewport(){
