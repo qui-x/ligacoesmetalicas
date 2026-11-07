@@ -11,6 +11,12 @@ SILM.microstructure=(()=>{
  function create({element,item=null}={}){
   const section=node('section','silm-workshop-micro-viewer'),viewport=node('div','silm-workshop-micro-viewport');
   const synthetic=SILM.microstructureSynthetic;
+  const appearance=SILM.microstructureAppearance?.get(element?.atomicNumber)||null;
+  section.dataset.appearanceBasis=appearance?.basis||'symbolic-neutral';
+  section.dataset.appearancePalette=appearance?.paletteKey||'neutral-stone';
+  const palette=appearance||{light:'#e0e1e3',mid:'#b3bbc2',dark:'#7b8894',edge:'#50606f',
+   label:'Paleta neutra didática',basis:'symbolic-neutral',warning:'Cor sem correspondência física exclusiva.'};
+  section.style.setProperty('--silm-grain-edge',palette.edge);
   if(!synthetic)throw new Error('Gerador esquemático de microestruturas não carregado.');
   const prefKey='silm:microstructure:schematic:v1:'+String(element?.atomicNumber||'free');
   let seed=synthetic.DEFAULT_SEED,profile='equiaxial';
@@ -35,6 +41,16 @@ SILM.microstructure=(()=>{
   const defs=svgNode('defs'),uid='silm-micro-'+(++serial);
   for(let p=0;p<4;p++){const pattern=svgNode('pattern',{id:uid+'-pattern-'+p,patternUnits:'userSpaceOnUse',width:22,height:22,patternTransform:'rotate('+(p*37+12)+')'});
    pattern.append(svgNode('path',{d:'M 0 0 V 22',stroke:'currentColor','stroke-opacity':'.13','stroke-width':1.35}));defs.append(pattern);}
+  // Relevo suave por luz e sombra, sem sugerir medidas/fases. Gradientes são
+  // iguais para todo o desenho e variam somente para distinguir polígonos.
+  for(let k=0;k<4;k++){
+   const g=svgNode('linearGradient',{id:uid+'-material-'+k,x1:(k%2?20:0)+'%',y1:'0%',x2:(k%2?100:80)+'%',y2:'100%'});
+   const stops=[
+    ['0%',palette.light],['48%',palette.mid],['100%',palette.dark]
+   ];
+   for(const [offset,color] of stops)g.append(svgNode('stop',{offset,'stop-color':color}));
+   defs.append(g);
+  }
   svg.append(defs);
   const plane=svgNode('g',{'class':'silm-micro-plane'});svg.append(plane);
   let paths=[],cells=[];
@@ -59,7 +75,8 @@ SILM.microstructure=(()=>{
    if(poly.length<3)return;
    const d='M'+poly.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')+' Z';
    const g=svgNode('g',{'class':'silm-micro-cell'}),p=svgNode('path',{d,'class':'silm-micro-grain',tabindex:0,role:'button','aria-label':sourceData?'Selecionar grão segmentado '+sourceData.grains[i].id+' (dados importados não homologados)':'Destacar grão ilustrativo '+(i+1),'aria-pressed':'false'});
-   p.style.setProperty('--grain-tone',(16+(i*17)%30)+'%');p.addEventListener('click',()=>{if(!suppressClick)choose(i);});
+   p.style.setProperty('--silm-grain-fill',sourceData?'var(--panel2,var(--surface))':'url(#'+uid+'-material-'+(i%4)+')');
+   p.addEventListener('click',()=>{if(!suppressClick)choose(i);});
    p.addEventListener('keydown',e=>{
     if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(i);return;}
     const step=55*(e.shiftKey?2:1);
@@ -71,7 +88,8 @@ SILM.microstructure=(()=>{
     }
    });
    const hatch=svgNode('path',{d,'class':'silm-micro-hatching',fill:'url(#'+uid+'-pattern-'+(i%4)+')','pointer-events':'none'});
-   g.append(p,hatch);plane.append(g);paths[i]=p;cells[i]=g;
+   const bevel=svgNode('path',{d,'class':'silm-micro-highlight','pointer-events':'none'});
+   g.append(p,bevel,hatch);plane.append(g);paths[i]=p;cells[i]=g;
    });
    if(chosen>=polygons.length)chosen=polygons.length-1;
    if(chosen>=0)choose(chosen);else status.textContent=sourceData?'Selecione um grão segmentado · dados importados não homologados':'Selecione um grão · modelo esquemático';
@@ -119,7 +137,11 @@ SILM.microstructure=(()=>{
   };
   svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);
   viewport.append(svg);
-  const note=node('p','silm-workshop-micro-caveat','Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.');
+  const note=node('details','silm-workshop-micro-caveat silm-micro-reveal');
+  const noteSummary=node('summary','','✦ Não é bem assim... mas é como podemos nos aproximar.');
+  const noteDetails=node('p','',
+   'Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos. A cor é uma referência visual, não uma leitura química. Cada estudo descreve uma amostra e condição.');
+  note.append(noteSummary,noteDetails);
   // Mudanças de formação são explícitas. Redimensionar, ampliar ou mudar
   // o tema nunca regeneram os grãos, alteram a semente ou as propriedades.
   function applySchematic(options){
@@ -135,7 +157,7 @@ SILM.microstructure=(()=>{
    evidence.dataset.evidenceLevel='D0-schematic-conceptual';
    evidenceStatus.textContent='D0 · Modelo de grãos conceitual. A geometria é ilustrativa: não reproduz uma amostra medida nem a forma real dos grãos deste objeto.';
    dimension.textContent='Tamanho real: indisponível (sem escala em µm)';
-   note.textContent='Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.';
+   noteDetails.textContent='Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos. A cor é uma referência visual, não uma leitura química. Cada estudo descreve uma amostra e condição.';
    chosen=-1;zoom=1;offsetX=0;offsetY=0;
    drawGrains();persist();
    if(formationsButton)formationsButton.disabled=false;
@@ -263,6 +285,14 @@ SILM.microstructure=(()=>{
    evidence.append(collection);
   }
   evidence.append(node('p','','Dados experimentais de grãos, composição e tamanho físico: não homologados neste modelo. Estudos candidatos não são parâmetros do gerador.'));
+  const appearanceNote=node('p','silm-micro-appearance-note',
+   'Cores e relevo: '+palette.label+'. '+palette.warning+' As diferenças de tom entre grãos não indicam composição, orientação ou porcentagens.');
+  evidence.append(appearanceNote);
+  if(appearance?.source){
+   const link=node('a','','Referência para a leitura de cor');
+   link.href=appearance.source;link.target='_blank';link.rel='noopener noreferrer';
+   evidence.append(link);
+  }
   const fileLabel=node('label','','Arquivo JSON de microestrutura');
   const fileInput=node('input');fileInput.type='file';fileInput.accept='.json,application/json';fileInput.setAttribute('aria-label','Arquivo JSON de microestrutura');
   fileLabel.append(fileInput);
@@ -292,7 +322,7 @@ SILM.microstructure=(()=>{
     evidenceStatus.textContent='Contornos importados · informações declaradas pelo arquivo, ainda não homologadas. A referência da rede não valida a amostra.';
     section.dataset.measurementStatus=sourceData.image.micrometersPerPixel===null?'uncalibrated':'provided-unverified';
     dimension.textContent=sourceData.image.micrometersPerPixel===null?'Escala física indisponível':'Escala declarada: '+sourceData.image.micrometersPerPixel.toLocaleString('pt-BR')+' µm/pixel';
-    note.textContent='Contornos importados sem homologação científica; medidas derivadas da segmentação/calibração declaradas, nunca composição ou fração de fase.';
+    noteDetails.textContent='Contornos importados sem homologação científica; medidas derivadas da segmentação/calibração declaradas, nunca composição ou fração de fase.';
     sourceLink.href=sourceData.source.url;sourceLink.hidden=false;
     report.textContent=sourceData.title+' · '+sourceData.grains.length+' grão(s) · '+sourceData.source.citation+' · '+sourceData.segmentation.method;
     drawGrains();
