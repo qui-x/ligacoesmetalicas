@@ -60,6 +60,14 @@ def validate_meta(meta):
         fail("Independent registered BSE mask provenance required")
     if not isinstance(mask.get("threshold"), (int, float)) or isinstance(mask.get("threshold"), bool) or not 0 <= mask["threshold"] <= 1:
         fail("Normalized BSE threshold is invalid")
+    segmentation = meta.get("segmentation", {})
+    for key in ("rawAlgorithm", "correctedAlgorithm", "borderPolicy"):
+        if not isinstance(segmentation.get(key), str) or not segmentation[key].strip():
+            fail("Segmentation algorithms and border policy must be documented")
+    for key in ("rawThresholdDegrees", "correctedThresholdDegrees"):
+        value = segmentation.get(key)
+        if type(value) not in (int, float) or not np.isfinite(value) or not 0 < value <= 60:
+            fail("Valid misorientation thresholds for both maps are required")
     return tuple(size)
 
 
@@ -141,6 +149,8 @@ def analyze(meta, raw, corrected):
             "edgeComparisonAtOneCommonPixel": measured,
             "experimentalValidation": "not-homologated",
             "registrationAssessment": "metadata-declared; not independently verified",
+            "segmentationMethods": meta["segmentation"],
+            "causalAttribution": "not-possible: distortion correction and segmentation methods may differ",
             "cannotInfer": ["chemical concentration", "voids from unindexed EBSD",
                             "ASTM grain size", "volume fraction", "licence to reuse",
                             "TrueEBSD correction validity"],
