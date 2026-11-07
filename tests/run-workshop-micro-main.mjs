@@ -65,6 +65,39 @@ async function test(viewport){
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-zoom'),'1','Ajuste ao quadro não funciona');
  assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'Zoom modificou o estado científico');
  assert.equal(await page.locator('#silm-integration-scene').isVisible(),false,'Rede cristalina apareceu na escala 2');
+
+ // Mapa importado: contornos e calibração declarados, SEM fração de fase ou composição.
+ assert.ok(await page.evaluate(()=>!!SILM.microstructureData?.validate),'Validador de microestruturas não foi carregado.');
+ const sample={
+  schema:'silm.microstructure-map.v1',id:'teste-geometrico',title:'Teste sintético, não é amostra',
+  materialAtomicNumber:26,material:'Ferro fictício do teste',sourceKind:'literature-image',
+  source:{citation:'Fixture fictício, apenas para regressão',url:'https://example.org/fixture',
+   acquisitionMethod:'Contornos gerados manualmente para teste'},
+  image:{widthPx:100,heightPx:80,micrometersPerPixel:.5,
+   calibrationReference:'Calibração fictícia para verificação matemática'},
+  segmentation:{method:'Contorno manual fictício'},
+  grains:[{id:'g1',vertices:[[10,10],[30,10],[30,20],[10,20]]}]
+ };
+ await viewer.getByRole('button',{name:'Abrir dados segmentados'}).click();
+ const importDialog=viewer.locator('.silm-micro-data-dialog');
+ await importDialog.waitFor({state:'visible'});
+ await importDialog.locator('input[type=file]').setInputFiles({
+  name:'amostra-de-teste.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(sample))
+ });
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.measurementStatus==='provided-unverified');
+ assert.equal(await viewer.locator('.silm-micro-grain').count(),1,'O mapa importado não alterou a segmentação.');
+ await importDialog.getByRole('button',{name:'Fechar importação de dados'}).click();
+ await viewer.locator('.silm-micro-grain').first().click();
+ assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/área segmentada 50 µm².*não homologados/,'Área calibrada de teste ou aviso de procedência não aparece.');
+ assert.doesNotMatch(await viewer.locator('.silm-workshop-micro-status').textContent(),/%/,'Mapas importados não autorizam porcentagens de composição.');
+ assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'Importar mapa modificou o estado científico.');
+ await viewer.getByRole('button',{name:'Abrir dados segmentados'}).click();
+ await importDialog.getByRole('button',{name:'Retornar ao mapa didático'}).click();
+ await importDialog.getByRole('button',{name:'Fechar importação de dados'}).click();
+ assert.equal(await viewer.getAttribute('data-microstructure-source'),'schematic','Mapa esquemático não foi restaurado.');
+ assert.ok(await viewer.locator('.silm-micro-grain').count()>=45,'Grãos ilustrativos não foram restaurados.');
+ await viewer.locator('.silm-micro-grain').nth(25).click();
+
  if(viewport.width>800){
   const frame=viewer.locator('.silm-workshop-micro-viewport'),grain=viewer.locator('.silm-micro-grain.is-selected');
   await page.locator('#nav-toggle').click();
