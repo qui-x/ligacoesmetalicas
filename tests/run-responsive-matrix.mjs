@@ -90,6 +90,29 @@ try{
   ['periodic-tablet',768,1024],
   ['periodic-desktop',1440,900]
  ])await checkPeriodic(label,w,h);
+
+ // Após selecionar uma aplicação real, conferir a tela de investigação em vez
+ // de testar apenas a tela inicial (que ainda não possui palco científico).
+ await page.setViewportSize({width:390,height:844});
+ await page.locator('#silm-workshop-context').getByRole('button',{name:'Tabela Periódica'}).click();
+ await page.locator('#silm-periodic-dialog').waitFor({state:'visible'});
+ await page.locator('#silm-periodic-dialog [data-z="26"]').click();
+ await page.locator('#silm-periodic-dialog [id$="-explore"]').click();
+ await page.locator('.silm-workshop-card').filter({hasText:'Parafuso de aço'})
+  .getByRole('button',{name:'Investigar componente'}).click();
+ await page.waitForFunction(()=>window.SILMIntegration?.snapshot?.()?.metal?.atomicNumber===26,undefined,{timeout:30000});
+ for(const [label,w,h] of [
+  ['focus-phone-320',320,568],['focus-phone-390',390,844],
+  ['focus-landscape',844,390],['focus-tablet',1024,768],
+  ['focus-notebook',1280,720],['focus-full-hd',1920,1080]
+ ])await checkSize(label,w,h);
+ await page.locator('.silm-workshop-scale').nth(1).click();
+ await page.locator('.silm-workshop-micro-viewer').waitFor({state:'visible'});
+ for(const [label,w,h] of [
+  ['micro-phone-320',320,568],['micro-phone-390',390,844],
+  ['micro-landscape',844,390],['micro-tablet',768,1024],
+  ['micro-notebook',1280,720],['micro-full-hd',1920,1080]
+ ])await checkSize(label,w,h);
  // O crescimento do texto deve manter a tela dentro do viewport.
  await page.setViewportSize({width:390,height:844});
  const a11y=page.locator('#si-a11y-toggle');
