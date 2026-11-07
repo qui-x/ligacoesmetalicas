@@ -54,7 +54,6 @@ SILM.microstructure=(()=>{
   };
   function drawGrains(){
    paths=[];cells=[];plane.replaceChildren();
-   svg.setAttribute('viewBox','0 0 '+W.toFixed(2)+' '+H);
    polygons.forEach((poly,i)=>{
    if(poly.length<3)return;
    const d='M'+poly.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')+' Z';
@@ -66,7 +65,7 @@ SILM.microstructure=(()=>{
    });
    if(chosen>=polygons.length)chosen=polygons.length-1;
    if(chosen>=0)choose(chosen);else status.textContent=sourceData?'Selecione um grão segmentado · dados importados não homologados':'Selecione um grão · modelo esquemático';
-   offsetX=0;offsetY=0;update();svg.dataset.mapReady='true';
+   offsetX=0;offsetY=0;update();fitViewport();
   }
   const toolbar=node('div','silm-workshop-micro-toolbar'),zoomLabel=node('output','silm-workshop-micro-zoom','100%');
   zoomLabel.setAttribute('aria-label','Ampliação da microestrutura');
@@ -109,11 +108,8 @@ SILM.microstructure=(()=>{
   const sourceLink=node('a','','Consultar origem declarada');sourceLink.target='_blank';sourceLink.rel='noopener noreferrer';sourceLink.hidden=true;
   const dialogActions=node('div','silm-micro-data-actions');
   const reset=button('Retornar ao mapa didático','Repor esquema',()=>{
-   sourceData=null;section.dataset.microstructureSource='schematic';section.dataset.measurementStatus='unavailable';
-   dimension.textContent='Tamanho real: indisponível (sem escala em µm)';
-   note.textContent='Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.';
+   applySchematic({seed,profile});
    sourceLink.hidden=true;sourceLink.removeAttribute('href');report.textContent='Esquema didático restaurado.';
-   chosen=-1;lastAspect=0;zoom=1;makeField(viewport.clientWidth/Math.max(1,viewport.clientHeight));drawGrains();
   });
   const close=button('Fechar importação de dados','Fechar',()=>dataDialog.close());
   dialogActions.append(reset,close);dataDialog.append(dataTitle,dataHelp,fileLabel,report,sourceLink,dialogActions);
@@ -139,22 +135,23 @@ SILM.microstructure=(()=>{
   });
   zoomControls.append(button('Abrir dados segmentados','Dados',()=>dataDialog.showModal()));
   section.append(viewport,toolbar,note,dataDialog);
-  let lastAspect=0,resizeFrame=0;
-  // Nunca modificar o SVG dentro da entrega de um ResizeObserver: no WebKit,
-  // isso pode desencadear "ResizeObserver loop completed with undelivered notifications".
-  // Coalescer notificações e redesenhar no frame seguinte preserva proporção
-  // e evita que mudanças de viewBox alimentem o mesmo ciclo de observação.
-  const resize=()=>{
-   if(!viewport.isConnected||sourceData)return;
+  // A câmera ocupa o quadro em qualquer proporção sem alterar um só grão.
+  // A vista efetua recorte central (não estica geometria nem reamostra a formação).
+  function fitViewport(){
+   if(!viewport.isConnected)return;
    const rect=viewport.getBoundingClientRect();
    if(rect.width<2||rect.height<2)return;
-   const ratio=rect.width/rect.height;
-   if(Math.abs(ratio-lastAspect)<.025)return;
-   lastAspect=ratio;makeField(ratio);drawGrains();
-  };
+   const ratio=clamp(rect.width/rect.height,.2,8),base=W/H;
+   const boxW=ratio<base?H*ratio:W,boxH=ratio>base?W/ratio:H;
+   svg.setAttribute('viewBox',[
+    (W-boxW)/2,(H-boxH)/2,boxW,boxH
+   ].map(n=>Number(n.toFixed(3))).join(' '));
+   svg.dataset.mapReady='true';
+  }
+  let resizeFrame=0;
   const scheduleResize=()=>{
    if(resizeFrame)return;
-   resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;resize();});
+   resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;fitViewport();});
   };
   if(typeof ResizeObserver==='function'){
    const observer=new ResizeObserver(scheduleResize);
