@@ -36,6 +36,21 @@ A [especificação Oxford h5oina](https://github.com/oinanoanalysis/h5oina/blob/
 - Consultar licenciamento do registro sem presumir que `Open` autoriza redistribuição do arquivo/imagens ou de seus derivados.
 - Publicar apenas `copper-h5oina-audit.json` e `copper-h5oina-audit.md` em artefato temporário para revisão, não na pasta pública de mídias do site.
 
+## Resultado da conferência real do HDF5 — 07/11/2026
+
+A auditoria [GitHub Actions #42340012964](https://github.com/qui-x/ligacoesmetalicas/actions/runs/42340012964) **passou** e examinou o arquivo original em runner efêmero, sem publicá-lo no site.
+
+- **163.730.279 bytes** baixados, MD5 calculado e confirmado: `ffe617d5cb3d2e4ed1a5e3b7d27d6e11`.
+- **Grade real:** 1031 × 547 = **563.957 pontos**. A documentação apresenta 511.713 pontos indexados em Copper e 52.244 sem indexação — a soma confirma o total real. O valor **557.957** citado numa resposta anterior estava incorreto.
+- **Calibração do próprio cabeçalho:** `X Step = Y Step = 0,10000000149 µm`; campo entre posições extremas ~**103,0 × 54,6 µm**, antes de considerar eventuais transformações da imagem ou recortes.
+- **Fases:** 511.713 pontos da fase **Copper** (ID 1), 52.244 pontos sem indexação (ID 0). Esses percentuais são frações de *pontos indexados*, não porcentagens químicas de cobre, de grãos ou de fases no volume.
+- **Cristalografia da fase indexada:** estrutura Fm-3m, grupo espacial **225**, cela com `a ≈ 3,6144 Å`; grupo Laue 11. A matriz `/1/EBSD/Data/Euler` contém **563.957 × 3** orientações em `float32`; X/Y e Band Contrast também estão no arquivo.
+- **Amostra identificada:** `P1700`, adquirida em 17/01/2023; notas de amostra mencionam **500 ciclos térmicos**. Esses detalhes são condições da fonte, não autorização para simular envelhecimento de qualquer cobre.
+- **Direitos de reutilização:** a API de metadados consultada retornou `rights: []`, sem uma licença inequívoca. **Não há permissão presumida para redistribuir imagens, mapas ou derivados.**
+- **Status:** metadados, identidade de arquivo, calibração e contagem de fases validados. **Contornos de grão, diâmetros equivalentes, dados de aplicação do cotidiano e direitos ainda não homologados.**
+
+Resumo versionado em `research/microstructure/copper-ebsd-verified-metadata.json`. Inventário HDF5 original conferido está como artefato temporário do workflow, sem matrizes brutas.
+
 ## Etapa seguinte — segmentação experimental, somente após validação
 
 O [exemplo original MATLAB](https://github.com/vtvivian/mtex-trueEbsd/blob/main/examples/example_copper.m) reconstrói grãos de cobre com `calcGrains(...,'angle',10*degree)`, mas **não usa somente esse limiar**: antes aplica TrueEBSD para alinhamento de imagens, corrige distorções, cria uma máscara para vazios a partir de BSE e preenche pontos sem indexação antes de calcular limites.
@@ -51,8 +66,8 @@ Para produzir uma derivação honesta, a implementação deverá:
 
 ## Critérios de aceite
 
-- [ ] HDF5 original com MD5, X/Y Cells e X/Y Step verificados.
-- [ ] Fases e unidades cruzadas com o exemplo do MTEX.
+- [x] HDF5 original com MD5, X/Y Cells e X/Y Step verificados.
+- [x] Fases e unidades cruzadas com o exemplo do MTEX.
 - [ ] Licença dos dados e das imagens esclarecida e registrada.
 - [ ] Transformação de orientações, limiar e algoritmo de segmentação conferidos.
 - [ ] Estatísticas com diferenças em relação a MTEX avaliadas e documentadas.
