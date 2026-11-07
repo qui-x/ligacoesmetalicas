@@ -66,7 +66,7 @@ test('metadados são somente contexto: sem morfologia, escala, concentração ou
  assert.match(view,/silm-micro-study-context/);
  assert.match(view,/Estudos sobre materiais que contêm o elemento/);
  assert.match(view,/Nenhum deles define os grãos deste desenho/);
- assert.match(view,/SILM\.microstructureStudies\.forElement/);
+ assert.ok(view.includes('SILM.microstructureStudies?.forElement?.('));
  assert.ok(!generator.includes('microstructureStudies'),
   'O gerador geométrico não pode adaptar a geometria à fonte não homologada');
 });
