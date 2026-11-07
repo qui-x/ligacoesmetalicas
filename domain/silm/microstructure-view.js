@@ -4,38 +4,28 @@ window.SILM=window.SILM||{};
    Não representa EBSD, metalografia medida, fases, textura ou tamanho de grão de um elemento específico. */
 SILM.microstructure=(()=>{
  const NS='http://www.w3.org/2000/svg';
- let W=1000,H=620,CX=W/2,CY=H/2;
  const svgNode=(name,attrs={})=>{const n=document.createElementNS(NS,name);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,String(v));return n;};
  const node=(tag,cls='',txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;};
  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
- // Recorta cada região pela mediatriz dos pares de sementes: tesselação de Voronoi esquemática.
- function bisect(poly,a,b){
-  if(!poly.length)return poly;
-  const dx=2*(b.x-a.x),dy=2*(b.y-a.y),limit=b.x*b.x+b.y*b.y-a.x*a.x-a.y*a.y;
-  const side=p=>dx*p[0]+dy*p[1]-limit;
-  const out=[];let before=poly[poly.length-1],db=side(before);
-  for(const now of poly){const dn=side(now),inside=dn<=0,oldInside=db<=0;
-   if(inside!==oldInside){const t=db/(db-dn);out.push([before[0]+t*(now[0]-before[0]),before[1]+t*(now[1]-before[1])]);}
-   if(inside)out.push(now);before=now;db=dn;
-  }
-  return out;
- }
- // Desenha um campo de grãos na razão real do painel, sem esticar o SVG.
- let polygons=[];
- function makeField(aspect){
-  H=620;
-  const ratio=clamp(aspect,.5,5),rows=Math.max(5,Math.round(Math.sqrt(60/ratio))),cols=Math.max(6,Math.round(rows*ratio));
-  W=H*ratio;CX=W/2;CY=H/2;
-  const sites=[];let seed=139712;
-  const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
-  for(let row=0;row<rows;row++)for(let col=0;col<cols;col++)
-   sites.push({x:(col+.5+(rnd()-.5)*.65)*W/cols,y:(row+.5+(rnd()-.5)*.65)*H/rows});
-  polygons=sites.map((s,i)=>{let poly=[[0,0],[W,0],[W,H],[0,H]];for(let j=0;j<sites.length;j++){if(j!==i)poly=bisect(poly,s,sites[j]);if(!poly.length)break;}return poly;});
- }
- makeField(W/H);
  let serial=0;
  function create({element,item=null}={}){
   const section=node('section','silm-workshop-micro-viewer'),viewport=node('div','silm-workshop-micro-viewport');
+  const synthetic=SILM.microstructureSynthetic;
+  if(!synthetic)throw new Error('Gerador esquemático de microestruturas não carregado.');
+  const prefKey='silm:microstructure:schematic:v1:'+String(element?.atomicNumber||'free');
+  let seed=synthetic.DEFAULT_SEED,profile='equiaxial';
+  try{
+   const pref=JSON.parse(localStorage.getItem(prefKey)||'null');
+   if(pref&&synthetic.validSeed(pref.seed)&&synthetic.validProfile(pref.profile)){
+    seed=pref.seed;profile=pref.profile;
+   }
+  }catch{/* armazenamento indisponível: usar o desenho padrão */}
+  let generated=synthetic.generate({seed,profile}),W=generated.width,H=generated.height;
+  let CX=W/2,CY=H/2,polygons=generated.polygons;
+  section.dataset.syntheticSeed=String(seed);
+  section.dataset.syntheticProfile=profile;
+  section.dataset.syntheticGenerator=generated.generator;
+  const persist=()=>{try{localStorage.setItem(prefKey,JSON.stringify({seed,profile}));}catch{/* sem persistência disponível */}};
   section.setAttribute('aria-label','Microestrutura ampliada: visualização didática de grãos sem medições experimentais');
   // Guardar proveniência explícita: a tesselação não autoriza porcentagens científicas.
   section.dataset.microstructureSource='schematic';section.dataset.measurementStatus='unavailable';
