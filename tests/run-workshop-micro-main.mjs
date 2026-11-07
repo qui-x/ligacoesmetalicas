@@ -273,6 +273,25 @@ async function test(viewport){
  assert.ok(toolbarState.items.every(b=>Math.abs(b.width-44)<1&&Math.abs(b.height-44)<1),'Botões instrumentais ficaram menores ou maiores do que 44 px.');
  assert.ok(toolbarState.items.every(b=>Math.abs(b.cy-toolbarState.items[0].cy)<2),'Ícones de câmera perderam o alinhamento vertical.');
  assert.ok(Math.abs(toolbarState.barHeight-60)<2,'A faixa científica não conservou uma altura fixa.');
+ if(viewport.width<=900){
+  const previousSize=page.viewportSize();
+  await page.setViewportSize({width:343,height:768});
+  const toolbarNav=page.locator('#silm-scene-actionbar');
+  await toolbarNav.waitFor({state:'visible'});
+  await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar')?.dataset.toolbarNavigation==='ready');
+  await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar')?.dataset.toolbarOverflow==='true');
+  const nextTool=toolbarNav.getByRole('button',{name:'Mostrar próximas ferramentas'});
+  await nextTool.waitFor({state:'visible'});
+  await nextTool.click();
+  await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar').scrollLeft>10);
+  const prevTool=toolbarNav.getByRole('button',{name:'Mostrar ferramentas anteriores'});
+  await prevTool.waitFor({state:'visible'});
+  await prevTool.click();
+  await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar').scrollLeft<10);
+  const barBox=await toolbarNav.boundingBox();
+  assert.ok(barBox.height<=62,'A barra instrumental aumentou de altura no celular.');
+  await page.setViewportSize(previousSize);
+ }
  if(viewport.width>900){
   const expand=page.locator('#si-expand-structure');
   assert.ok(await expand.isVisible(),'Botão expandir/recolher não aparece na faixa científica.');
@@ -342,6 +361,37 @@ async function test(viewport){
   assert.ok(layoutGeometry.previewTop>=layoutGeometry.headTop,'A identificação deve ficar acima da prévia em celular.');
  }
  assert.ok(layoutGeometry.contentExtent>=.75,'A estrutura desenhada está demasiadamente pequena dentro do SVG.');
+ if(viewport.width<=900){
+  const previousSize=page.viewportSize();
+  await page.setViewportSize({width:343,height:768});
+  await page.waitForTimeout(60);
+  // Clonar cartão só no teste visual; nenhuma alteração na coleção salva.
+  await cards.evaluate(grid=>{
+   const card=grid.querySelector('.silm-structure-card');
+   const copy=card.cloneNode(true);copy.dataset.visualTestClone='true';grid.append(copy);
+  });
+  const sizes=await overview.evaluate(root=>{
+   const list=[...root.querySelectorAll('.silm-structure-card')];
+   const preview=list[0].querySelector('.silm-structure-preview').getBoundingClientRect();
+   return {preview:preview.height,scrollHeight:root.scrollHeight,clientHeight:root.clientHeight};
+  });
+  assert.ok(sizes.preview<=256,'Prévia excessiva no celular: '+JSON.stringify(sizes));
+  assert.ok(sizes.scrollHeight>sizes.clientHeight+30,'Painel não reconheceu segunda estrutura: '+JSON.stringify(sizes));
+  await overview.evaluate(root=>{root.scrollTop=root.scrollHeight;});
+  await page.waitForTimeout(80);
+  const last=await overview.evaluate(root=>{
+   const actions=root.querySelector('.silm-structure-card:last-child .silm-structure-card-actions');
+   const r=actions.getBoundingClientRect(),v=root.getBoundingClientRect();
+   return {bottom:r.bottom,viewBottom:v.bottom,top:r.top,viewTop:v.top,scrollTop:root.scrollTop};
+  });
+  assert.ok(last.scrollTop>0,'Visão geral não rola verticalmente.');
+  assert.ok(last.bottom<=last.viewBottom+3&&last.top>=last.viewTop-3,
+   'Comandos da segunda estrutura inacessíveis: '+JSON.stringify(last));
+  await cards.evaluate(grid=>grid.querySelector('[data-visual-test-clone]')?.remove());
+  await overview.evaluate(root=>{root.scrollTop=0;});
+  await page.setViewportSize(previousSize);
+ }
+
 
  await manager.getByRole('button',{name:'Ver estruturas em grade'}).click();
  shown=await computed();
