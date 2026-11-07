@@ -22,6 +22,12 @@ def check(snapshot, live):
         raise AssertionError("Script repository commit no longer pinned")
     if snapshot["sourceVersionsByteIdentical"] != live["sameScriptBytes"]:
         raise AssertionError("Previous code-version comparison no longer agrees")
+    structural = snapshot["noncommentStructuralComparison"]
+    live_struct = live["noncommentStructuralComparison"]
+    if structural["noncommentSequencesIdentical"] != live_struct["noncommentSequencesIdentical"]:
+        raise AssertionError("MATLAB noncomment source equality changed")
+    if structural["noncommentLineEdits"] != live_struct["editCounts"]:
+        raise AssertionError("MATLAB source-line edit counts drifted")
     if snapshot["zenodoLicenseEvidence"]["value"] != live["rights"]["declaredLicenseId"]:
         raise AssertionError("Record license metadata differs from reviewed evidence")
     if live["experimentApprovedForSILM"] or live["rawArraysOrImagesRedistributed"]:
