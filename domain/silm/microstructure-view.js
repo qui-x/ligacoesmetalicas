@@ -31,12 +31,13 @@ SILM.microstructure=(()=>{
    sites.push({x:(col+.5+(rnd()-.5)*.65)*W/cols,y:(row+.5+(rnd()-.5)*.65)*H/rows});
   polygons=sites.map((s,i)=>{let poly=[[0,0],[W,0],[W,H],[0,H]];for(let j=0;j<sites.length;j++){if(j!==i)poly=bisect(poly,s,sites[j]);if(!poly.length)break;}return poly;});
  }
- const grainArea=poly=>Math.abs(poly.reduce((sum,p,i)=>{const q=poly[(i+1)%poly.length];return sum+p[0]*q[1]-q[0]*p[1];},0))/2;
  makeField(W/H);
  let serial=0;
  function create({element,item=null}={}){
   const section=node('section','silm-workshop-micro-viewer'),viewport=node('div','silm-workshop-micro-viewport');
-  section.setAttribute('aria-label','Microestrutura ampliada: visualização didática de grãos');
+  section.setAttribute('aria-label','Microestrutura ampliada: visualização didática de grãos sem medições experimentais');
+  // Guardar proveniência explícita: a tesselação não autoriza porcentagens científicas.
+  section.dataset.microstructureSource='schematic';section.dataset.measurementStatus='unavailable';
   const svg=svgNode('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'xMidYMid meet',role:'group','aria-label':'Policristal didático ampliado: percorra os grãos com Tab e destaque com Enter; não é micrografia experimental'});
   svg.classList.add('silm-workshop-micro-map');svg.setAttribute('data-zoom','1');
   const defs=svgNode('defs'),uid='silm-micro-'+(++serial);
@@ -46,12 +47,13 @@ SILM.microstructure=(()=>{
   const plane=svgNode('g',{'class':'silm-micro-plane'});svg.append(plane);
   let paths=[],cells=[];
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
-  const status=node('span','silm-workshop-micro-status','Selecione um grão · área do desenho: —');
+  const status=node('span','silm-workshop-micro-status','Selecione um grão · modelo esquemático');
   const dimension=node('span','silm-workshop-micro-dimension','Tamanho real: indisponível (sem escala em µm)');
   status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');
   const choose=i=>{chosen=i;paths.forEach((p,j)=>{p.classList.toggle('is-selected',j===i);p.setAttribute('aria-pressed',String(j===i));cells[j]?.classList.toggle('is-selected',j===i);});
-   const share=grainArea(polygons[i])/(W*H)*100;
-   status.textContent='Grão '+(i+1)+' · área no desenho: '+share.toLocaleString('pt-BR',{maximumFractionDigits:1,minimumFractionDigits:1})+'% (ilustrativa)';
+   // O grão é identificável, mas sua área visual não representa fração de fase,
+   // concentração química, tamanho físico ou proporção medida de uma amostra.
+   status.textContent='Grão '+(i+1)+' selecionado · modelo esquemático';
    svg.setAttribute('data-selected-grain',String(i+1));
   };
   function drawGrains(){
@@ -67,7 +69,7 @@ SILM.microstructure=(()=>{
    g.append(p,hatch);plane.append(g);paths[i]=p;cells[i]=g;
    });
    if(chosen>=polygons.length)chosen=polygons.length-1;
-   if(chosen>=0)choose(chosen);else status.textContent='Selecione um grão · área do desenho: —';
+   if(chosen>=0)choose(chosen);else status.textContent='Selecione um grão · modelo esquemático';
    offsetX=0;offsetY=0;update();svg.dataset.mapReady='true';
   }
   const toolbar=node('div','silm-workshop-micro-toolbar'),zoomLabel=node('output','silm-workshop-micro-zoom','100%');
@@ -98,7 +100,7 @@ SILM.microstructure=(()=>{
   };
   svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);
   viewport.append(svg);
-  const note=node('p','silm-workshop-micro-caveat','Grãos ilustrativos · área relativa ao desenho, não é medida experimental de tamanho em micrômetros.');
+  const note=node('p','silm-workshop-micro-caveat','Grãos e tonalidades esquemáticos, sem escala física. Não representam concentração de elementos, fração de fase ou tamanho medido.');
   section.append(viewport,toolbar,note);
   let lastAspect=0,resizeFrame=0;
   // Nunca modificar o SVG dentro da entrega de um ResizeObserver: no WebKit,
