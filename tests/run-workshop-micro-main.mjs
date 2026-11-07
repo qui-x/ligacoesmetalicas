@@ -251,7 +251,8 @@ async function test(viewport){
  const balance=await quantity('jouleEnergy')+await quantity('externalEnergy')-await quantity('removedEnergy')-await quantity('storedEnergy');
  assert.ok(Math.abs(balance)<.00005,'Leituras de energia não fecham o balanço.');
  await results.getByRole('button',{name:'Fechar leituras do efeito Joule'}).click();
- assert.equal(await conditions.evaluate(n=>document.activeElement===n),true,'Fechar leituras perdeu o foco da barra inferior.');
+ // O evento close do dialog é enfileirado; aguardar o retorno do foco em ambos os motores.
+ await page.waitForFunction(()=>document.activeElement===document.querySelector('.silm-joule-controls select'),undefined,{timeout:5000});
  await conditions.selectOption('restore');
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span').textContent.includes(' · t 0 · '));
  assert.equal(await value('T média'),0);
