@@ -57,7 +57,7 @@ async function test(viewport){
  assert.equal(await viewer.getAttribute('data-microstructure-source'),'schematic','Proveniência geométrica do mapa não declarada.');
  assert.equal(await viewer.getAttribute('data-measurement-status'),'unavailable','Medidas experimentais não devem estar disponíveis para esquema gerado.');
  assert.doesNotMatch(await viewer.locator('.silm-workshop-micro-status').textContent(),/\d+[,.]?\d*\s*%/,'O grão não deve exibir porcentagem de composição ou fração sem dados experimentais.');
- assert.match(await viewer.locator('.silm-workshop-micro-caveat').textContent(),/Não representam concentração de elementos, fração de fase ou tamanho medido/,'Aviso científico ausente para mapa esquemático.');
+ assert.match(await viewer.locator('.silm-workshop-micro-caveat').textContent(),/sem composição, fração de fase ou tamanho medidos/,'Aviso científico ausente para mapa esquemático.');
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  await viewer.getByRole('button',{name:'Ampliar microestrutura'}).click();
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-zoom'),'1.25','Zoom não funciona');
