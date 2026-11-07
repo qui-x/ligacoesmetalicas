@@ -1,6 +1,6 @@
 # SILM — Rede cristalina × ambiente atômico: efeitos das propriedades
 
-**Status:** especificação pedagógica e científica em discussão; não implementada na interface pública.
+**Status:** diretriz de remodelação aprovada pelo autor em 06/11/2026; implementação incremental em branch, ainda não homologada nem integrada à interface pública.
 
 ## 1. Correção de escopo (06/11/2026)
 
@@ -97,3 +97,38 @@ Os indicadores locais não são novos estados científicos editáveis; não pode
 - University of Texas, *Statistical Mechanics*, §7.12: vibrações de rede como movimentos acoplados em torno do equilíbrio.
 - ETH Zurich, *Microstructure Evolution*, descrição da plasticidade associada a discordâncias e deslizamento.
 - MIT OpenCourseWare, 3.091, *Bonding in Metals, Semiconductors and Insulators*.
+
+## 8. Diretriz aprovada — remodelação progressiva da interface
+
+**Decisão:** adotar a remodelação funcional do SILM como uma experiência de investigação contínua. A alteração de escala muda **o nível de observação do mesmo ensaio**, sem reiniciar metal, composição, propriedades, histórico, temperatura ou condições de contorno.
+
+### Estrutura visual comum
+
+- **Faixa superior:** quatro escalas sempre distinguíveis e navegáveis: `Objeto`, `Grãos`, `Rede`, `Centro`.
+- **Região central:** imagem ou modelo dominante, preferencialmente cerca de 80% da área científica útil, não da tela inteira; textos explicativos secundários e recolhíveis.
+- **Faixa inferior única:** controles de exploração, medição ou cálculo correspondentes ao módulo e ao contexto; botões de pelo menos 44 × 44 px, com rolagem horizontal discreta no mobile quando necessário.
+- **Tema e acessibilidade:** cores do tema escolhido, alto contraste, teclado, leitor de tela, movimento reduzido e orientação da tela respeitados.
+
+### Papéis das escalas
+
+| Escala | Prioridade visual | Operação principal |
+|---|---|---|
+| Objeto e componente | Imagem fiel da aplicação cotidiana e indicação do componente estudado | Selecionar o componente metálico |
+| Microestrutura | Grãos e distribuição didática/experimental identificada corretamente | Selecionar regiões e entender microestrutura |
+| Rede e célula | Modelo espacial coletivo e célula unitária | Aplicar estímulos e visualizar respostas da estrutura |
+| Centro metálico | Mesmo sistema científico, centrado no sítio em destaque | Observar localmente as consequências dos estímulos coletivos |
+
+A quarta escala **não** vira um modelo nuclear ou planetário. Manter o nível atual dos centros metálicos; não mostrar prótons, nêutrons ou órbitas do átomo isolado no palco principal.
+
+### Plano de execução e revisão
+
+- [x] **Etapa 1a — Semântica e navegação:** rótulos distinguem rede de centro; descrições acessíveis por escala; alvos de toque de 44 px no seletor, sem alterar os modelos científicos. *Implementado neste branch; homologação pendente.*
+- [ ] **Etapa 1b — Arquitetura comum:** auditar painéis e posicionar consistentemente escalas no topo, desenho no centro e ferramentas na faixa inferior. Garantir estados `focus`/`overview` sem barras de rolagem indevidas.
+- [ ] **Etapa 2 — Diferenciação dos ambientes:** separar apresentação coletiva e apresentação local, preservando o renderizador e o estado científico únicos.
+- [ ] **Etapa 3 — Propriedades sincronizadas:** projetar calor, resfriamento, eletricidade, deformação e combinações como indicadores locais apenas quando cientificamente fundamentados; sem duplicação nem números arbitrários.
+- [ ] **Etapa 4 — Homologação:** testes Playwright no GitHub Actions em Chromium, Firefox e WebKit, múltiplos viewports, temas, teclado, regressão científica e inspeção visual.
+- [ ] **Integração à main:** somente após revisão do PR e resultados conhecidos dos testes.
+
+### Cuidados de compatibilidade
+
+Não romper o comportamento dos módulos `Explorar`, `Medir` e `Calcular`, os roteiros, missões, montagem livre, célula unitária, ações existentes e fluxo de acessibilidade. Os dados e equações validados permanecem como fonte única; mudanças visuais não criam fenômenos científicos.
