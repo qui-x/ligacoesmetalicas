@@ -32,6 +32,7 @@ def make_synthetic_h5(target: pathlib.Path) -> None:
     phase[9, 9] = 0  # ausência de indexação não equivale a segunda fase química
     euler = np.zeros((n, n, 3), dtype=np.float32)
     euler[7:12, 7:12, 0] = np.deg2rad(8.0)
+    euler[9, 9, :] = np.nan  # NaN fora da fase Cu nunca pode criar orientação
     x = np.tile(np.arange(n, dtype=np.float32) * 0.1, (n, 1))
     y = np.tile((np.arange(n, dtype=np.float32) * 0.1)[:, None], (1, n))
     with h5py.File(target, "w") as f:
