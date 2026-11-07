@@ -95,6 +95,8 @@
 .silm-workshop-micro-viewport{height:clamp(320px,64vh,720px);min-width:0;overflow:hidden;border:1px solid var(--border);border-radius:12px;background:var(--panel2,var(--surface))}
 .silm-workshop-micro-map{display:block;width:100%;height:100%;user-select:none;touch-action:pan-y;cursor:crosshair}
 .silm-workshop-micro-viewport.is-zoomed .silm-workshop-micro-map{touch-action:none;cursor:grab}
+.silm-workshop-micro-viewport.is-pannable .silm-workshop-micro-map{touch-action:none;cursor:grab}
+.silm-workshop-micro-viewport.is-pannable .silm-workshop-micro-map:active{cursor:grabbing}
 .silm-workshop-micro-viewport.is-zoomed .silm-workshop-micro-map:active{cursor:grabbing}
 .silm-micro-grain{fill:color-mix(in srgb,var(--text) var(--grain-tone,20%),var(--surface));stroke:var(--text);stroke-opacity:.9;stroke-width:2.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;outline:none}
 .silm-micro-hatching{opacity:.6}
@@ -312,3 +314,8 @@
  :is(.silm-micro-data-dialog,.silm-micro-generator-dialog){border:2px solid CanvasText;color:CanvasText;background:Canvas}
  :is(.silm-micro-data-dialog,.silm-micro-generator-dialog) :is(button,input):focus-visible{outline:3px solid Highlight}
 }
+
+/* Gerador: controles acessíveis sem aumentar a altura permanente do palco. */
+.silm-micro-generator-dialog select,.silm-micro-generator-dialog input[type=number]{box-sizing:border-box;max-width:100%;width:100%;min-height:44px;font:inherit;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text)}
+.silm-micro-generator-dialog .silm-micro-data-actions{gap:6px}
+.silm-micro-generator-dialog .silm-micro-data-actions button{min-height:44px}
