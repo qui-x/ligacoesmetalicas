@@ -1,0 +1,96 @@
+name: SILM — Auditoria permanente de responsividade
+
+# Sem filtro de paths: TODO commit na main passa pela matriz de telas.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: silm-responsive-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  responsividade:
+    name: Responsividade / ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
+
+    steps:
+      - name: Obter versão do SILM
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Verificar sintaxe da auditoria
+        run: node --check tests/run-responsive-audit.mjs
+
+      - name: Instalar Playwright no runner
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-playwright/node_modules/playwright" >> "$GITHUB_ENV"
+
+      - name: Preparar navegador
+        run: |
+          "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright" install --with-deps "$BROWSER_NAME"
+
+      - name: Abrir servidor local do SILM
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-http.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/silm-http.pid"
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent "$BASE_URL/index.html" > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-http.log"
+          exit 1
+
+      - name: Executar auditoria de telas, aplicações e microestruturas
+        run: node tests/run-responsive-audit.mjs
+
+      - name: Publicar resumo no GitHub Actions
+        if: always()
+        run: |
+          FILE="reports/responsividade/$BROWSER_NAME/relatorio.md"
+          if [ -f "$FILE" ]; then
+            cat "$FILE" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Auditoria de $BROWSER_NAME interrompida antes de produzir relatório." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Guardar capturas e diagnóstico
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-responsividade-${{ matrix.browser }}
+          path: reports/responsividade/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Encerrar servidor
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/silm-http.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/silm-http.pid")" 2>/dev/null || true
+          fi
