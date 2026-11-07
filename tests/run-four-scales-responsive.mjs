@@ -86,6 +86,15 @@ try{
     if(height>=550)assert.ok(m.art.height>=Math.min(175,m.stage.height*.27),
      label+': visual macro verticalmente pequeno');
    }
+   if(scale===1&&label==='celular-390'){
+    const details=page.locator('.silm-workshop-materials');
+    await details.locator('summary').click();
+    assert.match(await details.innerText(),/Material do componente:/,
+     'Resumo compacto escondeu a identificação científica do material');
+    assert.match(await details.innerText(),/Composição e fonte|Fonte da aplicação/,
+     'As referências da aplicação devem continuar consultáveis');
+    await details.locator('summary').click();
+   }
    if(scale===2){
     assert.ok(m.micro&&m.micro.width>=Math.min(260,m.stage.width*.75),
      label+': largura da microestrutura ficou pequena');
