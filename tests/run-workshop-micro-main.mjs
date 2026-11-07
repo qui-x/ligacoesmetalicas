@@ -137,6 +137,10 @@ async function test(viewport){
   name:'amostra-de-teste.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(sample))
  });
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.measurementStatus==='provided-unverified');
+ assert.equal(await viewer.getAttribute('data-didactic-evidence-level'),'imported-unverified',
+  'Importação não pode herdar a classificação D0 do gerador.');
+ assert.match(await evidencePanel.innerText(),/informações declaradas pelo arquivo, ainda não homologadas/,
+  'A revisão dos contornos importados não pode ser pressuposta.');
  assert.equal(await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).isDisabled(),true,'Um mapa importado não pode ser trocado silenciosamente por um esquema.');
  assert.equal(await viewer.locator('.silm-micro-grain').count(),1,'O mapa importado não alterou a segmentação.');
  await importDialog.getByRole('button',{name:'Fechar importação de dados'}).click();
@@ -147,6 +151,8 @@ async function test(viewport){
  await viewer.getByRole('button',{name:'Abrir dados segmentados'}).click();
  await importDialog.getByRole('button',{name:'Retornar ao mapa didático'}).click();
  await importDialog.getByRole('button',{name:'Fechar importação de dados'}).click();
+ assert.equal(await viewer.getAttribute('data-didactic-evidence-level'),'D0-schematic-conceptual',
+  'Ao restaurar o gerador, a classificação D0 deve ser recuperada.');
  assert.equal(await viewer.getAttribute('data-microstructure-source'),'schematic','Mapa esquemático não foi restaurado.');
  assert.equal(await viewer.getByRole('button',{name:'Abrir gerador de formações de grãos'}).isEnabled(),true,'Restauração não reativou o gerador esquemático.');
  assert.ok(await viewer.locator('.silm-micro-grain').count()>=45,'Grãos ilustrativos não foram restaurados.');
