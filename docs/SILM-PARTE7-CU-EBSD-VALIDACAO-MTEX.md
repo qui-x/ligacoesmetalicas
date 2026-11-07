@@ -52,7 +52,7 @@ Até cumprir esses critérios, os dados reais permanecem em `research/` e o PR [
 - [x] MD5, número de pontos, fases, passo e identidade da amostra conferidos no HDF5.
 - [x] Prévia de conectividade orientacional registrada com limitações explícitas.
 - [x] Diferenças metodológicas entre aquisição bruta, recorte SILM e mapa TrueEBSD documentadas.
-- [ ] Executar testes sintéticos de limiares, simetria e borda em CI.
+- [x] Executar testes sintéticos de limiares, simetria e borda em CI — etapa aprovada em [Actions #42341238547](https://github.com/qui-x/ligacoesmetalicas/actions/runs/42341238547); auditoria EBSD real prossegue separadamente.
 - [ ] Selecionar recorte coincidente antes/depois de TrueEBSD e manter as transformações auditáveis.
 - [ ] Confrontar segmentações e estatísticas com mesmo recorte, escala, máscara de vazios e parâmetros de grão.
 - [ ] Documentar erro/uncerteza e política de grãos de borda, sem reinterpretar ECD individual como número ASTM.
