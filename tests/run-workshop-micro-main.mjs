@@ -133,6 +133,30 @@ async function test(viewport){
  const crystalURL=await evidencePanel.getByRole('link',{name:'Consultar fonte cristalográfica'}).getAttribute('href');
  assert.match(crystalURL,/^https:\/\//,'Falta URL rastreável da estrutura de referência.');
  assert.equal(await viewer.getAttribute('data-didactic-evidence-level'),'D0-schematic-conceptual');
+ const studiesContext=evidencePanel.locator('details.silm-micro-study-context');
+ const relatedCount=await page.evaluate(()=>SILM.microstructureStudies.forElement(26).length);
+ assert.ok(relatedCount>=1,'Ferro não recebeu as referências relacionadas já catalogadas.');
+ assert.equal(await evidencePanel.getAttribute('data-catalogued-studies'),String(relatedCount),
+  'O número de estudos apresentados deve coincidir com o catálogo offline.');
+ assert.equal(await studiesContext.locator('.silm-micro-study-entry').count(),relatedCount,
+  'Os estudos do Fe precisam ser individuais, sem inventar material de amostra.');
+ assert.equal(await studiesContext.getAttribute('open'),null,
+  'Estudos devem iniciar recolhidos para preservar a organização da interface.');
+ const visualBeforeStudies=await signature();
+ await studiesContext.locator('summary').click();
+ assert.equal(await studiesContext.getAttribute('open'),'',
+  'A lista de estudos não expandiu via teclado ou clique.');
+ assert.match(await studiesContext.innerText(),/Estudos sobre materiais que contêm o elemento/,
+  'O texto deve explicar o vínculo indireto com o elemento.');
+ assert.match(await studiesContext.innerText(),/Nenhum deles define os grãos deste desenho/,
+  'Estudos candidatos não podem validar visualmente os polígonos.');
+ assert.equal(await studiesContext.locator('.silm-micro-study-entry a[href]').count(),relatedCount,
+  'Toda referência deve manter uma URL para consulta independente.');
+ assert.equal(await signature(),visualBeforeStudies,
+  'Abrir o catálogo não pode alterar os contornos de grãos.');
+ assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,
+  'Abrir estudos não pode modificar o estado científico.');
+ await studiesContext.locator('summary').click();
  await importDialog.locator('input[type=file]').setInputFiles({
   name:'amostra-de-teste.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(sample))
  });
