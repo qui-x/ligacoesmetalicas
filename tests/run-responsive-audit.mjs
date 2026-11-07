@@ -142,7 +142,7 @@ try{
  page=await context.newPage();
  // Instrumentação de diagnóstico sem mascarar falhas de ResizeObserver.
  // Captura a origem dos observadores, alvos e callbacks que antecedem a falha.
- if(browserName==='webkit'){
+ if(browserName==='webkit'&&process.env.SILM_RESIZE_TRACE==='1'){
   await page.addInitScript(()=>{
    const Native=window.ResizeObserver;
    if(typeof Native!=='function')return;
@@ -215,7 +215,7 @@ try{
  await page.locator('.silm-workshop-micro-viewer').waitFor({state:'visible'});
  for(const [name,w,h] of sizes)await inspect('micro',name,w,h);
 
- if(browserName==='webkit'){
+ if(browserName==='webkit'&&process.env.SILM_RESIZE_TRACE==='1'){
   const trace=await page.evaluate(()=>window.__silmResizeTrace||null);
   if(trace){
    writeFileSync(join(dir,'resizeobserver-trace.json'),JSON.stringify(trace,null,2));
