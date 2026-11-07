@@ -255,7 +255,7 @@
  function updateWorkshopViewport(investigationActive){
   const showCrystal=!!investigationActive&&(workshopScale===0||workshopScale>=3);
   const stage=$('si-stage'),scene=$('silm-integration-scene'),actionbar=$('silm-scene-actionbar');
-  if(stage){stage.classList.toggle('silm-workshop-context-only',!showCrystal);stage.dataset.workshopScale=showCrystal?String(workshopScale||'free'):'context';}
+  if(stage){stage.classList.toggle('silm-workshop-context-only',!showCrystal);stage.dataset.workshopScale=String(workshopScale||'free');}
   if(scene)scene.hidden=!showCrystal;
   if(actionbar)actionbar.hidden=!showCrystal;
   if(!showCrystal&&stage?.classList.contains('si-scene-expanded'))setStageExpanded(false,{restoreFocus:false});
