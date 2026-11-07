@@ -17,7 +17,8 @@
     "elementsWithCandidateLeads": 65,
     "elementsPendingSpecificLead": 0,
     "elementalMetalGrainDatasetsValidatedAndIntegrated": 0,
-    "preliminaryExperimentalStatisticalAudits": 2
+    "preliminaryExperimentalStatisticalAudits": 2,
+    "preliminaryExperimentalMetadataAudits": 1
   },
   "interpretationPolicy": {
     "crystalReference": "Experimental structure of a reference element, not proof of the application's microstructure.",
@@ -2071,7 +2072,27 @@
           "cu-be-contacts-c17000"
         ],
         "candidateReviewStatus": "identified-not-audited",
-        "applicationMatchedSpecimenValidated": false
+        "applicationMatchedSpecimenValidated": false,
+        "experimentalAnalysis": {
+          "sourceStudyId": "cu-polycrystal-ebsd",
+          "stage": "original-HDF5-MD5-and-scan-calibration-verified; grain-segmentation-and-license-pending",
+          "summary": "research/microstructure/copper-ebsd-verified-metadata.json",
+          "protocol": "research/microstructure/audit_copper_ebsd.py",
+          "report": "docs/SILM-PROTOCOLO-CU-EBSD-CONTORNOS-2026-11.md",
+          "specimen": "P1700",
+          "processingFromHeader": "500 heat cycles",
+          "material": "copper polycrystal",
+          "sourcePixels": 563957,
+          "copperPhasePixels": 511713,
+          "unindexedPixels": 52244,
+          "xCells": 1031,
+          "yCells": 547,
+          "micrometersPerPixel": 0.1,
+          "grainBoundarySegmentationValidated": false,
+          "applicationMatchedSpecimenValidated": false,
+          "readyToPublishImage": false,
+          "canParameterizeApprovedGenerator": false
+        }
       }
     },
     {
