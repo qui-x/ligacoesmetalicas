@@ -1,0 +1,31 @@
+name: SILM — Contrato comparativo Cu/TrueEBSD (dados sintéticos)
+on:
+  push:
+    branches:
+      - design/silm-rede-ambiente-atomico-parte6
+    paths:
+      - 'research/microstructure/validate_copper_correlative_pair.py'
+      - 'tests/test_copper_correlative_pair.py'
+      - '.github/workflows/silm-copper-correlative-contract.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-correlative-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar apenas dependências numéricas
+        run: python -m pip install --disable-pip-version-check 'numpy>=1.26,<3' 'scipy>=1.13,<2'
+      - name: Validar sintaxe, contrato e recusas de segurança científica
+        run: |
+          python -m py_compile research/microstructure/validate_copper_correlative_pair.py tests/test_copper_correlative_pair.py
+          python tests/test_copper_correlative_pair.py
+      - name: Confirmar ausência de dependência de mapas originais
+        run: |
+          test ! -e research/microstructure/copper29.h5oina
+          echo "OK: somente testes sintéticos. Nenhum mapa corrigido real foi homologado."
