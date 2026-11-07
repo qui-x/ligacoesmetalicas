@@ -98,8 +98,11 @@
 .silm-workshop-micro-viewport.is-pannable .silm-workshop-micro-map{touch-action:none;cursor:grab}
 .silm-workshop-micro-viewport.is-pannable .silm-workshop-micro-map:active{cursor:grabbing}
 .silm-workshop-micro-viewport.is-zoomed .silm-workshop-micro-map:active{cursor:grabbing}
-.silm-micro-grain{fill:color-mix(in srgb,var(--text) var(--grain-tone,20%),var(--surface));stroke:var(--text);stroke-opacity:.9;stroke-width:2.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;outline:none}
-.silm-micro-hatching{opacity:.6}
+.silm-micro-grain{fill:var(--silm-grain-fill,var(--panel2,var(--surface)));stroke:var(--silm-grain-edge,var(--text));stroke-opacity:.9;stroke-width:2.8;stroke-linejoin:round;vector-effect:non-scaling-stroke;cursor:pointer;outline:none}
+.silm-micro-hatching{opacity:.32}
+.silm-micro-highlight{fill:none;stroke:rgba(255,255,255,.44);stroke-width:1.7;stroke-linejoin:round;vector-effect:non-scaling-stroke;opacity:.7;pointer-events:none}
+:root.si-highcontrast .silm-micro-highlight{display:none}
+@media(forced-colors:active){.silm-micro-highlight{display:none}}
 .silm-micro-grain:hover,.silm-micro-grain:focus-visible{stroke:var(--ring);stroke-width:5;stroke-opacity:1;stroke-dasharray:9 4}
 .silm-micro-grain.is-selected{fill:color-mix(in srgb,var(--accent) 40%,var(--surface));stroke:var(--accent);stroke-width:6;stroke-opacity:1;stroke-dasharray:11 4}
 .silm-workshop-micro-toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}
@@ -108,6 +111,12 @@
 .silm-workshop-micro-zoom{min-width:48px;text-align:center;font-size:.88rem;font-variant-numeric:tabular-nums}
 .silm-workshop-micro-status{margin-right:auto;order:-1;font-size:.78rem;color:var(--muted,#627487)}
 .silm-workshop-micro-caveat{margin:0;font-size:.7rem;color:var(--muted,#627487);line-height:1.4}
+.silm-micro-reveal{min-width:0;font-size:.76rem;line-height:1.45}
+.silm-micro-reveal summary{cursor:pointer;display:list-item;list-style-position:inside;max-width:100%;padding:2px 0;font-weight:650;overflow-wrap:anywhere}
+.silm-micro-reveal summary:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.silm-micro-reveal p{margin:4px 0 0;max-width:84ch;overflow-wrap:anywhere}
+.silm-micro-appearance-note{border-top:1px solid var(--border);padding-top:6px}
+
 .silm-workshop-reference>.silm-workshop-scales{margin:0 0 8px;position:relative;z-index:1}
 .silm-workshop-micro-mode .silm-workshop-scales{margin:0 0 4px}
 @media(max-width:560px){
