@@ -17,7 +17,7 @@
     "elementsWithCandidateLeads": 65,
     "elementsPendingSpecificLead": 0,
     "elementalMetalGrainDatasetsValidatedAndIntegrated": 0,
-    "preliminaryExperimentalStatisticalAudits": 1
+    "preliminaryExperimentalStatisticalAudits": 2
   },
   "interpretationPolicy": {
     "crystalReference": "Experimental structure of a reference element, not proof of the application's microstructure.",
@@ -1608,7 +1608,20 @@
           "al-mn-annealed-ebsd-bse-2022"
         ],
         "candidateReviewStatus": "identified-not-audited",
-        "applicationMatchedSpecimenValidated": false
+        "applicationMatchedSpecimenValidated": false,
+        "experimentalAnalysis": {
+          "sourceStudyId": "al-scalmalloy-ebsd-ved-csv-2025",
+          "status": "source-files-md5-and-unit-checked-and-statistics-calculated; scientific-review-and-license-pending",
+          "summary": "research/microstructure/scalmalloy-ebsd-preliminary-stats.json",
+          "protocol": "research/microstructure/audit_scalmalloy_csv.py",
+          "report": "docs/SILM-AUDITORIA-EBSD-SCALMALLOY-RESULTADOS-REAIS.md",
+          "sampleMaterial": "Scalmalloy alloy, phase labeled Aluminium",
+          "rawRegions": 157626,
+          "regionsInAluminiumPhase": 157616,
+          "phaseFractionValidated": false,
+          "chemicalCompositionPerGrainValidated": false,
+          "canParameterizeApprovedGenerator": false
+        }
       }
     },
     {
