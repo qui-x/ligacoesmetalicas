@@ -44,7 +44,10 @@ jobs:
           python-version: '3.x'
 
       - name: Verificar sintaxe da auditoria
-        run: node --check tests/run-responsive-audit.mjs
+        run: |
+          node --check tests/run-responsive-audit.mjs
+          node --check tests/run-periodic-responsive.mjs
+          node --check domain/silm/periodic-table.js
 
       - name: Instalar Playwright no runner
         run: |
@@ -65,6 +68,9 @@ jobs:
           done
           cat "$RUNNER_TEMP/silm-http.log"
           exit 1
+
+      - name: Validar 118 elementos, alvos de toque e rolagem confinada
+        run: node tests/run-periodic-responsive.mjs
 
       - name: Executar auditoria de telas, aplicações e microestruturas
         run: node tests/run-responsive-audit.mjs

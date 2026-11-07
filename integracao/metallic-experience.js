@@ -177,8 +177,10 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
  const dialog=document.getElementById('silm-periodic-dialog'),body=document.getElementById('silm-periodic-body'),trigger=document.getElementById('silm-open-periodic');let tableScope;
  trigger.addEventListener('click',()=>{
   tableScope?.destroy();tableScope=SimCore.createScope();body.replaceChildren();
-  S.createPeriodicTable(body,{scope:tableScope,state:{selection:Number(document.getElementById('silm-metal').value)||29,query:''},onSelect:e=>prepareMetal(e.atomicNumber),onInvestigate:async e=>{dialog.close();await selectMetal(e.atomicNumber);},onExplore:e=>{prepareMetal(e.atomicNumber);dialog.close();},onSources:e=>{const text=Data.sourceIds(e).map(id=>{const s=Data.source(id);return s?s.institution+' — '+s.title:id;}).join('\n');document.getElementById('silm-periodic-sources').textContent=text;}});
+  const periodicTable=S.createPeriodicTable(body,{scope:tableScope,state:{selection:Number(document.getElementById('silm-metal').value)||29,query:''},onSelect:e=>prepareMetal(e.atomicNumber),onInvestigate:async e=>{dialog.close();await selectMetal(e.atomicNumber);},onExplore:e=>{prepareMetal(e.atomicNumber);dialog.close();},onSources:e=>{const text=Data.sourceIds(e).map(id=>{const s=Data.source(id);return s?s.institution+' — '+s.title:id;}).join('\n');document.getElementById('silm-periodic-sources').textContent=text;}});
   document.getElementById('silm-periodic-sources').textContent='';dialog.showModal();
+  // No WebKit, a medida do conteúdo modal estabiliza após sua abertura.
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{if(dialog.open)periodicTable.resize();}));
  });
  document.getElementById('silm-close-periodic').addEventListener('click',()=>dialog.close());
  dialog.addEventListener('close',()=>{tableScope?.destroy();trigger.focus({preventScroll:true});});

@@ -60,3 +60,31 @@
 .silm-periodic[data-density=tiny] .element-z{font-size:.5rem;margin-left:1px}
 .silm-periodic[data-density=tiny] .periodic-element{padding:1px;border-radius:4px}
 .periodic-scroll-hint{margin:0;font-size:.74rem;color:var(--secondary);text-align:center}.periodic-scroll-hint[hidden]{display:none}
+
+
+/* SILM responsividade R07: evitar células minúsculas e duas rolagens em
+   apresentação. 44 px é a dimensão mínima de cada alvo, não uma escala
+   "física" dos elementos. A topologia da tabela permanece 18 grupos. */
+.silm-periodic{min-height:0;min-width:0}
+.periodic-scroll{box-sizing:border-box;min-height:88px;max-width:100%;overscroll-behavior:contain;scrollbar-gutter:stable}
+.periodic-grid{min-width:max-content}
+.periodic-element{touch-action:manipulation}
+.periodic-scroll:focus-visible{outline:3px solid var(--ring);outline-offset:-3px;border-radius:5px}
+.periodic-heading,.periodic-footer,.periodic-search{min-width:0}
+.periodic-search button,.periodic-actions button{white-space:normal}
+.silm-presentation .silm-periodic{min-height:0}
+.silm-presentation>.dialog-body{overflow:hidden}
+@media(max-width:600px){
+ .silm-periodic{gap:6px}
+ .periodic-heading{gap:6px}
+ .periodic-legend{gap:4px 7px}
+ .periodic-summary{gap:3px 8px}
+ .periodic-actions{gap:4px}
+ .periodic-element .element-symbol{letter-spacing:0}
+}
+@media(max-height:500px){
+ .silm-periodic{gap:4px}
+ .periodic-legend{font-size:.68rem;gap:3px 5px}
+ .periodic-legend span{padding:2px 5px}
+ .periodic-footer{gap:4px;padding-top:5px}
+}
