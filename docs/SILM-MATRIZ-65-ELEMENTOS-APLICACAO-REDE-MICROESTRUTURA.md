@@ -19,6 +19,8 @@
 
 **Os 65 já podem ser investigados quanto à estrutura de referência; os 65 NÃO estão cobertos por micrografias experimentais.** Todos têm um modelo geométrico didático próprio da interface (mesmo algoritmo), não uma reconstrução de amostras reais.
 
+**Política didático-científica aprovada para desenvolvimento (Parte 7):** os 65 estão classificados **D0 — esquemática conceitual**, com separação estrita entre **aplicação ilustrada**, **grãos Voronoi hipotéticos** e **cristalografia de referência registrada**. Esta classificação não equipara o gerador a imagens metalográficas ou à morfologia real de cada elemento. Ver [protocolo D0/D1/D2](SILM-PARTE7-PROTOCOLO-DIDATICO-CIENTIFICO.md) e [matriz computável de evidências dos 65](../research/microstructure/didactic-evidence-65.json), com testes de regressão específicos.
+
 A estrutura cristalográfica provém de um registro experimental de referência do elemento selecionado. Entretanto, uma **imagem de aplicação** pode mostrar outro material (liga, composto, fase ou revestimento). Para vincular as escalas **Objeto → Grãos → Rede → Centro**, deve haver uma *ponte de identidade de material e condição*, não apenas a presença do símbolo químico.
 
 ## Classificação do tipo de material representado
