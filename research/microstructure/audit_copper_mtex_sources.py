@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import difflib
 import hashlib
 import json
 import pathlib
@@ -66,6 +67,38 @@ def script_info(source: bytes):
     }
 
 
+def noncomment_lines(source: bytes):
+    """Conservative structural comparison: excludes full-line MATLAB comments.
+
+    It does not parse MATLAB, rewrite inline comments, or establish that two
+    sequences of noncomment lines have identical behavior or dependencies.
+    """
+    return [line.strip() for line in source.decode("utf-8-sig").splitlines()
+            if line.strip() and not line.lstrip().startswith("%")]
+
+
+def structural_comparison(published: bytes, pinned: bytes):
+    old = noncomment_lines(published)
+    new = noncomment_lines(pinned)
+    matcher = difflib.SequenceMatcher(a=old, b=new, autojunk=False)
+    edits = {"insertedNoncommentLines": 0, "deletedNoncommentLines": 0,
+             "replacedOldNoncommentLines": 0, "replacedNewNoncommentLines": 0}
+    for op, i1, i2, j1, j2 in matcher.get_opcodes():
+        if op == "insert":
+            edits["insertedNoncommentLines"] += j2 - j1
+        elif op == "delete":
+            edits["deletedNoncommentLines"] += i2 - i1
+        elif op == "replace":
+            edits["replacedOldNoncommentLines"] += i2 - i1
+            edits["replacedNewNoncommentLines"] += j2 - j1
+    return {"publishedNoncommentLines": len(old), "pinnedNoncommentLines": len(new),
+            "noncommentSequencesIdentical": old == new,
+            "editCounts": edits,
+            "method": "order-preserving line comparison excluding blank and full-line comments",
+            "limitation": "This is not a MATLAB parser; inline comments, formatting, "
+                          "equivalent statements and execution behavior are not resolved."}
+
+
 def rights_view(obj):
     record = obj if isinstance(obj, dict) else {}
     metadata = record.get("metadata") or {}
@@ -114,6 +147,7 @@ def analyze(published: bytes, pinned: bytes, metadata=None):
         "githubPinnedURL": GITHUB_PINNED_URL,
         "github": repo,
         "sameScriptBytes": published == pinned,
+        "noncommentStructuralComparison": structural_comparison(published, pinned),
         "sourceStage": "published-MATLAB-script-vs-pinned-GitHub-repository-script",
         "mtexTutorial": "https://mtex-toolbox.github.io/example_copper_2.html",
         "mtexTutorialEquivalentToPublishedScript": "NOT_ESTABLISHED",
@@ -161,6 +195,8 @@ def main():
     print(json.dumps({
         "publishedScriptMD5Verified": True,
         "samePublishedAndGitHubSource": result["sameScriptBytes"],
+        "sameNoncommentSourceLines": result["noncommentStructuralComparison"]["noncommentSequencesIdentical"],
+        "noncommentSourceEdits": result["noncommentStructuralComparison"]["editCounts"],
         "publishedScriptBytes": result["zenodo"]["byteLength"],
         "pinnedScriptBytes": result["github"]["byteLength"],
         "metadataAvailable": result["metadataAvailable"],
