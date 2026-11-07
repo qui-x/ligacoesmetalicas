@@ -13,9 +13,9 @@
     "specificSchematicMicrostructureAssets": 20,
     "experimentalCrystalReferences": 65,
     "experimentalMicrostructureDatasetsIntegrated": 0,
-    "candidateStudyRecords": 20,
-    "elementsWithCandidateLeads": 20,
-    "elementsPendingSpecificLead": 45
+    "candidateStudyRecords": 28,
+    "elementsWithCandidateLeads": 29,
+    "elementsPendingSpecificLead": 36
   },
   "interpretationPolicy": {
     "crystalReference": "Experimental structure of a reference element, not proof of the application's microstructure.",
@@ -418,6 +418,166 @@
       ],
       "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12415841/",
       "comment": "Artigo aberto, imagens/dados suplementares a auditar. Não equivalente ao revestimento eletrônico.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ag-native-wire-ebsd",
+      "dataset": "Prata nativa em fios de alta pureza",
+      "elements": [
+        "Ag"
+      ],
+      "specimenClass": "elemental",
+      "technique": "EBSD+optical+microprobe",
+      "supports": [
+        "twinning",
+        "grain-boundaries"
+      ],
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5998055/",
+      "comment": "Artigo com Ag >99,7 wt%, não microestrutura de contato elétrico; arquivos brutos não auditados.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "sn-bi-solder-ebsd",
+      "dataset": "Solda Sn–Bi: precipitação e orientação",
+      "elements": [
+        "Sn",
+        "Bi"
+      ],
+      "specimenClass": "alloy",
+      "technique": "in-situ-EBSD+SEM",
+      "supports": [
+        "phase-transformation",
+        "texture"
+      ],
+      "url": "https://spiral.imperial.ac.uk/entities/publication/3f2856ea-d46b-4e20-9334-120bce371a7b",
+      "comment": "Artigo aberto (CC BY); não representa Sn nem Bi puros.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "au-pd-tem",
+      "dataset": "Nanoestrutura Au–Pd aquecida em TEM",
+      "elements": [
+        "Au",
+        "Pd"
+      ],
+      "specimenClass": "alloy",
+      "technique": "in-situ-TEM",
+      "supports": [
+        "phase-separation-nanoscale"
+      ],
+      "url": "https://zenodo.org/records/18554547",
+      "comment": "Separação de fases em nanoestruturas de liga, não grãos de revestimento Au ou catalisador Pd.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "pr-rich-magnet",
+      "dataset": "Ímãs ricos em Pr–(Fe,Co)–B",
+      "elements": [
+        "Pr",
+        "Fe",
+        "Co"
+      ],
+      "specimenClass": "intermetallic",
+      "technique": "SEM+phase-characterization",
+      "supports": [
+        "microstructure",
+        "phase-context"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S1359645423008467",
+      "comment": "Estudo de ímã de Pr; ainda sem dados brutos ou direitos revisados.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "sm-co-magnet-thesis",
+      "dataset": "Ímãs sinterizados SmCo5 — processamento e propriedades",
+      "elements": [
+        "Sm",
+        "Co"
+      ],
+      "specimenClass": "intermetallic",
+      "technique": "metallography",
+      "supports": [
+        "grain-phase-evolution",
+        "magnetism"
+      ],
+      "url": "https://teses.usp.br/teses/disponiveis/3/3133/tde-28052025-142145/pt-br.html",
+      "comment": "Tese USP com reserva explícita de direitos; não redistribuir imagens.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "y-tb-nd-magnet",
+      "dataset": "Ímãs (Y,RE)2Fe14B (RE=Nd,Tb)",
+      "elements": [
+        "Y",
+        "Tb",
+        "Nd",
+        "Fe"
+      ],
+      "specimenClass": "intermetallic",
+      "technique": "SEM+BSE+EDS",
+      "supports": [
+        "elemental-maps",
+        "grain-boundary-phase"
+      ],
+      "url": "https://doi.org/10.1016/j.rinp.2023.106417",
+      "comment": "Mapas químicos mostram fases de ímãs, não microestrutura de Y/Tb metálicos.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "la-electrical-steel",
+      "dataset": "Aço elétrico com adições de La",
+      "elements": [
+        "La",
+        "Fe"
+      ],
+      "specimenClass": "alloy",
+      "technique": "metallography+texture",
+      "supports": [
+        "grain-size-trend",
+        "texture"
+      ],
+      "url": "https://www.sciencedirect.com/science/article/pii/S1002072112603494",
+      "comment": "La atua na liga; artigo não valida microestrutura metálica de La puro.",
+      "recordStatus": "record-or-publication-page-verified",
+      "rawFilesAudited": false,
+      "licenseAudited": false,
+      "appSpecimenMatchVerified": false
+    },
+    {
+      "id": "ni-bicrystal-pillar",
+      "dataset": "Níquel bicristalino sob microcompressão",
+      "elements": [
+        "Ni"
+      ],
+      "specimenClass": "elemental",
+      "technique": "SEM+mechanical-CSV",
+      "supports": [
+        "grain-boundary-response",
+        "stress-strain"
+      ],
+      "url": "https://zenodo.org/records/17725223",
+      "comment": "Dados de bicristal de Ni sob compressão; não correspondem a filmes de níquel.",
       "recordStatus": "record-or-publication-page-verified",
       "rawFilesAudited": false,
       "licenseAudited": false,
@@ -907,7 +1067,10 @@
           "nd-ce-dy-magnet",
           "ti-ulc-inclusions",
           "fe-multisteel-9-ebsd",
-          "in718-ebsd-3d"
+          "in718-ebsd-3d",
+          "pr-rich-magnet",
+          "y-tb-nd-magnet",
+          "la-electrical-steel"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -946,7 +1109,9 @@
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
           "co-ta-superalloys",
-          "nb-ni-co-mu-phases"
+          "nb-ni-co-mu-phases",
+          "pr-rich-magnet",
+          "sm-co-magnet-thesis"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -987,7 +1152,8 @@
           "ni-pure-ebsd",
           "fe-316l-correlative",
           "in718-ebsd-3d",
-          "nb-ni-co-mu-phases"
+          "nb-ni-co-mu-phases",
+          "ni-bicrystal-pillar"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1173,8 +1339,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "y-tb-nd-magnet"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1434,8 +1602,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "au-pd-tem"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1470,8 +1640,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "ag-native-wire-ebsd"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1542,8 +1714,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "sn-bi-solder-ebsd"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1650,8 +1824,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "la-electrical-steel"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1724,8 +1900,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "pr-rich-magnet"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1761,7 +1939,8 @@
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
-          "nd-ce-dy-magnet"
+          "nd-ce-dy-magnet",
+          "y-tb-nd-magnet"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -1798,8 +1977,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "sm-co-magnet-thesis"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -1906,8 +2087,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "y-tb-nd-magnet"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
@@ -2420,7 +2603,8 @@
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
         "experimentalCandidateLeadIDs": [
-          "au-polycrystal-ebsd"
+          "au-polycrystal-ebsd",
+          "au-pd-tem"
         ],
         "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
@@ -2529,8 +2713,10 @@
         "experimentalSampleIntegrated": false,
         "segmentedExperimentalMicrographIntegrated": false,
         "quantitativeGrainDataVerified": false,
-        "experimentalCandidateLeadIDs": [],
-        "candidateReviewStatus": "search-needed",
+        "experimentalCandidateLeadIDs": [
+          "sn-bi-solder-ebsd"
+        ],
+        "candidateReviewStatus": "identified-not-audited",
         "applicationMatchedSpecimenValidated": false
       }
     },
