@@ -21,7 +21,8 @@
  return {active:false,positions:{1:[.5,.5],2:[.5,.5],3:[.5,.5],4:[.5,.5]}};
  };
  let settings=initial(),stage=null,host=null,scale=0,drag=null,raf=0;
- let layer=null,ring=null,toolbar=null,toggle=null,reset=null,advance=null;
+ let layer=null,ring=null,toolbar=null,toggle=null,reset=null,advance=null,mark=null,status=null;
+ let referenceId=null,notice='',selections={object:null,grain:null};
  let observer=null,resizer=null;
  const save=()=>{try{root.localStorage.setItem(KEY,JSON.stringify({
   schema:'silm.lens-ui.v1',active:settings.active,positions:settings.positions
@@ -52,12 +53,114 @@
   if(!scale)return;
   settings.positions[scale]=[.5,.5];place();save();
  };
+
+ // A seleção da lente é UI didática. Nenhuma das coordenadas abaixo é uma
+ // coordenada metalográfica, cristalográfica ou uma medição em micrômetros.
+ const currentReference=()=>root.SILMIntegration?.snapshot?.()?.metadata?.workshop?.referenceId||null;
+ const lensCenter=()=>{
+  if(!ring?.isConnected)return null;
+  const rect=ring.getBoundingClientRect();
+  return {x:rect.left+rect.width/2,y:rect.top+rect.height/2};
+ };
+ const resetSelectionIfReferenceChanged=()=>{
+  const id=currentReference();
+  if(id===referenceId)return;
+  referenceId=id;notice='';selections={object:null,grain:null};
+ };
+ const objectRegionAt=(center)=>{
+  if(!host||!center)return null;
+  // object-fit:contain pode deixar faixas vazias. Não aceitar cliques
+  // nessas faixas como observações sobre a peça.
+  const img=host.querySelector('img');
+  const visual=img||host.querySelector('svg');
+  if(!visual)return null;
+  const rect=visual.getBoundingClientRect();
+  let width=rect.width,height=rect.height,left=rect.left,top=rect.top;
+  if(img){
+   if(!img.complete||!img.naturalWidth||!img.naturalHeight)return null;
+   const fit=Math.min(width/img.naturalWidth,height/img.naturalHeight);
+   width=img.naturalWidth*fit;height=img.naturalHeight*fit;
+   left+=((rect.width-width)/2);top+=((rect.height-height)/2);
+  }
+  if(width<2||height<2||center.x<left||center.x>left+width
+     ||center.y<top||center.y>top+height)return null;
+  const x=clamp((center.x-left)/width,0,1),y=clamp((center.y-top)/height,0,1);
+  const row=y<1/3?'superior':y<2/3?'central':'inferior';
+  const column=x<1/3?'esquerda':x<2/3?'central':'direita';
+  const region=row==='central'&&column==='central'?'central':
+   row==='central'?column:column==='central'?row:row+' '+column;
+  return {kind:'object',referenceId,x,y,label:'Região visual '+region};
+ };
+ const grainAt=(center)=>{
+  const svg=host?.querySelector('svg.silm-workshop-micro-map');
+  if(!svg||!center)return null;
+  const grains=[...svg.querySelectorAll('.silm-micro-grain')];
+  // A matriz de cada path inclui a câmera SVG, o zoom e o deslocamento da
+  // microestrutura. A interseção é REAL com o contorno que o motor desenhou.
+  for(const [i,path] of grains.entries()){
+   try{
+    const transform=path.getScreenCTM();
+    if(!transform||typeof path.isPointInFill!=='function')continue;
+    const local=new DOMPoint(center.x,center.y).matrixTransform(transform.inverse());
+    if(!path.isPointInFill(local))continue;
+    // Reutilizar o manipulador nativo choose(i) do próprio SILM: sem
+    // selecionar o "grão mais próximo" e sem alterar a semente/contornos.
+    path.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+    const number=String(i+1);
+    if(svg.dataset.selectedGrain!==number)return null;
+    const section=svg.closest('.silm-workshop-micro-viewer');
+    const source=section?.dataset.microstructureSource||'unknown';
+    return {kind:'grain',referenceId,number,source,d:path.getAttribute('d'),
+     label:source==='schematic'?'Grão ilustrativo '+number:
+      'Grão de contorno importado '+number+' · não homologado'};
+   }catch{/* Transformação SVG indisponível: não inventar o grão. */}
+  }
+  return null;
+ };
+ const selectedForScale=()=>{
+  if(scale===1)return selections.object?.referenceId===referenceId?selections.object:null;
+  if(scale===2){
+   const s=selections.grain,svg=host?.querySelector('svg.silm-workshop-micro-map');
+   const path=s&&svg?.querySelectorAll('.silm-micro-grain')?.[Number(s.number)-1];
+   const section=svg?.closest('.silm-workshop-micro-viewer');
+   if(s?.referenceId!==referenceId||svg?.dataset.selectedGrain!==s?.number
+      ||path?.getAttribute('d')!==s?.d||section?.dataset.microstructureSource!==s?.source)return null;
+   return s;
+  }
+  return null;
+ };
+ const updateSelectionStatus=()=>{
+  if(!status)return;
+  const result=selectedForScale();
+  const message=notice||(result?result.label+(scale===1?
+   ' · imagem ilustrativa, sem amostra medida':result.source==='schematic'?
+   ' · modelo D0, sem medição experimental':' · proveniência declarada, sem homologação'):'');
+  status.textContent=message;
+  setHidden(status,!settings.active||scale>2||!message);
+ };
+ const markSelection=()=>{
+  if(!settings.active||!host||(scale!==1&&scale!==2))return false;
+  resetSelectionIfReferenceChanged();
+  const center=lensCenter();
+  let result=null;
+  if(scale===1)result=objectRegionAt(center);
+  if(scale===2)result=grainAt(center);
+  if(result){
+   selections[scale===1?'object':'grain']=result;
+   notice='';
+  }else notice=scale===1?'Posicione a lente sobre a ilustração.':
+   'Nenhum contorno de grão sob o centro da lente.';
+  updateSelectionStatus();
+  return !!result;
+ };
+
  const render=()=>{
   if(!layer)return;
   const active=settings.active;
   setHidden(ring,!active);
   setHidden(reset,!active);
   setHidden(advance,!active||scale>=4);
+  setHidden(mark,!active||scale>2);
   toggle.setAttribute('aria-pressed',String(active));
   const name=active?'Ocultar':'Ativar';
   const label=name+' lente multiescala';
@@ -67,9 +170,14 @@
    toggle.textContent=active?'◉':'◎';
   }
   if(ring)ring.setAttribute('aria-label','Lente na escala '+(labels[scale]||'')+
-   '. Arraste ou use as setas para mover; tecla Home para centralizar.');
+   '. Arraste ou use as setas para mover; Home centraliza; Enter marca a região visual ou grão.');
   if(advance)advance.setAttribute('aria-label','Aprofundar para '+(labels[scale+1]||'próxima escala'));
+  if(mark){
+   const label=scale===1?'Marcar região visual da ilustração':'Destacar grão sob a lente';
+   mark.setAttribute('aria-label',label);mark.title=label;
+  }
   if(active)place();
+  updateSelectionStatus();
  };
  const targetFor=n=>{
   if(n===1)return stage.querySelector('#silm-workshop-context .silm-workshop-reference-art');
@@ -99,7 +207,10 @@
    host=nextHost;
    if(resizer)resizer.observe(host);
   }
+  const scaleChanged=scale!==nextScale;
   scale=nextScale;
+  resetSelectionIfReferenceChanged();
+  if(scaleChanged)notice='';
   if(layer.parentNode!==host)host.append(layer);
   layer.dataset.scale=String(scale);
   render();
@@ -121,7 +232,7 @@
   layer=document.createElement('div');layer.className='silm-lens-layer';
   layer.setAttribute('data-testid','silm-lens-layer');
   ring=document.createElement('div');ring.className='silm-lens-circle';
-  ring.tabIndex=0;ring.setAttribute('role','group');
+  ring.tabIndex=0;ring.setAttribute('role','button');
   const cross=document.createElement('span');cross.className='silm-lens-reticle';
   cross.setAttribute('aria-hidden','true');
   ring.append(cross);
@@ -130,8 +241,12 @@
   toggle=makeButton('silm-lens-toggle','◎','Ativar lente multiescala');
   reset=makeButton('silm-lens-reset','⊙','Centralizar lente');
   advance=makeButton('silm-lens-advance','↓','Aprofundar para a próxima escala');
-  toolbar.append(toggle,reset,advance);
-  layer.append(ring,toolbar);
+  mark=makeButton('silm-lens-mark','⌖','Marcar região visual da ilustração');
+  status=document.createElement('output');status.className='silm-lens-selection';
+  status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+  status.setAttribute('aria-atomic','true');
+  toolbar.append(toggle,reset,mark,advance);
+  layer.append(ring,status,toolbar);
   // A cena cristalina ouve eventos de ponteiro. Os controles da lente
   // devem ser isolados para não clicar/arrastar átomos ao mesmo tempo.
   for(const event of ['pointerdown','pointerup','click']){
@@ -143,6 +258,7 @@
   });
   reset.addEventListener('click',center);
   advance.addEventListener('click',deeper);
+  mark.addEventListener('click',markSelection);
   ring.addEventListener('pointerdown',e=>{
    if(e.button!==0||!settings.active)return;
    drag={id:e.pointerId,x:e.clientX,y:e.clientY};
@@ -172,6 +288,8 @@
     move(dx*step,dy*step);
    }else if(e.key==='Home'){
     e.preventDefault();e.stopPropagation();center();
+   }else if((e.key==='Enter'||e.key===' ')&&scale<=2){
+    e.preventDefault();e.stopPropagation();markSelection();
    }
   });
   // Os renderizadores substituem o conteúdo da cena ao trocar de escala.
@@ -192,7 +310,12 @@
   inspect:()=>Object.freeze({
    active:settings.active,scale,attached:!!layer?.isConnected,
    targetClass:host?.className||null,
-   position:scale?[...currentPosition()]:null
+   position:scale?[...currentPosition()]:null,
+   selected:scale<=2&&selectedForScale()?Object.freeze({
+    kind:selectedForScale().kind,label:selectedForScale().label,
+    referenceId:selectedForScale().referenceId,
+    ...(scale===2?{number:selectedForScale().number,source:selectedForScale().source}:{})
+   }):null
   })
  });
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
