@@ -81,6 +81,7 @@ try{
  assert.ok(grainless>5,'O gerador real de grãos não foi preservado');
  const firstPath=await page.locator('.silm-micro-grain').first().getAttribute('d');
  const mapBefore=await page.locator('.silm-workshop-micro-map').getAttribute('viewBox');
+ const grainScientificBefore=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
  // Marco 2: o alvo deve corresponder ao contorno SVG real sob o centro da lente.
  await page.locator('.silm-lens-mark').click();
  const grainMark=await page.evaluate(()=>SILM.lensController.inspect().selected);
@@ -94,6 +95,22 @@ try{
  assert.match(await page.locator('.silm-lens-selection').innerText(),/sem medição experimental/);
  assert.equal(await page.locator('.silm-workshop-micro-map').getAttribute('viewBox'),mapBefore,
   'Marcar grão mudou a câmera/microestrutura');
+ assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),grainScientificBefore,
+  'Destacar um grão didático alterou o snapshot científico');
+ // A geometria usada para marcar precisa continuar correta com a câmera SVG
+ // ampliada: não basta escolher o primeiro grão ou o mais próximo.
+ await page.locator('.silm-lens-reset').click();
+ await page.getByRole('button',{name:'Ampliar microestrutura'}).click();
+ assert.equal(await page.locator('.silm-workshop-micro-map').getAttribute('data-zoom'),'1.25');
+ const grainScientificZoomed=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
+ await page.locator('.silm-lens-mark').click();
+ const zoomMark=await page.evaluate(()=>SILM.lensController.inspect().selected);
+ assert.equal(zoomMark?.kind,'grain','Seleção deve funcionar com zoom SVG de 125%');
+ assert.equal(zoomMark.number,await page.locator('.silm-workshop-micro-map').getAttribute('data-selected-grain'));
+ assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),grainScientificZoomed,
+  'Selecionar grão com zoom modificou dados científicos');
+ await page.getByRole('button',{name:'Ajustar microestrutura ao quadro'}).click();
+ await page.locator('.silm-lens-mark').click();
  await page.locator('.silm-lens-circle').focus();
  await page.locator('.silm-lens-circle').press('ArrowDown');
  assert.equal(await page.locator('.silm-micro-grain').first().getAttribute('d'),firstPath,
