@@ -128,6 +128,37 @@ async function checkDock(panel){
  await page.waitForFunction(p=>document.querySelector('[data-open-dock="'+p+'"]')?.getAttribute('aria-expanded')==='false',panel);
  assert.equal(await scientific(),before,panel+': fechar painel modificou o motor científico');
 }
+
+async function checkSingleDock(label,width){
+ const initial=await scientific();
+ for(const target of ['montagem','ver','dados','montagem']){
+  await page.locator('[data-open-dock="'+target+'"]').click();
+  await page.waitForFunction(p=>document.querySelector('[data-open-dock="'+p+'"]')
+   ?.getAttribute('aria-expanded')==='true',target);
+  const observed=await page.evaluate(()=>{
+   const triggers=[...document.querySelectorAll('.si-launchers [data-open-dock]')];
+   const opened=triggers.filter(b=>b.getAttribute('aria-expanded')==='true').map(b=>b.dataset.openDock);
+   const workspace=document.querySelector('#si-workspace');
+   const focus=document.querySelector('#workspace-focus');
+   return {
+    opened,leftHidden:document.querySelector('#si-dock-left').hidden,
+    rightHidden:document.querySelector('#si-dock-right').hidden,
+    leftOpen:workspace.dataset.leftOpen,rightOpen:workspace.dataset.rightOpen,
+    leftPadding:parseFloat(getComputedStyle(focus).paddingLeft),
+    rightPadding:parseFloat(getComputedStyle(focus).paddingRight)
+   };
+  });
+  assert.deepEqual(observed.opened,[target],label+': duas docas ou comando errado: '+JSON.stringify(observed));
+  assert.equal(observed.leftHidden,target!=='montagem',label+': painel esquerdo incorreto');
+  assert.equal(observed.rightHidden,target==='montagem',label+': painel direito incorreto');
+  if(width>=901)assert.ok(observed.leftPadding<=30&&observed.rightPadding<=30,
+   label+': painel comprimiu o palco: '+JSON.stringify(observed));
+  assert.equal(await scientific(),initial,label+': alternância de docas alterou a ciência');
+ }
+ await page.locator('[data-close-dock="left"]').click();
+ await page.waitForFunction(()=>document.querySelector('#si-dock-left')?.hidden);
+ assert.equal(await scientific(),initial,label+': fechar doca alterou experimento');
+}
 try{
  const ctx=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
  page=await ctx.newPage();
@@ -174,6 +205,7 @@ try{
    await checkDock('ver');
    await checkDock('dados');
    await checkDock('montagem');
+   await checkSingleDock(label,width);
   }
  }
  const end=JSON.parse(await scientific());
