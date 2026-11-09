@@ -113,7 +113,7 @@ async function checkModes(label,scale,width,height){
   assert.ok(controls.width>100&&controls.height>=40,desc+': faixa de ferramentas desapareceu');
   assert.ok(controls.buttons.length>=2,desc+': faltam ferramentas científicas');
   assert.ok(controls.buttons.every(b=>b.width>=42&&b.height>=42),
-   desc+': alvos menores que 44px');
+   desc+': alvos menores que 44px: '+JSON.stringify(controls.buttons.filter(b=>b.width<42||b.height<42)));
  }
 }
 async function checkDock(panel){
