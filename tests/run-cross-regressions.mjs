@@ -141,6 +141,13 @@ try{
  await page.locator('.silm-workshop-card[data-reference-id="atlas-cu"]')
    .getByRole('button',{name:'Investigar componente'}).click();
  await page.waitForFunction(()=>window.SILMIntegration?.snapshot?.()?.metal?.atomicNumber===29);
+ // A Visão geral gerencia investigações com uma estrutura existente. O
+ // Objeto isolado ainda não gera cartão: preparar Cu com o motor real antes
+ // da matriz reproduz a situação de várias estruturas salvas do usuário.
+ await page.locator('.silm-workshop-scale[data-scale="3"]').click();
+ await page.waitForFunction(()=>SILMIntegration.snapshot()?.structure?.units?.length>0);
+ await page.locator('.silm-workshop-scale[data-scale="1"]').click();
+ await page.waitForFunction(()=>document.querySelector('#si-stage')?.dataset.workshopScale==='1');
  const start=JSON.parse(await scientific());
 
  // Um teste adversarial reproduz a regra CSS que causou o incidente P0.
