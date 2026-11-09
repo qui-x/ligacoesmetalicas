@@ -32,15 +32,14 @@
  };
  const setHidden=(node,yes)=>{if(node&&node.hidden!==yes)node.hidden=yes;};
  const currentPosition=()=>settings.positions[scale]||[.5,.5];
+ // Guardamos o CENTRO como porcentagem da região, nunca como posição
+ // absoluta em pixels. CSS limita o centro ao espaço útil, até quando
+ // o WebKit troca a largura sem notificar o ResizeObserver.
  const place=()=>{
   if(!host||!ring||!layer?.isConnected||!settings.active)return;
-  const w=layer.clientWidth,h=layer.clientHeight;
-  const size=ring.getBoundingClientRect();
-  if(w<80||h<80||size.width===0||size.height===0)return;
-  const gap=5;
-  const left=clamp(w*currentPosition()[0]-size.width/2,gap,Math.max(gap,w-size.width-gap));
-  const top=clamp(h*currentPosition()[1]-size.height/2,gap,Math.max(gap,h-size.height-gap));
-  ring.style.left=left+'px';ring.style.top=top+'px';
+  const [x,y]=currentPosition();
+  ring.style.setProperty('--silm-lens-position-x',(x*100)+'%');
+  ring.style.setProperty('--silm-lens-position-y',(y*100)+'%');
  };
  const move=(dx,dy)=>{
   if(!host||!scale)return;
