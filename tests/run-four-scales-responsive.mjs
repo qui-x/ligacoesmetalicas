@@ -20,8 +20,8 @@ async function sample(page){
   const stage=document.querySelector('#si-stage');
   const ref=stage.querySelector('.silm-workshop-reference');
   const nav=ref?.querySelector('.silm-workshop-scales');
-  const buttons=nav?[...nav.querySelectorAll('button')]:[];
-  const traversal=ref?.querySelector('.silm-workshop-traversal');
+  const buttons=nav?[...nav.querySelectorAll('.silm-workshop-scale')]:[];
+  const traversal=nav;
   const arrows=traversal?[...traversal.querySelectorAll('.silm-workshop-traverse')]:[];
   const art=ref?.querySelector('.silm-workshop-reference-art');
   const image=art?.querySelector('img');
