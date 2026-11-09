@@ -592,53 +592,46 @@
  display:none!important;
 }
 
-/* SILM Parte 8 — Travessia na faixa superior, sem doca ou camada científica nova.
-   Os 4 passos continuam acessíveis diretamente: setas só complementam a navegação. */
-.silm-workshop-traversal{
- display:grid;grid-template-columns:44px minmax(0,1fr) 44px;
- align-items:stretch;gap:6px;min-width:0;margin:0 0 8px;
+/* SILM Parte 8 — Travessia integrada ao primeiro filho original da Oficina.
+   Os quatro botões e os atalhos anterior/próximo compartilham a mesma faixa.
+   Sem criar doca ou camada de simulação científica. */
+#si-stage .silm-workshop-reference>.silm-workshop-scales{
+ display:grid;grid-template-columns:44px repeat(4,minmax(0,1fr)) 44px;
+ align-items:stretch;min-width:0;gap:4px;margin:0 0 8px!important;
+ padding:3px;border:1px solid var(--border);border-radius:12px;
+ background:var(--panel2,var(--surface));overflow:visible;
 }
-.silm-workshop-traversal>.silm-workshop-scales{
- display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
- min-width:0;gap:4px;margin:0!important;padding:3px;
- border:1px solid var(--border);border-radius:12px;
- background:var(--panel2,var(--surface));
- overflow:visible;
-}
-.silm-workshop-traversal .silm-workshop-scale{
+#si-stage .silm-workshop-scales .silm-workshop-scale{
  min-width:0;min-height:44px;border:1px solid transparent;
  border-radius:8px;background:transparent;color:var(--text);
 }
-.silm-workshop-traversal .silm-workshop-scale[aria-current="step"]{
+#si-stage .silm-workshop-scales .silm-workshop-scale[aria-current="step"]{
  border-color:var(--accent);background:var(--surface);
  box-shadow:inset 0 -3px 0 var(--accent);
 }
-.silm-workshop-traverse{
+#si-stage .silm-workshop-scales .silm-workshop-traverse{
  display:grid;place-items:center;min-width:44px;min-height:44px;
  padding:0;border:1px solid var(--border);border-radius:10px;
  background:var(--surface);color:var(--text);font:inherit;
  font-size:1.55rem;line-height:1;cursor:pointer;
 }
-.silm-workshop-traverse:disabled{opacity:.4;cursor:default}
-.silm-workshop-traverse:focus-visible,
-.silm-workshop-traversal .silm-workshop-scale:focus-visible{
+#si-stage .silm-workshop-scales .silm-workshop-traverse:disabled{opacity:.4;cursor:default}
+#si-stage .silm-workshop-scales :is(.silm-workshop-traverse,.silm-workshop-scale):focus-visible{
  outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px;
 }
-/* Em telas estreitas, os quatro passos permanecem na mesma linha, com
-   alvos amplos. A navegação por teclado continua habilitada. */
+/* No celular, quatro acessos diretos preservam alvos de 44 px e não espremem a cena. */
 @media(max-width:650px){
- .silm-workshop-traversal{grid-template-columns:minmax(0,1fr);gap:0;margin-bottom:5px}
- .silm-workshop-traverse{display:none}
- .silm-workshop-traversal>.silm-workshop-scales{
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:2px;padding:2px;overflow:visible;
+ #si-stage .silm-workshop-reference>.silm-workshop-scales{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:2px;padding:2px;margin-bottom:5px!important;
  }
- .silm-workshop-traversal .silm-workshop-scale{
-  min-height:44px;min-width:0;padding:2px 0;font-size:.8rem;
+ #si-stage .silm-workshop-scales .silm-workshop-traverse{display:none}
+ #si-stage .silm-workshop-scales .silm-workshop-scale{
+  min-width:0;min-height:44px;padding:2px 0;font-size:.8rem;
  }
 }
 @media(forced-colors:active){
- .silm-workshop-traversal .silm-workshop-scale[aria-current="step"]{
+ #si-stage .silm-workshop-scales .silm-workshop-scale[aria-current="step"]{
   border:2px solid Highlight;outline:2px solid Highlight;outline-offset:-4px;
  }
 }
