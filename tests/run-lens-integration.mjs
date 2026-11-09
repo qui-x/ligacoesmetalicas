@@ -197,6 +197,28 @@ try{
  assert.ok(geometry.buttonSizes.every(([w,h])=>w>=43&&h>=43),
   'Ações da lente menores que os alvos de toque');
  await page.screenshot({path:join(path,'centro-mobile.jpg'),type:'jpeg',quality:68});
+ // Regressão do Marco 2 na largura mínima: o controle de marcação
+ // precisa funcionar sem adicionar menus nem alargar o documento.
+ await page.locator('.silm-workshop-scale[data-scale="2"]').click();
+ await page.waitForFunction(()=>SILM.lensController.inspect().scale===2);
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
+ await page.locator('.silm-lens-reset').click();
+ await page.locator('.silm-lens-mark').click();
+ assert.equal(await page.evaluate(()=>SILM.lensController.inspect().selected?.kind),'grain',
+  'Marcar grão didático não funciona em 320 px');
+ const mobileRead=await page.evaluate(()=>{
+  const stage=document.querySelector('.silm-lens-layer').getBoundingClientRect();
+  const badge=document.querySelector('.silm-lens-selection').getBoundingClientRect();
+  return {pageWidth:document.documentElement.scrollWidth,windowWidth:innerWidth,
+   badgeVisible:badge.width>0&&badge.left>=stage.left-2&&badge.right<=stage.right+2};
+ });
+ assert.ok(mobileRead.pageWidth<=mobileRead.windowWidth+5,'Marcação causou overflow móvel');
+ assert.ok(mobileRead.badgeVisible,'O resultado da marcação saiu do palco no celular');
+ await page.screenshot({path:join(path,'graos-mobile.jpg'),type:'jpeg',quality:68});
+ await page.locator('.silm-workshop-scale[data-scale="1"]').click();
+ await page.waitForFunction(()=>SILM.lensController.inspect().scale===1);
+ assert.equal(await page.evaluate(()=>SILM.lensController.inspect().selected?.kind),'object',
+  'Voltar ao Objeto perdeu sua região visual após a investigação das outras escalas');
  assert.deepEqual(errors,[],'Erros JavaScript: '+errors.join(' | '));
  console.log('OK '+browserName+': lente real, mouse, teclado, 4 escalas, estado científico, visões e 320px');
  await context.close();
