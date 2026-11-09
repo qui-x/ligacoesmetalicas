@@ -16,6 +16,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  integridade:
+    name: Contratos científicos e interface
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Obter versão do SILM
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar sintaxe dos contratos
+        run: |
+          node --check tests/interface-safety.test.mjs
+          node --check tests/run-cross-regressions.mjs
+      - name: Verificar contratos estáticos e motores científicos
+        run: node --test tests/*.test.*
+
   responsividade:
     name: Responsividade / ${{ matrix.browser }}
     runs-on: ubuntu-latest
@@ -48,6 +66,7 @@ jobs:
           node --check tests/run-responsive-audit.mjs
           node --check tests/run-periodic-responsive.mjs
           node --check tests/run-four-scales-responsive.mjs
+          node --check tests/run-cross-regressions.mjs
           node --check domain/silm/periodic-table.js
 
       - name: Instalar Playwright no runner
@@ -75,6 +94,9 @@ jobs:
 
       - name: Validar ocupação visual e navegação das quatro escalas
         run: node tests/run-four-scales-responsive.mjs
+
+      - name: Verificar contratos de estado Foco/Visão geral e controles
+        run: node tests/run-cross-regressions.mjs
 
       - name: Executar auditoria de telas, aplicações e microestruturas
         run: node tests/run-responsive-audit.mjs
@@ -106,9 +128,34 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Guardar evidências de regressões cruzadas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-regressoes-${{ matrix.browser }}
+          path: reports/contratos-regressao/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Encerrar servidor
         if: always()
         run: |
           if [ -f "$RUNNER_TEMP/silm-http.pid" ]; then
             kill "$(cat "$RUNNER_TEMP/silm-http.pid")" 2>/dev/null || true
           fi
+
+  portao:
+    name: Portão de regressões SILM
+    if: always()
+    needs: [integridade, responsividade]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bloquear aprovação quando algum contrato falhou
+        env:
+          CONTRATOS: ${{ needs.integridade.result }}
+          NAVEGADORES: ${{ needs.responsividade.result }}
+        run: |
+          echo "Contratos científicos e interface: $CONTRATOS" >> "$GITHUB_STEP_SUMMARY"
+          echo "Matriz Chromium/Firefox/WebKit: $NAVEGADORES" >> "$GITHUB_STEP_SUMMARY"
+          test "$CONTRATOS" = "success"
+          test "$NAVEGADORES" = "success"
