@@ -20,11 +20,20 @@
  isolation:isolate;
 }
 #si-stage .silm-lens-circle{
- position:absolute;top:25%;left:30%;
+ position:absolute;
  box-sizing:border-box;
- width:clamp(104px,min(34vw,31dvh),184px);
- height:clamp(104px,min(34vw,31dvh),184px);
+ --silm-lens-base:clamp(104px,min(34vw,31dvh),184px);
+ --silm-lens-w:min(var(--silm-lens-base),calc(100% - 12px));
+ --silm-lens-h:min(var(--silm-lens-base),calc(100% - 12px));
+ width:var(--silm-lens-w);height:var(--silm-lens-h);
  max-width:calc(100% - 12px);max-height:calc(100% - 12px);
+ /* A posição depende do quadro atual, não de pixels calculados antes do
+    redimensionamento. O próprio CSS mantém o círculo totalmente visível. */
+ left:clamp(calc(var(--silm-lens-w) / 2 + 6px),var(--silm-lens-position-x,50%),
+  calc(100% - var(--silm-lens-w) / 2 - 6px));
+ top:clamp(calc(var(--silm-lens-h) / 2 + 6px),var(--silm-lens-position-y,50%),
+  calc(100% - var(--silm-lens-h) / 2 - 6px));
+ transform:translate(-50%,-50%);
  border:6px solid var(--surface,#fff);
  border-radius:50%;
  outline:2px solid var(--primary,var(--accent,#227a80));
@@ -94,7 +103,7 @@
 }
 @media(max-height:470px) and (orientation:landscape){
  #si-stage .silm-lens-circle{
-  width:clamp(88px,27dvh,132px);height:clamp(88px,27dvh,132px);
+  --silm-lens-base:clamp(88px,27dvh,132px);
  }
 }
 @media(prefers-reduced-motion:reduce){
