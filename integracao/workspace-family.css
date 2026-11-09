@@ -469,7 +469,7 @@ body.si-structure-expanded #silm-scene-actionbar{
 }
 #silm-scene-actionbar .silm-projection-trigger{
  box-sizing:border-box!important;
- min-height:40px!important;height:40px!important;
+ min-height:44px!important;height:44px!important;
 }
 #silm-scene-actionbar .silm-lattice-nav{
  display:flex!important;flex:0 0 auto!important;
