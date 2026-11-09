@@ -113,9 +113,6 @@ SILM.workshop=(()=>{
   }
   // Travessia: controles de interface ligados às escalas reais do mesmo ensaio.
   // Não cria câmera, simulação, estrutura ou estado científico paralelo.
-  const traversal=node('div','silm-workshop-traversal');
-  traversal.setAttribute('role','group');
-  traversal.setAttribute('aria-label','Percurso entre escalas');
   const scales=node('div','silm-workshop-scales');
   scales.setAttribute('role','group');
   scales.setAttribute('aria-label','Escalas de investigação');
@@ -171,8 +168,10 @@ SILM.workshop=(()=>{
    if(target===undefined)return;
    event.preventDefault();navigate(target);
   });
-  traversal.append(arrow('prev',previous,'‹'),scales,arrow('next',following,'›'));
-  s.insertBefore(traversal,s.firstChild);
+  scales.prepend(arrow('prev',previous,'‹'));
+  scales.append(arrow('next',following,'›'));
+  // Preserva a estrutura pública original esperada pelas auditorias de microestrutura.
+  s.insertBefore(scales,s.firstChild);
   if(scale!==2)s.append(node('p','silm-workshop-scale-note',scale===3?'A rede e a célula unitária mostram os efeitos coletivos. Selecione um centro para aprofundar a mesma investigação.':scale===4?'O centro selecionado pertence à rede: observe nele a resposta local dos estímulos aplicados à estrutura.':'O componente permanece identificado enquanto a visualização se aproxima; a mudança de escala não troca o material.'));
   if(scale!==2&&items.some(other=>other.id!==item?.id)){const alt=node('div','silm-workshop-alternatives'),row=node('div','silm-workshop-alternative-list');alt.append(node('h3','','Outras aplicações com '+element.name));
    for(const other of items){if(other.id===item?.id)continue;const b=node('button','silm-workshop-alternative',other.title);b.type='button';b.addEventListener('click',()=>onChoose(other));row.append(b);}alt.append(row);s.append(alt);}
