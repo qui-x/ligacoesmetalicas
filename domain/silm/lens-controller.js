@@ -133,6 +133,11 @@
   advance=makeButton('silm-lens-advance','↓','Aprofundar para a próxima escala');
   toolbar.append(toggle,reset,advance);
   layer.append(ring,toolbar);
+  // A cena cristalina ouve eventos de ponteiro. Os controles da lente
+  // devem ser isolados para não clicar/arrastar átomos ao mesmo tempo.
+  for(const event of ['pointerdown','pointerup','click']){
+   toolbar.addEventListener(event,e=>e.stopPropagation());
+  }
   toggle.addEventListener('click',()=>{
    settings.active=!settings.active;save();render();
    if(settings.active)ring.focus({preventScroll:true});
