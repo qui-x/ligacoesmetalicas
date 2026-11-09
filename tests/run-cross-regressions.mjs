@@ -105,7 +105,8 @@ async function checkModes(label,scale,width,height){
    const rect=n.getBoundingClientRect();
    return {width:rect.width,height:rect.height,
     buttons:[...n.querySelectorAll('#silm-view-controls button,#silm-view-quick-actions button')]
-     .filter(b=>!b.hidden&&getComputedStyle(b).display!=='none')
+     .filter(b=>!b.hidden&&getComputedStyle(b).display!=='none'&&
+      b.getBoundingClientRect().width>0&&b.getBoundingClientRect().height>0)
      .map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height,
       name:b.getAttribute('aria-label')||b.textContent?.trim()}))};
   });
