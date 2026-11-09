@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.10';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='focus-overview-mobile-20261107';
+const BUILD='lente-multiescala-ui-20261108';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "assets/workshop/motor.webp",
@@ -160,7 +160,9 @@ const FILES=[
   "domain/silm/microstructure-appearance.js",
   "domain/silm/microstructure-view.js",
   "domain/silm/workshop.js",
+  "domain/silm/lens-controller.js",
   "domain/silm/workshop.css",
+  "domain/silm/lens.css",
   "domain/silm/electron-view.js",
   "domain/silm/property-view.js",
   "domain/silm/measure-view.js",
