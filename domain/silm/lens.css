@@ -6,6 +6,14 @@
 #si-stage .silm-assembly-stage{
  position:relative;
 }
+/* A fotografia e a lente NÃO podem sobrepor o resumo nem os botões
+   de Composição e fonte ao empilhar as colunas no celular. */
+#si-stage .silm-workshop-reference-art{
+ z-index:0;isolation:isolate;
+}
+#si-stage .silm-workshop-reference-top>.silm-workshop-reference-summary{
+ position:relative;z-index:1;
+}
 #si-stage .silm-lens-layer{
  position:absolute;inset:0;z-index:18;
  pointer-events:none;overflow:hidden;
