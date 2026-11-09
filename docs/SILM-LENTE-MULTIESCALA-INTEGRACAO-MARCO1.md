@@ -19,7 +19,7 @@ A lente é um **instrumento visual opcional** e flutuante em uma oficina única,
 
 O controlador cria **um só elemento DOM** para a lente e muda apenas seu contêiner pai quando o visualizador ativo é alterado. A investigação, a escala e o objeto selecionado são determinados pelo SILM original; a lente identifica a escala pelo `data-workshop-scale` existente. Para aprofundar, o controle da lente **aciona o botão de escala original** em vez de chamar fórmulas ou reescrever o modelo.
 
-Os únicos dados da lente são `active` e `positions` (frações normalizadas `[x,y]` para cada escala), no armazenamento local `silm:ui:lente-multiescala:v1`. Posição e ativação não entram no `scientific.state` nem no snapshot de `SILMIntegration`. A lente começa desativada se não houver preferência salva.
+A preferência persistida contém somente `active` e `positions` (frações normalizadas `[x,y]` para cada escala), no armazenamento local `silm:ui:lente-multiescala:v1`. A partir do Marco 2, marcações de regiões ilustrativas e grãos são guardadas **apenas em memória de UI**, vinculadas à referência do objeto; não são incorporadas ao `scientific.state`, ao snapshot de `SILMIntegration` nem exportadas como dados experimentais. A lente começa desativada se não houver preferência salva.
 
 ## Controles de uso
 
@@ -51,12 +51,37 @@ Os únicos dados da lente são `active` e `positions` (frações normalizadas `[
 - Em 320 px, a lente permanece no quadro e os botões têm ≥44 px.
 - Testes em Chromium, Firefox e WebKit, com capturas guardadas no GitHub Actions.
 
+## Marco 2 — seleção didática pelo centro da lente (08/11/2026)
+
+O Marco 2 acrescenta **uma única ação de marcar** (`⌖`) ao grupo compacto de controles, visível somente quando a lente está ativa em Objeto ou Grãos. `Enter` ou `Espaço` com foco na lente produz a mesma ação. **Mover sem confirmar não troca a seleção.** O resultado é exibido em uma frase breve, sem painel lateral ou modal.
+
+### Objeto: região visual, não amostra
+
+- O ponto de observação é o centro **visível** da lente.
+- Quando houver imagem com `object-fit:contain`, a posição é verificada contra os limites reais do conteúdo desenhado; faixas vazias não contam como pontos da peça.
+- A imagem é dividida **somente para localização didática**, em 3 × 3 regiões nomeadas: superior/central/inferior × esquerda/central/direita.
+- A saída é `Região visual ... · imagem ilustrativa, sem amostra medida`, sem indicar metal, composição, dureza, microestrutura ou percentual de fase naquele ponto.
+- A identificação da região usa frações entre zero e um **apenas na ilustração**; não é uma localização no espaço físico da amostra.
+
+### Grãos: seleção do contorno que realmente está sob a lente
+
+- A seleção usa os elementos `path.silm-micro-grain` **existentes**, sem gerar novos polígonos. Para cada contorno, transforma o centro de tela para o referencial do próprio SVG (`getScreenCTM().inverse()`) e verifica `isPointInFill`.
+- Somente quando há um `path` contendo exatamente esse ponto, é acionado o manipulador `choose(i)` original do SILM por evento de clique no próprio path.
+- O estado nativo `data-selected-grain` e o destaque acessível `aria-pressed` continuam sendo os responsáveis pela visualização. Não selecionamos o grão mais próximo se a lente está em uma região vazia.
+- O texto diferencia `modelo D0 sem medição experimental` de `contorno importado não homologado`. A cor/posição do grão não determina composição química ou orientação cristalográfica.
+- A verificação por matriz SVG preserva o comportamento sob **zoom de 125%**; não muda `viewBox`, semente, perfil ou contornos.
+
+### Estado e limites
+
+A seleção do Objeto e a seleção de Grãos são estados separados e efêmeros. Quando a referência de objeto muda, as duas marcações são descartadas. Se a microestrutura é regenerada ou importada de outra fonte, uma seleção anterior é considerada inválida se deixar de corresponder ao contorno ativo. Não há mapeamento causal/espacial comprovado **Objeto → Grãos**, apenas um encadeamento de investigação didática.
+
+A regressão `tests/run-lens-integration.mjs` valida, nos três navegadores, uma região visual marcada, a ativação do grão real na tesselação, o resultado sem medição experimental, a estabilidade do `snapshot` do motor, o zoom SVG e a ausência de seleção automática durante o arraste. **O motor científico existente não foi alterado.**
+
 ## Próximos marcos — ainda NÃO implementados
 
-- Seleção espacial de regiões **de interesse** no Objeto, claramente distinta de uma amostra real validada.
-- Seleção didática de grão a partir do ponto da lente, sem confundir mapa D0 com EBSD/TrueEBSD.
 - Alinhamento da lente aos centros/células do renderizador com critérios de clique/raio, sem interpolar coordenadas cristalográficas a partir de pixels.
 - Refinamento da hierarquia Foco/Visão geral e redução de menus à luz de testes com estudantes.
-- Homologação de responsividade e integração à `main` **somente após revisão**.
+- Mapeamento experimental imagem↔amostra↔EBSD — somente se fontes, corregistro e metadados reais forem homologados (não é pressuposto do SILM didático).
+- Integração à `main` **somente após revisão visual**.
 
-O objetivo desta fase é exercitar a lente **sobre o motor real**, não declarar que a transposição científica completa está resolvida.
+O objetivo atual é validar a lente **sobre o motor real**, não declarar que a transposição científica completa está resolvida.
