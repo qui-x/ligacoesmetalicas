@@ -629,6 +629,9 @@
  #si-stage .silm-workshop-scales .silm-workshop-scale{
   min-width:0;min-height:44px;padding:2px 0;font-size:.8rem;
  }
+ /* Quatro colunas: mostrar rótulos curtos em TODAS as escalas, inclusive 1/2. */
+ #si-stage .silm-workshop-scales .silm-workshop-scale-long{display:none}
+ #si-stage .silm-workshop-scales .silm-workshop-scale-short{display:inline}
 }
 @media(forced-colors:active){
  #si-stage .silm-workshop-scales .silm-workshop-scale[aria-current="step"]{
