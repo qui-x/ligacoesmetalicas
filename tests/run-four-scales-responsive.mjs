@@ -111,6 +111,47 @@ try{
     assert.ok(m.action&&m.action.height>=40,
      label+': faixa instrumental sumiu');
    }
+   // P0: em Objeto/Grãos, a CSS de altura não pode ressuscitar Foco
+   // quando a Base SI troca para Visão geral. Reproduz a tela do usuário
+   // com desktop largo e o mesmo fluxo nos celulares.
+   if(scale<=2&&['celular-390','notebook','desktop'].includes(label)){
+    await page.locator('[data-scene-view="overview"]').click();
+    await page.waitForFunction(()=>document.querySelector('#si-workspace')?.dataset.viewMode==='overview');
+    const views=await page.evaluate(()=>{
+     const focus=document.querySelector('#workspace-focus');
+     const overview=document.querySelector('#workspace-overview');
+     const scene=document.querySelector('#si-stage');
+     const a=focus.getBoundingClientRect(),b=overview.getBoundingClientRect(),
+      s=scene.getBoundingClientRect();
+     return {mode:document.querySelector('#si-workspace').dataset.viewMode,
+      focusHidden:focus.hidden,focusDisplay:getComputedStyle(focus).display,
+      focusWidth:a.width,overviewHidden:overview.hidden,
+      overviewDisplay:getComputedStyle(overview).display,
+      overviewWidth:b.width,stageWidth:s.width,
+      managerWidth:document.querySelector('#silm-comparison-items').getBoundingClientRect().width};
+    });
+    assert.equal(views.focusHidden,true,label+': Foco não recebeu hidden');
+    assert.equal(views.focusDisplay,'none',
+     label+': Foco continuou desenhado atrás da Visão geral: '+JSON.stringify(views));
+    assert.ok(views.focusWidth<1,label+': Foco ocupa a primeira coluna da tela');
+    assert.equal(views.overviewHidden,false,label+': Visão geral continua oculta');
+    assert.notEqual(views.overviewDisplay,'none',label+': Visão geral desapareceu');
+    assert.ok(views.overviewWidth>=views.stageWidth*.84,
+     label+': gerenciamento comprimido à direita: '+JSON.stringify(views));
+    assert.ok(views.managerWidth>=views.stageWidth*.72,
+     label+': cartões do gerenciamento estão espremidos: '+JSON.stringify(views));
+    if(label==='notebook'||label==='celular-390')
+     await page.screenshot({path:join(dir,label+'-visao-geral-escala-'+scale+'.jpg'),
+      type:'jpeg',quality:72,animations:'disabled'});
+    await page.locator('[data-scene-view="focus"]').click();
+    await page.waitForFunction(()=>document.querySelector('#si-workspace')?.dataset.viewMode==='focus');
+    const back=await page.evaluate(()=>({
+     focusDisplay:getComputedStyle(document.querySelector('#workspace-focus')).display,
+     overviewDisplay:getComputedStyle(document.querySelector('#workspace-overview')).display
+    }));
+    assert.notEqual(back.focusDisplay,'none',label+': Foco não voltou');
+    assert.equal(back.overviewDisplay,'none',label+': Visão geral não foi escondida ao voltar');
+   }
   }
   if(['celular-390','paisagem-curta','desktop'].includes(label)){
    await page.screenshot({path:join(dir,label+'-centro.jpg'),type:'jpeg',quality:70,animations:'disabled'});
