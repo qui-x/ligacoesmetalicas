@@ -84,6 +84,17 @@ try{
   'A lente substituiu o renderizador cristalográfico');
  await page.screenshot({path:join(path,'rede.jpg'),type:'jpeg',quality:68});
  await page.locator('.silm-lens-advance').click();
+ await page.waitForTimeout(250);
+ const centerDebug=await page.evaluate(()=>({
+  lens:SILM.lensController.inspect(),
+  stage:document.querySelector('#si-stage')?.dataset.workshopScale,
+  nextButton:document.querySelector('.silm-workshop-scale[data-scale="4"]')?.outerHTML.slice(0,400),
+  workshop:SILMIntegration.snapshot().metadata?.workshop,
+  structure:SILMIntegration.snapshot().structure?.crystallography?.representation
+ }));
+ console.log('LENS_CENTER_DIAGNOSTIC',JSON.stringify(centerDebug));
+ assert.equal(centerDebug.stage,'4',
+  'Lente não avançou para Centro; estado: '+JSON.stringify(centerDebug));
  await page.waitForFunction(()=>SILM.lensController.inspect().scale===4&&
   SILM.lensController.inspect().attached);
  assert.equal(await page.locator('.silm-lens-advance:visible').count(),0,
