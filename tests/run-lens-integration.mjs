@@ -55,6 +55,20 @@ try{
  assert.ok(afterKeyboard[0]>moved[0],'Movimento por teclado não funcionou');
  await page.locator('.silm-lens-reset').click();
  assert.deepEqual(await page.evaluate(()=>SILM.lensController.inspect().position),[.5,.5]);
+ // Marco 2: marcar uma REGIÃO VISUAL não faz amostragem do material.
+ await page.locator('.silm-lens-mark').click();
+ const objectMark=await page.evaluate(()=>SILM.lensController.inspect().selected);
+ assert.equal(objectMark?.kind,'object','A lente não marcou a ilustração do Objeto');
+ assert.match(objectMark?.label||'',/Região visual/);
+ assert.ok((await page.locator('.silm-lens-selection').innerText()).includes('sem amostra medida'));
+ assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),baseline,
+  'Marcar imagem alterou o estado científico da investigação');
+ // Mover a lente não é equivalente a remarcar o Objeto.
+ await ring.focus();
+ await ring.press('ArrowLeft');
+ assert.deepEqual(await page.evaluate(()=>SILM.lensController.inspect().selected),objectMark,
+  'Mover a lente alterou a região visual antes da confirmação');
+ await page.locator('.silm-lens-reset').click();
  await page.screenshot({path:join(path,'objeto.jpg'),type:'jpeg',quality:68});
 
  // Os próprios botões da oficina movimentam o motor. O controller apenas
@@ -66,10 +80,27 @@ try{
  const grainless=await page.locator('.silm-micro-grain').count();
  assert.ok(grainless>5,'O gerador real de grãos não foi preservado');
  const firstPath=await page.locator('.silm-micro-grain').first().getAttribute('d');
+ const mapBefore=await page.locator('.silm-workshop-micro-map').getAttribute('viewBox');
+ // Marco 2: o alvo deve corresponder ao contorno SVG real sob o centro da lente.
+ await page.locator('.silm-lens-mark').click();
+ const grainMark=await page.evaluate(()=>SILM.lensController.inspect().selected);
+ assert.equal(grainMark?.kind,'grain','Não encontrou grão real sob a lente: '+
+  await page.locator('.silm-lens-selection').innerText());
+ assert.equal(grainMark.source,'schematic','Confusão entre grão D0 e experimento importado');
+ assert.equal(await page.locator('.silm-micro-grain.is-selected').count(),1,
+  'A marcação não acionou o seletor nativo de grãos');
+ const chosenGrain=await page.locator('.silm-workshop-micro-map').getAttribute('data-selected-grain');
+ assert.equal(grainMark.number,chosenGrain);
+ assert.match(await page.locator('.silm-lens-selection').innerText(),/sem medição experimental/);
+ assert.equal(await page.locator('.silm-workshop-micro-map').getAttribute('viewBox'),mapBefore,
+  'Marcar grão mudou a câmera/microestrutura');
  await page.locator('.silm-lens-circle').focus();
  await page.locator('.silm-lens-circle').press('ArrowDown');
  assert.equal(await page.locator('.silm-micro-grain').first().getAttribute('d'),firstPath,
   'Mover a lente alterou a microestrutura');
+ assert.equal(await page.locator('.silm-workshop-micro-map').getAttribute('data-selected-grain'),chosenGrain,
+  'Mover a lente selecionou automaticamente outro grão');
+ assert.equal(await page.evaluate(()=>SILM.lensController.inspect().selected?.number),chosenGrain);
  assert.equal(await page.locator('.silm-lens-layer').count(),1,'A lente foi duplicada');
  await page.screenshot({path:join(path,'graos.jpg'),type:'jpeg',quality:68});
  await page.locator('.silm-lens-toggle').click();
