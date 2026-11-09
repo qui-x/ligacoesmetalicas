@@ -93,6 +93,18 @@ try{
   structure:SILMIntegration.snapshot().structure?.crystallography?.representation
  }));
  console.log('LENS_CENTER_DIAGNOSTIC',JSON.stringify(centerDebug));
+ if(centerDebug.stage!=='4'){
+  const native=await page.locator('.silm-workshop-scale[data-scale="4"]')
+   .evaluate(button=>{const disabled=button.disabled;button.click();return disabled;});
+  await page.waitForTimeout(250);
+  const result=await page.evaluate(()=>({
+   stage:document.querySelector('#si-stage')?.dataset.workshopScale,
+   lens:SILM.lensController.inspect(),
+   workshop:SILMIntegration.snapshot().metadata?.workshop,
+   units:SILMIntegration.snapshot().structure?.units?.length
+  }));
+  console.log('NATIVE_SCALE_COMPARISON',JSON.stringify({disabled:native,result}));
+ }
  assert.equal(centerDebug.stage,'4',
   'Lente não avançou para Centro; estado: '+JSON.stringify(centerDebug));
  await page.waitForFunction(()=>SILM.lensController.inspect().scale===4&&
