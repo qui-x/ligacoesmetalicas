@@ -371,7 +371,7 @@
  display:flex!important;flex:1 1 0!important;height:auto!important;
  min-width:0!important;min-height:0!important;overflow:hidden!important;
 }
-#si-stage.silm-workshop-context-only #workspace-focus{
+#si-stage.silm-workshop-context-only #workspace-focus:not([hidden]){
  box-sizing:border-box;display:flex!important;flex:1 1 auto!important;
  flex-direction:column!important;width:100%;height:100%!important;
  min-height:0!important;min-width:0!important;
@@ -581,4 +581,13 @@
 /* No retrato, os textos resumidos ficam disponíveis ao abrir Composição e fonte. */
 .silm-workshop-detail-material,.silm-workshop-detail-note{
  margin:5px 0;font-size:.78rem;line-height:1.4;color:var(--text);
+}
+
+
+/* P0 · Foco e Visão geral são EXCLUSIVOS.
+   A regra de palco acima não pode forçar display:flex quando a Base SI
+   muda o atributo hidden. Guardar o contrato em todas as larguras. */
+#si-workspace #si-stage #workspace-focus[hidden],
+#si-workspace #si-stage #workspace-overview[hidden]{
+ display:none!important;
 }
