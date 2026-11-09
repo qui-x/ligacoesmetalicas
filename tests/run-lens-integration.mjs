@@ -125,13 +125,23 @@ try{
 
  // Regressão em viewport estreito sem barra lateral extra ou overflow global.
  await page.setViewportSize({width:320,height:568});
- await page.waitForTimeout(90);
+ // WebKit pode fornecer a primeira geometria antes de recalcular clamp()
+ // e o ResizeObserver. A lente deve se realinhar sem interação adicional.
+ await page.waitForFunction(()=>{
+  const host=document.querySelector('.silm-lens-layer'),lens=host?.querySelector('.silm-lens-circle');
+  if(!host||!lens)return false;
+  const h=host.getBoundingClientRect(),r=lens.getBoundingClientRect();
+  return r.left>=h.left-2&&r.top>=h.top-2&&r.right<=h.right+2&&r.bottom<=h.bottom+2;
+ },null,{timeout:2200}).catch(()=>{});
  const geometry=await page.evaluate(()=>{
-  const h=document.querySelector('.silm-lens-layer').getBoundingClientRect();
-  const r=document.querySelector('.silm-lens-circle').getBoundingClientRect();
+  const layer=document.querySelector('.silm-lens-layer'),lens=document.querySelector('.silm-lens-circle');
+  const h=layer.getBoundingClientRect(),r=lens.getBoundingClientRect();
   const b=[...document.querySelectorAll('.silm-lens-tool:not([hidden])')].map(x=>x.getBoundingClientRect());
   return {width:document.documentElement.scrollWidth,viewport:innerWidth,
    inside:r.left>=h.left-2&&r.top>=h.top-2&&r.right<=h.right+2&&r.bottom<=h.bottom+2,
+   layer:{left:h.left,top:h.top,right:h.right,bottom:h.bottom,width:h.width,height:h.height},
+   lens:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height,
+    cssLeft:lens.style.left,cssTop:lens.style.top},
    buttonSizes:b.map(x=>[x.width,x.height])};
  });
  assert.ok(geometry.width<=geometry.viewport+5,'Lente provocou rolagem horizontal');
