@@ -190,8 +190,17 @@ try{
   assert.equal(await page.locator('.silm-lens-layer').count(),1,
    'Troca de módulo duplicou o DOM da lente');
  }
- assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),stableBeforeModules,
-  'Alternar módulos mudou o estado científico além do módulo ativo');
+ // A troca de módulo atualiza legitimamente o carimbo updatedAt do ensaio.
+ // Isso não é mutação física: comparar o snapshot COMPLETO salvo esse carimbo.
+ const stableAfterModules=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
+ const scientificWithoutAuditTime=value=>{
+  const data=JSON.parse(value);
+  if(data.investigation)delete data.investigation.updatedAt;
+  return data;
+ };
+ assert.deepEqual(scientificWithoutAuditTime(stableAfterModules),
+  scientificWithoutAuditTime(stableBeforeModules),
+  'Módulos alteraram estrutura, metal, propriedades, medições ou contexto');
  // Abrir os painéis originais não pode instanciar outras lentes nem docas extras.
  for(const section of ['montagem','ver','dados']){
   await page.locator('[data-open-dock="'+section+'"]').click();
@@ -202,7 +211,7 @@ try{
   assert.deepEqual(opened,[section],'Duas docas simultâneas ao usar a lente');
   assert.equal(await page.evaluate(()=>SILM.lensController.inspect().attached),true,
    'Abrir painel removeu lente do Foco');
-  assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),stableBeforeModules,
+  assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),stableAfterModules,
    'Abrir Montagem/Ver/Dados alterou o experimento');
  }
  await page.locator('[data-close-dock="right"]').click();
