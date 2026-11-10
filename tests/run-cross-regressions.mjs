@@ -232,6 +232,58 @@ async function checkMobileIcons(label,width,scale){
  reports.push({label,scale,mode:'icon-mobile',...results});
 }
 
+
+// Parte 9: avisos devem aparecer entre a Travessia e a doca inferior,
+// preservar alvos de toque e não alterar a investigação.
+async function checkMobileNotices(label,width,scale,accessible=false){
+ if(!['celular-320','celular-390'].includes(label))return;
+ const before=await scientific();
+ await page.evaluate(()=>{
+  const rail=document.getElementById('si-notifications');
+  [...rail.querySelectorAll('.si-notice button')].forEach(b=>b.click());
+  window.BaseDemoSI.notify('Aviso de investigação: condição visual sem medição experimental.','warning');
+  window.BaseDemoSI.notify('Nova escala disponível para observação.','info');
+  window.BaseDemoSI.notify('Estado científico preservado.','success');
+ });
+ await page.waitForFunction(()=>document.querySelector('#si-notifications')?.dataset.silmPositioned==='true');
+ await page.waitForTimeout(70);
+ const geometry=await page.evaluate(()=>{
+  const rail=document.getElementById('si-notifications');
+  const nav=document.querySelector('#si-stage .silm-workshop-scales');
+  const dock=document.querySelector('#si-workspace .si-launchers');
+  const a=rail.getBoundingClientRect(),n=nav.getBoundingClientRect(),d=dock.getBoundingClientRect();
+  const rect=r=>({top:r.top,bottom:r.bottom,left:r.left,right:r.right,width:r.width,height:r.height});
+  const buttons=[...rail.querySelectorAll('.si-notice button')].map(b=>({
+   ...rect(b.getBoundingClientRect()),pointerEvents:getComputedStyle(b).pointerEvents
+  }));
+  return {rail:rect(a),nav:rect(n),dock:rect(d),buttons,
+   count:rail.querySelectorAll('.si-notice').length,
+   overflow:document.documentElement.scrollWidth,
+   placed:rail.dataset.silmPositioned,
+   last:rail.lastElementChild?.textContent||''};
+ });
+ const where=label+'/escala '+scale+(accessible?'/150%':'');
+ assert.equal(geometry.placed,'true',where+': avisos não posicionados');
+ assert.equal(geometry.count,3,where+': avisos empilhados incorretamente');
+ assert.ok(geometry.rail.top>=geometry.nav.bottom+3,
+  where+': notificações invadem a Travessia '+JSON.stringify(geometry));
+ assert.ok(geometry.rail.bottom<=geometry.dock.top-3,
+  where+': notificações encobrem docas '+JSON.stringify(geometry));
+ assert.ok(geometry.rail.left>=0&&geometry.rail.right<=width+2,
+  where+': avisos extrapolam a largura');
+ assert.ok(geometry.buttons.every(b=>b.width>=43.5&&b.height>=43.5&&b.pointerEvents==='auto'),
+  where+': botão de dispensar inacessível');
+ assert.ok(geometry.last.includes('Estado científico preservado.'),
+  where+': mensagem mais recente foi perdida');
+ assert.ok(geometry.overflow<=width+6,where+': rolagem global');
+ if(accessible&&scale===1)
+  await page.screenshot({path:join(evidenceDir,label+'-notificacoes-acessibilidade.jpg'),
+   type:'jpeg',quality:70,animations:'disabled'});
+ await page.evaluate(()=>[...document.querySelectorAll('#si-notifications .si-notice button')].forEach(b=>b.click()));
+ assert.equal(await scientific(),before,where+': avisos alteraram estado científico');
+ reports.push({label,scale,mode:accessible?'notices-a11y':'notices',...geometry});
+}
+
 async function checkModuleShortcuts(label,width){
  const before=JSON.parse(await scientific());
  const buttons=await page.locator('#silm-module-shortcuts [data-silm-module-shortcut]')
@@ -318,6 +370,7 @@ try{
    await page.waitForTimeout(70);
    await checkModes(label,scale,width,height);
    await checkMobileIcons(label,width,scale);
+   await checkMobileNotices(label,width,scale);
    // Condições reais do menu de acessibilidade: 150% de texto, leitura
    // simples e alto contraste. Só afetam apresentação, jamais os dados.
    if((label==='celular-320'||label==='celular-390')){
@@ -330,6 +383,7 @@ try{
     });
     await page.waitForTimeout(90);
     await checkMobileIcons(label+'-acessibilidade-150',width,scale);
+    await checkMobileNotices(label,width,scale,true);
     assert.equal(await scientific(),beforeA11y,
      label+': alto contraste/leitura simples alterou a investigação');
     if(scale===1||scale===4)
