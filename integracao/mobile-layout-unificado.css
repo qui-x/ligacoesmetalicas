@@ -313,6 +313,10 @@
 }
 @media(forced-colors:active){
  body.route-ambiente #si-stage .silm-workshop-reference-art{border:2px solid CanvasText}
+ body.route-ambiente #si-stage .silm-workshop-reference-art::before{display:none!important}
+}
+:root.si-highcontrast #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art::before{
+ display:none!important;
 }
 
 /* P8-M7 · Objeto em retrato: enquadramento alto, fotografia integral.
@@ -340,6 +344,24 @@
   aspect-ratio:auto!important;
   object-fit:contain!important;
   object-position:center!important;
+ }
+ /* Fundo difuso é uma camada visual NÃO experimental: usa a foto já
+    exibida pelo atlas. Não há duplicação de imagem no DOM, outra amostra,
+    reconstituição ou interpolação de dados científicos. */
+ body.route-ambiente:not(.si-structure-expanded) #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art:has(.silm-workshop-photo){
+  position:relative!important;isolation:isolate;
+  background:var(--panel2,var(--surface));
+ }
+ body.route-ambiente:not(.si-structure-expanded) #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art:has(.silm-workshop-photo)::before{
+  content:"";position:absolute;inset:-20px;
+  z-index:0;pointer-events:none;
+  background-image:var(--silm-object-ambient-image,none);
+  background-size:cover;background-position:center;
+  filter:blur(24px) brightness(.43) saturate(.82);
+  opacity:.8;
+ }
+ body.route-ambiente:not(.si-structure-expanded) #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art>.silm-workshop-photo{
+  position:relative;z-index:1;
  }
  /* A lente não deve se deslocar sobre o espaço de letterboxing do
     object-fit:contain: delimitar sua camada aos pixels exibidos na imagem
