@@ -13,7 +13,7 @@ const base=process.env.BASE_URL||'http://127.0.0.1:8765';
 const evidenceDir=join('reports','contratos-regressao',browserName);
 mkdirSync(evidenceDir,{recursive:true});
 const viewports=[
- ['celular-320',320,568],['celular-360',360,780],['celular-390',390,844],['celular-414',414,896],
+ ['celular-320',320,568],['celular-360',360,780],['celular-390',390,844],['celular-400',400,692],['celular-414',414,896],
  ['celular-horizontal',844,390],['tablet',768,1024],
  ['notebook',1366,768],['desktop',1440,900]
 ];
