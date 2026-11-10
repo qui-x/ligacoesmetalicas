@@ -331,9 +331,6 @@
   workshopSelectionId=saved&&S.workshop.get(saved.referenceId)?.atomicNumber===active.atomicNumber?saved.referenceId:null;
   workshopScale=activeWorkshopScale(saved);
   updateWorkshopViewport(true);
-  if(showObjectEntry&&workshopScale===1){const key='entry:active:'+active.atomicNumber;
-   if(host.dataset.key!==key){host.dataset.key=key;renderObjectEntry(host,{active});}return;}
-  disposeEntryTable();
    const key='pending:'+candidate.atomicNumber+':'+active.atomicNumber;
    if(host.dataset.key!==key){host.dataset.key=key;host.hidden=false;S.workshop.renderDiscovery(host,{element:candidate,notice:'A investigação atual de '+active.name+' permanece preservada. Escolher uma aplicação solicitará a troca antes de iniciar a nova investigação.',onOpenPeriodic:()=>$('silm-open-periodic')?.click(),onContinue:()=>{selected=String(active.atomicNumber);$('silm-metal').value=selected;workshopSelectionId=null;workshopScale=1;schedule();openLeft('preparo');},onInvestigate:investigateWorkshopReference,onStartDirect:()=>start()});}
    return;
@@ -352,6 +349,12 @@
   workshopSelectionId=saved&&S.workshop.get(saved.referenceId)?.atomicNumber===active.atomicNumber?saved.referenceId:null;
   workshopScale=activeWorkshopScale(saved);
   updateWorkshopViewport(true);
+  if(showObjectEntry&&workshopScale===1){
+   const key='entry:active:'+active.atomicNumber;
+   if(host.dataset.key!==key){host.dataset.key=key;renderObjectEntry(host,{active});}
+   return;
+  }
+  disposeEntryTable();
   if(workshopSelectionId&&S.workshop.get(workshopSelectionId)?.atomicNumber!==active.atomicNumber)workshopSelectionId=null;
   const item=S.workshop.get(workshopSelectionId);
   const chosen=item?.atomicNumber===active.atomicNumber?item:(S.workshop.list(active.atomicNumber).find(reference=>reference.atlasPath)||null);
@@ -529,6 +532,9 @@
   B.setupNavigationDrawer();B.setupMenuReview();B.updateRoute();window.addEventListener('hashchange',B.updateRoute);
   const objectDialog=$('silm-objects-dialog');
   objectDialog?.querySelector('#silm-objects-close')?.addEventListener('click',()=>objectDialog.close());
+  objectDialog?.addEventListener('click',event=>{
+   if(event.target.closest('a[href^="#/manual"]'))objectDialog.close();
+  });
   objectDialog?.addEventListener('close',()=>{if(catalogNavigating)return;
    const target=catalogOpener;
    requestAnimationFrame(()=>{
