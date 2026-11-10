@@ -31,6 +31,32 @@ try{
  assert.equal(await page.locator('.silm-lens-circle:visible').count(),0,'Lente deve iniciar desativada');
  const toggle=page.locator('.silm-lens-toggle');
  assert.equal(await toggle.getAttribute('aria-pressed'),'false');
+ // Os comandos devem ocupar a Travessia, nunca a fotografia, os grãos ou a rede.
+ async function checkLensDocked(label){
+  const layout=await page.evaluate(()=>{
+   const actions=document.querySelector('.silm-lens-actions');
+   const nav=document.querySelector('.silm-workshop-scales');
+   const lens=document.querySelector('.silm-lens-layer');
+   const visibleButtons=[...actions.querySelectorAll('button')].filter(b=>
+    !b.hidden&&getComputedStyle(b).display!=='none');
+   const bounds=el=>{
+    const r=el.getBoundingClientRect();
+    return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};
+   };
+   return {inNav:!!nav?.contains(actions),inLens:!!lens?.contains(actions),
+    actions:bounds(actions),nav:bounds(nav),buttons:visibleButtons.map(bounds),
+    viewport:innerWidth,scrollWidth:document.documentElement.scrollWidth};
+  });
+  assert.equal(layout.inNav,true,label+': comandos da lente fora da Travessia');
+  assert.equal(layout.inLens,false,label+': botões da lente cobrem a cena');
+  assert.ok(layout.actions.left>=layout.nav.left-2&&layout.actions.right<=layout.nav.right+2,
+   label+': comandos não cabem na navegação '+JSON.stringify(layout));
+  assert.ok(layout.buttons.length>=1&&layout.buttons.every(b=>b.width>=43.5&&b.height>=43.5),
+   label+': alvos da lente inferiores a 44 px');
+  assert.ok(layout.scrollWidth<=layout.viewport+5,
+   label+': comandos causaram overflow global '+JSON.stringify(layout));
+ }
+ await checkLensDocked('objeto-390');
  const baseline=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
  await toggle.click();
  await page.locator('.silm-lens-circle').waitFor({state:'visible'});
@@ -53,7 +79,8 @@ try{
  await ring.press('ArrowRight');
  const afterKeyboard=await page.evaluate(()=>SILM.lensController.inspect().position);
  assert.ok(afterKeyboard[0]>moved[0],'Movimento por teclado não funcionou');
- await page.locator('.silm-lens-reset').click();
+ await ring.focus();
+ await ring.press('Home');
  assert.deepEqual(await page.evaluate(()=>SILM.lensController.inspect().position),[.5,.5]);
  // Marco 2: marcar uma REGIÃO VISUAL não faz amostragem do material.
  await page.locator('.silm-lens-mark').click();
@@ -68,15 +95,17 @@ try{
  await ring.press('ArrowLeft');
  assert.deepEqual(await page.evaluate(()=>SILM.lensController.inspect().selected),objectMark,
   'Mover a lente alterou a região visual antes da confirmação');
- await page.locator('.silm-lens-reset').click();
+ await ring.focus();
+ await ring.press('Home');
  await page.screenshot({path:join(path,'objeto.jpg'),type:'jpeg',quality:68});
 
  // Os próprios botões da oficina movimentam o motor. O controller apenas
  // reaproveita o DOM ativo; não processa micrografias nem geometria atômica.
- await page.locator('.silm-lens-advance').click();
+ await page.locator('.silm-workshop-scale[data-scale="2"]').click();
  await page.waitForFunction(()=>SILM.lensController.inspect().scale===2&&
   SILM.lensController.inspect().targetClass.includes('micro-viewport'));
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
+ await checkLensDocked('graos-390');
  const grainless=await page.locator('.silm-micro-grain').count();
  assert.ok(grainless>5,'O gerador real de grãos não foi preservado');
  const firstPath=await page.locator('.silm-micro-grain').first().getAttribute('d');
@@ -99,7 +128,8 @@ try{
   'Destacar um grão didático alterou o snapshot científico');
  // A geometria usada para marcar precisa continuar correta com a câmera SVG
  // ampliada: não basta escolher o primeiro grão ou o mais próximo.
- await page.locator('.silm-lens-reset').click();
+ await ring.focus();
+ await ring.press('Home');
  await page.getByRole('button',{name:'Ampliar microestrutura'}).click();
  assert.equal(await page.locator('.silm-workshop-micro-map').getAttribute('data-zoom'),'1.25');
  const grainScientificZoomed=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
@@ -125,12 +155,13 @@ try{
  await page.locator('.silm-lens-toggle').click();
  await page.locator('.silm-lens-circle').waitFor({state:'visible'});
 
- await page.locator('.silm-lens-advance').click();
+ await page.locator('.silm-workshop-scale[data-scale="3"]').click();
  await page.waitForFunction(()=>SILM.lensController.inspect().scale===3&&
   SILM.lensController.inspect().targetClass.includes('silm-assembly-stage'));
  assert.ok(await page.locator('.silm-crystal-stage').count(),
   'A lente substituiu o renderizador cristalográfico');
  await page.screenshot({path:join(path,'rede.jpg'),type:'jpeg',quality:68});
+ await page.setViewportSize({width:1366,height:768});
  await page.locator('.silm-lens-advance').click();
  await page.waitForTimeout(250);
  const centerDebug=await page.evaluate(()=>({
@@ -230,7 +261,9 @@ try{
  const geometry=await page.evaluate(()=>{
   const layer=document.querySelector('.silm-lens-layer'),lens=document.querySelector('.silm-lens-circle');
   const h=layer.getBoundingClientRect(),r=lens.getBoundingClientRect();
-  const b=[...document.querySelectorAll('.silm-lens-tool:not([hidden])')].map(x=>x.getBoundingClientRect());
+  const b=[...document.querySelectorAll('.silm-lens-tool:not([hidden])')]
+   .filter(x=>getComputedStyle(x).display!=='none')
+   .map(x=>x.getBoundingClientRect());
   return {width:document.documentElement.scrollWidth,viewport:innerWidth,
    inside:r.left>=h.left-2&&r.top>=h.top-2&&r.right<=h.right+2&&r.bottom<=h.bottom+2,
    layer:{left:h.left,top:h.top,right:h.right,bottom:h.bottom,width:h.width,height:h.height},
@@ -242,13 +275,16 @@ try{
  assert.ok(geometry.inside,'Lente saiu da área visual em 320px: '+JSON.stringify(geometry));
  assert.ok(geometry.buttonSizes.every(([w,h])=>w>=43&&h>=43),
   'Ações da lente menores que os alvos de toque');
+ await checkLensDocked('centro-320');
  await page.screenshot({path:join(path,'centro-mobile.jpg'),type:'jpeg',quality:68});
  // Regressão do Marco 2 na largura mínima: o controle de marcação
  // precisa funcionar sem adicionar menus nem alargar o documento.
  await page.locator('.silm-workshop-scale[data-scale="2"]').click();
  await page.waitForFunction(()=>SILM.lensController.inspect().scale===2);
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
- await page.locator('.silm-lens-reset').click();
+ await checkLensDocked('graos-320');
+ await ring.focus();
+ await ring.press('Home');
  await page.locator('.silm-lens-mark').click();
  assert.equal(await page.evaluate(()=>SILM.lensController.inspect().selected?.kind),'grain',
   'Marcar grão didático não funciona em 320 px');
