@@ -48,3 +48,19 @@
 }
 @media(forced-colors:active){#silm-objects-dialog{border:2px solid CanvasText}}
 @media print{#silm-objects-dialog{display:none!important}}
+
+/* A grade mobile da Parte 8 posiciona TODOS os botões diretos na coluna 2,
+ * linha 1. O novo acesso a Objetos precisa de sua própria linha, caso
+ * contrário encobre o botão Tabela em 320–650 px. */
+@media(max-width:650px){
+ body.route-ambiente #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary>.silm-workshop-browse-objects{
+  grid-column:1/-1!important;
+  grid-row:4!important;
+  justify-self:start!important;
+  align-self:center;
+  max-width:100%;
+  min-width:44px;
+  min-height:44px;
+  margin:0!important;
+ }
+}
