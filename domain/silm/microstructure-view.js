@@ -336,7 +336,7 @@ SILM.microstructure=(()=>{
   science.append(
    scienceToggle,
    node('p','silm-workshop-micro-component',item?item.component+' · '+item.material:'Policristal didático · '+element.symbol),
-   node('p','silm-workshop-micro-scale-explain','O mapa esquemático é apresentado sem escala em µm. Uma escala declarada em dados importados não equivale a validação experimental.'),
+   node('p','silm-workshop-micro-scale-explain','No modo esquemático, o desenho é apresentado sem escala em µm. Contornos importados podem declarar calibração, mas essa declaração não equivale a validação experimental.'),
    note
   );
   section.append(viewport,toolbar,science,genDialog,dataDialog);
