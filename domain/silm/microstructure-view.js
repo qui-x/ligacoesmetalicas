@@ -112,6 +112,10 @@ SILM.microstructure=(()=>{
   const button=(name,txt,action)=>{const b=node('button','silm-workshop-micro-control',txt);b.type='button';b.setAttribute('aria-label',name);b.addEventListener('click',action);return b;};
   const zoomControls=node('div','silm-workshop-micro-zoom-tools');
   zoomControls.append(button('Reduzir microestrutura','−',()=>setZoom(zoom-.25)),zoomLabel,button('Ampliar microestrutura','+',()=>setZoom(zoom+.25)),button('Ajustar microestrutura ao quadro','Ajustar',()=>setZoom(1)));
+  // Informação operacional (grão selecionado + zoom) continua sempre visível.
+  // Escala física e limitações científicas ficam num <details> nativo.
+  // O aviso "sem escala" é informação essencial e permanece visível mesmo
+  // com a seção explicativa recolhida. Isso preserva o contrato didático.
   toolbar.append(status,dimension,zoomControls);
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
   svg.addEventListener('pointerdown',e=>{
@@ -301,7 +305,7 @@ SILM.microstructure=(()=>{
    sourceLink.hidden=true;sourceLink.removeAttribute('href');report.textContent='Esquema didático restaurado.';
   });
   const close=button('Fechar importação de dados','Fechar',()=>dataDialog.close());
-  dialogActions.append(reset,close);dataDialog.append(dataTitle,dataHelp,evidence,fileLabel,report,sourceLink,dialogActions);
+  dialogActions.append(reset,close);dataDialog.append(dataTitle,dataHelp,note,evidence,fileLabel,report,sourceLink,dialogActions);
   fileInput.addEventListener('change',async()=>{
    const file=fileInput.files?.[0];if(!file)return;
    try{
@@ -327,7 +331,10 @@ SILM.microstructure=(()=>{
    fileInput.value='';
   });
   zoomControls.append(formationsButton,button('Abrir dados segmentados','Dados',()=>dataDialog.showModal()));
-  section.append(viewport,toolbar,note,genDialog,dataDialog);
+  // A dimensão não calibrada continua visível e operacional.
+  // Métodos, limitações e referências passam ao tópico do Manual;
+  // dados declarados no arquivo seguem no diálogo da importação.
+  section.append(viewport,toolbar,genDialog,dataDialog);
   // A câmera ocupa o quadro em qualquer proporção sem alterar um só grão.
   // A vista efetua recorte central (não estica geometria nem reamostra a formação).
   function fitViewport(){

@@ -13,7 +13,7 @@ const base=process.env.BASE_URL||'http://127.0.0.1:8765';
 const evidenceDir=join('reports','contratos-regressao',browserName);
 mkdirSync(evidenceDir,{recursive:true});
 const viewports=[
- ['celular-320',320,568],['celular-390',390,844],
+ ['celular-320',320,568],['celular-360',360,780],['celular-390',390,844],['celular-400',400,692],['celular-414',414,896],
  ['celular-horizontal',844,390],['tablet',768,1024],
  ['notebook',1366,768],['desktop',1440,900]
 ];
@@ -160,6 +160,78 @@ async function checkSingleDock(label,width){
  assert.equal(await scientific(),initial,label+': fechar doca alterou experimento');
 }
 
+// Auditoria iconográfica móvel: um SVG de 20px deve caber inteiro
+// dentro do alvo acionável de >=44px. A faixa científica pode rolar,
+// mas nunca pode encolher seus botões nem distorcer o desenho.
+async function checkMobileIcons(label,width,scale){
+ if(width>900)return;
+ const results=await page.evaluate(()=>{
+  const visible=e=>{
+   if(!e||!e.getClientRects().length)return false;
+   const c=getComputedStyle(e);
+   return c.display!=='none'&&c.visibility!=='hidden';
+  };
+  const targets=[
+   '#si-workspace .silm-module-shortcut',
+   '#si-workspace .si-launchers [data-open-dock]',
+   '#si-stage .silm-workshop-scales .silm-workshop-scale',
+   '#si-stage .silm-workshop-scales .silm-lens-tool',
+   '#silm-scene-actionbar #silm-view-quick-actions .silm-quick-icon',
+   '#silm-scene-actionbar #silm-view-controls .silm-camera-btn',
+   '#silm-scene-actionbar #silm-view-controls #si-expand-structure',
+   '#silm-scene-actionbar #scene-undo.silm-action--icon',
+   '#silm-scene-actionbar .silm-toolbar-scroll-arrow:not([hidden])',
+   '#si-stage .silm-workshop-micro-control'
+  ];
+  const glyphs=[
+   '#si-workspace .silm-module-shortcut>svg',
+   '#si-workspace .si-launchers .si-launch-icon',
+   '#silm-scene-actionbar .silm-action-icon',
+   '#silm-scene-actionbar .silm-quick-icon svg',
+   '#silm-scene-actionbar .silm-camera-btn svg',
+   '#si-stage .silm-workshop-micro-control .silm-action-icon'
+  ];
+  const tr=targets.flatMap(q=>[...document.querySelectorAll(q)])
+   .filter(visible).map(n=>{
+    const b=n.getBoundingClientRect();
+    return {name:n.getAttribute('aria-label')||n.id||n.className,width:b.width,height:b.height};
+   });
+  const gr=glyphs.flatMap(q=>[...document.querySelectorAll(q)])
+   .filter(visible).map(n=>{
+    const p=n.closest('button'),a=n.getBoundingClientRect(),b=p?.getBoundingClientRect();
+    const name=p?.getAttribute('aria-label')||p?.id||'svg';
+    return {name,width:a.width,height:a.height,within:!!b&&
+     a.left>=b.left-1&&a.right<=b.right+1&&
+     a.top>=b.top-1&&a.bottom<=b.bottom+1};
+   });
+  const nav=document.querySelector('#si-workspace .si-workspace-toolbar')?.getBoundingClientRect();
+  const stageNav=document.querySelector('#si-stage .silm-workshop-scales')?.getBoundingClientRect();
+  const bar=document.getElementById('silm-scene-actionbar');
+  return {targets:tr,glyphs:gr,barOverflow:bar?getComputedStyle(bar).overflowX:null,
+   barScrollable:bar?bar.scrollWidth>bar.clientWidth+4:false,
+   pageWidth:document.documentElement.scrollWidth,viewport:innerWidth,
+   topbar:nav?{left:nav.left,right:nav.right}:null,
+   nav:stageNav?{left:stageNav.left,right:stageNav.right}:null};
+ });
+ const where=label+'/escala '+scale;
+ assert.ok(results.targets.length>=7,where+': controles móveis ausentes');
+ const badTargets=results.targets.filter(t=>t.width<43.5||t.height<43.5);
+ assert.deepEqual(badTargets,[],where+': alvos abaixo de 44px');
+ assert.ok(results.glyphs.length>=3,where+': ícones vetoriais não renderizados');
+ const badGlyphs=results.glyphs.filter(g=>g.width<15||g.height<15||
+  g.width>25||g.height>25||!g.within);
+ assert.deepEqual(badGlyphs,[],where+': ícones deformados, excessivos ou fora dos botões');
+ if(results.barScrollable)assert.equal(results.barOverflow,'auto',
+  where+': ferramentas foram cortadas sem rolagem');
+ assert.ok(results.pageWidth<=width+6,where+': ícones ampliaram a página');
+ for(const [name,nav]of [['barra superior',results.topbar],['Travessia',results.nav]]){
+  if(!nav)continue;
+  assert.ok(nav.left>=-5&&nav.right<=width+5,
+   where+': '+name+' extrapola o viewport '+JSON.stringify(nav));
+ }
+ reports.push({label,scale,mode:'icon-mobile',...results});
+}
+
 async function checkModuleShortcuts(label,width){
  const before=JSON.parse(await scientific());
  const buttons=await page.locator('#silm-module-shortcuts [data-silm-module-shortcut]')
@@ -245,6 +317,31 @@ try{
     await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
    await page.waitForTimeout(70);
    await checkModes(label,scale,width,height);
+   await checkMobileIcons(label,width,scale);
+   // Condições reais do menu de acessibilidade: 150% de texto, leitura
+   // simples e alto contraste. Só afetam apresentação, jamais os dados.
+   if((label==='celular-320'||label==='celular-390')){
+    const beforeA11y=await scientific();
+    await page.evaluate(()=>{
+     const root=document.documentElement;
+     root.classList.add('si-font-mod','si-simple-reading','si-highcontrast');
+     root.style.fontSize='24px';
+     root.style.setProperty('--si-font-factor','1.5');
+    });
+    await page.waitForTimeout(90);
+    await checkMobileIcons(label+'-acessibilidade-150',width,scale);
+    assert.equal(await scientific(),beforeA11y,
+     label+': alto contraste/leitura simples alterou a investigação');
+    if(scale===1||scale===4)
+     await page.screenshot({path:join(evidenceDir,label+'-acessibilidade-'+scale+'.jpg'),
+      type:'jpeg',quality:65,animations:'disabled'});
+    await page.evaluate(()=>{
+     const root=document.documentElement;
+     root.classList.remove('si-font-mod','si-simple-reading','si-highcontrast');
+     root.style.fontSize='';
+     root.style.removeProperty('--si-font-factor');
+    });
+   }
   }
   if(label==='celular-390'||label==='desktop'){
    await checkDock('ver');

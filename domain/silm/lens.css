@@ -1,0 +1,187 @@
+/* Primeira integração da Lente multiescala.
+   Somente sobreposição visual: não altera pixels/células do motor científico.
+   Os controles não criam nova barra lateral nem ocultam Montagem/Ver/Dados. */
+#si-stage .silm-workshop-reference-art,
+#si-stage .silm-workshop-micro-viewport,
+#si-stage .silm-assembly-stage{
+ position:relative;
+}
+/* A fotografia e a lente NÃO podem sobrepor o resumo nem os botões
+   de Composição e fonte ao empilhar as colunas no celular. */
+#si-stage .silm-workshop-reference-art{
+ z-index:0;isolation:isolate;
+}
+#si-stage .silm-workshop-reference-top>.silm-workshop-reference-summary{
+ position:relative;z-index:1;
+}
+#si-stage .silm-lens-layer{
+ position:absolute;inset:0;z-index:18;
+ pointer-events:none;overflow:hidden;
+ isolation:isolate;
+}
+#si-stage .silm-lens-circle{
+ position:absolute;
+ box-sizing:border-box;
+ --silm-lens-base:clamp(104px,min(34vw,31dvh),184px);
+ --silm-lens-w:min(var(--silm-lens-base),calc(100% - 12px));
+ --silm-lens-h:min(var(--silm-lens-base),calc(100% - 12px));
+ width:var(--silm-lens-w);height:var(--silm-lens-h);
+ max-width:calc(100% - 12px);max-height:calc(100% - 12px);
+ /* A posição depende do quadro atual, não de pixels calculados antes do
+    redimensionamento. O próprio CSS mantém o círculo totalmente visível. */
+ left:clamp(calc(var(--silm-lens-w) / 2 + 6px),var(--silm-lens-position-x,50%),
+  calc(100% - var(--silm-lens-w) / 2 - 6px));
+ top:clamp(calc(var(--silm-lens-h) / 2 + 6px),var(--silm-lens-position-y,50%),
+  calc(100% - var(--silm-lens-h) / 2 - 6px));
+ transform:translate(-50%,-50%);
+ border:6px solid var(--surface,#fff);
+ border-radius:50%;
+ outline:2px solid var(--primary,var(--accent,#227a80));
+ outline-offset:0;
+ background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.12),rgba(70,150,155,.085) 78%);
+ box-shadow:0 0 0 9px rgba(32,122,131,.11),
+  0 9px 25px rgba(17,56,62,.2),
+  inset 0 0 20px rgba(31,113,125,.16);
+ backdrop-filter:contrast(1.06);
+ -webkit-backdrop-filter:contrast(1.06);
+ cursor:grab;touch-action:none;user-select:none;
+ pointer-events:auto;
+}
+#si-stage .silm-lens-circle:active{cursor:grabbing}
+#si-stage .silm-lens-circle:focus-visible{
+ outline:4px solid var(--ring,var(--accent,#227a80));
+ outline-offset:5px;
+}
+#si-stage .silm-lens-reticle{
+ position:absolute;left:50%;top:50%;width:20px;height:20px;
+ transform:translate(-50%,-50%);
+ border:1px solid rgba(25,91,101,.48);border-radius:50%;
+ pointer-events:none;
+}
+#si-stage .silm-lens-reticle::before,
+#si-stage .silm-lens-reticle::after{
+ content:"";position:absolute;background:rgba(25,91,101,.67);
+}
+#si-stage .silm-lens-reticle::before{
+ left:50%;top:-10px;bottom:-10px;width:1px;
+}
+#si-stage .silm-lens-reticle::after{
+ top:50%;left:-10px;right:-10px;height:1px;
+}
+#si-stage .silm-lens-actions{
+ position:absolute;bottom:8px;right:8px;
+ display:flex;align-items:center;justify-content:flex-end;gap:5px;
+ max-width:calc(100% - 16px);
+ pointer-events:none;
+}
+#si-stage .silm-lens-tool{
+ box-sizing:border-box;display:grid;place-items:center;
+ width:44px;min-width:44px;height:44px;min-height:44px;
+ padding:0;border:1px solid var(--border,#a9bfc0);border-radius:13px;
+ background:var(--surface,#fff);color:var(--text,#263d43);
+ box-shadow:0 2px 8px rgba(10,40,45,.15);
+ font:700 1.27rem/1 system-ui,sans-serif;
+ cursor:pointer;touch-action:manipulation;pointer-events:auto;
+}
+#si-stage .silm-lens-tool:hover{
+ background:var(--panel2,#eaf4f2);
+}
+#si-stage .silm-lens-toggle[aria-pressed="true"]{
+ background:var(--primary,var(--accent,#217d84));
+ color:var(--on-primary,#fff);
+ border-color:var(--primary,var(--accent,#217d84));
+}
+#si-stage .silm-lens-tool:focus-visible{
+ outline:3px solid var(--ring,var(--accent,#227a80));
+ outline-offset:2px;
+}
+#si-stage .silm-lens-tool[hidden],
+#si-stage .silm-lens-circle[hidden],
+#si-stage .silm-lens-layer[hidden]{display:none!important}
+@media(min-width:901px){
+ #si-stage .silm-lens-actions{bottom:12px;right:12px}
+}
+@media(max-height:470px) and (orientation:landscape){
+ #si-stage .silm-lens-circle{
+  --silm-lens-base:clamp(88px,27dvh,132px);
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #si-stage .silm-lens-layer,
+ #si-stage .silm-lens-circle,
+ #si-stage .silm-lens-tool{transition:none!important;animation:none!important}
+}
+:root.si-highcontrast #si-stage .silm-lens-circle{
+ border:5px solid var(--text);outline:3px solid var(--surface);
+ box-shadow:0 0 0 4px var(--text);background:transparent;backdrop-filter:none;
+}
+@media(forced-colors:active){
+ #si-stage .silm-lens-circle{
+  border:5px solid CanvasText;outline:3px solid Highlight;
+  background:transparent;box-shadow:none;backdrop-filter:none;
+ }
+ #si-stage .silm-lens-tool{
+  border:2px solid ButtonText;background:ButtonFace;color:ButtonText;
+  box-shadow:none;
+ }
+ #si-stage .silm-lens-toggle[aria-pressed="true"]{
+  background:Highlight;color:HighlightText;
+ }
+}
+/* A marcação é identificada pelo anel, pelo grão selecionado e pelo
+   status nativo da microestrutura. Não desenhar um cartão de explicação por
+   cima da fotografia, dos grãos ou da rede. A mensagem detalhada permanece
+   como aria-live, acessível a leitores de tela e no Manual. */
+#si-stage .silm-lens-selection{
+ position:absolute!important;inline-size:1px!important;block-size:1px!important;
+ padding:0!important;margin:-1px!important;border:0!important;
+ overflow:hidden!important;clip-path:inset(50%)!important;
+ white-space:nowrap!important;pointer-events:none!important;
+}
+#si-stage .silm-lens-selection[hidden]{display:none!important}
+@media(max-width:420px){
+ #si-stage .silm-lens-actions{right:5px;bottom:5px;gap:3px}
+}
+
+
+/* Parte 8 — os comandos da lente participam da faixa SUPERIOR de escalas.
+   O anel é a única peça flutuante sobre a cena. Nenhum botão encobre grão,
+   átomo ou fotografia; a faixa inferior de ferramentas não é duplicada. */
+#si-stage .silm-workshop-reference>.silm-workshop-scales{
+ grid-template-columns:44px repeat(4,minmax(0,1fr)) 44px max-content!important;
+}
+#si-stage .silm-workshop-scales>.silm-lens-actions{
+ position:static!important;inset:auto!important;bottom:auto!important;right:auto!important;
+ display:flex;align-items:center;justify-content:flex-end;gap:3px;
+ min-width:44px;max-width:none!important;width:max-content;
+ height:44px;margin:0;padding:0 0 0 4px;
+ border-left:1px solid var(--border);
+ pointer-events:auto;
+}
+#si-stage .silm-workshop-scales>.silm-lens-actions .silm-lens-tool{
+ box-shadow:none;border-radius:8px;
+}
+#si-stage .silm-workshop-scales>.silm-lens-actions .silm-lens-tool:focus-visible{
+ outline-offset:-3px;
+}
+@media(max-width:650px){
+ #si-stage .silm-workshop-reference>.silm-workshop-scales{
+  /* Quatro escalas + uma só célula composta pelas ações visíveis. */
+  grid-template-columns:repeat(4,minmax(44px,1fr)) max-content!important;
+  column-gap:2px!important;
+ }
+ #si-stage .silm-workshop-scales>.silm-lens-actions{
+  padding:0;gap:2px;border:0;height:44px;
+ }
+ #si-stage .silm-workshop-scales>.silm-lens-actions :is(.silm-lens-reset,.silm-lens-advance){
+  display:none!important;
+ }
+ #si-stage .silm-workshop-scales>.silm-lens-actions .silm-lens-tool{
+  width:44px;min-width:44px;height:44px;
+ }
+}
+@media(max-width:320px){
+ #si-stage .silm-workshop-scales .silm-workshop-scale{
+  padding-inline:0!important;font-size:.72rem!important;
+ }
+}

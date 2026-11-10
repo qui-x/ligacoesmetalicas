@@ -1,0 +1,104 @@
+/* SILM — contrato mobile dos ícones (Parte 8, 2026-11-10).
+   Alvo físico >=44px e desenho interno 20px. Não encolher controles para
+   evitar overflow: somente a faixa científica rola horizontalmente. */
+@media(max-width:900px){
+ :root{--silm-mobile-glyph:20px;--silm-mobile-touch:44px}
+ /* O ícone cabe dentro do alvo mesmo com ampliação de fonte,
+    sem distorcer viewBox nem crescer com a tipografia do navegador. */
+ :is(.topbar,.side,.si-a11y-panel) :is(.si-menu-svg,.si-a11y-svg),
+ #si-workspace .si-launchers .si-launch-icon,
+ #si-workspace .silm-module-shortcut>svg,
+ #silm-scene-actionbar :is(.silm-action-icon,.silm-quick-icon svg,.silm-camera-btn svg,#si-expand-structure svg),
+ #si-stage .silm-workshop-micro-control .silm-action-icon{
+  box-sizing:content-box!important;
+  display:block!important;
+  width:var(--silm-mobile-glyph)!important;
+  height:var(--silm-mobile-glyph)!important;
+  min-width:0!important;min-height:0!important;
+  max-width:var(--silm-mobile-glyph)!important;
+  max-height:var(--silm-mobile-glyph)!important;
+  flex:0 0 var(--silm-mobile-glyph)!important;
+  aspect-ratio:1/1;object-fit:contain;
+  transform:none!important;vertical-align:middle;
+ }
+ :is(.topbar .menu-toggle,.topbar .si-header-action,.si-drawer-head .si-drawer-close){
+  box-sizing:border-box;min-width:var(--silm-mobile-touch);
+  min-height:var(--silm-mobile-touch);
+  display:inline-flex;align-items:center;justify-content:center;
+ }
+ #si-workspace .silm-module-shortcut{
+  box-sizing:border-box;flex:0 0 var(--silm-mobile-touch);
+  width:var(--silm-mobile-touch);min-width:var(--silm-mobile-touch);
+  min-height:var(--silm-mobile-touch);
+  padding:0;align-items:center;justify-content:center;
+ }
+ #si-workspace .si-launchers button{
+  box-sizing:border-box;min-width:0;min-height:var(--silm-mobile-touch);
+  gap:5px;align-items:center;justify-content:center;
+ }
+ #si-workspace .si-launchers button>span:not(.si-launch-icon){
+  min-width:0;overflow:hidden;text-overflow:ellipsis;
+ }
+ #silm-scene-actionbar #silm-view-quick-actions .silm-quick-icon,
+ #silm-scene-actionbar #silm-view-controls .silm-camera-btn,
+ #silm-scene-actionbar #silm-view-controls #si-expand-structure.si-structure-expand-in-camera,
+ #silm-scene-actionbar #scene-undo.silm-action--icon{
+  box-sizing:border-box!important;
+  flex:0 0 var(--silm-mobile-touch)!important;
+  width:var(--silm-mobile-touch)!important;min-width:var(--silm-mobile-touch)!important;
+  max-width:var(--silm-mobile-touch)!important;
+  height:var(--silm-mobile-touch)!important;min-height:var(--silm-mobile-touch)!important;
+  max-height:var(--silm-mobile-touch)!important;
+  padding:0!important;margin:0!important;
+  display:grid!important;place-items:center!important;
+  overflow:hidden!important;
+ }
+ #silm-scene-actionbar #silm-view-controls .silm-camera-glyph{
+  box-sizing:border-box!important;display:block!important;
+  font-size:19px!important;line-height:1!important;
+  font-weight:700!important;white-space:nowrap!important;
+  transform:none!important;
+ }
+ #silm-scene-actionbar{
+  flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;
+  scroll-padding-inline:50px!important;
+ }
+ #silm-scene-actionbar .silm-toolbar-scroll-arrow{
+  font-size:1.36rem!important;line-height:1!important;
+  flex-shrink:0!important;
+ }
+ #si-stage .silm-workshop-scales>.silm-lens-actions .silm-lens-tool{
+  box-sizing:border-box;flex:0 0 var(--silm-mobile-touch);
+  width:var(--silm-mobile-touch)!important;min-width:var(--silm-mobile-touch)!important;
+  height:var(--silm-mobile-touch)!important;min-height:var(--silm-mobile-touch)!important;
+  max-height:var(--silm-mobile-touch)!important;
+  padding:0;line-height:1;font-size:1.16rem;
+  display:grid;place-items:center;
+ }
+ #si-stage .silm-workshop-scales .silm-workshop-scale{
+  box-sizing:border-box;min-height:var(--silm-mobile-touch);
+  line-height:1.15;white-space:normal;overflow-wrap:normal;
+ }
+ #si-stage .silm-workshop-micro-zoom-tools .silm-workshop-micro-control{
+  box-sizing:border-box;min-width:var(--silm-mobile-touch);
+  min-height:var(--silm-mobile-touch);
+  display:inline-flex;align-items:center;justify-content:center;
+  overflow:hidden;
+ }
+ /* Rótulos continuam visíveis nos botões textuais; o SVG não disputa largura. */
+ button.silm-action--with-icon .silm-action-icon{flex-shrink:0!important}
+}
+/* Modo leitura simples: o texto deve ser legível, não espremido para 44px.
+   A faixa já rola: o alvo pode crescer com o rótulo. */
+@media(max-width:900px){
+ :root.si-simple-reading #silm-scene-actionbar button.silm-action--icon{
+  display:inline-flex!important;
+  flex:0 0 auto!important;
+  width:auto!important;max-width:none!important;min-width:44px!important;
+  padding-inline:9px!important;gap:6px!important;
+  overflow:visible!important;white-space:nowrap!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #silm-scene-actionbar :is(.silm-action-icon,.silm-quick-icon svg,.silm-camera-glyph){transition:none!important;animation:none!important}
+}

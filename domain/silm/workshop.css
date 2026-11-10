@@ -638,3 +638,438 @@
   border:2px solid Highlight;outline:2px solid Highlight;outline-offset:-4px;
  }
 }
+
+/* Parte 8 · Escalas 1 e 2: imagem como área predominante, ciência sob demanda.
+   Textos e avisos mantidos no DOM em detalhes HTML nativos; nenhum dado
+   científico é escondido por display:none dentro de disclosure aberto. */
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-top:has(.silm-workshop-atlas-photo){
+ grid-template-columns:minmax(0,4fr) minmax(180px,1fr);
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary{
+ align-content:start;justify-items:start;gap:6px;min-width:0;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary .silm-workshop-eyebrow{
+ display:none;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary h2{
+ font-size:clamp(.98rem,1.3vw,1.18rem);
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-selected-title{
+ font-size:.84rem;line-height:1.25;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-science-details{
+ box-sizing:border-box;display:block;width:100%;min-width:0;
+ border:1px solid var(--border);border-radius:10px;
+ background:var(--panel2,var(--surface));
+ font-size:.78rem;line-height:1.4;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-science-details>summary{
+ box-sizing:border-box;display:list-item;min-height:44px;
+ padding:12px 8px;cursor:pointer;font-size:.78rem;font-weight:700;
+ list-style-position:inside;overflow-wrap:anywhere;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-science-details[open]{
+ padding:0 8px 9px;
+ max-height:min(48dvh,470px);overflow-y:auto;overscroll-behavior:contain;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-science-details:focus-within{
+ outline:2px solid var(--ring);outline-offset:2px;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-science-details p{
+ margin:7px 0;overflow-wrap:anywhere;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-science-details .silm-workshop-composition{
+ grid-template-columns:1fr;gap:5px 0;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-science-details a{
+ display:inline-block;margin:7px 0;overflow-wrap:anywhere;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading{
+ gap:4px;min-height:28px;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-titles{
+ display:flex;align-items:center;min-width:0;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-info{
+ box-sizing:border-box;grid-row:3;min-width:0;
+ font-size:.76rem;color:var(--muted,#627487);
+ border-top:1px solid var(--border);
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-info>summary{
+ box-sizing:border-box;display:list-item;min-height:44px;
+ padding:12px 5px;list-style-position:inside;
+ cursor:pointer;font-size:.78rem;font-weight:650;color:var(--text);
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-info>summary:focus-visible{
+ outline:3px solid var(--ring);outline-offset:2px;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-info :is(.silm-workshop-micro-component,.silm-workshop-micro-dimension,.silm-workshop-micro-caveat){
+ display:block;position:static;grid-row:auto;grid-column:auto;
+ margin:5px 0;padding:0 5px;
+ font-size:.77rem;line-height:1.4;overflow-wrap:anywhere;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-info[open]{
+ max-height:36dvh;overflow-y:auto;overscroll-behavior:contain;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar{
+ display:flex;align-items:center;justify-content:space-between;
+ flex-wrap:wrap;min-width:0;gap:3px 8px;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar .silm-workshop-micro-status{
+ flex:1 1 140px;min-width:0;order:0;margin:0;line-height:1.25;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar .silm-workshop-micro-zoom-tools{
+ display:flex;align-items:center;justify-content:flex-end;
+ flex:0 1 auto;min-width:0;min-height:44px;gap:3px;
+}
+@media(max-width:760px){
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-top:has(.silm-workshop-atlas-photo){
+  grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art:has(.silm-workshop-atlas-photo){
+  min-height:clamp(220px,46dvh,490px);
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary{
+  display:flex;flex-wrap:wrap;align-items:center;gap:3px 7px;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-science-details{
+  width:auto;max-width:100%;flex:0 1 auto;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-science-details[open]{
+  width:100%;order:10;max-height:40dvh;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar{
+  display:flex;flex-wrap:wrap;gap:3px 6px;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar .silm-workshop-micro-status{
+  flex-basis:120px;grid-row:auto;grid-column:auto;order:0;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar .silm-workshop-micro-zoom-tools{
+  grid-row:auto;grid-column:auto;order:1;margin-left:auto;
+ }
+}
+@media(forced-colors:active){
+ #si-stage[data-workshop-scale="1"] .silm-workshop-science-details,
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-info{
+  border:2px solid CanvasText;background:Canvas;color:CanvasText;
+ }
+}
+
+/* O aviso de escala física permanece na vista, ainda que o detalhamento
+   científico esteja recolhido. Não representar unidade sem calibração. */
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-info .silm-workshop-micro-scale-explain{
+ display:block;margin:6px 0;padding:0 5px;line-height:1.4;
+ font-size:.77rem;overflow-wrap:anywhere;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar .silm-workshop-micro-dimension{
+ display:inline-block;position:static;grid-column:auto;grid-row:auto;
+ flex:0 1 auto;min-width:0;margin:0;color:var(--muted);
+ font-size:.72rem;line-height:1.25;overflow-wrap:anywhere;
+}
+@media(max-width:760px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar .silm-workshop-micro-dimension{
+  flex:1 1 130px;order:1;font-size:.69rem;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar .silm-workshop-micro-zoom-tools{
+  order:2;
+ }
+}
+
+/* Capturas da revisão: a legenda da imagem invadia o título no celular.
+   Mantê-la semanticamente no figure, porém visualmente em "Fontes". */
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-art .silm-workshop-photo{
+ position:relative;min-height:0;max-width:100%;overflow:hidden;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-art .silm-workshop-photo figcaption{
+ position:absolute!important;width:1px!important;height:1px!important;
+ padding:0!important;margin:-1px!important;border:0!important;
+ clip-path:inset(50%)!important;overflow:hidden!important;white-space:nowrap!important;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-science-details .silm-workshop-image-credit{
+ font-size:.75rem;line-height:1.4;margin:7px 0;
+ color:var(--muted);overflow-wrap:anywhere;
+}
+@media(max-width:760px){
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-top:has(.silm-workshop-atlas-photo){
+  grid-template-rows:auto auto!important;align-items:start!important;
+  flex:0 0 auto!important;min-height:0!important;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art:has(.silm-workshop-atlas-photo){
+  box-sizing:border-box;height:clamp(230px,45dvh,470px)!important;
+  min-height:0!important;max-height:none!important;align-self:start!important;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art .silm-workshop-atlas-photo{
+  box-sizing:border-box;height:100%!important;min-height:0!important;
+  display:flex!important;flex-direction:column!important;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art .silm-workshop-atlas-photo img{
+  box-sizing:border-box;flex:1 1 auto!important;
+  min-height:0!important;max-height:100%!important;
+  object-fit:contain!important;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary{
+  align-self:start!important;position:relative;
+  margin-top:5px;min-height:0!important;
+ }
+}
+
+/* Parte 8 · Alternativas do Objeto: uma linha contextual, nunca uma faixa
+   abaixo da imagem. O disclosure preserva o seletor científico original. */
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary>.silm-workshop-alternatives{
+ box-sizing:border-box;width:100%;max-width:100%;min-width:0;
+ margin:0;padding:0;border:1px solid var(--border);
+ border-radius:10px;background:var(--panel2,var(--surface));
+ color:var(--text);font-size:.79rem;align-self:start;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-alternatives>summary{
+ box-sizing:border-box;display:list-item;list-style-position:inside;
+ min-height:44px;width:100%;padding:12px 8px;
+ cursor:pointer;font-size:.78rem;line-height:1.35;font-weight:700;
+ overflow-wrap:anywhere;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-alternatives>summary:focus-visible{
+ outline:3px solid var(--ring);outline-offset:2px;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-alternatives[open]{
+ padding:0 5px 6px;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-alternative-list{
+ display:grid;grid-template-columns:minmax(0,1fr);
+ gap:4px;max-height:min(31dvh,200px);min-height:0;
+ margin:0;padding:2px;overflow-y:auto;overflow-x:hidden;
+ overscroll-behavior:contain;scrollbar-width:thin;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-alternative{
+ box-sizing:border-box;display:block;width:100%;min-height:44px;
+ padding:8px 10px;text-align:left;line-height:1.3;
+ font-size:.78rem;font-weight:650;white-space:normal;overflow-wrap:anywhere;
+ border:1px solid var(--border);background:var(--surface);
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-alternative:hover{
+ background:var(--tint);
+}
+@media(max-width:760px){
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary>.silm-workshop-alternatives{
+  flex:0 1 auto;width:auto;min-width:135px;max-width:100%;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-alternatives[open]{
+  flex-basis:100%;width:100%;order:11;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-alternatives .silm-workshop-alternative-list{
+  max-height:min(28dvh,170px);
+ }
+}
+@media(forced-colors:active){
+ #si-stage[data-workshop-scale="1"] .silm-workshop-alternatives{
+  background:Canvas;color:CanvasText;border:2px solid CanvasText;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-alternative{
+  background:ButtonFace;color:ButtonText;border:2px solid ButtonText;
+ }
+}
+
+/* SILM · Palco limpo (Parte 8). A investigação mostra objeto, grãos e
+   estrutura; fontes, ressalvas extensas e imagens auxiliares permanecem
+   consultáveis em <details> nativos. Sem novas barras ou painéis. */
+#si-stage .silm-workshop-discovery{
+ box-sizing:border-box;gap:8px;
+ padding:clamp(8px,1.25vw,18px);
+}
+#si-stage .silm-workshop-discovery>.silm-workshop-intro{
+ max-width:68ch;font-size:.78rem;line-height:1.35;
+}
+#si-stage .silm-workshop-discovery .silm-workshop-grid{
+ gap:8px;min-width:0;
+}
+#si-stage .silm-workshop-discovery .silm-workshop-card{
+ box-sizing:border-box;
+ grid-template-columns:minmax(0,1.35fr) minmax(150px,1fr);
+ padding:8px;gap:9px;align-items:stretch;
+}
+#si-stage .silm-workshop-card .silm-workshop-art{
+ box-sizing:border-box;min-width:0;min-height:150px;
+ overflow:hidden;
+}
+#si-stage .silm-workshop-card .silm-workshop-photo{
+ display:flex;flex-direction:column;
+ width:100%;height:100%;min-height:0;
+}
+#si-stage .silm-workshop-card .silm-workshop-photo img{
+ flex:1 1 auto;min-height:0;max-height:100%;
+ width:100%;height:100%;object-fit:contain;
+}
+/* O crédito permanece semanticamente na figura e legível em Material e
+   limites; não sobrepõe a miniatura nem ocupa sua linha inferior. */
+#si-stage .silm-workshop-card .silm-workshop-photo figcaption{
+ position:absolute!important;width:1px!important;height:1px!important;
+ padding:0!important;margin:-1px!important;border:0!important;
+ clip-path:inset(50%)!important;overflow:hidden!important;
+ white-space:nowrap!important;
+}
+#si-stage .silm-workshop-card-body{gap:5px;min-width:0}
+#si-stage .silm-workshop-card-body h3{font-size:clamp(.86rem,1.2vw,1rem)}
+#si-stage .silm-workshop-card-body .silm-workshop-component-label{
+ font-size:.75rem;line-height:1.25;overflow-wrap:anywhere;
+}
+#si-stage .silm-workshop-card-science{
+ box-sizing:border-box;min-width:0;max-width:100%;
+ border-top:1px solid var(--border);font-size:.75rem;line-height:1.4;
+}
+#si-stage .silm-workshop-card-science>summary{
+ box-sizing:border-box;display:list-item;min-height:44px;
+ padding:12px 2px;list-style-position:inside;
+ font-size:.77rem;font-weight:650;cursor:pointer;
+}
+#si-stage .silm-workshop-card-science>summary:focus-visible{
+ outline:3px solid var(--ring);outline-offset:2px;
+}
+#si-stage .silm-workshop-card-science[open]{
+ max-height:37dvh;overflow-y:auto;overscroll-behavior:contain;
+}
+#si-stage .silm-workshop-card-science p{
+ margin:6px 0;overflow-wrap:anywhere;
+}
+#si-stage .silm-workshop-card-body>.button{
+ box-sizing:border-box;min-height:44px;
+ margin-top:auto;align-self:stretch;
+}
+#si-stage .silm-workshop-reference-summary--stage{
+ display:flex;align-items:center;justify-content:space-between;
+ flex-wrap:nowrap;gap:6px;min-width:0;min-height:44px;
+}
+#si-stage .silm-workshop-reference-summary--stage h2{
+ min-width:0;flex:1 1 auto;margin:0;
+ font-size:clamp(.88rem,1.2vw,1rem);
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+#si-stage .silm-workshop-reference-summary--stage>button{
+ box-sizing:border-box;flex:0 0 auto;
+ margin:0 0 0 auto;min-height:44px;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-info .silm-workshop-micro-atlas-reference{
+ box-sizing:border-box;margin:8px 4px;max-width:100%;
+ border-top:1px solid var(--border);
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-atlas-reference>summary{
+ min-height:44px;padding:11px 3px;font-size:.78rem;
+ line-height:1.3;cursor:pointer;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-atlas-reference img{
+ max-height:48dvh;object-fit:contain;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-atlas-reference figcaption{
+ font-size:.75rem;line-height:1.4;
+}
+/* A identidade do metal já é comunicada pelo título sr-only de Montagem e
+   pela linha contextual. Não repetir etiqueta sobre a estrutura física. */
+#silm-integration-scene .silm-scene-caption{
+ display:none!important;
+}
+@media(max-width:760px){
+ #si-stage .silm-workshop-discovery .silm-workshop-card{
+  grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);
+  padding:7px;gap:7px;
+ }
+ #si-stage .silm-workshop-card .silm-workshop-art{
+  min-height:120px;
+ }
+ #si-stage .silm-workshop-card .silm-workshop-card-body{
+  min-width:0;
+ }
+ #si-stage .silm-workshop-card .silm-workshop-card-body>.button{
+  width:100%;min-width:0;white-space:normal;
+ }
+ #si-stage .silm-workshop-card-science[open]{max-height:32dvh}
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary{
+  min-width:0;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary :is(h2,.silm-workshop-selected-title){
+  overflow-wrap:anywhere;
+ }
+}
+@media(max-width:360px){
+ #si-stage .silm-workshop-discovery .silm-workshop-card{
+  grid-template-columns:minmax(0,1fr);
+ }
+ #si-stage .silm-workshop-card .silm-workshop-art{
+  height:clamp(128px,23dvh,170px);
+ }
+ :root.si-font-mod #si-stage.silm-workshop-context-only #workspace-focus{
+  scroll-padding-bottom:72px;
+  overscroll-behavior-y:contain;
+ }
+}
+@media(forced-colors:active){
+ #si-stage .silm-workshop-card-science{
+  border-top:2px solid CanvasText;
+ }
+}
+
+/* Separação científica: o palco oferece só um acesso discreto ao Manual.
+   Informação bibliográfica, imagens auxiliares e descrição longa vivem na
+   página de leitura, não em um painel contextual ou overlay da cena. */
+#si-stage .silm-workshop-manual-link{
+ box-sizing:border-box;min-width:44px;min-height:44px;
+ display:inline-flex;align-items:center;justify-content:center;
+ flex:0 0 auto;align-self:start;
+ padding:7px 9px;border:1px solid var(--border);border-radius:9px;
+ background:var(--surface);color:var(--text);
+ font-size:.77rem;font-weight:700;line-height:1.15;
+ text-decoration:none;white-space:nowrap;
+}
+#si-stage .silm-workshop-manual-link:focus-visible{
+ outline:3px solid var(--ring);outline-offset:2px;
+}
+#si-stage .silm-workshop-manual-link:hover{background:var(--tint)}
+#si-stage .silm-workshop-card-body .silm-workshop-manual-link{
+ align-self:flex-start;min-height:44px;
+ margin-block:0;
+}
+#si-stage .silm-workshop-reference-summary--stage .silm-workshop-manual-link{
+ margin-left:0;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary{
+ min-width:0;align-content:start;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading{
+ flex-wrap:nowrap;min-width:0;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading .silm-workshop-manual-link{
+ margin-left:auto;
+}
+.silm-manual-reference{
+ margin:1.25rem 0;
+ padding:clamp(10px,2vw,20px);
+ background:var(--panel2,var(--surface));
+ border:1px solid var(--border);
+ border-radius:12px;
+ overflow-wrap:anywhere;
+}
+.silm-manual-reference h2{margin:0 0 12px;font-size:clamp(1.05rem,2vw,1.35rem)}
+.silm-manual-reference h3{font-size:1rem;margin:14px 0 6px}
+.silm-manual-reference p{line-height:1.5;max-width:90ch;margin:9px 0}
+.silm-manual-reference ul{padding-inline-start:1.25rem}
+.silm-manual-reference li{margin:6px 0;line-height:1.45}
+.silm-manual-reference a{overflow-wrap:anywhere}
+.silm-manual-micro-figure{max-width:min(100%,760px);margin:10px 0}
+.silm-manual-micro-figure img{display:block;width:100%;height:auto;object-fit:contain;border-radius:10px}
+.silm-manual-micro-figure figcaption{margin-top:7px;font-size:.84rem;line-height:1.45}
+@media(max-width:650px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading{
+  flex-wrap:wrap;gap:4px;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading .button,
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading .silm-workshop-manual-link{
+  min-width:44px;min-height:44px;
+ }
+ #si-stage .silm-workshop-reference-summary--stage{
+  flex-wrap:wrap;min-width:0;
+ }
+ #si-stage .silm-workshop-card-body .silm-workshop-manual-link{
+  font-size:.76rem;
+ }
+}
+@media(forced-colors:active){
+ #si-stage .silm-workshop-manual-link{border:2px solid CanvasText;background:Canvas;color:CanvasText}
+ .silm-manual-reference{border:2px solid CanvasText;background:Canvas;color:CanvasText}
+}

@@ -9,7 +9,8 @@ const base=process.env.BASE_URL||'http://127.0.0.1:8765';
 const playwright=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const dir=join('reports','quatro-escalas',browserName);mkdirSync(dir,{recursive:true});
 const sizes=[
- ['celular-320',320,568],['celular-390',390,844],['celular-414',414,896],
+ ['celular-320',320,568],['celular-360',360,780],['celular-390',390,844],
+ ['celular-400',400,692],['celular-414',414,896],
  ['paisagem-curta',844,390],['tablet-retrato',768,1024],['tablet-paisagem',1024,768],
  ['notebook',1366,768],['desktop',1440,900],['full-hd',1920,1080]
 ];
@@ -30,6 +31,12 @@ async function sample(page){
   const scene=stage.querySelector('.silm-crystal .silm-assembly-area');
   const stageCanvas=stage.querySelector('.silm-crystal-stage');
   const action=document.querySelector('#silm-scene-actionbar');
+  const tabs=document.querySelector('#si-workspace .si-view-tabs');
+  const launcher=document.querySelector('#si-workspace .si-launchers button');
+  const launchBar=document.querySelector('#si-workspace .si-launchers');
+  const top=ref?.querySelector('.silm-workshop-reference-top');
+  const summary=ref?.querySelector('.silm-workshop-reference-summary');
+  const microHeading=ref?.querySelector('.silm-workshop-micro-heading');
   const q=n=>{if(!n)return null;const r=n.getBoundingClientRect();return{
    left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}};
   return {
@@ -41,7 +48,10 @@ async function sample(page){
    current:buttons.filter(b=>b.getAttribute('aria-current')==='step').map(b=>b.dataset.scale),
    art:q(art),image:q(image),imageLoaded:!!image&&image.complete&&image.naturalWidth>0,
    micro:q(micro),microTools:q(tools),scene:q(scene),stageCanvas:q(stageCanvas),
-   action:q(action),
+   action:q(action),viewTabs:q(tabs),firstLauncher:q(launcher),
+   launcherBar:q(launchBar),referenceTop:q(top),summary:q(summary),
+   microHeading:q(microHeading),referenceBorder:ref?getComputedStyle(ref).borderTopWidth:null,
+   imageFit:image?getComputedStyle(image).objectFit:null,
    focusScroll:stage.querySelector('#workspace-focus')?.scrollHeight||0,
    focusClient:stage.querySelector('#workspace-focus')?.clientHeight||0
   };
@@ -96,10 +106,56 @@ try{
    if(scale===2)await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
    await page.waitForTimeout(90);
    const m=await sample(page);metrics.push({label,...m});
+   if(label==='celular-400'){
+    await page.screenshot({path:join(dir,'celular-400-escala-'+scale+'.jpg'),
+     type:'jpeg',quality:72,animations:'disabled'});
+   }
    assert.equal(m.scale,String(scale),label+': escala errada');
    assert.ok(m.documentWidth<=width+6,label+': rolagem global horizontal '+m.documentWidth+'/'+width);
    assert.ok(m.stage&&m.stage.width>=Math.min(width-36,240),label+': palco comprimido');
    assert.ok(m.nav&&m.buttons.length===4,label+': navegação de quatro escalas ausente');
+   if(width<=414&&height>width){
+    const near=(a,b,tol=4)=>a!==null&&b!==null&&Math.abs(a-b)<=tol;
+    assert.ok(m.viewTabs&&m.firstLauncher&&m.launcherBar,
+     label+': faltam barras de contexto ou rodapé');
+    assert.ok(near(m.viewTabs.left,m.nav.left),
+     label+': Foco e Travessia têm margens diferentes '+JSON.stringify(m));
+    assert.ok(near(m.firstLauncher.left,m.nav.left,6),
+     label+': rodapé e Travessia não compartilham o mesmo eixo');
+    assert.ok(m.buttons.every(x=>near(x.height,m.buttons[0].height,2)),
+     label+': alturas de botões de escala diferem');
+    assert.ok((parseFloat(m.referenceBorder)||0)<.6,
+     label+': moldura duplicada ressuscitou no palco');
+    if(scale===1){
+     assert.ok(m.art&&near(m.art.left,m.nav.left)&&near(m.art.right,m.nav.right),
+      label+': Objeto fora do enquadramento compartilhado');
+     assert.ok(m.summary&&near(m.summary.left,m.nav.left)&&near(m.summary.right,m.nav.right),
+      label+': informações do Objeto desalinhadas');
+     assert.equal(m.imageFit,'contain',label+': foto ilustrativa cortada ou distorcida');
+     assert.ok(m.summary.top>=m.art.bottom-3,label+': identificação invadiu a fotografia');
+     if(height>=640){
+      const expected=Math.min(570,height-359);
+      assert.ok(m.art.height>=expected-9,
+       label+': altura útil não foi redistribuída ao Objeto '+JSON.stringify({expected,actual:m.art.height}));
+      assert.ok(m.art.bottom<=m.summary.top+1,
+       label+': foto expandida sobrepôs identificação e botões');
+     }
+    }
+    if(scale===2){
+     assert.ok(m.micro&&near(m.micro.left,m.nav.left)&&near(m.micro.right,m.nav.right),
+      label+': Grãos fora do enquadramento compartilhado');
+     assert.ok(m.microHeading&&near(m.microHeading.left,m.nav.left),
+      label+': título de Grãos desalinhado');
+    }
+    if(scale>=3){
+     assert.ok(m.summary&&near(m.summary.left,m.nav.left),
+      label+': identificação de Rede/Centro desalinhada da Travessia');
+     if(m.action&&m.action.height>1){
+      assert.ok(m.action.bottom<=m.launcherBar.top+3,
+       label+': faixa científica cobre o rodapé');
+     }
+    }
+   }
    assert.ok(m.traversal&&m.arrows.length===2,label+': controles da Travessia ausentes');
    assert.deepEqual(m.current,[String(scale)],label+': escala corrente não identificada');
    if(width>=651)assert.ok(m.arrows.every(x=>x.visible&&x.rect.height>=43.5),
@@ -125,13 +181,11 @@ try{
      label+': visual macro verticalmente pequeno');
    }
    if(scale===1&&label==='celular-390'){
-    const details=page.locator('.silm-workshop-materials');
-    await details.locator('summary').click();
-    assert.match(await details.innerText(),/Material do componente:/,
-     'Resumo compacto escondeu a identificação científica do material');
-    assert.match(await details.innerText(),/Composição e fonte|Fonte da aplicação/,
-     'As referências da aplicação devem continuar consultáveis');
-    await details.locator('summary').click();
+    assert.equal(await page.locator('.silm-workshop-science-details').count(),0,
+     'Explicações extensas não devem permanecer dentro da área de investigação');
+    const manual=page.locator('.silm-workshop-reference-summary .silm-workshop-manual-link');
+    assert.match(await manual.getAttribute('href'),/topico=aplicacoes-metalicas&referencia=/,
+     'A composição e as fontes devem ser consultadas no Manual com a referência preservada');
    }
    if(scale===2){
     assert.ok(m.micro&&m.micro.width>=Math.min(260,m.stage.width*.75),
@@ -191,7 +245,7 @@ try{
     assert.equal(back.overviewDisplay,'none',label+': Visão geral não foi escondida ao voltar');
    }
   }
-  if(['celular-390','paisagem-curta','desktop'].includes(label)){
+  if(['celular-390','celular-400','paisagem-curta','desktop'].includes(label)){
    await page.screenshot({path:join(dir,label+'-centro.jpg'),type:'jpeg',quality:70,animations:'disabled'});
   }
  }

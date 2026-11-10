@@ -39,6 +39,12 @@ SILM.workshop=(()=>{
  const MICRO='<svg viewBox="0 0 220 110" role="img" aria-label="Esquema didático de grãos metálicos"><path d="M8 10 44 8 62 31 45 58 12 53zM44 8l43 2 14 26-39-5zM87 10l48-1 13 26-47 1zM135 9l37 5 10 30-34-9zM172 14l39-2 1 43-30-11zM12 53l33 5 23 30-48 9zM45 58l39-21 27 32-42 28zM84 37l48 0 11 32-32 28zM132 37l34 8 22 31-45-7zM166 45l46 10-4 36-34-15z"/><path class="silm-workshop-highlight" d="M44 9 62 31 45 58m42-48 14 26-17 28m48-55 13 26-13 29"/></svg>';
  const LATTICE='<svg viewBox="0 0 220 110" role="img" aria-label="Esquema de rede cristalina"><path d="M36 29 110 9l74 20v52l-74 20-74-20zM36 29l74 21 74-21M110 50v51"/><g class="silm-workshop-atoms"><circle cx="36" cy="29" r="5"/><circle cx="110" cy="9" r="5"/><circle cx="184" cy="29" r="5"/><circle cx="36" cy="81" r="5"/><circle cx="110" cy="101" r="5"/><circle cx="184" cy="81" r="5"/><circle cx="110" cy="50" r="7"/></g></svg>';
  const node=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;};
+ const manualHref=(topic,item)=>'#/manual?topico='+encodeURIComponent(topic)+(item?'&referencia='+encodeURIComponent(item.id):'');
+ const manualLink=(topic,item,ariaLabel='Consultar fundamentos e fontes no Manual')=>{
+  const a=node('a','silm-workshop-manual-link','Manual');
+  a.href=manualHref(topic,item);a.setAttribute('aria-label',ariaLabel);a.title=ariaLabel;
+  return a;
+ };
  const IMAGE_LABELS={motor:'Motor aberto com enrolamentos de cobre',fitting:'Conexão hidráulica de latão',screw:'Parafuso de aço com revestimento metálico',transformer:'Transformador com núcleo laminado e bobinas',laptop:'Notebook com a carcaça inferior removida',wheel:'Estrutura metálica de um volante',battery:'Pilhas NiMH com corte ilustrativo do eletrodo',lighter:'Isqueiro mecânico com pedra pirofórica'};
  const escapeAttr=value=>String(value||'').replace(/[&"<>]/g,ch=>({'&':'&amp;','"':'&quot;','<':'&lt;','>':'&gt;'}[ch]));
  const visual=(item,scale)=>{
@@ -57,13 +63,16 @@ SILM.workshop=(()=>{
   const article=node('article','silm-workshop-card');article.dataset.referenceId=item.id;
   const art=node('div','silm-workshop-art');art.innerHTML=visual(item,1);
   const body=node('div','silm-workshop-card-body');
-  body.append(node('p','silm-workshop-eyebrow',item.context),node('h3','',item.title),node('p','silm-workshop-component-label','Componente: '+item.component),node('p','silm-workshop-material','Material: '+item.material),node('p','silm-workshop-card-note',item.explanation),node('p','silm-workshop-caveat',item.caveat));
+  body.append(node('h3','',item.title),node('p','silm-workshop-component-label',item.component));
+  // Metadados e ressalvas são consultados no Manual, por referência.
+  // O cartão mantém a figura, o componente e a ação de investigar.
+  body.append(manualLink('aplicacoes-metalicas',item,'Consultar no Manual composição e fontes de '+item.title));
   const b=node('button','button outline',label);b.type='button';b.addEventListener('click',()=>onAction(item));body.append(b);article.append(art,body);return article;
  }
  function renderDiscovery(host,{element,notice='',onOpenPeriodic=()=>{},onContinue=()=>{},onInvestigate=()=>{},onStartDirect=()=>{}}={}){
   host.replaceChildren();host.hidden=false;const s=node('section','silm-workshop-discovery');
-  s.append(node('p','silm-workshop-eyebrow','OFICINA DOS METAIS · INVESTIGAÇÃO POR ELEMENTO'),node('h2','','Onde encontramos '+(element?.name||'um metal')+'?'),
-   node('p','silm-workshop-intro',element?'Escolha um componente que contenha o elemento. O objeto completo reúne outros metais, ligas, isolantes e materiais.':'Comece selecionando um metal na Tabela Periódica.'));
+  s.append(node('h2','',element?'Aplicações de '+element.name:'Escolha um metal'),
+   node('p','silm-workshop-intro',element?'Aplicações ilustrativas, não medições da composição.':'Selecione um metal na Tabela Periódica.'));
   if(notice)s.append(node('p','silm-workshop-pending-notice',notice));
   const actions=node('div','silm-workshop-discovery-actions'),table=node('button','button primary','Tabela Periódica'),free=node('button','button outline','Montagem livre');
   table.type='button';free.type='button';table.addEventListener('click',onOpenPeriodic);free.addEventListener('click',onContinue);actions.append(table,free);s.append(actions);
@@ -71,7 +80,6 @@ SILM.workshop=(()=>{
   const refs=list(element.atomicNumber);
   if(!refs.length){s.append(node('p','silm-workshop-empty','Esta primeira curadoria ainda não possui aplicações cadastradas para este metal. A investigação direta continua disponível.'));
    const direct=node('button','button outline','Iniciar investigação sem referência');direct.type='button';direct.addEventListener('click',onStartDirect);s.append(direct);host.append(s);return;}
-  s.append(node('h3','silm-workshop-section-title','Materiais e dispositivos de referência'));
   const grid=node('div','silm-workshop-grid');for(const item of refs)grid.append(itemCard(item,onInvestigate));s.append(grid);host.append(s);
  }
  function renderReference(host,{element,item=null,items=[],scale=1,onChoose=()=>{},onScale=()=>{},onOpenPeriodic=()=>{}}={}){
@@ -80,36 +88,86 @@ SILM.workshop=(()=>{
   if(scale===2){
    s.classList.add('silm-workshop-micro-mode');
    const heading=node('div','silm-workshop-micro-heading'),titles=node('div','silm-workshop-micro-titles');
-   titles.append(node('h2','','Microestrutura · '+element.name));
-   titles.append(node('p','silm-workshop-micro-component',item?item.component+' · '+item.material:'Policristal didático · '+element.symbol));
-   const table=node('button','button outline','Tabela Periódica');table.type='button';table.addEventListener('click',onOpenPeriodic);
-   heading.append(titles,table);s.append(heading);
-   if(SILM.microstructure?.create)s.append(SILM.microstructure.create({element,item}));
+   const microHeading=node('h2','','Grãos · '+element.name);
+   microHeading.setAttribute('aria-label','Microestrutura de '+element.name);
+   titles.append(microHeading);
+   const table=node('button','button outline','Tabela');table.type='button';table.setAttribute('aria-label','Tabela Periódica');table.title='Abrir Tabela Periódica';table.addEventListener('click',onOpenPeriodic);
+   heading.append(titles,table,
+    manualLink('graos-microestrutura',item,'Consultar no Manual grãos, escala e referências de '+element.name));
+   s.append(heading);
+   const viewer=SILM.microstructure?.create?.({element,item})||null;
+   if(viewer)s.append(viewer);
    else{const fallback=node('div','silm-workshop-reference-art');fallback.innerHTML=MICRO;s.append(fallback);}
-   // A imagem do atlas é uma representação esquemática alternativa, nunca uma micrografia medida.
-   const atlasMicro=SILM.metalAtlas?.micro?.(element.atomicNumber);
-   if(atlasMicro){
-    const panel=node('details','silm-workshop-micro-atlas-reference'),toggle=node('summary','','Ver imagem esquemática do atlas (sem escala)');
-    const figure=node('figure','silm-workshop-photo'),img=node('img');
-    img.src=atlasMicro.path;img.width=960;img.height=640;img.loading='lazy';img.decoding='async';
-    img.alt='Modelo didático de grãos de '+element.name+'; não é micrografia experimental, sem escala em micrômetros';
-    figure.append(img,node('figcaption','','Modelo didático sem escala física. Não identifica fases ou composição de grãos; a estrutura científica do elemento é consultada separadamente.'));
-    panel.append(toggle,figure);s.append(panel);
-   }
+   // Imagens alternativas e proveniência metalográfica são lidas no
+   // Manual. O palco de Grãos mantém o mapa interativo e seus instrumentos.
   }else{
    const top=node('div','silm-workshop-reference-top'),art=node('div','silm-workshop-reference-art');
-   if(item){art.innerHTML=visual(item,1);top.append(art);}
+   let imageCredit='';
+   if(item){
+    art.innerHTML=visual(item,1);
+    // Fundo ambiental decorativo reutiliza a MESMA ilustração do objeto.
+    // A foto original permanece intacta, com object-fit:contain; a lente
+    // só considera os pixels da fotografia em primeiro plano.
+    if(scale===1){
+     const photo=art.querySelector('.silm-workshop-photo img');
+     const src=photo?.getAttribute('src');
+     // URL absoluta: no CSS, url() substituído por var() pode ser resolvido
+     // a partir da folha em /integracao/, não da rota de /index.html.
+     // Usar a URL da própria imagem evita requisição /integracao/assets/*.
+     if(src)art.style.setProperty('--silm-object-ambient-image',
+      'url('+JSON.stringify(new URL(src,document.baseURI).href)+')');
+    }
+    // Legenda associada à figura para leitores de tela; cópia legível
+    // dentro dos dados recolhíveis, sem invadir o título no celular.
+    imageCredit=art.querySelector('figcaption')?.textContent||'';
+    top.append(art);
+   }
    const summary=node('div','silm-workshop-reference-summary'),heading=node('h2','');
-   heading.append(node('span','silm-workshop-prefix','Investigando '),document.createTextNode(element.name));
-   summary.append(node('p','silm-workshop-eyebrow','OBJETO E COMPOSIÇÃO'),heading);
-  if(item){const component=node('p','silm-workshop-selected-title',item.title);component.append(node('span','silm-workshop-component-long',' · '+item.component));summary.append(component,node('p','silm-workshop-material','Material do componente: '+item.material),node('p','silm-workshop-card-note',item.explanation));
-   const ul=node('ul','silm-workshop-composition');for(const [name,role]of item.composition){const li=node('li','');li.append(node('strong','',name),node('span','',role));ul.append(li);}const details=node('details','silm-workshop-materials');details.append(node('summary','','Composição e fonte'),ul,node('p','silm-workshop-caveat',item.caveat));
-   const source=node('a','','Fonte da aplicação');source.target='_blank';source.rel='noopener noreferrer';
-   const sources={12:'https://periodic-table.rsc.org/element/12/magnesium',29:'https://periodic-table.rsc.org/element/29/copper',57:'https://periodic-table.rsc.org/element/57/lanthanum'};
-   source.href=item.sourceURL||sources[item.atomicNumber]||(item.id==='ferro-transformador'?'https://www.thyssenkrupp-steel.com/en/industries/energy/energy.html':'https://worldsteel.org/about-steel/what-is-steel/');
-   details.append(node('p','silm-workshop-detail-material','Material do componente: '+item.material),node('p','silm-workshop-detail-note',item.explanation),source);summary.append(details,node('p','silm-workshop-caveat','A rede representa o elemento de referência. A peça pode conter outras fases e materiais.'));
+   const stageOnly=scale>=3;
+   heading.append(document.createTextNode(element.name));
+   heading.setAttribute('aria-label','Elemento investigado: '+element.name);
+   summary.append(heading);
+   if(stageOnly)summary.classList.add('silm-workshop-reference-summary--stage');
+   else summary.append(node('p','silm-workshop-eyebrow','OBJETO E COMPOSIÇÃO'));
+  if(item&&!stageOnly){
+   const component=node('p','silm-workshop-selected-title',item.title);
+   if(scale!==1)component.append(node('span','silm-workshop-component-long',' · '+item.component));
+   summary.append(component);
+   // As fontes e a composição completas pertencem ao Manual. O palco
+   // mantém apenas a referência necessária para observar a imagem.
+   summary.append(manualLink('aplicacoes-metalicas',item,'Consultar no Manual composição e fontes de '+item.title));
   }else if(scale===1)summary.append(node('p','silm-workshop-intro','Escolha um objeto para observar o componente metálico.'));
-  const table=node('button','button outline');table.setAttribute('aria-label','Tabela Periódica');table.append(node('span','','Tabela'),node('span','silm-workshop-table-long',' Periódica'));table.type='button';table.addEventListener('click',onOpenPeriodic);summary.append(table);top.append(summary);s.append(top);
+  const table=node('button','button outline');table.setAttribute('aria-label','Tabela Periódica');table.append(node('span','','Tabela'),node('span','silm-workshop-table-long',' Periódica'));table.type='button';table.addEventListener('click',onOpenPeriodic);summary.append(table);
+  if(stageOnly)summary.append(manualLink('travessia-escalas',item,'Consultar no Manual a interpretação de Rede e Centro'));
+  // Trocar a aplicação pertence ao contexto do objeto, não à área do desenho.
+  // Um disclosure nativo ocupa apenas um alvo de toque quando recolhido e
+  // preserva os mesmos handlers científicos de seleção da Oficina.
+  if(scale===1){
+   const others=items.filter(other=>other.id!==item?.id);
+   if(others.length){
+    const alt=node('details','silm-workshop-alternatives');
+    alt.dataset.alternativeCount=String(others.length);
+    const caption=others.length===1?'Outra aplicação (1)':'Outras aplicações ('+others.length+')';
+    alt.append(node('summary','',caption));
+    const row=node('div','silm-workshop-alternative-list');
+    for(const other of others){
+     const b=node('button','silm-workshop-alternative',other.title);
+     b.type='button';b.dataset.referenceId=other.id;
+     b.setAttribute('aria-label','Investigar '+other.title);
+     b.addEventListener('click',()=>{
+      onChoose(other);
+      // O botão clicado é removido pelo render do novo objeto; foco retorna
+      // a um controle disponível na interface reconstituída.
+      requestAnimationFrame(()=>{
+       host.querySelector('.silm-workshop-alternatives>summary')?.focus({preventScroll:true});
+      });
+     });
+     row.append(b);
+    }
+    alt.append(row);summary.append(alt);
+   }
+  }
+  top.append(summary);s.append(top);
   }
   // Travessia: controles de interface ligados às escalas reais do mesmo ensaio.
   // Não cria câmera, simulação, estrutura ou estado científico paralelo.
@@ -172,9 +230,7 @@ SILM.workshop=(()=>{
   scales.append(arrow('next',following,'›'));
   // Preserva a estrutura pública original esperada pelas auditorias de microestrutura.
   s.insertBefore(scales,s.firstChild);
-  if(scale!==2)s.append(node('p','silm-workshop-scale-note',scale===3?'A rede e a célula unitária mostram os efeitos coletivos. Selecione um centro para aprofundar a mesma investigação.':scale===4?'O centro selecionado pertence à rede: observe nele a resposta local dos estímulos aplicados à estrutura.':'O componente permanece identificado enquanto a visualização se aproxima; a mudança de escala não troca o material.'));
-  if(scale!==2&&items.some(other=>other.id!==item?.id)){const alt=node('div','silm-workshop-alternatives'),row=node('div','silm-workshop-alternative-list');alt.append(node('h3','','Outras aplicações com '+element.name));
-   for(const other of items){if(other.id===item?.id)continue;const b=node('button','silm-workshop-alternative',other.title);b.type='button';b.addEventListener('click',()=>onChoose(other));row.append(b);}alt.append(row);s.append(alt);}
+
   host.append(s);
  }
  if(!valid())throw new Error('Catálogo inicial da Oficina dos Metais inválido.');
