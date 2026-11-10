@@ -105,6 +105,14 @@ SILM.workshop=(()=>{
    let imageCredit='';
    if(item){
     art.innerHTML=visual(item,1);
+    // Fundo ambiental decorativo reutiliza a MESMA ilustração do objeto.
+    // A foto original permanece intacta, com object-fit:contain; a lente
+    // só considera os pixels da fotografia em primeiro plano.
+    if(scale===1){
+     const photo=art.querySelector('.silm-workshop-photo img');
+     const src=photo?.getAttribute('src');
+     if(src)art.style.setProperty('--silm-object-ambient-image','url('+JSON.stringify(src)+')');
+    }
     // Legenda associada à figura para leitores de tela; cópia legível
     // dentro dos dados recolhíveis, sem invadir o título no celular.
     imageCredit=art.querySelector('figcaption')?.textContent||'';
