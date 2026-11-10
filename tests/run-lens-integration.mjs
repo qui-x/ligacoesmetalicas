@@ -24,18 +24,13 @@ try{
  await page.locator('#silm-periodic-dialog [data-z="29"]').click();
  await page.locator('#silm-periodic-dialog [id$="-explore"]').click();
  const discoveryCard=page.locator('.silm-workshop-card[data-reference-id="atlas-cu"]');
- const discoveryScience=discoveryCard.locator('.silm-workshop-card-science');
- assert.equal(await discoveryScience.count(),1,'Cartão de objeto perdeu as ressalvas científicas');
- assert.equal(await discoveryScience.getAttribute('open'),null,'Cartão mostra explicações antes da investigação');
- const conciseCard=await discoveryCard.locator('.silm-workshop-card-body').evaluate(body=>
-  [...body.children].filter(n=>n.tagName!=='DETAILS'&&
-   !n.matches('button')).map(n=>n.textContent.trim()).join(' '));
+ const discoveryLink=discoveryCard.locator('.silm-workshop-manual-link');
+ assert.equal(await discoveryCard.locator('details').count(),0,
+  'Cartão de descoberta ainda coloca fontes dentro do palco');
+ assert.match(await discoveryLink.getAttribute('href'),/topico=aplicacoes-metalicas&referencia=atlas-cu/,
+  'Manual não preserva a referência do componente');
+ const conciseCard=await discoveryCard.locator('.silm-workshop-card-body').innerText();
  assert.ok(conciseCard.length<125,'Cartão introdutório ficou com texto excessivo');
- await discoveryScience.locator('summary').click();
- assert.match(await discoveryScience.innerText(),/Material: /);
- assert.ok((await discoveryScience.innerText()).length>conciseCard.length,
-  'Explicações e fontes desapareceram ao reduzir o cartão');
- await discoveryScience.locator('summary').click();
  await discoveryCard.getByRole('button',{name:'Investigar componente'}).click();
  await page.waitForFunction(()=>SILMIntegration?.snapshot?.()?.metal?.atomicNumber===29);
  await page.waitForFunction(()=>SILM.lensController.inspect().scale===1&&SILM.lensController.inspect().attached);
@@ -69,27 +64,22 @@ try{
    label+': comandos causaram overflow global '+JSON.stringify(layout));
  }
  await checkLensDocked('objeto-390');
- // As advertências permanecem verificáveis, sem ocupar a fotografia.
- const objectScience=page.locator('.silm-workshop-science-details');
- assert.equal(await objectScience.count(),1,'Objeto sem seção de fontes e limites');
- assert.equal(await objectScience.getAttribute('open'),null,'Objeto: textos devem começar recolhidos');
+ // O palco não é um capítulo do Manual: há somente o atalho contextual.
+ assert.equal(await page.locator('.silm-workshop-science-details').count(),0,
+  'Fontes e limitações permanecem no palco do Objeto');
+ const objectManual=page.locator('.silm-workshop-reference-summary .silm-workshop-manual-link');
+ assert.match(await objectManual.getAttribute('href'),/topico=aplicacoes-metalicas&referencia=atlas-cu/);
  const objectImage=page.locator('.silm-workshop-reference-art');
  const imageArea=await objectImage.boundingBox();
  assert.ok(imageArea?.height>=215,'Objeto: fotografia perdeu espaço no celular');
  const objectHeading=await page.locator('.silm-workshop-reference-summary h2').boundingBox();
  assert.ok(objectHeading&&objectHeading.y>=imageArea.y+imageArea.height-2,
   'Objeto: título sobreposto à imagem no celular: '+JSON.stringify({imageArea,objectHeading}));
- const credit=await objectScience.locator('.silm-workshop-image-credit').textContent();
- assert.match(credit||'',/Ilustração gerada por IA/,
-  'Crédito da imagem desapareceu ao recolher as informações');
- const beforeDisclosure=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
- await objectScience.locator('summary').click();
- assert.match(await objectScience.innerText(),/A rede representa o elemento de referência/);
- assert.match(await objectScience.innerText(),/transposição didática/);
- assert.equal(await objectScience.getByRole('link',{name:'Fonte da aplicação'}).count(),1);
- await objectScience.locator('summary').click();
- assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),beforeDisclosure,
-  'Abrir informações do Objeto alterou a investigação científica');
+ assert.match(await page.locator('.silm-workshop-reference-art figcaption').textContent(),
+  /Ilustração gerada por IA/,'Proveniência semântica da figura foi descartada');
+ const manualTopics=await page.evaluate(()=>SILM.manual.topics.map(t=>t.id));
+ for(const topic of ['aplicacoes-metalicas','graos-microestrutura','travessia-escalas'])
+  assert.ok(manualTopics.includes(topic),'Manual sem tópico '+topic);
  // A troca de componente não deve se converter num segundo painel abaixo da foto.
  const alternatives=page.locator('.silm-workshop-reference-summary>.silm-workshop-alternatives');
  assert.equal(await alternatives.count(),1,'Lista de outros objetos ausente no contexto do Objeto');
@@ -194,23 +184,14 @@ try{
   SILM.lensController.inspect().targetClass.includes('micro-viewport'));
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
  await checkLensDocked('graos-390');
- const grainScience=page.locator('.silm-workshop-micro-info');
- assert.equal(await grainScience.count(),1,'Grãos sem limites e escala recolhíveis');
- const atlasReference=page.locator('.silm-workshop-micro-atlas-reference');
- if(await atlasReference.count()){
-  assert.equal(await grainScience.locator('.silm-workshop-micro-atlas-reference').count(),1,
-   'Imagem didática alternativa criou um painel extra dentro do palco');
-  assert.equal(await atlasReference.getAttribute('open'),null,
-   'Imagem didática auxiliar está expandida sobre os grãos');
- }
- assert.equal(await grainScience.getAttribute('open'),null,'Grãos: avisos devem iniciar recolhidos');
- const beforeGrainDisclosure=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
- await grainScience.locator('summary').click();
- assert.match(await grainScience.innerText(),/sem escala em µm/);
- assert.match(await grainScience.innerText(),/sem composição, fração de fase ou tamanho medidos/);
- await grainScience.locator('summary').click();
- assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),beforeGrainDisclosure,
-  'Abrir informações de grãos alterou dados científicos');
+ assert.equal(await page.locator('.silm-workshop-micro-info').count(),0,
+  'Limitações e fontes ainda ocupam a área de Grãos');
+ assert.equal(await page.locator('.silm-workshop-micro-atlas-reference').count(),0,
+  'Imagem do atlas ainda ocupa uma segunda área da investigação');
+ const grainManual=page.locator('.silm-workshop-micro-heading .silm-workshop-manual-link');
+ assert.match(await grainManual.getAttribute('href'),/topico=graos-microestrutura&referencia=atlas-cu/);
+ assert.equal(await page.locator('.silm-workshop-micro-dimension').isVisible(),true,
+  'Aviso físico obrigatório foi removido junto com as explicações');
  const grainless=await page.locator('.silm-micro-grain').count();
  assert.ok(grainless>5,'O gerador real de grãos não foi preservado');
  const firstPath=await page.locator('.silm-micro-grain').first().getAttribute('d');
