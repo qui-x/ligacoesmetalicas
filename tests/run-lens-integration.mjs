@@ -23,8 +23,20 @@ try{
  await page.locator('#silm-workshop-context').getByRole('button',{name:'Tabela Periódica'}).click();
  await page.locator('#silm-periodic-dialog [data-z="29"]').click();
  await page.locator('#silm-periodic-dialog [id$="-explore"]').click();
- await page.locator('.silm-workshop-card[data-reference-id="atlas-cu"]')
-  .getByRole('button',{name:'Investigar componente'}).click();
+ const discoveryCard=page.locator('.silm-workshop-card[data-reference-id="atlas-cu"]');
+ const discoveryScience=discoveryCard.locator('.silm-workshop-card-science');
+ assert.equal(await discoveryScience.count(),1,'Cartão de objeto perdeu as ressalvas científicas');
+ assert.equal(await discoveryScience.getAttribute('open'),null,'Cartão mostra explicações antes da investigação');
+ const conciseCard=await discoveryCard.locator('.silm-workshop-card-body').evaluate(body=>
+  [...body.children].filter(n=>n.tagName!=='DETAILS'&&
+   !n.matches('button')).map(n=>n.textContent.trim()).join(' '));
+ assert.ok(conciseCard.length<125,'Cartão introdutório ficou com texto excessivo');
+ await discoveryScience.locator('summary').click();
+ assert.match(await discoveryScience.innerText(),/Material: /);
+ assert.ok((await discoveryScience.innerText()).length>conciseCard.length,
+  'Explicações e fontes desapareceram ao reduzir o cartão');
+ await discoveryScience.locator('summary').click();
+ await discoveryCard.getByRole('button',{name:'Investigar componente'}).click();
  await page.waitForFunction(()=>SILMIntegration?.snapshot?.()?.metal?.atomicNumber===29);
  await page.waitForFunction(()=>SILM.lensController.inspect().scale===1&&SILM.lensController.inspect().attached);
  assert.equal(await page.locator('.silm-lens-layer').count(),1,'Lente duplicada na cena');
@@ -184,6 +196,13 @@ try{
  await checkLensDocked('graos-390');
  const grainScience=page.locator('.silm-workshop-micro-info');
  assert.equal(await grainScience.count(),1,'Grãos sem limites e escala recolhíveis');
+ const atlasReference=page.locator('.silm-workshop-micro-atlas-reference');
+ if(await atlasReference.count()){
+  assert.equal(await grainScience.locator('.silm-workshop-micro-atlas-reference').count(),1,
+   'Imagem didática alternativa criou um painel extra dentro do palco');
+  assert.equal(await atlasReference.getAttribute('open'),null,
+   'Imagem didática auxiliar está expandida sobre os grãos');
+ }
  assert.equal(await grainScience.getAttribute('open'),null,'Grãos: avisos devem iniciar recolhidos');
  const beforeGrainDisclosure=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
  await grainScience.locator('summary').click();
@@ -268,6 +287,16 @@ try{
  await page.locator('.silm-lens-circle').waitFor({state:'visible'});
 
  await page.locator('.silm-workshop-scale[data-scale="3"]').click();
+ await page.waitForFunction(()=>SILM.lensController.inspect().scale===3&&
+  SILM.lensController.inspect().attached);
+ const stageContext=page.locator('.silm-workshop-reference-summary--stage');
+ assert.equal(await stageContext.count(),1,'Rede não tem cabeçalho de metal compacto');
+ assert.equal(await stageContext.locator('.silm-workshop-selected-title').count(),0,
+  'Referência do objeto repetida dentro da Rede');
+ assert.ok((await stageContext.innerText()).trim().length<48,
+  'Cabeçalho da Rede tem explicações repetidas: '+await stageContext.innerText());
+ assert.equal(await page.locator('#silm-integration-scene .silm-scene-caption:visible').count(),0,
+  'Etiqueta duplicada ocupa a representação científica');
  await page.waitForFunction(()=>SILM.lensController.inspect().scale===3&&
   SILM.lensController.inspect().targetClass.includes('silm-assembly-stage'));
  assert.ok(await page.locator('.silm-crystal-stage').count(),
