@@ -112,7 +112,9 @@ SILM.microstructure=(()=>{
   const button=(name,txt,action)=>{const b=node('button','silm-workshop-micro-control',txt);b.type='button';b.setAttribute('aria-label',name);b.addEventListener('click',action);return b;};
   const zoomControls=node('div','silm-workshop-micro-zoom-tools');
   zoomControls.append(button('Reduzir microestrutura','−',()=>setZoom(zoom-.25)),zoomLabel,button('Ampliar microestrutura','+',()=>setZoom(zoom+.25)),button('Ajustar microestrutura ao quadro','Ajustar',()=>setZoom(1)));
-  toolbar.append(status,dimension,zoomControls);
+  // Informação operacional (grão selecionado + zoom) continua sempre visível.
+  // Escala física e limitações científicas ficam num <details> nativo.
+  toolbar.append(status,zoomControls);
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
   svg.addEventListener('pointerdown',e=>{
    if(e.button!==0||!viewport.classList.contains('is-pannable'))return;
@@ -327,7 +329,10 @@ SILM.microstructure=(()=>{
    fileInput.value='';
   });
   zoomControls.append(formationsButton,button('Abrir dados segmentados','Dados',()=>dataDialog.showModal()));
-  section.append(viewport,toolbar,note,genDialog,dataDialog);
+  const science=node('details','silm-workshop-micro-info');
+  const scienceToggle=node('summary','','Limites e escala');
+  science.append(scienceToggle,dimension,note);
+  section.append(viewport,toolbar,science,genDialog,dataDialog);
   // A câmera ocupa o quadro em qualquer proporção sem alterar um só grão.
   // A vista efetua recorte central (não estica geometria nem reamostra a formação).
   function fitViewport(){
