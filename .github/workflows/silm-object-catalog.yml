@@ -1,5 +1,7 @@
 name: SILM — Objetos: tabela e catálogo modal
 on:
+  push:
+    branches: [feat/silm-parte9-entrada-objetos-tabela-catalogo-20261110]
   pull_request:
     branches: [main]
     paths:
