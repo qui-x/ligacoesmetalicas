@@ -69,6 +69,8 @@ jobs:
           exit 1
       - name: Testar quatro escalas com lente real
         run: node tests/run-lens-integration.mjs
+      - name: Homologar entrada por Tabela e catálogo de objetos
+        run: node tests/run-object-entry-catalog.mjs
       - name: Guardar evidências visuais
         if: always()
         uses: actions/upload-artifact@v4
