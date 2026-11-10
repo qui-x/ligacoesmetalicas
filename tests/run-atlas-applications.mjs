@@ -36,22 +36,42 @@ async function check(v){
    await figure.scrollIntoViewIfNeeded();
    assert.equal(await figure.evaluate(i=>i.naturalWidth),960,item.symbol+' não carrega após investigação');
    assert.match(await figure.getAttribute('alt'),/Ilustração tecnológica/);
-   assert.match(await page.locator('.silm-workshop-reference').textContent(),/Ilustração gerada por IA/);
+   // A aplicação mantém a imagem; documentação e procedência vivem no Manual.
+   const macroManual=page.locator('.silm-workshop-reference-summary .silm-workshop-manual-link');
+   const macroHref=await macroManual.getAttribute('href');
+   assert.match(macroHref,new RegExp('topico=aplicacoes-metalicas&referencia=atlas-'+item.symbol));
+   assert.equal(await page.locator('.silm-workshop-science-details').count(),0,
+    'Metadados extensos ainda aparecem na investigação');
+   assert.match(await page.locator('.silm-workshop-reference figcaption').textContent(),/Ilustração gerada por IA/);
+   const snapshot=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
+   await macroManual.click();
+   await page.locator('.silm-manual-article').waitFor({state:'visible'});
+   assert.match(await page.locator('#manual-reference').innerText(),/Material indicado: /);
+   assert.match(await page.locator('#manual-reference').innerText(),/Ilustração gerada por IA/);
+   assert.ok(await page.locator('#manual-reference a[href^="https://"]').count()>=1,
+    'A referência da aplicação não foi transferida ao Manual');
+   await page.locator('#manual-workspace').click();
+   await page.locator('.silm-workshop-reference .silm-workshop-atlas-photo img').waitFor({state:'visible'});
+   assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),snapshot,
+    'Ler o Manual modificou a investigação científica');
    if(item.micro){
     await page.locator('.silm-workshop-scale').nth(1).click();
-    const science=page.locator('.silm-workshop-micro-info');
-    assert.equal(await science.count(),1,'Escala Grãos perdeu informações científicas');
-    assert.equal(await science.getAttribute('open'),null,
-     'Fonte didática ocupa o palco antes de ser solicitada');
-    const model=science.locator('.silm-workshop-micro-atlas-reference');
-    await model.waitFor({state:'attached'});
-    assert.equal(await model.getAttribute('open'),null,'Imagem auxiliar iniciou expandida');
-    await science.locator(':scope > summary').click();
-    await model.locator('summary').click();
-    const image=model.locator('img');
+    assert.equal(await page.locator('.silm-workshop-micro-atlas-reference').count(),0,
+     'A ilustração auxiliar ainda está presente no palco Grãos');
+    const manual=page.locator('.silm-workshop-micro-heading .silm-workshop-manual-link');
+    assert.match(await manual.getAttribute('href'),new RegExp('topico=graos-microestrutura&referencia=atlas-'+item.symbol));
+    await manual.click();
+    await page.locator('.silm-manual-article').waitFor({state:'visible'});
+    const image=page.locator('.silm-manual-micro-figure img');
     await image.waitFor({state:'visible'});
-    assert.match(await image.getAttribute('alt'),/sem escala/);
-    await page.waitForFunction(sym=>{const i=document.querySelector('.silm-workshop-micro-atlas-reference img');return i?.complete&&i.naturalWidth>0;},item.symbol,{timeout:15000});
+    assert.match(await image.getAttribute('alt'),/sem escala física/);
+    await page.waitForFunction(sym=>{
+     const im=document.querySelector('.silm-manual-micro-figure img');
+     return im?.complete&&im.naturalWidth>0&&im.getAttribute('src')?.endsWith('/'+sym+'-microestrutura-esquematica.webp');
+    },item.symbol,{timeout:15000});
+    assert.match(await page.locator('#manual-reference').innerText(),/modelo D0|desenho.*sem tamanho real/i);
+    await page.locator('#manual-workspace').click();
+    await page.locator('.silm-workshop-micro-map').waitFor({state:'visible'});
    }
    assert.deepEqual(errors,[],'Erro de execução: '+item.symbol);
    console.log('ATLAS_OK',name,v.width+'x'+v.height,item.symbol,'imagem carregada');
