@@ -234,6 +234,10 @@ try{
     assert.equal(back.overviewDisplay,'none',label+': Visão geral não foi escondida ao voltar');
    }
   }
+  if(label==='celular-400'){
+   await page.screenshot({path:join(dir,'celular-400-escala-'+scale+'.jpg'),
+    type:'jpeg',quality:72,animations:'disabled'});
+  }
   if(['celular-390','celular-400','paisagem-curta','desktop'].includes(label)){
    await page.screenshot({path:join(dir,label+'-centro.jpg'),type:'jpeg',quality:70,animations:'disabled'});
   }
