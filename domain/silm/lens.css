@@ -150,3 +150,46 @@
   border:2px solid CanvasText;box-shadow:none;background:Canvas;color:CanvasText
  }
 }
+
+
+/* Parte 8 — os comandos da lente participam da faixa SUPERIOR de escalas.
+   O anel é a única peça flutuante sobre a cena. Nenhum botão encobre grão,
+   átomo ou fotografia; a faixa inferior de ferramentas não é duplicada. */
+#si-stage .silm-workshop-reference>.silm-workshop-scales{
+ grid-template-columns:44px repeat(4,minmax(0,1fr)) 44px max-content!important;
+}
+#si-stage .silm-workshop-scales>.silm-lens-actions{
+ position:static!important;inset:auto!important;bottom:auto!important;right:auto!important;
+ display:flex;align-items:center;justify-content:flex-end;gap:3px;
+ min-width:44px;max-width:none!important;width:max-content;
+ height:44px;margin:0;padding:0 0 0 4px;
+ border-left:1px solid var(--border);
+ pointer-events:auto;
+}
+#si-stage .silm-workshop-scales>.silm-lens-actions .silm-lens-tool{
+ box-shadow:none;border-radius:8px;
+}
+#si-stage .silm-workshop-scales>.silm-lens-actions .silm-lens-tool:focus-visible{
+ outline-offset:-3px;
+}
+@media(max-width:650px){
+ #si-stage .silm-workshop-reference>.silm-workshop-scales{
+  /* Quatro escalas + uma só célula composta pelas ações visíveis. */
+  grid-template-columns:repeat(4,minmax(44px,1fr)) max-content!important;
+  column-gap:2px!important;
+ }
+ #si-stage .silm-workshop-scales>.silm-lens-actions{
+  padding:0;gap:2px;border:0;height:44px;
+ }
+ #si-stage .silm-workshop-scales>.silm-lens-actions :is(.silm-lens-reset,.silm-lens-advance){
+  display:none!important;
+ }
+ #si-stage .silm-workshop-scales>.silm-lens-actions .silm-lens-tool{
+  width:44px;min-width:44px;height:44px;
+ }
+}
+@media(max-width:320px){
+ #si-stage .silm-workshop-scales .silm-workshop-scale{
+  padding-inline:0!important;font-size:.72rem!important;
+ }
+}
