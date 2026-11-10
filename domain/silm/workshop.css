@@ -754,3 +754,23 @@
   border:2px solid CanvasText;background:Canvas;color:CanvasText;
  }
 }
+
+/* O aviso de escala física permanece na vista, ainda que o detalhamento
+   científico esteja recolhido. Não representar unidade sem calibração. */
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-info .silm-workshop-micro-scale-explain{
+ display:block;margin:6px 0;padding:0 5px;line-height:1.4;
+ font-size:.77rem;overflow-wrap:anywhere;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar .silm-workshop-micro-dimension{
+ display:inline-block;position:static;grid-column:auto;grid-row:auto;
+ flex:0 1 auto;min-width:0;margin:0;color:var(--muted);
+ font-size:.72rem;line-height:1.25;overflow-wrap:anywhere;
+}
+@media(max-width:760px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar .silm-workshop-micro-dimension{
+  flex:1 1 130px;order:1;font-size:.69rem;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar .silm-workshop-micro-zoom-tools{
+  order:2;
+ }
+}
