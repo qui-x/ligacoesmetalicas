@@ -39,8 +39,14 @@ async function check(v){
    assert.match(await page.locator('.silm-workshop-reference').textContent(),/Ilustração gerada por IA/);
    if(item.micro){
     await page.locator('.silm-workshop-scale').nth(1).click();
-    const model=page.locator('.silm-workshop-micro-atlas-reference');
+    const science=page.locator('.silm-workshop-micro-info');
+    assert.equal(await science.count(),1,'Escala Grãos perdeu informações científicas');
+    assert.equal(await science.getAttribute('open'),null,
+     'Fonte didática ocupa o palco antes de ser solicitada');
+    const model=science.locator('.silm-workshop-micro-atlas-reference');
     await model.waitFor({state:'attached'});
+    assert.equal(await model.getAttribute('open'),null,'Imagem auxiliar iniciou expandida');
+    await science.locator(':scope > summary').click();
     await model.locator('summary').click();
     const image=model.locator('img');
     await image.waitFor({state:'visible'});
