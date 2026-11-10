@@ -125,13 +125,11 @@ try{
      label+': visual macro verticalmente pequeno');
    }
    if(scale===1&&label==='celular-390'){
-    const details=page.locator('.silm-workshop-materials');
-    await details.locator('summary').click();
-    assert.match(await details.innerText(),/Material do componente:/,
-     'Resumo compacto escondeu a identificação científica do material');
-    assert.match(await details.innerText(),/Composição e fonte|Fonte da aplicação/,
-     'As referências da aplicação devem continuar consultáveis');
-    await details.locator('summary').click();
+    assert.equal(await page.locator('.silm-workshop-science-details').count(),0,
+     'Explicações extensas não devem permanecer dentro da área de investigação');
+    const manual=page.locator('.silm-workshop-reference-summary .silm-workshop-manual-link');
+    assert.match(await manual.getAttribute('href'),/topico=aplicacoes-metalicas&referencia=/,
+     'A composição e as fontes devem ser consultadas no Manual com a referência preservada');
    }
    if(scale===2){
     assert.ok(m.micro&&m.micro.width>=Math.min(260,m.stage.width*.75),
