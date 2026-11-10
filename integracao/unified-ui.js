@@ -233,6 +233,12 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
      paragraph('Aplicação no atlas: '+atlas.materialCategory+'. '+atlas.caveat);
      const src=sourceLink('Fonte da aplicação ilustrada',atlas.referenceURL);if(src)section.append(src);
     }
+    const appearance=S.microstructureAppearance?.get?.(elementId);
+    if(appearance){
+     paragraph('Cores e relevo: '+appearance.label+'. '+appearance.warning+' Os tons não indicam fração de fase, orientação ou porcentagens dos grãos.');
+     const src=sourceLink('Referência da aparência ilustrativa',appearance.source);
+     if(src)section.append(src);
+    }
     const image=S.metalAtlas?.micro?.(elementId);
     if(image?.path){
      const figure=N('figure');figure.className='silm-manual-micro-figure';
