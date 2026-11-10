@@ -81,7 +81,7 @@ SILM.workshop=(()=>{
    s.classList.add('silm-workshop-micro-mode');
    const heading=node('div','silm-workshop-micro-heading'),titles=node('div','silm-workshop-micro-titles');
    titles.append(node('h2','','Microestrutura · '+element.name));
-   titles.append(node('p','silm-workshop-micro-component',item?item.component+' · '+item.material:'Policristal didático · '+element.symbol));
+   // O material e seus limites científicos estão no detalhe da microestrutura.
    const table=node('button','button outline','Tabela Periódica');table.type='button';table.addEventListener('click',onOpenPeriodic);
    heading.append(titles,table);s.append(heading);
    if(SILM.microstructure?.create)s.append(SILM.microstructure.create({element,item}));
