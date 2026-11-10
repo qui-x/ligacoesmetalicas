@@ -52,6 +52,7 @@ A lente permanece opcional, vinculada à faixa da Travessia. Rede/Centro podem u
 - [x] P8-M3 · Harmonizar enquadramento Rede/Centro, a faixa instrumental e o rodapé, sem mover controles científicos.
 - [x] P8-M4 · Estender regressões a 320, 360, 390, 400 e 414 px, horizontal, rotação, Foco/Visão geral e painel aberto.
 - [x] P8-M7 · Distribuir o espaço vertical no Objeto em retrato (320–414 px), preservando `object-fit:contain` e delimitando a lente aos pixels reais da fotografia. Testes com geometria do enquadramento e da lente.
+- [x] P8-M8 · Preencher faixas de enquadramento com camada fotográfica difusa *meramente decorativa* (mesma imagem em cache), sem recortar a fotografia central, sem capturar eventos da lente e sem exibi-la em alto contraste.
 - [ ] P8-M5 · Conferir capturas finais em Chromium, Firefox e WebKit; homologar também leitura 150% e alto contraste; corrigir se necessário.
 - [ ] P8-M6 · Revisão visual em aparelho real, sem merge automático.
 
