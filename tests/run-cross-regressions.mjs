@@ -159,6 +159,51 @@ async function checkSingleDock(label,width){
  await page.waitForFunction(()=>document.querySelector('#si-dock-left')?.hidden);
  assert.equal(await scientific(),initial,label+': fechar doca alterou experimento');
 }
+
+async function checkModuleShortcuts(label,width){
+ const before=JSON.parse(await scientific());
+ const buttons=await page.locator('#silm-module-shortcuts [data-silm-module-shortcut]')
+  .evaluateAll(nodes=>nodes.map(n=>{
+   const b=n.getBoundingClientRect();
+   return {id:n.dataset.silmModuleShortcut,pressed:n.getAttribute('aria-pressed'),
+    disabled:n.disabled,width:b.width,height:b.height,left:b.left,right:b.right};
+  }));
+ assert.equal(buttons.length,3,label+': atalhos de módulo ausentes');
+ assert.deepEqual(buttons.map(b=>b.id),['explorar','medir','calcular'],label+': ordem dos módulos');
+ assert.deepEqual(buttons.filter(b=>b.pressed==='true').map(b=>b.id),[before.module],
+  label+': indicador do módulo ativo incorreto');
+ assert.ok(buttons.every(b=>b.width>=43.5&&b.height>=43.5&&b.left>=-2&&b.right<=width+2),
+  label+': módulos invisíveis ou comprimidos '+JSON.stringify(buttons));
+ const visualWidth=await page.evaluate(()=>document.documentElement.scrollWidth);
+ assert.ok(visualWidth<=width+6,label+': atalhos provocaram rolagem global '+visualWidth);
+ if(!['celular-390','desktop'].includes(label))return;
+ for(const target of ['medir','calcular','explorar']){
+  const button=page.locator('[data-silm-module-shortcut="'+target+'"]');
+  await button.click();
+  await page.waitForFunction(mode=>window.SILMIntegration?.snapshot?.()?.module?.active===mode,target);
+  await page.waitForFunction(mode=>document.querySelector('#silm-module-shortcuts')?.dataset.activeModule===mode,target);
+  const current=JSON.parse(await scientific());
+  assert.equal(current.module,target,label+': atalho não alterou o módulo');
+  assert.equal(await page.locator('#silm-module').inputValue(),target,
+   label+': seletor original não sincronizado');
+  assert.deepEqual(await page.locator('#silm-module-shortcuts [aria-pressed="true"]')
+   .evaluateAll(nodes=>nodes.map(n=>n.dataset.silmModuleShortcut)),[target],
+   label+': mais de um módulo marcado como ativo');
+  assert.equal(await page.locator('[data-silm-module-shortcut="'+target+'"]').isDisabled(),false,
+   label+': módulo livre ficou bloqueado');
+  for(const key of ['metal','investigationId','structure','properties','electrons','measurements','calculations'])
+   assert.deepEqual(current[key],before[key],label+': mudar módulo alterou '+key);
+  const allowed=await page.evaluate(()=>window.BaseDemoSI?.availableViewerFamilies?.()||[]);
+  assert.ok(allowed.includes(target==='explorar'?'observar':target),
+   label+': ferramentas do módulo ficaram indisponíveis');
+  if(target!=='explorar'){
+   assert.equal(await page.locator('#scene-undo').isDisabled(),true,
+    label+': editar estrutura deve continuar proibido em '+target);
+  }
+ }
+ assert.equal(await scientific(),JSON.stringify(before),label+': sequência de módulos mudou a investigação');
+}
+
 try{
  const ctx=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
  page=await ctx.newPage();
@@ -207,6 +252,7 @@ try{
    await checkDock('montagem');
    await checkSingleDock(label,width);
   }
+  await checkModuleShortcuts(label,width);
  }
  const end=JSON.parse(await scientific());
  assert.equal(end.metal,start.metal,'Navegação trocou o metal');
