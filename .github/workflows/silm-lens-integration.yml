@@ -10,6 +10,8 @@ on:
       - 'domain/silm/lens-controller.js'
       - 'integracao/module-shortcuts.js'
       - 'integracao/module-shortcuts.css'
+      - 'integracao/mobile-icon-fit.css'
+      - 'tests/run-cross-regressions.mjs'
       - 'integracao/dock-focus.js'
       - 'tests/run-lens-integration.mjs'
       - 'index.html'
