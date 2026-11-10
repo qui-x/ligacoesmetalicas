@@ -292,7 +292,7 @@
   const title=document.createElement('h2');title.textContent='Objetos do cotidiano';
   const actions=document.createElement('div');actions.className='silm-object-entry-actions';
   // Mantém acesso ao diálogo histórico da tabela para apresentação e compatibilidade.
-  const full=document.createElement('button');full.type='button';full.className='button outline';full.textContent='Tabela Periódica';
+  const full=document.createElement('button');full.type='button';full.className='button outline';full.textContent='Ampliar tabela';full.title='Abrir a Tabela Periódica em janela ampliada';
   full.setAttribute('aria-label','Tabela Periódica');full.addEventListener('click',()=> $('silm-open-periodic')?.click());
   actions.append(full);
   if(active){const back=document.createElement('button');back.type='button';back.className='button outline';
