@@ -57,6 +57,21 @@ try{
    label+': comandos causaram overflow global '+JSON.stringify(layout));
  }
  await checkLensDocked('objeto-390');
+ // As advertências permanecem verificáveis, sem ocupar a fotografia.
+ const objectScience=page.locator('.silm-workshop-science-details');
+ assert.equal(await objectScience.count(),1,'Objeto sem seção de fontes e limites');
+ assert.equal(await objectScience.getAttribute('open'),null,'Objeto: textos devem começar recolhidos');
+ const objectImage=page.locator('.silm-workshop-reference-art');
+ const imageArea=await objectImage.boundingBox();
+ assert.ok(imageArea?.height>=215,'Objeto: fotografia perdeu espaço no celular');
+ const beforeDisclosure=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
+ await objectScience.locator('summary').click();
+ assert.match(await objectScience.innerText(),/A rede representa o elemento de referência/);
+ assert.match(await objectScience.innerText(),/transposição didática/);
+ assert.equal(await objectScience.getByRole('link',{name:'Fonte da aplicação'}).count(),1);
+ await objectScience.locator('summary').click();
+ assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),beforeDisclosure,
+  'Abrir informações do Objeto alterou a investigação científica');
  const baseline=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
  await toggle.click();
  await page.locator('.silm-lens-circle').waitFor({state:'visible'});
@@ -106,6 +121,16 @@ try{
   SILM.lensController.inspect().targetClass.includes('micro-viewport'));
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
  await checkLensDocked('graos-390');
+ const grainScience=page.locator('.silm-workshop-micro-info');
+ assert.equal(await grainScience.count(),1,'Grãos sem limites e escala recolhíveis');
+ assert.equal(await grainScience.getAttribute('open'),null,'Grãos: avisos devem iniciar recolhidos');
+ const beforeGrainDisclosure=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
+ await grainScience.locator('summary').click();
+ assert.match(await grainScience.innerText(),/sem escala em µm/);
+ assert.match(await grainScience.innerText(),/sem composição, fração de fase ou tamanho medidos/);
+ await grainScience.locator('summary').click();
+ assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),beforeGrainDisclosure,
+  'Abrir informações de grãos alterou dados científicos');
  const grainless=await page.locator('.silm-micro-grain').count();
  assert.ok(grainless>5,'O gerador real de grãos não foi preservado');
  const firstPath=await page.locator('.silm-micro-grain').first().getAttribute('d');
