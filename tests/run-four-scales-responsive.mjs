@@ -106,6 +106,10 @@ try{
    if(scale===2)await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
    await page.waitForTimeout(90);
    const m=await sample(page);metrics.push({label,...m});
+   if(label==='celular-400'){
+    await page.screenshot({path:join(dir,'celular-400-escala-'+scale+'.jpg'),
+     type:'jpeg',quality:72,animations:'disabled'});
+   }
    assert.equal(m.scale,String(scale),label+': escala errada');
    assert.ok(m.documentWidth<=width+6,label+': rolagem global horizontal '+m.documentWidth+'/'+width);
    assert.ok(m.stage&&m.stage.width>=Math.min(width-36,240),label+': palco comprimido');
@@ -233,10 +237,6 @@ try{
     assert.notEqual(back.focusDisplay,'none',label+': Foco não voltou');
     assert.equal(back.overviewDisplay,'none',label+': Visão geral não foi escondida ao voltar');
    }
-  }
-  if(label==='celular-400'){
-   await page.screenshot({path:join(dir,'celular-400-escala-'+scale+'.jpg'),
-    type:'jpeg',quality:72,animations:'disabled'});
   }
   if(['celular-390','celular-400','paisagem-curta','desktop'].includes(label)){
    await page.screenshot({path:join(dir,label+'-centro.jpg'),type:'jpeg',quality:70,animations:'disabled'});
