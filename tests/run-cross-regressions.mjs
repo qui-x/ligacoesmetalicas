@@ -318,6 +318,30 @@ try{
    await page.waitForTimeout(70);
    await checkModes(label,scale,width,height);
    await checkMobileIcons(label,width,scale);
+   // Condições reais do menu de acessibilidade: 150% de texto, leitura
+   // simples e alto contraste. Só afetam apresentação, jamais os dados.
+   if((label==='celular-320'||label==='celular-390')){
+    const beforeA11y=await scientific();
+    await page.evaluate(()=>{
+     const root=document.documentElement;
+     root.classList.add('si-font-mod','si-simple-reading','si-highcontrast');
+     root.style.fontSize='24px';
+     root.style.setProperty('--si-font-factor','1.5');
+    });
+    await page.waitForTimeout(90);
+    await checkMobileIcons(label+'-acessibilidade-150',width,scale);
+    assert.equal(await scientific(),beforeA11y,
+     label+': alto contraste/leitura simples alterou a investigação');
+    if(scale===1||scale===4)
+     await page.screenshot({path:join(evidenceDir,label+'-acessibilidade-'+scale+'.jpg'),
+      type:'jpeg',quality:65,animations:'disabled'});
+    await page.evaluate(()=>{
+     const root=document.documentElement;
+     root.classList.remove('si-font-mod','si-simple-reading','si-highcontrast');
+     root.style.fontSize='';
+     root.style.removeProperty('--si-font-factor');
+    });
+   }
   }
   if(label==='celular-390'||label==='desktop'){
    await checkDock('ver');
