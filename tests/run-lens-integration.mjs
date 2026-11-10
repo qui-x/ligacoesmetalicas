@@ -134,7 +134,21 @@ try{
  const grainless=await page.locator('.silm-micro-grain').count();
  assert.ok(grainless>5,'O gerador real de grãos não foi preservado');
  const firstPath=await page.locator('.silm-micro-grain').first().getAttribute('d');
- const mapBefore=await page.locator('.silm-workshop-micro-map').getAttribute('viewBox');
+ // O ResizeObserver pode readaptar a câmera ao fechar o disclosure.
+ // Só comparar viewBox após a estabilização do enquadramento com o quadro.
+ await page.waitForFunction(()=>{
+  const svg=document.querySelector('.silm-workshop-micro-map');
+  const frame=svg?.closest('.silm-workshop-micro-viewport')?.getBoundingClientRect();
+  const box=svg?.viewBox?.baseVal;
+  return frame?.height>5&&box?.height>5&&
+   Math.abs(frame.width/frame.height-box.width/box.height)<.04;
+ },null,{timeout:3000});
+ const readMicroCamera=()=>page.locator('.silm-workshop-micro-map').evaluate(svg=>{
+  const rect=svg.closest('.silm-workshop-micro-viewport').getBoundingClientRect();
+  return {viewBox:svg.getAttribute('viewBox'),frameWidth:rect.width,
+   frameHeight:rect.height,zoom:svg.dataset.zoom};
+ });
+ const mapBefore=await readMicroCamera();
  const grainScientificBefore=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
  // Marco 2: o alvo deve corresponder ao contorno SVG real sob o centro da lente.
  await page.locator('.silm-lens-mark').click();
@@ -147,8 +161,20 @@ try{
  const chosenGrain=await page.locator('.silm-workshop-micro-map').getAttribute('data-selected-grain');
  assert.equal(grainMark.number,chosenGrain);
  assert.match(await page.locator('.silm-lens-selection').innerText(),/sem medição experimental/);
- assert.equal(await page.locator('.silm-workshop-micro-map').getAttribute('viewBox'),mapBefore,
-  'Marcar grão mudou a câmera/microestrutura');
+ const mapAfter=await readMicroCamera();
+ assert.equal(mapAfter.zoom,mapBefore.zoom,'Marcar grão mudou o zoom');
+ const frameStable=Math.abs(mapAfter.frameWidth-mapBefore.frameWidth)<1&&
+  Math.abs(mapAfter.frameHeight-mapBefore.frameHeight)<1;
+ if(frameStable){
+  assert.equal(mapAfter.viewBox,mapBefore.viewBox,
+   'Marcar grão moveu a câmera com quadro geométrico constante');
+ }else{
+  const ratio=mapAfter.viewBox.split(' ').map(Number);
+  assert.ok(Math.abs(ratio[2]/ratio[3]-mapAfter.frameWidth/mapAfter.frameHeight)<.05,
+   'ResizeObserver não ajustou o mapa após redimensionar o quadro');
+ }
+ assert.equal(await page.locator('.silm-micro-grain').first().getAttribute('d'),firstPath,
+  'Marcar grão alterou o contorno geométrico');
  assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),grainScientificBefore,
   'Destacar um grão didático alterou o snapshot científico');
  // A geometria usada para marcar precisa continuar correta com a câmera SVG
