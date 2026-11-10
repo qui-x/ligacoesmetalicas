@@ -171,6 +171,43 @@ try{
   SILM.lensController.inspect().scale===4);
  assert.equal(await page.locator('.silm-lens-circle:visible').count(),1);
 
+ // Parte 8: a lente acompanha a Oficina unificada e nunca cria outro motor.
+ // As mudanças de módulo usam o seletor científico original do SILM.
+ await page.setViewportSize({width:1366,height:768});
+ const stableBeforeModules=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
+ const shortcuts=page.locator('#silm-module-shortcuts [data-silm-module-shortcut]');
+ assert.equal(await shortcuts.count(),3,'Travessia integrada perdeu os três módulos');
+ for(const module of ['medir','calcular','explorar']){
+  const button=page.locator('[data-silm-module-shortcut="'+module+'"]');
+  await button.click();
+  await page.waitForFunction(n=>SILMIntegration.snapshot()?.module?.active===n,module);
+  await page.waitForFunction(()=>SILM.lensController.inspect().attached&&SILM.lensController.inspect().scale===4);
+  assert.equal(await page.locator('#silm-module').inputValue(),module,
+   'Atalho de módulo não usa o seletor científico original');
+  assert.deepEqual(await shortcuts.evaluateAll(nodes=>nodes.filter(n=>
+   n.getAttribute('aria-pressed')==='true').map(n=>n.dataset.silmModuleShortcut)),[module],
+   'Estado visual do módulo ativo inconsistente com o motor');
+  assert.equal(await page.locator('.silm-lens-layer').count(),1,
+   'Troca de módulo duplicou o DOM da lente');
+ }
+ assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),stableBeforeModules,
+  'Alternar módulos mudou o estado científico além do módulo ativo');
+ // Abrir os painéis originais não pode instanciar outras lentes nem docas extras.
+ for(const section of ['montagem','ver','dados']){
+  await page.locator('[data-open-dock="'+section+'"]').click();
+  await page.waitForFunction(n=>document.querySelector('[data-open-dock="'+n+'"]')
+   ?.getAttribute('aria-expanded')==='true',section);
+  const opened=await page.locator('.si-launchers [data-open-dock][aria-expanded="true"]')
+   .evaluateAll(nodes=>nodes.map(b=>b.dataset.openDock));
+  assert.deepEqual(opened,[section],'Duas docas simultâneas ao usar a lente');
+  assert.equal(await page.evaluate(()=>SILM.lensController.inspect().attached),true,
+   'Abrir painel removeu lente do Foco');
+  assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),stableBeforeModules,
+   'Abrir Montagem/Ver/Dados alterou o experimento');
+ }
+ await page.locator('[data-close-dock="right"]').click();
+ await page.screenshot({path:join(path,'lente-travessia-modulos.jpg'),type:'jpeg',quality:70});
+
  // Regressão em viewport estreito sem barra lateral extra ou overflow global.
  await page.setViewportSize({width:320,height:568});
  // WebKit pode fornecer a primeira geometria antes de recalcular clamp()
