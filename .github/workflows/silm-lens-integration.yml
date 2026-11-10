@@ -11,6 +11,7 @@ on:
       - 'integracao/module-shortcuts.js'
       - 'integracao/module-shortcuts.css'
       - 'integracao/mobile-icon-fit.css'
+      - 'integracao/mobile-layout-unificado.css'
       - 'tests/run-cross-regressions.mjs'
       - 'integracao/dock-focus.js'
       - 'tests/run-lens-integration.mjs'
