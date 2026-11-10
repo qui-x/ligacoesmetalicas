@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.10';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='regression-gate-projection-44px-20261109';
+const BUILD='oficina-modulos-diretos-20261109';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "assets/workshop/motor.webp",
@@ -185,6 +185,9 @@ const FILES=[
   "integracao/adapter.js",
   "integracao/action-icons.js",
   "integracao/toolbar-scroll.js",
+  "integracao/dock-focus.js",
+  "integracao/module-shortcuts.css",
+  "integracao/module-shortcuts.js",
   "domain/silm/abertura/silm-intro-v3.css",
   "domain/silm/abertura/silm-intro-v3.js",
   "integracao/pwa.js",

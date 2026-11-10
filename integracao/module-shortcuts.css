@@ -1,0 +1,70 @@
+/* SILM Parte 8 — módulos na barra superior original, sem nova doca.
+   Cada comando tem alvo de 44px e usa o seletor científico existente. */
+#si-workspace .si-workspace-toolbar #si-module-tag{
+ position:absolute!important;width:1px!important;height:1px!important;
+ padding:0!important;margin:-1px!important;border:0!important;
+ clip-path:inset(50%);overflow:hidden;white-space:nowrap;
+}
+#si-workspace .silm-module-shortcuts{
+ display:flex;align-items:center;justify-content:center;
+ gap:4px;min-width:0;flex:0 0 auto;
+ border:1px solid var(--border);border-radius:11px;
+ padding:3px;background:var(--panel2,var(--surface));
+}
+#si-workspace .silm-module-shortcut{
+ box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+ gap:5px;min-width:44px;min-height:44px;padding:7px 10px;
+ border:1px solid transparent;border-radius:8px;background:transparent;
+ color:var(--text);font:inherit;font-size:.76rem;font-weight:700;
+ white-space:nowrap;cursor:pointer;
+}
+#si-workspace .silm-module-shortcut svg{
+ width:19px;height:19px;flex:none;
+ stroke:currentColor;fill:none;stroke-width:1.9;
+ stroke-linecap:round;stroke-linejoin:round;
+}
+#si-workspace .silm-module-shortcut[aria-pressed="true"]{
+ border-color:var(--accent);background:var(--surface);
+ color:var(--text);box-shadow:inset 0 -3px 0 var(--accent);
+}
+#si-workspace .silm-module-shortcut:hover:not(:disabled){background:var(--tint)}
+#si-workspace .silm-module-shortcut:disabled{cursor:not-allowed;opacity:.6}
+#si-workspace .silm-module-shortcut[aria-pressed="true"]:disabled{opacity:1}
+#si-workspace .silm-module-shortcut:focus-visible{
+ outline:3px solid var(--ring,var(--accent));outline-offset:2px;
+}
+#si-workspace[data-silm-module="medir"] #scene-undo,
+#si-workspace[data-silm-module="calcular"] #scene-undo,
+#si-workspace[data-silm-module="medir"] #silm-quick-explore,
+#si-workspace[data-silm-module="calcular"] #silm-quick-explore{
+ display:none!important;
+}
+/* Em largura intermediária só os ícones permanecem, com rótulos acessíveis. */
+@media(max-width:1300px){
+ #si-workspace .silm-module-shortcut{width:44px;padding:0}
+ #si-workspace .silm-module-shortcut-label{display:none}
+}
+@media(max-width:900px){
+ #si-workspace .si-workspace-toolbar{padding-inline:7px;gap:5px}
+ #si-workspace .si-workspace-toolbar .si-view-tabs{
+  display:flex;flex:1 1 0;min-width:0;width:auto;gap:4px;
+ }
+ #si-workspace .si-workspace-toolbar .si-view-tabs button{
+  min-width:0;padding:7px 4px;
+ }
+ #si-workspace .silm-module-shortcuts{padding:2px;gap:2px}
+ #si-workspace .silm-module-shortcut{width:44px;min-width:44px}
+}
+/* Expandir continua disponível em sua posição real na câmera ao investigar
+   a rede; na barra estreita o controle duplicado não consome largura. */
+@media(max-width:650px){
+ #si-workspace .si-workspace-toolbar #si-expand-structure{display:none!important}
+}
+@media(forced-colors:active){
+ #si-workspace .silm-module-shortcut[aria-pressed="true"]{
+  border:2px solid Highlight;box-shadow:inset 0 -3px Highlight;
+ }
+}
+@media print{
+ #si-workspace .silm-module-shortcuts{display:none!important}
+}

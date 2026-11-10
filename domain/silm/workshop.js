@@ -111,24 +111,66 @@ SILM.workshop=(()=>{
   }else if(scale===1)summary.append(node('p','silm-workshop-intro','Escolha um objeto para observar o componente metálico.'));
   const table=node('button','button outline');table.setAttribute('aria-label','Tabela Periódica');table.append(node('span','','Tabela'),node('span','silm-workshop-table-long',' Periódica'));table.type='button';table.addEventListener('click',onOpenPeriodic);summary.append(table);top.append(summary);s.append(top);
   }
-  const scales=node('div','silm-workshop-scales');scales.setAttribute('role','group');scales.setAttribute('aria-label','Escalas de investigação');
-  // A escala altera o que é observado no mesmo ensaio, não inicia outro experimento.
+  // Travessia: controles de interface ligados às escalas reais do mesmo ensaio.
+  // Não cria câmera, simulação, estrutura ou estado científico paralelo.
+  const scales=node('div','silm-workshop-scales');
+  scales.setAttribute('role','group');
+  scales.setAttribute('aria-label','Escalas de investigação');
   const steps=[
    ['Objeto e componente','Objeto','Identificar o componente metálico e sua aplicação.'],
    ['Microestrutura','Grãos','Observar os grãos e as regiões do material.'],
    ['Rede e célula','Rede','Investigar a estrutura e os efeitos coletivos das propriedades.'],
    ['Centro metálico','Centro','Acompanhar os efeitos das mesmas propriedades no centro metálico selecionado.']
   ];
+  const allowed=steps.map((_,i)=>i+1).filter(n=>n!==1||item||items.length);
+  const previous=allowed.filter(n=>n<scale).at(-1);
+  const following=allowed.find(n=>n>scale);
+  function navigate(target,returnFocus='step'){
+   if(!allowed.includes(target)||target===scale)return;
+   onScale(target); // Usa exatamente o manipulador original do SILM.
+   requestAnimationFrame(()=>{
+    const button=returnFocus==='step'?host.querySelector('.silm-workshop-scale[data-scale="'+target+'"]'):
+     host.querySelector('.silm-workshop-traverse[data-direction="'+returnFocus+'"]');
+    const fallback=host.querySelector('.silm-workshop-scale[data-scale="'+target+'"]');
+    (button&&!button.disabled?button:fallback)?.focus({preventScroll:true});
+   });
+  }
+  function arrow(direction,target,glyph){
+   const b=node('button','silm-workshop-traverse',glyph),back=direction==='prev';
+   b.type='button';b.dataset.direction=direction;
+   const label=back?'Escala anterior':'Próxima escala';
+   b.setAttribute('aria-label',target===undefined?label+' indisponível':label+': '+steps[target-1][1]);
+   b.title=target===undefined?label+' indisponível':label+': '+steps[target-1][0];
+   b.disabled=target===undefined;
+   b.addEventListener('click',()=>navigate(target,direction));
+   return b;
+  }
   for(const [i,[label,short,description]]of steps.entries()){
-   const name=String(i+1)+' · '+label,b=node('button','silm-workshop-scale');
-   b.type='button';b.dataset.scale=String(i+1);
+   const n=i+1,name=String(n)+' · '+label,b=node('button','silm-workshop-scale');
+   b.type='button';b.dataset.scale=String(n);
    b.setAttribute('aria-label',name+' — '+description);
    b.title=name+' — '+description;
    b.append(node('span','silm-workshop-scale-long',name),node('span','silm-workshop-scale-short',short));
-   if(i===0&&!item&&!items.length){b.disabled=true;b.title='Sem objeto de referência cadastrado para '+element.name;}
-   b.setAttribute('aria-pressed',String(scale===i+1));
-   b.addEventListener('click',()=>onScale(i+1));scales.append(b);
+   if(!allowed.includes(n)){b.disabled=true;b.title='Sem objeto de referência cadastrado para '+element.name;}
+   b.setAttribute('aria-pressed',String(scale===n));
+   if(scale===n)b.setAttribute('aria-current','step');
+   b.addEventListener('click',()=>navigate(n));scales.append(b);
   }
+  // Teclado: seta para escala contígua, Home/End para as extremidades.
+  // A navegação não intercepta atalhos fora dos quatro botões de escala.
+  scales.addEventListener('keydown',event=>{
+   if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+   const button=event.target.closest('.silm-workshop-scale');
+   if(!button||!scales.contains(button))return;
+   const from=Number(button.dataset.scale);
+   const target=event.key==='Home'?allowed[0]:event.key==='End'?allowed.at(-1):
+    event.key==='ArrowLeft'?allowed.filter(n=>n<from).at(-1):allowed.find(n=>n>from);
+   if(target===undefined)return;
+   event.preventDefault();navigate(target);
+  });
+  scales.prepend(arrow('prev',previous,'‹'));
+  scales.append(arrow('next',following,'›'));
+  // Preserva a estrutura pública original esperada pelas auditorias de microestrutura.
   s.insertBefore(scales,s.firstChild);
   if(scale!==2)s.append(node('p','silm-workshop-scale-note',scale===3?'A rede e a célula unitária mostram os efeitos coletivos. Selecione um centro para aprofundar a mesma investigação.':scale===4?'O centro selecionado pertence à rede: observe nele a resposta local dos estímulos aplicados à estrutura.':'O componente permanece identificado enquanto a visualização se aproxima; a mudança de escala não troca o material.'));
   if(scale!==2&&items.some(other=>other.id!==item?.id)){const alt=node('div','silm-workshop-alternatives'),row=node('div','silm-workshop-alternative-list');alt.append(node('h3','','Outras aplicações com '+element.name));

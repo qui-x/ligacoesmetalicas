@@ -20,7 +20,9 @@ async function sample(page){
   const stage=document.querySelector('#si-stage');
   const ref=stage.querySelector('.silm-workshop-reference');
   const nav=ref?.querySelector('.silm-workshop-scales');
-  const buttons=nav?[...nav.querySelectorAll('button')]:[];
+  const buttons=nav?[...nav.querySelectorAll('.silm-workshop-scale')]:[];
+  const traversal=nav;
+  const arrows=traversal?[...traversal.querySelectorAll('.silm-workshop-traverse')]:[];
   const art=ref?.querySelector('.silm-workshop-reference-art');
   const image=art?.querySelector('img');
   const micro=ref?.querySelector('.silm-workshop-micro-viewport');
@@ -34,6 +36,9 @@ async function sample(page){
    viewport:[innerWidth,innerHeight],scale:stage.dataset.workshopScale,
    documentWidth:document.documentElement.scrollWidth,
    stage:q(stage),reference:q(ref),nav:q(nav),buttons:buttons.map(q),
+   traversal:q(traversal),arrows:arrows.map(b=>({disabled:b.disabled,
+    visible:getComputedStyle(b).display!=='none',rect:q(b)})),
+   current:buttons.filter(b=>b.getAttribute('aria-current')==='step').map(b=>b.dataset.scale),
    art:q(art),image:q(image),imageLoaded:!!image&&image.complete&&image.naturalWidth>0,
    micro:q(micro),microTools:q(tools),scene:q(scene),stageCanvas:q(stageCanvas),
    action:q(action),
@@ -56,6 +61,31 @@ try{
  await page.locator('.silm-workshop-card[data-reference-id="atlas-cu"]').getByRole('button',{name:'Investigar componente'}).click();
  await page.waitForFunction(()=>window.SILMIntegration?.snapshot?.()?.metal?.atomicNumber===29);
  const scientific=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
+ // A Travessia atua no motor já existente; teclado e setas não iniciam novo ensaio.
+ const signature=()=>page.evaluate(()=>{
+  const s=SILMIntegration.snapshot();
+  return JSON.stringify({metal:s.metal?.atomicNumber,investigation:s.investigation?.id,module:s.module?.active});
+ });
+ const beforeTraversal=await signature();
+ await page.locator('.silm-workshop-scale[data-scale="1"]').click();
+ await page.locator('.silm-workshop-scale[data-scale="1"]').focus();
+ await page.keyboard.press('ArrowRight');
+ await page.waitForFunction(()=>document.querySelector('#si-stage')?.dataset.workshopScale==='2');
+ await page.locator('.silm-workshop-scale[data-scale="2"]').focus();
+ await page.keyboard.press('End');
+ await page.waitForFunction(()=>document.querySelector('#si-stage')?.dataset.workshopScale==='4');
+ await page.locator('.silm-workshop-scale[data-scale="4"]').focus();
+ await page.keyboard.press('Home');
+ await page.waitForFunction(()=>document.querySelector('#si-stage')?.dataset.workshopScale==='1');
+ assert.equal(await page.locator('.silm-workshop-traverse[data-direction="prev"]').isDisabled(),true,
+  'Seta anterior deveria estar desabilitada no Objeto');
+ await page.setViewportSize({width:1366,height:768});
+ await page.locator('.silm-workshop-traverse[data-direction="next"]').click();
+ await page.waitForFunction(()=>document.querySelector('#si-stage')?.dataset.workshopScale==='2');
+ await page.locator('.silm-workshop-traverse[data-direction="prev"]').click();
+ await page.waitForFunction(()=>document.querySelector('#si-stage')?.dataset.workshopScale==='1');
+ assert.equal(await signature(),beforeTraversal,'Travessia alterou identidade do experimento');
+ await page.setViewportSize({width:390,height:844});
  for(const [label,width,height] of sizes){
   await page.setViewportSize({width,height});
   for(const scale of [1,2,3,4]){
@@ -70,6 +100,14 @@ try{
    assert.ok(m.documentWidth<=width+6,label+': rolagem global horizontal '+m.documentWidth+'/'+width);
    assert.ok(m.stage&&m.stage.width>=Math.min(width-36,240),label+': palco comprimido');
    assert.ok(m.nav&&m.buttons.length===4,label+': navegação de quatro escalas ausente');
+   assert.ok(m.traversal&&m.arrows.length===2,label+': controles da Travessia ausentes');
+   assert.deepEqual(m.current,[String(scale)],label+': escala corrente não identificada');
+   if(width>=651)assert.ok(m.arrows.every(x=>x.visible&&x.rect.height>=43.5),
+    label+': setas da Travessia não têm alvo adequado');
+   if(width<=650)assert.ok(m.arrows.every(x=>!x.visible),
+    label+': setas comprimem a navegação direta no celular');
+   if(scale===1)assert.equal(m.arrows[0].disabled,true,label+': seta anterior ativa no início');
+   if(scale===4)assert.equal(m.arrows[1].disabled,true,label+': seta próxima ativa no final');
    assert.ok(m.buttons.every(x=>x.height>=43.5),label+': botões de escala menores que 44 px');
    assert.ok(m.buttons.every(x=>Math.abs(x.top-m.buttons[0].top)<3),
     label+': navegação quebrou em mais de uma linha na escala '+scale);

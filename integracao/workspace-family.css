@@ -575,3 +575,31 @@ body.si-structure-expanded #silm-scene-actionbar{
   color:ButtonText!important;box-shadow:none;
  }
 }
+
+/* Parte 8: doca auxiliar temporária. Quando aberta, não reduz o palco científico.
+   A exclusão mútua é controlada pelo adaptador de interface dock-focus.js;
+   a Base SI continua proprietária de hidden, foco e painel selecionado. */
+@media(min-width:901px){
+ #si-workspace[data-left-open="true"] #workspace-focus{
+  padding-left:12px!important;
+ }
+ #si-workspace[data-right-open="true"] #workspace-focus{
+  padding-right:12px!important;
+ }
+ #si-workspace .si-dock:not([hidden]){
+  box-shadow:0 14px 32px rgb(0 0 0 / .20);
+ }
+}
+/* Lançadores atuais: estado da doca visível pelo mesmo atributo acessível. */
+#si-workspace .si-launchers [data-open-dock][aria-expanded="true"]{
+ border-color:var(--accent);background:var(--tint);
+ box-shadow:inset 0 -3px 0 var(--accent);
+}
+#si-workspace .si-launchers [data-open-dock]:focus-visible{
+ outline:3px solid var(--ring,var(--accent));outline-offset:2px;
+}
+@media(forced-colors:active){
+ #si-workspace .si-launchers [data-open-dock][aria-expanded="true"]{
+  border:2px solid Highlight;outline:2px solid Highlight;outline-offset:-4px;
+ }
+}
