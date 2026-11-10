@@ -186,7 +186,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
  const MANUAL_GROUPS=[['Investigue',['interface','aplicacoes-metalicas','graos-microestrutura','travessia-escalas','selecionar-metal','montagem','estruturas-cristalinas','eletrons-deslocalizados','propriedades-metalicas','explorar','medir','calcular','vista','vista-3d']],['Prepare e registre',['atividades','montagens-prontas','caderno','relatorio']],['Orientação',['navegacao','tour','problemas','manual','preferencias','abertura','reiniciar','offline','sobre-silm']],['Para ensinar',['professor']]];
  const MANUAL_QUICK=[['selecionar-metal','Como escolher um metal'],['medir','Como medir o parâmetro de rede'],['problemas','Por que uma opção não aparece']];
  const arrowSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-  const renderReferenceContext=(article,topicId)=>{
+  const renderReferenceContext=(article,topicId,referenceId)=>{
    if(!['aplicacoes-metalicas','graos-microestrutura'].includes(topicId))return;
    const saved=model.state.metadata?.workshop?.referenceId;
    const selected=S.workshop?.get?.(referenceId||saved);
@@ -297,7 +297,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
     crumb.append(home,N('span','/'),N('span',group),N('span','/'),here);for(const sep of crumb.querySelectorAll('span:not([aria-current])'))if(sep.textContent==='/')sep.setAttribute('aria-hidden','true');
     const article=N('article');article.className='silm-reading silm-manual-article';const eyebrow=N('p',group.toUpperCase());eyebrow.className='eyebrow';const h1=N('h1',topic.title);h1.id='manual-title';h1.tabIndex=-1;const lead=N('p',operation(topic.summary));lead.className='silm-lead';
     article.append(eyebrow,h1,lead);for(const k of ['purpose','content'])if(topic[k])article.append(N('p',operation(topic[k])));
-    renderReferenceContext(article,topic.id);
+    renderReferenceContext(article,topic.id,referenceId);
     if(topic.steps){article.append(N('h2','Passo a passo'));const ol=N('ol');topic.steps.forEach(x=>ol.append(N('li',operation(x))));article.append(ol);}
     if(topic.details?.length){article.append(N('h2','Saiba mais'));for(const d of topic.details){const det=N('details');det.append(N('summary',d.title),N('p',operation(d.text)));article.append(det);}}
     const related=(topic.related||[]).map(find).filter(Boolean);if(related.length){const nav=N('nav');nav.className='silm-manual-related';nav.setAttribute('aria-label','Veja também');nav.append(N('h2','Veja também'));const box=N('div');for(const r of related)box.append(arrowLink(r.title,href(r.id)));nav.append(box);article.append(nav);}
