@@ -774,3 +774,41 @@
   order:2;
  }
 }
+
+/* Capturas da revisão: a legenda da imagem invadia o título no celular.
+   Mantê-la semanticamente no figure, porém visualmente em "Fontes". */
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-art .silm-workshop-photo{
+ position:relative;min-height:0;max-width:100%;overflow:hidden;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-art .silm-workshop-photo figcaption{
+ position:absolute!important;width:1px!important;height:1px!important;
+ padding:0!important;margin:-1px!important;border:0!important;
+ clip-path:inset(50%)!important;overflow:hidden!important;white-space:nowrap!important;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-science-details .silm-workshop-image-credit{
+ font-size:.75rem;line-height:1.4;margin:7px 0;
+ color:var(--muted);overflow-wrap:anywhere;
+}
+@media(max-width:760px){
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-top:has(.silm-workshop-atlas-photo){
+  grid-template-rows:auto auto!important;align-items:start!important;
+  flex:0 0 auto!important;min-height:0!important;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art:has(.silm-workshop-atlas-photo){
+  box-sizing:border-box;height:clamp(230px,45dvh,470px)!important;
+  min-height:0!important;max-height:none!important;align-self:start!important;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art .silm-workshop-atlas-photo{
+  box-sizing:border-box;height:100%!important;min-height:0!important;
+  display:flex!important;flex-direction:column!important;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art .silm-workshop-atlas-photo img{
+  box-sizing:border-box;flex:1 1 auto!important;
+  min-height:0!important;max-height:100%!important;
+  object-fit:contain!important;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary{
+  align-self:start!important;position:relative;
+  margin-top:5px;min-height:0!important;
+ }
+}
