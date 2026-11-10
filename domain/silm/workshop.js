@@ -102,12 +102,31 @@ SILM.workshop=(()=>{
    const summary=node('div','silm-workshop-reference-summary'),heading=node('h2','');
    heading.append(node('span','silm-workshop-prefix','Investigando '),document.createTextNode(element.name));
    summary.append(node('p','silm-workshop-eyebrow','OBJETO E COMPOSIÇÃO'),heading);
-  if(item){const component=node('p','silm-workshop-selected-title',item.title);component.append(node('span','silm-workshop-component-long',' · '+item.component));summary.append(component,node('p','silm-workshop-material','Material do componente: '+item.material),node('p','silm-workshop-card-note',item.explanation));
-   const ul=node('ul','silm-workshop-composition');for(const [name,role]of item.composition){const li=node('li','');li.append(node('strong','',name),node('span','',role));ul.append(li);}const details=node('details','silm-workshop-materials');details.append(node('summary','','Composição e fonte'),ul,node('p','silm-workshop-caveat',item.caveat));
+  if(item){
+   const component=node('p','silm-workshop-selected-title',item.title);
+   component.append(node('span','silm-workshop-component-long',' · '+item.component));
+   summary.append(component);
+   // Todas as ressalvas e os dados continuam disponíveis, mas não disputam
+   // espaço permanentemente com a fotografia e a lente da investigação.
+   const details=node('details','silm-workshop-materials silm-workshop-science-details');
+   details.append(node('summary','','Material, composição e fontes'));
+   const ul=node('ul','silm-workshop-composition');
+   for(const [name,role]of item.composition){
+    const li=node('li','');li.append(node('strong','',name),node('span','',role));ul.append(li);
+   }
+   details.append(
+    node('p','silm-workshop-detail-material','Componente: '+item.component),
+    node('p','silm-workshop-detail-material','Material do componente: '+item.material),
+    node('p','silm-workshop-detail-note',item.explanation),
+    ul,
+    node('p','silm-workshop-caveat',item.caveat),
+    node('p','silm-workshop-caveat','A rede representa o elemento de referência. A peça pode conter outras fases e materiais.'),
+    node('p','silm-workshop-detail-note','Aproximar a visualização é uma transposição didática, não uma medida microscópica do objeto.')
+   );
    const source=node('a','','Fonte da aplicação');source.target='_blank';source.rel='noopener noreferrer';
    const sources={12:'https://periodic-table.rsc.org/element/12/magnesium',29:'https://periodic-table.rsc.org/element/29/copper',57:'https://periodic-table.rsc.org/element/57/lanthanum'};
    source.href=item.sourceURL||sources[item.atomicNumber]||(item.id==='ferro-transformador'?'https://www.thyssenkrupp-steel.com/en/industries/energy/energy.html':'https://worldsteel.org/about-steel/what-is-steel/');
-   details.append(node('p','silm-workshop-detail-material','Material do componente: '+item.material),node('p','silm-workshop-detail-note',item.explanation),source);summary.append(details,node('p','silm-workshop-caveat','A rede representa o elemento de referência. A peça pode conter outras fases e materiais.'));
+   details.append(source);summary.append(details);
   }else if(scale===1)summary.append(node('p','silm-workshop-intro','Escolha um objeto para observar o componente metálico.'));
   const table=node('button','button outline');table.setAttribute('aria-label','Tabela Periódica');table.append(node('span','','Tabela'),node('span','silm-workshop-table-long',' Periódica'));table.type='button';table.addEventListener('click',onOpenPeriodic);summary.append(table);top.append(summary);s.append(top);
   }
@@ -172,7 +191,7 @@ SILM.workshop=(()=>{
   scales.append(arrow('next',following,'›'));
   // Preserva a estrutura pública original esperada pelas auditorias de microestrutura.
   s.insertBefore(scales,s.firstChild);
-  if(scale!==2)s.append(node('p','silm-workshop-scale-note',scale===3?'A rede e a célula unitária mostram os efeitos coletivos. Selecione um centro para aprofundar a mesma investigação.':scale===4?'O centro selecionado pertence à rede: observe nele a resposta local dos estímulos aplicados à estrutura.':'O componente permanece identificado enquanto a visualização se aproxima; a mudança de escala não troca o material.'));
+  if(scale!==2&&scale!==1)s.append(node('p','silm-workshop-scale-note',scale===3?'A rede e a célula unitária mostram os efeitos coletivos. Selecione um centro para aprofundar a mesma investigação.':scale===4?'O centro selecionado pertence à rede: observe nele a resposta local dos estímulos aplicados à estrutura.':'O componente permanece identificado enquanto a visualização se aproxima; a mudança de escala não troca o material.'));
   if(scale!==2&&items.some(other=>other.id!==item?.id)){const alt=node('div','silm-workshop-alternatives'),row=node('div','silm-workshop-alternative-list');alt.append(node('h3','','Outras aplicações com '+element.name));
    for(const other of items){if(other.id===item?.id)continue;const b=node('button','silm-workshop-alternative',other.title);b.type='button';b.addEventListener('click',()=>onChoose(other));row.append(b);}alt.append(row);s.append(alt);}
   host.append(s);
