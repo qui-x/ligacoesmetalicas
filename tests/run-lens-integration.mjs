@@ -166,6 +166,13 @@ try{
  assert.equal(objectMark?.kind,'object','A lente não marcou a ilustração do Objeto');
  assert.match(objectMark?.label||'',/Região visual/);
  assert.ok((await page.locator('.silm-lens-selection').innerText()).includes('sem amostra medida'));
+ const liveStatus=page.locator('.silm-lens-selection');
+ assert.equal(await liveStatus.getAttribute('role'),'status');
+ assert.equal(await liveStatus.getAttribute('aria-live'),'polite');
+ const overlaySize=await liveStatus.boundingBox();
+ assert.ok(overlaySize?.width<=2&&overlaySize?.height<=2,
+  'Texto explicativo da lente ainda cobre a imagem');
+
  assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),baseline,
   'Marcar imagem alterou o estado científico da investigação');
  // Mover a lente não é equivalente a remarcar o Objeto.
