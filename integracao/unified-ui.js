@@ -183,15 +183,92 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
  const operation=text=>String(text).replaceAll('Montagem → Metal','Montagem → Preparo').replaceAll('Ver → Analisar → Calcular','Ver → Analisar → Cálculos cristalográficos').replaceAll('Ver → Observar → Camadas','Ver → Observar → Estrutura e representação').replaceAll('O Caderno não está ativado no SILM.','O Caderno guarda observações locais.');
  /* Manual na arquitetura do SIAB: barra com busca, "Voltar à oficina" e impressão; início com apresentação, "Quero saber" e
     grupos de tópicos; tópico com caminho, artigo, detalhes recolhíveis, "Veja também" e retorno; resultados de busca. */
- const MANUAL_GROUPS=[['Investigue',['interface','selecionar-metal','montagem','estruturas-cristalinas','eletrons-deslocalizados','propriedades-metalicas','explorar','medir','calcular','vista','vista-3d']],['Prepare e registre',['atividades','montagens-prontas','caderno','relatorio']],['Orientação',['navegacao','tour','problemas','manual','preferencias','abertura','reiniciar','offline','sobre-silm']],['Para ensinar',['professor']]];
+ const MANUAL_GROUPS=[['Investigue',['interface','aplicacoes-metalicas','graos-microestrutura','travessia-escalas','selecionar-metal','montagem','estruturas-cristalinas','eletrons-deslocalizados','propriedades-metalicas','explorar','medir','calcular','vista','vista-3d']],['Prepare e registre',['atividades','montagens-prontas','caderno','relatorio']],['Orientação',['navegacao','tour','problemas','manual','preferencias','abertura','reiniciar','offline','sobre-silm']],['Para ensinar',['professor']]];
  const MANUAL_QUICK=[['selecionar-metal','Como escolher um metal'],['medir','Como medir o parâmetro de rede'],['problemas','Por que uma opção não aparece']];
  const arrowSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  const renderReferenceContext=(article,topicId)=>{
+   if(!['aplicacoes-metalicas','graos-microestrutura'].includes(topicId))return;
+   const saved=model.state.metadata?.workshop?.referenceId;
+   const selected=S.workshop?.get?.(referenceId||saved);
+   const elementId=selected?.atomicNumber??model.state.metal?.atomicNumber;
+   const metal=elementId?S.data.get(elementId):null;
+   const atlas=elementId?S.metalAtlas?.get?.(elementId):null;
+   const section=N('section');section.className='silm-manual-reference';section.id='manual-reference';
+   const sourceLink=(label,url)=>{
+    if(typeof url!=='string'||!/^https:\/\//.test(url))return null;
+    const a=N('a',label);a.href=url;a.target='_blank';a.rel='noopener noreferrer';return a;
+   };
+   const heading=text=>{const h=N('h2',text);section.append(h);};
+   const paragraph=text=>{if(text)section.append(N('p',text));};
+   if(topicId==='aplicacoes-metalicas'&&selected){
+    heading('Aplicação em estudo: '+selected.title);
+    paragraph('Componente: '+selected.component);
+    paragraph('Material indicado: '+selected.material);
+    paragraph(selected.explanation);
+    if(selected.composition?.length){
+     section.append(N('h3','Constituintes descritos para esta aplicação'));
+     const list=N('ul');
+     for(const [name,role]of selected.composition)list.append(N('li',name+' — '+role));
+     section.append(list);
+    }
+    paragraph(selected.caveat);
+    paragraph('A rede representa o elemento de referência, não todos os materiais, fases ou camadas de um produto.');
+    paragraph('A aproximação entre Objeto, Grãos, Rede e Centro é didática; não equivale a ampliar uma imagem experimental.');
+    const credit=selected.atlasPath?'Ilustração gerada por IA · aplicação tecnológica, não fotografia nem certificação de composição.':'Ilustração didática de referência genérica, sem certificação da composição do objeto.';
+    paragraph(credit);
+    const src=sourceLink('Consultar fonte desta aplicação',selected.sourceURL||atlas?.referenceURL);
+    if(src)section.append(src);
+    article.append(section);
+   }else if(topicId==='aplicacoes-metalicas'&&atlas){
+    heading('Referência do metal: '+metal?.name);
+    paragraph(atlas.application);paragraph('Material: '+atlas.materialCategory);paragraph(atlas.caveat);
+    paragraph('Imagem gerada por IA; não representa uma amostra de composição medida.');
+    const src=sourceLink('Fonte da aplicação',atlas.referenceURL);if(src)section.append(src);
+    article.append(section);
+   }else if(topicId==='graos-microestrutura'&&metal){
+    heading('Contexto e fontes: '+metal.name);
+    paragraph('O desenho da Oficina é um modelo D0 de policristal, sem tamanho real em µm, composição ou porcentagens medidas.');
+    if(selected)paragraph('Objeto de partida: '+selected.title+' · '+selected.material+'. O desenho dos grãos não deriva da peça ilustrada.');
+    if(atlas){
+     paragraph('Aplicação no atlas: '+atlas.materialCategory+'. '+atlas.caveat);
+     const src=sourceLink('Fonte da aplicação ilustrada',atlas.referenceURL);if(src)section.append(src);
+    }
+    const image=S.metalAtlas?.micro?.(elementId);
+    if(image?.path){
+     const figure=N('figure');figure.className='silm-manual-micro-figure';
+     const img=N('img');img.src=image.path;img.alt='Ilustração esquemática de grãos de '+metal.name+' sem escala física';img.loading='lazy';img.decoding='async';
+     figure.append(img,N('figcaption',image.caveat));
+     section.append(N('h3','Imagem esquemática do atlas'),figure);
+    }
+    const refElement=S.data?.get?.(elementId);
+    const crystal=refElement&&S.data?.structure?.(refElement);
+    if(crystal){
+     paragraph('Rede de referência: '+(crystal.type||'não registrada')+(crystal.spaceGroupNumber?' · grupo espacial '+crystal.spaceGroupNumber:'')+'. A liga ou produto pode ter outras condições e fases.');
+     const crystalSource=crystal.sourceId?S.data?.source?.(crystal.sourceId):null;
+     const src=sourceLink('Fonte cristalográfica',crystalSource?.url);if(src)section.append(src);
+    }
+    const studies=S.microstructureStudies?.forElement?.(elementId)||[];
+    if(studies.length){
+     const list=N('ul');section.append(N('h3','Estudos relacionados ('+studies.length+')'));
+     paragraph('Estes estudos são contexto bibliográfico; não homologam o desenho nem definem seus grãos.');
+     for(const study of studies){
+      const li=N('li');li.append(N('strong',study.name+' — '));
+      li.append(document.createTextNode(S.microstructureStudies.describe(study)+'. '+study.caveat+' '+S.microstructureStudies.caveat(study)));
+      if(study.review?.includes('not-independently-verified'))li.append(document.createTextNode(' Documento original ainda não conferido de forma independente.'));
+      const src=sourceLink('Consultar estudo',study.url);if(src)li.append(document.createTextNode(' '),src);
+      list.append(li);
+     }
+     section.append(list);
+    }
+    article.append(section);
+   }
+  };
  let manualKey='';
  window.addEventListener('si-route-changed',event=>{if(event.detail!=='manual')manualKey='';});
  function manual(){
-  const host=$('silm-manual');if(!host)return;const params=new URLSearchParams(location.hash.split('?')[1]||''),id=params.get('topico'),query=(params.get('busca')||'').trim();
+  const host=$('silm-manual');if(!host)return;const params=new URLSearchParams(location.hash.split('?')[1]||''),id=params.get('topico'),query=(params.get('busca')||'').trim(),referenceId=params.get('referencia');
   const topics=S.manual.topics,find=x=>topics.find(t=>t.id===x)||topics.find(t=>t.id===S.manual.aliases?.[x]),topic=id?find(id):null;
-  const key=(id||'')+'|'+query;if(key===manualKey&&host.childElementCount)return;const previous=manualKey;manualKey=key;host.replaceChildren();
+  const key=(id||'')+'|'+query+'|'+(referenceId||'');if(key===manualKey&&host.childElementCount)return;const previous=manualKey;manualKey=key;host.replaceChildren();
   const href=x=>'#/manual?topico='+encodeURIComponent(x);
   const arrowLink=(text,to,cls)=>{const a=N('a',text+' ');a.href=to;if(cls)a.className=cls;a.insertAdjacentHTML('beforeend',arrowSvg);return a;};
   // Barra: busca, voltar à oficina e imprimir.
@@ -220,6 +297,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
     crumb.append(home,N('span','/'),N('span',group),N('span','/'),here);for(const sep of crumb.querySelectorAll('span:not([aria-current])'))if(sep.textContent==='/')sep.setAttribute('aria-hidden','true');
     const article=N('article');article.className='silm-reading silm-manual-article';const eyebrow=N('p',group.toUpperCase());eyebrow.className='eyebrow';const h1=N('h1',topic.title);h1.id='manual-title';h1.tabIndex=-1;const lead=N('p',operation(topic.summary));lead.className='silm-lead';
     article.append(eyebrow,h1,lead);for(const k of ['purpose','content'])if(topic[k])article.append(N('p',operation(topic[k])));
+    renderReferenceContext(article,topic.id);
     if(topic.steps){article.append(N('h2','Passo a passo'));const ol=N('ol');topic.steps.forEach(x=>ol.append(N('li',operation(x))));article.append(ol);}
     if(topic.details?.length){article.append(N('h2','Saiba mais'));for(const d of topic.details){const det=N('details');det.append(N('summary',d.title),N('p',operation(d.text)));article.append(det);}}
     const related=(topic.related||[]).map(find).filter(Boolean);if(related.length){const nav=N('nav');nav.className='silm-manual-related';nav.setAttribute('aria-label','Veja também');nav.append(N('h2','Veja também'));const box=N('div');for(const r of related)box.append(arrowLink(r.title,href(r.id)));nav.append(box);article.append(nav);}
