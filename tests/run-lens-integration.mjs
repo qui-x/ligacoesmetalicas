@@ -78,6 +78,61 @@ try{
  await objectScience.locator('summary').click();
  assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),beforeDisclosure,
   'Abrir informações do Objeto alterou a investigação científica');
+ // A troca de componente não deve se converter num segundo painel abaixo da foto.
+ const alternatives=page.locator('.silm-workshop-reference-summary>.silm-workshop-alternatives');
+ assert.equal(await alternatives.count(),1,'Lista de outros objetos ausente no contexto do Objeto');
+ assert.equal(await alternatives.getAttribute('open'),null,'Lista de aplicações não inicia recolhida');
+ assert.equal(await page.locator('.silm-workshop-reference>.silm-workshop-alternatives').count(),0,
+  'Aplicações ainda ocupam uma faixa permanente sob a fotografia');
+ const available=await page.evaluate(()=>SILM.workshop.list(29).length-1);
+ assert.equal(Number(await alternatives.getAttribute('data-alternative-count')),available,
+  'Contagem de outras aplicações diferente do catálogo');
+ const alternativeBefore=JSON.parse(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())));
+ const initialRef=alternativeBefore.metadata.workshop.referenceId;
+ const imageBeforeAlternatives=await objectImage.boundingBox();
+ await alternatives.locator('summary').click();
+ const altItems=alternatives.locator('button[data-reference-id]');
+ assert.equal(await altItems.count(),available,'Alternativas não correspondem ao catálogo');
+ assert.ok(await altItems.first().isVisible(),'Alternativas não podem ser acessadas');
+ const alternativeLayout=await page.evaluate(()=>{
+  const image=document.querySelector('.silm-workshop-reference-art').getBoundingClientRect();
+  const panel=document.querySelector('.silm-workshop-alternatives').getBoundingClientRect();
+  const b=[...document.querySelectorAll('.silm-workshop-alternative')]
+   .filter(n=>n.getBoundingClientRect().height>0)
+   .map(n=>n.getBoundingClientRect().height);
+  return {imageHeight:image.height,panelLeft:panel.left,panelRight:panel.right,
+   viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,heights:b};
+ });
+ assert.ok(Math.abs(alternativeLayout.imageHeight-imageBeforeAlternatives.height)<2,
+  'Abrir aplicações diminuiu o espaço da fotografia');
+ assert.ok(alternativeLayout.panelRight<=alternativeLayout.viewport+2&&
+  alternativeLayout.documentWidth<=alternativeLayout.viewport+5,
+  'Aplicações provocaram overflow horizontal no celular');
+ assert.ok(alternativeLayout.heights.every(h=>h>=43.5),
+  'Botões de troca de aplicação menores que 44 px');
+ await page.screenshot({path:join(path,'objeto-outras-aplicacoes.jpg'),type:'jpeg',quality:68});
+ const nextRef=await altItems.first().getAttribute('data-reference-id');
+ assert.notEqual(nextRef,initialRef,'A troca não pode escolher a mesma aplicação');
+ await altItems.first().click();
+ await page.waitForFunction(ref=>SILMIntegration.snapshot()?.metadata?.workshop?.referenceId===ref,nextRef);
+ await page.waitForFunction(()=>SILM.lensController.inspect().attached&&SILM.lensController.inspect().scale===1);
+ assert.equal(await page.locator('.silm-workshop-selected-title').textContent(),
+  await page.evaluate(ref=>SILM.workshop.get(ref).title,nextRef),
+  'Objeto não atualizou a referência visual');
+ assert.equal((await page.evaluate(()=>SILMIntegration.snapshot())).metal.atomicNumber,29,
+  'Trocar aplicação modificou o elemento metálico investigado');
+ const returnList=page.locator('.silm-workshop-alternatives');
+ await returnList.locator('summary').click();
+ await returnList.locator('button[data-reference-id="'+initialRef+'"]').click();
+ await page.waitForFunction(ref=>SILMIntegration.snapshot()?.metadata?.workshop?.referenceId===ref,initialRef);
+ await page.waitForFunction(()=>SILM.lensController.inspect().attached&&SILM.lensController.inspect().scale===1);
+ const alternativeAfter=JSON.parse(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())));
+ for(const key of ['metal','structure','module','properties','measurements','calculations']){
+  assert.deepEqual(alternativeAfter[key],alternativeBefore[key],
+   'Trocar e retornar de aplicação modificou '+key);
+ }
+ assert.equal(alternativeAfter.metadata.workshop.referenceId,initialRef,
+  'Objeto original não foi restaurado');
  const baseline=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
  await toggle.click();
  await page.locator('.silm-lens-circle').waitFor({state:'visible'});
