@@ -92,10 +92,11 @@ try{
    artBackground:getComputedStyle(art).backgroundImage,
    imageVar:art.style.getPropertyValue('--silm-object-ambient-image'),
    imageBackground:getComputedStyle(img).backgroundColor,
+   absoluteSource:img?new URL(img.getAttribute('src'),document.baseURI).href:null,
    original:img?.getAttribute('src')};
  });
- assert.ok(decorative.original&&decorative.imageVar.includes(decorative.original),
-  'Fundo decorativo não usa a mesma foto da investigação');
+ assert.ok(decorative.original&&decorative.imageVar.includes(decorative.absoluteSource),
+  'Fundo decorativo precisa da URL absoluta da própria foto (e não /integracao/assets/*)');
  assert.notEqual(decorative.background,'none','Enquadramento alto ainda tem faixas vazias');
  assert.notEqual(decorative.artBackground,'none',
   'Camada de preenchimento ainda está ausente da própria moldura do Objeto');
