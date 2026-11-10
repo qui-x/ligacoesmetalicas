@@ -64,6 +64,12 @@ try{
  const objectImage=page.locator('.silm-workshop-reference-art');
  const imageArea=await objectImage.boundingBox();
  assert.ok(imageArea?.height>=215,'Objeto: fotografia perdeu espaço no celular');
+ const objectHeading=await page.locator('.silm-workshop-reference-summary h2').boundingBox();
+ assert.ok(objectHeading&&objectHeading.y>=imageArea.y+imageArea.height-2,
+  'Objeto: título sobreposto à imagem no celular: '+JSON.stringify({imageArea,objectHeading}));
+ const credit=await objectScience.locator('.silm-workshop-image-credit').textContent();
+ assert.match(credit||'',/Ilustração gerada por IA/,
+  'Crédito da imagem desapareceu ao recolher as informações');
  const beforeDisclosure=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
  await objectScience.locator('summary').click();
  assert.match(await objectScience.innerText(),/A rede representa o elemento de referência/);
