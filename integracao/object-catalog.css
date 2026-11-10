@@ -1,0 +1,50 @@
+/* SILM Parte 9 · a Tabela Periódica é a entrada visual da escala Objeto. */
+#si-stage .silm-object-entry{box-sizing:border-box;display:flex;flex-direction:column;gap:8px;
+ width:100%;max-width:100%;min-width:0;height:clamp(360px,calc(100dvh - 188px),860px);
+ padding:8px;border:1px solid var(--border);border-radius:13px;background:var(--surface);overflow:hidden}
+#si-stage .silm-object-entry-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+#si-stage .silm-object-entry h2{font-size:clamp(1rem,2vw,1.35rem);margin:0}
+#si-stage .silm-object-entry-actions{display:flex;flex-wrap:wrap;gap:6px}
+#si-stage .silm-object-entry-actions button{min-height:44px}
+#si-stage .silm-object-entry-table{flex:1 1 auto;min-height:0;min-width:0;display:flex;flex-direction:column}
+#si-stage .silm-object-entry-table .silm-periodic{height:100%;min-height:0;flex:1}
+#si-stage .silm-object-entry-table .periodic-scroll{max-height:none;min-height:84px}
+#si-stage .silm-object-entry-table .periodic-heading h1{font-size:clamp(1rem,2.2vw,1.3rem)}
+#si-stage .silm-object-entry-table .periodic-actions [id$="-investigate"],
+#si-stage .silm-object-entry-table .periodic-actions [id$="-explore"]{display:none!important}
+#si-stage .silm-object-entry-table .periodic-element[data-availability="available"]{cursor:pointer}
+#si-stage .silm-workshop-browse-objects{min-height:44px}
+#silm-objects-dialog{box-sizing:border-box;width:min(1060px,96vw);max-width:96vw;
+ height:min(790px,92dvh);max-height:92dvh;margin:auto;padding:0;
+ background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:16px;box-shadow:0 24px 60px #0005;overflow:hidden}
+#silm-objects-dialog[open]{display:flex;flex-direction:column}
+#silm-objects-dialog::backdrop{background:rgba(7,18,30,.75)}
+.silm-objects-dialog-head{box-sizing:border-box;flex:0 0 auto;display:flex;align-items:center;
+ justify-content:space-between;gap:9px;padding:12px 15px;border-bottom:1px solid var(--border)}
+.silm-objects-dialog-head h2{margin:0;font-size:clamp(1.05rem,2.6vw,1.5rem)}
+.silm-objects-dialog-head p{margin:3px 0 0;font-size:.83rem;color:var(--secondary)}
+#silm-objects-close{min-height:44px;flex-shrink:0}
+.silm-objects-dialog-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;padding:14px;scrollbar-width:thin}
+.silm-object-catalog{display:grid;gap:9px}
+.silm-object-catalog h2{margin:0;font-size:1.1rem}
+.silm-object-catalog-note{margin:0;font-size:.82rem;color:var(--secondary)}
+#silm-objects-dialog .silm-object-catalog-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:10px}
+#silm-objects-dialog .silm-workshop-card{grid-template-columns:minmax(0,1fr);min-width:0;padding:8px}
+#silm-objects-dialog .silm-workshop-art{min-height:145px}
+#silm-objects-dialog .silm-workshop-art img{width:100%;max-height:230px;object-fit:contain}
+#silm-objects-dialog .silm-workshop-card-body{gap:5px}
+#silm-objects-dialog .silm-workshop-card .button{min-height:44px}
+@media(max-width:650px){
+ #si-stage .silm-object-entry{height:clamp(300px,calc(100dvh - 178px),740px);padding:6px}
+ #si-stage .silm-object-entry-head{gap:4px}
+ #si-stage .silm-object-entry-actions{width:100%}
+ #si-stage .silm-object-entry-actions button{flex:1 1 auto}
+ #si-stage .silm-object-entry-table .periodic-search{width:100%}
+ #silm-objects-dialog{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border-radius:0;border:0}
+ .silm-objects-dialog-head{align-items:flex-start;padding:10px}
+ .silm-objects-dialog-head p{font-size:.75rem}
+ .silm-objects-dialog-body{padding:8px}
+ #silm-objects-dialog .silm-object-catalog-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media(forced-colors:active){#silm-objects-dialog{border:2px solid CanvasText}}
+@media print{#silm-objects-dialog{display:none!important}}
