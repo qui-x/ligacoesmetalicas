@@ -84,6 +84,19 @@ try{
   return {fitted,layer:{left:l.left,top:l.top,width:l.width,height:l.height}};
  });
  assert.ok(imageGeometry,'Objeto: não foi possível aferir fotografia e lente');
+ const decorative=await page.evaluate(()=>{
+  const art=document.querySelector('.silm-workshop-reference-art');
+  const pseudo=getComputedStyle(art,'::before');
+  return {background:pseudo.backgroundImage,pointerEvents:pseudo.pointerEvents,
+   imageVar:art.style.getPropertyValue('--silm-object-ambient-image'),
+   original:art.querySelector('img')?.getAttribute('src')};
+ });
+ assert.ok(decorative.original&&decorative.imageVar.includes(decorative.original),
+  'Fundo decorativo não usa a mesma foto da investigação');
+ assert.notEqual(decorative.background,'none','Enquadramento alto ainda tem faixas vazias');
+ assert.equal(decorative.pointerEvents,'none',
+  'Fundo decorativo capturou eventos reservados à lente e à fotografia');
+
  const {fitted,layer}=imageGeometry;
  for(const key of ['left','top','width','height'])
   assert.ok(Math.abs(fitted[key]-layer[key])<=3,
