@@ -344,6 +344,9 @@
   aspect-ratio:auto!important;
   object-fit:contain!important;
   object-position:center!important;
+  /* O CSS antigo da imagem preenchia as áreas letterbox com cor opaca,
+     ocultando o fundo difuso que vive ABAIXO da foto original. */
+  background:transparent!important;
  }
  /* Fundo difuso é uma camada visual NÃO experimental: usa a foto já
     exibida pelo atlas. Não há duplicação de imagem no DOM, outra amostra,
