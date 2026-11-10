@@ -111,7 +111,11 @@ SILM.workshop=(()=>{
     if(scale===1){
      const photo=art.querySelector('.silm-workshop-photo img');
      const src=photo?.getAttribute('src');
-     if(src)art.style.setProperty('--silm-object-ambient-image','url('+JSON.stringify(src)+')');
+     // URL absoluta: no CSS, url() substituído por var() pode ser resolvido
+     // a partir da folha em /integracao/, não da rota de /index.html.
+     // Usar a URL da própria imagem evita requisição /integracao/assets/*.
+     if(src)art.style.setProperty('--silm-object-ambient-image',
+      'url('+JSON.stringify(new URL(src,document.baseURI).href)+')');
     }
     // Legenda associada à figura para leitores de tela; cópia legível
     // dentro dos dados recolhíveis, sem invadir o título no celular.
