@@ -133,6 +133,13 @@ try{
       label+': informações do Objeto desalinhadas');
      assert.equal(m.imageFit,'contain',label+': foto ilustrativa cortada ou distorcida');
      assert.ok(m.summary.top>=m.art.bottom-3,label+': identificação invadiu a fotografia');
+     if(height>=640){
+      const expected=Math.min(570,height-359);
+      assert.ok(m.art.height>=expected-9,
+       label+': altura útil não foi redistribuída ao Objeto '+JSON.stringify({expected,actual:m.art.height}));
+      assert.ok(m.art.bottom<=m.summary.top+1,
+       label+': foto expandida sobrepôs identificação e botões');
+     }
     }
     if(scale===2){
      assert.ok(m.micro&&near(m.micro.left,m.nav.left)&&near(m.micro.right,m.nav.right),
