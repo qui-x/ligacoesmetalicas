@@ -91,7 +91,7 @@ SILM.workshop=(()=>{
    const microHeading=node('h2','','Grãos · '+element.name);
    microHeading.setAttribute('aria-label','Microestrutura de '+element.name);
    titles.append(microHeading);
-   const table=node('button','button outline','Tabela Periódica');table.type='button';table.addEventListener('click',onOpenPeriodic);
+   const table=node('button','button outline','Tabela');table.type='button';table.setAttribute('aria-label','Tabela Periódica');table.title='Abrir Tabela Periódica';table.addEventListener('click',onOpenPeriodic);
    heading.append(titles,table,
     manualLink('graos-microestrutura',item,'Consultar no Manual grãos, escala e referências de '+element.name));
    s.append(heading);
