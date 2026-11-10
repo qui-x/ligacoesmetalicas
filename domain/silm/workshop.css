@@ -867,3 +867,140 @@
   background:ButtonFace;color:ButtonText;border:2px solid ButtonText;
  }
 }
+
+/* SILM · Palco limpo (Parte 8). A investigação mostra objeto, grãos e
+   estrutura; fontes, ressalvas extensas e imagens auxiliares permanecem
+   consultáveis em <details> nativos. Sem novas barras ou painéis. */
+#si-stage .silm-workshop-discovery{
+ box-sizing:border-box;gap:8px;
+ padding:clamp(8px,1.25vw,18px);
+}
+#si-stage .silm-workshop-discovery>.silm-workshop-intro{
+ max-width:68ch;font-size:.78rem;line-height:1.35;
+}
+#si-stage .silm-workshop-discovery .silm-workshop-grid{
+ gap:8px;min-width:0;
+}
+#si-stage .silm-workshop-discovery .silm-workshop-card{
+ box-sizing:border-box;
+ grid-template-columns:minmax(0,1.35fr) minmax(150px,1fr);
+ padding:8px;gap:9px;align-items:stretch;
+}
+#si-stage .silm-workshop-card .silm-workshop-art{
+ box-sizing:border-box;min-width:0;min-height:150px;
+ overflow:hidden;
+}
+#si-stage .silm-workshop-card .silm-workshop-photo{
+ display:flex;flex-direction:column;
+ width:100%;height:100%;min-height:0;
+}
+#si-stage .silm-workshop-card .silm-workshop-photo img{
+ flex:1 1 auto;min-height:0;max-height:100%;
+ width:100%;height:100%;object-fit:contain;
+}
+/* O crédito permanece semanticamente na figura e legível em Material e
+   limites; não sobrepõe a miniatura nem ocupa sua linha inferior. */
+#si-stage .silm-workshop-card .silm-workshop-photo figcaption{
+ position:absolute!important;width:1px!important;height:1px!important;
+ padding:0!important;margin:-1px!important;border:0!important;
+ clip-path:inset(50%)!important;overflow:hidden!important;
+ white-space:nowrap!important;
+}
+#si-stage .silm-workshop-card-body{gap:5px;min-width:0}
+#si-stage .silm-workshop-card-body h3{font-size:clamp(.86rem,1.2vw,1rem)}
+#si-stage .silm-workshop-card-body .silm-workshop-component-label{
+ font-size:.75rem;line-height:1.25;overflow-wrap:anywhere;
+}
+#si-stage .silm-workshop-card-science{
+ box-sizing:border-box;min-width:0;max-width:100%;
+ border-top:1px solid var(--border);font-size:.75rem;line-height:1.4;
+}
+#si-stage .silm-workshop-card-science>summary{
+ box-sizing:border-box;display:list-item;min-height:44px;
+ padding:12px 2px;list-style-position:inside;
+ font-size:.77rem;font-weight:650;cursor:pointer;
+}
+#si-stage .silm-workshop-card-science>summary:focus-visible{
+ outline:3px solid var(--ring);outline-offset:2px;
+}
+#si-stage .silm-workshop-card-science[open]{
+ max-height:37dvh;overflow-y:auto;overscroll-behavior:contain;
+}
+#si-stage .silm-workshop-card-science p{
+ margin:6px 0;overflow-wrap:anywhere;
+}
+#si-stage .silm-workshop-card-body>.button{
+ box-sizing:border-box;min-height:44px;
+ margin-top:auto;align-self:stretch;
+}
+#si-stage .silm-workshop-reference-summary--stage{
+ display:flex;align-items:center;justify-content:space-between;
+ flex-wrap:nowrap;gap:6px;min-width:0;min-height:44px;
+}
+#si-stage .silm-workshop-reference-summary--stage h2{
+ min-width:0;flex:1 1 auto;margin:0;
+ font-size:clamp(.88rem,1.2vw,1rem);
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+#si-stage .silm-workshop-reference-summary--stage>button{
+ box-sizing:border-box;flex:0 0 auto;
+ margin:0 0 0 auto;min-height:44px;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-info .silm-workshop-micro-atlas-reference{
+ box-sizing:border-box;margin:8px 4px;max-width:100%;
+ border-top:1px solid var(--border);
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-atlas-reference>summary{
+ min-height:44px;padding:11px 3px;font-size:.78rem;
+ line-height:1.3;cursor:pointer;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-atlas-reference img{
+ max-height:48dvh;object-fit:contain;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-atlas-reference figcaption{
+ font-size:.75rem;line-height:1.4;
+}
+/* A identidade do metal já é comunicada pelo título sr-only de Montagem e
+   pela linha contextual. Não repetir etiqueta sobre a estrutura física. */
+#silm-integration-scene .silm-scene-caption{
+ display:none!important;
+}
+@media(max-width:760px){
+ #si-stage .silm-workshop-discovery .silm-workshop-card{
+  grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);
+  padding:7px;gap:7px;
+ }
+ #si-stage .silm-workshop-card .silm-workshop-art{
+  min-height:120px;
+ }
+ #si-stage .silm-workshop-card .silm-workshop-card-body{
+  min-width:0;
+ }
+ #si-stage .silm-workshop-card .silm-workshop-card-body>.button{
+  width:100%;min-width:0;white-space:normal;
+ }
+ #si-stage .silm-workshop-card-science[open]{max-height:32dvh}
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary{
+  min-width:0;
+ }
+ #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary :is(h2,.silm-workshop-selected-title){
+  overflow-wrap:anywhere;
+ }
+}
+@media(max-width:360px){
+ #si-stage .silm-workshop-discovery .silm-workshop-card{
+  grid-template-columns:minmax(0,1fr);
+ }
+ #si-stage .silm-workshop-card .silm-workshop-art{
+  height:clamp(128px,23dvh,170px);
+ }
+ :root.si-font-mod #si-stage.silm-workshop-context-only #workspace-focus{
+  scroll-padding-bottom:72px;
+  overscroll-behavior-y:contain;
+ }
+}
+@media(forced-colors:active){
+ #si-stage .silm-workshop-card-science{
+  border-top:2px solid CanvasText;
+ }
+}
