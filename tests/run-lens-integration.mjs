@@ -72,6 +72,23 @@ try{
  const objectImage=page.locator('.silm-workshop-reference-art');
  const imageArea=await objectImage.boundingBox();
  assert.ok(imageArea?.height>=215,'Objeto: fotografia perdeu espaço no celular');
+ assert.ok(imageArea.height>=470,'Objeto: enquadramento alto não ocupou o espaço disponível em 390×844');
+ const imageGeometry=await page.evaluate(()=>{
+  const img=document.querySelector('.silm-workshop-reference-art img');
+  const layer=document.querySelector('.silm-workshop-reference-art>.silm-lens-layer');
+  if(!img||!layer||!img.naturalWidth||!img.naturalHeight)return null;
+  const i=img.getBoundingClientRect(),l=layer.getBoundingClientRect();
+  const scale=Math.min(i.width/img.naturalWidth,i.height/img.naturalHeight);
+  const w=img.naturalWidth*scale,h=img.naturalHeight*scale;
+  const fitted={left:i.left+(i.width-w)/2,top:i.top+(i.height-h)/2,width:w,height:h};
+  return {fitted,layer:{left:l.left,top:l.top,width:l.width,height:l.height}};
+ });
+ assert.ok(imageGeometry,'Objeto: não foi possível aferir fotografia e lente');
+ const {fitted,layer}=imageGeometry;
+ for(const key of ['left','top','width','height'])
+  assert.ok(Math.abs(fitted[key]-layer[key])<=3,
+   'Lente está sobre uma faixa vazia da fotografia ('+key+'): '+JSON.stringify(imageGeometry));
+
  const objectHeading=await page.locator('.silm-workshop-reference-summary h2').boundingBox();
  assert.ok(objectHeading&&objectHeading.y>=imageArea.y+imageArea.height-2,
   'Objeto: título sobreposto à imagem no celular: '+JSON.stringify({imageArea,objectHeading}));
