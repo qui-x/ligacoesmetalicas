@@ -195,10 +195,14 @@
   const visible=isActiveRoute&&focus&&!focus.hidden&&overview?.hidden===true
     &&Number.isInteger(nextScale)&&nextScale>=1&&nextScale<=4;
   const nextHost=visible?targetFor(nextScale):null;
-  if(!nextHost||nextHost.closest('[hidden]')||!nextHost.getClientRects().length){
+  // A Travessia é o único cabeçalho de navegação. Seus controles recebem
+  // a lente, sem criar um segundo menu sobre o desenho científico.
+  const nav=visible?stage.querySelector('#silm-workshop-context .silm-workshop-reference > .silm-workshop-scales'):null;
+  if(!nextHost||!nav||nextHost.closest('[hidden]')||!nextHost.getClientRects().length){
    if(resizer&&host)resizer.unobserve(host);
    host=null;scale=0;
    if(layer.isConnected)layer.remove();
+   if(toolbar?.isConnected)toolbar.remove();
    return;
   }
   const changedHost=host!==nextHost;
@@ -212,6 +216,7 @@
   resetSelectionIfReferenceChanged();
   if(scaleChanged)notice='';
   if(layer.parentNode!==host)host.append(layer);
+  if(toolbar.parentNode!==nav)nav.append(toolbar);
   layer.dataset.scale=String(scale);
   render();
  };
@@ -246,7 +251,8 @@
   status.setAttribute('role','status');status.setAttribute('aria-live','polite');
   status.setAttribute('aria-atomic','true');
   toolbar.append(toggle,reset,mark,advance);
-  layer.append(ring,status,toolbar);
+  // O anel permanece sobre o visualizador; as ações vivem junto às escalas.
+  layer.append(ring,status);
   // A cena cristalina ouve eventos de ponteiro. Os controles da lente
   // devem ser isolados para não clicar/arrastar átomos ao mesmo tempo.
   for(const event of ['pointerdown','pointerup','click']){
