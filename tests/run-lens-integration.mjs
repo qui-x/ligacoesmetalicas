@@ -89,6 +89,7 @@ try{
   const pseudo=getComputedStyle(art,'::before');
   const img=art.querySelector('img');
   return {background:pseudo.backgroundImage,pointerEvents:pseudo.pointerEvents,
+   artBackground:getComputedStyle(art).backgroundImage,
    imageVar:art.style.getPropertyValue('--silm-object-ambient-image'),
    imageBackground:getComputedStyle(img).backgroundColor,
    original:img?.getAttribute('src')};
@@ -96,6 +97,8 @@ try{
  assert.ok(decorative.original&&decorative.imageVar.includes(decorative.original),
   'Fundo decorativo não usa a mesma foto da investigação');
  assert.notEqual(decorative.background,'none','Enquadramento alto ainda tem faixas vazias');
+ assert.notEqual(decorative.artBackground,'none',
+  'Camada de preenchimento ainda está ausente da própria moldura do Objeto');
  assert.equal(decorative.pointerEvents,'none',
   'Fundo decorativo capturou eventos reservados à lente e à fotografia');
  assert.ok(decorative.imageBackground==='transparent'||
