@@ -331,7 +331,12 @@ SILM.microstructure=(()=>{
   zoomControls.append(formationsButton,button('Abrir dados segmentados','Dados',()=>dataDialog.showModal()));
   const science=node('details','silm-workshop-micro-info');
   const scienceToggle=node('summary','','Limites e escala');
-  science.append(scienceToggle,dimension,note);
+  science.append(
+   scienceToggle,
+   node('p','silm-workshop-micro-component',item?item.component+' · '+item.material:'Policristal didático · '+element.symbol),
+   dimension,
+   note
+  );
   section.append(viewport,toolbar,science,genDialog,dataDialog);
   // A câmera ocupa o quadro em qualquer proporção sem alterar um só grão.
   // A vista efetua recorte central (não estica geometria nem reamostra a formação).
