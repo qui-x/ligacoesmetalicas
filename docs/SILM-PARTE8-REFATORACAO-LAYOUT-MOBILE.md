@@ -51,6 +51,7 @@ A lente permanece opcional, vinculada à faixa da Travessia. Rede/Centro podem u
 - [x] P8-M2 · Ajustar composição da escala Objeto e da identificação da escala Grãos, com imagem prioritária e ações agrupadas.
 - [x] P8-M3 · Harmonizar enquadramento Rede/Centro, a faixa instrumental e o rodapé, sem mover controles científicos.
 - [x] P8-M4 · Estender regressões a 320, 360, 390, 400 e 414 px, horizontal, rotação, Foco/Visão geral e painel aberto.
+- [x] P8-M7 · Distribuir o espaço vertical no Objeto em retrato (320–414 px), preservando `object-fit:contain` e delimitando a lente aos pixels reais da fotografia. Testes com geometria do enquadramento e da lente.
 - [ ] P8-M5 · Conferir capturas finais em Chromium, Firefox e WebKit; homologar também leitura 150% e alto contraste; corrigir se necessário.
 - [ ] P8-M6 · Revisão visual em aparelho real, sem merge automático.
 
@@ -59,7 +60,7 @@ A lente permanece opcional, vinculada à faixa da Travessia. Rede/Centro podem u
 1. **Alinhamento:** as bordas esquerda/direita de Foco, Travessia e palco interno têm o mesmo gutter, tolerância de 3 px em retrato 320–414; o rodapé usa o mesmo padding interno.
 2. **Continuidade:** quatro escalas na mesma faixa, mesmo espaço horizontal; barra científica da Rede/Centro não move os lançadores nem sobrepõe a figura.
 3. **Tela íntegra:** `scrollWidth <= innerWidth + 5px`; nenhuma sobreposição entre faixa fixa e controles; qualquer conteúdo longo rola somente na região prevista.
-4. **Figura preservada:** foto carregada, sem estiramento ou recorte obrigatório; mapa de grãos ≥190 px de altura no retrato de 568px ou mais; canvas científico visível em Rede/Centro.
+4. **Figura preservada:** foto carregada, sem estiramento ou recorte obrigatório; enquadramento de Objeto cresce em telas altas e a lente coincide com a região visível da imagem; mapa de grãos ≥190 px de altura no retrato de 568px ou mais; canvas científico visível em Rede/Centro.
 5. **Acessibilidade:** botão acionável ≥44px e SVG 20px; teclado, alto contraste e fonte ampliada sem amputar rótulos nem ocultar a barra inferior.
 6. **Ciência:** snapshot de metal, estrutura, módulo, propriedades, medições, cálculos e contexto mantém integridade ao alternar a Travessia, abrir/fechar docas e o Manual.
 7. **CI:** suites de lente, quatro escalas, microestrutura, prévia didática e portão de regressões completas, sem falha.
