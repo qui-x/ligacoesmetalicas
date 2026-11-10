@@ -98,13 +98,20 @@ SILM.workshop=(()=>{
    }
   }else{
    const top=node('div','silm-workshop-reference-top'),art=node('div','silm-workshop-reference-art');
-   if(item){art.innerHTML=visual(item,1);top.append(art);}
+   let imageCredit='';
+   if(item){
+    art.innerHTML=visual(item,1);
+    // Legenda associada à figura para leitores de tela; cópia legível
+    // dentro dos dados recolhíveis, sem invadir o título no celular.
+    imageCredit=art.querySelector('figcaption')?.textContent||'';
+    top.append(art);
+   }
    const summary=node('div','silm-workshop-reference-summary'),heading=node('h2','');
    heading.append(node('span','silm-workshop-prefix','Investigando '),document.createTextNode(element.name));
    summary.append(node('p','silm-workshop-eyebrow','OBJETO E COMPOSIÇÃO'),heading);
   if(item){
    const component=node('p','silm-workshop-selected-title',item.title);
-   component.append(node('span','silm-workshop-component-long',' · '+item.component));
+   if(scale!==1)component.append(node('span','silm-workshop-component-long',' · '+item.component));
    summary.append(component);
    // Todas as ressalvas e os dados continuam disponíveis, mas não disputam
    // espaço permanentemente com a fotografia e a lente da investigação.
@@ -126,7 +133,9 @@ SILM.workshop=(()=>{
    const source=node('a','','Fonte da aplicação');source.target='_blank';source.rel='noopener noreferrer';
    const sources={12:'https://periodic-table.rsc.org/element/12/magnesium',29:'https://periodic-table.rsc.org/element/29/copper',57:'https://periodic-table.rsc.org/element/57/lanthanum'};
    source.href=item.sourceURL||sources[item.atomicNumber]||(item.id==='ferro-transformador'?'https://www.thyssenkrupp-steel.com/en/industries/energy/energy.html':'https://worldsteel.org/about-steel/what-is-steel/');
-   details.append(source);summary.append(details);
+   details.append(source);
+   if(imageCredit)details.append(node('p','silm-workshop-image-credit',imageCredit));
+   summary.append(details);
   }else if(scale===1)summary.append(node('p','silm-workshop-intro','Escolha um objeto para observar o componente metálico.'));
   const table=node('button','button outline');table.setAttribute('aria-label','Tabela Periódica');table.append(node('span','','Tabela'),node('span','silm-workshop-table-long',' Periódica'));table.type='button';table.addEventListener('click',onOpenPeriodic);summary.append(table);top.append(summary);s.append(top);
   }
