@@ -122,6 +122,11 @@
   margin:0;font-size:clamp(.88rem,3.4vw,1.04rem);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
  }
+ /* Mesmo nome curto da Tabela nas quatro escalas; o aria-label completo
+    permanece no botão e a informação do elemento ganha largura útil. */
+ body.route-ambiente #si-stage .silm-workshop-reference-summary .silm-workshop-table-long{
+  display:none!important;
+ }
  body.route-ambiente #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary>.button{
   grid-column:2;grid-row:1;
   box-sizing:border-box;margin:0!important;
