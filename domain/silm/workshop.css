@@ -1004,3 +1004,72 @@
   border-top:2px solid CanvasText;
  }
 }
+
+/* Separação científica: o palco oferece só um acesso discreto ao Manual.
+   Informação bibliográfica, imagens auxiliares e descrição longa vivem na
+   página de leitura, não em um painel contextual ou overlay da cena. */
+#si-stage .silm-workshop-manual-link{
+ box-sizing:border-box;min-width:44px;min-height:44px;
+ display:inline-flex;align-items:center;justify-content:center;
+ flex:0 0 auto;align-self:start;
+ padding:7px 9px;border:1px solid var(--border);border-radius:9px;
+ background:var(--surface);color:var(--text);
+ font-size:.77rem;font-weight:700;line-height:1.15;
+ text-decoration:none;white-space:nowrap;
+}
+#si-stage .silm-workshop-manual-link:focus-visible{
+ outline:3px solid var(--ring);outline-offset:2px;
+}
+#si-stage .silm-workshop-manual-link:hover{background:var(--tint)}
+#si-stage .silm-workshop-card-body .silm-workshop-manual-link{
+ align-self:flex-start;min-height:44px;
+ margin-block:0;
+}
+#si-stage .silm-workshop-reference-summary--stage .silm-workshop-manual-link{
+ margin-left:0;
+}
+#si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary{
+ min-width:0;align-content:start;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading{
+ flex-wrap:nowrap;min-width:0;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading .silm-workshop-manual-link{
+ margin-left:auto;
+}
+.silm-manual-reference{
+ margin:1.25rem 0;
+ padding:clamp(10px,2vw,20px);
+ background:var(--panel2,var(--surface));
+ border:1px solid var(--border);
+ border-radius:12px;
+ overflow-wrap:anywhere;
+}
+.silm-manual-reference h2{margin:0 0 12px;font-size:clamp(1.05rem,2vw,1.35rem)}
+.silm-manual-reference h3{font-size:1rem;margin:14px 0 6px}
+.silm-manual-reference p{line-height:1.5;max-width:90ch;margin:9px 0}
+.silm-manual-reference ul{padding-inline-start:1.25rem}
+.silm-manual-reference li{margin:6px 0;line-height:1.45}
+.silm-manual-reference a{overflow-wrap:anywhere}
+.silm-manual-micro-figure{max-width:min(100%,760px);margin:10px 0}
+.silm-manual-micro-figure img{display:block;width:100%;height:auto;object-fit:contain;border-radius:10px}
+.silm-manual-micro-figure figcaption{margin-top:7px;font-size:.84rem;line-height:1.45}
+@media(max-width:650px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading{
+  flex-wrap:wrap;gap:4px;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading .button,
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-heading .silm-workshop-manual-link{
+  min-width:44px;min-height:44px;
+ }
+ #si-stage .silm-workshop-reference-summary--stage{
+  flex-wrap:wrap;min-width:0;
+ }
+ #si-stage .silm-workshop-card-body .silm-workshop-manual-link{
+  font-size:.76rem;
+ }
+}
+@media(forced-colors:active){
+ #si-stage .silm-workshop-manual-link{border:2px solid CanvasText;background:Canvas;color:CanvasText}
+ .silm-manual-reference{border:2px solid CanvasText;background:Canvas;color:CanvasText}
+}
