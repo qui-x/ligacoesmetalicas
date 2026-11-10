@@ -114,7 +114,9 @@ SILM.microstructure=(()=>{
   zoomControls.append(button('Reduzir microestrutura','−',()=>setZoom(zoom-.25)),zoomLabel,button('Ampliar microestrutura','+',()=>setZoom(zoom+.25)),button('Ajustar microestrutura ao quadro','Ajustar',()=>setZoom(1)));
   // Informação operacional (grão selecionado + zoom) continua sempre visível.
   // Escala física e limitações científicas ficam num <details> nativo.
-  toolbar.append(status,zoomControls);
+  // O aviso "sem escala" é informação essencial e permanece visível mesmo
+  // com a seção explicativa recolhida. Isso preserva o contrato didático.
+  toolbar.append(status,dimension,zoomControls);
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
   svg.addEventListener('pointerdown',e=>{
    if(e.button!==0||!viewport.classList.contains('is-pannable'))return;
@@ -334,7 +336,7 @@ SILM.microstructure=(()=>{
   science.append(
    scienceToggle,
    node('p','silm-workshop-micro-component',item?item.component+' · '+item.material:'Policristal didático · '+element.symbol),
-   dimension,
+   node('p','silm-workshop-micro-scale-explain','O mapa esquemático é apresentado sem escala em µm. Uma escala declarada em dados importados não equivale a validação experimental.'),
    note
   );
   section.append(viewport,toolbar,science,genDialog,dataDialog);
