@@ -305,7 +305,7 @@ SILM.microstructure=(()=>{
    sourceLink.hidden=true;sourceLink.removeAttribute('href');report.textContent='Esquema didático restaurado.';
   });
   const close=button('Fechar importação de dados','Fechar',()=>dataDialog.close());
-  dialogActions.append(reset,close);dataDialog.append(dataTitle,dataHelp,evidence,fileLabel,report,sourceLink,dialogActions);
+  dialogActions.append(reset,close);dataDialog.append(dataTitle,dataHelp,note,evidence,fileLabel,report,sourceLink,dialogActions);
   fileInput.addEventListener('change',async()=>{
    const file=fileInput.files?.[0];if(!file)return;
    try{
@@ -331,15 +331,10 @@ SILM.microstructure=(()=>{
    fileInput.value='';
   });
   zoomControls.append(formationsButton,button('Abrir dados segmentados','Dados',()=>dataDialog.showModal()));
-  const science=node('details','silm-workshop-micro-info');
-  const scienceToggle=node('summary','','Limites e escala');
-  science.append(
-   scienceToggle,
-   node('p','silm-workshop-micro-component',item?item.component+' · '+item.material:'Policristal didático · '+element.symbol),
-   node('p','silm-workshop-micro-scale-explain','No modo esquemático, o desenho é apresentado sem escala em µm. Contornos importados podem declarar calibração, mas essa declaração não equivale a validação experimental.'),
-   note
-  );
-  section.append(viewport,toolbar,science,genDialog,dataDialog);
+  // A dimensão não calibrada continua visível e operacional.
+  // Métodos, limitações e referências passam ao tópico do Manual;
+  // dados declarados no arquivo seguem no diálogo da importação.
+  section.append(viewport,toolbar,genDialog,dataDialog);
   // A câmera ocupa o quadro em qualquer proporção sem alterar um só grão.
   // A vista efetua recorte central (não estica geometria nem reamostra a formação).
   function fitViewport(){
