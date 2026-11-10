@@ -87,15 +87,20 @@ try{
  const decorative=await page.evaluate(()=>{
   const art=document.querySelector('.silm-workshop-reference-art');
   const pseudo=getComputedStyle(art,'::before');
+  const img=art.querySelector('img');
   return {background:pseudo.backgroundImage,pointerEvents:pseudo.pointerEvents,
    imageVar:art.style.getPropertyValue('--silm-object-ambient-image'),
-   original:art.querySelector('img')?.getAttribute('src')};
+   imageBackground:getComputedStyle(img).backgroundColor,
+   original:img?.getAttribute('src')};
  });
  assert.ok(decorative.original&&decorative.imageVar.includes(decorative.original),
   'Fundo decorativo não usa a mesma foto da investigação');
  assert.notEqual(decorative.background,'none','Enquadramento alto ainda tem faixas vazias');
  assert.equal(decorative.pointerEvents,'none',
   'Fundo decorativo capturou eventos reservados à lente e à fotografia');
+ assert.ok(decorative.imageBackground==='transparent'||
+  decorative.imageBackground==='rgba(0, 0, 0, 0)',
+  'Fundo opaco da imagem ainda encobre o ambiente difuso: '+JSON.stringify(decorative));
 
  const {fitted,layer}=imageGeometry;
  for(const key of ['left','top','width','height'])
