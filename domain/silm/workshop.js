@@ -57,13 +57,26 @@ SILM.workshop=(()=>{
   const article=node('article','silm-workshop-card');article.dataset.referenceId=item.id;
   const art=node('div','silm-workshop-art');art.innerHTML=visual(item,1);
   const body=node('div','silm-workshop-card-body');
-  body.append(node('p','silm-workshop-eyebrow',item.context),node('h3','',item.title),node('p','silm-workshop-component-label','Componente: '+item.component),node('p','silm-workshop-material','Material: '+item.material),node('p','silm-workshop-card-note',item.explanation),node('p','silm-workshop-caveat',item.caveat));
+  body.append(node('h3','',item.title),node('p','silm-workshop-component-label',item.component));
+  // O cartão serve à escolha; composição e limites continuam disponíveis,
+  // mas não competem com a imagem da aplicação ou com a ação principal.
+  const more=node('details','silm-workshop-card-science');
+  more.append(node('summary','','Material e limites'));
+  more.append(
+   node('p','silm-workshop-card-context',item.context),
+   node('p','silm-workshop-material','Material: '+item.material),
+   node('p','silm-workshop-card-note',item.explanation),
+   node('p','silm-workshop-caveat',item.caveat)
+  );
+  const pictureCredit=art.querySelector('figcaption')?.textContent;
+  if(pictureCredit)more.append(node('p','silm-workshop-image-credit',pictureCredit));
+  body.append(more);
   const b=node('button','button outline',label);b.type='button';b.addEventListener('click',()=>onAction(item));body.append(b);article.append(art,body);return article;
  }
  function renderDiscovery(host,{element,notice='',onOpenPeriodic=()=>{},onContinue=()=>{},onInvestigate=()=>{},onStartDirect=()=>{}}={}){
   host.replaceChildren();host.hidden=false;const s=node('section','silm-workshop-discovery');
-  s.append(node('p','silm-workshop-eyebrow','OFICINA DOS METAIS · INVESTIGAÇÃO POR ELEMENTO'),node('h2','','Onde encontramos '+(element?.name||'um metal')+'?'),
-   node('p','silm-workshop-intro',element?'Escolha um componente que contenha o elemento. O objeto completo reúne outros metais, ligas, isolantes e materiais.':'Comece selecionando um metal na Tabela Periódica.'));
+  s.append(node('h2','',element?'Aplicações de '+element.name:'Escolha um metal'),
+   node('p','silm-workshop-intro',element?'Aplicações ilustrativas, não medições da composição.':'Selecione um metal na Tabela Periódica.'));
   if(notice)s.append(node('p','silm-workshop-pending-notice',notice));
   const actions=node('div','silm-workshop-discovery-actions'),table=node('button','button primary','Tabela Periódica'),free=node('button','button outline','Montagem livre');
   table.type='button';free.type='button';table.addEventListener('click',onOpenPeriodic);free.addEventListener('click',onContinue);actions.append(table,free);s.append(actions);
@@ -71,7 +84,6 @@ SILM.workshop=(()=>{
   const refs=list(element.atomicNumber);
   if(!refs.length){s.append(node('p','silm-workshop-empty','Esta primeira curadoria ainda não possui aplicações cadastradas para este metal. A investigação direta continua disponível.'));
    const direct=node('button','button outline','Iniciar investigação sem referência');direct.type='button';direct.addEventListener('click',onStartDirect);s.append(direct);host.append(s);return;}
-  s.append(node('h3','silm-workshop-section-title','Materiais e dispositivos de referência'));
   const grid=node('div','silm-workshop-grid');for(const item of refs)grid.append(itemCard(item,onInvestigate));s.append(grid);host.append(s);
  }
  function renderReference(host,{element,item=null,items=[],scale=1,onChoose=()=>{},onScale=()=>{},onOpenPeriodic=()=>{}}={}){
@@ -80,11 +92,13 @@ SILM.workshop=(()=>{
   if(scale===2){
    s.classList.add('silm-workshop-micro-mode');
    const heading=node('div','silm-workshop-micro-heading'),titles=node('div','silm-workshop-micro-titles');
-   titles.append(node('h2','','Microestrutura · '+element.name));
-   // O material e seus limites científicos estão no detalhe da microestrutura.
+   const microHeading=node('h2','','Grãos · '+element.name);
+   microHeading.setAttribute('aria-label','Microestrutura de '+element.name);
+   titles.append(microHeading);
    const table=node('button','button outline','Tabela Periódica');table.type='button';table.addEventListener('click',onOpenPeriodic);
    heading.append(titles,table);s.append(heading);
-   if(SILM.microstructure?.create)s.append(SILM.microstructure.create({element,item}));
+   const viewer=SILM.microstructure?.create?.({element,item})||null;
+   if(viewer)s.append(viewer);
    else{const fallback=node('div','silm-workshop-reference-art');fallback.innerHTML=MICRO;s.append(fallback);}
    // A imagem do atlas é uma representação esquemática alternativa, nunca uma micrografia medida.
    const atlasMicro=SILM.metalAtlas?.micro?.(element.atomicNumber);
@@ -94,7 +108,12 @@ SILM.workshop=(()=>{
     img.src=atlasMicro.path;img.width=960;img.height=640;img.loading='lazy';img.decoding='async';
     img.alt='Modelo didático de grãos de '+element.name+'; não é micrografia experimental, sem escala em micrômetros';
     figure.append(img,node('figcaption','','Modelo didático sem escala física. Não identifica fases ou composição de grãos; a estrutura científica do elemento é consultada separadamente.'));
-    panel.append(toggle,figure);s.append(panel);
+    panel.append(toggle,figure);
+    // Uma imagem alternativa é referência auxiliar, não outra área de
+    // investigação: manter no detalhe científico já presente em Grãos.
+    const science=viewer?.querySelector('.silm-workshop-micro-info');
+    if(science)science.append(panel);
+    else s.append(panel);
    }
   }else{
    const top=node('div','silm-workshop-reference-top'),art=node('div','silm-workshop-reference-art');
@@ -107,9 +126,13 @@ SILM.workshop=(()=>{
     top.append(art);
    }
    const summary=node('div','silm-workshop-reference-summary'),heading=node('h2','');
-   heading.append(node('span','silm-workshop-prefix','Investigando '),document.createTextNode(element.name));
-   summary.append(node('p','silm-workshop-eyebrow','OBJETO E COMPOSIÇÃO'),heading);
-  if(item){
+   const stageOnly=scale>=3;
+   heading.append(document.createTextNode(element.name));
+   heading.setAttribute('aria-label','Elemento investigado: '+element.name);
+   summary.append(heading);
+   if(stageOnly)summary.classList.add('silm-workshop-reference-summary--stage');
+   else summary.append(node('p','silm-workshop-eyebrow','OBJETO E COMPOSIÇÃO'));
+  if(item&&!stageOnly){
    const component=node('p','silm-workshop-selected-title',item.title);
    if(scale!==1)component.append(node('span','silm-workshop-component-long',' · '+item.component));
    summary.append(component);
