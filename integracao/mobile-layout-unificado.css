@@ -314,3 +314,50 @@
 @media(forced-colors:active){
  body.route-ambiente #si-stage .silm-workshop-reference-art{border:2px solid CanvasText}
 }
+
+/* P8-M7 · Objeto em retrato: enquadramento alto, fotografia integral.
+   Medições de 320–414 px: topo app + Foco + Travessia + contexto + rodapé
+   reservam cerca de 359 px. A diferença até 100dvh pertence à área visual.
+   Não introduzir object-fit:cover, escalas artificiais ou outra faixa. */
+@media(max-width:650px) and (min-height:560px) and (orientation:portrait){
+ body.route-ambiente:not(.si-structure-expanded) #si-stage[data-workshop-scale="1"]{
+  --silm-object-visual-height:clamp(205px,
+   calc(100dvh - 359px - env(safe-area-inset-bottom,0px)),570px);
+ }
+ body.route-ambiente:not(.si-structure-expanded) #si-stage[data-workshop-scale="1"] .silm-workshop-reference-top{
+  flex:0 0 auto!important;
+  height:auto!important;min-height:0!important;
+ }
+ body.route-ambiente:not(.si-structure-expanded) #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art:has(.silm-workshop-photo){
+  box-sizing:border-box!important;
+  flex:0 0 auto!important;
+  aspect-ratio:auto!important;
+  height:var(--silm-object-visual-height)!important;
+  min-height:205px!important;max-height:none!important;
+  width:100%!important;
+ }
+ body.route-ambiente:not(.si-structure-expanded) #si-stage[data-workshop-scale="1"] .silm-workshop-photo img{
+  aspect-ratio:auto!important;
+  object-fit:contain!important;
+  object-position:center!important;
+ }
+ /* A lente não deve se deslocar sobre o espaço de letterboxing do
+    object-fit:contain: delimitar sua camada aos pixels exibidos na imagem
+    3:2 (catálogo 960×640), no centro do enquadramento maior. */
+ body.route-ambiente:not(.si-structure-expanded) #si-stage[data-workshop-scale="1"] .silm-workshop-reference-art>.silm-lens-layer{
+  box-sizing:border-box!important;
+  inset:auto!important;
+  left:50%!important;top:50%!important;
+  width:calc(100% - 2px)!important;
+  height:auto!important;max-height:calc(100% - 2px)!important;
+  aspect-ratio:3/2!important;
+  transform:translate(-50%,-50%)!important;
+ }
+ /* Abrir outras aplicações não pode encolher a fotografia: o palco rola
+    internamente, mantendo o rodapé acessível, sem document scroll global. */
+ body.route-ambiente:not(.si-structure-expanded) #si-stage[data-workshop-scale="1"] .silm-workshop-reference-summary{
+  flex:0 0 auto!important;min-width:0;
+ }
+}
+/* Orientação horizontal curta: prevalece o enquadramento original de 3:2
+   com rolagem confinada; não forçar a altura do retrato. */
