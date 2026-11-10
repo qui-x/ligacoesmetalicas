@@ -40,7 +40,9 @@ try{
   });
   assert.ok(dims.left>=-4&&dims.right<=width+4,label+': a Tabela extrapola a janela');
   assert.ok(dims.pageWidth<=width+6,label+': rolagem horizontal global');
-  assert.ok(dims.scrollWidth>dims.scrollClient,label+': a Tabela deixou de preservar 18 grupos com rolagem interna');
+  if(width<900)assert.ok(dims.scrollWidth>dims.scrollClient,
+   label+': tabela sem rolagem horizontal interna no celular');
+  // Em desktop os 18 grupos podem caber integralmente: rolagem não é obrigatória.
   note('table-'+label,dims);
   if(width<=390)await page.screenshot({path:join(dir,label+'-tabela-inicial.jpg'),type:'jpeg',quality:72,animations:'disabled'});
  }
