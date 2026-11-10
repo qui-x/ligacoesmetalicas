@@ -135,7 +135,7 @@
   const message=notice||(result?result.label+(scale===1?
    ' · imagem ilustrativa, sem amostra medida':result.source==='schematic'?
    ' · modelo D0, sem medição experimental':' · proveniência declarada, sem homologação'):'');
-  status.textContent=message;
+  if(status.textContent!==message)status.textContent=message; // Evita ciclo de MutationObserver em cada frame.
   setHidden(status,!settings.active||scale>2||!message);
  };
  const markSelection=()=>{
