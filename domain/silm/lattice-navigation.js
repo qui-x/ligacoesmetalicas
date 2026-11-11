@@ -148,7 +148,10 @@ SILM.createLatticePanel = function ({geometry, initialKey, initialAnchor, onFocu
     summary.focus({preventScroll:true});
    }
   });
-  scope.listen(document,'pointerdown',event=>{
+  // Fechar após o clique (não no pointerdown): assim um botão externo,
+  // como Avançar Joule, recebe seu click mesmo quando esta gaveta está aberta.
+  // Um fechamento no pointerdown pode reposicionar o alvo antes do pointerup.
+  scope.listen(document,'click',event=>{
    if(more.open&&!more.contains(event.target))more.open=false;
   });
   scope.listen(window,'resize',positionMore);
