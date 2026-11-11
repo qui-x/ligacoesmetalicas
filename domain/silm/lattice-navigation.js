@@ -72,7 +72,7 @@ SILM.createLatticeCursor = function (geometry, initialKey, initialAnchor) {
   };
 };
 
-SILM.createLatticePanel = function ({geometry, initialKey, initialAnchor, onFocus, scope}) {
+SILM.createLatticePanel = function ({geometry, initialKey, initialAnchor, onFocus, scope, mode='network'}) {
   const cursor = SILM.createLatticeCursor(geometry, initialKey, initialAnchor);
   function element(tag, text) {
     const node = document.createElement(tag);
@@ -95,13 +95,17 @@ SILM.createLatticePanel = function ({geometry, initialKey, initialAnchor, onFocu
   const reading = element('span');
   status.append(position, reading);
   root.append(element('strong', 'Rede'));
+  const more=element('details');more.className='silm-lattice-more';
+  const summary=element('summary',mode==='center'?'Escolher centro':'Navegação por eixos');
+  const controls=element('div');controls.className='silm-lattice-more-controls';
+  more.append(summary,controls);
   function button(label, title, action) {
     const node = element('button', label);
     node.type = 'button';
     node.setAttribute('aria-label', title);
     node.title = title;
     scope.listen(node, 'click', action);
-    root.append(node);
+    controls.append(node);
     return node;
   }
   const moves = [];
@@ -110,15 +114,19 @@ SILM.createLatticePanel = function ({geometry, initialKey, initialAnchor, onFocu
     refresh();
     onFocus(cursor.site, cursor.anchor);
   }
-  for (const [axis, letter] of ['a','b','c'].entries()) {
+  if(mode!=='center')for (const [axis, letter] of ['a','b','c'].entries()) {
     for (const step of [-1,1]) {
       const title = (step > 0 ? 'Avançar' : 'Recuar') + ' uma célula no eixo ' + letter;
       moves.push({axis,step,node:button((step > 0 ? '+' : '−') + letter, title, () => visit(cursor.translate(axis,step),cursor.anchor))});
     }
   }
-  root.append(select);
-  scope.listen(select, 'change', () => visit(cursor.shell.list.find(site => site.key === select.value)));
+  if(mode==='center')controls.append(select);else root.append(select);
+  scope.listen(select, 'change', () => {
+   const site=cursor.shell.list.find(site => site.key === select.value);
+   if(site)visit(site);
+  });
   button('Origem', 'Voltar ao centro inicial da rede', () => visit(geometry.cell[0], geometry.cell[0]));
+  root.append(more);
   function refresh() {
     const site = cursor.site, shell = cursor.shell;
     position.textContent = 'Célula [' + cursor.offset.join(', ') + '] · sítio ' + (site.basis + 1);
