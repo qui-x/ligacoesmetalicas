@@ -62,13 +62,17 @@
   projection:()=>representation.projection,
   viewMode:()=>representation.viewMode,
   available3D:()=>!unavailable3D,
-  camera3D:()=>({...representation.camera3D}),
+  camera3D:()=>({...representation[workshopScale===4?'centerCamera3D':'camera3D']}),
   setViewMode(mode,{projection=null}={}){
    if(!S.representation.VIEW_MODES.includes(mode)||(mode==='3d'&&unavailable3D))return;
    if(projection&&S.representation.PROJECTIONS.includes(projection))representation.projection=projection;
    focusAfterRender=document.activeElement?.id||null;representation.viewMode=mode;saveView();schedule();
   },
-  setCamera3D(patch,{silent=false}={}){representation.camera3D=S.representation.sanitizeCamera3D({...representation.camera3D,...patch});saveView();if(!silent)view?.update();},
+  setCamera3D(patch,{silent=false}={}){
+   const key=workshopScale===4?'centerCamera3D':'camera3D';
+   representation[key]=S.representation.sanitizeCamera3D({...representation[key],...patch});
+   saveView();if(!silent)view?.update();
+  },
   fail3D(){if(unavailable3D)return;unavailable3D=true;representation.viewMode='2d';saveView();schedule();say('A vista 3D não está disponível. A vista 2D continua com a mesma investigação.','warning');},
   setProjection(value){if(!S.representation.PROJECTIONS.includes(value))return;representation.projection=value;saveView();view?.update();},
   camera:mode=>representation.cameras[mode],
