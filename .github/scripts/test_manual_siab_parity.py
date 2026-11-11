@@ -58,9 +58,11 @@ def run(browser_name: str, base_url: str) -> None:
             expect(page.locator(".silm-manual-category-page .silm-manual-explanation")).to_be_visible()
             expect(page.locator(".silm-manual-category-page .silm-manual-explanation")).to_contain_text("A Oficina dos Metais é o espaço principal")
             assert len(page.locator(".silm-manual-category-page .silm-manual-explanation").inner_text().strip()) >= 400
-            expect(page.locator(".silm-manual-category-page .silm-manual-steps li")).to_have_count(4)
             expect(page.locator(".silm-manual-category-page .silm-manual-article-head")).to_be_visible()
             expect(page.locator(".silm-manual-category-page .silm-manual-steps li")).to_have_count(4)
+            if width == 1440:
+                Path("artifacts").mkdir(exist_ok=True)
+                page.screenshot(path=f"artifacts/manual-categoria-oficina-{browser_name}.png", full_page=True)
             topic = page.locator(".silm-manual-topic-link").first
             topic.click(force=True)
             expect(page.locator(".silm-manual-article")).to_be_visible()
