@@ -6,7 +6,7 @@ window.SILM=window.SILM||{};
    - Guardado à parte (storage 'representation.view'), com versão própria e ligado à investigação: outra
      investigação, valores inválidos ou de versão desconhecida voltam ao padrão, sem impedir a investigação de abrir.
      A versão 1 (0.11.x) migra para a 2 sem perda: projeção e câmeras ficam; o modo começa em 2D.
-   - Câmera por modo: a montagem livre, a estrutura em 2D e a estrutura em 3D têm cenas diferentes.
+   - Câmera por modo: montagem livre, rede/célula 2D/3D e centro metálico 2D/3D têm cenas independentes.
      camera = {mode:'fit'|'free', zoom, x, y}: (x, y) é o ponto da cena no centro do palco; zoom 1 mostra a cena inteira.
      camera3D = {preset:'3d'|'xy'|'xz'|'yz'|null, yaw, pitch, projection:'perspective'|'orthographic'}: orientação da
      órbita em graus (null = a do preset; '3d' parte da vista de referência da estrutura). Alvo = centro da célula;
@@ -22,7 +22,7 @@ SILM.representation=(()=>{
  const ZOOM=Object.freeze({min:.5,max:4,step:1.25});
  const camera=()=>({mode:'fit',zoom:1,x:.5,y:.5});
  const camera3D=()=>({preset:'3d',yaw:null,pitch:null,projection:'perspective'});
- const defaults=(investigationId=null)=>({version:VERSION,investigationId,viewMode:'2d',projection:'isometric',camera3D:camera3D(),cameras:{free:camera(),crystal:camera(),crystal3d:camera()}});
+ const defaults=(investigationId=null)=>({version:VERSION,investigationId,viewMode:'2d',projection:'isometric',camera3D:camera3D(),cameras:{free:camera(),crystal:camera(),crystal3d:camera(),center:camera(),center3d:camera()}});
  const num=(v,lo,hi,fallback)=>typeof v==='number'&&Number.isFinite(v)?Math.min(hi,Math.max(lo,v)):fallback;
  function sanitizeCamera(c){
   const out=camera();if(!c||typeof c!=='object')return out;
@@ -43,7 +43,7 @@ SILM.representation=(()=>{
   if(!v||typeof v!=='object'||(v.version!==1&&v.version!==VERSION)||v.investigationId!==investigationId)return out;
   if(typeof v.latticeFocus==='string'&&/^-?\d,-?\d,-?\d\|\d{1,3}$/.test(v.latticeFocus))out.latticeFocus=v.latticeFocus;
   if(PROJECTIONS.includes(v.projection))out.projection=v.projection;
-  for(const k of ['free','crystal','crystal3d'])out.cameras[k]=sanitizeCamera(v.cameras?.[k]);
+  for(const k of ['free','crystal','crystal3d','center','center3d'])out.cameras[k]=sanitizeCamera(v.cameras?.[k]);
   if(v.version===VERSION){if(VIEW_MODES.includes(v.viewMode))out.viewMode=v.viewMode;out.camera3D=sanitizeCamera3D(v.camera3D);}   // versão 1: modo 2D, câmera 3D padrão
   return out;
  }
