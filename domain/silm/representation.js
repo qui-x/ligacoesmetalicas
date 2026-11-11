@@ -22,7 +22,7 @@ SILM.representation=(()=>{
  const ZOOM=Object.freeze({min:.5,max:4,step:1.25});
  const camera=()=>({mode:'fit',zoom:1,x:.5,y:.5});
  const camera3D=()=>({preset:'3d',yaw:null,pitch:null,projection:'perspective'});
- const defaults=(investigationId=null)=>({version:VERSION,investigationId,viewMode:'2d',projection:'isometric',camera3D:camera3D(),cameras:{free:camera(),crystal:camera(),crystal3d:camera(),center:camera(),center3d:camera()}});
+ const defaults=(investigationId=null)=>({version:VERSION,investigationId,viewMode:'2d',projection:'isometric',camera3D:camera3D(),centerCamera3D:camera3D(),cameras:{free:camera(),crystal:camera(),crystal3d:camera(),center:camera(),center3d:camera()}});
  const num=(v,lo,hi,fallback)=>typeof v==='number'&&Number.isFinite(v)?Math.min(hi,Math.max(lo,v)):fallback;
  function sanitizeCamera(c){
   const out=camera();if(!c||typeof c!=='object')return out;
@@ -44,7 +44,7 @@ SILM.representation=(()=>{
   if(typeof v.latticeFocus==='string'&&/^-?\d,-?\d,-?\d\|\d{1,3}$/.test(v.latticeFocus))out.latticeFocus=v.latticeFocus;
   if(PROJECTIONS.includes(v.projection))out.projection=v.projection;
   for(const k of ['free','crystal','crystal3d','center','center3d'])out.cameras[k]=sanitizeCamera(v.cameras?.[k]);
-  if(v.version===VERSION){if(VIEW_MODES.includes(v.viewMode))out.viewMode=v.viewMode;out.camera3D=sanitizeCamera3D(v.camera3D);}   // versão 1: modo 2D, câmera 3D padrão
+  if(v.version===VERSION){if(VIEW_MODES.includes(v.viewMode))out.viewMode=v.viewMode;out.camera3D=sanitizeCamera3D(v.camera3D);out.centerCamera3D=sanitizeCamera3D(v.centerCamera3D);}   // versão 1: modo 2D, câmera 3D padrão
   return out;
  }
  return Object.freeze({VERSION,PROJECTIONS,MODES,VIEW_MODES,PRESETS,PROJECTIONS3D,LABELS,PRESET_LABELS,ZOOM,camera,camera3D,defaults,sanitize,sanitizeCamera,sanitizeCamera3D});
