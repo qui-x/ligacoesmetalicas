@@ -243,7 +243,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   if(layout)R.setCamera({...R.camera,mode:'free'},{settled:false});
   if(unit&&model.state.structure.crystallography.representation.selectedUnitId!==unit.id)actions.select(unit.id);
   render();
-  if(layout)R.revealBounds(RD.boundsOf(scene.drawn),layout.project(D(site.cart)),unitFraction*.72);
+  if(layout){if(localFocus)R.center();else R.revealBounds(RD.boundsOf(scene.drawn),layout.project(D(site.cart)),unitFraction*.72);}
  }});
  const cellCart=cart=>scene?.rep.view==='lattice'?navigator.cursor.displayCart(cart):cart;
  root.insertBefore(navigator.status,area);
@@ -409,7 +409,12 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
      ', distância '+focusShell.distances[index].toLocaleString('pt-BR',{maximumFractionDigits:3})+' ångströms');
     button.title='Focalizar centro vizinho '+(index+1);
     button.disabled=!navigator.cursor.has(site.key);
-    button.addEventListener('click',()=>{if(!button.disabled)navigator.visit(site);});
+    button.addEventListener('click',()=>{
+     if(button.disabled)return;
+     const actualUnit=model.state.structure.units.find(u=>X.key(navigator.cursor.displaySite(u.site))===site.key);
+     if(measureOptions?.pickActive()&&actualUnit){measureOptions.onPick(actualUnit.id);return;}
+     navigator.visit(site);
+    });
     localShellLayer.append(button);
    }
    localStatus.textContent=element.symbol+' · centro em foco · '+focusShell.list.length+
