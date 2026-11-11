@@ -1,0 +1,109 @@
+/* SILM · escala Centro metálico · câmera focal (reuso dos gestos QuímiX)
+   A apresentação local é derivada da geometria do motor SILM. Nenhuma
+   ligação covalente, novo sítio científico ou trajetória orbital é criada. */
+.silm-crystal[data-local-focus="true"] .silm-cell-layer,
+.silm-crystal[data-local-focus="true"] .silm-lattice-layer,
+.silm-crystal[data-local-focus="true"] .silm-ghost-layer{
+ display:none!important
+}
+/* A camada de unidades reais ocupa o palco inteiro e fica acima dos
+   vizinhos: só o centro destacado recebe toque. O fundo fica transparente
+   para os botões de vizinhos (não usar z-index acima das ferramentas). */
+.silm-crystal[data-local-focus="true"] .silm-assembly-units{
+ pointer-events:none
+}
+.silm-crystal[data-local-focus="true"] .silm-crystal-unit[data-local-center]{
+ pointer-events:auto
+}
+.silm-crystal[data-local-focus="true"] .silm-crystal-unit:not([data-local-center]){
+ opacity:0!important;visibility:hidden!important;pointer-events:none!important
+}
+.silm-crystal[data-local-focus="true"] .silm-crystal-unit[data-local-center]{
+ opacity:1!important;visibility:visible!important;
+ --depth-scale:1.22!important;--depth-fade:1!important;z-index:220!important
+}
+.silm-crystal[data-local-focus="true"] .silm-crystal-unit[data-local-center] .silm-unit-core{
+ outline:3px solid var(--scientific-accent,#0e9488);outline-offset:3px;
+ box-shadow:0 0 0 7px color-mix(in srgb,var(--scientific-accent,#0e9488) 17%,transparent),
+  inset -3px -4px 7px #0004,0 5px 16px #0003
+}
+.silm-crystal[data-local-focus="true"] .silm-center-shell-layer{
+ pointer-events:none
+}
+.silm-center-shell-layer .silm-center-neighbor{
+ position:absolute;box-sizing:border-box;left:50%;top:50%;
+ display:grid;place-items:center;
+ width:clamp(32px,4.6vw,52px);height:clamp(32px,4.6vw,52px);
+ min-width:32px;min-height:32px;
+ transform:translate(-50%,-50%);
+ font-size:clamp(.63rem,.9vw,.84rem);font-weight:750;
+ border:2px solid color-mix(in srgb,var(--scientific-accent,#0e9488) 70%,var(--border,#94a3b8));
+ border-radius:50%;color:var(--text);
+ background:radial-gradient(circle at 32% 28%,
+   color-mix(in srgb,var(--surface,#fff) 72%,var(--scientific-accent,#0e9488)),
+   color-mix(in srgb,var(--surface,#fff) 55%,var(--scientific-accent,#0e9488)));
+ opacity:.82;
+ box-shadow:0 3px 9px #0002;
+ cursor:pointer;pointer-events:auto;touch-action:manipulation;
+}
+.silm-center-shell-layer .silm-center-neighbor:focus-visible{
+ outline:3px solid var(--scientific-accent,#0e9488);outline-offset:3px;
+ opacity:1
+}
+.silm-center-shell-layer .silm-center-neighbor:disabled{
+ cursor:default;opacity:.27;border-style:dashed
+}
+.silm-crystal[data-local-focus="true"] .silm-center-focus-summary{
+ position:absolute;z-index:13;top:8px;left:50%;transform:translateX(-50%);
+ box-sizing:border-box;max-width:calc(100% - 16px);
+ background:color-mix(in srgb,var(--surface,#fff) 93%,transparent);
+ color:var(--text);border:1px solid var(--border);
+ box-shadow:0 3px 12px #0002;border-radius:999px;
+ padding:6px 12px;font-size:.75rem;font-weight:600;
+ line-height:1.2;text-align:center;pointer-events:none
+}
+@media(max-width:600px){
+ .silm-crystal[data-local-focus="true"] .silm-center-focus-summary{
+  top:4px;border-radius:10px;max-width:calc(100% - 12px);
+  padding:4px 7px;font-size:.66rem
+ }
+ .silm-center-shell-layer .silm-center-neighbor{
+  width:36px;height:36px
+ }
+}
+@media(forced-colors:active){
+ .silm-center-shell-layer .silm-center-neighbor{
+  color:ButtonText;background:ButtonFace;border:2px solid ButtonText;
+  opacity:1;forced-color-adjust:none
+ }
+ .silm-crystal[data-local-focus="true"] .silm-center-focus-summary{
+  color:CanvasText;background:Canvas;border:1px solid CanvasText
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .silm-crystal[data-local-focus="true"] .silm-center-neighbor,
+ .silm-crystal[data-local-focus="true"] .silm-crystal-unit{
+  transition:none!important;animation:none!important
+ }
+}
+
+/* O foco em grãos interpola a câmera só durante a ação; arrastar a
+   microestrutura permanece imediato. Redução de movimento respeitada. */
+.silm-workshop-micro-map[data-focus-transition="on"] .silm-micro-plane{
+ transition:transform 340ms cubic-bezier(.2,.8,.2,1)
+}
+@media(prefers-reduced-motion:reduce){
+ .silm-workshop-micro-map[data-focus-transition="on"] .silm-micro-plane{transition:none!important}
+}
+
+/* A navegação por eixos é própria da Rede. No Centro a escolha é feita
+   tocando nos vizinhos ou pelo seletor de vizinhança já existente.
+   Os controles de estímulo (inclusive Joule) continuam visíveis. */
+.silm-center-navigation>strong{font-size:.77rem}
+.silm-center-navigation button[aria-label^="Avançar uma célula"],
+.silm-center-navigation button[aria-label^="Recuar uma célula"]{
+ display:none!important
+}
+.silm-crystal[data-local-focus="true"] .silm-lattice-status{
+ display:none!important
+}

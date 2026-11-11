@@ -60,16 +60,20 @@
   latticeFocus:()=>representation.latticeFocus,
   setLatticeFocus:key=>{representation.latticeFocus=key;saveView();},
   projection:()=>representation.projection,
-  viewMode:()=>representation.viewMode,
+  viewMode:()=>workshopScale===4?representation.centerViewMode:representation.viewMode,
   available3D:()=>!unavailable3D,
-  camera3D:()=>({...representation.camera3D}),
+  camera3D:()=>({...representation[workshopScale===4?'centerCamera3D':'camera3D']}),
   setViewMode(mode,{projection=null}={}){
    if(!S.representation.VIEW_MODES.includes(mode)||(mode==='3d'&&unavailable3D))return;
    if(projection&&S.representation.PROJECTIONS.includes(projection))representation.projection=projection;
-   focusAfterRender=document.activeElement?.id||null;representation.viewMode=mode;saveView();schedule();
+   focusAfterRender=document.activeElement?.id||null;representation[workshopScale===4?'centerViewMode':'viewMode']=mode;saveView();schedule();
   },
-  setCamera3D(patch,{silent=false}={}){representation.camera3D=S.representation.sanitizeCamera3D({...representation.camera3D,...patch});saveView();if(!silent)view?.update();},
-  fail3D(){if(unavailable3D)return;unavailable3D=true;representation.viewMode='2d';saveView();schedule();say('A vista 3D não está disponível. A vista 2D continua com a mesma investigação.','warning');},
+  setCamera3D(patch,{silent=false}={}){
+   const key=workshopScale===4?'centerCamera3D':'camera3D';
+   representation[key]=S.representation.sanitizeCamera3D({...representation[key],...patch});
+   saveView();if(!silent)view?.update();
+  },
+  fail3D(){if(unavailable3D)return;unavailable3D=true;representation[workshopScale===4?'centerViewMode':'viewMode']='2d';saveView();schedule();say('A vista 3D não está disponível. A vista 2D continua com a mesma investigação.','warning');},
   setProjection(value){if(!S.representation.PROJECTIONS.includes(value))return;representation.projection=value;saveView();view?.update();},
   camera:mode=>representation.cameras[mode],
   saveCamera(mode,value){representation.cameras[mode]=S.representation.sanitizeCamera(value);saveView();}
@@ -152,7 +156,7 @@
   return 'Organizar indisponível para '+e.name.toLowerCase()+': '+eligibility.message.replace(/\.$/,'')+label+'. A montagem livre continua disponível.';}
  function openLeft(tab){const open=document.querySelector('[data-open-dock="montagem"]');if(open&&open.getAttribute('aria-expanded')!=='true')open.click();requestAnimationFrame(()=>document.querySelector('[data-left-tab="'+tab+'"]:not([hidden])')?.click());}
  function renderScene(){
-  const state=model.state,e=element(),key=e?state.investigation.id+':'+e.atomicNumber+':'+state.module.active+':'+(state.structure?.mode||'empty')+':'+(state.structure?.mode==='crystalline'?representation.viewMode:'2d'):'none';
+  const state=model.state,e=element(),key=e?state.investigation.id+':'+e.atomicNumber+':'+state.module.active+':'+(state.structure?.mode||'empty')+':'+(state.structure?.mode==='crystalline'?(workshopScale===4?representation.centerViewMode:representation.viewMode):'2d')+':'+(workshopScale===4?'centro':'rede'):'none';
   if(viewKey!==key){placeExpansionButton(false);scope?.destroy();scope=null;view=null;viewKey=key;$('silm-integration-scene').replaceChildren();
    if(!e){
     // Fallback para a Oficina anterior caso o módulo de aplicações não carregue.
@@ -161,7 +165,7 @@
    else if(!state.structure)emptyState({title:'Estrutura de '+e.name+' vazia',text:state.module.active==='explorar'?['Use ','Adicionar unidade',' para montar a estrutura de '+e.name+'. Depois organize segundo a estrutura de referência.']:['A estrutura ainda não foi montada. Volte ao módulo ','Explorar',' em Ver para adicionar unidades.'],actions:state.module.active==='explorar'&&(!routeUI.session.open()||routeUI.canBuild())?[['Adicionar unidade',()=>run.add(),'primary'],['Abrir Montagem',()=>openLeft('objetos')]]:[['Abrir Ver',()=>{const button=document.querySelector('[data-open-dock="ver"]');if(button?.getAttribute('aria-expanded')!=='true')button?.click();requestAnimationFrame(()=>$('silm-module-shortcuts')?.querySelector('[aria-pressed="true"]')?.focus({preventScroll:true}));},'primary']]});
    else if(state.structure){
     scope=SimCore.createScope();const common={scope,model,element:e,actions:run,reducedMotion:reduced,representation:rep,observer:workspaceFamily.observer,moduleTitle:{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active],measure:tools.measure,calc:tools.calc,properties:experience.scene};
-    if(state.structure.mode==='crystalline')view=S.createCrystalView($('silm-integration-scene'),{...common,geometry:S.crystal.geometry(e)});
+    if(state.structure.mode==='crystalline')view=S.createCrystalView($('silm-integration-scene'),{...common,geometry:S.crystal.geometry(e),localFocus:workshopScale===4&&!routeUI?.session.open()});
     else view=S.createAssemblyView($('silm-integration-scene'),{...common,editable:state.module.active==='explorar'&&(!routeUI.session.open()||routeUI.canBuild()),organize:{run:run.organize,state:()=>{
      const eligibility=S.crystal.eligibility(e);return {disabled:!model.state.structure?.units.length||eligibility.status!=='available',reason:eligibility.status!=='available'?organizeReason(e,eligibility):'',more:{label:'Por que uma opção não aparece',href:'#/manual?topico=problemas'}};
     }}});

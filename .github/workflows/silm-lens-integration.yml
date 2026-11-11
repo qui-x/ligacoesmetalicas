@@ -7,6 +7,14 @@ on:
     branches: [main]
     paths:
       - 'domain/silm/lens.css'
+      - 'domain/silm/center-focus.css'
+      - 'domain/silm/crystal-view.js'
+      - 'domain/silm/renderer-2d.js'
+      - 'domain/silm/representation.js'
+      - 'domain/silm/microstructure-view.js'
+      - 'domain/silm/assembly.css'
+      - 'integracao/adapter.js'
+      - 'tests/run-center-camera-focus.mjs'
       - 'domain/silm/lens-controller.js'
       - 'integracao/module-shortcuts.js'
       - 'integracao/module-shortcuts.css'
@@ -50,6 +58,12 @@ jobs:
       - name: Conferir sintaxe e contrato offline
         run: |
           node --check domain/silm/lens-controller.js
+          node --check domain/silm/crystal-view.js
+          node --check domain/silm/renderer-2d.js
+          node --check domain/silm/representation.js
+          node --check domain/silm/microstructure-view.js
+          node --check tests/run-center-camera-focus.mjs
+          grep -q 'domain/silm/center-focus.css' sw.js
           node --check integracao/module-shortcuts.js
           node --check integracao/dock-focus.js
           node --check integracao/workspace-family.js
@@ -83,6 +97,8 @@ jobs:
         run: node tests/run-lens-gestures.mjs
       - name: Testar ferramentas diretas nos três módulos
         run: node tests/run-direct-ver-tools.mjs
+      - name: Homologar câmera do centro e foco dos grãos
+        run: node tests/run-center-camera-focus.mjs
       - name: Guardar evidências visuais
         if: always()
         uses: actions/upload-artifact@v4
@@ -91,6 +107,7 @@ jobs:
           path: |
             reports/lente/${{ matrix.browser }}/
             reports/ver-direto/${{ matrix.browser }}/
+            reports/camera-focal/${{ matrix.browser }}/
           if-no-files-found: warn
           retention-days: 14
       - name: Encerrar servidor

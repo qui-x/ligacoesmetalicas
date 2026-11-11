@@ -115,7 +115,7 @@ SILM.renderer2d=(()=>{
   scope.cleanup(()=>{if(settleTimer)clearTimeout(settleTimer);settleTimer=0;});
   function setCamera(next,{animate=false,say=null,settled=true}={}){
    next=limit(R.sanitizeCamera(next),interest);const changed=!same(next,cam);cam=next;
-   if(changed){if(animate&&!reducedMotion()){stage.dataset.cameraAnimate='';scope.timeout(()=>{delete stage.dataset.cameraAnimate;},240);}apply();}
+   if(changed){if(animate&&!reducedMotion()){stage.dataset.cameraAnimate='';scope.timeout(()=>{delete stage.dataset.cameraAnimate;},380);}apply();}
    if(settled)settle(say);
    return changed;
   }
