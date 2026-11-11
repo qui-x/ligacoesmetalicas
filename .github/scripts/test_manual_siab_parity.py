@@ -119,6 +119,42 @@ def run(browser_name: str, base_url: str) -> None:
             expect(page.locator(".silm-manual-article h1")).to_have_text(
                 "Escolher um instrumento"
             )
+            if width == 1440:
+                # Auditoria de conteúdo completa: nenhum dos 29 tópicos pode ficar
+                # sem explicação detalhada, seja na fonte, seja na página renderizada.
+                topic_rows = page.evaluate("""() => window.SILM.manual.topics.map(t => ({
+                    id: t.id, title: t.title, summary: t.summary || '',
+                    content: t.content || ''
+                }))""")
+                assert len(topic_rows) == 29, f"Tópicos do Manual: {len(topic_rows)}"
+                assert len({item["id"] for item in topic_rows}) == 29
+                for item in topic_rows:
+                    assert len(item["summary"].strip()) >= 20, (
+                        f"Resumo ausente em {item['id']}"
+                    )
+                    assert len(item["content"].strip()) >= 120, (
+                        f"Explicação ausente em {item['id']}"
+                    )
+                    page.evaluate(
+                        """topicId => {location.hash = '#/manual?topico='
+                          + encodeURIComponent(topicId)}""", item["id"]
+                    )
+                    article = page.locator(
+                        f'.silm-manual-article[data-manual-topic="{item["id"]}"]'
+                    )
+                    expect(article).to_be_visible(timeout=10000)
+                    expect(article.locator(".silm-manual-purpose p")).to_be_visible()
+                    explanation = article.locator(".silm-manual-explanation")
+                    expect(explanation.locator("h2")).to_have_text("Entenda")
+                    assert len(explanation.locator("p").all_inner_texts()) >= 1
+                    assert len(" ".join(explanation.locator("p").all_inner_texts()).strip()) >= 120, (
+                        f"Página sem explicação renderizada: {item['id']}"
+                    )
+                # Acessibilidade era uma categoria sem apresentação conceitual.
+                page.evaluate("() => {location.hash='#/manual?categoria=acessibilidade'}")
+                expect(page.locator(".silm-manual-category-page")).to_be_visible()
+                expect(page.locator(".silm-manual-category-page .silm-manual-explanation")).to_be_visible()
+                expect(page.locator(".silm-manual-category-page .silm-manual-purpose p")).to_be_visible()
             assert not errors, f"{browser_name} {width}: erros JS: {errors!r}"
             print(f"OK {browser_name} {width}x{height}: Manual SIAB/SILM")
             context.close()
