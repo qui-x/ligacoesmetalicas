@@ -257,23 +257,76 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  else root.append(navigator.root);
  scope.cleanup(()=>navigator.root.remove());
  const fieldNames={temperature:'Temperatura',potential:'Potencial elétrico',dissipation:'Dissipação Joule'};
- let jouleControls=null,jouleSettings=null;
+ let jouleControls=null,jouleUI=null;
  const formatRelative=value=>value.toLocaleString('pt-BR',{maximumFractionDigits:3});
- // Reutiliza os comandos de Observar e as mesmas restrições científicas em cada referência.
+ // Joule é a combinação da fonte elétrica com a resposta térmica, não
+ // uma nova navegação nem uma segunda tela. O quadro é irmão da barra
+ // da rede, por isso permanece disponível em Célula, Rede e Centro.
  if(propertyOptions?.quickActions&&model.state.module.active==='explorar'){
-  // Estímulos já são ativados diretamente em Ver → Explorar.
-  // Esta faixa mantém apenas os parâmetros instrumentais do ensaio Joule
-  // quando necessários, sem um segundo seletor das mesmas propriedades.
-  jouleControls=U.element('span',null,'silm-joule-controls');jouleControls.hidden=true;
-  jouleSettings=document.createElement('select');jouleSettings.setAttribute('aria-label','Condições do efeito Joule');
-  for(const [value,label] of [['','Condições Joule'],['voltage','Tensão imposta'],['current','Corrente imposta'],['ambient','Terminais à temperatura ambiente'],['insulated','Amostra isolada'],['supply','Ligar ou desligar alimentação'],['external','Ligar ou desligar calor externo'],['temperature','Ver temperatura'],['potential','Ver potencial elétrico'],['dissipation','Ver dissipação Joule'],['readings','Leituras e balanço de energia'],['restore','Reiniciar ensaio'],['end','Encerrar efeito Joule']]){
-   const option=document.createElement('option');option.value=value;option.textContent=label;jouleSettings.append(option);
+  const act=(key,origin=null)=>propertyOptions.quickActions.jouleAction(key,origin);
+  jouleControls=U.element('div',null,'silm-joule-controls');
+  jouleControls.hidden=true;
+  jouleControls.setAttribute('role','group');
+  jouleControls.setAttribute('aria-label','Experiência integrada de efeito Joule');
+  const live=U.element('span','Joule · t 0','silm-joule-live');
+  live.setAttribute('aria-label','Leituras resumidas de transformação elétrica em calor');
+  const createButton=(label,className,command)=>{
+   const btn=U.element('button',label,className);btn.type='button';
+   scope.listen(btn,'click',()=>act(typeof command==='function'?command():command,btn));
+   return btn;
+  };
+  const supply=createButton('Fonte ligada','silm-joule-supply','supply');
+  const playback=createButton('Reproduzir','silm-joule-play',()=>jouleUI?.playing?'pause':'play');
+  const step=createButton('+0,5','silm-joule-step','step');
+  step.setAttribute('aria-label','Avançar meio intervalo no efeito Joule');
+  step.title='Avançar 0,5 unidade de tempo relativa';
+  const advanced=document.createElement('details');advanced.className='silm-joule-advanced';
+  const summary=U.element('summary','Ajustes','silm-joule-advanced-summary');
+  summary.setAttribute('aria-label','Ajustar ensaio elétrico e térmico');
+  const panel=U.element('div',null,'silm-joule-panel');
+  const description=U.element('p','Elétrica → dissipação Joule → calor na rede. Todas as grandezas são relativas; esta simulação não utiliza condutividades individuais em SI.','silm-joule-explanation');
+  panel.append(description);
+  function addChoice(label,options){
+   const wrap=U.element('label',label,'silm-joule-setting');
+   const select=document.createElement('select');
+   for(const [value,text] of options){const option=document.createElement('option');option.value=value;option.textContent=text;select.append(option);}
+   wrap.append(select);panel.append(wrap);
+   scope.listen(select,'change',()=>act(select.value,select));
+   return select;
   }
-  scope.listen(jouleSettings,'change',()=>{const action=jouleSettings.value;jouleSettings.value='';propertyOptions.quickActions.jouleAction(action,jouleSettings);});
-  const step=U.element('button','Avançar 0,5');step.type='button';step.setAttribute('aria-label','Avançar meio intervalo no efeito Joule');step.title='Avançar meio intervalo no efeito Joule';step.classList.add('silm-joule-step');
-  scope.listen(step,'click',()=>propertyOptions.quickActions.jouleAction('step'));
-  jouleControls.append(jouleSettings,step);navigator.root.append(jouleControls);
-
+  const mode=addChoice('Fonte elétrica',[['voltage','Tensão imposta (relativa)'],['current','Corrente imposta (relativa)']]);
+  const boundary=addChoice('Troca térmica',[['ambient','Terminais como reservatório térmico'],['insulated','Amostra isolada']]);
+  const map=addChoice('Mapa no metal',[['temperature','Elevação de temperatura'],['potential','Potencial elétrico'],['dissipation','Dissipação Joule']]);
+  const extra=createButton('Adicionar calor externo','silm-joule-external','external');
+  const reset=createButton('Reiniciar evolução','silm-joule-reset','restore');
+  const end=createButton('Voltar à elétrica simples','silm-joule-end','end');
+  panel.append(extra,reset,end);
+  const quantities=[['time','Tempo relativo'],['voltage','Tensão'],['current','Corrente'],['resistance','Resistência equivalente'],['power','Potência Joule'],['mean','Elevação térmica média'],['maximum','Elevação térmica máxima'],['jouleEnergy','Energia Joule'],['externalEnergy','Energia externa'],['removedEnergy','Energia removida'],['storedEnergy','Energia armazenada']];
+  const reading=U.element('dl',null,'silm-joule-readings'),outputs=new Map();
+  for(const [key,label] of quantities){
+   const value=U.element('dd','0');value.dataset.quantity=key;
+   reading.append(U.element('dt',label),value);outputs.set(key,value);
+  }
+  const note=U.element('p','Balanço: energia elétrica + calor externo = energia armazenada + energia removida, em unidades relativas.','silm-joule-explanation');
+  panel.append(reading,note);advanced.append(summary,panel);
+  jouleControls.append(live,supply,playback,step,advanced);
+  navigator.root.after(jouleControls);
+  scope.cleanup(()=>jouleControls.remove());
+  function positionPanel(){
+   if(!advanced.open)return;
+   const pos=summary.getBoundingClientRect(),vw=window.visualViewport?.width||window.innerWidth,vh=window.visualViewport?.height||window.innerHeight;
+   const width=Math.min(338,vw-24);
+   panel.style.width=width+'px';
+   const height=Math.min(panel.scrollHeight,vh-24);
+   panel.style.left=Math.max(12,Math.min(pos.left,vw-width-12))+'px';
+   panel.style.top=Math.max(12,Math.min(pos.top-height-8,vh-height-12))+'px';
+   panel.style.maxHeight=Math.max(120,vh-24)+'px';
+  }
+  scope.listen(advanced,'toggle',positionPanel);
+  scope.listen(window,'resize',positionPanel);
+  scope.listen(window,'scroll',positionPanel,{capture:true});
+  scope.listen(document,'click',event=>{if(advanced.open&&!advanced.contains(event.target))advanced.open=false;});
+  jouleUI={live,supply,playback,step,mode,boundary,map,extra,outputs,playing:false,advanced};
  }
 
  const pt=p=>{const q=layout.project(D(p));return {x:q.x*100,y:q.y*100,depth:q.depth};};
@@ -428,7 +481,24 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const refCentres=list.map(u=>refLayout.project(D(g.site(u.site).cart))),refSpacing=d*refLayout.scale;
   // Calor + corrente (0.17.x): a mesma fonte de calor também na condutividade elétrica (transitória, sem gravar).
   const coupled=propertyOptions?.jouleReading?.(S);
-  if(jouleControls)jouleControls.hidden=!coupled;
+  if(jouleControls){
+  jouleControls.hidden=!coupled;
+  if(coupled&&jouleUI){
+   const {input,values}=coupled;
+   jouleUI.live.textContent='Joule · t '+formatRelative(values.time)+' · P '+formatRelative(values.power)+' · ΔT '+formatRelative(values.mean);
+   jouleUI.supply.textContent=pr.electrical.field?'Fonte ligada':'Fonte desligada';
+   jouleUI.supply.setAttribute('aria-pressed',String(!!pr.electrical.field));
+   jouleUI.supply.setAttribute('aria-label',pr.electrical.field?'Desligar alimentação elétrica':'Ligar alimentação elétrica');
+   jouleUI.playing=!!coupled.playing;
+   jouleUI.playback.textContent=coupled.playing?'Pausar':'Reproduzir';
+   jouleUI.playback.setAttribute('aria-label',coupled.playing?'Pausar evolução do efeito Joule':'Reproduzir aquecimento e resfriamento Joule');
+   jouleUI.playback.setAttribute('aria-pressed',String(!!coupled.playing));
+   jouleUI.mode.value=input.mode;jouleUI.boundary.value=input.boundary;jouleUI.map.value=coupled.layer;
+   jouleUI.extra.textContent=input.external?'Retirar calor externo':'Adicionar calor externo';
+   jouleUI.extra.setAttribute('aria-pressed',String(!!input.external));
+   for(const [key,output] of jouleUI.outputs)output.textContent=formatRelative(values[key]);
+  }
+ }
   if(coupled){navigator.reading.setAttribute('aria-live','polite');navigator.reading.tabIndex=0;}
   else{navigator.reading.removeAttribute('aria-live');navigator.reading.removeAttribute('tabindex');}
   scene.coupled=coupled;
@@ -492,7 +562,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // Pista visual da corrente total calculada: não representa trajetórias locais nem velocidade em SI.
   const currentFactor=coupled?coupled.values.current/(1+coupled.values.current):null;
   electronLayer.update({visible:shownElectrons,motion:!!el?.representation.motion,field:fieldOn,centers:centersT,spacing:d*layout.scale,connect:false,drive:driveCtl?.intensity??.6,defects,currentFactor});
-  navigator.root.hidden=navigator.status.hidden=r.view!=='lattice';
+  navigator.root.hidden=r.view!=='lattice';
+  navigator.status.hidden=r.view!=='lattice'&&!coupled;
   if(r.view==='lattice'){
    const effects=[];
    if(active)effects.push(P.catalog[active].title);
