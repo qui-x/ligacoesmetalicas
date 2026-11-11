@@ -149,7 +149,14 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    const filter=N('select');filter.id='silm-themes-filter';
    for(const [id,title] of [['all','Todos os assuntos'],...Object.entries(categories)]){const opt=N('option',title);opt.value=id;filter.append(opt);}
    const search=N('input');search.type='search';search.id='silm-themes-search';search.placeholder='Pesquisar tema ou metal';search.setAttribute('aria-label','Pesquisar temas');
-   controls.append(label,filter,search);host.append(controls);
+   const metalLabel=N('label','Metal disponível');metalLabel.htmlFor='silm-themes-metal-filter';
+   const metalFilter=N('select');metalFilter.id='silm-themes-metal-filter';metalFilter.setAttribute('aria-label','Filtrar por metal disponível');
+   const allMetals=N('option','Todos os metais');allMetals.value='all';metalFilter.append(allMetals);
+   for(const e of S.data.elements.filter(e=>e.silmEligibility.status==='available')){
+    const option=N('option',e.name+' ('+e.symbol+')');option.value=String(e.atomicNumber);metalFilter.append(option);
+   }
+   const count=N('p');count.className='silm-learning-count';count.setAttribute('role','status');count.setAttribute('aria-live','polite');
+   controls.append(label,filter,metalLabel,metalFilter,search);host.append(controls,count);
    const list=N('div');list.className='silm-content-list silm-learning-catalog';
    const groups=new Map();
    for(const item of S.themes.registry){
@@ -165,15 +172,15 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
      const text=N('span');text.append(N('strong',item.title),N('small',detail));
      const status=N('span',progress.completed[item.id]?'Revisado':'Não revisado');status.className='silm-row-status';
      row.append(text,status);list.append(row);
-     rows.push({row,category,haystack:(item.title+' '+item.subtitle+' '+item.description+' '+item.relatedMetals.map(z=>S.data.get(z).name+' '+S.data.get(z).symbol).join(' ')).normalize('NFD').replace(/\p{M}/gu,'').toLowerCase()});
+     rows.push({row,category,metals:item.relatedMetals,haystack:(item.title+' '+item.subtitle+' '+item.description+' '+item.relatedMetals.map(z=>S.data.get(z).name+' '+S.data.get(z).symbol).join(' ')).normalize('NFD').replace(/\p{M}/gu,'').toLowerCase()});
     }
    }
    const apply=()=>{
     const q=search.value.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().trim(),counts=new Map();
-    for(const item of rows){const shown=(filter.value==='all'||filter.value===item.category)&&(!q||item.haystack.includes(q));item.row.hidden=!shown;if(shown)counts.set(item.category,(counts.get(item.category)||0)+1);}
-    for(const [id,heading] of headingMap)heading.hidden=!counts.get(id);
+    for(const item of rows){const shown=(filter.value==='all'||filter.value===item.category)&&(metalFilter.value==='all'||item.metals.includes(Number(metalFilter.value)))&&(!q||item.haystack.includes(q));item.row.hidden=!shown;if(shown)counts.set(item.category,(counts.get(item.category)||0)+1);}
+    for(const [id,heading] of headingMap)heading.hidden=!counts.get(id);count.textContent=Array.from(counts.values()).reduce((sum,n)=>sum+n,0)+' de '+rows.length+' temas';
    };
-   filter.addEventListener('change',apply);search.addEventListener('input',apply);
+   filter.addEventListener('change',apply);metalFilter.addEventListener('change',apply);search.addEventListener('input',apply);apply();
    host.append(list);
    // Retorno do tema: o foco volta para a linha do tema aberto, como quem fecha um detalhe.
    if(lastTheme){const back=$('theme-card-'+lastTheme);lastTheme=null;if(back)requestAnimationFrame(()=>back.focus({preventScroll:false}));}
