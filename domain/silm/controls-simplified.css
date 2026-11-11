@@ -1,0 +1,114 @@
+/* SILM · Parte 9 — comandos essenciais, gestos e alternativas acessíveis.
+   A câmera e a navegação cristalográfica conservam suas ações originais:
+   apenas os controles secundários ficam sob demanda. */
+#silm-view-controls .silm-camera-compact{
+ box-sizing:border-box;display:flex;flex-flow:row wrap;gap:5px;
+ align-items:center;align-content:center;max-height:none;
+ padding:0;border:0;box-shadow:none;background:transparent;
+}
+#silm-view-controls .silm-camera-compact>.silm-camera-btn{
+ width:44px;min-width:44px;height:44px;min-height:44px;
+ border-radius:9px;
+}
+#silm-view-controls .silm-camera-advanced{
+ position:relative;display:block;min-width:0;z-index:30;
+}
+#silm-view-controls .silm-camera-advanced-summary{
+ box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+ min-width:44px;min-height:44px;padding:4px 8px;
+ border:1px solid var(--border);border-radius:9px;
+ color:var(--text);background:var(--surface);font:inherit;
+ cursor:pointer;font-size:.72rem;font-weight:700;line-height:1.15;
+}
+#silm-view-controls .silm-camera-advanced-summary:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px
+}
+#silm-view-controls .silm-camera-advanced[open] .silm-camera-advanced-summary{
+ border-color:var(--accent);
+}
+#silm-view-controls .silm-camera-advanced-panel{
+ position:absolute;z-index:50;bottom:calc(100% + 8px);right:0;
+ box-sizing:border-box;display:grid;
+ grid-template-columns:repeat(4,minmax(44px,1fr));
+ align-items:center;gap:6px;min-width:220px;max-width:min(324px,calc(100vw - 20px));
+ padding:9px;border-radius:12px;border:1px solid var(--border);
+ background:var(--panel,var(--surface));box-shadow:0 5px 16px #0003;
+ max-height:min(320px,60dvh);overflow-y:auto;overscroll-behavior:contain;
+}
+#silm-view-controls .silm-camera-advanced:not([open]) .silm-camera-advanced-panel{display:none}
+#silm-view-controls .silm-camera-advanced-panel .silm-camera-btn{
+ width:44px;height:44px;min-width:44px;min-height:44px;
+}
+#silm-view-controls .silm-camera-advanced-panel .silm-camera-zoom{
+ grid-column:span 2;min-width:0;width:auto;text-align:center
+}
+#silm-view-controls .silm-camera-advanced-panel .silm-camera-orbit[hidden]{display:none}
+#silm-view-controls .silm-camera-advanced-panel .silm-camera-btn:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px
+}
+/* Rede: escolha de vizinhos à vista e deslocamentos cristalográficos em
+   uma gaveta. Centro: a cena é a interface; seletor e origem na gaveta. */
+#si-stage .silm-lattice-nav:not([hidden]){gap:6px}
+#si-stage .silm-lattice-more{position:relative;display:inline-block;min-width:0}
+#si-stage .silm-lattice-more>summary{
+ display:flex;align-items:center;justify-content:center;
+ box-sizing:border-box;min-height:44px;min-width:44px;
+ padding:6px 10px;border:1px solid var(--border);
+ border-radius:9px;background:var(--surface);color:var(--text);
+ cursor:pointer;font-size:.75rem;font-weight:700;white-space:normal
+}
+#si-stage .silm-lattice-more>summary:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px
+}
+#si-stage .silm-lattice-more-controls{
+ position:absolute;z-index:55;bottom:calc(100% + 8px);right:0;
+ box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;
+ justify-content:flex-end;gap:6px;
+ padding:8px;min-width:220px;max-width:min(335px,calc(100vw - 20px));
+ border:1px solid var(--border);border-radius:12px;
+ background:var(--panel,var(--surface));box-shadow:0 5px 16px #0003
+}
+#si-stage .silm-lattice-more:not([open]) .silm-lattice-more-controls{display:none}
+#si-stage .silm-lattice-more-controls select{flex:1 1 100%;max-width:100%;min-height:44px}
+#si-stage .silm-lattice-more-controls button{min-width:44px;min-height:44px}
+#si-stage .silm-lattice-nav.silm-center-navigation>strong{display:none}
+/* Apenas o centro traz símbolos: os vizinhos são esferas 3D discretas
+   com descrição completa em aria-label e tooltip. Alvo de toque 44px. */
+.silm-crystal[data-local-focus="true"] .silm-center-shell-layer .silm-center-neighbor{
+ box-sizing:border-box;width:44px;height:44px;min-width:44px;min-height:44px;
+ border:0;box-shadow:none;background:transparent;opacity:1;
+ color:transparent;touch-action:manipulation;
+}
+.silm-crystal[data-local-focus="true"] .silm-center-shell-layer .silm-center-neighbor::before{
+ content:'';display:block;position:absolute;
+ inset:4px;border-radius:50%;
+ border:1.5px solid color-mix(in srgb,var(--scientific-accent,#0e9488) 67%,var(--border,#94a3b8));
+ background:radial-gradient(circle at 27% 23%,
+  color-mix(in srgb,var(--surface,#fff) 83%,var(--scientific-accent,#0e9488)),
+  color-mix(in srgb,var(--surface,#fff) 43%,var(--scientific-accent,#0e9488)));
+ box-shadow:inset -3px -4px 6px #0002,0 3px 8px #0002;
+ transform:scale(calc(1.04 - var(--local-depth,.5)*.15));
+}
+.silm-crystal[data-local-focus="true"] .silm-center-shell-layer .silm-center-neighbor:disabled::before{
+ opacity:.3;border-style:dashed
+}
+.silm-crystal[data-local-focus="true"] .silm-center-shell-layer .silm-center-neighbor:focus-visible{
+ outline:3px solid var(--scientific-accent,#0e9488);outline-offset:1px;
+}
+@media(max-width:600px){
+ #silm-view-controls .silm-camera-advanced-panel{right:-46px;max-width:min(280px,calc(100vw - 16px))}
+ #si-stage .silm-lattice-more-controls{right:0}
+ #si-stage .silm-lattice-nav:not([hidden])>strong{display:none}
+}
+@media(forced-colors:active){
+ #silm-view-controls .silm-camera-advanced-summary,
+ #si-stage .silm-lattice-more>summary{border-color:ButtonText;background:ButtonFace;color:ButtonText}
+ .silm-crystal[data-local-focus="true"] .silm-center-shell-layer .silm-center-neighbor::before{
+  background:ButtonFace;border:2px solid ButtonText;forced-color-adjust:none
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #silm-view-controls .silm-camera-compact *,#si-stage .silm-lattice-more *{
+  transition:none!important;animation:none!important
+ }
+}
