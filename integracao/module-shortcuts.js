@@ -8,6 +8,13 @@
  if(!root||!selection)return;
  const buttons=[...root.querySelectorAll('[data-silm-module-shortcut]')];
  const modules=new Set(['explorar','medir','calcular']);
+ const preferredFamily={explorar:'observar',medir:'medir',calcular:'calcular'};
+ const lastFamily=new Map();
+ let lastModule=null;
+ window.addEventListener('si-viewer-family-selected',()=>{
+  const current=window.BaseDemoSI?.currentViewerFamily?.();
+  if(lastModule&&current)lastFamily.set(lastModule,current);
+ });
  const summary=document.getElementById('silm-module-selection-help');
  const descriptions={
   explorar:'Observação da estrutura, elétrons e propriedades.',
@@ -20,6 +27,23 @@
   const chosen=modules.has(select?.value)?select.value:
    window.SILMIntegration?.snapshot?.()?.module?.active||'explorar';
   const locked=!select||select.disabled;
+  const changed=lastModule!==null&&lastModule!==chosen;
+  lastModule=chosen;
+  // O módulo científico filtra os visualizadores via BaseDemoSI.moduleAllows.
+  // Ao alternar, abrir a família correspondente (ou a última escolhida nele)
+  // faz o segundo nível acompanhar o primeiro, como na navegação do SIAB.
+  if(changed)requestAnimationFrame(()=>{
+   if(currentSelect()?.value!==chosen)return;
+   const base=window.BaseDemoSI;
+   const allowed=base?.availableViewerFamilies?.()||[];
+   const previous=lastFamily.get(chosen);
+   const desired=allowed.includes(previous)?previous:preferredFamily[chosen];
+   if(allowed.includes(desired)&&base.currentViewerFamily?.()!==desired)
+    base.chooseViewerFamily(desired);
+   const right=document.getElementById('si-dock-right');
+   const back=document.getElementById('si-dock-viewer-back');
+   if(right&&!right.hidden&&back&&!back.hidden)back.click();
+  });
   root.dataset.activeModule=chosen;
   root.dataset.locked=String(locked);
   if(summary){
