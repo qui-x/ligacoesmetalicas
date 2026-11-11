@@ -394,12 +394,38 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   else{scene.slipCount=0;drawCell(calcMark?.mode==='edges');}
   ghostLayer.replaceChildren();
   if(neighbors&&!localFocus){const occupied=new Set(list.map(u=>X.key(u.site)));for(const n of neighbors.list)if(!occupied.has(n.key)){const q=layout.project(D(n.cart));ghostLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*50*dscale(q)}));}}
+  // Visualização dedicada: a geometria dos vizinhos vem exclusivamente do
+  // motor SILM. Tocar um vizinho transfere o foco, como no visualizador do
+  // QuímiX, sem produzir nova estrutura nem uma ligação localizada.
+  if(localFocus){
+   localShellLayer.replaceChildren();
+   for(const [index,site] of focusShell.list.entries()){
+    const p=layout.project(D(site.cart));
+    const button=U.element('button',element.symbol,'silm-center-neighbor');
+    button.type='button';button.dataset.siteKey=site.key;
+    button.style.left=(p.x*100)+'%';button.style.top=(p.y*100)+'%';
+    button.style.setProperty('--local-depth',String(p.depth));
+    button.setAttribute('aria-label','Focalizar vizinho '+(index+1)+' de '+focusShell.list.length+
+     ', distância '+focusShell.distances[index].toLocaleString('pt-BR',{maximumFractionDigits:3})+' ångströms');
+    button.title='Focalizar centro vizinho '+(index+1);
+    button.disabled=!navigator.cursor.has(site.key);
+    button.addEventListener('click',()=>{if(!button.disabled)navigator.visit(site);});
+    localShellLayer.append(button);
+   }
+   localStatus.textContent=element.symbol+' · centro em foco · '+focusShell.list.length+
+    ' primeiros vizinhos · distância '+(focusShell.distances[0]||0).toLocaleString('pt-BR',{maximumFractionDigits:3})+' Å · modelo cristalográfico';
+   root.dataset.centerSite=localKey;
+   root.dataset.coordination=String(focusShell.list.length);
+  }
   // Caixa de interesse da câmera: estrutura desenhada (com a deformação da propriedade e os vizinhos visíveis).
   const cellDrawn=[...g.cell.map(c=>c.cart),...(g.corners||[])].map(p=>layout.project(D(cellCart(p))));
   // Trocar a projeção ou a vista (Célula/Rede) reenquadra; mostrar vizinhos ou deformar mantém a câmera do usuário.
-  const presetKey=mode3d?(cam3.preset||lastPreset||'3d'):'',key=(mode3d?'3d:'+presetKey:proj)+'|'+r.view+(deforming?'|deformação':''),refit=fitKey!==null&&fitKey!==key&&R.camera.mode!=='fit';fitKey=key;if(mode3d&&cam3.preset)lastPreset=cam3.preset;
+  const presetKey=mode3d?(cam3.preset||lastPreset||'3d'):'',key=(mode3d?'3d:'+presetKey:proj)+'|'+r.view+(deforming?'|deformação':'')+
+   (localFocus?'|local:'+localKey:''),refit=fitKey!==null&&fitKey!==key&&(localFocus||R.camera.mode!=='fit');fitKey=key;if(mode3d&&cam3.preset)lastPreset=cam3.preset;
   if(refit)R.setCamera({...R.camera,mode:'fit'},{settled:false});
-  const box=extra.length?RD.boundsOf(extra.map(c=>layout.project(c))):RD.boundsOf([...cellDrawn,...drawn]),boxMargin=extra.length?.17:.12;
+  const box=localFocus?RD.boundsOf([layout.project(D(focusSite.cart)),...focusShell.list.map(site=>layout.project(D(site.cart)))]):
+   extra.length?RD.boundsOf(extra.map(c=>layout.project(c))):RD.boundsOf([...cellDrawn,...drawn]),
+   boxMargin=localFocus?.1:extra.length?.17:.12;
   R.setInterest(box,{margin:boxMargin});if(refit)rep2.saveCamera(cameraKey,R.camera);
   sizeSymbols();
   // Calor e níveis: sempre sobre a projeção de referência (isométrica, congelada), para que a vista nunca mude a experiência.
@@ -451,14 +477,18 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const el=S.electrons,shownElectrons=!!el?.representation.visible,moving=shownElectrons&&el.representation.motion&&!reducedMotion();scene.shownElectrons=shownElectrons;scene.electrons=el;
   updateWindow();
   /* Elétrons: centros na janela da vista enquadrada (não da câmera atual). Aproximar ou deslocar não refaz a distribuição. */
-  const fc=RD.fit(box,boxMargin),fa=RD.toScene(fc,{x:0,y:0}),fb=RD.toScene(fc,{x:1,y:1}),electronSites=latticeWindow({w:{x0:fa.x,y0:fa.y,x1:fb.x,y1:fb.y},c:{x:fc.x,y:fc.y},zoom:fc.zoom});
+  const fc=RD.fit(box,boxMargin),fa=RD.toScene(fc,{x:0,y:0}),fb=RD.toScene(fc,{x:1,y:1}),
+   electronSites=localFocus?[focusSite,...focusShell.list].map(site=>({
+    q:layout.project(D(site.cart)),fade:1,key:site.key
+   })):latticeWindow({w:{x0:fa.x,y0:fa.y,x1:fb.x,y1:fb.y},c:{x:fc.x,y:fc.y},zoom:fc.zoom});
   driveCtl?.sync();const deformExp=active==='malleability'||active==='ductility',slips=active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0;
   const fieldOn=active==='electrical'&&pr.electrical.field||deformExp&&!!driveCtl?.deformField,defects=deformExp&&DF?slips/DF.LIMIT:0,ET=SILM.electronTransport;
   scene.fieldOn=fieldOn;scene.defects=defects;
   // A órbita atualiza a região projetada sem interromper a animação eletrônica.
   // Calor + corrente: cada centro leva a temperatura local (0 sem calor) para o espalhamento dos elétrons.
   const tOf=k=>scene.heatTemps?.get(k)||0;
-  const centersT=[...drawn.map((q,i)=>({x:q.x,y:q.y,t:tOf(X.key(list[i].site))})),...electronSites.map(s=>({x:s.q.x,y:s.q.y,t:tOf(s.key)}))];
+  const centersT=[...(localFocus?[]:drawn.map((q,i)=>({x:q.x,y:q.y,t:tOf(X.key(list[i].site))))),
+   ...electronSites.map(s=>({x:s.q.x,y:s.q.y,t:tOf(s.key)}))];
   // Deriva média relativa (seta "elétrons (média)"): calor e defeitos reduzem; a intensidade do campo aumenta.
   scene.driftFactor=ET?(centersT.reduce((a,c)=>a+ET.drift(c.t),0)/Math.max(1,centersT.length))*ET.defectDrift(defects):1;
   // Pista visual da corrente total calculada: não representa trajetórias locais nem velocidade em SI.
@@ -498,7 +528,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   meta.textContent=(m.general?m.label+' · '+m.spaceGroup:m.code+' · '+m.name)+' · '+list.length+' unidades'+(added?' ('+added+' completadas pelo SILM)':'')+(active?' · '+P.catalog[active].title+' em estudo':'');
   meta.title=meta.textContent;   // 0.9.1: texto integral quando o celular limita a duas linhas
   paint();
-  stage.setAttribute('aria-label',structureName+'. '+(r.view==='lattice'?'Vista da rede extensa':'Vista da célula')+'; célula unitária '+(r.unitCell?'visível':'oculta')+'. '+inCell+' unidades na célula desenhada.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica; '+(moving?'movimento visual ativo.':'representação estática.'):'')+(coupled?' Ensaio Joule em grandezas relativas; os elétrons são uma pista visual da corrente total, não trajetórias locais calculadas.':'')+(narrative&&JSON.stringify(pr[active])!==JSON.stringify(P.defaults[active])?' '+P.catalog[active].title+': '+narrative.action+' '+narrative.observation:'')+(scene.measureText?' '+scene.measureText:''));
+  stage.setAttribute('aria-label',structureName+'. '+(localFocus?'Ambiente local do centro e '+focusShell.list.length+' primeiros vizinhos':r.view==='lattice'?'Vista da rede extensa':'Vista da célula')+'; célula unitária '+(localFocus?'oculta na escala Centro':r.unitCell?'visível':'oculta')+'. '+inCell+' unidades na célula desenhada.'+(shownElectrons?' Elétrons visíveis: representação qualitativa de elétrons de valência deslocalizados distribuídos pela estrutura metálica; '+(moving?'movimento visual ativo.':'representação estática.'):'')+(coupled?' Ensaio Joule em grandezas relativas; os elétrons são uma pista visual da corrente total, não trajetórias locais calculadas.':'')+(narrative&&JSON.stringify(pr[active])!==JSON.stringify(P.defaults[active])?' '+P.catalog[active].title+': '+narrative.action+' '+narrative.observation:'')+(scene.measureText?' '+scene.measureText:''));
   cellStatus.textContent='Célula unitária '+(r.unitCell?'visível':'oculta')+(observer?.centers?' · centros identificados':'');
   R.describe();
  }
