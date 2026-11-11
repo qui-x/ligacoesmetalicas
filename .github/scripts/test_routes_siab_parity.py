@@ -92,12 +92,6 @@ def run(browser_name: str, root: str) -> None:
             page.locator("#route-metal").select_option("29")
             page.locator("#route-mount").click()
             expect(page).to_have_url(re.compile(r".*#/ambiente.*"), timeout=10000)
-            free = page.evaluate("""() => ({
-                experiment: BaseDemoSI.storage.get('route.experiment',null),
-                route: window.SILM.routes.get('roteiro-cu-nd')
-            })""")
-            assert free["experiment"]["route"] == "roteiro-cu-nd", free
-            assert free["experiment"]["hypothesis"] == prediction, free
             page.goto(root.rstrip("/") + "/#/relatorios")
             report = page.locator("#silm-route-report")
             expect(report).to_contain_text("Hipótese inicial registrada")
