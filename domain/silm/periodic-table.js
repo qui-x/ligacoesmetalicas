@@ -156,7 +156,7 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
  // a cadeia de contêineres em telas pequenas e no WebKit.
  function reveal(b){
   if(!b||!scroll.isConnected)return;
-  if(entryObjects&&window.matchMedia('(max-width:900px)').matches){
+  if(entryObjects&&window.matchMedia('(max-width:1100px), (max-height:700px)').matches){
    const page=familyPageFor(D.get(Number(b.dataset.z)));
    if(page!==familyIndex){familyIndex=page;renderFamily();}
    return;
@@ -175,7 +175,7 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
   if(selected?.silmEligibility.status==='available'&&canInvestigate())onSelect(selected);
   if(focus){
    const b=buttons.get(z);reveal(b);
-   const visible=entryObjects&&window.matchMedia('(max-width:900px)').matches
+   const visible=entryObjects&&window.matchMedia('(max-width:1100px), (max-height:700px)').matches
     ?familyList?.querySelector('button[data-z="'+z+'"]'):b;
    visible?.focus({preventScroll:true});
   }

@@ -306,6 +306,11 @@
    onExplore:metal=>openObjectCatalog(metal),
    onSources:metal=>{const values=S.data.sourceIds(metal).map(id=>S.data.source(id)?.title||id);
     say(values.slice(0,2).join('; ')||'Consulte as fontes na ficha do elemento.','info');}});
+  // A busca é o comando principal da Tabela: compartilha o cabeçalho
+  // da escala Objeto, em vez de consumir uma segunda linha da grade.
+  // Mover o mesmo formulário preserva eventos, rótulos e estado de busca.
+  const search=tableHost.querySelector('.periodic-search');
+  if(search)head.insertBefore(search,actions);
  }
  function activeWorkshopScale(saved){
   if(saved?.scale>=1&&saved.scale<=4&&(saved.scale!==1||workshopSelectionId||S.workshop.list(element().atomicNumber).length))return saved.scale;
