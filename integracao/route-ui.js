@@ -68,7 +68,14 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    const filter=N('select');filter.id='silm-missions-filter';
    for(const [cat,title] of [['all','Todos os assuntos'],...Object.entries(categories)]){const option=N('option',title);option.value=cat;filter.append(option);}
    const search=N('input');search.type='search';search.id='silm-missions-search';search.placeholder='Pesquisar missão ou metal';search.setAttribute('aria-label','Pesquisar missões');
-   filters.append(label,filter,search);host.append(filters);
+   const metalLabel=N('label','Metal disponível');metalLabel.htmlFor='silm-missions-metal-filter';
+   const metalFilter=N('select');metalFilter.id='silm-missions-metal-filter';metalFilter.setAttribute('aria-label','Filtrar por metal disponível');
+   const allMetals=N('option','Todos os metais');allMetals.value='all';metalFilter.append(allMetals);
+   for(const e of S.data.elements.filter(e=>e.silmEligibility.status==='available')){
+    const option=N('option',e.name+' ('+e.symbol+')');option.value=String(e.atomicNumber);metalFilter.append(option);
+   }
+   const count=N('p');count.className='silm-learning-count';count.setAttribute('role','status');count.setAttribute('aria-live','polite');
+   filters.append(label,filter,metalLabel,metalFilter,search);host.append(filters,count);
    const groups=new Map();for(const mission of S.missions.registry){const cat=mission.category||'fundamentos';if(!groups.has(cat))groups.set(cat,[]);groups.get(cat).push(mission);}
    const list=N('div');list.className='silm-content-list silm-learning-catalog';const headings=new Map(),rows=[];
    const normalize=x=>String(x).normalize('NFD').replace(/\p{M}/gu,'').toLowerCase();
@@ -80,15 +87,15 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
      const body=N('span');body.append(N('strong',item.title),N('small',subtitle));
      const status=N('span',missionState(doc,item));status.className='silm-row-status';row.append(body,status);list.append(row);
      const names=item.metalSelection.atomicNumbers.map(z=>{const metal=S.data.get(z);return metal.name+' '+metal.symbol;}).join(' ');
-     rows.push({row,category,haystack:normalize(item.title+' '+item.subtitle+' '+item.concept+' '+names)});
+     rows.push({row,category,metals:item.metalSelection.atomicNumbers,haystack:normalize(item.title+' '+item.subtitle+' '+item.concept+' '+names)});
     }
    }
    const apply=()=>{
     const q=normalize(search.value.trim()),counts=new Map();
-    for(const item of rows){const show=(filter.value==='all'||filter.value===item.category)&&(!q||item.haystack.includes(q));item.row.hidden=!show;if(show)counts.set(item.category,(counts.get(item.category)||0)+1);}
-    for(const [cat,heading] of headings)heading.hidden=!counts.get(cat);
+    for(const item of rows){const show=(filter.value==='all'||filter.value===item.category)&&(metalFilter.value==='all'||item.metals.includes(Number(metalFilter.value)))&&(!q||item.haystack.includes(q));item.row.hidden=!show;if(show)counts.set(item.category,(counts.get(item.category)||0)+1);}
+    for(const [cat,heading] of headings)heading.hidden=!counts.get(cat);count.textContent=Array.from(counts.values()).reduce((sum,n)=>sum+n,0)+' de '+rows.length+' missões';
    };
-   filter.addEventListener('change',apply);search.addEventListener('input',apply);
+   filter.addEventListener('change',apply);metalFilter.addEventListener('change',apply);search.addEventListener('input',apply);apply();
    host.append(list);if(lastMission){const back=$('mission-card-'+lastMission);lastMission=null;if(back)requestAnimationFrame(()=>back.focus());}return;
   }
   const article=N('article');article.className='silm-reading';article.setAttribute('aria-labelledby','mission-title');
