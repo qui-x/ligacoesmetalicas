@@ -95,3 +95,15 @@
 @media(prefers-reduced-motion:reduce){
  .silm-workshop-micro-map[data-focus-transition="on"] .silm-micro-plane{transition:none!important}
 }
+
+/* A navegação por eixos é própria da Rede. No Centro a escolha é feita
+   tocando nos vizinhos ou pelo seletor de vizinhança já existente.
+   Os controles de estímulo (inclusive Joule) continuam visíveis. */
+.silm-center-navigation>strong{font-size:.77rem}
+.silm-center-navigation button[aria-label^="Avançar uma célula"],
+.silm-center-navigation button[aria-label^="Recuar uma célula"]{
+ display:none!important
+}
+.silm-crystal[data-local-focus="true"] .silm-lattice-status{
+ display:none!important
+}
