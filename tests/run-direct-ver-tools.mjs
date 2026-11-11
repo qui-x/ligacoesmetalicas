@@ -75,7 +75,6 @@ try{
  const choices=page.locator('#silm-direct-actionbar [data-silm-direct-tool^="calcular:"]');
  assert.ok(await choices.count()>=1,'Calcular não oferece fórmulas diretamente');
  const selected=await page.locator('#silm-formula').inputValue();
- const next=choices.filter({hasNot:page.locator('[aria-pressed="true"]')}).first();
  // Seleção de fórmula pelo próprio motor, sem executar cálculo.
  const options=await choices.evaluateAll(all=>all.map(n=>({
   id:n.dataset.silmDirectTool.slice('calcular:'.length),disabled:n.disabled
