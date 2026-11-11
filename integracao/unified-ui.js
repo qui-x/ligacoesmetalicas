@@ -143,10 +143,37 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   if(key===themeKey&&host.childElementCount)return;const previous=themeKey.split('|')[0];themeKey=key;host.replaceChildren();head.hidden=!!t;
   if(id&&!t)say('Tema não encontrado. Escolha um tema da lista.','warning');
   if(!t){
-   const list=N('div');list.className='silm-content-list';
-   for(const item of S.themes.registry){const row=N('a');row.className='silm-content-row';row.href='#/aprender?tema='+item.id;row.id='theme-card-'+item.id;
-    const text=N('span');text.append(N('strong',item.title),N('small',item.subtitle+'. '+item.description));
-    const status=N('span',progress.completed[item.id]?'Revisado':'Não revisado');status.className='silm-row-status';row.append(text,status);list.append(row);}
+   const categories={fundamentos:'Fundamentos',familias:'Famílias de metais',estruturas:'Estruturas cristalinas',propriedades:'Propriedades metálicas',calculos:'Medições e cálculos',aplicacoes:'Aplicações e escalas'};
+   const controls=N('div');controls.className='silm-learning-filters';
+   const label=N('label','Filtrar temas');label.htmlFor='silm-themes-filter';
+   const filter=N('select');filter.id='silm-themes-filter';
+   for(const [id,title] of [['all','Todos os assuntos'],...Object.entries(categories)]){const opt=N('option',title);opt.value=id;filter.append(opt);}
+   const search=N('input');search.type='search';search.id='silm-themes-search';search.placeholder='Pesquisar tema ou metal';search.setAttribute('aria-label','Pesquisar temas');
+   controls.append(label,filter,search);host.append(controls);
+   const list=N('div');list.className='silm-content-list silm-learning-catalog';
+   const groups=new Map();
+   for(const item of S.themes.registry){
+    const cat=item.category||'fundamentos';if(!groups.has(cat))groups.set(cat,[]);
+    groups.get(cat).push(item);
+   }
+   const headingMap=new Map(),rows=[];
+   for(const [category,items] of groups){
+    const heading=N('h2',categories[category]||category);heading.className='silm-catalog-group-heading';headingMap.set(category,heading);list.append(heading);
+    for(const item of items){
+     const row=N('a');row.className='silm-content-row';row.href='#/aprender?tema='+item.id;row.id='theme-card-'+item.id;
+     const detail=item.subtitle+'. '+item.description+' · '+item.relatedMetals.length+' '+(item.relatedMetals.length===1?'metal':'metais');
+     const text=N('span');text.append(N('strong',item.title),N('small',detail));
+     const status=N('span',progress.completed[item.id]?'Revisado':'Não revisado');status.className='silm-row-status';
+     row.append(text,status);list.append(row);
+     rows.push({row,category,haystack:(item.title+' '+item.subtitle+' '+item.description+' '+item.relatedMetals.map(z=>S.data.get(z).name+' '+S.data.get(z).symbol).join(' ')).normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase()});
+    }
+   }
+   const apply=()=>{
+    const q=search.value.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().trim(),counts=new Map();
+    for(const item of rows){const shown=(filter.value==='all'||filter.value===item.category)&&(!q||item.haystack.includes(q));item.row.hidden=!shown;if(shown)counts.set(item.category,(counts.get(item.category)||0)+1);}
+    for(const [id,heading] of headingMap)heading.hidden=!counts.get(id);
+   };
+   filter.addEventListener('change',apply);search.addEventListener('input',apply);
    host.append(list);
    // Retorno do tema: o foco volta para a linha do tema aberto, como quem fecha um detalhe.
    if(lastTheme){const back=$('theme-card-'+lastTheme);lastTheme=null;if(back)requestAnimationFrame(()=>back.focus({preventScroll:false}));}
@@ -164,6 +191,17 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    section.append(N('h3','Percurso na Oficina'),steps,N('h3','Que evidência registrar?'),N('p',study.evidence),N('h3','Interprete'),N('p',study.reflection));
    article.append(section);
   }
+  let metalChoice=null;
+  if(t.relatedMetals.length>1&&!t.comparison){
+   const field=N('div');field.className='silm-field silm-theme-metal-choice';
+   const label=N('label','Metal a investigar');label.htmlFor='silm-theme-metal';
+   const select=N('select');select.id='silm-theme-metal';
+   for(const z of t.relatedMetals){
+    const e=S.data.get(z),eligible=S.crystal.eligibility(e),opt=N('option',e.name+' ('+e.symbol+')'+(eligible.status!=='available'?' · rede indisponível':''));opt.value=String(z);select.append(opt);
+   }
+   metalChoice=select;field.append(label,select);
+   article.append(field);
+  }
   const actions=N('div');actions.className='silm-actions';
   const metal=S.data.get(t.relatedMetals[0]),investigate=N('button',t.comparison?'Preparar Cobre na Oficina':'Investigar na oficina');investigate.type='button';investigate.className='button primary';investigate.id='theme-investigate';
   const prepare=(z)=>{
@@ -174,7 +212,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    location.hash='#/ambiente';say(selected.name+' preparado na Montagem. Escolha Iniciar para começar a investigação.','success');
    requestAnimationFrame(()=>requestAnimationFrame(()=>{const open=document.querySelector('[data-open-dock="montagem"]');if(open&&open.getAttribute('aria-expanded')!=='true')open.click();}));
   };
-  investigate.addEventListener('click',()=>prepare(metal.atomicNumber));
+  investigate.addEventListener('click',()=>prepare(metalChoice?Number(metalChoice.value):metal.atomicNumber));
   const mark=N('button',progress.completed[t.id]?'Revisado · desmarcar':'Marcar como revisado');mark.type='button';mark.className='button outline silm-quiet';mark.id='theme-complete';mark.setAttribute('aria-pressed',String(!!progress.completed[t.id]));
   mark.addEventListener('click',()=>{if(progress.completed[t.id])delete progress.completed[t.id];else progress.completed[t.id]=t.version;storage.set('learning.themes',progress);themes();$('theme-complete').focus();say(progress.completed[t.id]?'Tema marcado como revisado. Ele continua disponível para revisitar.':'Marcação de revisado removida.','success');});
   actions.append(investigate);
@@ -188,7 +226,11 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   const group=(label,items)=>{if(!items.length)return;const row=N('div');row.className='silm-related-row';row.append(N('span',label));for(const [text,href] of items)row.append(link(text,href));related.append(row);};
   group(t.relatedMissions.length===1?'Missão relacionada':'Missões relacionadas',t.relatedMissions.map(m=>[S.missions.get(m).title,'#/missoes?item='+m]));
   group(t.relatedRoutes.length===1?'Roteiro relacionado':'Roteiros relacionados',t.relatedRoutes.map(r=>[S.routes.get(r).title,'#/roteiros?item='+r]));
-  const metals=N('p');metals.className='silm-related-metals';metals.append(N('span','Metais para observar'),' '+t.relatedMetals.map(z=>S.data.get(z).name).join(', ')+'. Investigar na oficina prepara '+metal.name+'.');related.append(metals);article.append(related);
+  const metals=N('p');metals.className='silm-related-metals';
+  const names=t.relatedMetals.slice(0,10).map(z=>S.data.get(z).name).join(', ');
+  const suffix=t.relatedMetals.length>10?' e mais '+(t.relatedMetals.length-10)+' disponíveis pela seleção.':'';
+  metals.append(N('span','Metais para observar'),': '+names+suffix);
+  related.append(metals);article.append(related);
   const deeper=N('section');deeper.setAttribute('aria-labelledby','theme-deeper');const dh=N('h2','Aprofunde');dh.id='theme-deeper';deeper.append(dh);
   for(const c of t.concepts){if(c===idea)continue;const d=N('details');d.append(N('summary',c.title),N('p',c.text));deeper.append(d);}
   const sources=N('details');sources.append(N('summary','Fontes'));for(const sid of t.sources){const source=S.data.source(sid);const p=N('p',source.institution+' — '+source.title);if(source.url){const a=link('Consultar',source.url);a.target='_blank';a.rel='noopener noreferrer';p.append(' ',a);}sources.append(p);}
