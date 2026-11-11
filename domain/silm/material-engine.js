@@ -11,7 +11,7 @@ window.SILM=window.SILM||{};
  const S=SILM;
  const PROPERTY_IDS=Object.freeze(['electrical','thermal','malleability','ductility','luster']);
  const missing=(reasonCode,extra={})=>Object.freeze({ok:false,reasonCode,...extra});
- const profile=atomicNumber=>S.materialPropertyProfiles?.byAtomicNumber?.[Number(atomicNumber)]||null;
+ const profile=atomicNumber=>S.materialProfiles?.get?.(atomicNumber)||null;
  const element=atomicNumber=>S.data?.get?.(atomicNumber)||null;
  function capability(atomicNumber,propertyId){
   const el=element(atomicNumber);
