@@ -478,8 +478,8 @@ async function test(viewport){
  assert.equal(await value('t'),timeBeforeNavigation,'Navegar não deve avançar o ensaio.');
  await page.getByRole('button',{name:'Recuar uma célula no eixo a'}).click();
  await openAdvanced();
- const map=advanced.getByLabel('Mapa no metal');
- await map.selectOption('potential');
+ const jouleMap=advanced.getByLabel('Mapa no metal');
+ await jouleMap.selectOption('potential');
  assert.match(await reading.textContent(),/Mapa: Potencial elétrico/);
  await advanced.getByLabel('Fonte elétrica').selectOption('current');
  const currentBefore=await value('I');
