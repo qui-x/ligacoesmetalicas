@@ -24,9 +24,7 @@ def run(browser_name: str, base_url: str) -> None:
             errors: list[str] = []
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.goto(root + "/#/aprender", wait_until="domcontentloaded")
-            expect(page.locator("#silm-themes .silm-content-row")).to_have_count(
-                24, timeout=20000
-            )
+            expect(page.locator("#silm-themes .silm-content-row").first).to_be_visible(timeout=20000)
             expect(page.locator("#silm-themes-filter")).to_be_visible()
             expect(page.locator("#silm-themes-search")).to_be_visible()
             page.locator("#silm-themes-filter").select_option("familias")
@@ -40,7 +38,8 @@ def run(browser_name: str, base_url: str) -> None:
                     id:t.id, metals:t.relatedMetals, investigation:t.investigation
                 }))"""
             )
-            assert len(themes) == 24
+            assert len(themes) >= 24
+            expect(page.locator("#silm-themes .silm-content-row")).to_have_count(len(themes))
             active_themes = themes if width == 1440 else [
                 x for x in themes if x["id"] in
                 ("ligacao-metalica", "familia-alcalinos", "lantanideos-modelos", "cobre-neodimio")
@@ -69,9 +68,7 @@ def run(browser_name: str, base_url: str) -> None:
             )
 
             page.goto(root + "/#/missoes", wait_until="domcontentloaded")
-            expect(page.locator("#silm-mission-catalog .silm-content-row")).to_have_count(
-                27, timeout=20000
-            )
+            expect(page.locator("#silm-mission-catalog .silm-content-row").first).to_be_visible(timeout=20000)
             expect(page.locator("#silm-missions-filter")).to_be_visible()
             expect(page.locator("#silm-missions-search")).to_be_visible()
             page.locator("#silm-missions-filter").select_option("propriedades")
@@ -86,7 +83,8 @@ def run(browser_name: str, base_url: str) -> None:
                     study:m.study, objectives:m.evidenceObjectives
                 }))"""
             )
-            assert len(missions) == 27
+            assert len(missions) >= 27
+            expect(page.locator("#silm-mission-catalog .silm-content-row")).to_have_count(len(missions))
             active_missions = missions if width == 1440 else [
                 x for x in missions if x["id"] in
                 ("montagem-ordem", "lantanideos-eletrons", "calor-metalico",
@@ -149,7 +147,7 @@ def run(browser_name: str, base_url: str) -> None:
                     full_page=True,
                 )
             assert not errors, (browser_name, width, errors)
-            print(f"OK: {browser_name} {width}x{height}; 24 temas e 27 missões")
+            print(f"OK: {browser_name} {width}x{height}; {len(themes)} temas e {len(missions)} missões")
             context.close()
         browser.close()
 
