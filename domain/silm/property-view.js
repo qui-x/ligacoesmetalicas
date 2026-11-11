@@ -129,15 +129,11 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   const show=(...ids)=>{for(const [k,b]of Object.entries(B))b.hidden=!ids.includes(k);};
   if(joule){
    const {input,values}=joule,format=n=>n.toLocaleString('pt-BR',{maximumFractionDigits:3});
-   head.textContent='Condutividade elétrica e térmica · efeito Joule';
-   show('field','heat','advance','restore','end');
-   B.field.textContent=p.field?'Desligar alimentação':'Ligar alimentação';
-   B.field.setAttribute('aria-pressed',String(p.field));
-   B.heat.textContent=input.external?'Desligar calor externo':'Ligar calor externo';
-   B.heat.setAttribute('aria-pressed',String(input.external));
-   B.advance.textContent='Avançar meio intervalo';
-   for(const key of ['field','heat','advance','restore','end'])B[key].setAttribute('aria-disabled',String(!editable));
-   status.textContent='Grandezas relativas · t '+format(values.time)+' · potência Joule '+format(values.power)+' · temperatura média '+format(values.mean)+'. O tempo avança pelos controles da experiência.';
+   head.textContent='Elétrica + térmica → efeito Joule';
+   // A fonte, o relógio e os mapas pertencem ao mesmo palco. Não duplicar
+   // controles aqui: o painel Ver conserva apenas contexto e leituras.
+   show();
+   status.textContent='Corrente elétrica gera aquecimento na rede. Fonte, evolução, mapas e balanço no quadro Joule da barra inferior. Grandezas relativas · t '+format(values.time)+' · potência '+format(values.power)+' · elevação térmica média '+format(values.mean)+'.';
    for(const [key,value]of valuesByKey)value.textContent=format(values[key]);
    return;
   }
