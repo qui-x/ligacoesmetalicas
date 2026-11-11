@@ -285,6 +285,17 @@ async function checkMobileNotices(label,width,scale,accessible=false){
 }
 
 async function checkModuleShortcuts(label,width){
+ const launch=page.locator('[data-open-dock="ver"]');
+ if(await launch.getAttribute('aria-expanded')!=='true')await launch.click();
+ await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===false);
+ assert.equal(await page.locator('.si-workspace-toolbar #silm-module-shortcuts').count(),0,
+  label+': controle de módulos ainda está na barra superior');
+ assert.equal(await page.locator('#si-dock-right [data-right-panel="ver"] #silm-module-shortcuts').count(),1,
+  label+': módulo científico não está em Ver');
+ const close=async()=>{
+  await page.locator('[data-close-dock="right"]').click();
+  await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===true);
+ };
  const before=JSON.parse(await scientific());
  const buttons=await page.locator('#silm-module-shortcuts [data-silm-module-shortcut]')
   .evaluateAll(nodes=>nodes.map(n=>{
@@ -300,7 +311,7 @@ async function checkModuleShortcuts(label,width){
   label+': módulos invisíveis ou comprimidos '+JSON.stringify(buttons));
  const visualWidth=await page.evaluate(()=>document.documentElement.scrollWidth);
  assert.ok(visualWidth<=width+6,label+': atalhos provocaram rolagem global '+visualWidth);
- if(!['celular-390','desktop'].includes(label))return;
+ if(!['celular-390','desktop'].includes(label)){await close();return;}
  for(const target of ['medir','calcular','explorar']){
   const button=page.locator('[data-silm-module-shortcut="'+target+'"]');
   await button.click();
@@ -326,6 +337,7 @@ async function checkModuleShortcuts(label,width){
   }
  }
  assert.equal(await scientific(),JSON.stringify(before),label+': sequência de módulos mudou a investigação');
+ await close();
 }
 
 try{
