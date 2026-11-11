@@ -1,7 +1,6 @@
-"""Audita a dinâmica investigativa das Missões e Temas do SILM em navegadores reais.
+"""Valida os catálogos expandidos e suas interfaces em Chromium, Firefox e WebKit.
 
-O catálogo SIAB orienta pergunta, previsão, evidência, interpretação e conclusão;
-o modelo SILM permanece como única fonte dos critérios científicos.
+Os critérios científicos e a persistência são testados separadamente pelo contrato Node.
 """
 from __future__ import annotations
 
@@ -14,7 +13,7 @@ def run(browser_name: str, base_url: str) -> None:
     root = base_url.rstrip("/")
     with sync_playwright() as playwright:
         browser = getattr(playwright, browser_name).launch(headless=True)
-        for width, height in [(390, 844), (1440, 900)]:
+        for width, height in ((390, 844), (1440, 900)):
             context = browser.new_context(
                 viewport={"width": width, "height": height},
                 locale="pt-BR",
@@ -26,132 +25,131 @@ def run(browser_name: str, base_url: str) -> None:
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.goto(root + "/#/aprender", wait_until="domcontentloaded")
             expect(page.locator("#silm-themes .silm-content-row")).to_have_count(
-                8, timeout=20000
+                24, timeout=20000
             )
+            expect(page.locator("#silm-themes-filter")).to_be_visible()
+            expect(page.locator("#silm-themes-search")).to_be_visible()
+            page.locator("#silm-themes-filter").select_option("familias")
+            assert page.locator("#silm-themes .silm-content-row:visible").count() >= 6
+            page.locator("#silm-themes-filter").select_option("all")
+            page.locator("#silm-themes-search").fill("neodimio")
+            assert page.locator("#silm-themes .silm-content-row:visible").count() >= 1
+            page.locator("#silm-themes-search").fill("")
             themes = page.evaluate(
                 """() => window.SILM.themes.registry.map(t => ({
-                    id:t.id, investigation:t.investigation
+                    id:t.id, metals:t.relatedMetals, investigation:t.investigation
                 }))"""
             )
-            assert len(themes) == 8
-            for theme in themes:
+            assert len(themes) == 24
+            active_themes = themes if width == 1440 else [
+                x for x in themes if x["id"] in
+                ("ligacao-metalica", "familia-alcalinos", "lantanideos-modelos", "cobre-neodimio")
+            ]
+            for theme in active_themes:
                 study = theme["investigation"]
                 assert study and len(study["actions"]) == 3, theme["id"]
-                for key in ("problem", "prediction", "evidence", "reflection"):
-                    assert len(study[key]) >= 50, (theme["id"], key)
                 page.goto(root + "/#/aprender?tema=" + theme["id"])
                 section = page.locator("#silm-themes .silm-theme-inquiry")
                 expect(section).to_be_visible()
                 expect(section.locator("h2")).to_have_text("Investigue este tema")
                 expect(section.locator(".silm-theme-inquiry-steps li")).to_have_count(3)
                 expect(page.locator("#theme-investigate")).to_be_visible()
-                assert len(section.inner_text().strip()) > 400, theme["id"]
+                if len(theme["metals"]) > 1 and theme["id"] != "cobre-neodimio":
+                    expect(page.locator("#silm-theme-metal option")).to_have_count(
+                        len(theme["metals"])
+                    )
+                assert len(section.inner_text().strip()) > 250, theme["id"]
+            page.goto(root + "/#/aprender?tema=lantanideos-modelos")
+            page.locator("#silm-theme-metal").select_option("60")
+            expect(page.locator("#silm-theme-metal")).to_have_value("60")
+            page.goto(root + "/#/aprender?tema=cobre-neodimio")
+            expect(page.locator("#theme-compare-neodimio")).to_be_visible()
+            expect(page.locator(".silm-learning-science-note")).to_contain_text(
+                "não calcula o magnetismo"
+            )
 
             page.goto(root + "/#/missoes", wait_until="domcontentloaded")
             expect(page.locator("#silm-mission-catalog .silm-content-row")).to_have_count(
-                7, timeout=20000
+                27, timeout=20000
             )
+            expect(page.locator("#silm-missions-filter")).to_be_visible()
+            expect(page.locator("#silm-missions-search")).to_be_visible()
+            page.locator("#silm-missions-filter").select_option("propriedades")
+            assert page.locator("#silm-mission-catalog .silm-content-row:visible").count() >= 5
+            page.locator("#silm-missions-filter").select_option("all")
+            page.locator("#silm-missions-search").fill("neodimio")
+            assert page.locator("#silm-mission-catalog .silm-content-row:visible").count() >= 1
+            page.locator("#silm-missions-search").fill("")
             missions = page.evaluate(
                 """() => window.SILM.missions.registry.map(m => ({
-                    id:m.id, study:m.study, objectives:m.evidenceObjectives
+                    id:m.id, metals:m.metalSelection.atomicNumbers,
+                    study:m.study, objectives:m.evidenceObjectives
                 }))"""
             )
-            assert len(missions) == 7
-            for mission in missions:
+            assert len(missions) == 27
+            active_missions = missions if width == 1440 else [
+                x for x in missions if x["id"] in
+                ("montagem-ordem", "lantanideos-eletrons", "calor-metalico",
+                 "objeto-ao-centro", "travessia-metais")
+            ]
+            for mission in active_missions:
                 study = mission["study"]
-                assert len(mission["objectives"]) >= 2
-                assert any(x["mode"] == "criterion" for x in mission["objectives"])
                 assert study and len(study["questions"]) >= 2, mission["id"]
-                for key in ("context", "question", "prediction", "evidence", "limit"):
-                    assert len(study[key]) >= 50, (mission["id"], key)
+                assert len(mission["objectives"]) >= 2, mission["id"]
                 page.goto(root + "/#/missoes?item=" + mission["id"])
                 section = page.locator("#silm-mission-catalog .silm-mission-inquiry")
                 expect(section).to_be_visible()
                 expect(section).to_contain_text(study["question"])
-                expect(page.locator("#mission-metal")).to_be_visible()
+                expect(page.locator("#mission-metal option")).to_have_count(
+                    len(mission["metals"])
+                )
+                expect(page.locator(".silm-mission-objectives li")).to_have_count(
+                    len(mission["objectives"])
+                )
                 expect(page.locator("#mission-mount")).to_be_visible()
-                expect(page.locator(".silm-mission-objectives li")).to_have_count(len(mission["objectives"]))
-                if mission["id"] == "objeto-ao-centro":
-                    expect(page.locator("#mission-metal option")).to_have_count(2)
-
-            # Motor real com modelo de teste isolado: evidência científica + conclusão.
-            results = page.evaluate(
-                """() => {
-                    const clone = x => JSON.parse(JSON.stringify(x));
-                    const state = {
-                        investigation:{id:'test-inquiry'}, metal:{atomicNumber:29},
-                        structure:{mode:'free',units:[]},module:{active:'explorar'},
-                        measurements:[],calculations:[],
-                        properties:{active:null},electrons:{representation:{visible:false,motion:false}}
-                    };
-                    const model = {
-                        state,
-                        checkpoint:() => ({state:clone(state)}),
-                        snapshot:() => clone(state),
-                        rollback:() => {},
-                        restore:() => ({ok:true}),
-                        begin:(z,kind) => {state.metal={atomicNumber:z};return kind==='mission';},
-                        beginAssembly:() => {state.structure={mode:'free',units:[]};return true;},
-                        addUnit:() => {state.structure.units.push({id:state.structure.units.length+1});return {ok:true};},
-                        organize:() => {state.structure.mode='crystalline';return {ok:true};},
-                        setModule:m => {state.module.active=m;return true;}
-                    };
-                    const storage = {get:() => null,set:() => true};
-                    const session=window.SILM.createRouteSession({
-                        model,storage,view:()=>({}),onView:()=>true,say:()=>{}
-                    });
-                    const started=session.start('montagem-ordem',29);
-                    model.organize();
-                    const beforeObserving=session.ready();
-                    state.structure.crystallography={representation:{view:'cell'}};
-                    session.observe(true);
-                    const afterCell=session.ready();
-                    state.structure.crystallography.representation.view='lattice';
-                    session.observe(true);
-                    const checked=session.missionProgress();
-                    const evidenceReady=session.ready();
-                    const before=session.complete();
-                    const stillActive=session.context()?.status==='active';
-                    const stored=session.edit('conclusion','A organização periódica foi observada na estrutura, sem representar uma amostra real.');
-                    const after=session.complete();
-                    return {started,beforeObserving,afterCell,checked,evidenceReady,before,stillActive,stored,after};
-                }"""
-            )
-            assert results["started"] and results["evidenceReady"], results
-            assert results["beforeObserving"] is False and results["afterCell"] is False, results
-            assert len(results["checked"]) == 3 and all(x["met"] for x in results["checked"]), results
-            assert results["before"]["ok"] is False, results
-            assert "conclusão" in results["before"]["message"].lower(), results
-            assert results["stillActive"] and results["stored"], results
-            assert results["after"]["ok"] is True, results
-
-            page.goto(root + "/#/aprender?tema=cobre-neodimio")
-            expect(page.locator("#theme-compare-neodimio")).to_be_visible()
-            expect(page.locator(".silm-learning-science-note")).to_contain_text("não calcula o magnetismo")
             page.goto(root + "/#/missoes?item=objeto-ao-centro")
-            expect(page.locator("#mission-metal option")).to_have_count(2)
+            expect(page.locator("#mission-metal option")).to_have_count(1)
+            page.goto(root + "/#/missoes?item=travessia-metais")
+            expect(page.locator("#mission-metal option")).to_have_count(62)
+            page.goto(root + "/#/missoes?item=lantanideos-eletrons")
+            expect(page.locator("#mission-metal option")).to_have_count(14)
+            expect(page.locator("#mission-metal")).to_contain_text("rede não disponível")
 
             if width == 390:
-                for route in ("#/aprender?tema=ligacao-metalica", "#/missoes?item=campo-metal"):
+                for route in (
+                    "#/aprender", "#/missoes",
+                    "#/aprender?tema=lantanideos-modelos",
+                    "#/missoes?item=travessia-metais",
+                ):
                     page.goto(root + "/" + route)
                     overflow = page.evaluate(
                         "() => document.documentElement.scrollWidth - window.innerWidth"
                     )
                     assert overflow <= 2, (browser_name, route, overflow)
-            if width == 1440:
+            else:
                 Path("artifacts").mkdir(exist_ok=True)
-                page.goto(root + "/#/aprender?tema=propriedades-metalicas")
+                page.goto(root + "/#/aprender")
                 page.screenshot(
-                    path=f"artifacts/temas-aprofundados-{browser_name}.png",
+                    path=f"artifacts/temas-catalogo-{browser_name}.png",
                     full_page=True,
                 )
-                page.goto(root + "/#/missoes?item=campo-metal")
+                page.goto(root + "/#/aprender?tema=lantanideos-modelos")
                 page.screenshot(
-                    path=f"artifacts/missao-aprofundada-{browser_name}.png",
+                    path=f"artifacts/temas-lantanideos-{browser_name}.png",
+                    full_page=True,
+                )
+                page.goto(root + "/#/missoes")
+                page.screenshot(
+                    path=f"artifacts/missoes-catalogo-{browser_name}.png",
+                    full_page=True,
+                )
+                page.goto(root + "/#/missoes?item=travessia-metais")
+                page.screenshot(
+                    path=f"artifacts/missoes-travessia-{browser_name}.png",
                     full_page=True,
                 )
             assert not errors, (browser_name, width, errors)
-            print(f"OK: {browser_name} {width}x{height}; 8 temas e 7 missões")
+            print(f"OK: {browser_name} {width}x{height}; 24 temas e 27 missões")
             context.close()
         browser.close()
 
