@@ -9,12 +9,12 @@ window.SILM=window.SILM||{};
    0.12.x — vista 3D: as mesmas unidades (botões), a mesma célula e a mesma rede, projetadas por uma câmera de órbita
    (SILM.crystal.layout3D) a partir das coordenadas científicas em Å. Nada é reconstruído a partir de pixels. Arrastar
    gira; zoom e deslocamento são a câmera 2D sobre a cena projetada; o Organizar e o calor continuam na isométrica. */
-SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle='Explorar',note='',animateFrom=null,reducedMotion=()=>false,electrons:electronOptions=null,properties:propertyOptions=null,measure:measureOptions=null,calc:calcOptions=null,representation=null,observer=null})=>{
+SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle='Explorar',note='',animateFrom=null,reducedMotion=()=>false,electrons:electronOptions=null,properties:propertyOptions=null,measure:measureOptions=null,calc:calcOptions=null,representation=null,observer=null,localFocus=false})=>{
  const U=SimCore.ExperienceUI,X=SILM.crystal,RD=SILM.renderer2d,RP=SILM.representation,m=g.model,name=element.name.toLocaleLowerCase('pt-BR'),NS='http://www.w3.org/2000/svg';
  const rep2=representation||{projection:()=>'isometric',setProjection:()=>{},camera:()=>null,saveCamera:()=>{},viewMode:()=>'2d',camera3D:()=>RP.camera3D(),available3D:()=>false,setViewMode:()=>{},setCamera3D:()=>{},fail3D:()=>{}};
- const mode3d=rep2.viewMode()==='3d',cameraKey=mode3d?'crystal3d':'crystal';
+ const mode3d=rep2.viewMode()==='3d',cameraKey=localFocus?(mode3d?'center3d':'center'):(mode3d?'crystal3d':'crystal');
  const structureName='Estrutura cristalina '+m.name+' de '+name;
- const root=U.element('section',null,'silm-assembly silm-crystal');root.dataset.editable='true';root.setAttribute('aria-labelledby','silm-assembly-title');
+ const root=U.element('section',null,'silm-assembly silm-crystal');root.dataset.editable='true';root.dataset.localFocus=String(localFocus);root.setAttribute('aria-labelledby','silm-assembly-title');
  const title=U.element('h1',structureName,'sr-only');title.id='silm-assembly-title';
  const meta=U.element('p','','sr-only');meta.id='silm-assembly-meta';
  const quickHost=document.getElementById('silm-view-quick-actions'),cameraHost=document.getElementById('silm-view-controls');
@@ -103,6 +103,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  scope.cleanup(()=>{if(quickHost){quickHost.replaceChildren();quickHost.hidden=true;}const notes=document.getElementById('silm-structure-notes');if(notes)notes.replaceChildren();});
  const instructions=U.element('p','Selecione uma unidade (clique, toque ou Enter) para identificar seu centro e consultar vizinhos. Setas percorrem as unidades; Esc limpa a seleção.'+(note?' '+note:''),'silm-assembly-help');instructions.id='silm-assembly-help';
  const cameraHelp=U.element('p',mode3d?'Vista 3D: arraste para girar; J e L giram na horizontal, I e K na vertical e P alterna perspectiva/ortográfica. Shift + arrastar desloca; + e − aproximam; F enquadra; 0 restaura.':'Vista: + e − aproximam e afastam, F enquadra, C centraliza, 0 restaura e Shift + setas deslocam. Arraste o fundo para deslocar; no celular, use dois dedos para aproximar.','silm-camera-help');
+ const localStatus=localFocus?U.element('p','','silm-center-focus-summary'):null;
+ if(localStatus){localStatus.setAttribute('role','status');localStatus.setAttribute('aria-live','polite');area.append(localStatus);}
  const legend=U.element('p',m.id==='HCP'?'Camadas A e B: empilhamento ABAB. Unidades da camada B têm anel interno tracejado. Na projeção Superior, a camada B aparece nos espaços entre os centros da camada A.':m.general?'Célula da ficha cristalográfica (grupo espacial '+m.spaceGroup+'), com posições geradas pelas operações de simetria registradas. O sólido continua em todas as direções: a célula é a unidade que se repete.':'O sólido continua em todas as direções: a célula é a unidade que se repete.','silm-crystal-legend');
  const electronLegend=U.element('p','Pontos ciano: elétrons de valência deslocalizados pela estrutura inteira. A distribuição representa a interação metálica coletiva, não ligações localizadas entre pares nem o número real de elétrons.','silm-electron-legend');
  const cellStatus=U.element('span','','silm-assist-badge');cellStatus.id='silm-crystal-cell-status';
@@ -119,7 +121,12 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const latticeSvg=worldSvg('silm-lattice-layer'),cellSvg=worldSvg('silm-cell-layer'),ghostSvg=worldSvg('silm-ghost-layer');
  const group=(svg,cls)=>{const n=document.createElementNS(NS,'g');n.setAttribute('class',cls);svg.append(n);return n;};
  const latticeLayer=group(latticeSvg,'silm-lattice'),planeLayer=group(cellSvg,'silm-cell-planes'),cellLayer=group(cellSvg,'silm-cell-edges'),ghostLayer=group(ghostSvg,'silm-neighbor-ghosts');
- R.layer('lattice',latticeSvg,{camera:true});R.layer('unitCell',cellSvg,{camera:true});R.layer('neighbors',ghostSvg,{camera:true});R.layer('structure',units,{camera:true});
+ R.layer('lattice',latticeSvg,{camera:true});R.layer('unitCell',cellSvg,{camera:true});R.layer('neighbors',ghostSvg,{camera:true});
+ // Navegação local: os vizinhos são sítios cristalográficos reais, não
+ // moléculas nem unidades adicionadas ao estado científico.
+ const localShellLayer=U.element('div',null,'silm-center-shell-layer');
+ if(localFocus)R.layer('neighbors',localShellLayer,{camera:true});
+ R.layer('structure',units,{camera:true});
  // 0.6.x: a distribuição eletrônica acompanha a rede; o contorno da célula não é parede.
  const electronLayer=SILM.createElectronLayer(stage,{scope,viewport:area,before:units,reducedMotion});R.layer('electrons',electronLayer.canvas);
  // Elétrons e propriedades mantêm seus controles completos no painel Ver; o palco recebe somente as camadas visuais.
@@ -290,7 +297,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  /* Escala de profundidade: no 2D e na ortográfica, a pista da 0.5.x; na perspectiva, o fator da própria projeção. */
  const dscale=q=>layout?.perspective?Math.max(.5,Math.min(1.7,q.size)):1.08-.16*q.depth;
  function drawCell(forced){
-  cellLayer.replaceChildren();planeLayer.replaceChildren();if(!scene.rep.unitCell&&!forced)return;
+  cellLayer.replaceChildren();planeLayer.replaceChildren();if(localFocus||!scene.rep.unitCell&&!forced)return;
   for(const [a,b]of g.edges()){const p=pt(cellCart(a)),q=pt(cellCart(b));cellLayer.append(svgEl('line',{x1:p.x,y1:p.y,x2:q.x,y2:q.y,'data-back':String((p.depth+q.depth)/2>.55)}));}
   if(m.id==='HCP'){const h=g.vectors[2][2];for(const z of [0,h]){const ring=[0,1,2,3,4,5].map(k=>{const a=g.vectors[0][0];return pt(cellCart([a*Math.cos(k*Math.PI/3),a*Math.sin(k*Math.PI/3),z]));});planeLayer.append(svgEl('polygon',{points:ring.map(p=>p.x+','+p.y).join(' ')}));}}
  }
@@ -298,7 +305,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
     máximo 260 círculos. O sólido continua; a rede desenhada não é infinita nem é estado científico. */
  const LATTICE_CAP=260;
  function latticeWindow(view={w:R.visible(),c:R.toScene({x:.5,y:.5}),zoom:R.camera.zoom}){
-  if(scene.rep.view!=='lattice')return [];const {w,c:cv}=view,pad=.06,occupied=new Set(scene.list.map(u=>X.key(u.site))),reach=.62/view.zoom;
+  if(localFocus||scene.rep.view!=='lattice')return [];const {w,c:cv}=view,pad=.06,occupied=new Set(scene.list.map(u=>X.key(u.site))),reach=.62/view.zoom;
   // Na deformação, a rede vira a amostra: todos os sítios do bloco, sem esmaecimento, deslizando com as unidades.
   const sys=specimen&&DF?DF.system(g):null,pr=scene.pr||{},n=pr?.active==='malleability'?pr.malleability.compression:pr?.active==='ductility'?pr.ductility.elongation:0;
   const out=[];for(const s of (specimen&&DF?DF.specimen(g):navigator.cursor.contextSites)){if(occupied.has(s.key))continue;const q=layout.project(D(s.cart));if(specimen){out.push({q,fade:1,block:DF.block(sys,s.cart,n)});continue;}const T=scene.heatTemps?.get(s.key);if(q.x<w.x0-pad||q.x>w.x1+pad||q.y<w.y0-pad||q.y>w.y1+pad)continue;
@@ -329,12 +336,15 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  }
  function sceneDescription(){
   if(!scene)return '';const r=scene.rep,sel=r.selectedUnitId?scene.list.findIndex(u=>u.id===r.selectedUnitId):-1;
-  return structureName+'. '+viewName()+'; '+(r.view==='lattice'?'rede extensa':'célula unitária')+'. '+(observer?.centers?'Centros metálicos identificados. ':'')+(sel>=0?'Unidade '+(sel+1)+' selecionada'+(r.neighbors?', com os vizinhos imediatos destacados':'')+'.':'Nenhuma unidade selecionada.')+
+  return structureName+'. '+viewName()+'; '+(localFocus?'ambiente local do centro metálico':r.view==='lattice'?'rede extensa':'célula unitária')+'. '+(observer?.centers?'Centros metálicos identificados. ':'')+(sel>=0?'Unidade '+(sel+1)+' selecionada'+(r.neighbors?', com os vizinhos imediatos destacados':'')+'.':'Nenhuma unidade selecionada.')+
    (scene.heatAside?' Nesta projeção, a região aquecida (contorno tracejado) não fica à esquerda; a experiência é a mesma da vista isométrica.':'');
  }
  function render(){
   const S=model.state,s=S.structure;if(!s||s.mode!=='crystalline')return;const r=s.crystallography.representation,baseUnits=s.units,pr=S.properties,active=pr?.active||null;const alignNow=(mode3d?'3d':rep2.projection())+'|'+(pr?.startedAt||'');if(alignNow!==alignKey){alignKey=alignNow;align=camAngles(rep2.projection());}
   const list=r.view==='lattice'?baseUnits.map(u=>({...u,referenceSite:u.site,site:navigator.cursor.displaySite(u.site)})):baseUnits;
+  const focusSite=localFocus?navigator.cursor.site:null;
+  const focusShell=focusSite?g.neighbors(focusSite):null;
+  const localKey=focusSite?.key||null;
   deformCtl?.sync();const live=deformCtl?.transform(align)||null;deform=live||P.deformer(S,g,align);const deforming=!!live||(!!deform&&['malleability','ductility'].includes(active));specimen=deforming;
   const proj=rep2.projection(),cam3=mode3d?{...rep2.camera3D(),...(orbitLive||{})}:null,selectValue=mode3d?(cam3.preset&&cam3.preset!=='3d'?'3d-'+cam3.preset:'3d'):proj;
   syncProjectionPicker(selectValue);root.dataset.projection=mode3d?'3d':proj;root.dataset.viewMode=mode3d?'3d':'2d';
@@ -342,15 +352,17 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const calcMark=calcOptions?.marks?.()||null;root.dataset.calc=calcMark?.mode||'';
   root.dataset.view=r.view;root.dataset.labels=String(r.labels);root.dataset.cell=String(r.unitCell);root.dataset.observerCenters=String(observer?.centers===true);
   for(const [id,node]of nodes)if(!list.some(u=>u.id===id)){node.remove();nodes.delete(id);}
-  const selected=r.selectedUnitId,selectedUnit=selected?list.find(u=>u.id===selected):null,neighbors=r.neighbors&&selectedUnit?g.neighbors(selectedUnit.site):null,neighborKeys=new Set(neighbors?.list.map(x=>x.key)||[]);
+  const selected=r.selectedUnitId,selectedUnit=selected?list.find(u=>u.id===selected):null,neighbors=localFocus?focusShell:r.neighbors&&selectedUnit?g.neighbors(selectedUnit.site):null,neighborKeys=new Set(neighbors?.list.map(x=>x.key)||[]);
   // Cena estável (sem vizinhos nem margem de rede): a câmera, e não o layout, enquadra o que estiver visível.
   // Durante a deformação, a cena enquadra também a amostra orientada e as formas extremas (sem "respirar" a cada quadro).
-  const extra=deforming&&!mode3d?deformFit(baseUnits,proj,r.view,active)||[]:[],fitCarts=[...g.cell.map(c=>c.cart),...(g.corners||[]),...baseUnits.map(u=>g.site(u.site).cart),...extra];
+  const extra=deforming&&!mode3d?deformFit(baseUnits,proj,r.view,active)||[]:[],
+   fitCarts=localFocus?[focusSite.cart,...focusShell.list.map(site=>site.cart)]:
+    [...g.cell.map(c=>c.cart),...(g.corners||[]),...baseUnits.map(u=>g.site(u.site).cart),...extra];
   if(mode3d){try{
-   const center=r.view==='lattice'?navigator.cursor.displayCart(g.center):g.center;
+   const center=localFocus?focusSite.cart:r.view==='lattice'?navigator.cursor.displayCart(g.center):g.center;
    const refFit=r.view==='lattice'?fitCarts.map(cart=>navigator.cursor.displayCart(cart)):fitCarts;
    layout=X.layout3D({...g,center},refFit,cam3);}catch(error){rep2.fail3D(error);layout=X.layoutFor(g,fitCarts,{margin:.12,projection:proj});}}
-  else layout=X.layoutFor(g,fitCarts,{margin:.12,projection:proj});
+  else layout=X.layoutFor(localFocus?{...g,center:focusSite.cart}:g,fitCarts,{margin:localFocus?.09:.12,projection:proj});
   // Distância entre vizinhos: fixa para a geometria (calculada uma vez, não a cada quadro).
   const d=nearest??=g.neighbors(g.cell[0]).distances[0];unitFraction=Math.min(.11,Math.max(.045,d*layout.scale*.3));stage.style.setProperty('--unit-size',(unitFraction*100).toFixed(3)+'%');
   scene={rep:r,list,selected,neighbors,active,module:S.module.active};
@@ -363,6 +375,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    node.style.zIndex=String(selected===u.id?200:10+Math.round((1-p.depth)*100));node.__depthScale=dscale(p);node.style.setProperty('--depth-scale',node.__depthScale.toFixed(3));node.style.setProperty('--depth-fade',(1-.22*p.depth).toFixed(3));
    node.dataset.role=info.role;node.dataset.layer=info.layer||'';node.dataset.placement=u.placement;node.querySelector('.silm-site-label').textContent=calcMark?.mode==='fractions'?(shares[info.role]||''):(shortRole[info.role]||'');
    const centerTag=node.querySelector('.silm-observer-center-tag');centerTag.textContent='M'+(i+1)+(shortRole[info.role]?' · '+shortRole[info.role]:'');centerTag.hidden=!observer?.centers;
+   if(localFocus&&u.id===selected)node.dataset.localCenter='';else delete node.dataset.localCenter;
    // Rede durante a deformação: a amostra é uma fatia fina; unidades da célula fora dela ficam esmaecidas.
    if(specimen&&r.view==='lattice'&&DF&&!DF.inSlab(g,g.site(u.site).cart))node.dataset.outside='';else delete node.dataset.outside;
    {const k=specimen&&DF?DF.block(DF.system(g),g.site(u.site).cart,active==='malleability'?pr.malleability.compression:active==='ductility'?pr.ductility.elongation:0):0;if(k%2)node.dataset.block='odd';else delete node.dataset.block;}
@@ -380,7 +393,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    scene.slipCount=n;}
   else{scene.slipCount=0;drawCell(calcMark?.mode==='edges');}
   ghostLayer.replaceChildren();
-  if(neighbors){const occupied=new Set(list.map(u=>X.key(u.site)));for(const n of neighbors.list)if(!occupied.has(n.key)){const q=layout.project(D(n.cart));ghostLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*50*dscale(q)}));}}
+  if(neighbors&&!localFocus){const occupied=new Set(list.map(u=>X.key(u.site)));for(const n of neighbors.list)if(!occupied.has(n.key)){const q=layout.project(D(n.cart));ghostLayer.append(svgEl('circle',{cx:q.x*100,cy:q.y*100,r:unitFraction*50*dscale(q)}));}}
   // Caixa de interesse da câmera: estrutura desenhada (com a deformação da propriedade e os vizinhos visíveis).
   const cellDrawn=[...g.cell.map(c=>c.cart),...(g.corners||[])].map(p=>layout.project(D(cellCart(p))));
   // Trocar a projeção ou a vista (Célula/Rede) reenquadra; mostrar vizinhos ou deformar mantém a câmera do usuário.
