@@ -468,6 +468,8 @@ async function test(viewport){
  const electronFlow=()=>page.locator('.silm-electron-canvas').evaluate(n=>n.silmElectrons.snapshot().currentFactor);
  const flowBefore=await electronFlow();
  await step.click();
+ // Fechar o painel avançado ao tocar o botão não pode roubar o clique.
+ await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 1 · '),undefined,{timeout:8000});
  assert.equal(await value('I'),currentBefore,'A corrente imposta mudou com a temperatura.');
  assert.equal(await electronFlow(),flowBefore,'A pista visual aplicou o efeito térmico duas vezes sob corrente imposta.');
  const warm=await value('T média');
