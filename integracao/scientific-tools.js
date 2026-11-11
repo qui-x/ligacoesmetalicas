@@ -67,6 +67,33 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
  const allowed=t=>!activity()||activity().allows(t);
  function value(m){return U.format(m.value,m.unit==='Å'?unit:m.unit);}
  const points=n=>n+(n===1?' ponto':' pontos');
+ const pointLetters=['A','B','C'];
+ const measureDirections={
+  distance:'Régua: selecione dois centros metálicos. O segmento A–B usa as coordenadas do modelo, não os pixels da tela.',
+  angle:'Goniômetro: selecione três centros na ordem A, B, C. O ponto B será o vértice do ângulo.',
+  latticeParameter:'Parâmetro de rede: selecione centros equivalentes nas extremidades de uma aresta da célula.',
+  coordination:'Coordenação: selecione um centro para identificar os vizinhos de sua primeira camada.'
+ };
+ function moduleGuide(title,description,{progress='',actions=[]}={}){
+  const section=node('section');section.className='silm-module-guide';section.dataset.module=model.state.module.active;
+  section.append(node('strong',title),node('p',description));
+  if(progress){const p=node('p',progress);p.className='silm-module-guide-progress';p.setAttribute('role','status');section.append(p);}
+  if(actions.length){const row=node('div');row.className='silm-module-guide-actions';
+   for(const [label,fn]of actions)row.append(button(label,fn));section.append(row);}
+  return section;
+ }
+ function undoPoint(){if(!picks.length)return;picks.pop();review=null;change();}
+ function clearPoints(){if(!picks.length)return;picks=[];review=null;change();}
+ // O instrumento opera na cena; atalhos só atuam enquanto a oficina ou Ver tem foco.
+ // Campos editáveis e diálogos não são afetados.
+ document.addEventListener('keydown',event=>{
+  if(model.state.module.active!=='medir'||!tool||!picks.length||event.altKey||event.ctrlKey||event.metaKey)return;
+  if(event.key!=='Escape'&&event.key!=='Backspace')return;
+  if(event.target.closest('input,select,textarea,[contenteditable="true"],dialog'))return;
+  if(!event.target.closest('#si-stage,#silm-direct-tools'))return;
+  event.preventDefault();event.stopPropagation();
+  if(event.key==='Backspace')undoPoint();else clearPoints();
+ },true);
  /* O que fazer quando a seleção não serve ao instrumento: explicação em linguagem do estudante, sem códigos internos. */
  function measureHelp(reason){
   const hex=type()==='HCP',axes=general()?' (cada aresta corresponde a um eixo: a, b ou c).':hex?' (aresta da base para a; aresta vertical para c).':'.';
@@ -143,7 +170,7 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
  }
  function activateFormula(id){formula=id;choice={};user={};change();}
  function render(){
-  const state=model.state,key=state.investigation?.id+':'+state.structure?.mode;
+  const state=model.state,key=state.investigation?.id+':'+state.structure?.mode+':'+state.module.active;
   if(key!==context){context=key;reset();}
   host.replaceChildren();moduleHost.replaceChildren();history.replaceChildren();
   if(state.module.active==='medir'){
@@ -161,20 +188,38 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
   field(moduleHost,'Módulo ativo',select('silm-module',[['explorar','Explorar'],['medir','Medir'],['calcular','Calcular']],state.module.active,v=>{if(activity()?.lockedModule())return;reset();model.setModule(v);onModule(v);change();}));
   document.getElementById('silm-module').disabled=!!activity()?.lockedModule();
   if(state.module.active!=='explorar'){
-   host.append(node('p','Medições e cálculos usam o modelo cristalográfico em escala física. Zoom e projeção não alteram os valores.'));
+   // A ciência trabalha sobre os sítios e o banco cristalográfico, não sobre a imagem renderizada.
    if(!available())host.append(node('p',model.measurementAvailability().reason==='DEFORMED'?'Restaure a experiência de deformação em Explorar para medir ou calcular a estrutura de referência.':'Organize uma estrutura cristalina em Explorar para usar este módulo. A montagem livre não tem escala física.'));
    else if(state.module.active==='medir'){
+    const total=tool?MS.types[tool].points:0;
+    const nextPoint=pointLetters[picks.length];
+    const progress=tool?(picks.length?'Selecionados '+picks.length+'/'+total+' · próximo ponto '+nextPoint:
+      'Próximo ponto '+nextPoint+' de '+total):'Selecione o instrumento acima para começar.';
+    const operations=tool?[
+     ...(picks.length?[['Desfazer último ponto',undoPoint],['Cancelar seleção',clearPoints]]:[]),
+     ['Desativar instrumento',()=>activateMeasure(tool)]
+    ]:[];
+    host.append(moduleGuide(tool?MS.types[tool].label:'Instrumentos de medição',
+     tool?measureDirections[tool]:'Escolha uma ferramenta. Em seguida, toque ou use Enter nos centros da cena; o modelo fornece os valores em escala física.',
+     {progress,actions:operations}));
     field(host,'Instrumento',select('silm-instrument',[['','Escolha um instrumento'],...Object.entries(MS.types).filter(([k])=>allowed(k)).map(([k,t])=>[k,t.label])],tool||'',v=>{tool=null;activateMeasure(v||null);}));
     field(host,'Unidade de comprimento',select('silm-measure-unit',Object.keys(U.length).map(k=>[k,k]),unit,v=>{unit=v;change();}));
-    host.append(node('p',tool?'Selecionados: '+picks.length+' de '+MS.types[tool].points+'. Para ângulos, B é o vértice.':'Selecione um instrumento para medir na cena.'));
-    host.append(button('Cancelar seleção',()=>{tool=null;picks=[];change();}));
    }else{
     const formulas=CA.applicable(type()).filter(f=>allowed(f.quantity));if(!formulas.some(f=>f.id===formula))formula=formulas[0]?.id;
     field(host,'Fórmula',select('silm-formula',formulas.map(f=>[f.id,f.name]),formula,activateFormula));
     const f=S.formulas[formula];if(f){
+     host.append(moduleGuide(f.name,
+      'Relação geométrica: '+f.expression+'. Inspecione na cena os centros, as arestas ou os contatos destacados. Os valores registrados mantêm sua origem científica.',
+      {progress:f.requiredInputs.length?
+       f.requiredInputs.length+' entrada(s) · dado tabelado, medida do modelo, cálculo anterior ou valor informado':
+       'Contagem geométrica direta · sem entradas adicionais'}));
      host.append(node('p',f.expression),node('p',f.notes));{const d=f.describe?.(S.crystal.geometry(element()));if(d){const n=node('p',d);n.id='silm-formula-detail';host.append(n);}}
      for(const spec of f.requiredInputs){
-      const opts=options(spec);if(!opts.some(o=>o.id===choice[spec.key]))choice[spec.key]=opts[0]?.id;
+      const opts=options(spec);
+      // Uma medida realmente realizada nesta investigação prevalece como sugestão,
+      // sem impedir que o estudante escolha o dado tabelado ou informe outro valor.
+      if(!opts.some(o=>o.id===choice[spec.key]))
+       choice[spec.key]=opts.find(o=>o.origin==='MODEL_MEASUREMENT')?.id||opts[0]?.id;
       field(host,spec.symbol+' — '+spec.name+' ('+spec.unit+')',select('silm-origin-'+spec.key,opts.map(o=>[o.id,o.label]),choice[spec.key],v=>{choice[spec.key]=v;change();}));
       // Entrada que o SILM calcula (V, r…) mas que ainda não foi calculada: indicar a fórmula que vem antes.
       const before=spec.origins.includes('CALCULATED')&&spec.key!=='n'&&!opts.some(o=>o.origin!=='USER')?CA.applicable(type()).find(x=>x.quantity===spec.quantity&&x.id!==f.id&&allowed(x.quantity)):null;
@@ -203,5 +248,16 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
   }
   if(!state.measurements.length&&!state.calculations.length)history.append(node('p','Nenhum registro nesta investigação.'));
  }
- return {render,measure:{pickActive:()=>model.state.module.active==='medir'&&!!tool&&available(),onPick:pick,marks},calc:{marks:()=>null}};
+ const calcMarks=()=>{
+  if(model.state.module.active!=='calcular'||!available()||!formula)return null;
+  const f=S.formulas[formula];if(!f)return null;
+  // O renderer já dispõe de três anotações científicas. Cada fórmula escolhe
+  // a indicação apropriada, sem redesenhar nem recalcular a geometria.
+  const mode=f.quantity==='effectiveAtoms'||f.quantity==='packingFactor'?'fractions':
+   f.quantity==='radius'||(f.quantity==='latticeParameter'&&f.requiredInputs.some(i=>i.key==='r'))?'contact':'edges';
+  return {mode};
+ };
+ return {render,measure:{pickActive:()=>model.state.module.active==='medir'&&!!tool&&available(),onPick:pick,marks,
+  instruction:()=>model.state.module.active==='medir'&&tool&&available()?measureDirections[tool]+' '+(picks.length?'Ponto '+pointLetters[picks.length]+' pendente.':'Inicie no ponto A.') : null},
+  calc:{marks:calcMarks}};
 };
