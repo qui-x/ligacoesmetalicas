@@ -13,6 +13,8 @@ window.SILM=window.SILM||{};
  const missing=(reasonCode,extra={})=>Object.freeze({ok:false,reasonCode,...extra});
  const profile=atomicNumber=>S.materialProfiles?.get?.(atomicNumber)||null;
  const element=atomicNumber=>S.data?.get?.(atomicNumber)||null;
+ const referenceId=()=>S.referenceConditions?.defaultId||null;
+ const matchConditions=conditions=>S.referenceConditions?.compare(conditions)||missing('CONDITIONS_VALIDATOR_UNAVAILABLE');
  function capability(atomicNumber,propertyId){
   const el=element(atomicNumber);
   if(!PROPERTY_IDS.includes(propertyId))return missing('PROPERTY_UNKNOWN',{atomicNumber:Number(atomicNumber),property:propertyId});
@@ -27,6 +29,8 @@ window.SILM=window.SILM||{};
    property:propertyId,mode:material?'reference-data':'qualitative',
    dataKind:material,source:spec?.source|| (available.data?{sourceId:available.data.sourceId}:null),
    conditions:spec?.conditions||available.data?.conditions||null,
+   conditionMatch:spec?matchConditions(spec.conditions):null,
+   requestedReference:referenceId(),
    reasonCode:material?null:'PROPERTY_DATA_MISSING'});
  }
  function spectralProfile(atomicNumber){
@@ -87,10 +91,24 @@ window.SILM=window.SILM||{};
    property:'luster',mode:'reference-data',evidence:'TABULATED_NK',
    wavelengthNm:lambdaNm,incidenceDeg:thetaDeg,n:sample.n,k:sample.k,
    reflectance,source:spec.source,conditions:spec.conditions,
+   requestedReference:referenceId(),conditionMatch:matchConditions(spec.conditions),
    assumptions:Object.freeze(['interface ar–metal plana','superfície ideal lisa','sem filme de óxido',
     'luz não polarizada','Fresnel; interpolação linear de n,k']),
    limitation:'Não representa a aparência de uma peça real; superfície, filme, ângulo do observador e iluminante dependem de modelo adicional.'});
  }
- S.materialEngine=Object.freeze({propertyIds:PROPERTY_IDS,capability,optical,
+ // Consulta estrita para os dados que o usuário pesquisa em CNTP.
+ // Ela não corrige n,k por temperatura/pressão e não confunde Cu ambiente
+ // com Cu a 273,15 K / 101325 Pa.
+ function opticalForReference(atomicNumber,lambdaNm,thetaDeg=0,reference=referenceId()){
+  const result=optical(atomicNumber,lambdaNm,thetaDeg);
+  if(!result.ok)return result;
+  const condition=S.referenceConditions?.compare(result.conditions,reference);
+  if(!condition?.ok)return missing(condition?.reasonCode||'CONDITIONS_UNVERIFIED',{
+   atomicNumber:result.atomicNumber,property:'luster',
+   requestedReference:reference,sourceConditions:result.conditions,
+   note:'É necessário dado medido na condição de referência ou transformação física validada'});
+  return Object.freeze({...result,conditionMatch:condition,requestedReference:reference});
+ }
+ S.materialEngine=Object.freeze({propertyIds:PROPERTY_IDS,capability,optical,opticalForReference,
   opticalModel:Object.freeze({fresnel,interpolate})});
 })();
