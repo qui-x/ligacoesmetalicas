@@ -27,7 +27,13 @@ SILM.createPropertyOverlay=(stage,{before=null}={})=>{
    el('text',{x:50-H-3,y:fieldY+1.5,class:'silm-overlay-label'},fieldG,'+');
    el('text',{x:50+H+2,y:fieldY+1.5,class:'silm-overlay-label'},fieldG,'0');
    el('text',{x:50,y:fieldY+1.5,'text-anchor':'middle',class:'silm-overlay-label'},fieldG,'U (rel.)');
-   if(I>0){arrow(fieldG,50+Ld,96,50-Ld,96,'silm-drift-arrow');el('text',{x:Math.min(80,50+Ld+2),y:97.4,class:'silm-overlay-label silm-overlay-small'},fieldG,'elétrons (qualitativo)');}
+   if(I>0){
+    arrow(fieldG,50+Ld,96,50-Ld,96,'silm-drift-arrow');
+    el('text',{x:Math.min(80,50+Ld+2),y:97.4,class:'silm-overlay-label silm-overlay-small'},fieldG,'elétrons (qualitativo)');
+    // A lei da conversão aparece na própria rede, não num diagrama
+    // independente. A malha eletrotérmica calcula P=UI e distribuição.
+    el('text',{x:50,y:11,'text-anchor':'middle',class:'silm-overlay-label silm-overlay-small'},fieldG,'P Joule = U × I → calor');
+   }
   }else if(field&&intensity!==null){const H=5+25*intensity,Ld=4+14*intensity*(drift??1);arrow(fieldG,50-H,fieldY,50+H,fieldY,'silm-field-arrow');el('text',{x:Math.min(97,50+H+5),y:fieldY+1.5,class:'silm-overlay-label'},fieldG,'E');
    arrow(fieldG,50+Ld,96,50-Ld,96,'silm-drift-arrow');el('text',{x:Math.min(80,50+Ld+2),y:97.4,class:'silm-overlay-label silm-overlay-small'},fieldG,'elétrons (média)');}
   else if(field){arrow(fieldG,32,4.5,68,4.5,'silm-field-arrow');el('text',{x:73,y:6,class:'silm-overlay-label'},fieldG,'E');
@@ -129,15 +135,11 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   const show=(...ids)=>{for(const [k,b]of Object.entries(B))b.hidden=!ids.includes(k);};
   if(joule){
    const {input,values}=joule,format=n=>n.toLocaleString('pt-BR',{maximumFractionDigits:3});
-   head.textContent='Condutividade elétrica e térmica · efeito Joule';
-   show('field','heat','advance','restore','end');
-   B.field.textContent=p.field?'Desligar alimentação':'Ligar alimentação';
-   B.field.setAttribute('aria-pressed',String(p.field));
-   B.heat.textContent=input.external?'Desligar calor externo':'Ligar calor externo';
-   B.heat.setAttribute('aria-pressed',String(input.external));
-   B.advance.textContent='Avançar meio intervalo';
-   for(const key of ['field','heat','advance','restore','end'])B[key].setAttribute('aria-disabled',String(!editable));
-   status.textContent='Grandezas relativas · t '+format(values.time)+' · potência Joule '+format(values.power)+' · temperatura média '+format(values.mean)+'. O tempo avança pelos controles da experiência.';
+   head.textContent='Elétrica + térmica → efeito Joule';
+   // A fonte, o relógio e os mapas pertencem ao mesmo palco. Não duplicar
+   // controles aqui: o painel Ver conserva apenas contexto e leituras.
+   show();
+   status.textContent='Corrente elétrica gera aquecimento na rede. Fonte, evolução, mapas e balanço no quadro Joule da barra inferior. Grandezas relativas · t '+format(values.time)+' · potência '+format(values.power)+' · elevação térmica média '+format(values.mean)+'.';
    for(const [key,value]of valuesByKey)value.textContent=format(values[key]);
    return;
   }

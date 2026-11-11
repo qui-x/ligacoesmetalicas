@@ -154,14 +154,14 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   // físico correspondente. Não criar uma segunda fonte ou estado científico.
   const propertyDirections={
    electrical:'Ative o campo elétrico e ajuste a fonte de intensidade na cena; observe a resposta coletiva dos elétrons.',
-   thermal:'Aplique ou retire a fonte de calor da cena; acompanhe a propagação e o resfriamento.',
+   thermal:'Aplique a fonte de calor e observe a propagação; combinada com Elétrica, ativa a dissipação Joule na mesma rede.',
    malleability:'Ative a prensa e manipule a compressão no palco (mouse, toque ou teclado).',
    ductility:'Ative a tração e manipule a deformação no palco (mouse, toque ou teclado).',
    luster:'Acione a luz e direcione a lanterna no palco para investigar o brilho metálico.'
   };
   const propertyButtons=new Map();
   const propertyTools=node('div',null,'silm-observer-selection-tools');
-  const propertyHelp=node('p','Ctrl (ou ⌘) + clique em duas propriedades e solte para combinar.','silm-observer-selection-status');
+  const propertyHelp=node('p','Ative Elétrica + Térmica para observar a transformação da energia elétrica em calor. Ctrl (ou ⌘) combina outras propriedades compatíveis.','silm-observer-selection-status');
   propertyHelp.setAttribute('role','status');propertyHelp.setAttribute('aria-live','polite');
   const touchModeButton=node('button','Selecionar várias','silm-observer-select-mode');
   touchModeButton.type='button';touchModeButton.setAttribute('aria-pressed','false');
@@ -188,7 +188,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
     const pending=names.join(' + ');
     propertyHelp.textContent='Seleção: '+pending+(multiSelectMode?' · toque em Aplicar seleção':' · solte Ctrl para aplicar');
    }else{
-    propertyHelp.textContent=multiSelectMode?'Selecione duas propriedades compatíveis e toque em Aplicar seleção.':touchCapable?'Toque em Selecionar várias para combinar propriedades.':'Ctrl + clique em duas propriedades e solte Ctrl para combinar.';
+    propertyHelp.textContent=multiSelectMode?'Selecione duas propriedades compatíveis e toque em Aplicar seleção.':touchCapable?'Elétrica + Térmica revela o aquecimento por Joule; Selecionar várias combina outras propriedades.':'Elétrica + Térmica = efeito Joule. Também é possível selecionar juntas com Ctrl + clique.';
    }
    touchModeButton.setAttribute('aria-pressed',String(multiSelectMode));
    touchModeButton.textContent=multiSelectMode?'Seleção múltipla ativa':'Selecionar várias';
@@ -254,15 +254,8 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    button.dataset.disabledReason=why;
    propertyButtons.set(id,button);
   }
-  // Efeito Joule tem uma mecânica própria: o disparo fica em Ver;
-  // tensão/corrente e passos do ensaio continuam no painel específico.
-  const electrical=model.propertyAvailability('electrical'),thermal=model.propertyAvailability('thermal');
-  const jouleReady=canExplore&&crystal&&electrical.ok&&thermal.ok;
-  actionButton(propertyActions,{id:'joule',label:'Iniciar efeito Joule',path:actionIcons.joule,
-   disabled:!jouleReady,reason:jouleReady?'':'Requer estrutura e respostas elétrica e térmica disponíveis.',
-   hint:'Abrir o ensaio de alimentação e aquecimento de Joule.',
-   onClick:()=>{if(!jouleReady)return;quickActions?.beginJoule?.();refreshScene();renderViewers();}
-  });
+  // Não há ação exclusiva para Joule: ativar Elétrica + Térmica
+  // utiliza a própria infraestrutura de combinação das propriedades.
   syncPropertySelection();
   output.append(root);
   // Os controles de combinação ficam abaixo da faixa rolável; não criam

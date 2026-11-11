@@ -437,79 +437,102 @@ async function test(viewport){
  }
  assert.match(await status.textContent(),/Célula \[0, 0, 0\]/);
  assert.equal(await page.locator('#silm-scene-actionbar .silm-lattice-nav').count(),1);
- // O estímulo passa ao menu Ver; as condições/leituras do ensaio
- // permanecem na ferramenta científica existente.
+ // Joule é uma combinação direta: sem iniciar um simulador separado.
  await page.locator('[data-open-dock="ver"]').click();
  await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===false);
- const startJoule=page.locator('#silm-direct-actionbar [data-action="joule"]');
- await startJoule.waitFor({state:'visible'});
- assert.equal(await startJoule.isEnabled(),true,'Joule indisponível no menu Ver');
- await startJoule.click();
+ const direct=page.locator('#silm-direct-actionbar');
+ assert.equal(await direct.locator('[data-action="joule"]').count(),0,'Joule voltou a ser uma ação duplicada em Ver');
+ await direct.locator('[data-action="property-electrical"]').click();
+ await direct.locator('[data-action="property-thermal"]').click();
  await page.locator('[data-open-dock="ver"]').click();
- const step=page.getByRole('button',{name:'Avançar meio intervalo no efeito Joule'}),conditions=page.getByLabel('Condições do efeito Joule');
+ const step=page.getByRole('button',{name:'Avançar meio intervalo no efeito Joule'});
+ const controls=page.locator('#silm-scene-actionbar .silm-joule-controls');
+ const playback=controls.locator('.silm-joule-play');
+ const advanced=controls.locator('details.silm-joule-advanced');
+ const panel=page.locator('#silm-joule-popover');
+ const openAdvanced=async()=>{
+  if(await advanced.getAttribute('open')===null)await advanced.locator('summary').click();
+  await panel.waitFor({state:'visible'});
+ };
  const reading=page.locator('.silm-lattice-status span');
- await step.locator('svg.silm-action-icon').waitFor({state:'visible'});
+ await step.waitFor({state:'visible'});
+ assert.equal(await step.evaluate(b=>!!b.closest('#silm-scene-actionbar')),true,
+  'Joule não acompanha os controles do palco nas escalas da rede e do centro');
  const stepBox=await step.boundingBox();
- assert.ok(Math.abs(stepBox.width-44)<1&&Math.abs(stepBox.height-44)<1,'Avançar Joule deve manter o alvo de 44 px.');
+ assert.ok(stepBox.width>=43.5&&stepBox.height>=43.5,'Avançar Joule precisa manter alvo tátil de 44 px.');
+ // O modo contínuo aquece por padrão; congelamos o relógio para testar
+ // valores, balanço e o avanço único sem corridas com o timer.
+ if(await playback.getAttribute('aria-pressed')==='true')await playback.click();
+ await openAdvanced();
+ await panel.getByRole('button',{name:'Reiniciar evolução'}).click();
+ await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 0 · '));
+ const supply=controls.locator('.silm-joule-supply');
+ assert.equal(await supply.getAttribute('aria-pressed'),'false','Reiniciar deve desligar alimentação');
+ await supply.click();
+ await page.waitForFunction(()=>document.querySelector('.silm-joule-supply')?.getAttribute('aria-pressed')==='true');
  await step.click();
- await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span').textContent.includes(' · t 0,5 · '));
+ await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 0,5 · '));
  const value=async label=>Number((await reading.textContent()).split(' · '+label+' ')[1].split(' · ')[0].replace(',','.'));
  const timeBeforeNavigation=await value('t');
- // Clicar em Ver fecha corretamente os popovers externos. Reabrir a
- // navegação avançada para ensaiar a translação após iniciar Joule.
+ // A translação do cristal não pode afetar o avanço da malha térmica.
  if(await details.getAttribute('open')===null)await details.locator('summary').click();
  await page.getByRole('button',{name:'Avançar uma célula no eixo a'}).click();
  assert.equal(await value('t'),timeBeforeNavigation,'Navegar não deve avançar o ensaio.');
  await page.getByRole('button',{name:'Recuar uma célula no eixo a'}).click();
- await conditions.selectOption('potential');
+ await openAdvanced();
+ const jouleMap=panel.getByLabel('Mapa no metal');
+ await jouleMap.selectOption('potential');
  assert.match(await reading.textContent(),/Mapa: Potencial elétrico/);
- await conditions.selectOption('current');
+ await panel.getByLabel('Fonte elétrica').selectOption('current');
  const currentBefore=await value('I');
  const electronFlow=()=>page.locator('.silm-electron-canvas').evaluate(n=>n.silmElectrons.snapshot().currentFactor);
  const flowBefore=await electronFlow();
  await step.click();
- // Fechar o painel avançado ao tocar o botão não pode roubar o clique.
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 1 · '),undefined,{timeout:8000});
  assert.equal(await value('I'),currentBefore,'A corrente imposta mudou com a temperatura.');
  assert.equal(await electronFlow(),flowBefore,'A pista visual aplicou o efeito térmico duas vezes sob corrente imposta.');
  const warm=await value('T média');
- await conditions.selectOption('supply');
+ await supply.click();
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · U 0 · I 0 · '),undefined,{timeout:10000});
  await step.click();
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 1,5 · '),undefined,{timeout:10000});
  assert.match(await reading.textContent(),/corrente imposta.* · t 1,5 · U 0 · I 0 · R [\d,]+ · P Joule 0/);
  assert.ok(await value('T média')<warm,'Desligar a fonte com terminais ao ambiente precisa permitir resfriamento.');
  assert.equal(await electronFlow(),0);
- await conditions.selectOption('readings');
- const results=page.getByRole('dialog',{name:'Leituras do efeito Joule'});
- await results.waitFor({state:'visible'});
- const quantity=async key=>Number((await results.locator('[data-quantity="'+key+'"]').textContent()).replace(',','.'));
+ await openAdvanced();
+ const quantity=async key=>Number((await panel.locator('[data-quantity="'+key+'"]').textContent()).replace(',','.'));
  assert.equal(await quantity('power'),0);
  const balance=await quantity('jouleEnergy')+await quantity('externalEnergy')-await quantity('removedEnergy')-await quantity('storedEnergy');
  assert.ok(Math.abs(balance)<.00005,'Leituras de energia não fecham o balanço.');
- await results.getByRole('button',{name:'Fechar leituras do efeito Joule'}).click();
- // O evento close do dialog é enfileirado; aguardar o retorno do foco em ambos os motores.
- await page.waitForFunction(()=>document.activeElement===document.querySelector('.silm-joule-controls select'),undefined,{timeout:5000});
- await conditions.selectOption('restore');
- await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span').textContent.includes(' · t 0 · '));
+ assert.match(await panel.textContent(),/energia elétrica \+ calor externo = energia armazenada \+ energia removida/i);
+ await panel.getByRole('button',{name:'Reiniciar evolução'}).click();
+ await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 0 · '));
  assert.equal(await value('T média'),0);
  assert.equal(await value('I'),0);
  assert.match(await reading.textContent(),/corrente imposta/,'Reiniciar mudou a condição elétrica.');
- await conditions.selectOption('end');
+ await panel.getByRole('button',{name:'Voltar à elétrica simples'}).click();
  assert.equal(await step.isVisible(),false);
- assert.equal(await page.locator('.silm-crystal').getAttribute('data-field-map'),null,'Encerrar deixou o mapa acoplado na cena.');
+ assert.equal(await page.locator('.silm-crystal').getAttribute('data-field-map'),null,
+  'Encerrar o acoplamento deixou o mapa Joule na cena.');
  if(viewport.width>1100){
   await page.getByRole('button',{name:'Ver',exact:true}).click();
-  await page.locator('#silm-direct-actionbar [data-action="property-electrical"]').waitFor({state:'visible'});
+  await direct.locator('[data-action="property-electrical"]').waitFor({state:'visible'});
   await page.keyboard.down('Control');
-  await page.locator('#silm-direct-actionbar .silm-observer-action[data-action="property-electrical"]').click();
-  await page.locator('#silm-direct-actionbar .silm-observer-action[data-action="property-thermal"]').click();
+  await direct.locator('[data-action="property-electrical"]').click();
+  await direct.locator('[data-action="property-thermal"]').click();
   await page.keyboard.up('Control');
   await step.waitFor({state:'visible'});
-  for(const id of ['electrical','thermal'])assert.equal(await page.locator('#silm-direct-actionbar .silm-observer-action[data-action="property-'+id+'"]').getAttribute('aria-pressed'),'true','Soltar Ctrl desativou uma propriedade do par.');
+  for(const id of ['electrical','thermal'])assert.equal(
+   await direct.locator('[data-action="property-'+id+'"]').getAttribute('aria-pressed'),
+   'true','Soltar Ctrl desativou uma propriedade do par.');
   await page.getByRole('button',{name:'Fechar painel',exact:true}).click();
-  assert.match(await reading.textContent(),/Efeito Joule.* · t 0 · /,'Ctrl + E + T não iniciou o mesmo ensaio.');
-  await conditions.selectOption('end');
+  assert.match(await reading.textContent(),/Efeito Joule/,'Ctrl + elétrica + térmica não ativou o mesmo motor.');
+  // Clicar em Térmica novamente retira apenas o acoplamento, mantendo Elétrica.
+  await page.getByRole('button',{name:'Ver',exact:true}).click();
+  await direct.locator('[data-action="property-thermal"]').click();
+  assert.equal(await step.isVisible(),false,'Retirar Térmica não desligou o acoplamento.');
+  assert.equal(await direct.locator('[data-action="property-electrical"]').getAttribute('aria-pressed'),'true');
+  await page.getByRole('button',{name:'Fechar painel',exact:true}).click();
  }
  assert.deepEqual(errors,[],'Erros JavaScript: '+errors.join('; '));
  await context.close();
