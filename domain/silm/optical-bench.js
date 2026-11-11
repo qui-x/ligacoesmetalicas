@@ -27,7 +27,7 @@ window.SILM=window.SILM||{};
    'Brilho · '+elementSymbol+' · superfície ilustrativa');
   const area=element('div','silm-optical-bench-area');
   const graphic=svg('svg',{viewBox:'0 0 240 140','aria-hidden':'true',
-   class:'silm-optical-bench-svg',preserveAspectRatio:'xMidYMid meet'},area);
+   class:'silm-optical-bench-svg',preserveAspectRatio:'none'},area);
   const normal=svg('line',{x1:120,y1:93,x2:120,y2:24,
    class:'silm-optical-bench-normal'},graphic);
   const incident=svg('line',{x1:92,y1:36,x2:120,y2:93,
@@ -139,7 +139,7 @@ window.SILM=window.SILM||{};
    reflected.setAttribute('x2',refl.x);reflected.setAttribute('y2',refl.y);
    shine.hidden=!illuminated||!['aligned','near'].includes(view.appearance);
    scatter.hidden=!illuminated||view.appearance!=='diffuse';
-   status.textContent=view.description;
+   if(status.textContent!==view.description)status.textContent=view.description;
    source.textContent=illuminated?'Apagar luz':'Ligar luz';
    source.setAttribute('aria-pressed',String(illuminated));
    finish.textContent='Acabamento: '+(drive.finish==='polished'?'polido':'fosco');
