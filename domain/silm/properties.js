@@ -19,7 +19,7 @@ window.SILM=window.SILM||{};
   thermal:{id:'thermal',title:'Condutividade térmica',requires:'crystalline',limitation:'Representação qualitativa: a energia passa entre vizinhos imediatos pela equação do calor discreta, com um coeficiente didático único (igual para todos os metais) e troca simplificada com o ambiente durante o resfriamento. A escala de tempo é a da animação, não a do metal, e não há comparação entre metais.'},
   malleability:{id:'malleability',title:'Maleabilidade',requires:'crystalline',limitation:DEFORMATION_LIMITS},
   ductility:{id:'ductility',title:'Ductilidade',requires:'crystalline',limitation:DEFORMATION_LIMITS},
-  luster:{id:'luster',title:'Brilho metálico',requires:'crystalline',limitation:'O feixe atual é um esquema geométrico da reflexão em superfície lisa: θr = θi é uma lei geral, não exclusiva dos metais. A vista ainda não calcula refletância, cor do metal, rugosidade, oxidação ou orientação física da superfície; não usar a intensidade desenhada como dado óptico.'}
+  luster:{id:'luster',title:'Brilho metálico',requires:'crystalline',limitation:'A bancada óptica é uma ilustração qualitativa de uma superfície: a direção especular obedece θr = θi, mas os destaques polido/fosco não são refletância, cor, luminância ou rugosidade calculadas. Os dados n,k experimentais do Cu permanecem referência de interface ideal lisa à temperatura ambiente (CNTP não verificada); não se aplicam automaticamente a outros metais.'}
  });
  const reasons=Object.freeze({
   PROPERTY_DATA_MISSING:'Dado tabelado não homologado no banco do SILM para este metal.',
@@ -106,8 +106,16 @@ window.SILM=window.SILM||{};
   if((id==='malleability'||id==='ductility')&&drive?.deformField){const k=id==='malleability'?params.compression:params.elongation;
    const extra=electronsVisible?' Com o campo elétrico ('+pct+'): '+(k?'os deslizamentos geraram defeitos na rede (discordâncias, que esta representação não desenha); eles espalham um pouco mais os elétrons, e a deriva média diminui levemente.':'sem deslizamentos, a deriva é a da rede sem deformação; deforme para comparar.'):' Mostre os elétrons (Ver → Elétrons) para observar a deriva sob o campo.';
    return {...n,observation:n.observation+extra,interpretation:(n.interpretation?n.interpretation+' ':'')+'Pela regra de Matthiessen, a resistividade de um metal soma contribuições térmica, de impurezas e de deformação; a da deformação vem dos defeitos criados ao deformar e é menor que a térmica à temperatura ambiente. Representação qualitativa, igual para todos os metais.'};}
-  if(id==='luster'&&params.light&&drive)return {action:'Lanterna a θᵢ = '+drive.angle+'° da normal de referência do diagrama.',observation:'Esquema de superfície lisa: θᵣ = θᵢ = '+drive.angle+'°. A direção do feixe é ilustrativa; a vista ainda não determina quanta luz é refletida, absorvida ou espalhada por este metal.',interpretation:n.interpretation+' A igualdade dos ângulos vale para qualquer superfície lisa. O brilho e a cor de um metal dependem de sua resposta eletrônica à frequência da luz e do estado da superfície.'};
-  if(id==='luster'&&!params.light&&drive)return {...n,observation:'Sem luz incidente. Toque na lanterna (ou use Incidir luz) e arraste-a para mudar o ângulo.'};
+  if(id==='luster'&&params.light&&drive){
+   const view=SILM.opticalObservation?.observe({
+    illuminated:true,incidenceDeg:drive.angle,observerDeg:drive.observerAngle??35,
+    finish:drive.finish??'polished'
+   });
+   return {action:'Iluminação a '+drive.angle+'°; observador a '+(drive.observerAngle??35)+'°; superfície '+(drive.finish==='matte'?'fosca':'polida')+'.',
+    observation:view?.description||'Observe o destaque na amostra superficial da cena.',
+    interpretation:'A bancada ilustra direção de reflexão e espalhamento. O brilho e a cor reais dependem da resposta óptica do material e da superfície; estes destaques não são medições.'};
+  }
+  if(id==='luster'&&!params.light&&drive)return {...n,observation:'Lanterna apagada. Ligue a luz na bancada do palco e mova lanterna e observador para investigar o reflexo.'};
   return n;
  }
  function narrativeCore(id,params,{reduced=false,electronsVisible=true,deformation=null,thermal=null}={}){
@@ -141,7 +149,7 @@ window.SILM=window.SILM||{};
   if(id==='ductility'){if(!params.elongation)return off;
    return {action:'Alongamento aplicado (etapa '+params.elongation+' de '+limits.elongation+').',observation:'Sob tração, a estrutura se alonga e se estreita, como um fio, por reorganização coletiva das camadas.',interpretation:'O deslizamento de camadas mantido pela distribuição eletrônica coletiva permite alongar sem fratura imediata. A ductilidade real varia entre metais e condições.'};}
   if(id==='luster'){if(!params.light)return {action:'Luz desligada.',observation:'Sem luz incidente.',interpretation:''};
-   return {action:'Luz incidente no diagrama de uma superfície lisa.',observation:'O feixe indica a direção geométrica da reflexão, sem representar refletância específica do metal.',interpretation:'A resposta eletrônica, incluindo absorções entre bandas, e o acabamento da superfície influenciam o brilho e a cor; este diagrama ainda não os calcula.'};}
+   return {action:'Superfície iluminada.',observation:'O brilho observado muda qualitativamente com iluminação, observador e acabamento.',interpretation:'A resposta eletrônica e a condição da superfície influenciam o brilho e a cor; esta bancada não fornece valores numéricos de espalhamento.'};}
   return off;
  }
  SILM.properties=Object.freeze({ids:IDS,defaults,limits,catalog,reasons,phase,data,eligibility,deformer,compress,elongate,heat,heatSources,heatWord,narrative,

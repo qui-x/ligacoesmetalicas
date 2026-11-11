@@ -157,7 +157,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    thermal:'Aplique a fonte de calor e observe a propagação; combinada com Elétrica, ativa a dissipação Joule na mesma rede.',
    malleability:'Ative a prensa e manipule a compressão no palco (mouse, toque ou teclado).',
    ductility:'Ative a tração e manipule a deformação no palco (mouse, toque ou teclado).',
-   luster:'Acione a luz e direcione a lanterna no palco para investigar o brilho metálico.'
+   luster:'Na bancada da cena, mude a luz, o observador e o acabamento. Os raios geométricos são opcionais.'
   };
   const propertyButtons=new Map();
   const propertyTools=node('div',null,'silm-observer-selection-tools');

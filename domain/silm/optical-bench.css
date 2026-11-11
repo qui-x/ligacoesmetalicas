@@ -1,0 +1,106 @@
+/* Brilho no Explorar: bancada didática única, sem novo modal ou menu lateral.
+   A textura é ilustração, NÃO cor real, BRDF ou rugosidade medida. */
+.silm-optical-bench{
+ position:absolute;z-index:335;top:8px;right:8px;box-sizing:border-box;
+ width:min(268px,calc(100% - 16px));max-height:min(260px,calc(100% - 16px));
+ padding:8px;display:grid;gap:5px;overflow:auto;overscroll-behavior:contain;
+ color:var(--text);background:var(--surface);border:1px solid var(--border);
+ border-radius:12px;box-shadow:0 5px 18px rgb(0 0 0/.16)
+}
+.silm-optical-bench[hidden],.silm-optical-bench *[hidden]{display:none!important}
+#silm-properties .silm-optical-bands[hidden]{display:none!important}
+.silm-optical-bench-title{font-size:.76rem;line-height:1.25;overflow-wrap:anywhere}
+.silm-optical-bench-area{position:relative;width:100%;height:118px;min-width:0}
+.silm-optical-bench-svg{width:100%;height:100%;display:block}
+.silm-optical-bench-surface{
+ fill:var(--panel2,var(--surface));stroke:var(--text);stroke-width:.8
+}
+.silm-optical-bench[data-finish=polished] .silm-optical-bench-surface{
+ fill:color-mix(in srgb,var(--text) 32%,var(--surface))
+}
+.silm-optical-bench[data-finish=matte] .silm-optical-bench-surface{
+ fill:color-mix(in srgb,var(--text) 48%,var(--surface));
+ stroke-dasharray:2 1
+}
+.silm-optical-bench-shine{
+ fill:var(--silm-light,var(--accent));opacity:.85
+}
+.silm-optical-bench[data-appearance=near] .silm-optical-bench-shine{opacity:.22}
+.silm-optical-bench-scatter line{
+ stroke:var(--silm-light,var(--accent));stroke-width:1.4;opacity:.65
+}
+.silm-optical-bench-normal{
+ stroke:var(--muted,var(--text));stroke-width:.6;stroke-dasharray:3 3
+}
+.silm-optical-bench-incident,.silm-optical-bench-reflected{
+ stroke:var(--silm-light,var(--accent));stroke-width:1.6
+}
+.silm-optical-bench-reflected{stroke-dasharray:4 2}
+.silm-optical-bench-lamp,.silm-optical-bench-eye{
+ position:absolute;display:grid;place-items:center;
+ box-sizing:border-box;width:44px;height:44px;margin:-22px 0 0 -22px;
+ padding:0;touch-action:none;user-select:none;cursor:grab;
+ border:2px solid var(--accent);border-radius:50%;
+ background:var(--surface);color:var(--text);
+ box-shadow:0 2px 5px rgb(0 0 0/.2);
+ font-size:1.12rem;font-weight:700
+}
+.silm-optical-bench-lamp:active,.silm-optical-bench-eye:active{cursor:grabbing}
+.silm-optical-bench-lamp:focus-visible,.silm-optical-bench-eye:focus-visible,
+.silm-optical-bench button:focus-visible{
+ outline:3px solid var(--ring,var(--accent));outline-offset:2px
+}
+.silm-optical-bench-controls{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ align-items:stretch;gap:4px
+}
+.silm-optical-bench-controls button{
+ box-sizing:border-box;min-width:0;min-height:44px;
+ padding:5px 3px;background:var(--surface);color:var(--text);
+ border:1px solid var(--border);border-radius:7px;
+ font:inherit;font-size:.68rem;line-height:1.25;
+ font-weight:700;cursor:pointer;overflow-wrap:anywhere
+}
+.silm-optical-bench-controls button[aria-pressed=true]{
+ border:2px solid var(--accent);background:var(--tint,var(--surface))
+}
+.silm-optical-bench-status{
+ margin:0;font-size:.69rem;line-height:1.3;min-height:2.6em;overflow-wrap:anywhere
+}
+.silm-optical-bench-limitation{
+ font-size:.62rem;line-height:1.25;color:var(--muted,var(--text))
+}
+@media(max-width:420px){
+ .silm-optical-bench{top:4px;right:4px;padding:5px;gap:3px;
+  width:min(248px,calc(100% - 8px));max-height:min(226px,calc(100% - 8px))}
+ .silm-optical-bench-area{height:100px}
+ .silm-optical-bench-title{font-size:.71rem}
+ .silm-optical-bench-status{font-size:.65rem}
+ .silm-optical-bench-controls button{font-size:.63rem}
+}
+@media(forced-colors:active){
+ .silm-optical-bench,.silm-optical-bench-lamp,.silm-optical-bench-eye,
+ .silm-optical-bench button{background:Canvas;color:CanvasText;
+  border:2px solid CanvasText;box-shadow:none}
+ .silm-optical-bench-shine,.silm-optical-bench-surface{fill:Canvas;stroke:CanvasText}
+ .silm-optical-bench-scatter line,
+ .silm-optical-bench-incident,.silm-optical-bench-reflected{stroke:Highlight}
+}
+@media(prefers-reduced-motion:reduce){
+ .silm-optical-bench *{animation:none!important;transition:none!important}
+}
+
+
+.silm-optical-bench-angles{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;min-width:0
+}
+.silm-optical-bench-angle-label{
+ display:grid;min-width:0;gap:1px;font-size:.66rem;font-weight:700
+}
+.silm-optical-bench-angle-label input[type=range]{
+ width:100%;max-width:100%;min-width:0;min-height:44px;margin:0;
+ box-sizing:border-box;accent-color:var(--accent);touch-action:auto;cursor:pointer
+}
+.silm-optical-bench-angle-label input[type=range]:focus-visible{
+ outline:3px solid var(--ring,var(--accent));outline-offset:2px
+}

@@ -5,26 +5,36 @@ import {readFileSync} from 'node:fs';
 
 const ctx=vm.createContext({console});
 ctx.window=ctx;
+vm.runInContext(readFileSync(new URL('../domain/silm/optical-observation.js',import.meta.url),'utf8'),ctx);
 vm.runInContext(readFileSync(new URL('../domain/silm/properties.js',import.meta.url),'utf8'),ctx);
 const P=ctx.SILM.properties;
 
-test('brilho em Explorar explicita que o feixe é apenas esquema geométrico',()=>{
+test('brilho em Explorar explica a superfície e o observador sem prever cor',()=>{
  const catalog=P.catalog.luster.limitation;
- assert.match(catalog,/lei geral|não exclusiva/);
- assert.match(catalog,/não calcula refletância/);
- const n=P.narrative('luster',{light:true},{drive:{angle:35}});
- assert.match(n.action,/normal de referência do diagrama/);
- assert.match(n.observation,/θᵣ = θᵢ = 35°/);
- assert.match(n.observation,/não determina quanta luz/);
+ assert.match(catalog,/ilustração qualitativa/);
+ assert.match(catalog,/CNTP não verificada/);
+ assert.match(catalog,/θr = θi/);
+ const n=P.narrative('luster',{light:true},{drive:{
+  angle:35,observerAngle:35,finish:'polished'}});
+ assert.match(n.action,/observador a 35°/);
+ assert.match(n.observation,/direção especular/);
+ assert.match(n.interpretation,/não são medições/);
  assert.doesNotMatch(n.observation,/reflete a maior parte/);
- assert.match(n.interpretation,/absorções entre bandas|resposta eletrônica/);
+ const shifted=P.narrative('luster',{light:true},{drive:{
+  angle:35,observerAngle:80,finish:'polished'}});
+ assert.match(shifted.observation,/afastado da direção especular/);
+ const rough=P.narrative('luster',{light:true},{drive:{
+  angle:35,observerAngle:80,finish:'matte'}});
+ assert.match(rough.observation,/espalhamento ilustrado/);
 });
 
-test('texto óptico sem controlador não inventa refletância específica',()=>{
+test('sem luz ou controlador não há brilho fictício',()=>{
+ const unlit=P.narrative('luster',{light:false},{drive:{angle:35}});
+ assert.match(unlit.observation,/Lanterna apagada/);
  const n=P.narrative('luster',{light:true});
- assert.match(n.observation,/sem representar refletância específica/);
+ assert.match(n.observation,/qualitativamente/);
  assert.doesNotMatch(n.observation,/maior parte/);
- assert.match(n.interpretation,/acabamento da superfície/);
+ assert.match(n.interpretation,/não fornece valores numéricos/);
 });
 
 test('texto térmico segue a dissipação ambiental do motor, sem conservação fictícia',()=>{
