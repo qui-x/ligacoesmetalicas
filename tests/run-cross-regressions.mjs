@@ -305,6 +305,20 @@ async function checkModuleShortcuts(label,width){
   }));
  assert.equal(buttons.length,3,label+': atalhos de módulo ausentes');
  assert.deepEqual(buttons.map(b=>b.id),['explorar','medir','calcular'],label+': ordem dos módulos');
+ const glyphs=await page.locator('#si-dock-right #silm-module-shortcuts svg').evaluateAll(nodes=>
+  nodes.map(n=>{const box=n.getBoundingClientRect(),host=n.closest('button').getBoundingClientRect();
+   return {width:box.width,height:box.height,inside:box.left>=host.left-1&&
+    box.right<=host.right+1&&box.top>=host.top-1&&box.bottom<=host.bottom+1};
+  }));
+ assert.equal(glyphs.length,3,label+': faltam ícones vetoriais dos módulos');
+ assert.ok(glyphs.every(g=>g.width>=15&&g.height>=15&&g.width<=25&&g.height<=25&&g.inside),
+  label+': ícones de Ver deformados '+JSON.stringify(glyphs));
+ assert.ok(await page.locator('#si-dock-right .silm-module-shortcut-label').first().isVisible(),
+  label+': rótulos dos módulos não estão visíveis');
+ if(label==='celular-390'||label==='desktop')
+  await page.screenshot({path:join(evidenceDir,label+'-modulos-no-ver.jpg'),
+   type:'jpeg',quality:70,animations:'disabled'});
+
  assert.deepEqual(buttons.filter(b=>b.pressed==='true').map(b=>b.id),[before.module],
   label+': indicador do módulo ativo incorreto');
  assert.ok(buttons.every(b=>b.width>=43.5&&b.height>=43.5&&b.left>=-2&&b.right<=width+2),
@@ -336,7 +350,16 @@ async function checkModuleShortcuts(label,width){
     label+': editar estrutura deve continuar proibido em '+target);
   }
  }
- assert.equal(await scientific(),JSON.stringify(before),label+': sequência de módulos mudou a investigação');
+ // Teclado: a seleção visual segue o padrão do SIAB.
+ const explorar=page.locator('[data-silm-module-shortcut="explorar"]');
+ await explorar.focus();
+ await explorar.press('ArrowRight');
+ await page.waitForFunction(()=>SILMIntegration.snapshot()?.module?.active==='medir');
+ await page.locator('[data-silm-module-shortcut="medir"]').press('End');
+ await page.waitForFunction(()=>SILMIntegration.snapshot()?.module?.active==='calcular');
+ await page.locator('[data-silm-module-shortcut="calcular"]').press('Home');
+ await page.waitForFunction(()=>SILMIntegration.snapshot()?.module?.active==='explorar');
+ assert.equal(await scientific(),JSON.stringify(before),label+': teclado alterou registros científicos');
  await close();
 }
 
