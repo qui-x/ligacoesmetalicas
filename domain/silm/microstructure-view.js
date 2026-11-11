@@ -67,7 +67,9 @@ SILM.microstructure=(()=>{
    const cx=poly.reduce((sum,p)=>sum+p[0],0)/poly.length;
    const cy=poly.reduce((sum,p)=>sum+p[1],0)/poly.length;
    zoom=Math.max(2,zoom);
+   svg.dataset.focusTransition='on';
    offsetX=zoom*(CX-cx);offsetY=zoom*(CY-cy);
+   window.setTimeout(()=>{delete svg.dataset.focusTransition;},380);
    update();
    svg.dataset.focusedGrain=String(i+1);
    return true;
