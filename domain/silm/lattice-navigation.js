@@ -127,6 +127,36 @@ SILM.createLatticePanel = function ({geometry, initialKey, initialAnchor, onFocu
   });
   button('Origem', 'Voltar ao centro inicial da rede', () => visit(geometry.cell[0], geometry.cell[0]));
   root.append(more);
+  const positionMore=()=>{
+   if(!more.open)return;
+   const v=window.visualViewport,r=summary.getBoundingClientRect();
+   const vw=v?.width||window.innerWidth,vh=v?.height||window.innerHeight;
+   const width=Math.min(335,Math.max(180,vw-24));
+   const height=Math.min(controls.scrollHeight,Math.max(100,vh*.64));
+   const left=Math.max(12,Math.min(r.right-width,vw-width-12));
+   const above=r.top-height-8,below=r.bottom+8;
+   controls.style.left=left+'px';
+   controls.style.top=Math.max(8,above>=8?above:Math.min(below,Math.max(8,vh-height-8)))+'px';
+  };
+  scope.listen(more,'toggle',()=>{
+   if(more.open)positionMore();
+   else if(controls.contains(document.activeElement))summary.focus({preventScroll:true});
+  });
+  scope.listen(more,'keydown',event=>{
+   if(event.key==='Escape'&&more.open){
+    event.preventDefault();event.stopPropagation();more.open=false;
+    summary.focus({preventScroll:true});
+   }
+  });
+  scope.listen(document,'pointerdown',event=>{
+   if(more.open&&!more.contains(event.target))more.open=false;
+  });
+  scope.listen(window,'resize',positionMore);
+  scope.listen(window,'scroll',positionMore,{capture:true});
+  if(window.visualViewport){
+   scope.listen(window.visualViewport,'resize',positionMore);
+   scope.listen(window.visualViewport,'scroll',positionMore);
+  }
   function refresh() {
     const site = cursor.site, shell = cursor.shell;
     position.textContent = 'Célula [' + cursor.offset.join(', ') + '] · sítio ' + (site.basis + 1);
