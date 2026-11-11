@@ -1805,3 +1805,52 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
  .silm-learning-filters{grid-template-columns:1fr;gap:10px}
  .silm-learning-count{margin:0 0 14px}
 }
+
+/* Roteiros experimentais aprofundados: questões, procedimento e registros
+   seguem o contrato visual do SIAB, sem criar uma bancada paralela. */
+.silm-reading .silm-experiment-observations{
+ display:grid;gap:0;border-top:1px solid var(--border);
+ max-width:74ch;margin:12px 0 20px;
+}
+.silm-reading .silm-experiment-observation-row{
+ display:flex;align-items:baseline;gap:18px;padding:12px 0;
+ border-bottom:1px solid var(--border);color:var(--text);line-height:1.65;
+}
+.silm-reading .silm-experiment-observation-row strong{
+ flex:0 0 26px;font:600 .82rem/1.4 Consolas,monospace;color:var(--accent);
+}
+.silm-reading .silm-experiment-observation-row span{min-width:0;overflow-wrap:anywhere}
+.silm-reading .silm-experiment-teacher{
+ border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+ padding:2px 0;margin:24px 0;max-width:74ch;background:transparent;
+}
+.silm-reading .silm-experiment-teacher summary{
+ cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:600;
+ font-size:.94rem;padding:10px 0;
+}
+.silm-reading .silm-experiment-teacher p{margin:0 0 16px;line-height:1.65;color:var(--secondary,var(--muted))}
+.silm-route-hypothesis{max-width:74ch}
+.silm-route-hypothesis textarea{
+ display:block;box-sizing:border-box;width:100%;min-height:94px;max-width:100%;
+ border:1px solid var(--border);border-radius:var(--radius,9px);
+ background:var(--surface);color:var(--text);padding:12px;resize:vertical;
+ font:inherit;line-height:1.6;
+}
+.silm-route-hypothesis textarea:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+#silm-route-guidance .silm-experiment-teacher ol{padding:0 10px 0 25px}
+#silm-route-guidance .silm-experiment-teacher li{margin:8px 0;line-height:1.5}
+.silm-report-doc [data-report-section="proposta"]>h3,
+.silm-report-doc [data-report-section="analise"]>h3{margin:18px 0 10px;font-size:1rem}
+.silm-report-doc [data-report-section="proposta"] li,
+.silm-report-doc [data-report-section="analise"] li{
+ margin-bottom:7px;line-height:1.6;overflow-wrap:anywhere
+}
+@media(max-width:460px){
+ .silm-reading .silm-experiment-observation-row{gap:10px;padding:10px 0}
+ .silm-reading .silm-experiment-observation-row strong{flex-basis:24px}
+ .silm-route-hypothesis textarea{min-height:110px}
+}
+@media print{
+ .silm-route-hypothesis,.silm-experiment-teacher{display:none!important}
+ .silm-reading .silm-experiment-observation-row{break-inside:avoid}
+}
