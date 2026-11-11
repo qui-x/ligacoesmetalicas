@@ -25,6 +25,27 @@ window.SILM=window.SILM||{};
    if(p.evidence!=='TABULATED_NK'||!Array.isArray(p.points)||p.points.length<2||
       !p.source?.doi||!p.conditions)
     throw new TypeError('Perfil óptico sem evidência, série ou fonte');
+   const valid=SILM.referenceConditions?.validate(p.conditions);
+   if(!valid?.ok)throw new TypeError('Condições ópticas inválidas: '+(valid?.reasonCode||'VALIDATOR_UNAVAILABLE'));
+  }
+  // Perfis futuros de elétrica, térmica e mecânica também exigirão
+  // condição de referência por grandeza. Não aceitar valores avulsos.
+  if(record.properties!==undefined){
+   if(!record.properties||typeof record.properties!=='object'||Array.isArray(record.properties))
+    throw new TypeError('Mapa de propriedades inválido');
+   const ids=new Set(['electrical','thermal','malleability','ductility','luster']);
+   for(const [id,entry] of Object.entries(record.properties)){
+    if(!ids.has(id)||!entry||typeof entry!=='object'||Array.isArray(entry))
+     throw new TypeError('Propriedade desconhecida ou registro inválido: '+id);
+    const valid=SILM.referenceConditions?.validate(entry.conditions);
+    if(!valid?.ok)throw new TypeError('Condição da propriedade '+id+': '+(valid?.reasonCode||'VALIDATOR_UNAVAILABLE'));
+    if(!entry.source||!entry.source.title||!['TABULATED','QUALITATIVE'].includes(entry.evidence))
+     throw new TypeError('Falta fonte ou classe de evidência para '+id);
+    if(entry.evidence==='TABULATED'&&(!Number.isFinite(entry.value)||typeof entry.unit!=='string'||!entry.unit.trim()))
+     throw new TypeError('Valor ou unidade inválidos para '+id);
+    if(entry.evidence==='QUALITATIVE'&&(!entry.description||typeof entry.description!=='string'))
+     throw new TypeError('Descrição qualitativa ausente para '+id);
+   }
   }
   const saved=freeze(structuredClone(record));
   profiles.set(record.atomicNumber,saved);
