@@ -10,6 +10,7 @@ on:
       - 'integracao/unified-ui.js'
       - 'integracao/integration.css'
       - '.github/scripts/test_learning_siab_parity.py'
+      - '.github/scripts/test_learning_contracts.js'
       - '.github/workflows/silm-learning-siab-parity.yml'
   push:
     branches: [main]
@@ -26,6 +27,15 @@ permissions:
   contents: read
 
 jobs:
+  contracts:
+    name: Contratos sem navegador
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar motor, persistência e catálogos
+        run: node .github/scripts/test_learning_contracts.js
+
   investigar:
     name: Missões e temas / ${{ matrix.browser }}
     runs-on: ubuntu-latest
