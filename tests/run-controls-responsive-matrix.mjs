@@ -158,9 +158,23 @@ try{
  await page.locator('[data-silm-module-shortcut="medir"]').click();
  assert.ok(await direct.locator('[data-silm-direct-tool="medir:distance"]').count()===1,
   'Medir deixou de oferecer instrumento direto');
+ const guide=page.locator('#silm-tools .silm-module-guide');
+ assert.equal(await guide.getAttribute('data-module'),'medir','Medir perdeu instrução contextual');
+ await direct.locator('[data-silm-direct-tool="medir:angle"]').click();
+ await page.waitForFunction(()=>document.querySelector('#silm-tools .silm-module-guide')?.textContent.includes('B será o vértice'));
+ assert.match(await guide.textContent(),/Próximo ponto A de 3/,'Medir não indica o ponto da cena');
  await page.locator('[data-silm-module-shortcut="calcular"]').click();
  assert.ok(await direct.locator('[data-silm-direct-tool^="calcular:"]').count()>=1,
   'Calcular deixou de oferecer fórmulas');
+ assert.equal(await guide.getAttribute('data-module'),'calcular','Calcular perdeu a relação geométrica');
+ assert.match(await guide.textContent(),/Relação geométrica/,'A fórmula não explica a ação mecânica');
+ await page.waitForFunction(()=>document.querySelector('.silm-crystal')?.dataset.calc==='fractions',undefined,{timeout:10000});
+ assert.equal(await page.locator('.silm-crystal').getAttribute('data-calc'),'fractions',
+  'Contagem geométrica não realçou as frações dos sítios');
+ await page.locator('[data-silm-module-shortcut="medir"]').click();
+ await page.waitForFunction(()=>document.querySelector('#silm-tools .silm-module-guide')?.textContent.includes('Selecione o instrumento acima'));
+ assert.equal(await direct.locator('[data-silm-direct-tool="medir:angle"]').getAttribute('aria-pressed'),'false',
+  'Trocar de módulo deixou instrumento antigo ativo');
  await page.locator('[data-silm-module-shortcut="explorar"]').click();
  // O painel Ver no mobile usa uma folha modal. Fechar a folha antes da
  // travessia evita clicar através do backdrop (bloqueio correto do produto).
@@ -225,6 +239,21 @@ try{
  evidence.push({name:'texto-150-390',...zoomedFont});
  assert.ok(zoomedFont.camera>=43.5&&zoomedFont.nav>=43.5,
   'Alvos comprimidos em 150% '+JSON.stringify(zoomedFont));
+ // Demonstração óptica: a Oficina carrega apenas o perfil experimental de Cu.
+ // O painel distingue dado de referência de aparência macroscópica real.
+ await page.evaluate(()=>document.documentElement.style.fontSize='');
+ await page.locator('[data-open-dock="ver"]').click();
+ await direct.locator('[data-action="property-luster"]').click();
+ await page.waitForFunction(()=>document.querySelector('#silm-properties .silm-optical-sample')?.dataset.evidence==='tabulated');
+ const optical=await page.locator('#silm-properties .silm-optical-sample').evaluate(node=>({
+  text:node.textContent,bands:[...node.querySelectorAll('meter')].map(m=>m.value),
+  shown:getComputedStyle(node).display!=='none'
+ }));
+ assert.ok(optical.shown&&optical.bands.length===3&&optical.bands.every(n=>n>0&&n<1),
+  'Perfil óptico Cu não foi exposto sem inventar refletâncias: '+JSON.stringify(optical));
+ assert.match(optical.text,/Johnson|Christy/,'Falta procedência do Cu');
+ assert.match(optical.text,/óxido, rugosidade|não a cor de uma peça real/,'Falta limite da referência');
+ evidence.push({name:'cobre-optica-referencia',bands:optical.bands});
  assert.deepEqual(errors,[],errors.join(' | '));
  await context.close();
 }catch(e){evidence.push({error:String(e),stack:e.stack});throw e;}

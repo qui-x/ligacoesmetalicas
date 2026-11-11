@@ -136,3 +136,73 @@
   flex:0 0 auto;flex-wrap:nowrap;width:max-content;gap:6px
  }
 }
+
+
+/* Operação científica contextual: acompanha o instrumento/fórmula selecionado,
+   não ocupa a cena nem cria uma quarta barra de controles. */
+#si-dock-right #silm-tools .silm-module-guide{
+ box-sizing:border-box;display:grid;gap:5px;
+ width:100%;min-width:0;margin:5px 0 11px;
+ padding:9px 11px;border:1px solid var(--border);
+ border-inline-start:3px solid var(--accent);border-radius:9px;
+ background:var(--tint);color:var(--text);
+}
+#si-dock-right #silm-tools .silm-module-guide>strong{
+ font-size:.84rem;line-height:1.35;overflow-wrap:anywhere
+}
+#si-dock-right #silm-tools .silm-module-guide p{
+ margin:0;line-height:1.4;font-size:.78rem;overflow-wrap:anywhere
+}
+#si-dock-right #silm-tools .silm-module-guide-progress{
+ font-weight:700;color:var(--accent);
+ font-variant-numeric:tabular-nums
+}
+#si-dock-right #silm-tools .silm-module-guide-actions{
+ display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0
+}
+#si-dock-right #silm-tools .silm-module-guide-actions button{
+ box-sizing:border-box;min-height:44px;flex:0 1 auto;
+ padding:7px 10px;border-radius:9px;white-space:normal;
+ background:var(--surface);color:var(--text);border:1px solid var(--border);
+ font:inherit;font-size:.76rem;font-weight:700;cursor:pointer
+}
+#si-dock-right #silm-tools .silm-module-guide-actions button:focus-visible{
+ outline:3px solid var(--ring);outline-offset:2px
+}
+@media(max-width:480px){
+ #si-dock-right #silm-tools .silm-module-guide-actions button{
+  flex:1 1 108px;min-width:0
+ }
+}
+@media(forced-colors:active){
+ #si-dock-right #silm-tools .silm-module-guide{background:Canvas;border:2px solid CanvasText}
+ #si-dock-right #silm-tools .silm-module-guide-actions button{border:2px solid ButtonText}
+}
+
+
+/* Camada óptica comum: leitura compacta dos perfis, fora da cena e dos
+   controles de câmera. O mostrador não é uma cor RGB prevista para a peça. */
+#silm-properties .silm-optical-sample{
+ min-width:0;display:grid;gap:7px;padding:11px;margin:8px 0;
+ border:1px solid var(--border);border-radius:10px;
+ background:var(--surface);color:var(--text)
+}
+#silm-properties .silm-optical-sample[hidden]{display:none}
+#silm-properties .silm-optical-sample strong{font-size:.88rem}
+#silm-properties .silm-optical-sample p{
+ margin:0;line-height:1.4;font-size:.78rem;overflow-wrap:anywhere
+}
+#silm-properties .silm-optical-bands{display:grid;gap:7px;min-width:0}
+#silm-properties .silm-optical-band{
+ display:grid;grid-template-columns:minmax(80px,1fr) minmax(54px,1fr) auto;
+ align-items:center;gap:8px;min-width:0;font-size:.76rem;font-variant-numeric:tabular-nums
+}
+#silm-properties .silm-optical-band meter{max-width:100%;width:100%;height:15px}
+#silm-properties .silm-optical-band output{min-width:3.1rem;text-align:right}
+#silm-properties .silm-optical-source{font-size:.74rem;color:var(--muted)}
+@media(max-width:380px){
+ #silm-properties .silm-optical-band{grid-template-columns:minmax(65px,1fr) minmax(35px,1fr) auto;gap:5px}
+}
+@media(forced-colors:active){
+ #silm-properties .silm-optical-sample{background:Canvas;border:1px solid CanvasText}
+}

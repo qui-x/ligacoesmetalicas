@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.10';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='parte9-controles-enxutos-auditoria-multirresolucao-20261111';
+const BUILD='parte10-cntp-contrato-dados-20261111';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "assets/workshop/motor.webp",
@@ -148,6 +148,10 @@ const FILES=[
   "domain/silm/electrothermal.js",
   "domain/silm/drive.js",
   "domain/silm/properties.js",
+  "domain/silm/reference-conditions.js",
+  "domain/silm/material-profile-registry.js",
+  "domain/silm/data/material-profile-demo-cu.js",
+  "domain/silm/material-engine.js",
   "domain/silm/measurements.js",
   "domain/silm/calculations.js",
   "domain/silm/state.js",

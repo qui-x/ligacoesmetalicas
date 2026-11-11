@@ -61,7 +61,53 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  const readings=U.element('dl',null,'silm-joule-readings');readings.hidden=true;
  const quantities=[['resistance','Resistência equivalente'],['maximum','Temperatura máxima'],['jouleEnergy','Energia gerada por Joule'],['externalEnergy','Energia da fonte externa'],['storedEnergy','Energia armazenada'],['removedEnergy','Energia removida']];
  const valuesByKey=new Map(quantities.map(([key,label])=>{const value=U.element('dd','');readings.append(U.element('dt',label),value);return [key,value];}));
- box.append(head,row,status,readings,list);container.append(box);
+ const opticalSection=U.element('section',null,'silm-optical-sample');opticalSection.hidden=true;
+ opticalSection.setAttribute('aria-label','Amostra experimental de refletância');
+ const opticalHeading=U.element('strong','Resposta óptica por metal'),opticalNote=U.element('p','','silm-optical-note');
+ const spectralBars=U.element('div',null,'silm-optical-bands');
+ const channels=[['Azul',450],['Verde',550],['Vermelho',650]].map(([name,nm])=>{
+  const item=U.element('div',null,'silm-optical-band'),label=U.element('span',name+' · '+nm+' nm'),
+   meter=U.element('meter'),value=U.element('output');
+  meter.min=0;meter.max=1;meter.value=0;
+  meter.setAttribute('aria-label','Refletância de referência a '+nm+' nanômetros');
+  value.setAttribute('aria-label','Refletância da amostra');
+  item.append(label,meter,value);spectralBars.append(item);return {nm,meter,value};
+ });
+ const opticalSource=U.element('p','','silm-optical-source');
+ opticalSection.append(opticalHeading,opticalNote,spectralBars,opticalSource);
+ box.append(head,row,status,readings,opticalSection,list);container.append(box);
+ function updateOptical(state,angle){
+  const service=SILM.materialEngine;
+  const numeric=state.metal?.atomicNumber;
+  const cap=service?.capability(numeric,'luster');
+  const validated=cap?.ok&&cap.mode==='reference-data';
+  spectralBars.hidden=!validated;
+  opticalSection.dataset.evidence=validated?'tabulated':'qualitative';
+  opticalSection.dataset.reference=validated?
+   (cap.conditionMatch?.ok?'cntp-verified':'source-conditions-only'):'unavailable';
+  if(!validated){
+   opticalNote.textContent='Modelo geométrico qualitativo. Sem perfil óptico homologado para este metal: não são exibidas porcentagens nem uma cor calculada.';
+   opticalSource.textContent='A luz e a superfície continuam como esquema, não como previsão da aparência.';
+   return;
+  }
+  const angleDeg=Number.isFinite(angle)?angle:0,values=channels.map(row=>service.optical(numeric,row.nm,angleDeg));
+  if(values.some(v=>!v.ok)){
+   spectralBars.hidden=true;
+   opticalNote.textContent='A amostra não permite calcular esta condição sem extrapolar os dados.';
+   opticalSource.textContent='Revise o intervalo espectral ou o perfil de referência.';
+   return;
+  }
+  for(let i=0;i<channels.length;i++){
+   const v=values[i],channel=channels[i];channel.meter.value=v.reflectance;
+   channel.value.textContent=(100*v.reflectance).toLocaleString('pt-BR',{maximumFractionDigits:1})+' %';
+  }
+  const atReference=!!cap.conditionMatch?.ok;
+  opticalNote.textContent=cap.symbol+' · interface lisa ideal ar–metal · luz não polarizada · incidência '+angleDeg+'° da normal de referência. Valores ilustram a fonte original, não a cor de uma peça real.';
+  opticalSource.textContent=(atReference?'Condição CNTP verificada. ':
+   'ATENÇÃO: fonte à temperatura ambiente; CNTP (0 °C, 1 atm) não verificada — não interpretar estas porcentagens como previsão em CNTP. ')+
+   'Constantes n,k: '+cap.source.authors+' ('+cap.source.year+'). Sem considerar óxido, rugosidade ou filme.';
+ }
+
  const button=(id,label,run,opts={})=>{const b=SILM.actionButton(label,run,scope,{id:prefix+'-'+id,...opts});return b;};
  const B={field:button('field','Aplicar campo elétrico',()=>actions.field(),{primary:true}),heat:button('heat','Aquecer região',()=>actions.heat(),{primary:true}),advance:button('advance','Avançar propagação',()=>actions.advance()),
   compress:button('compress','Aplicar compressão',()=>actions.compress(),{primary:true}),stretch:button('stretch','Alongar',()=>actions.stretch(),{primary:true}),light:button('light','Incidir luz',()=>actions.light(),{primary:true}),
@@ -72,6 +118,8 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  function update(){
   const {state,eligibility,editable,reduced,availability,joule}=info(),pr=state.properties,active=pr?.active;
   readings.hidden=!joule||compact;
+  opticalSection.hidden=active!=='luster'||compact;
+  if(!opticalSection.hidden)updateOptical(state,info().drive?.angle);
   box.dataset.active=active||'';list.hidden=!!active||compact;row.hidden=!active;
   if(!active){head.textContent=compact?'':'Escolha uma propriedade para investigar.';status.textContent=compact?'':'Uma experiência por vez; as experiências não alteram a estrutura científica.';
    for(const id of P.ids){const el=eligibility[id],able=availability(id),ok=el.status!=='unavailable'&&able.ok&&editable;starts[id].setAttribute('aria-disabled',String(!ok));

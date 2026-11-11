@@ -17,9 +17,9 @@
  });
  const summary=document.getElementById('silm-module-selection-help');
  const descriptions={
-  explorar:'Observação da estrutura, elétrons e propriedades.',
-  medir:'Instrumentos para medir o modelo cristalográfico.',
-  calcular:'Fórmulas com dados e proveniência identificados.'
+  explorar:'Ative um estímulo em Ver e manipule fonte, luz, calor ou esforço diretamente na cena.',
+  medir:'Escolha um instrumento e marque os centros A, B e C na estrutura para registrar a medida.',
+  calcular:'Escolha uma fórmula, observe seu destaque geométrico e selecione a origem dos dados.'
  };
  function currentSelect(){return document.getElementById('silm-module');}
  function sync(){
