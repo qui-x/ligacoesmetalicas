@@ -45,6 +45,18 @@ Separar quatro mecanismos:
 
 **Au, Ag, Cu:** Johnson & Christy, *Optical Constants of the Noble Metals*, *Physical Review B* 6 (1972), DOI [10.1103/PhysRevB.6.4370](https://doi.org/10.1103/PhysRevB.6.4370). Séries `n,k` tabuladas também no projeto [refractiveindex.info-database](https://github.com/polyanskiy/refractiveindex.info-database/tree/main/database/data/main), que declara os arquivos CC0. **Implementar primeiro apenas esses três metais com dados verificáveis**, e depois ampliar, sem generalizar o espectro aos demais. Antes de calcular cor RGB final, definir iluminante e integração colorimétrica (observador padrão).
 
+### Prova de conceito quantitativa, **fora** da aplicação
+
+Interpolei linearmente `n(λ)` e `k(λ)` dos 49 pares experimentais de cada metal (Johnson & Christy 1972; arquivos `Au/Ag/Cu/nk/Johnson.yml` na fonte indicada) e apliquei `R=((n−1)²+k²)/((n+1)²+k²)` em **incidência normal**, interface ar–metal **lisa**, a temperatura de referência. A tabela é **aproximada**, não inclui textura, óxido, iluminante, câmera, espalhamento nem objetos reais.
+
+| λ | Prata Ag | Ouro Au | Cobre Cu |
+| --- | ---: | ---: | ---: |
+| 450 nm (azul) | 98,0 % | 40,8 % | 53,8 % |
+| 550 nm (verde) | 98,3 % | 79,2 % | 62,4 % |
+| 650 nm (vermelho) | 99,0 % | 95,7 % | 93,5 % |
+
+**Conclusão didática:** manter um feixe refletido da mesma cor e intensidade para todos os metais oculta uma diferença física central. Um observador não pode inferir esses valores diretamente da cor de um centro atômico desenhado.
+
 **Outros metais:** indicar “Modelo óptico qualitativo — sem constantes espectrais homologadas” até validar fontes, condições, superfície e intervalo de `λ`. O metal deve poder ser investigado visualmente, mas o gráfico quantitativo e percentuais permanecem indisponíveis.
 
 ## 3. Proposta de mecânica de investigação óptica
