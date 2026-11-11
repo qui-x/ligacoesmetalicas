@@ -333,12 +333,20 @@ async function checkModuleShortcuts(label,width){
   await page.waitForFunction(mode=>document.querySelector('#silm-module-shortcuts')?.dataset.activeModule===mode,target);
   const family=target==='explorar'?'observar':target;
   await page.waitForFunction(id=>window.BaseDemoSI?.currentViewerFamily?.()===id,family);
-  const families=await page.locator('#si-dock-right #si-viewer-families button').count();
-  assert.ok(families>=1,label+': nenhuma família contextual disponível em Ver');
-  // Um único agrupamento não requer uma segunda aba visual: a lista de
-  // ferramentas permanece presente e acessível para o módulo escolhido.
-  assert.ok(await page.locator('#si-dock-right #si-viewer-buttons button').count()>=1,
-   label+': ferramentas contextuais indisponíveis em '+target);
+  assert.equal(await page.locator('#si-dock-right #si-viewer-catalog').isVisible(),false,
+   label+': menus intermediários ainda estão visíveis em Ver');
+  const direct=page.locator('#si-dock-right #silm-direct-actionbar');
+  const tool=target==='explorar'?'[data-action="electrons"]':
+   target==='medir'?'[data-silm-direct-tool="medir:distance"]':
+   '[data-silm-direct-tool^="calcular:"]';
+  assert.ok(await direct.locator(tool).count()>=1,
+   label+': não há botões diretos para '+target);
+  const visible=await direct.locator('button').evaluateAll(nodes=>nodes.map(n=>({
+   shown:n.getClientRects().length>0,disabled:n.disabled,
+   height:n.getBoundingClientRect().height,width:n.getBoundingClientRect().width
+  })));
+  assert.ok(visible.some(x=>x.shown&&x.height>=43.5&&x.width>=43.5),
+   label+': ferramentas diretas invisíveis ou muito pequenas '+JSON.stringify(visible));
   const current=JSON.parse(await scientific());
   assert.equal(current.module,target,label+': atalho não alterou o módulo');
   assert.equal(await page.locator('#silm-module').inputValue(),target,
