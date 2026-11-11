@@ -122,3 +122,27 @@ test('o registro recusa dados rotulados CNTP com T e P inconsistentes',()=>{
  assert.equal(P.list().length,1);
  assert.equal(S.referenceConditions.compare(valid).ok,true);
 });
+
+test('motor geral recebe propriedades CNTP futuras sem copiar o perfil do cobre',()=>{
+ // Instância isolada: valor fictício de contrato, nunca exposto à Oficina.
+ const isolated=vm.createContext({console,structuredClone});isolated.window=isolated;
+ for(const path of ['data/bundle','data-api','crystal','properties','reference-conditions',
+                    'material-profile-registry','data/material-profile-demo-cu','material-engine'])
+  vm.runInContext(readFileSync(new URL('../domain/silm/'+path+'.js',import.meta.url),'utf8'),isolated);
+ const T=isolated.SILM;
+ T.materialProfiles.register({atomicNumber:47,element:'Ag',
+  properties:{thermal:{
+   evidence:'TABULATED',value:1,unit:'unidade fictícia de teste',
+   source:{title:'Fixture de teste — não é fonte científica'},
+   conditions:{basis:'CNTP_BR_0C_1ATM',temperatureK:273.15,pressurePa:101325}
+  }}
+ });
+ const silver=T.materialEngine.capability(47,'thermal');
+ assert.equal(silver.ok,true);
+ assert.equal(silver.mode,'reference-data');
+ assert.equal(silver.tabulatedValue.value,1);
+ assert.equal(silver.conditionMatch.ok,true);
+ const copper=T.materialEngine.capability(29,'thermal');
+ assert.notEqual(copper.tabulatedValue?.value,1);
+ assert.notEqual(T.materialEngine.optical(47,550).ok,true);
+});
