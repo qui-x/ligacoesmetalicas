@@ -22,16 +22,20 @@ window.SILM=window.SILM||{};
   const available=S.properties?.eligibility?.(el)?.[propertyId];
   if(!available||available.status==='unavailable')
    return missing(available?.reasonCode||'PROPERTY_UNAVAILABLE',{atomicNumber:el.atomicNumber,property:propertyId});
-  const spec=propertyId==='luster'?profile(el.atomicNumber)?.optical||null:null;
-  const material=propertyId==='luster'&&spec?'TABULATED_NK':
-   (available.data?.kind||null);
+  const record=profile(el.atomicNumber);
+  const spec=propertyId==='luster'?record?.optical||null:record?.properties?.[propertyId]||null;
+  const material=spec?.evidence||(available.data?.kind||null);
+  const numeric=material==='TABULATED'||material==='TABULATED_NK';
   return Object.freeze({ok:true,atomicNumber:el.atomicNumber,symbol:el.symbol,
-   property:propertyId,mode:material?'reference-data':'qualitative',
+   property:propertyId,mode:numeric?'reference-data':'qualitative',
    dataKind:material,source:spec?.source|| (available.data?{sourceId:available.data.sourceId}:null),
    conditions:spec?.conditions||available.data?.conditions||null,
    conditionMatch:spec?matchConditions(spec.conditions):null,
+   // Dados tabelados presentes no registro não são aplicados automaticamente
+   // a motores qualitativos sem acoplamento e validação científica específicos.
+   tabulatedValue:material==='TABULATED'?Object.freeze({value:spec.value,unit:spec.unit}):null,
    requestedReference:referenceId(),
-   reasonCode:material?null:'PROPERTY_DATA_MISSING'});
+   reasonCode:numeric?null:'PROPERTY_DATA_MISSING'});
  }
  function spectralProfile(atomicNumber){
   const spec=profile(atomicNumber)?.optical;
