@@ -1791,3 +1791,17 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
  .silm-catalog-group-heading{margin-top:18px!important}
  .silm-learning-catalog .silm-content-row{padding:12px 14px}
 }
+
+/* Filtros do catálogo ampliado: grupos semânticos com rótulos próprios. */
+.silm-learning-filters{
+ display:grid;grid-template-columns:repeat(2,minmax(150px,1fr)) minmax(170px,1.2fr);
+ gap:12px;max-width:100%;align-items:stretch
+}
+.silm-learning-filters .silm-learning-field{display:grid;grid-template-rows:auto minmax(44px,auto);align-content:end;gap:6px;min-width:0}
+.silm-learning-filters .silm-learning-field label{grid-column:auto;margin:0;line-height:1.4}
+.silm-learning-filters .silm-learning-field select,.silm-learning-filters .silm-learning-field input{width:100%;min-width:0;max-width:100%}
+.silm-learning-count{font-size:.82rem;color:var(--secondary,var(--muted));margin:-12px 0 20px;line-height:1.5}
+@media(max-width:760px){
+ .silm-learning-filters{grid-template-columns:1fr;gap:10px}
+ .silm-learning-count{margin:0 0 14px}
+}
