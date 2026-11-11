@@ -442,7 +442,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   if(refit)R.setCamera({...R.camera,mode:'fit'},{settled:false});
   const box=localFocus?RD.boundsOf([layout.project(D(focusSite.cart)),...focusShell.list.map(site=>layout.project(D(site.cart)))]):
    extra.length?RD.boundsOf(extra.map(c=>layout.project(c))):RD.boundsOf([...cellDrawn,...drawn]),
-   boxMargin=localFocus?.1:extra.length?.17:.12;
+   boxMargin=localFocus?.17:extra.length?.17:.12;
   R.setInterest(box,{margin:boxMargin});if(refit)rep2.saveCamera(cameraKey,R.camera);
   sizeSymbols();
   // Calor e níveis: sempre sobre a projeção de referência (isométrica, congelada), para que a vista nunca mude a experiência.
