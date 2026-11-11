@@ -1690,3 +1690,43 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
 .silm-manual-page .silm-manual-explanation p + p{
   margin-top:15px;
 }
+
+/* Missões e Temas: investigação ativa com a organização discreta do SIAB.
+   A explicação é parte da leitura; ações científicas continuam na Oficina. */
+.silm-theme-inquiry,.silm-mission-inquiry{
+ margin:24px 0;padding:20px 0 4px;border-top:1px solid var(--border);
+ max-width:74ch;overflow-wrap:anywhere
+}
+.silm-theme-inquiry h2,.silm-mission-inquiry h2{font-size:1.15rem;margin:0 0 10px}
+.silm-theme-inquiry h3,.silm-mission-inquiry h3{
+ font-size:.95rem;margin:20px 0 8px;color:var(--accent)
+}
+.silm-theme-inquiry p,.silm-mission-inquiry p{
+ color:var(--secondary,var(--muted));line-height:1.7;margin:8px 0
+}
+.silm-theme-inquiry-steps{
+ counter-reset:learning-step;list-style:none;margin:12px 0 22px;padding:0
+}
+.silm-theme-inquiry-steps>li{
+ counter-increment:learning-step;position:relative;min-height:42px;
+ padding:10px 0 12px 40px;border-bottom:1px solid var(--border);
+ line-height:1.65;color:var(--text)
+}
+.silm-theme-inquiry-steps>li::before{
+ content:counter(learning-step,decimal-leading-zero);
+ position:absolute;left:2px;top:10px;color:var(--accent);
+ font:.82rem/1.6 Consolas,monospace
+}
+#silm-route-guidance .silm-mission-inquiry{
+ margin:10px 0 12px;padding:7px 0;border:0;border-bottom:1px solid var(--border)
+}
+#silm-route-guidance .silm-mission-questions{
+ margin:10px 0 14px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)
+}
+#silm-route-guidance .silm-mission-questions ol{padding-left:24px}
+#silm-route-guidance .silm-mission-questions li{padding:3px 0;line-height:1.55}
+#silm-route-guidance .silm-mission-questions p{color:var(--secondary,var(--muted));line-height:1.6}
+@media(max-width:460px){
+ .silm-theme-inquiry,.silm-mission-inquiry{margin-top:16px;padding-top:16px}
+ .silm-theme-inquiry-steps>li{padding-left:34px}
+}
