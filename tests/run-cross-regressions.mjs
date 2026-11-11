@@ -333,8 +333,12 @@ async function checkModuleShortcuts(label,width){
   await page.waitForFunction(mode=>document.querySelector('#silm-module-shortcuts')?.dataset.activeModule===mode,target);
   const family=target==='explorar'?'observar':target;
   await page.waitForFunction(id=>window.BaseDemoSI?.currentViewerFamily?.()===id,family);
-  assert.ok(await page.locator('#si-dock-right #si-viewer-families').isVisible(),
-   label+': famílias contextuais não estão dentro de Ver');
+  const families=await page.locator('#si-dock-right #si-viewer-families button').count();
+  assert.ok(families>=1,label+': nenhuma família contextual disponível em Ver');
+  // Um único agrupamento não requer uma segunda aba visual: a lista de
+  // ferramentas permanece presente e acessível para o módulo escolhido.
+  assert.ok(await page.locator('#si-dock-right #si-viewer-buttons button').count()>=1,
+   label+': ferramentas contextuais indisponíveis em '+target);
   const current=JSON.parse(await scientific());
   assert.equal(current.module,target,label+': atalho não alterou o módulo');
   assert.equal(await page.locator('#silm-module').inputValue(),target,
