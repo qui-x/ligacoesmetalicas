@@ -1,0 +1,138 @@
+/* SILM Parte 9 — no menu Ver, o segundo nível é a própria ferramenta.
+   Os elementos legados de catálogo e detalhe permanecem no DOM para que
+   a Base SI mantenha suas permissões e o registro científico existentes. */
+#si-dock-right [data-right-panel="ver"] #si-viewer-catalog,
+#si-dock-right [data-right-panel="ver"] #si-viewer-detail,
+#si-dock-right #si-dock-viewer-back{
+ display:none!important
+}
+#si-dock-right [data-right-panel="ver"] #silm-direct-tools{
+ box-sizing:border-box;display:flex;flex-direction:column;
+ width:100%;min-width:0;gap:8px;padding:0 0 12px
+}
+#si-dock-right #silm-direct-actionbar{
+ box-sizing:border-box;display:flex;gap:7px;flex-wrap:wrap;
+ width:100%;min-width:0;max-width:100%;
+ align-content:start
+}
+#si-dock-right #silm-direct-actionbar .silm-observer-actions{
+ box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:stretch;
+ width:100%;min-width:0;gap:7px
+}
+#si-dock-right #silm-direct-actionbar .silm-observer-action-group,
+#si-dock-right #silm-direct-actionbar .silm-observer-action-grid{
+ display:contents
+}
+#si-dock-right #silm-direct-actionbar .silm-observer-action-heading{
+ position:absolute;width:1px;height:1px;overflow:hidden;white-space:nowrap;
+ clip-path:inset(50%)
+}
+#si-dock-right #silm-direct-actionbar :is(.silm-observer-action,.silm-direct-choice){
+ box-sizing:border-box;flex:0 0 87px;min-width:87px;min-height:70px;
+ width:87px;padding:7px 5px;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;gap:6px;
+ border:1px solid var(--border);border-radius:10px;
+ background:var(--surface);color:var(--text);
+ font:inherit;cursor:pointer;touch-action:manipulation;
+ white-space:normal;overflow-wrap:anywhere
+}
+#si-dock-right #silm-direct-actionbar :is(.silm-observer-action,.silm-direct-choice)[aria-pressed="true"]{
+ background:var(--tint);color:var(--accent);
+ border-color:var(--accent);box-shadow:inset 0 -3px var(--accent)
+}
+#si-dock-right #silm-direct-actionbar :is(.silm-observer-action,.silm-direct-choice):focus-visible{
+ outline:3px solid var(--ring);outline-offset:2px
+}
+#si-dock-right #silm-direct-actionbar :is(.silm-observer-action,.silm-direct-choice):disabled{
+ cursor:not-allowed;opacity:.46
+}
+#si-dock-right #silm-direct-actionbar :is(.silm-observer-action,.silm-direct-choice) svg{
+ flex:0 0 22px;width:22px;height:22px
+}
+#si-dock-right #silm-direct-actionbar .silm-direct-choice span,
+#si-dock-right #silm-direct-actionbar .silm-observer-action-label{
+ font-size:.72rem;font-weight:700;line-height:1.13;text-align:center;
+ overflow-wrap:anywhere
+}
+#si-dock-right #silm-direct-selection:empty,
+#si-dock-right #silm-direct-tool-context:empty,
+#si-dock-right #silm-explore-extras:empty{display:none}
+#si-dock-right #silm-direct-selection{
+ display:block;min-width:0
+}
+#si-dock-right #silm-direct-selection .silm-observer-selection-tools{
+ padding:5px 0 6px;gap:6px 7px
+}
+#si-dock-right #silm-direct-selection :is(.silm-observer-select-mode,.silm-observer-selection-command){
+ min-height:44px
+}
+#si-dock-right #silm-direct-tool-context{
+ box-sizing:border-box;min-width:0;max-width:100%
+}
+#si-dock-right #silm-explore-extras{
+ display:grid;gap:7px
+}
+#si-dock-right #silm-explore-extras>details{
+ border:1px solid var(--border);border-radius:9px;padding:8px;
+ background:var(--surface);min-width:0
+}
+#si-dock-right #silm-explore-extras>details>summary{
+ cursor:pointer;font-size:.79rem;font-weight:700;
+ min-height:38px;display:flex;align-items:center
+}
+#si-dock-right #silm-explore-extras .silm-layer-group{
+ margin:6px 0
+}
+#si-dock-right #silm-tools{
+ box-sizing:border-box;min-width:0
+}
+#si-dock-right #silm-tools label[for="silm-instrument"],
+#si-dock-right #silm-tools #silm-instrument,
+#si-dock-right #silm-tools label[for="silm-formula"],
+#si-dock-right #silm-tools #silm-formula{
+ /* O controle legado continua no DOM e recebe eventos do motor científico.
+    Os botões diretos são a interface principal da mesma seleção. */
+ position:absolute!important;width:1px!important;height:1px!important;
+ padding:0!important;margin:-1px!important;overflow:hidden!important;
+ clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important
+}
+#si-dock-right #silm-tools input,
+#si-dock-right #silm-tools select:not(#silm-instrument):not(#silm-formula){
+ max-width:100%;min-height:44px
+}
+@media(max-width:900px){
+ #si-dock-right [data-right-panel="ver"] #silm-direct-tools{
+  gap:7px
+ }
+ #si-dock-right #silm-direct-actionbar{
+  display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
+  scroll-padding-inline:8px;scroll-snap-type:x proximity;
+  overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;padding:4px 4px 9px
+ }
+ #si-dock-right #silm-direct-actionbar .silm-observer-actions{
+  flex:0 0 auto;width:max-content;flex-wrap:nowrap;gap:6px
+ }
+ #si-dock-right #silm-direct-actionbar :is(.silm-observer-action,.silm-direct-choice){
+  flex:0 0 80px;min-width:80px;width:80px;min-height:66px;
+  scroll-snap-align:start;padding:5px 3px
+ }
+ #si-dock-right #silm-direct-actionbar .silm-direct-choice{
+  flex-shrink:0
+ }
+}
+@media(forced-colors:active){
+ #si-dock-right #silm-direct-actionbar :is(.silm-observer-action,.silm-direct-choice)[aria-pressed="true"]{
+  border:2px solid Highlight;box-shadow:inset 0 -3px Highlight
+ }
+}
+
+#si-dock-right #silm-direct-actionbar .silm-direct-choice-row{
+ box-sizing:border-box;display:flex;flex-wrap:wrap;
+ width:100%;min-width:0;gap:7px
+}
+@media(max-width:900px){
+ #si-dock-right #silm-direct-actionbar .silm-direct-choice-row{
+  flex:0 0 auto;flex-wrap:nowrap;width:max-content;gap:6px
+ }
+}

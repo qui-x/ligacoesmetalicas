@@ -7,6 +7,57 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
  const button=(text,fn)=>{const b=node('button',text);b.type='button';b.className='button outline';b.addEventListener('click',fn);return b;};
  const select=(id,items,value,fn)=>{const s=node('select');s.id=id;for(const [v,t]of items){const o=node('option',t);o.value=v;s.append(o);}s.value=value;s.addEventListener('change',()=>fn(s.value));return s;};
  const field=(parent,text,input)=>{const l=node('label',text);l.htmlFor=input.id;parent.append(l,input);};
+ // Segunda faixa de Ver: um botão já escolhe a ferramenta real do motor.
+ // A seleção de pontos e o cálculo permanecem atos científicos separados.
+ const directIcons={
+  distance:'M4 12h16M4 7v10M20 7v10',angle:'M4 19V5m0 14h14M5 18l10-10',
+  latticeParameter:'M4 4h16v16H4zM4 9h16M9 4v16',
+  coordination:'M12 12h7M12 12l-6-6M12 12l-6 6M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8',
+  formula:'M5 5h14M6 11h12M6 17h12M16 14l3 3-3 3'
+ };
+ const directChoices=(kind,items,selected,onPick,{disabled=false,reason=''}={})=>{
+  const bar=document.getElementById('silm-direct-actionbar');if(!bar)return;
+  bar.replaceChildren();
+  bar.setAttribute('aria-label',kind==='medir'?'Instrumentos de medição':'Fórmulas disponíveis');
+  const nav=document.createElement('div');nav.className='silm-direct-choice-row';
+  nav.setAttribute('role','group');
+  nav.setAttribute('aria-label',kind==='medir'?'Escolher instrumento':'Escolher fórmula');
+  for(const item of items){
+   const btn=document.createElement('button');btn.type='button';
+   btn.className='silm-direct-choice';btn.dataset.silmDirectTool=kind+':'+item.id;
+   btn.disabled=disabled||!!item.disabled;
+   btn.setAttribute('aria-pressed',String(item.id===selected&&!btn.disabled));
+   btn.setAttribute('aria-label',item.label);
+   btn.title=btn.disabled?reason||'Organize uma estrutura cristalina válida para utilizar esta ferramenta.':item.label;
+   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+   svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');
+   svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.8');
+   svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');
+   svg.setAttribute('aria-hidden','true');
+   const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+   p.setAttribute('d',directIcons[item.id]||directIcons.formula);svg.append(p);
+   const caption=document.createElement('span');caption.textContent=item.label;btn.append(svg,caption);
+   btn.addEventListener('click',()=>{
+    if(btn.disabled)return;
+    onPick(item.id);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>
+     document.querySelector('[data-silm-direct-tool="'+kind+':'+item.id+'"]')?.focus({preventScroll:true})));
+   });
+   nav.append(btn);
+  }
+  nav.addEventListener('keydown',event=>{
+   if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+   const current=event.target.closest('button[data-silm-direct-tool]');if(!current)return;
+   const usable=[...nav.querySelectorAll('button:not(:disabled)')];
+   if(!usable.length)return;
+   const at=usable.indexOf(current);if(at<0)return;
+   event.preventDefault();event.stopPropagation();
+   const next=event.key==='Home'?usable[0]:event.key==='End'?usable[usable.length-1]:
+    usable[(at+(event.key==='ArrowRight'?1:-1)+usable.length)%usable.length];
+   next.click();
+  });
+  bar.append(nav);
+ };
  const available=()=>model.measurementAvailability().ok;
  const type=()=>model.state.structure?.crystallography?.structureType;
  const general=()=>!!type()&&S.crystal.isGeneral(type());
@@ -86,23 +137,40 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
   const m=model.state.measurements.find(m=>m.id===review);if(!m||!MS.current(m,model.state.structure))return null;
   return {points:m.points.map((p,i)=>({site:p.site,label:['A','B','C'][i]})),kind:m.type==='coordination'?null:m.type,text:value(m),spoken:'Medida do modelo: '+value(m)};
  }
+ function activateMeasure(id){
+  tool=tool===id?null:id;picks=[];review=null;
+  change();say(tool?'Selecione '+points(MS.types[tool].points)+' na cena.':'Instrumento desligado.','info',{group:'medir'});
+ }
+ function activateFormula(id){formula=id;choice={};user={};change();}
  function render(){
   const state=model.state,key=state.investigation?.id+':'+state.structure?.mode;
   if(key!==context){context=key;reset();}
   host.replaceChildren();moduleHost.replaceChildren();history.replaceChildren();
+  if(state.module.active==='medir'){
+   directChoices('medir',Object.entries(MS.types).filter(([id])=>allowed(id))
+    .map(([id,t])=>({id,label:t.label})),tool,activateMeasure,
+    {disabled:!available(),reason:'Organize a estrutura cristalina para medir o modelo.'});
+  }else if(state.module.active==='calcular'){
+   const applicable=CA.applicable(type()).filter(f=>allowed(f.quantity));
+   if(!applicable.some(f=>f.id===formula))formula=applicable[0]?.id||null;
+   const listed=applicable.length?applicable:Object.values(S.formulas)
+    .filter(f=>allowed(f.quantity)).filter((f,i,all)=>all.findIndex(x=>x.quantity===f.quantity)===i);
+   directChoices('calcular',listed.map(f=>({id:f.id,label:f.name})),formula,activateFormula,
+    {disabled:!available(),reason:'Organize a estrutura cristalina para calcular.'});
+  }
   field(moduleHost,'Módulo ativo',select('silm-module',[['explorar','Explorar'],['medir','Medir'],['calcular','Calcular']],state.module.active,v=>{if(activity()?.lockedModule())return;reset();model.setModule(v);onModule(v);change();}));
   document.getElementById('silm-module').disabled=!!activity()?.lockedModule();
   if(state.module.active!=='explorar'){
    host.append(node('p','Medições e cálculos usam o modelo cristalográfico em escala física. Zoom e projeção não alteram os valores.'));
    if(!available())host.append(node('p',model.measurementAvailability().reason==='DEFORMED'?'Restaure a experiência de deformação em Explorar para medir ou calcular a estrutura de referência.':'Organize uma estrutura cristalina em Explorar para usar este módulo. A montagem livre não tem escala física.'));
    else if(state.module.active==='medir'){
-    field(host,'Instrumento',select('silm-instrument',[['','Escolha um instrumento'],...Object.entries(MS.types).filter(([k])=>allowed(k)).map(([k,t])=>[k,t.label])],tool||'',v=>{tool=v||null;picks=[];review=null;change();say(v?'Selecione '+points(MS.types[v].points)+' na cena.':'Instrumento desligado.','info',{group:'medir'});}));
+    field(host,'Instrumento',select('silm-instrument',[['','Escolha um instrumento'],...Object.entries(MS.types).filter(([k])=>allowed(k)).map(([k,t])=>[k,t.label])],tool||'',v=>{tool=null;activateMeasure(v||null);}));
     field(host,'Unidade de comprimento',select('silm-measure-unit',Object.keys(U.length).map(k=>[k,k]),unit,v=>{unit=v;change();}));
     host.append(node('p',tool?'Selecionados: '+picks.length+' de '+MS.types[tool].points+'. Para ângulos, B é o vértice.':'Selecione um instrumento para medir na cena.'));
     host.append(button('Cancelar seleção',()=>{tool=null;picks=[];change();}));
    }else{
     const formulas=CA.applicable(type()).filter(f=>allowed(f.quantity));if(!formulas.some(f=>f.id===formula))formula=formulas[0]?.id;
-    field(host,'Fórmula',select('silm-formula',formulas.map(f=>[f.id,f.name]),formula,id=>{formula=id;choice={};user={};change();}));
+    field(host,'Fórmula',select('silm-formula',formulas.map(f=>[f.id,f.name]),formula,activateFormula));
     const f=S.formulas[formula];if(f){
      host.append(node('p',f.expression),node('p',f.notes));{const d=f.describe?.(S.crystal.geometry(element()));if(d){const n=node('p',d);n.id='silm-formula-detail';host.append(n);}}
      for(const spec of f.requiredInputs){

@@ -27,7 +27,6 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  const storedLayers=B.storage.read(layerKey);
  const layerState={...layerDefaults,...(storedLayers&&typeof storedLayers==='object'?storedLayers:{})};
  const definitions=[
-  {id:'observacao-contextual',title:'Ações de observação',capability:'tools',family:'observar',description:'Ações diretas para estrutura, elétrons e propriedades metálicas.',render:output=>renderObserverContext(output)},
   {id:'camadas-estrutura',title:'Destaque estrutural',capability:'tools',family:'camadas',description:'Controle de destaque dos centros metálicos.',render:output=>renderLayerStructure(output)},
   {id:'camadas-indicacoes',title:'Indicações',capability:'tools',family:'camadas',description:'Respostas visuais, rótulos e legendas.',render:output=>renderLayerIndications(output)},
   {id:'comparar-livre-cristalina',title:'Montagem livre × cristalina',capability:'tools',family:'comparar',description:'Compare a preparação livre com a organização cristalográfica.',render:output=>renderComparison('free-crystal',output)},
@@ -43,11 +42,31 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  // Preserva o foco da navegação por teclado quando o conteúdo do painel é reconstruído.
  function renderViewers(){
   const focused=document.activeElement;
-  const tab=focused?.closest('#si-viewer-families')?focused.getAttribute('aria-selected'):null;
-  const action=focused?.closest('.silm-observer-action')?.dataset.action||null;
+  const action=focused?.closest('#silm-direct-actionbar .silm-observer-action')?.dataset.action||null;
   B.renderViewers(emptyScene());
-  if(tab)$('si-viewer-families').querySelector('[aria-selected="true"]')?.focus({preventScroll:true});
-  else if(action)document.querySelector('.silm-observer-action[data-action="'+action+'"]')?.focus({preventScroll:true});
+  const bar=$('silm-direct-actionbar'),selection=$('silm-direct-selection'),extras=$('silm-explore-extras');
+  if(model.state.module.active==='explorar'&&bar){
+   bar.replaceChildren();selection?.replaceChildren();
+   renderObserverContext(bar);
+   if(extras){
+    const preserve={display:extras.querySelector('[data-silm-extra="display"]')?.open||false,
+     comparison:extras.querySelector('[data-silm-extra="comparison"]')?.open||false};
+    extras.replaceChildren();
+    const display=node('details');display.dataset.silmExtra='display';
+    display.open=preserve.display;
+    display.append(node('summary','Exibição e rótulos'));
+    renderLayerStructure(display);renderLayerIndications(display);
+    const comparison=node('details');comparison.dataset.silmExtra='comparison';
+    comparison.open=preserve.comparison;
+    comparison.append(node('summary','Comparações conceituais (sem cena A/B independente)'));
+    for(const kind of ['free-crystal','cell-lattice','electrons','property'])renderComparison(kind,comparison);
+    extras.append(display,comparison);
+   }
+  }else{
+   selection?.replaceChildren();
+   extras?.replaceChildren();
+  }
+  if(action)bar?.querySelector('.silm-observer-action[data-action="'+action+'"]')?.focus({preventScroll:true});
  }
  const actionIcons={
   view:'M3 7 12 3l9 4-9 4-9-4ZM3 12l9 4 9-4M3 17l9 4 9-4',
@@ -219,6 +238,9 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   }
   syncPropertySelection();
   output.append(root);
+  // Os controles de combinação ficam abaixo da faixa rolável; não criam
+  // uma terceira categoria nem rompem o gesto Ctrl+clique.
+  if(output.id==='silm-direct-actionbar')$('silm-direct-selection')?.append(propertyTools);
  }
   function toggleRow(output,{title,description,checked,disabled=false,onChange}){
   const row=node('label',null,'silm-layer-row'),copy=node('span',null,'silm-layer-copy');
