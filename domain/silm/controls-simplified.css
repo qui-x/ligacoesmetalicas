@@ -246,3 +246,15 @@
   display:flex!important;align-items:center;justify-content:center
  }
 }
+
+/* A câmera compacta vive na barra inferior, mesmo em celular.
+   A regra legada de integração esconde todo filho que não seja Expandir
+   quando .silm-camera-bar-has-expand aparece; isso ocultava <details>
+   enquanto Enquadrar continuava visível por uma regra !important de botão.
+   Prioridade explícita aqui evita perder a alternativa a gestos/atalhos. */
+#si-stage #silm-scene-actionbar #silm-view-controls .silm-camera-inline .silm-camera-bar.silm-camera-compact.silm-camera-bar-has-expand{
+ max-width:none!important;width:auto!important;padding:0!important;
+}
+#si-stage #silm-scene-actionbar #silm-view-controls .silm-camera-bar.silm-camera-compact>.silm-camera-advanced{
+ display:block!important;flex:0 0 auto!important;visibility:visible!important;
+}
