@@ -409,6 +409,9 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
      ', distância '+focusShell.distances[index].toLocaleString('pt-BR',{maximumFractionDigits:3})+' ångströms');
     button.title='Focalizar centro vizinho '+(index+1);
     button.disabled=!navigator.cursor.has(site.key);
+    // O botão é uma ferramenta do palco: o gesto não deve chegar ao
+    // hit-test de unidades que ficam ocultas nesta escala.
+    button.addEventListener('pointerdown',event=>event.stopPropagation());
     button.addEventListener('click',()=>{
      if(button.disabled)return;
      const actualUnit=model.state.structure.units.find(u=>X.key(navigator.cursor.displaySite(u.site))===site.key);
