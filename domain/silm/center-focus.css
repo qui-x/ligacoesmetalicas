@@ -33,7 +33,7 @@
  background:radial-gradient(circle at 32% 28%,
    color-mix(in srgb,var(--surface,#fff) 72%,var(--scientific-accent,#0e9488)),
    color-mix(in srgb,var(--surface,#fff) 55%,var(--scientific-accent,#0e9488)));
- opacity:clamp(.59,calc(.96 - var(--local-depth,.5) * .26),.98);
+ opacity:.82;
  box-shadow:0 3px 9px #0002;
  cursor:pointer;pointer-events:auto;touch-action:manipulation;
 }
@@ -76,4 +76,13 @@
  .silm-crystal[data-local-focus="true"] .silm-crystal-unit{
   transition:none!important;animation:none!important
  }
+}
+
+/* O foco em grãos interpola a câmera só durante a ação; arrastar a
+   microestrutura permanece imediato. Redução de movimento respeitada. */
+.silm-workshop-micro-map[data-focus-transition="on"] .silm-micro-plane{
+ transition:transform 340ms cubic-bezier(.2,.8,.2,1)
+}
+@media(prefers-reduced-motion:reduce){
+ .silm-workshop-micro-map[data-focus-transition="on"] .silm-micro-plane{transition:none!important}
 }
