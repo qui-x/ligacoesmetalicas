@@ -76,7 +76,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: silm-temas-missoes-${{ matrix.browser }}
-          path: artifacts/temas-aprofundados-*.png
+          path: artifacts/temas-*.png
           if-no-files-found: ignore
           retention-days: 14
       - name: Preservar capturas das missões
@@ -84,7 +84,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: silm-missoes-${{ matrix.browser }}
-          path: artifacts/missao-aprofundada-*.png
+          path: artifacts/missoes-*.png
           if-no-files-found: ignore
           retention-days: 14
       - name: Log de servidor em falha
