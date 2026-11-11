@@ -53,8 +53,16 @@ def run(browser_name: str, base_url: str) -> None:
             expect(page.locator(".silm-manual-category-page h1")).to_have_text(
                 "Oficina dos Metais"
             )
+            expect(page.locator('.silm-manual-category-page[data-manual-category="bancada"]')).to_be_visible()
+            expect(page.locator(".silm-manual-category-page .silm-manual-purpose p")).to_be_visible()
+            expect(page.locator(".silm-manual-category-page .silm-manual-explanation")).to_be_visible()
+            expect(page.locator(".silm-manual-category-page .silm-manual-explanation")).to_contain_text("A Oficina dos Metais é o espaço principal")
+            assert len(page.locator(".silm-manual-category-page .silm-manual-explanation").inner_text().strip()) >= 400
             expect(page.locator(".silm-manual-category-page .silm-manual-article-head")).to_be_visible()
             expect(page.locator(".silm-manual-category-page .silm-manual-steps li")).to_have_count(4)
+            if width == 1440:
+                Path("artifacts").mkdir(exist_ok=True)
+                page.screenshot(path=f"artifacts/manual-categoria-oficina-{browser_name}.png", full_page=True)
             topic = page.locator(".silm-manual-topic-link").first
             topic.click(force=True)
             expect(page.locator(".silm-manual-article")).to_be_visible()
@@ -150,11 +158,34 @@ def run(browser_name: str, base_url: str) -> None:
                     assert len(" ".join(explanation.locator("p").all_inner_texts()).strip()) >= 120, (
                         f"Página sem explicação renderizada: {item['id']}"
                     )
-                # Acessibilidade era uma categoria sem apresentação conceitual.
-                page.evaluate("() => {location.hash='#/manual?categoria=acessibilidade'}")
-                expect(page.locator(".silm-manual-category-page")).to_be_visible()
-                expect(page.locator(".silm-manual-category-page .silm-manual-explanation")).to_be_visible()
-                expect(page.locator(".silm-manual-category-page .silm-manual-purpose p")).to_be_visible()
+                # Todas as 13 categorias são artigos independentes, não apenas
+                # listas de links ou cópias do primeiro subtópico.
+                categories = page.evaluate("""() => Object.entries(window.SILM.manual.categoryGuides).map(([id, guide]) => ({
+                    id, purpose: guide.purpose || '', content: guide.content || '',
+                    steps: guide.steps || []
+                }))""")
+                assert len(categories) == 13, f"Guias de categorias: {len(categories)}"
+                for category in categories:
+                    assert len(category["purpose"].strip()) >= 60, category["id"]
+                    assert len(category["content"].strip()) >= 200, category["id"]
+                    assert len(category["steps"]) >= 3, category["id"]
+                    page.evaluate(
+                        """id => {location.hash = '#/manual?categoria='
+                          + encodeURIComponent(id)}""", category["id"]
+                    )
+                    article = page.locator(
+                        f'.silm-manual-category-page[data-manual-category="{category["id"]}"]'
+                    )
+                    expect(article).to_be_visible(timeout=10000)
+                    expect(article.locator(".silm-manual-purpose p")).to_be_visible()
+                    explanation = article.locator(".silm-manual-explanation")
+                    expect(explanation).to_be_visible()
+                    assert len(explanation.inner_text().strip()) >= 200, (
+                        f"Categoria sem explicação visível: {category['id']}"
+                    )
+                    expect(article.locator(".silm-manual-how .silm-manual-steps li")).not_to_have_count(0)
+                    expect(article.locator(".silm-manual-more .silm-manual-topic-link")).not_to_have_count(0)
+                expect(page.locator("#manual-conteudo")).to_be_visible()
             assert not errors, f"{browser_name} {width}: erros JS: {errors!r}"
             print(f"OK {browser_name} {width}x{height}: Manual SIAB/SILM")
             context.close()

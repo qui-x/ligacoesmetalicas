@@ -164,3 +164,153 @@ SILM.manual = {
       keywords:['instrumento','instrumentos','medição','distância','ângulo','parâmetro de rede','coordenação','régua'],related:['medir','estruturas-cristalinas','calcular']}
   ],aliases:{caderno:'caderno',anotacao:'caderno',csv:'caderno',backup:'caderno',problema:'problemas',bloqueado:'problemas',desativado:'problemas',zoom:'vista',camera:'vista',projecao:'vista','3d':'vista-3d',girar:'vista-3d',orbita:'vista-3d',perspectiva:'vista-3d',inicio:'sobre-silm',workspace:'interface',painel:'interface',movimento:'abertura',montar:'montagem',unidade:'montagem',cristal:'estruturas-cristalinas',celula:'estruturas-cristalinas',eletrons:'eletrons-deslocalizados',eletron:'eletrons-deslocalizados',valencia:'eletrons-deslocalizados',propriedades:'propriedades-metalicas',condutividade:'propriedades-metalicas',maleabilidade:'propriedades-metalicas',ductilidade:'propriedades-metalicas',brilho:'propriedades-metalicas',camadas:'explorar',comparar:'explorar',foco:'explorar'}
 };
+
+/* A categoria também é um artigo de orientação, conforme o contrato do Manual SIAB. */
+SILM.manual.categoryGuides = {
+  "comecar": {
+    "purpose": "Apresentar o SILM, orientar os primeiros acessos e esclarecer o que pode ser investigado neste ambiente didático.",
+    "content": "O Simulador Interativo de Ligações Metálicas organiza a investigação a partir de representações de metais, estruturas cristalinas e propriedades relacionadas à ligação metálica. A Oficina dos Metais reúne a experiência; o Manual documenta o funcionamento e os limites dos modelos.\n\nVocê pode começar conhecendo as áreas do programa e, em seguida, selecionar um metal elegível. O programa diferencia dados científicos documentados, medidas do modelo e representações qualitativas; os resultados devem ser interpretados conforme essa origem. A instalação offline permite continuar trabalhando com os recursos já armazenados, mas a disponibilidade depende da instalação e do navegador.",
+    "steps": [
+      "Leia A Arquitetura dos Metais para conhecer o objetivo do simulador e seus limites.",
+      "Consulte Como navegar para localizar Oficina, Aprender, Roteiros e Manual.",
+      "Abra a Oficina e experimente uma investigação livre com um metal disponível.",
+      "Se pretende utilizar o programa sem conexão, consulte Instalação e uso offline."
+    ],
+    "details": [
+      {
+        "title": "O que esta introdução não substitui?",
+        "text": "As representações didáticas não substituem medições experimentais, dados de composição de amostras nem a literatura de materiais. Consulte as fontes associadas a cada propriedade."
+      }
+    ]
+  },
+  "bancada": {
+    "purpose": "Preparar e acompanhar uma investigação sobre um metal, ligando o objeto do cotidiano às representações de grãos, rede cristalina e centro metálico.",
+    "content": "A Oficina dos Metais é o espaço principal de investigação do SILM. Ela mantém uma cena central para observar o material e organiza a preparação em Montagem, a observação e as ferramentas em Ver, e os registros em Dados. Esses painéis são diferentes pontos de acesso à mesma investigação: não é necessário reiniciar a estrutura para consultar cada um deles.\n\nEm Montagem, escolha um metal habilitado, examine a estrutura cristalina de referência e selecione o módulo de trabalho. Explorar permite interagir com a representação, suas camadas e propriedades. Medir utiliza instrumentos sobre a geometria validada do modelo. Calcular relaciona medidas, parâmetros e fórmulas com indicação de origem dos dados.\n\nA navegação por Objeto, Grãos, Rede e Centro aproxima representações em escalas didáticas distintas. O objeto e a microestrutura ilustrada não são a mesma amostra ampliada continuamente; a rede e o centro focalizam o modelo cristalográfico do metal selecionado. Na parte inferior, os controles disponíveis dependem da escala, do módulo e das restrições da atividade.",
+    "steps": [
+      "Abra a Oficina dos Metais e selecione Montagem para escolher o metal e organizar a estrutura.",
+      "Ative Explorar, Medir ou Calcular conforme a pergunta da investigação.",
+      "Use Ver e a navegação entre Objeto, Grãos, Rede e Centro para observar a representação e seus controles.",
+      "Abra Dados para consultar medições, cálculos, histórico e relatório sem perder a investigação."
+    ],
+    "details": [
+      {
+        "title": "O que muda ao trocar de módulo?",
+        "text": "O módulo define quais ferramentas estão disponíveis. A investigação e sua estrutura permanecem; ferramentas de medida e cálculo dependem de dados e geometria aplicáveis."
+      },
+      {
+        "title": "Por que algumas ações não aparecem?",
+        "text": "Um controle pode depender de escala, estrutura organizada, metal habilitado ou atividade restrita. A interface não deve oferecer uma medição física sem referência científica adequada."
+      }
+    ]
+  },
+  "explorar": {
+    "purpose": "Observar estruturas metálicas e investigar qualitativamente como suas propriedades respondem aos controles disponíveis.",
+    "content": "No módulo Explorar, as representações de estrutura, centros metálicos e elétrons deslocalizados ajudam a estabelecer relações entre organização microscópica e propriedades observáveis. O objetivo é explorar as tendências e as dependências de cada fenômeno, não reproduzir uma amostra real em tempo físico.\n\nAs propriedades elétricas, térmicas, mecânicas e ópticas têm parâmetros próprios. Quando a interface permitir ações simultâneas, a visualização deve preservar a distinção entre as causas e os efeitos de cada uma. O brilho metálico, por exemplo, é uma resposta óptica, e não simplesmente uma cor fixa do metal.\n\nA disponibilidade de cada interação depende do metal, da escala, do módulo e da validação dos dados. Consulte os tópicos sobre elétrons, propriedades, vistas e estrutura em três dimensões para compreender o que cada representação permite concluir.",
+    "steps": [
+      "Prepare um metal elegível e ative Explorar no painel Montagem.",
+      "Selecione a escala de observação apropriada à propriedade que deseja investigar.",
+      "Ative as camadas e interações disponíveis em Ver e nos controles da cena.",
+      "Compare a resposta do modelo e consulte Dados e os tópicos científicos para interpretar os limites da representação."
+    ]
+  },
+  "medir": {
+    "purpose": "Obter leituras da geometria do modelo de estrutura metálica e registrar sua origem, unidade e significado.",
+    "content": "Medir não é apenas movimentar instrumentos na tela: cada ferramenta deve consultar posições ou parâmetros definidos na estrutura científica em uso. Distâncias, ângulos, coordenação e parâmetros de rede descrevem o modelo cristalográfico apresentado, quando há dados suficientes para isso.\n\nUma resolução numérica na interface informa o detalhamento da leitura do modelo. Ela não representa automaticamente incerteza experimental nem prova que uma amostra física tenha as dimensões indicadas. O registro em Dados → Medições permite recuperar a leitura e reconhecer a estrutura e os centros que participaram da medição.",
+    "steps": [
+      "Organize a estrutura de referência no módulo Explorar.",
+      "Ative Medir e abra a área de instrumentos em Ver.",
+      "Selecione o instrumento e os centros ou parâmetros solicitados.",
+      "Confira o resultado, a unidade e a origem da leitura em Dados → Medições."
+    ]
+  },
+  "calcular": {
+    "purpose": "Relacionar parâmetros cristalográficos e medidas já disponíveis por meio de fórmulas com entradas verificáveis.",
+    "content": "O módulo Calcular organiza o raciocínio quantitativo a partir dos dados da estrutura e das medições registradas. Antes do resultado, o SILM deve indicar a relação empregada, quais valores foram usados, suas unidades e se vieram de referência científica, instrumento do modelo ou informação fornecida pelo usuário.\n\nAs fórmulas dependem da estrutura cristalina e dos dados homologados. Uma entrada ausente ou incompatível não deve ser substituída por um número inventado. O valor calculado descreve uma relação definida no modelo; interpretá-lo como propriedade de um produto comercial requer evidência adicional.",
+    "steps": [
+      "Prepare o metal e verifique se a estrutura científica está organizada.",
+      "Ative Calcular e escolha uma relação cristalográfica disponível.",
+      "Revise a fórmula, as entradas, as unidades e a origem de cada parâmetro.",
+      "Execute o cálculo e consulte o registro em Dados → Cálculos."
+    ]
+  },
+  "instrumentos": {
+    "purpose": "Explicar como selecionar, operar e interpretar os instrumentos virtuais sem confundir leitura de modelo e medição experimental.",
+    "content": "Os instrumentos disponíveis no SILM tratam de informações geométricas da representação cristalográfica: distância entre centros, ângulos, parâmetros de rede e coordenação, conforme a técnica apresentada. Eles usam dados e seleções da própria investigação, não uma escala física inventada a partir do tamanho dos desenhos na tela.\n\nCada instrumento deve indicar a grandeza, a unidade, as seleções necessárias e o significado da leitura. Falta de parâmetro científico, montagem ainda livre ou restrição de atividade podem impedir seu uso. A origem e a resolução numérica informadas precisam acompanhar a interpretação do resultado.",
+    "steps": [
+      "Abra uma estrutura com dados de referência adequados.",
+      "Ative o módulo Medir e selecione o instrumento disponível.",
+      "Faça as seleções de centros ou parâmetros exigidas pela técnica.",
+      "Consulte a leitura em Dados → Medições e veja Escolher um instrumento para os limites específicos."
+    ]
+  },
+  "montagens": {
+    "purpose": "Iniciar uma investigação a partir de configurações preparadas, reconhecendo o que já foi definido e o que ainda pode ser alterado.",
+    "content": "Montagens prontas oferecem pontos de partida para a Oficina dos Metais. Diferentemente de um roteiro, elas não exigem necessariamente uma sequência de tarefas; sua finalidade é preparar uma configuração inicial, como metal, estrutura de referência e opções de observação, para uma exploração posterior.\n\nAntes de carregar uma montagem, verifique a identificação do material e as condições associadas aos parâmetros científicos. A aplicação de uma montagem não autoriza concluir que o material corresponde à composição de um objeto comercial. Ao salvar observações e resultados, indique o que foi medido ou calculado e o que já estava definido no ponto de partida.",
+    "steps": [
+      "Abra Montagens prontas e escolha uma configuração adequada ao conteúdo estudado.",
+      "Consulte o metal e a estrutura indicados antes de aplicar a montagem.",
+      "Confirme a substituição, caso exista uma investigação em andamento.",
+      "Continue pela Oficina e registre observações ou resultados em Dados."
+    ]
+  },
+  "roteiros": {
+    "purpose": "Conduzir uma investigação com problema, objetivos e procedimentos, preservando a autonomia de exploração e a documentação dos resultados.",
+    "content": "O roteiro experimental apresenta uma questão de estudo e prepara uma configuração inicial para a Oficina. Ele orienta o percurso, mas não substitui as decisões do estudante nem restringe, por si só, todas as ferramentas disponíveis. A investigação deve produzir observações, medidas ou cálculos pertinentes ao problema proposto.\n\nMissões são diferentes: suas condições de conclusão e os recursos liberados podem ser verificados pelo simulador. Uma atividade enviada pelo professor também pode restringir recursos e navegação. Em qualquer modalidade, dados científicos e representações qualitativas devem ser distinguidos na interpretação e no relatório.",
+    "steps": [
+      "Escolha um roteiro e leia o problema, o objetivo e os critérios apresentados.",
+      "Prepare a Oficina com o metal e a estrutura indicados.",
+      "Realize a investigação usando Explorar, Medir e Calcular quando aplicáveis.",
+      "Registre a interpretação e a conclusão no relatório da atividade."
+    ]
+  },
+  "relatorios": {
+    "purpose": "Documentar uma investigação de maneira que suas condições, observações, referências e conclusões possam ser compreendidas.",
+    "content": "O Relatório organiza o trabalho feito na Oficina, reunindo informações do contexto da investigação e os campos preenchidos pelo estudante. É importante distinguir registros automáticos, como metal e módulo, dos textos interpretativos e das evidências coletadas.\n\nMedidas do modelo e valores calculados devem conservar a referência à origem e às unidades. Uma conclusão não deve extrapolar para uma amostra real aquilo que foi obtido apenas de uma simulação qualitativa. A impressão ou exportação permite revisar e compartilhar o registro, conforme as ferramentas disponíveis na aplicação.",
+    "steps": [
+      "Abra Dados → Relatório durante ou ao final da investigação.",
+      "Confira o metal, o módulo, as condições e os dados inseridos automaticamente.",
+      "Escreva observações, interpretação, conclusão e referências utilizadas.",
+      "Revise a organização do relatório antes de imprimir ou exportar."
+    ]
+  },
+  "caderno": {
+    "purpose": "Reunir hipóteses, observações e conclusões em registros acessíveis após as atividades.",
+    "content": "O Caderno do SILM funciona como espaço de continuidade entre investigações. Ele permite retomar anotações e acompanhar os registros associados a roteiros, missões e relatórios, conforme a persistência disponível na instalação utilizada.\n\nUma anotação pessoal não altera as medidas científicas da estrutura. Para que os registros sejam úteis, identifique o metal, o problema da atividade, os resultados observados e as dúvidas que permanecem. Os dados guardados localmente dependem do navegador e podem ser perdidos se o armazenamento for limpo.",
+    "steps": [
+      "Abra o Caderno pelo menu do simulador.",
+      "Localize uma anotação ou registro relacionado à sua investigação.",
+      "Registre hipótese, observações e conclusão com contexto suficiente.",
+      "Revise os registros e faça cópias dos dados relevantes quando a aplicação oferecer exportação."
+    ]
+  },
+  "acessibilidade": {
+    "purpose": "Adequar a apresentação visual e a navegação às necessidades de leitura sem modificar o modelo científico.",
+    "content": "As preferências de acessibilidade incluem alternativas de tema, contraste, tamanho de texto, espaçamento, percepção de cores e redução de movimento. Elas são recursos de leitura, não parâmetros de temperatura, composição ou propriedades do metal investigado.\n\nNo teclado, Tab e Shift+Tab percorrem controles, Enter ou Espaço acionam elementos apropriados, e Escape fecha painéis quando previsto. Em telas menores, a navegação se reorganiza para manter a cena e os controles acessíveis. O modo projetor amplia a apresentação para a turma sem alterar medidas e cálculos.",
+    "steps": [
+      "Abra Acessibilidade ou Preferências no cabeçalho ou no menu.",
+      "Ajuste tema, contraste, texto, espaçamento e visão de cores conforme a necessidade.",
+      "Ative redução de movimento quando preferir transições menos intensas.",
+      "Teste a navegação pelo teclado e consulte os tópicos de preferências e abertura."
+    ]
+  },
+  "problemas": {
+    "purpose": "Identificar por que determinada opção, visualização, medida ou registro não está disponível e recuperar a continuidade da investigação.",
+    "content": "Os controles do SILM dependem do estado atual da investigação. Uma ferramenta pode não aparecer porque o módulo está inadequado, a escala não oferece a ação, o metal ainda não possui dados validados ou a atividade aplica restrições. Isso não significa necessariamente que a investigação tenha sido apagada.\n\nQuando uma representação ou leitura parecer inconsistente, comece verificando o metal e a estrutura selecionados, o módulo ativo e a disponibilidade de dados. Em seguida, revise o Manual do controle ou o tour da Oficina. Se o problema envolver persistência offline, confira as condições de instalação e armazenamento antes de limpar qualquer dado.",
+    "steps": [
+      "Identifique a ação ou a leitura que não está disponível.",
+      "Verifique o módulo, a escala, o metal e o estado da estrutura.",
+      "Consulte Por que uma opção não aparece ou Pesquisar no Manual para obter orientação específica.",
+      "Retome a investigação preservando os registros; evite limpar dados locais antes de exportar informações importantes."
+    ]
+  },
+  "professor": {
+    "purpose": "Preparar atividades orientadas, limitar recursos quando necessário e acompanhar a apresentação didática para a turma.",
+    "content": "Na Área do Professor, roteiros, missões e montagens podem servir de base para atividades adaptadas a uma turma. As restrições configuradas determinam metais e ferramentas permitidos, enquanto os critérios de conclusão continuam associados às regras do simulador.\n\nO professor deve diferenciar claramente objetivos de aprendizagem, manipulação do modelo e interpretação científica. O modo projetor privilegia a visibilidade em sala, mas não acrescenta precisão aos cálculos nem muda a estrutura investigada. Links de atividades devem ser conferidos antes do uso com estudantes, incluindo o comportamento em diferentes tamanhos de tela.",
+    "steps": [
+      "Acesse a Área do Professor e escolha o tipo de atividade a preparar.",
+      "Defina objetivos, configurações e eventuais restrições de navegação ou ferramentas.",
+      "Revise a experiência do estudante e, quando aplicável, compartilhe o acesso da atividade.",
+      "Use o modo projetor para apresentação coletiva e examine os registros produzidos."
+    ]
+  }
+};
