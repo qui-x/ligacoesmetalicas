@@ -85,6 +85,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   const button=node('button',null,'silm-observer-action');
   button.type='button';button.dataset.action=id;button.disabled=!!disabled;
   button.setAttribute('aria-label',label);button.title=reason?label+' — '+reason:(hint||label);
+  if(hint)button.setAttribute('aria-description',hint);
   button.setAttribute('aria-pressed',String(!!pressed));
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
   svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');
@@ -149,6 +150,15 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    ['ductility','Ductilidade',actionIcons.ductility],
    ['luster','Brilho metálico',actionIcons.luster]
   ];
+  // O controle de Ver aciona o fenômeno; o gesto no palco manipula o estímulo
+  // físico correspondente. Não criar uma segunda fonte ou estado científico.
+  const propertyDirections={
+   electrical:'Ative o campo elétrico e ajuste a fonte de intensidade na cena; observe a resposta coletiva dos elétrons.',
+   thermal:'Aplique ou retire a fonte de calor da cena; acompanhe a propagação e o resfriamento.',
+   malleability:'Ative a prensa e manipule a compressão no palco (mouse, toque ou teclado).',
+   ductility:'Ative a tração e manipule a deformação no palco (mouse, toque ou teclado).',
+   luster:'Acione a luz e direcione a lanterna no palco para investigar o brilho metálico.'
+  };
   const propertyButtons=new Map();
   const propertyTools=node('div',null,'silm-observer-selection-tools');
   const propertyHelp=node('p','Ctrl (ou ⌘) + clique em duas propriedades e solte para combinar.','silm-observer-selection-status');
@@ -232,7 +242,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   for(const [id,label,path]of propertyInfo){
    const activityState=quickActions?.propertyState?.(id),active=activityState?.active??(state.properties?.active===id),availability=element?model.propertyAvailability(id):{ok:false,reason:'NO_STRUCTURE'};
    const why=availability.ok?'':SILM.properties.reasons[availability.reason]||'Prepare a estrutura para esta experiência.';
-   const button=actionButton(propertyActions,{id:'property-'+id,label,path,pressed:active,disabled:!canExplore||(!active&&!availability.ok),reason:why,hint:'Clique para uma experiência isolada; Ctrl (ou ⌘) + clique para selecionar em conjunto.',onClick:event=>{
+   const button=actionButton(propertyActions,{id:'property-'+id,label,path,pressed:active,disabled:!canExplore||(!active&&!availability.ok),reason:why,hint:propertyDirections[id]+' Ctrl (ou ⌘) + clique permite selecionar propriedades em conjunto.',onClick:event=>{
     const withModifier=!!(event?.ctrlKey||event?.metaKey);
     if(multiSelectMode||withModifier){
      stageProperty(id,{fromCtrl:withModifier});
