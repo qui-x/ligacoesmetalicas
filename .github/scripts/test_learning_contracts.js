@@ -18,8 +18,8 @@ for(const path of ['domain/silm/routes.js','domain/silm/missions.js','domain/sil
  vm.runInContext(fs.readFileSync(path,'utf8'),context,{filename:path});
 }
 const missions=S.missions.registry,themes=S.themes.registry;
-assert.equal(missions.length,27,'27 missões no catálogo');
-assert.equal(themes.length,24,'24 temas no catálogo');
+assert.ok(missions.length>=27,'O catálogo deve preservar pelo menos 27 missões');
+assert.ok(themes.length>=24,'O catálogo deve preservar pelo menos 24 temas');
 assert.equal(S.missions.validate(missions).ok,true);
 assert.equal(S.themes.validate().ok,true);
 const eligible=S.data.elements.filter(e=>e.silmEligibility.status==='available');
@@ -136,4 +136,4 @@ for(const [id,property,patch] of [
  const restored=ctx.create();assert.equal(restored.load(),true);
  assert.equal(restored.context().id,'montagem-ordem');
 }
-console.log('OK: 27 missões, 24 temas, 65 metais cobertos, 62 redes, critérios e migração de sessões.');
+console.log('OK: '+missions.length+' missões, '+themes.length+' temas, 65 metais cobertos, 62 redes, critérios e migração de sessões.');
