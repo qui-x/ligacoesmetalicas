@@ -32,7 +32,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  /* Roteiro Experimental como no SIAB: "Montar na oficina" prepara a oficina LIVRE com o metal, a estrutura inicial e o
     módulo do roteiro e guarda qual roteiro foi montado (título e proposta do relatório). Não há trava nem "concluir": o
     estudante usa todos os painéis e termina no relatório (Dados → Relatório). Em atividade restrita, não monta. */
- async function mountRoute(r,z,identity){
+ async function mountRoute(r,z,identity,hypothesis=''){
   if(session.open()){say('Montagem definida pela atividade em andamento. Encerre a atividade para montar outro roteiro.','warning');return false;}
   // Mesma confirmação de "Iniciar outra investigação" (e das Montagens prontas) quando já há uma investigação na oficina.
   if(!await selectMetal(Number(z)))return false;
@@ -40,7 +40,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   for(let i=0;ok&&i<r.initialState.units;i++)ok=model.addUnit().ok;
   if(ok&&r.initialState.mode==='crystalline')ok=model.organize().ok;
   if(!ok||!model.setModule(r.module)){say('Não foi possível preparar esta investigação.','warning');return false;}
-  storage.set('route.experiment',{route:r.id,version:r.version,investigation:model.state.investigation.id,createdAt:new Date().toISOString()});
+  storage.set('route.experiment',{route:r.id,version:r.version,investigation:model.state.investigation.id,createdAt:new Date().toISOString(),hypothesis:String(hypothesis||'').trim().slice(0,2000)});
   for(const [k,v] of Object.entries(identity||{}))if(v)unified.editReport(k,v);
   onModule(r.module);location.hash='#/ambiente';sync();say('Roteiro montado na oficina: '+sentence(r.title)+' Quando terminar, abra Dados → Relatório.','success');return true;
  }
@@ -188,33 +188,97 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   if(key===routeKey&&host.childElementCount)return;const previous=routeKey.split('|')[0];routeKey=key;host.replaceChildren();head.hidden=!!r;
   if(id&&!r)say('Roteiro não encontrado. Escolha um roteiro da lista.','warning');
   if(!r){
-   const list=N('div');list.className='silm-content-list';
-   for(const item of S.routes.registry){const row=N('a');row.className='silm-content-row';row.href=url(item.id);row.id='route-card-'+item.id;
-    const text=N('span');text.append(N('strong',item.title),N('small',item.subtitle+'.'));const state=routeState(doc,item);
-    const status=N('span',moduleName(item.module)+(state?' · '+state:''));status.className='silm-row-status silm-row-next';status.insertAdjacentHTML('beforeend','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>');row.append(text,status);list.append(row);}
-   host.append(list);if(lastRoute){const back=$('route-card-'+lastRoute);lastRoute=null;if(back)requestAnimationFrame(()=>back.focus());}return;}
+   const categories={fundamentos:'Fundamentos',familias:'Famílias de metais',estruturas:'Estruturas cristalinas',propriedades:'Propriedades metálicas',medicoes:'Medir',calculos:'Calcular',aplicacoes:'Aplicações e escalas'};
+   const controls=N('div');controls.className='silm-learning-filters';
+   const groupField=N('div');groupField.className='silm-learning-field';
+   const groupLabel=N('label','Assunto');groupLabel.htmlFor='silm-routes-filter';
+   const group=N('select');group.id='silm-routes-filter';
+   for(const [value,label] of [['all','Todos os assuntos'],...Object.entries(categories)]){const opt=N('option',label);opt.value=value;group.append(opt);}
+   groupField.append(groupLabel,group);
+   const metalField=N('div');metalField.className='silm-learning-field';
+   const metalLabel=N('label','Metal disponível');metalLabel.htmlFor='silm-routes-metal-filter';
+   const metal=N('select');metal.id='silm-routes-metal-filter';
+   const all=N('option','Todos os metais');all.value='all';metal.append(all);
+   for(const element of S.data.elements.filter(e=>e.silmEligibility.status==='available')){const opt=N('option',element.name+' ('+element.symbol+')');opt.value=String(element.atomicNumber);metal.append(opt);}
+   metalField.append(metalLabel,metal);
+   const searchField=N('div');searchField.className='silm-learning-field';
+   const searchLabel=N('label','Pesquisar');searchLabel.htmlFor='silm-routes-search';
+   const search=N('input');search.type='search';search.id='silm-routes-search';search.placeholder='Pesquisar roteiro ou metal';search.setAttribute('aria-label','Pesquisar roteiros experimentais');
+   searchField.append(searchLabel,search);
+   controls.append(groupField,metalField,searchField);
+   const count=N('p');count.className='silm-learning-count';count.setAttribute('role','status');count.setAttribute('aria-live','polite');
+   host.append(controls,count);
+   const list=N('div');list.className='silm-content-list silm-learning-catalog';
+   const byGroup=new Map(),headings=new Map(),rows=[];
+   const normalize=value=>String(value).normalize('NFD').replace(/\p{M}/gu,'').toLowerCase();
+   for(const item of S.routes.registry){const type=item.category||'fundamentos';if(!byGroup.has(type))byGroup.set(type,[]);byGroup.get(type).push(item);}
+   for(const [category,items] of byGroup){
+    const heading=N('h2',categories[category]||category);heading.className='silm-catalog-group-heading';headings.set(category,heading);list.append(heading);
+    for(const item of items){
+     const row=N('a');row.className='silm-content-row';row.href=url(item.id);row.id='route-card-'+item.id;
+     const text=N('span');const sub=item.subtitle+' · '+moduleName(item.module)+' · '+item.metalSelection.atomicNumbers.length+' '+(item.metalSelection.atomicNumbers.length===1?'metal':'metais');
+     text.append(N('strong',item.title),N('small',sub));
+     const state=routeState(doc,item);const status=N('span',state||'Investigar');status.className='silm-row-status silm-row-next';status.insertAdjacentHTML('beforeend','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>');
+     row.append(text,status);list.append(row);
+     const names=item.metalSelection.atomicNumbers.map(z=>{const e=S.data.get(z);return e.name+' '+e.symbol;}).join(' ');
+     rows.push({row,category,metals:item.metalSelection.atomicNumbers,haystack:normalize(item.title+' '+item.subtitle+' '+item.description+' '+names)});
+    }
+   }
+   const apply=()=>{
+    const q=normalize(search.value.trim()),counts=new Map();
+    for(const row of rows){const visible=(group.value==='all'||group.value===row.category)&&(metal.value==='all'||row.metals.includes(Number(metal.value)))&&(!q||row.haystack.includes(q));row.row.hidden=!visible;if(visible)counts.set(row.category,(counts.get(row.category)||0)+1);}
+    for(const [category,heading] of headings)heading.hidden=!counts.get(category);
+    count.textContent=Array.from(counts.values()).reduce((sum,value)=>sum+value,0)+' de '+rows.length+' roteiros';
+   };
+   group.addEventListener('change',apply);metal.addEventListener('change',apply);search.addEventListener('input',apply);
+   host.append(list);apply();
+   if(lastRoute){const back=$('route-card-'+lastRoute);lastRoute=null;if(back&&!back.hidden)requestAnimationFrame(()=>back.focus());}
+   return;
+  }
   const article=N('article');article.className='silm-reading';article.setAttribute('aria-labelledby','route-title');
   const title=N('h1',r.title);title.id='route-title';title.tabIndex=-1;const lead=N('p',r.subtitle+'.');lead.className='silm-lead';const tag=N('p',moduleName(r.module)+(routeState(doc,r)?' · '+routeState(doc,r):''));tag.className='eyebrow';
   article.append(title,lead,tag);
   const section=(heading,...nodes)=>{const box=N('section');box.append(N('h2',heading),...nodes);article.append(box);};
   const list=(tag,items)=>{const l=N(tag);for(const x of items)l.append(N('li',x));return l;};
-  section('O problema',N('p',r.description));section('Objetivo',N('p',r.objectives.join(' ')));
-  section('O que você vai fazer',list('ol',[r.guidance.action,'Quando terminar, abra Dados → Relatório e registre observações, interpretação e conclusão.']));
-  section('Na oficina',list('ul',[r.initialState.mode==='free'?'Montagem livre com '+r.initialState.units+' unidades iniciais.':'Estrutura cristalina de referência do metal escolhido.','Módulo inicial: '+moduleName(r.module)+'.','Recursos indicados: '+toolNames(r.allowedTools)+'.',r.metalSelection.atomicNumbers.length+' metais disponíveis para este roteiro.']));
-  section('O que observar',N('p',r.guidance.hint));section('Evidência esperada',N('p',r.guidance.criterion));
+  const study=r.study;
+  section('O problema',N('p',study?.context||r.description));
+  if(study?.question)section('Pergunta central',N('p',study.question));
+  section('Objetivo',N('p',r.objectives.join(' ')));
+  if(study?.hypothesis)section('Antes de investigar',N('p',study.hypothesis));
+  section('O que você vai fazer',list('ol',study?.tasks?.length?study.tasks:[r.guidance.action,'Quando terminar, abra Dados → Relatório e registre observações, interpretação e conclusão.']));
+  section('Na oficina',list('ul',[r.initialState.mode==='free'?'Montagem inicial livre com '+r.initialState.units+' unidades.':'Estrutura cristalina de referência do metal escolhido.','Módulo inicial: '+moduleName(r.module)+'.','Ferramentas sugeridas: '+toolNames(r.allowedTools)+'.','A investigação continua livre: após montar, é possível consultar os demais módulos e escalas quando habilitados.',r.metalSelection.atomicNumbers.length+' metais elegíveis. Compare metais diferentes em investigações separadas.']));
+  if(study?.observe?.length){
+   const record=N('div');record.className='silm-experiment-observations';
+   for(const [i,subject] of study.observe.entries()){
+    const row=N('div');row.className='silm-experiment-observation-row';
+    row.append(N('strong',String(i+1).padStart(2,'0')),N('span',subject));
+    record.append(row);
+   }
+   section('Plano de observações',record);
+  }else section('O que observar',N('p',r.guidance.hint));
+  if(study?.interpretation?.length)section('Analise e interprete',list('ol',study.interpretation));
+  section('Evidência esperada',N('p',r.guidance.criterion));
+  if(study?.limits)section('Limites do modelo',N('p',study.limits));
+  if(study?.teacher){const note=N('details');note.className='silm-experiment-teacher';note.append(N('summary','Orientações para o professor'),N('p',study.teacher));article.append(note);}
   if(session.open()){const actions=N('div');actions.className='silm-actions';const b=button(session.context()?.id===r.id?'Retomar na oficina':'Voltar à atividade em andamento',()=>{location.hash=session.context()?.id===r.id?'#/ambiente':url(session.context().id);},'route-resume');b.classList.replace('outline','primary');actions.append(b);article.append(actions);}
   else{
    // Identificação como no SIAB: guardada para a próxima montagem e copiada para o relatório desta sessão.
    const saved=storage.get('route.identity',{}),form=N('form');form.className='silm-identity-form';form.noValidate=true;const set=N('fieldset');set.className='silm-identity';set.append(N('legend','Identificação'));
    for(const [k,label,type] of IDENTITY){const f=N('div');f.className='silm-field';const l=N('label',label);l.htmlFor='route-id-'+k;const input=N('input');input.id=l.htmlFor;input.name=k;input.type=type;input.maxLength=160;input.value=type==='date'?isoDate(saved[k]):(typeof saved[k]==='string'?saved[k]:'');f.append(l,input);set.append(f);}
+   const hypothesisField=N('div');hypothesisField.className='silm-field silm-route-hypothesis';
+   const hypothesisLabel=N('label','Sua hipótese inicial (opcional)');hypothesisLabel.htmlFor='route-hypothesis';
+   const hypothesis=N('textarea');hypothesis.id='route-hypothesis';hypothesis.name='hypothesis';hypothesis.rows=3;hypothesis.maxLength=2000;hypothesis.placeholder='Registre sua previsão antes de usar os instrumentos.';
+   const previousHypothesis=storage.get('route.hypothesis:'+r.id,'');hypothesis.value=typeof previousHypothesis==='string'?previousHypothesis.slice(0,2000):'';
+   hypothesisField.append(hypothesisLabel,hypothesis);
    const selection=N('select');selection.id='route-metal';for(const z of r.metalSelection.atomicNumbers){const e=S.data.get(z),o=N('option',e.name+' ('+e.symbol+')');o.value=z;selection.append(o);}selection.value=r.metalSelection.atomicNumbers.includes(29)?'29':String(r.metalSelection.atomicNumbers[0]);
    const mf=N('div');mf.className='silm-field';const ml=N('label','Metal da investigação');ml.htmlFor='route-metal';mf.append(ml,selection);
    const actions=N('div');actions.className='silm-actions';
    const mount=N('button','Montar na oficina');mount.type='submit';mount.className='button primary';mount.id='route-mount';actions.append(mount);
    if(doc.archives[r.id])actions.append(button('Abrir relatório',()=>{location.hash='#/relatorios?roteiro='+r.id;},'route-archive'));
-   form.append(set,mf,actions);
+   form.append(set,mf,hypothesisField,actions);
    form.addEventListener('submit',async event=>{event.preventDefault();const identity={};for(const [k,,type] of IDENTITY){const v=form.elements[k].value.trim().slice(0,160);identity[k]=type==='date'?brDate(v):v;}storage.set('route.identity',identity);
-    await mountRoute(r,Number(selection.value),identity);});
+    const prediction=hypothesis.value.trim().slice(0,2000);storage.set('route.hypothesis:'+r.id,prediction);
+    await mountRoute(r,Number(selection.value),identity,prediction);});
    article.append(form);
   }
   if(!session.open()){const related=S.themes.registry.filter(t=>t.relatedRoutes.includes(r.id));if(related.length){const box=N('section');box.className='silm-related';box.append(N('h2','Conteúdo relacionado'));const row=N('div');row.className='silm-related-row';row.append(N('span',related.length===1?'Tema relacionado':'Temas relacionados'));for(const t of related){const a=N('a',t.title);a.className='button outline';a.href='#/aprender?tema='+t.id;row.append(a);}box.append(row);article.append(box);}}
@@ -226,6 +290,11 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const done=c.status==='completed',ready=session.ready();
   const eyebrow=N('p',(session.teacher()?'ATIVIDADE DO PROFESSOR · ':'')+'ROTEIRO · '+(done?'Concluído':'Em andamento'));eyebrow.className='eyebrow';
   host.append(eyebrow,N('h3',session.title()),N('h4','Objetivo'),N('p',r.objectives.join(' ')),N('h4','O que você vai fazer'),N('p',r.guidance.action),N('p','Módulo único: '+moduleName(r.module)+'. Recursos liberados: '+toolNames(session.teacher()?.tools||r.allowedTools)+'.'));
+  if(r.study?.question)host.append(N('h4','Pergunta central'),N('p',r.study.question));
+  if(r.study?.tasks?.length){
+   const steps=N('details');steps.className='silm-experiment-teacher';steps.append(N('summary','Procedimento do roteiro'));
+   const ol=N('ol');for(const task of r.study.tasks)ol.append(N('li',task));steps.append(ol);host.append(steps);
+  }
   const hint=N('details');hint.append(N('summary','O que observar'),N('p',r.guidance.hint));host.append(hint);
   const evidence=N('ul');evidence.className='silm-evidence';const item=N('li');item.dataset.objective=r.completionCriteria;item.dataset.met=String(done||ready);
   item.append(N('span',evidenceLabels[r.completionCriteria]||r.guidance.criterion),N('strong',done||ready?'Atendida':'Pendente'));evidence.append(item);host.append(N('h4','Evidência'),evidence);
@@ -268,6 +337,9 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   if(!record){const empty=N('div');empty.className='silm-report-empty';empty.append(N('h1','Relatório'),N('p','Inicie uma investigação na Oficina ou monte um roteiro experimental para abrir o relatório.'));host.append(empty);return;}
   const exp=!archived&&record.activityContext.type==='free'?unified.experiment():null;
   const r=registry.get(record.activityContext.id)||(exp?{...exp,id:'laboratorio',type:'free',module:record.checkpoint.module.active}:null)||{id:'laboratorio',title:archived?.title||'Investigação livre',subtitle:'Registros da Oficina',module:archived?.module||record.checkpoint.module.active,sources:[]},s=record.checkpoint,e=S.data.get(s.metal.atomicNumber),free=record.activityContext.type==='free',editable=!archived&&(free||session.context()?.id===r.id);
+  // A hipótese pertence à investigação livre montada, nunca a uma tentativa anterior.
+  const experimentRecord=free&&exp?storage.get('route.experiment',null):null;
+  const initialHypothesis=experimentRecord?.route===exp?.id&&experimentRecord?.investigation===s.investigation?.id&&typeof experimentRecord?.hypothesis==='string'?experimentRecord.hypothesis.slice(0,2000):'';
   // "Atividade de análise" é preparação do Professor: só fora de uma atividade e nunca num relatório arquivado (como no SIAB).
   const teacher=!archived&&!session.open(),key=archived?'arquivo:'+archiveKey:free?'livre:'+(s.investigation?.id||'sem-investigacao'):'atividade:'+r.id;
   const config=reportConfig(key);if(config.mode==='analise'&&!teacher)config.mode='completo';
@@ -315,6 +387,12 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   else if(r.description){proposal.append(N('p',r.description));if(r.objectives?.length){const ul=N('ul');for(const o of r.objectives)ul.append(N('li',o));proposal.append(ul);}}
   else proposal.append(N('p','Investigação livre: descreva a questão investigada na resposta à investigação.'));
   if(mode==='analise'&&config.question)proposal.append(N('h3','Questão para investigar'),N('p',config.question));
+  else if(r.study?.question)proposal.append(N('h3','Pergunta central do roteiro'),N('p',r.study.question));
+  if(initialHypothesis)proposal.append(N('h3','Hipótese inicial registrada'),N('p',initialHypothesis));
+  if(r.study?.observe?.length){
+   const obs=N('ul');for(const item of r.study.observe)obs.append(N('li',item));
+   proposal.append(N('h3','Plano de observações'),obs);
+  }
   const note=N('p','Dados do modelo SILM: dado tabelado, medida do modelo e cálculo do SILM aparecem identificados separadamente.');note.className='silm-report-note';proposal.append(note);
   // 3. Condições de referência: metal e estrutura como dados tabelados, montagem como representação didática.
   if(inc('conditions')){const sec=section(3,'Condições de referência','condicoes'),structure=S.data.structure(e),crystalline=s.structure?.mode==='crystalline';
@@ -339,9 +417,16 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    else if(mode==='completo'){const l=N('label',label);l.className='sr-only';l.htmlFor='report-'+k;const ta=N('textarea');ta.id=l.htmlFor;ta.value=record.report[k]||'';ta.readOnly=!editable;ta.maxLength=10000;const print=N('div',ta.value);print.className='silm-print-value';ta.addEventListener('input',()=>{if(free?unified.editReport(k,ta.value):session.edit(k,ta.value))print.textContent=ta.value;});box.append(l,ta,print);}
    else box.append(N('p',record.report[k]||'—'));sec.append(box);};
   field(section(7,'Observações','observacoes'),'observations','Observações');
-  const analysis=section(8,'Análise / interpretação','analise');field(analysis,'analysis','Análise');field(analysis,'interpretation','Interpretação');
+  const analysis=section(8,'Análise / interpretação','analise');
+  if(r.study?.interpretation?.length){
+   analysis.append(N('h3','Questões para interpretar'));
+   const questions=N('ol');for(const question of r.study.interpretation)questions.append(N('li',question));analysis.append(questions);
+  }
+  field(analysis,'analysis','Análise');field(analysis,'interpretation','Interpretação');
   field(section(9,'Resposta à investigação','resposta'),'answer','Resposta');
-  field(section(10,'Conclusão','conclusao'),'conclusion','Conclusão');
+  const conclusion=section(10,'Conclusão','conclusao');
+  if(r.study?.limits){const limit=N('p','Limite científico: '+r.study.limits);limit.className='silm-report-note';conclusion.append(limit);}
+  field(conclusion,'conclusion','Conclusão');
   // Fontes e nota sobre o modelo.
   const sources=new Set([...S.data.sourceIds(e),...(r.sources||[]),...s.calculations.flatMap(c=>c.provenance.references)]),sourceSec=section(0,'Fontes','fontes'),list=N('ul');
   for(const sid of sources){const src=S.data.source(sid);if(src)list.append(N('li',src.institution+' — '+src.title+(src.url?' · '+src.url:'')));}sourceSec.append(list);
