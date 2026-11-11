@@ -276,3 +276,97 @@
 #silm-scene-actionbar .silm-lattice-more-controls{
  width:min(335px,calc(100vw - 24px));max-width:calc(100vw - 24px);
 }
+
+
+/* Joule é a resposta térmica à corrente na mesma investigação.
+   Uma única barra inferior; parâmetros, mapa e balanço em painel flutuante
+   que não ocupa a cena nem ressuscita menus por propriedade. */
+#silm-scene-actionbar .silm-joule-controls{
+ display:flex;align-items:center;gap:4px;flex:0 0 auto;min-width:0;
+ font-size:.78rem;font-variant-numeric:tabular-nums
+}
+#silm-scene-actionbar .silm-joule-controls[hidden]{display:none!important}
+#silm-scene-actionbar .silm-joule-live{
+ display:block;max-width:210px;min-width:0;white-space:nowrap;
+ font-size:.75rem;font-weight:700;color:var(--text);
+ border-inline-start:2px solid var(--accent);padding-inline:8px
+}
+#silm-scene-actionbar .silm-joule-controls :is(button,summary){
+ box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+ flex:0 0 auto;min-height:44px;min-width:44px;white-space:nowrap;
+ padding:5px 9px;border-radius:9px;
+ border:1px solid var(--border);background:var(--surface);color:var(--text);
+ font:inherit;font-weight:650;cursor:pointer
+}
+#silm-scene-actionbar .silm-joule-controls .silm-joule-supply{
+ min-width:90px;
+}
+#silm-scene-actionbar .silm-joule-controls .silm-joule-play{
+ min-width:84px;
+}
+#silm-scene-actionbar .silm-joule-controls .silm-joule-step{
+ min-width:44px;min-height:44px;width:54px;height:44px
+}
+#silm-scene-actionbar .silm-joule-controls :is(button,summary)[aria-pressed=true]{
+ border:2px solid var(--accent);background:var(--tint)
+}
+#silm-scene-actionbar .silm-joule-controls .silm-joule-advanced{
+ position:relative;flex:0 0 auto;min-width:0
+}
+#silm-scene-actionbar .silm-joule-advanced>summary{list-style:none}
+#silm-scene-actionbar .silm-joule-advanced>summary::-webkit-details-marker{display:none}
+#silm-scene-actionbar .silm-joule-panel{
+ position:fixed!important;z-index:3200;box-sizing:border-box;
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:8px 10px;overflow-y:auto;overscroll-behavior:contain;
+ width:min(338px,calc(100vw - 24px));max-width:calc(100dvw - 24px);
+ padding:12px;border:1px solid var(--border);border-radius:12px;
+ background:var(--surface);color:var(--text);box-shadow:0 12px 34px rgb(0 0 0 / .24)
+}
+#silm-scene-actionbar .silm-joule-advanced:not([open])>.silm-joule-panel{display:none}
+#silm-scene-actionbar .silm-joule-panel .silm-joule-explanation,
+#silm-scene-actionbar .silm-joule-panel .silm-joule-readings{
+ grid-column:1/-1
+}
+#silm-scene-actionbar .silm-joule-panel .silm-joule-explanation{
+ margin:0;font-size:.75rem;line-height:1.4;overflow-wrap:anywhere
+}
+#silm-scene-actionbar .silm-joule-panel .silm-joule-setting{
+ grid-column:1/-1;display:grid;gap:3px;min-width:0;
+ font-size:.77rem;font-weight:700
+}
+#silm-scene-actionbar .silm-joule-panel select{
+ box-sizing:border-box;width:100%;min-width:0;min-height:44px;
+ padding:7px 8px;border:1px solid var(--border);border-radius:8px;
+ background:var(--surface);color:var(--text);font:inherit
+}
+#silm-scene-actionbar .silm-joule-panel :is(.silm-joule-external,.silm-joule-reset,.silm-joule-end){
+ min-width:0;max-width:100%;height:auto;white-space:normal;line-height:1.25
+}
+#silm-scene-actionbar .silm-joule-panel .silm-joule-external{grid-column:1/-1}
+#silm-scene-actionbar .silm-joule-panel .silm-joule-readings{
+ display:grid;grid-template-columns:minmax(0,1fr) auto;
+ gap:4px 10px;margin:6px 0 0;padding-top:8px;
+ border-top:1px solid var(--border);font-size:.76rem
+}
+#silm-scene-actionbar .silm-joule-panel .silm-joule-readings dt{overflow-wrap:anywhere}
+#silm-scene-actionbar .silm-joule-panel .silm-joule-readings dd{
+ margin:0;text-align:right;white-space:nowrap
+}
+@media(max-width:650px){
+ #silm-scene-actionbar .silm-joule-live{max-width:130px;font-size:.7rem}
+ #silm-scene-actionbar .silm-joule-controls .silm-joule-supply{min-width:74px}
+ #silm-scene-actionbar .silm-joule-controls .silm-joule-play{min-width:74px}
+}
+@media(max-width:390px){
+ #silm-scene-actionbar .silm-joule-live{max-width:100px;font-size:.67rem}
+}
+@media(forced-colors:active){
+ #silm-scene-actionbar .silm-joule-panel{
+  box-shadow:none;border:2px solid CanvasText;background:Canvas;color:CanvasText
+ }
+ #silm-scene-actionbar .silm-joule-controls [aria-pressed=true]{outline:2px solid Highlight}
+}
+@media(prefers-reduced-motion:reduce){
+ #silm-scene-actionbar .silm-joule-controls *{transition:none!important;animation:none!important}
+}
