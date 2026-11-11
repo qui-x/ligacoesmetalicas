@@ -135,21 +135,21 @@ SILM.electrothermal=(()=>{
   const boundary=input.boundary==='ambient'?
    'O calor pode sair pelos terminais mantidos na referência térmica.':
    'Sem troca térmica pelas bordas idealmente isoladas.';
-  let phase,message;
+  let phase,message,short;
   if(joule&&external){
-   phase='combined';message='Corrente e fonte de calor externa atuam juntas. A dissipação Joule e o aporte externo são contabilizados separadamente.';
+   phase='combined';short='Joule + calor externo';message='Corrente e fonte de calor externa atuam juntas. A dissipação Joule e o aporte externo são contabilizados separadamente.';
   }else if(joule&&warm){
-   phase='heating';message='Corrente elétrica → dissipação Joule na malha → calor acumulado e redistribuído entre regiões do metal.';
+   phase='heating';short='Corrente → Joule → aquecimento';message='Corrente elétrica → dissipação Joule na malha → calor acumulado e redistribuído entre regiões do metal.';
   }else if(joule){
-   phase='generating';message='Corrente elétrica → potência Joule distribuída na malha. O aquecimento aparece quando o tempo avança.';
+   phase='generating';short='Corrente → dissipação Joule';message='Corrente elétrica → potência Joule distribuída na malha. O aquecimento aparece quando o tempo avança.';
   }else if(external){
-   phase='external';message='Sem corrente: potência Joule igual a zero. O aquecimento decorre da fonte térmica externa.';
+   phase='external';short='Calor externo · Joule = 0';message='Sem corrente: potência Joule igual a zero. O aquecimento decorre da fonte térmica externa.';
   }else if(warm){
-   phase='residual';message='Fonte elétrica desligada: a geração Joule cessou. O calor já acumulado continua a se redistribuir.';
+   phase='residual';short='Joule cessou · calor residual';message='Fonte elétrica desligada: a geração Joule cessou. O calor já acumulado continua a se redistribuir.';
   }else{
-   phase='idle';message='Sem alimentação: não há dissipação Joule nem elevação térmica acumulada.';
+   phase='idle';short='Sem geração Joule ou calor novo';message='Sem alimentação: não há dissipação Joule nem elevação térmica acumulada.';
   }
-  return Object.freeze({phase,message,boundary,activeDissipation:joule,
+  return Object.freeze({phase,short,message,boundary,activeDissipation:joule,
    residualHeat:warm,externalHeat:external});
  }
  return Object.freeze({buildNetwork,createRun,explainFlow});
