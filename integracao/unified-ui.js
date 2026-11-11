@@ -165,11 +165,11 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
      const text=N('span');text.append(N('strong',item.title),N('small',detail));
      const status=N('span',progress.completed[item.id]?'Revisado':'Não revisado');status.className='silm-row-status';
      row.append(text,status);list.append(row);
-     rows.push({row,category,haystack:(item.title+' '+item.subtitle+' '+item.description+' '+item.relatedMetals.map(z=>S.data.get(z).name+' '+S.data.get(z).symbol).join(' ')).normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase()});
+     rows.push({row,category,haystack:(item.title+' '+item.subtitle+' '+item.description+' '+item.relatedMetals.map(z=>S.data.get(z).name+' '+S.data.get(z).symbol).join(' ')).normalize('NFD').replace(/\p{M}/gu,'').toLowerCase()});
     }
    }
    const apply=()=>{
-    const q=search.value.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().trim(),counts=new Map();
+    const q=search.value.normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().trim(),counts=new Map();
     for(const item of rows){const shown=(filter.value==='all'||filter.value===item.category)&&(!q||item.haystack.includes(q));item.row.hidden=!shown;if(shown)counts.set(item.category,(counts.get(item.category)||0)+1);}
     for(const [id,heading] of headingMap)heading.hidden=!counts.get(id);
    };
