@@ -331,6 +331,10 @@ async function checkModuleShortcuts(label,width){
   await button.click();
   await page.waitForFunction(mode=>window.SILMIntegration?.snapshot?.()?.module?.active===mode,target);
   await page.waitForFunction(mode=>document.querySelector('#silm-module-shortcuts')?.dataset.activeModule===mode,target);
+  const family=target==='explorar'?'observar':target;
+  await page.waitForFunction(id=>window.BaseDemoSI?.currentViewerFamily?.()===id,family);
+  assert.ok(await page.locator('#si-dock-right #si-viewer-families').isVisible(),
+   label+': famílias contextuais não estão dentro de Ver');
   const current=JSON.parse(await scientific());
   assert.equal(current.module,target,label+': atalho não alterou o módulo');
   assert.equal(await page.locator('#silm-module').inputValue(),target,
