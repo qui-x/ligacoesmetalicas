@@ -8,6 +8,9 @@ on:
     paths:
       - 'domain/silm/lens.css'
       - 'domain/silm/center-focus.css'
+      - 'domain/silm/controls-simplified.css'
+      - 'domain/silm/lattice-navigation.js'
+      - 'tests/run-controls-responsive-matrix.mjs'
       - 'domain/silm/crystal-view.js'
       - 'domain/silm/renderer-2d.js'
       - 'domain/silm/representation.js'
@@ -60,6 +63,9 @@ jobs:
           node --check domain/silm/lens-controller.js
           node --check domain/silm/crystal-view.js
           node --check domain/silm/renderer-2d.js
+          node --check domain/silm/lattice-navigation.js
+          node --check tests/run-controls-responsive-matrix.mjs
+          grep -q 'domain/silm/controls-simplified.css' sw.js
           node --check domain/silm/representation.js
           node --check domain/silm/microstructure-view.js
           node --check tests/run-center-camera-focus.mjs
@@ -99,6 +105,8 @@ jobs:
         run: node tests/run-direct-ver-tools.mjs
       - name: Homologar câmera do centro e foco dos grãos
         run: node tests/run-center-camera-focus.mjs
+      - name: Auditoria profunda: mouse, toque, teclado e nove resoluções
+        run: node tests/run-controls-responsive-matrix.mjs
       - name: Guardar evidências visuais
         if: always()
         uses: actions/upload-artifact@v4
@@ -108,6 +116,7 @@ jobs:
             reports/lente/${{ matrix.browser }}/
             reports/ver-direto/${{ matrix.browser }}/
             reports/camera-focal/${{ matrix.browser }}/
+            reports/controle-matriz/${{ matrix.browser }}/
           if-no-files-found: warn
           retention-days: 14
       - name: Encerrar servidor

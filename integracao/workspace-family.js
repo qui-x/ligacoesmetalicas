@@ -78,7 +78,8 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   thermal:'M14 14.8V5a2 2 0 0 0-4 0v9.8a5 5 0 1 0 4 0ZM12 11v7',
   malleability:'M4 8h16M4 16h16M8 4l-4 4 4 4M16 12l4 4-4 4',
   ductility:'M4 8h16M4 16h16M8 4 4 8l4 4M16 12l4 4-4 4',
-  luster:'M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1M17 12a5 5 0 1 1-10 0 5 5 0 0 1 10 0'
+  luster:'M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1M17 12a5 5 0 1 1-10 0 5 5 0 0 1 10 0',
+  joule:'M13 3v6l-5 3h5v9l7-11h-6l2-7z'
  };
  function actionButton(parent,{id,label,path,pressed=false,disabled=false,reason='',hint='',onClick}){
   const button=node('button',null,'silm-observer-action');
@@ -106,18 +107,24 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   const canExplore=state.module.active==='explorar'&&!activityLocked;
   const canObserve=!!structure&&!activityLocked;
   const editableStructure=canObserve;
+  // Centro é uma vista local: a célula não aparece nela, e a primeira
+  // vizinhança já é mostrada. Não oferecer botões sem efeito perceptível.
+  const localCenter=document.getElementById('si-stage')?.dataset.workshopScale==='4';
+  if(!localCenter){
   const structureActions=actionGroup(root,'Centros metálicos');
   actionButton(structureActions,{id:'centers',label:observer.centers?'Ocultar identificação':'Identificar centros',path:actionIcons.centers,pressed:observer.centers,disabled:!editableStructure,reason:!structure?'Monte uma estrutura primeiro':activityLocked?'Recurso restrito nesta atividade':'',hint:'Destaca todos os centros. Na montagem livre, identifica cada unidade; na célula cristalina, mostra o papel de cada sítio.',onClick:()=>{
    observer.centers=!observer.centers;B.storage.write(observerKey,{centers:observer.centers});
    window.dispatchEvent(new CustomEvent('silm:observer-presentation-changed'));
    refreshScene();renderViewers();
   }});
+  }
   const interactionActions=actionGroup(root,'Interação metálica');
   const electrons=state.electrons,minimum=SILM.electronModel?.minUnits||2;
   const electronsActive=!!electrons?.representation.visible&&!!electrons?.representation.motion;
   actionButton(interactionActions,{id:'electrons',label:electronsActive?'Ocultar mar de elétrons':'Mostrar mar de elétrons',path:actionIcons.electrons,pressed:electronsActive,disabled:!canExplore||(!structure||structure.units.length<minimum),reason:!structure?'Monte uma estrutura primeiro':structure.units.length<minimum?'São necessárias '+minimum+' unidades':!canExplore?'Disponível no módulo Explorar':'',hint:'Mostra o modelo coletivo dos elétrons de valência e seu movimento ao redor dos centros. Não representa ligações localizadas entre pares.',onClick:()=>{
    quickActions?.toggleElectrons?.();refreshScene();renderViewers();
   }});
+  if(!localCenter){
   const crystalActions=actionGroup(root,'Célula e rede cristalina');
   actionButton(crystalActions,{id:'view-toggle',label:crystal?(rep.view==='cell'?'Mostrar rede':'Mostrar célula'):'Célula / rede',path:actionIcons.view,pressed:!!crystal&&rep.view==='lattice',disabled:!crystal||!canObserve,reason:!crystal?'Organize a montagem para habilitar a célula e a rede':activityLocked?'Recurso restrito nesta atividade':'',onClick:()=>{
    if(!crystal||!canObserve)return;
@@ -133,6 +140,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    if(enabling&&!rep.selectedUnitId&&structure.units.length)patch.selectedUnitId=structure.units[0].id;
    model.setCrystalRepresentation(patch);refreshScene();renderViewers();
   }});
+  }
   const propertyActions=actionGroup(root,'Propriedades metálicas');
   const propertyInfo=[
    ['electrical','Condutividade elétrica',actionIcons.electrical],
@@ -236,6 +244,15 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    button.dataset.disabledReason=why;
    propertyButtons.set(id,button);
   }
+  // Efeito Joule tem uma mecânica própria: o disparo fica em Ver;
+  // tensão/corrente e passos do ensaio continuam no painel específico.
+  const electrical=model.propertyAvailability('electrical'),thermal=model.propertyAvailability('thermal');
+  const jouleReady=canExplore&&crystal&&electrical.ok&&thermal.ok;
+  actionButton(propertyActions,{id:'joule',label:'Iniciar efeito Joule',path:actionIcons.joule,
+   disabled:!jouleReady,reason:jouleReady?'':'Requer estrutura e respostas elétrica e térmica disponíveis.',
+   hint:'Abrir o ensaio de alimentação e aquecimento de Joule.',
+   onClick:()=>{if(!jouleReady)return;quickActions?.beginJoule?.();refreshScene();renderViewers();}
+  });
   syncPropertySelection();
   output.append(root);
   // Os controles de combinação ficam abaixo da faixa rolável; não criam
@@ -261,7 +278,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   const group=node('section',null,'silm-layer-group');
   group.append(node('h3','Destaque estrutural'));
   toggleRow(group,{title:'Destacar centros metálicos',description:'Reduzir o destaque não remove as unidades.',checked:layerState.centers,onChange:v=>layerChanged('centers',v)});
-  group.append(node('p','Célula, rede, unidade e vizinhos são ações diretas em Observar.','silm-layer-note'));
+  group.append(node('p','A geometria e as vizinhanças permanecem disponíveis na cena e nas ferramentas diretas de Ver.','silm-layer-note'));
   output.append(group);
  }
  function renderLayerIndications(output){

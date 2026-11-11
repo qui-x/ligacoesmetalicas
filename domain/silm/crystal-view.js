@@ -114,7 +114,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const R=RD.createStage(stage,{scope,area,viewport:area,idPrefix:'silm',camera:rep2.camera(cameraKey),reducedMotion,announce:text=>SimCore.notifications.announce(text),
   describe:()=>sceneDescription(),onCamera:c=>rep2.saveCamera(cameraKey,c),items:()=>unitItems,focusPoint:()=>selectedPoint,canArrowPan:()=>true,
   onUnitTap:id=>unitAction(id),onReset:()=>{if(mode3d){orbitLive=null;rep2.setCamera3D({preset:'3d',yaw:null,pitch:null},{silent:true});render();}else if(rep2.projection()!=='isometric')rep2.setProjection('isometric');},toolbarHost:cameraHost,
-  onOrbit:mode3d?(dx,dy,phase)=>orbit(dx,dy,phase):null,
+  onOrbit:mode3d?(dx,dy,phase)=>orbit(dx,dy,phase):null,compactToolbar:true,
   extraButtons:mode3d?button=>{perspectiveButton=button('perspective','◫','Perspectiva (desligada: ortográfica)','P',()=>rep2.setCamera3D({projection:rep2.camera3D().projection==='perspective'?'orthographic':'perspective'}));return [perspectiveButton];}:null});
  if(mode3d)R.setDragMode('orbit');
  const worldSvg=cls=>{const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox','0 0 100 100');s.setAttribute('aria-hidden','true');s.setAttribute('class','silm-crystal-svg '+cls);return s;};
@@ -237,7 +237,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  // O cursor percorre o mesmo recorte e a mesma projeção utilizados pelas propriedades.
  const initialStructure=model.state.structure;
  const initialUnit=initialStructure.units.find(u=>u.id===initialStructure.crystallography.representation.selectedUnitId);
- const navigator=SILM.createLatticePanel({geometry:g,scope,initialKey:rep2.latticeFocus?.()||(initialUnit&&X.key(initialUnit.site)),initialAnchor:initialUnit?.site,onFocus(site,anchor){
+ const navigator=SILM.createLatticePanel({geometry:g,scope,mode:localFocus?'center':'network',initialKey:rep2.latticeFocus?.()||(initialUnit&&X.key(initialUnit.site)),initialAnchor:initialUnit?.site,onFocus(site,anchor){
   const unit=model.state.structure.units.find(u=>X.key(u.site)===anchor.key);
   rep2.setLatticeFocus?.(site.key);
   if(layout)R.setCamera({...R.camera,mode:'free'},{settled:false});
@@ -261,31 +261,9 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const formatRelative=value=>value.toLocaleString('pt-BR',{maximumFractionDigits:3});
  // Reutiliza os comandos de Observar e as mesmas restrições científicas em cada referência.
  if(propertyOptions?.quickActions&&model.state.module.active==='explorar'){
-  const choices=[
-   ['electrons','Mar de elétrons',[]],
-   ['electrical','Campo elétrico',['electrical']],['thermal','Fonte de calor',['thermal']],
-   ['malleability','Compressão',['malleability']],['ductility','Tração',['ductility']],['luster','Luz',['luster']],
-   ['joule','Efeito Joule · corrente e calor',['electrical','thermal']],
-   ['heatElectrical','Campo elétrico + calor externo',['electrical','thermal']],
-   ['malleabilityElectrical','Compressão + campo elétrico',['malleability','electrical']],
-   ['ductilityElectrical','Tração + campo elétrico',['ductility','electrical']]
-  ];
-  const control=document.createElement('select');control.setAttribute('aria-label','Aplicar estímulo na rede');control.className='silm-lattice-stimulus';
-  const prompt=document.createElement('option');prompt.value='';prompt.textContent='Estímulos';control.append(prompt);
-  for(const [id,label,required]of choices){
-   const option=document.createElement('option');option.value=id;option.textContent=label;
-   option.disabled=required.some(prop=>!propertyOptions.canStudy(prop));
-   control.append(option);
-  }
-  scope.listen(control,'change',()=>{
-   const choice=choices.find(([id])=>id===control.value);control.value='';
-   if(!choice||model.state.module.active!=='explorar'||choice[2].some(prop=>!propertyOptions.canStudy(prop)))return;
-   if(choice[0]==='joule')propertyOptions.quickActions.beginJoule();
-   else if(choice[0]==='electrons')propertyOptions.quickActions.toggleElectrons();
-   else if(choice[2].length===2)propertyOptions.quickActions.activateCombination(choice[0]);
-   else propertyOptions.quickActions.toggleProperty(choice[0]);
-  });
-  navigator.root.append(control);
+  // Estímulos já são ativados diretamente em Ver → Explorar.
+  // Esta faixa mantém apenas os parâmetros instrumentais do ensaio Joule
+  // quando necessários, sem um segundo seletor das mesmas propriedades.
   jouleControls=U.element('span',null,'silm-joule-controls');jouleControls.hidden=true;
   jouleSettings=document.createElement('select');jouleSettings.setAttribute('aria-label','Condições do efeito Joule');
   for(const [value,label] of [['','Condições Joule'],['voltage','Tensão imposta'],['current','Corrente imposta'],['ambient','Terminais à temperatura ambiente'],['insulated','Amostra isolada'],['supply','Ligar ou desligar alimentação'],['external','Ligar ou desligar calor externo'],['temperature','Ver temperatura'],['potential','Ver potencial elétrico'],['dissipation','Ver dissipação Joule'],['readings','Leituras e balanço de energia'],['restore','Reiniciar ensaio'],['end','Encerrar efeito Joule']]){
@@ -406,13 +384,13 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    localShellLayer.replaceChildren();
    for(const [index,site] of focusShell.list.entries()){
     const p=layout.project(D(site.cart));
-    const button=U.element('button',element.symbol,'silm-center-neighbor');
+    const button=U.element('button','', 'silm-center-neighbor');
     button.type='button';button.dataset.siteKey=site.key;
     button.style.left=(p.x*100)+'%';button.style.top=(p.y*100)+'%';
     button.style.setProperty('--local-depth',String(p.depth));
-    button.setAttribute('aria-label','Focalizar vizinho '+(index+1)+' de '+focusShell.list.length+
+    button.setAttribute('aria-label','Focalizar centro '+element.symbol+', vizinho '+(index+1)+' de '+focusShell.list.length+
      ', distância '+focusShell.distances[index].toLocaleString('pt-BR',{maximumFractionDigits:3})+' ångströms');
-    button.title='Focalizar centro vizinho '+(index+1);
+    button.title='Focalizar centro '+element.symbol+' · vizinho '+(index+1);
     button.disabled=!navigator.cursor.has(site.key);
     // O botão é uma ferramenta do palco: o gesto não deve chegar ao
     // hit-test de unidades que ficam ocultas nesta escala.

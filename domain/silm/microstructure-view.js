@@ -127,7 +127,35 @@ SILM.microstructure=(()=>{
    viewport.classList.toggle('is-pannable',maxX>1||maxY>1);
   }
   const setZoom=z=>{zoom=clamp(Math.round(z*4)/4,1,4);if(zoom===1){offsetX=0;offsetY=0;}update();};
-  const button=(name,txt,action)=>{const b=node('button','silm-workshop-micro-control',txt);b.type='button';b.setAttribute('aria-label',name);b.addEventListener('click',action);return b;};
+  // Uma linguagem visual única para todos os comandos da microestrutura,
+  // inclusive dentro dos diálogos. Ícones são pictogramas de ação, e os
+  // rótulos acessíveis permanecem completos mesmo no celular.
+  const microIcons={
+   'Reduzir microestrutura':'M5 12h14',
+   'Ampliar microestrutura':'M5 12h14M12 5v14',
+   'Aproximar grão selecionado':'M7 3H3v4M17 3h4v4M3 17v4h4M21 17v4h-4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8',
+   'Ajustar microestrutura ao quadro':'M4 9V4h5M15 4h5v5M4 15v5h5M20 15v5h-5',
+   'Abrir gerador de formações de grãos':'M3 7h7v7H3zM14 4h7v7h-7zM12 15h8v6h-8z',
+   'Abrir dados segmentados':'M4 6c0-3 16-3 16 0v12c0 3-16 3-16 0zM4 12c0 3 16 3 16 0M4 6c0 3 16 3 16 0',
+   'Gerar formação com a semente informada':'M5 12h14M13 5l7 7-7 7',
+   'Gerar nova variação reproduzível':'M4 4v5h5M20 20v-5h-5M5 9a8 8 0 0 1 14-3M19 15a8 8 0 0 1-14 3',
+   'Restaurar formação padrão':'M3 11a9 9 0 1 1 3 7M3 4v7h7',
+   'Retornar ao mapa didático':'M3 11a9 9 0 1 1 3 7M3 4v7h7',
+   'Fechar configurações de formação':'M5 5l14 14M19 5 5 19',
+   'Fechar importação de dados':'M5 5l14 14M19 5 5 19'
+  };
+  const button=(name,txt,action)=>{
+   const b=node('button','silm-workshop-micro-control');
+   b.type='button';b.setAttribute('aria-label',name);b.dataset.microAction=name;
+   const icon=svgNode('svg',{viewBox:'0 0 24 24',width:18,height:18,
+    'aria-hidden':'true',fill:'none',stroke:'currentColor','stroke-width':1.8,
+    'stroke-linecap':'round','stroke-linejoin':'round'});
+   icon.append(svgNode('path',{d:microIcons[name]||'M5 12h14'}));
+   const label=node('span','silm-micro-button-label',txt);
+   b.append(icon,label);
+   b.addEventListener('click',action);
+   return b;
+  };
   const zoomControls=node('div','silm-workshop-micro-zoom-tools');
   const focusButton=button('Aproximar grão selecionado','Focar',()=>{
    if(chosen>=0)focusGrain(chosen);

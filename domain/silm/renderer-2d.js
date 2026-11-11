@@ -45,7 +45,7 @@ SILM.renderer2d=(()=>{
 
  function createStage(stage,{scope,area=null,viewport=stage,readOnly=false,idPrefix='silm',camera:initial=null,reducedMotion=()=>false,announce=()=>{},describe=null,
   onCamera=null,onBackgroundTap=null,onUnitTap=null,onUnitPress=null,items=()=>[],focusPoint=null,canArrowPan=()=>true,onReset=null,toolbar=!readOnly,
-  ownsUnitDrag=false,onGestureStart=null,toggleHost=null,toolbarHost=null,onOrbit=null,extraButtons=null}={}){
+  ownsUnitDrag=false,onGestureStart=null,toggleHost=null,toolbarHost=null,onOrbit=null,extraButtons=null,compactToolbar=false}={}){
   const U=SimCore.ExperienceUI;
   // O mundo usa uma escala isotrópica; a janela de entrada pode ser retangular.
   let spanX=1,spanY=1;
@@ -99,7 +99,54 @@ SILM.renderer2d=(()=>{
      button('pitch-up','⇡','Inclinar para cima','I',()=>orbitKey(0,-1)),button('pitch-down','⇣','Inclinar para baixo','K',()=>orbitKey(0,1))];
     for(const b of orbitButtons){b.classList.add('silm-camera-orbit');b.hidden=true;bar.append(b);}buttons.push(...orbitButtons);}
    for(const b of extraButtons?.(button)||[]){bar.append(b);buttons.push(b);}
-   const shown=()=>buttons.filter(b=>!b.hidden);
+   if(compactToolbar){
+    // Uma única ação principal e alternativas completas sob demanda.
+    // <details> mantém zoom, órbita, restauro e perspectiva disponíveis
+    // para quem não consegue executar pinça, arraste ou atalhos.
+    bar.classList.add('silm-camera-compact');
+    const advanced=U.element('details',null,'silm-camera-advanced');
+    const summary=U.element('summary','Controles de câmera','silm-camera-advanced-summary');
+    summary.title='Abrir zoom, giro, centralização, restauro e perspectiva';
+    summary.setAttribute('aria-label','Mais controles da câmera');
+    const panel=U.element('div',null,'silm-camera-advanced-panel');
+    for(const child of [...bar.children])if(child!==fitButton)panel.append(child);
+    advanced.append(summary,panel);bar.append(advanced);
+    fitButton.tabIndex=0;inButton.tabIndex=-1;
+    const positionAdvanced=()=>{
+     if(!advanced.open)return;
+     // Um painel fixo não é recortado pela rolagem horizontal da barra
+     // instrumental. A âncora acompanha o summary e respeita o viewport.
+     const v=window.visualViewport,r=summary.getBoundingClientRect();
+     const vw=v?.width||window.innerWidth,vh=v?.height||window.innerHeight;
+     const width=Math.min(324,Math.max(180,vw-24));
+     const height=Math.min(panel.scrollHeight,Math.max(100,vh*.6));
+     const left=Math.max(12,Math.min(r.right-width,vw-width-12));
+     const above=r.top-height-8,below=r.bottom+8;
+     const top=above>=8?above:Math.min(below,Math.max(8,vh-height-8));
+     panel.style.left=left+'px';panel.style.top=Math.max(8,top)+'px';
+    };
+    scope.listen(advanced,'toggle',()=>{
+     inButton.tabIndex=advanced.open?0:-1;
+     if(advanced.open)positionAdvanced();
+     else if(panel.contains(document.activeElement))summary.focus({preventScroll:true});
+    });
+    scope.listen(advanced,'keydown',event=>{
+     if(event.key==='Escape'&&advanced.open){
+      event.preventDefault();event.stopPropagation();advanced.open=false;
+      summary.focus({preventScroll:true});
+     }
+    });
+    scope.listen(document,'pointerdown',event=>{
+     if(advanced.open&&!advanced.contains(event.target))advanced.open=false;
+    });
+    scope.listen(window,'resize',positionAdvanced);
+    scope.listen(window,'scroll',positionAdvanced,{capture:true});
+    if(window.visualViewport){
+     scope.listen(window.visualViewport,'resize',positionAdvanced);
+     scope.listen(window.visualViewport,'scroll',positionAdvanced);
+    }
+   }
+   const shown=()=>buttons.filter(b=>!b.hidden&&b.getClientRects().length>0);
    scope.listen(bar,'keydown',e=>{const list=shown(),k=list.indexOf(document.activeElement);if(k<0)return;const next={ArrowDown:k+1,ArrowRight:k+1,ArrowUp:k-1,ArrowLeft:k-1,Home:0,End:list.length-1}[e.key];
     if(next==null||e.shiftKey)return;e.preventDefault();e.stopPropagation();const t=list[(next+list.length)%list.length];for(const b of buttons)b.tabIndex=b===t?0:-1;t.focus();});
   }

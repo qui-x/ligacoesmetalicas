@@ -72,7 +72,7 @@ SILM.createLatticeCursor = function (geometry, initialKey, initialAnchor) {
   };
 };
 
-SILM.createLatticePanel = function ({geometry, initialKey, initialAnchor, onFocus, scope}) {
+SILM.createLatticePanel = function ({geometry, initialKey, initialAnchor, onFocus, scope, mode='network'}) {
   const cursor = SILM.createLatticeCursor(geometry, initialKey, initialAnchor);
   function element(tag, text) {
     const node = document.createElement(tag);
@@ -95,13 +95,17 @@ SILM.createLatticePanel = function ({geometry, initialKey, initialAnchor, onFocu
   const reading = element('span');
   status.append(position, reading);
   root.append(element('strong', 'Rede'));
+  const more=element('details');more.className='silm-lattice-more';
+  const summary=element('summary',mode==='center'?'Mais navegação':'Navegação por eixos');
+  const controls=element('div');controls.className='silm-lattice-more-controls';
+  more.append(summary,controls);
   function button(label, title, action) {
     const node = element('button', label);
     node.type = 'button';
     node.setAttribute('aria-label', title);
     node.title = title;
     scope.listen(node, 'click', action);
-    root.append(node);
+    controls.append(node);
     return node;
   }
   const moves = [];
@@ -116,9 +120,46 @@ SILM.createLatticePanel = function ({geometry, initialKey, initialAnchor, onFocu
       moves.push({axis,step,node:button((step > 0 ? '+' : '−') + letter, title, () => visit(cursor.translate(axis,step),cursor.anchor))});
     }
   }
-  root.append(select);
-  scope.listen(select, 'change', () => visit(cursor.shell.list.find(site => site.key === select.value)));
+  if(mode==='center')controls.append(select);else root.append(select);
+  scope.listen(select, 'change', () => {
+   const site=cursor.shell.list.find(site => site.key === select.value);
+   if(site)visit(site);
+  });
   button('Origem', 'Voltar ao centro inicial da rede', () => visit(geometry.cell[0], geometry.cell[0]));
+  root.append(more);
+  const positionMore=()=>{
+   if(!more.open)return;
+   const v=window.visualViewport,r=summary.getBoundingClientRect();
+   const vw=v?.width||window.innerWidth,vh=v?.height||window.innerHeight;
+   const width=Math.min(335,Math.max(180,vw-24));
+   const height=Math.min(controls.scrollHeight,Math.max(100,vh*.64));
+   const left=Math.max(12,Math.min(r.right-width,vw-width-12));
+   const above=r.top-height-8,below=r.bottom+8;
+   controls.style.left=left+'px';
+   controls.style.top=Math.max(8,above>=8?above:Math.min(below,Math.max(8,vh-height-8)))+'px';
+  };
+  scope.listen(more,'toggle',()=>{
+   if(more.open)positionMore();
+   else if(controls.contains(document.activeElement))summary.focus({preventScroll:true});
+  });
+  scope.listen(more,'keydown',event=>{
+   if(event.key==='Escape'&&more.open){
+    event.preventDefault();event.stopPropagation();more.open=false;
+    summary.focus({preventScroll:true});
+   }
+  });
+  // Fechar após o clique (não no pointerdown): assim um botão externo,
+  // como Avançar Joule, recebe seu click mesmo quando esta gaveta está aberta.
+  // Um fechamento no pointerdown pode reposicionar o alvo antes do pointerup.
+  scope.listen(document,'click',event=>{
+   if(more.open&&!more.contains(event.target))more.open=false;
+  });
+  scope.listen(window,'resize',positionMore);
+  scope.listen(window,'scroll',positionMore,{capture:true});
+  if(window.visualViewport){
+   scope.listen(window.visualViewport,'resize',positionMore);
+   scope.listen(window.visualViewport,'scroll',positionMore);
+  }
   function refresh() {
     const site = cursor.site, shell = cursor.shell;
     position.textContent = 'Célula [' + cursor.offset.join(', ') + '] · sítio ' + (site.basis + 1);

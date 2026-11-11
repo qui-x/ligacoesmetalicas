@@ -269,7 +269,10 @@ async function test(viewport){
   return {items,barHeight:rect.height,barBottom:rect.bottom,scrollable:bar.scrollWidth>bar.clientWidth};
  });
  let toolbarState=await sampleSceneButtons();
- assert.ok(toolbarState.items.length>=6,'Faltam botões da câmera na faixa instrumental.');
+ assert.ok(toolbarState.items.length>=1&&toolbarState.items.length<=4,
+  'A câmera precisa manter Enquadrar e recolher os controles redundantes: '+JSON.stringify(toolbarState.items));
+ assert.equal(await page.locator('#silm-view-controls .silm-camera-advanced').getAttribute('open'),null,
+  'A câmera avançada deve iniciar recolhida.');
  assert.ok(toolbarState.items.every(b=>Math.abs(b.width-44)<1&&Math.abs(b.height-44)<1),'Botões instrumentais ficaram menores ou maiores do que 44 px.');
  assert.ok(toolbarState.items.every(b=>Math.abs(b.cy-toolbarState.items[0].cy)<2),'Ícones de câmera perderam o alinhamento vertical.');
  assert.ok(Math.abs(toolbarState.barHeight-60)<2,'A faixa científica não conservou uma altura fixa.');
@@ -279,15 +282,20 @@ async function test(viewport){
   const toolbarNav=page.locator('#silm-scene-actionbar');
   await toolbarNav.waitFor({state:'visible'});
   await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar')?.dataset.toolbarNavigation==='ready');
-  await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar')?.dataset.toolbarOverflow==='true');
-  const nextTool=toolbarNav.getByRole('button',{name:'Mostrar próximas ferramentas'});
-  await nextTool.waitFor({state:'visible'});
-  await nextTool.click();
-  await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar').scrollLeft>10);
-  const prevTool=toolbarNav.getByRole('button',{name:'Mostrar ferramentas anteriores'});
-  await prevTool.waitFor({state:'visible'});
-  await prevTool.click();
-  await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar').scrollLeft<10);
+  const overflow=await toolbarNav.evaluate(n=>n.scrollWidth>n.clientWidth+2);
+  if(overflow){
+   const nextTool=toolbarNav.getByRole('button',{name:'Mostrar próximas ferramentas'});
+   await nextTool.waitFor({state:'visible'});
+   await nextTool.click();
+   await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar').scrollLeft>10);
+   const prevTool=toolbarNav.getByRole('button',{name:'Mostrar ferramentas anteriores'});
+   await prevTool.waitFor({state:'visible'});
+   await prevTool.click();
+   await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar').scrollLeft<10);
+  }else{
+   assert.equal(await toolbarNav.locator('#silm-view-controls [id$="-camera-fit"]').isVisible(),true,
+    'Sem rolagem, Enquadrar precisa continuar visível e acessível.');
+  }
   const barBox=await toolbarNav.boundingBox();
   assert.ok(barBox.height<=62,'A barra instrumental aumentou de altura no celular.');
   await page.setViewportSize(previousSize);
@@ -309,7 +317,7 @@ async function test(viewport){
   assert.equal(await expand.getAttribute('aria-pressed'),'false','O botão não voltou ao estado recolhido.');
   assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'A expansão alterou dados científicos.');
  }else{
-  assert.ok(toolbarState.scrollable,'Faixa móvel precisa rolar, nunca comprimir controles instrumentais.');
+  assert.ok(toolbarState.items.length>=1,'Ações essenciais da câmera ficaram indisponíveis.');
  }
 
  await page.locator('[data-scene-view="overview"]').click();
@@ -413,6 +421,10 @@ async function test(viewport){
  await units.first().waitFor({state:'visible'});
  const sites=()=>units.evaluateAll(nodes=>nodes.map(n=>n.dataset.site));
  const original=await sites();
+ // Translação por eixos é ação avançada na escala Centro.
+ const details=page.locator('#silm-scene-actionbar .silm-lattice-more');
+ await details.locator('summary').click();
+ assert.equal(await details.getAttribute('open'),'','Navegação acessível não abriu.');
  for(const [axis,letter] of ['a','b','c'].entries()){
   await page.getByRole('button',{name:'Avançar uma célula no eixo '+letter}).click();
   const expected=original.map(key=>{
@@ -425,7 +437,15 @@ async function test(viewport){
  }
  assert.match(await status.textContent(),/Célula \[0, 0, 0\]/);
  assert.equal(await page.locator('#silm-scene-actionbar .silm-lattice-nav').count(),1);
- await page.getByLabel('Aplicar estímulo na rede').selectOption('joule');
+ // O estímulo passa ao menu Ver; as condições/leituras do ensaio
+ // permanecem na ferramenta científica existente.
+ await page.locator('[data-open-dock="ver"]').click();
+ await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===false);
+ const startJoule=page.locator('#silm-direct-actionbar [data-action="joule"]');
+ await startJoule.waitFor({state:'visible'});
+ assert.equal(await startJoule.isEnabled(),true,'Joule indisponível no menu Ver');
+ await startJoule.click();
+ await page.locator('[data-open-dock="ver"]').click();
  const step=page.getByRole('button',{name:'Avançar meio intervalo no efeito Joule'}),conditions=page.getByLabel('Condições do efeito Joule');
  const reading=page.locator('.silm-lattice-status span');
  await step.locator('svg.silm-action-icon').waitFor({state:'visible'});
@@ -435,6 +455,9 @@ async function test(viewport){
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span').textContent.includes(' · t 0,5 · '));
  const value=async label=>Number((await reading.textContent()).split(' · '+label+' ')[1].split(' · ')[0].replace(',','.'));
  const timeBeforeNavigation=await value('t');
+ // Clicar em Ver fecha corretamente os popovers externos. Reabrir a
+ // navegação avançada para ensaiar a translação após iniciar Joule.
+ if(await details.getAttribute('open')===null)await details.locator('summary').click();
  await page.getByRole('button',{name:'Avançar uma célula no eixo a'}).click();
  assert.equal(await value('t'),timeBeforeNavigation,'Navegar não deve avançar o ensaio.');
  await page.getByRole('button',{name:'Recuar uma célula no eixo a'}).click();
@@ -445,11 +468,15 @@ async function test(viewport){
  const electronFlow=()=>page.locator('.silm-electron-canvas').evaluate(n=>n.silmElectrons.snapshot().currentFactor);
  const flowBefore=await electronFlow();
  await step.click();
+ // Fechar o painel avançado ao tocar o botão não pode roubar o clique.
+ await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 1 · '),undefined,{timeout:8000});
  assert.equal(await value('I'),currentBefore,'A corrente imposta mudou com a temperatura.');
  assert.equal(await electronFlow(),flowBefore,'A pista visual aplicou o efeito térmico duas vezes sob corrente imposta.');
  const warm=await value('T média');
  await conditions.selectOption('supply');
+ await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · U 0 · I 0 · '),undefined,{timeout:10000});
  await step.click();
+ await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 1,5 · '),undefined,{timeout:10000});
  assert.match(await reading.textContent(),/corrente imposta.* · t 1,5 · U 0 · I 0 · R [\d,]+ · P Joule 0/);
  assert.ok(await value('T média')<warm,'Desligar a fonte com terminais ao ambiente precisa permitir resfriamento.');
  assert.equal(await electronFlow(),0);

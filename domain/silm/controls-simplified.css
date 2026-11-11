@@ -1,0 +1,278 @@
+/* SILM · Parte 9 — comandos essenciais, gestos e alternativas acessíveis.
+   A câmera e a navegação cristalográfica conservam suas ações originais:
+   apenas os controles secundários ficam sob demanda. */
+#silm-view-controls .silm-camera-compact{
+ box-sizing:border-box;display:flex;flex-flow:row wrap;gap:5px;
+ align-items:center;align-content:center;max-height:none;
+ padding:0;border:0;box-shadow:none;background:transparent;
+}
+#silm-view-controls .silm-camera-compact>.silm-camera-btn{
+ width:44px;min-width:44px;height:44px;min-height:44px;
+ border-radius:9px;
+}
+#silm-view-controls .silm-camera-advanced{
+ position:relative;display:block;min-width:0;z-index:30;
+}
+#silm-view-controls .silm-camera-advanced-summary{
+ box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+ min-width:44px;min-height:44px;padding:4px 8px;
+ border:1px solid var(--border);border-radius:9px;
+ color:var(--text);background:var(--surface);font:inherit;
+ cursor:pointer;font-size:.72rem;font-weight:700;line-height:1.15;
+}
+#silm-view-controls .silm-camera-advanced-summary:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px
+}
+#silm-view-controls .silm-camera-advanced[open] .silm-camera-advanced-summary{
+ border-color:var(--accent);
+}
+#silm-view-controls .silm-camera-advanced-panel{
+ position:absolute;z-index:50;bottom:calc(100% + 8px);right:0;
+ box-sizing:border-box;display:grid;
+ grid-template-columns:repeat(4,minmax(44px,1fr));
+ align-items:center;gap:6px;min-width:220px;max-width:min(324px,calc(100vw - 20px));
+ padding:9px;border-radius:12px;border:1px solid var(--border);
+ background:var(--panel,var(--surface));box-shadow:0 5px 16px #0003;
+ max-height:min(320px,60dvh);overflow-y:auto;overscroll-behavior:contain;
+}
+#silm-view-controls .silm-camera-advanced:not([open]) .silm-camera-advanced-panel{display:none}
+#silm-view-controls .silm-camera-advanced-panel .silm-camera-btn{
+ width:44px;height:44px;min-width:44px;min-height:44px;
+}
+#silm-view-controls .silm-camera-advanced-panel .silm-camera-zoom{
+ grid-column:span 2;min-width:0;width:auto;text-align:center
+}
+#silm-view-controls .silm-camera-advanced-panel .silm-camera-orbit[hidden]{display:none}
+#silm-view-controls .silm-camera-advanced-panel .silm-camera-btn:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px
+}
+/* Rede: escolha de vizinhos à vista e deslocamentos cristalográficos em
+   uma gaveta. Centro: a cena é a interface; seletor e origem na gaveta. */
+#silm-scene-actionbar .silm-lattice-nav:not([hidden]){gap:6px}
+#silm-scene-actionbar .silm-lattice-more{position:relative;display:inline-block;min-width:0}
+#silm-scene-actionbar .silm-lattice-more>summary{
+ display:flex;align-items:center;justify-content:center;
+ box-sizing:border-box;min-height:44px;min-width:44px;
+ padding:6px 10px;border:1px solid var(--border);
+ border-radius:9px;background:var(--surface);color:var(--text);
+ cursor:pointer;font-size:.75rem;font-weight:700;white-space:normal
+}
+#silm-scene-actionbar .silm-lattice-more>summary:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px
+}
+#silm-scene-actionbar .silm-lattice-more-controls{
+ position:absolute;z-index:55;bottom:calc(100% + 8px);right:0;
+ box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;
+ justify-content:flex-end;gap:6px;
+ padding:8px;min-width:220px;max-width:min(335px,calc(100vw - 20px));
+ border:1px solid var(--border);border-radius:12px;
+ background:var(--panel,var(--surface));box-shadow:0 5px 16px #0003
+}
+#silm-scene-actionbar .silm-lattice-more:not([open]) .silm-lattice-more-controls{display:none}
+#silm-scene-actionbar .silm-lattice-more-controls select{flex:1 1 100%;max-width:100%;min-height:44px}
+#silm-scene-actionbar .silm-lattice-more-controls button{min-width:44px;min-height:44px}
+#silm-scene-actionbar .silm-lattice-nav.silm-center-navigation>strong{display:none}
+/* Apenas o centro traz símbolos: os vizinhos são esferas 3D discretas
+   com descrição completa em aria-label e tooltip. Alvo de toque 44px. */
+.silm-crystal[data-local-focus="true"] .silm-center-shell-layer .silm-center-neighbor{
+ box-sizing:border-box;width:44px;height:44px;min-width:44px;min-height:44px;
+ border:0;box-shadow:none;background:transparent;opacity:1;
+ color:transparent;touch-action:manipulation;
+}
+.silm-crystal[data-local-focus="true"] .silm-center-shell-layer .silm-center-neighbor::before{
+ content:'';display:block;position:absolute;
+ inset:4px;border-radius:50%;
+ border:1.5px solid color-mix(in srgb,var(--scientific-accent,#0e9488) 67%,var(--border,#94a3b8));
+ background:radial-gradient(circle at 27% 23%,
+  color-mix(in srgb,var(--surface,#fff) 83%,var(--scientific-accent,#0e9488)),
+  color-mix(in srgb,var(--surface,#fff) 43%,var(--scientific-accent,#0e9488)));
+ box-shadow:inset -3px -4px 6px #0002,0 3px 8px #0002;
+ transform:scale(calc(1.04 - var(--local-depth,.5)*.15));
+}
+.silm-crystal[data-local-focus="true"] .silm-center-shell-layer .silm-center-neighbor:disabled::before{
+ opacity:.3;border-style:dashed
+}
+.silm-crystal[data-local-focus="true"] .silm-center-shell-layer .silm-center-neighbor:focus-visible{
+ outline:3px solid var(--scientific-accent,#0e9488);outline-offset:1px;
+}
+@media(max-width:600px){
+ #silm-view-controls .silm-camera-advanced-panel{right:-46px;max-width:min(280px,calc(100vw - 16px))}
+ #silm-scene-actionbar .silm-lattice-more-controls{right:0}
+ #silm-scene-actionbar .silm-lattice-nav:not([hidden])>strong{display:none}
+}
+@media(forced-colors:active){
+ #silm-view-controls .silm-camera-advanced-summary,
+ #silm-scene-actionbar .silm-lattice-more>summary{border-color:ButtonText;background:ButtonFace;color:ButtonText}
+ .silm-crystal[data-local-focus="true"] .silm-center-shell-layer .silm-center-neighbor::before{
+  background:ButtonFace;border:2px solid ButtonText;forced-color-adjust:none
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #silm-view-controls .silm-camera-compact *,#silm-scene-actionbar .silm-lattice-more *{
+  transition:none!important;animation:none!important
+ }
+}
+
+/* Microestruturas · botões consistentes e deliberados, sem depender do
+   estilo nativo do navegador nem acrescentar uma barra de navegação. */
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-control,
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) .silm-workshop-micro-control{
+ -webkit-appearance:none;appearance:none;box-sizing:border-box;
+ display:inline-flex;align-items:center;justify-content:center;gap:5px;
+ flex:0 0 auto;min-width:44px;min-height:44px;
+ padding:7px 10px;border:1px solid var(--border);border-radius:10px;
+ background:var(--surface);color:var(--text);
+ font-family:inherit;font-size:clamp(.73rem,.76vw,.85rem);
+ font-weight:700;line-height:1.15;
+ white-space:normal;text-align:center;overflow-wrap:anywhere;
+ box-shadow:inset 0 -2px 0 #0001;
+ cursor:pointer;touch-action:manipulation;transition:background .16s,border-color .16s,box-shadow .16s;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-control svg,
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) .silm-workshop-micro-control svg{
+ width:18px;height:18px;min-width:18px;flex:none;stroke:currentColor;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-control:hover:not(:disabled),
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) .silm-workshop-micro-control:hover:not(:disabled){
+ border-color:var(--accent);
+ background:color-mix(in srgb,var(--accent) 8%,var(--surface));
+ box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--accent) 40%,transparent);
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-control:active:not(:disabled),
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) .silm-workshop-micro-control:active:not(:disabled){
+ background:color-mix(in srgb,var(--accent) 14%,var(--surface));
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-control:disabled,
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) .silm-workshop-micro-control:disabled{
+ opacity:.48;cursor:not-allowed;box-shadow:none;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-control:focus-visible,
+:is(.silm-micro-data-dialog,.silm-micro-generator-dialog) .silm-workshop-micro-control:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-control[data-micro-action="Aproximar grão selecionado"],
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-control[data-micro-action="Abrir gerador de formações de grãos"],
+:is(.silm-micro-generator-dialog,.silm-micro-data-dialog) .silm-workshop-micro-control:is(
+ [data-micro-action="Gerar formação com a semente informada"],
+ [data-micro-action="Retornar ao mapa didático"]){
+ background:color-mix(in srgb,var(--accent) 12%,var(--surface));
+ border-color:color-mix(in srgb,var(--accent) 65%,var(--border));
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools{
+ box-sizing:border-box;display:flex;align-items:center;justify-content:flex-end;
+ gap:5px;min-width:0;flex-wrap:wrap;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools .silm-workshop-micro-zoom{
+ min-width:48px;font-weight:700;white-space:nowrap;
+}
+:is(.silm-micro-generator-dialog,.silm-micro-data-dialog) .silm-micro-data-actions{
+ box-sizing:border-box;display:flex;flex-wrap:wrap;justify-content:flex-end;
+ align-items:stretch;gap:7px;max-width:100%;
+}
+:is(.silm-micro-generator-dialog,.silm-micro-data-dialog) .silm-micro-data-actions .silm-workshop-micro-control{
+ flex:0 1 auto;max-width:100%;
+}
+:is(.silm-micro-generator-dialog,.silm-micro-data-dialog) input[type=file]{
+ box-sizing:border-box;width:100%;min-width:0;max-width:100%;
+ min-height:44px;padding:8px;border:1px solid var(--border);
+ border-radius:9px;background:var(--surface);color:var(--text);
+}
+:is(.silm-micro-generator-dialog,.silm-micro-data-dialog) input[type=file]::file-selector-button{
+ min-height:36px;margin-inline-end:8px;
+ padding:6px 9px;border:1px solid var(--border);
+ border-radius:8px;background:var(--panel2,var(--surface));
+ color:var(--text);font:inherit;font-weight:700;cursor:pointer;
+}
+:is(.silm-micro-generator-dialog,.silm-micro-data-dialog) input[type=file]:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px;
+}
+@media(max-width:600px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools{
+  justify-content:center;gap:5px;width:100%;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-control{
+  padding:6px 8px;
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools .silm-micro-button-label{
+  font-size:.7rem;
+ }
+ :is(.silm-micro-generator-dialog,.silm-micro-data-dialog) .silm-micro-data-actions{
+  justify-content:stretch;
+ }
+ :is(.silm-micro-generator-dialog,.silm-micro-data-dialog) .silm-micro-data-actions .silm-workshop-micro-control{
+  flex:1 1 115px;
+ }
+}
+@media(forced-colors:active){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-control,
+ :is(.silm-micro-generator-dialog,.silm-micro-data-dialog) .silm-workshop-micro-control{
+  background:ButtonFace!important;color:ButtonText!important;border:2px solid ButtonText!important;
+  forced-color-adjust:auto
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-control:disabled{
+  color:GrayText!important;border-color:GrayText!important
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-control,
+ :is(.silm-micro-generator-dialog,.silm-micro-data-dialog) .silm-workshop-micro-control{
+  transition:none!important
+ }
+}
+
+/* O Centro também disponibiliza a translação cristalográfica para
+   instrumentos e acessibilidade, mas somente depois de abrir Mais navegação. */
+#silm-scene-actionbar .silm-center-navigation .silm-lattice-more[open] .silm-lattice-more-controls button[aria-label^="Avançar uma célula"],
+#silm-scene-actionbar .silm-center-navigation .silm-lattice-more[open] .silm-lattice-more-controls button[aria-label^="Recuar uma célula"]{
+ display:inline-flex!important;align-items:center;justify-content:center
+}
+
+/* Compatibilidade com a barra antiga em grade e o recolhimento móvel:
+   nenhum media query anterior pode apagar o acesso ao disclosure novo. */
+#silm-view-controls .silm-camera-bar.silm-camera-compact,
+#silm-view-controls .silm-camera:not([data-open]) .silm-camera-bar.silm-camera-compact{
+ display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;
+ align-items:center!important;align-content:center!important;justify-content:center!important;
+ gap:5px!important;max-width:none!important;max-height:none!important;
+ overflow:visible!important;grid-template-columns:none!important;
+}
+@media(max-width:600px),(max-height:500px) and (orientation:landscape){
+ #silm-view-controls .silm-camera:not([data-open]) .silm-camera-bar.silm-camera-bar-has-expand.silm-camera-compact{
+  display:flex!important;max-width:min(260px,calc(100vw - 22px))!important;
+  flex-direction:row!important;padding:4px!important;
+ }
+ #silm-view-controls .silm-camera:not([data-open]) .silm-camera-bar.silm-camera-bar-has-expand.silm-camera-compact>:is(
+ .silm-camera-advanced,[id$="-camera-fit"]){
+  display:flex!important;align-items:center;justify-content:center
+ }
+}
+
+/* A câmera compacta vive na barra inferior, mesmo em celular.
+   A regra legada de integração esconde todo filho que não seja Expandir
+   quando .silm-camera-bar-has-expand aparece; isso ocultava <details>
+   enquanto Enquadrar continuava visível por uma regra !important de botão.
+   Prioridade explícita aqui evita perder a alternativa a gestos/atalhos. */
+#silm-scene-actionbar #silm-view-controls .silm-camera-inline .silm-camera-bar.silm-camera-compact.silm-camera-bar-has-expand{
+ max-width:none!important;width:auto!important;padding:0!important;
+}
+#silm-scene-actionbar #silm-view-controls .silm-camera-bar.silm-camera-compact>.silm-camera-advanced{
+ display:block!important;flex:0 0 auto!important;visibility:visible!important;
+}
+
+/* Popovers são ancorados por JS ao summary, mas usam posicionamento fixo:
+   sobrevivem ao overflow-x:auto da ação inferior sem cobrir a cena inteira. */
+#silm-scene-actionbar{
+ position:relative!important;z-index:120!important;
+}
+#silm-view-controls .silm-camera-advanced-panel,
+#silm-scene-actionbar .silm-lattice-more-controls{
+ position:fixed!important;top:0;left:0;right:auto!important;bottom:auto!important;
+ z-index:3100;max-height:min(320px,65dvh);
+ overflow-y:auto;overscroll-behavior:contain;
+}
+#silm-view-controls .silm-camera-advanced-panel{
+ width:min(324px,calc(100vw - 24px));max-width:calc(100vw - 24px);
+}
+#silm-scene-actionbar .silm-lattice-more-controls{
+ width:min(335px,calc(100vw - 24px));max-width:calc(100vw - 24px);
+}

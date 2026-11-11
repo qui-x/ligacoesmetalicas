@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.10';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='parte9-cameras-foco-centro-graos-20261110';
+const BUILD='parte9-controles-enxutos-auditoria-multirresolucao-20261111';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "assets/workshop/motor.webp",
@@ -131,6 +131,7 @@ const FILES=[
   "integracao/upstream/mobile-contract.css",
   "domain/silm/assembly.css",
   "domain/silm/center-focus.css",
+  "domain/silm/controls-simplified.css",
   "domain/silm/periodic-table.css",
   "integracao/integration.css",
   "integracao/silm-theme.css",

@@ -67,6 +67,7 @@ jobs:
           node --check tests/run-periodic-responsive.mjs
           node --check tests/run-four-scales-responsive.mjs
           node --check tests/run-cross-regressions.mjs
+          node --check tests/run-controls-responsive-matrix.mjs
           node --check domain/silm/periodic-table.js
 
       - name: Instalar Playwright no runner
@@ -101,6 +102,9 @@ jobs:
       - name: Executar auditoria de telas, aplicações e microestruturas
         run: node tests/run-responsive-audit.mjs
 
+      - name: Validar controles de câmera, Ver, microestrutura e nove resoluções
+        run: node tests/run-controls-responsive-matrix.mjs
+
       - name: Publicar resumo no GitHub Actions
         if: always()
         run: |
@@ -134,6 +138,15 @@ jobs:
         with:
           name: silm-regressoes-${{ matrix.browser }}
           path: reports/contratos-regressao/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Guardar auditoria visual dos controles em nove resoluções
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-controles-matriz-${{ matrix.browser }}
+          path: reports/controle-matriz/${{ matrix.browser }}/
           if-no-files-found: warn
           retention-days: 14
 
