@@ -125,5 +125,32 @@ SILM.electrothermal=(()=>{
   }
   return Object.freeze({advance,observe,temperatureAt:key=>T[net.byKey.get(key)],field:()=>new Map(net.sites.map((s,i)=>[s.key,T[i]]))});
  }
- return Object.freeze({buildNetwork,createRun});
+ // Leitura de causa e efeito derivada das mesmas grandezas da malha,
+ // sem acrescentar outro motor, unidades SI ou parâmetros metal-específicos.
+ // Potência Joule (instantânea), calor armazenado e calor externo são distintos.
+ function explainFlow(input,values){
+  if(!input||!values||!['ambient','insulated'].includes(input.boundary)||
+   !['power','mean','external'].every(k=>Number.isFinite(values[k])&&values[k]>=0))return null;
+  const joule=values.power>1e-10,external=values.external>1e-10,warm=values.mean>1e-8;
+  const boundary=input.boundary==='ambient'?
+   'O calor pode sair pelos terminais mantidos na referência térmica.':
+   'Sem troca térmica pelas bordas idealmente isoladas.';
+  let phase,message;
+  if(joule&&external){
+   phase='combined';message='Corrente e fonte de calor externa atuam juntas. A dissipação Joule e o aporte externo são contabilizados separadamente.';
+  }else if(joule&&warm){
+   phase='heating';message='Corrente elétrica → dissipação Joule na malha → calor acumulado e redistribuído entre regiões do metal.';
+  }else if(joule){
+   phase='generating';message='Corrente elétrica → potência Joule distribuída na malha. O aquecimento aparece quando o tempo avança.';
+  }else if(external){
+   phase='external';message='Sem corrente: potência Joule igual a zero. O aquecimento decorre da fonte térmica externa.';
+  }else if(warm){
+   phase='residual';message='Fonte elétrica desligada: a geração Joule cessou. O calor já acumulado continua a se redistribuir.';
+  }else{
+   phase='idle';message='Sem alimentação: não há dissipação Joule nem elevação térmica acumulada.';
+  }
+  return Object.freeze({phase,message,boundary,activeDissipation:joule,
+   residualHeat:warm,externalHeat:external});
+ }
+ return Object.freeze({buildNetwork,createRun,explainFlow});
 })();
