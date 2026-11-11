@@ -27,7 +27,6 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  const storedLayers=B.storage.read(layerKey);
  const layerState={...layerDefaults,...(storedLayers&&typeof storedLayers==='object'?storedLayers:{})};
  const definitions=[
-  {id:'observacao-contextual',title:'Ações de observação',capability:'tools',family:'observar',description:'Ações diretas para estrutura, elétrons e propriedades metálicas.',render:output=>renderObserverContext(output)},
   {id:'camadas-estrutura',title:'Destaque estrutural',capability:'tools',family:'camadas',description:'Controle de destaque dos centros metálicos.',render:output=>renderLayerStructure(output)},
   {id:'camadas-indicacoes',title:'Indicações',capability:'tools',family:'camadas',description:'Respostas visuais, rótulos e legendas.',render:output=>renderLayerIndications(output)},
   {id:'comparar-livre-cristalina',title:'Montagem livre × cristalina',capability:'tools',family:'comparar',description:'Compare a preparação livre com a organização cristalográfica.',render:output=>renderComparison('free-crystal',output)},
