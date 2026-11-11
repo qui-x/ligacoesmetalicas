@@ -32,6 +32,9 @@ SILM.createRouteSession=({model,storage,view,onView,say})=>{
     return !!s.electrons?.representation.visible&&(!!s.electrons?.representation.motion||reduced);
    }
    case 'property-field':return s.properties?.active==='electrical'&&!!s.properties?.electrical?.field;
+   case 'property-heating':return s.properties?.active==='thermal'&&!!s.properties?.thermal?.heating&&s.properties.thermal.stage>0;
+   case 'property-light':return s.properties?.active==='luster'&&!!s.properties?.luster?.light;
+   case 'property-elongation':return s.properties?.active==='ductility'&&s.properties?.ductility?.elongation>0;
    case 'packing-factor':return validCalculation(s,'packingFactor');
    case 'cell-and-lattice':return !!c.evidence.cell&&!!c.evidence.lattice;
    case 'electrons':return !!s.electrons?.representation.visible;
