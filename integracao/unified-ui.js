@@ -270,6 +270,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    }
   };
  let manualKey='';
+ let manualDraft='';
  let manualPrintCleanup=null;
  window.addEventListener('si-route-changed',event=>{if(event.detail!=='manual')manualKey='';});
  /* Organização do Manual espelhada no SIAB: 13 categorias, quatro grupos,
@@ -302,7 +303,8 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   const cat=SIAB_MANUAL_CATEGORIES.find(c=>c.id===cid),active=topic?manualCategory(topic.id):cat;
   const key=(id||'')+'|'+(cid||'')+'|'+query+'|'+(referenceId||'');
   if(key===manualKey&&host.childElementCount)return;
-  const previous=manualKey;manualKey=key;host.replaceChildren();
+  if(host.dataset.manualRouteKey!==key)manualDraft=query;
+  const previous=manualKey;manualKey=key;host.dataset.manualRouteKey=key;host.replaceChildren();
   const topicHref=x=>'#/manual?topico='+encodeURIComponent(x),catHref=x=>'#/manual?categoria='+encodeURIComponent(x);
   const nav=(text,to,cls)=>{const a=link(text,to);if(cls)a.className=cls;return a;};
   const makeTitle=text=>{const h=N('h1',text);h.id='manual-title';h.tabIndex=-1;return h;};
@@ -312,7 +314,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   const homeLink=nav('Manual','#/manual','silm-manual-home-link');
   const form=N('form');form.className='silm-manual-search';form.role='search';form.setAttribute('aria-label','Busca no Manual');
   const label=N('label','Buscar no Manual');label.htmlFor='manual-search';
-  const input=N('input');input.type='search';input.maxLength=120;input.autocomplete='off';input.id='manual-search';input.placeholder='Metal, estrutura, medir, Caderno…';input.value=query;input.setAttribute('aria-describedby','manual-status');
+  const input=N('input');input.type='search';input.maxLength=120;input.autocomplete='off';input.id='manual-search';input.placeholder='Metal, estrutura, medir, Caderno…';input.value=query||manualDraft;input.setAttribute('aria-describedby','manual-status');
   const clear=N('button','×');clear.type='button';clear.className='silm-manual-clear button outline';clear.id='manual-clear';clear.setAttribute('aria-label','Limpar busca');clear.hidden=!query;
   const go=N('button','Buscar');go.type='submit';go.className='button outline';
   const row=N('div');row.className='silm-manual-search-row';row.append(input,clear,go);form.append(label,row);
@@ -409,10 +411,10 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    }host.append(sheet);document.body.classList.add('silm-print-manual');
    const done=()=>{document.body.classList.remove('silm-print-manual');sheet.remove();window.removeEventListener('afterprint',done);};manualPrintCleanup=done;window.addEventListener('afterprint',done);
   }
-  renderBase();if(query)renderSearch(query);else clear.hidden=true;
-  input.addEventListener('input',()=>renderSearch(input.value));
+  renderBase();if(query||manualDraft)renderSearch(query||manualDraft);else clear.hidden=true;
+  input.addEventListener('input',()=>{manualDraft=input.value;renderSearch(input.value);});
   form.addEventListener('submit',event=>{event.preventDefault();const q=input.value.trim();const to=q?'#/manual?busca='+encodeURIComponent(q):'#/manual';if(location.hash!==to)location.hash=to;else{renderSearch(q);$('manual-title')?.focus();}});
-  clear.addEventListener('click',()=>{input.value='';if(location.hash.includes('?busca='))location.hash='#/manual';renderBase();input.focus();});
+  clear.addEventListener('click',()=>{manualDraft='';input.value='';if(location.hash.includes('?busca='))location.hash='#/manual';renderBase();input.focus();});
   toggle.addEventListener('click',()=>setIndex(toggle.getAttribute('aria-expanded')!=='true'));
   host.addEventListener('keydown',event=>{if(event.key==='Escape'&&toggle.getAttribute('aria-expanded')==='true'){event.preventDefault();setIndex(false,true);}}, {signal:(()=>{if(!host.manualAbort)host.manualAbort=new AbortController();else{host.manualAbort.abort();host.manualAbort=new AbortController();}return host.manualAbort.signal;})()});
   print.addEventListener('click',()=>{manualPrintCleanup?.();preparePrint();try{window.print();}catch(error){manualPrintCleanup?.();say('Impressão indisponível neste navegador.','warning');}});
