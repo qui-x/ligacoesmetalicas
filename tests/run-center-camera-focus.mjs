@@ -40,7 +40,8 @@ try{
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
  const seed=await page.locator('.silm-workshop-micro-viewer').getAttribute('data-synthetic-seed');
  const grain=page.locator('.silm-micro-grain').first();
- await grain.click();const selected=await page.locator('.silm-workshop-micro-map').getAttribute('data-selected-grain');
+ await grain.focus();await grain.press('Enter');
+ const selected=await page.locator('.silm-workshop-micro-map').getAttribute('data-selected-grain');
  await page.getByRole('button',{name:'Aproximar grão selecionado'}).click();
  assert.equal(await page.locator('.silm-workshop-micro-map').getAttribute('data-focused-grain'),selected,
   'Botão Focar não acompanhou o grão selecionado');
