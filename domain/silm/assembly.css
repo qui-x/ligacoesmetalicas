@@ -292,7 +292,7 @@
 .silm-stage{overflow:hidden}
 .silm-stage:not([data-readonly]){touch-action:none;-webkit-touch-callout:none}
 .silm-stage[data-panning]{cursor:grabbing}
-.silm-stage[data-camera-animate]>[data-camera]{transition:transform 200ms ease-out}
+.silm-stage[data-camera-animate]>[data-camera]{transition:transform 340ms cubic-bezier(.2,.8,.2,1)}
 :root[data-motion=on] .silm-stage[data-camera-animate]>[data-camera],:root[data-reading=on] .silm-stage[data-camera-animate]>[data-camera]{transition:none}
 @media(prefers-reduced-motion:reduce){.silm-stage[data-camera-animate]>[data-camera]{transition:none}}
 /* Seleção: anel tracejado na camada própria (acima da estrutura), além do contorno da esfera; não depende só de cor. */
