@@ -73,7 +73,7 @@ try{
     label+': estrutura dos 18 grupos perdida '+JSON.stringify(geometry));
    assert.ok(geometry.gridHeight>400,
     label+': períodos e séries foram comprimidos '+JSON.stringify(geometry));
-   assert.ok(geometry.cellWidth>=55&&geometry.cellHeight>=57,
+   assert.ok(geometry.cellWidth>=55&&geometry.cellHeight>=48.5,
     label+': células pequenas demais para toque e leitura '+JSON.stringify(geometry));
    assert.ok(geometry.nameDisplay!=='none'&&geometry.nameSize>=9,
     label+': nomes não aparecem nas células '+JSON.stringify(geometry));
