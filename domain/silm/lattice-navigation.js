@@ -96,7 +96,7 @@ SILM.createLatticePanel = function ({geometry, initialKey, initialAnchor, onFocu
   status.append(position, reading);
   root.append(element('strong', 'Rede'));
   const more=element('details');more.className='silm-lattice-more';
-  const summary=element('summary',mode==='center'?'Escolher centro':'Navegação por eixos');
+  const summary=element('summary',mode==='center'?'Mais navegação':'Navegação por eixos');
   const controls=element('div');controls.className='silm-lattice-more-controls';
   more.append(summary,controls);
   function button(label, title, action) {
@@ -114,7 +114,7 @@ SILM.createLatticePanel = function ({geometry, initialKey, initialAnchor, onFocu
     refresh();
     onFocus(cursor.site, cursor.anchor);
   }
-  if(mode!=='center')for (const [axis, letter] of ['a','b','c'].entries()) {
+  for (const [axis, letter] of ['a','b','c'].entries()) {
     for (const step of [-1,1]) {
       const title = (step > 0 ? 'Avançar' : 'Recuar') + ' uma célula no eixo ' + letter;
       moves.push({axis,step,node:button((step > 0 ? '+' : '−') + letter, title, () => visit(cursor.translate(axis,step),cursor.anchor))});
