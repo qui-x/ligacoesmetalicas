@@ -1269,8 +1269,7 @@
     "module": "medir",
     "tools": [
       "latticeParameter",
-      "distance",
-      "unitCell"
+      "distance"
     ],
     "mode": "crystalline",
     "criterion": "measure-a",
@@ -1359,8 +1358,7 @@
     "module": "medir",
     "tools": [
       "latticeParameter",
-      "distance",
-      "unitCell"
+      "distance"
     ],
     "mode": "crystalline",
     "criterion": "measure-a",
