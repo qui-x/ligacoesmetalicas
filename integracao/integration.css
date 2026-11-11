@@ -1730,3 +1730,31 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
  .silm-theme-inquiry,.silm-mission-inquiry{margin-top:16px;padding-top:16px}
  .silm-theme-inquiry-steps>li{padding-left:34px}
 }
+
+/* Missão multievidência e comparação Cu/Nd — sem inventar controles científicos. */
+.silm-mission-objectives{max-width:74ch;margin:20px 0}
+.silm-mission-objectives ol{margin:12px 0;padding-left:26px}
+.silm-mission-objectives li{padding:6px 0;line-height:1.6;color:var(--secondary,var(--muted))}
+.silm-learning-science-note{
+ margin:12px 0 24px;padding:14px 18px;
+ border-left:3px solid var(--accent);background:var(--panel);
+ color:var(--secondary,var(--muted));line-height:1.65;max-width:72ch
+}
+#silm-route-guidance .silm-evidence li{
+ display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;
+ gap:8px 12px;padding:10px 0;border-bottom:1px solid var(--border)
+}
+#silm-route-guidance .silm-evidence li strong{
+ font-size:.8rem;white-space:nowrap;color:var(--secondary,var(--muted))
+}
+#silm-route-guidance .silm-evidence li[data-met="true"] strong{color:var(--accent)}
+.silm-workshop-guided .silm-workshop-scales{
+ position:relative;z-index:1;max-width:100%;
+}
+.silm-workshop-guided .silm-workshop-reference-summary button:not(.silm-workshop-scale){
+ display:none
+}
+@media(max-width:460px){
+ #silm-route-guidance .silm-evidence li{align-items:flex-start}
+ .silm-learning-science-note{padding:12px}
+}
