@@ -131,7 +131,9 @@
   if(inCameraBar&&phone.matches&&tools){button.classList.add('secondary-btn','si-structure-expand-in-tools');tools.append(button);}
   else if(inCameraBar&&bar){button.classList.add('secondary-btn','silm-camera-btn','si-structure-expand-in-camera');bar.classList.add('silm-camera-bar-has-expand');
    // Tela cheia ao lado de Restaurar vista (par da grade de duas colunas), antes dos controles 3D.
-   const reset=bar.querySelector('[id$="-camera-reset"]');if(reset)reset.after(button);else bar.append(button);}
+   const anchor=bar.classList.contains('silm-camera-compact')?
+    bar.querySelector('[id$="-camera-fit"]'):bar.querySelector('[id$="-camera-reset"]');
+   if(anchor)anchor.after(button);else bar.append(button);}
   else{button.classList.add('si-tab');if(button.parentElement!==toolbar)toolbar.append(button);}
  }
  phone.addEventListener?.('change',()=>placeExpansionButton(expansionInScene));
