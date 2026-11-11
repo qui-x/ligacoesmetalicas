@@ -28,11 +28,10 @@ try{
  assert.equal(await page.locator('#silm-object-entry .silm-workshop-card').count(),0,
   'Objetos foram exibidos antes de escolher um metal');
  const initially=await snap();
- const pickMetal=async(z,group)=>{
-  if(await page.locator('#silm-object-entry .silm-periodic-family').isVisible()){
-   await page.locator('#silm-object-entry .silm-family-picker').selectOption(String(group));
-   await page.locator('#silm-object-entry .silm-family-element[data-z="'+z+'"]').click();
-  }else await page.locator('#silm-object-entry .periodic-element[data-z="'+z+'"]').click();
+ const pickMetal=async z=>{
+  // Mesmo componente periódico em todas as telas; o click faz
+  // rolagem interna se a célula estiver à direita do viewport.
+  await page.locator('#silm-object-entry .periodic-element[data-z="'+z+'"]').click();
  };
  for(const [label,width,height] of [['mobile-320',320,568],['mobile-390',390,844],['tablet-1024',1024,768],['short-desktop',1440,650],['desktop',1366,768],['desktop-wide',1649,927]]){
   await page.setViewportSize({width,height});
@@ -47,27 +46,59 @@ try{
   assert.ok(dims.left>=-4&&dims.right<=width+4,label+': a Tabela extrapola a janela');
   assert.ok(dims.pageWidth<=width+6,label+': rolagem horizontal global');
   if(width<=1100||height<=700){
-   const family=page.locator('#silm-object-entry .silm-periodic-family');
-   assert.ok(await family.isVisible(),label+': falta modo por famílias');
-   const scroller=page.locator('#silm-object-entry .periodic-scroll');
-   assert.equal(await scroller.evaluate(n=>getComputedStyle(n).display),'none',
-    label+': grade panorâmica continuou com rolagem no mobile');
-   assert.equal(await family.locator('.silm-family-element').count(),7,
-    label+': grupo 1 não exibiu a família completa (H, Li, Na, K, Rb, Cs e Fr)');
-   const group1=await family.locator('.silm-family-element').evaluateAll(all=>all.map(n=>n.dataset.z));
-   assert.deepEqual(group1,['1','3','11','19','37','55','87'],label+': família 1 incompleta');
-   const h=await family.locator('.silm-family-element').evaluateAll(all=>all.map(n=>n.getBoundingClientRect().height));
-   assert.ok(h.every(size=>size>=43.5),label+': alvos menores que 44 px');
-   await family.locator('.silm-family-picker').selectOption('18');
-   assert.equal(await family.locator('.silm-family-element').count(),7,
-    label+': grupo 18 não exibe de He a Og');
-   await family.locator('.silm-family-picker').selectOption('lanthanides');
-   assert.equal(await family.locator('.silm-family-element').count(),15,
-    label+': lantanídeos incompletos');
-   await family.locator('.silm-family-picker').selectOption('actinides');
-   assert.equal(await family.locator('.silm-family-element').count(),15,
-    label+': actinídeos incompletos');
-   await family.locator('.silm-family-picker').selectOption('1');
+   assert.equal(await page.locator('#silm-object-entry .silm-periodic-family').count(),0,
+    label+': modo alternativo por famílias ainda montado');
+   const geometry=await page.locator('#silm-object-entry .periodic-scroll').evaluate(node=>{
+    const css=getComputedStyle(node);
+    const grid=node.querySelector('.periodic-grid');
+    const h=grid.querySelector('.periodic-element[data-z="1"]').getBoundingClientRect();
+    const og=grid.querySelector('.periodic-element[data-z="118"]').getBoundingClientRect();
+    const cu=grid.querySelector('.periodic-element[data-z="29"]');
+    const element=cu.getBoundingClientRect();
+    const names=getComputedStyle(cu.querySelector('.element-name'));
+    const initial=node.scrollLeft;
+    node.scrollLeft=node.scrollWidth;
+    const end=node.scrollLeft;
+    node.scrollLeft=0;
+    return {display:css.display,overflowX:css.overflowX,overflowY:css.overflowY,
+     touchAction:css.touchAction,clientWidth:node.clientWidth,scrollWidth:node.scrollWidth,
+     initial,end,pageWidth:document.documentElement.scrollWidth,
+     cellWidth:element.width,cellHeight:element.height,numberHeight:h.height,
+     farGroup:og.left>h.left,gridCols:getComputedStyle(grid).gridTemplateColumns.split(' ').length,
+     nameDisplay:names.display,nameSize:parseFloat(names.fontSize),gridHeight:grid.getBoundingClientRect().height};
+   });
+   assert.equal(geometry.overflowX,'auto',label+': falta rolagem horizontal da Tabela');
+   assert.equal(geometry.overflowY,'hidden',label+': a Tabela gerou rolagem vertical própria');
+   assert.ok(geometry.farGroup&&geometry.gridCols===19,
+    label+': estrutura dos 18 grupos perdida '+JSON.stringify(geometry));
+   assert.ok(geometry.gridHeight>400,
+    label+': períodos e séries foram comprimidos '+JSON.stringify(geometry));
+   assert.ok(geometry.cellWidth>=55&&geometry.cellHeight>=57,
+    label+': células pequenas demais para toque e leitura '+JSON.stringify(geometry));
+   assert.ok(geometry.nameDisplay!=='none'&&geometry.nameSize>=9,
+    label+': nomes não aparecem nas células '+JSON.stringify(geometry));
+   if(width<=1100){
+    assert.ok(geometry.scrollWidth>geometry.clientWidth+100,
+     label+': rolagem horizontal sem conteúdo adicional '+JSON.stringify(geometry));
+    assert.ok(geometry.end>100,label+': o gesto de rolar não alcança outros grupos');
+   }
+   assert.ok(geometry.pageWidth<=width+6,
+    label+': rolagem horizontal vazou para toda a página '+JSON.stringify(geometry));
+   // A busca encontra uma célula distante sem alterar a investigação.
+   if(width===390){
+    const search=page.locator('#silm-object-entry .silm-object-entry-head input[type="search"]');
+    await search.fill('118');
+    await page.waitForFunction(()=>{
+     const s=document.querySelector('#silm-object-entry .periodic-scroll');
+     return s&&s.scrollLeft>150;
+    });
+    assert.equal(await snap(),initially,label+': busca mudou o estado científico');
+    await page.screenshot({path:join(dir,'mobile-390-rolagem-final.jpg'),
+     type:'jpeg',quality:72,animations:'disabled'});
+    await search.fill('');
+    await page.locator('#silm-object-entry .periodic-scroll').evaluate(n=>n.scrollLeft=0);
+   }
+   note('horizontal-'+label,geometry);
   }else{
    const panorama=await page.locator('#silm-object-entry .periodic-scroll').evaluate(node=>{
     const view=node.getBoundingClientRect();
@@ -232,7 +263,7 @@ try{
  // Abrir novamente a Tabela no palco NÃO substitui a investigação.
  const prior=await snap();
  await page.locator('.silm-workshop-reference-summary').getByRole('button',{name:'Tabela Periódica'}).click();
- await page.locator('#silm-object-entry .silm-family-picker').waitFor({state:'visible'});
+ await page.locator('#silm-object-entry .periodic-scroll').waitFor({state:'visible'});
  assert.equal(await snap(),prior,'Consultar Tabela substituiu a investigação');
  await pickMetal(26,8);
  await modal.waitFor({state:'visible'});
