@@ -1487,3 +1487,198 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
  body.silm-print-manual .silm-manual-print-category{break-inside:avoid;border-bottom:1px solid #aaa;padding:2mm 0 4mm}
  body.silm-print-manual .silm-manual-print-sheet a{color:#111!important}
 }
+
+/* ================================================================
+   MANUAL — PARIDADE VISUAL SIAB, REVISÃO 2
+   Elementos estruturais, não só medidas: mesma ordem, ícones SVG,
+   pesos, alturas, cabeçalhos, listas e estados de navegação.
+   As variáveis de cor continuam pertencendo ao tema SILM.
+   ================================================================ */
+.silm-manual-page .silm-manual-svg{
+ display:inline-block;width:20px;height:20px;flex:none;vertical-align:middle;
+ fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round
+}
+.silm-manual-page .silm-manual-index{
+ overflow:auto;scrollbar-width:thin
+}
+.silm-manual-page .silm-manual-index a{
+ display:flex;align-items:center;justify-content:flex-start;gap:9px;
+ min-height:44px;padding:10px 8px;border:0;border-radius:6px;
+ background:transparent;box-shadow:none;color:var(--secondary,var(--muted));
+ font-size:.875rem;font-weight:400;line-height:1.4;text-align:left;text-decoration:none;
+ white-space:normal;overflow-wrap:anywhere
+}
+.silm-manual-page .silm-manual-index a:hover{background:var(--hover,var(--tint));color:var(--text)}
+.silm-manual-page .silm-manual-index a[aria-current="page"]{
+ background:var(--panel2);color:var(--accent);font-weight:700;
+ box-shadow:inset 3px 0 currentColor
+}
+.silm-manual-page .silm-manual-index a .silm-manual-svg{width:20px;height:20px}
+.silm-manual-page .silm-manual-index ul{padding:0;margin:12px 0 0}
+.silm-manual-page .silm-manual-index ul ul{margin:0 0 6px 17px;padding-left:9px}
+.silm-manual-page .silm-manual-index ul ul a{
+ min-height:38px;padding:8px;font-size:.825rem;line-height:1.4
+}
+.silm-manual-page .silm-manual-index .silm-manual-index-home{font-weight:600}
+.silm-manual-page .silm-manual-breadcrumb{
+ display:flex;align-items:center;gap:6px 10px;
+ max-width:var(--silm-manual-reading);min-height:0;margin:0 0 24px;
+ font-size:.8rem;color:var(--muted)
+}
+.silm-manual-page .silm-manual-breadcrumb a{
+ display:inline-flex;align-items:center;min-height:34px;
+ padding:0;border:0;border-radius:0;background:transparent;
+ font-size:inherit;color:var(--accent);text-decoration:underline;text-underline-offset:3px
+}
+.silm-manual-page .silm-manual-card{min-width:0;background:var(--panel);border-radius:var(--radius,10px)}
+.silm-manual-page .silm-manual-card:hover{background:var(--panel2);border-color:var(--accent)}
+.silm-manual-page .silm-manual-symbol{height:auto;min-height:26px;margin-bottom:12px;line-height:1}
+.silm-manual-page .silm-manual-symbol .silm-manual-svg{width:26px;height:26px}
+.silm-manual-page .silm-manual-card h3{margin:0 0 8px;font-size:1rem}
+.silm-manual-page .silm-manual-card p{font-size:.9rem;line-height:1.6;color:var(--secondary,var(--muted));margin:0 0 16px;max-width:50ch}
+.silm-manual-page .silm-manual-card-action{font-size:.8rem;gap:10px;padding-top:5px}
+.silm-manual-page .silm-manual-card-action .silm-manual-svg{width:18px;height:18px}
+.silm-manual-page .silm-manual-group h2{font-size:1rem;letter-spacing:.01em}
+.silm-manual-page .silm-manual-hero-parity h1{font-weight:650;letter-spacing:-.025em}
+.silm-manual-page .silm-manual-hero-parity>div>p:not(.eyebrow){color:var(--secondary,var(--muted))}
+.silm-manual-page .silm-manual-hero-parity .silm-actions{align-items:center}
+.silm-manual-page .silm-manual-hero-parity .silm-actions .silm-manual-svg{width:18px;height:18px;margin-left:8px}
+.silm-manual-page .silm-manual-workspace-map{
+ background:radial-gradient(ellipse at 50% 70%,color-mix(in srgb,var(--accent) 8%,transparent),transparent 70%),var(--panel);
+}
+.silm-manual-page .silm-manual-map-actions a{background:var(--panel2);gap:5px}
+.silm-manual-page .silm-manual-map-actions a:hover{border-color:var(--accent)}
+.silm-manual-page .silm-manual-map-scene{
+ display:flex;flex-direction:row;align-items:center;justify-content:center;
+ gap:16px;min-height:174px;padding-top:8px;text-align:left
+}
+.silm-manual-page .silm-manual-lattice{flex-shrink:0;width:125px;max-width:40%;height:auto}
+.silm-manual-page .silm-manual-lattice-bonds{stroke:var(--secondary,var(--muted));stroke-width:2.2;stroke-linecap:round;opacity:.78}
+.silm-manual-page .silm-manual-lattice-node{fill:var(--panel2);stroke:var(--accent);stroke-width:2.5}
+.silm-manual-page .silm-manual-lattice-center{fill:var(--accent);stroke:var(--text);stroke-width:2}
+.silm-manual-page .silm-manual-map-scene>.silm-manual-map-description{display:grid;gap:7px;font-size:inherit;line-height:1.4;min-width:0}
+.silm-manual-page .silm-manual-map-description strong{font-size:.95rem}
+.silm-manual-page .silm-manual-map-description span{font-size:.8rem;color:var(--secondary,var(--muted))}
+.silm-manual-page .silm-manual-quick a{gap:8px;font-size:.875rem;min-height:36px}
+.silm-manual-page .silm-manual-quick .silm-manual-svg{width:16px;height:16px}
+.silm-manual-page .silm-manual-quick a:hover{text-decoration:underline}
+.silm-manual-page .silm-manual-article-head{
+ border-bottom:1px solid var(--border);padding-bottom:24px;margin-bottom:24px
+}
+.silm-manual-page .silm-manual-article-head h1{
+ margin:10px 0 16px;font-size:clamp(1.7rem,2.5vw,2.35rem);
+ line-height:1.2;letter-spacing:-.02em
+}
+.silm-manual-page .silm-manual-article-head .silm-lead{
+ color:var(--text);font-size:1.1rem;max-width:62ch;line-height:1.65;margin:0
+}
+.silm-manual-page .silm-manual-category-page>section,
+.silm-manual-page .silm-manual-article>section{margin:26px 0}
+.silm-manual-page .silm-manual-article h2,
+.silm-manual-page .silm-manual-category-page h2{font-size:1.12rem;margin:0 0 12px}
+.silm-manual-page .silm-manual-purpose p,
+.silm-manual-page .silm-manual-steps,
+.silm-manual-page .silm-manual-details p{
+ font-size:.975rem;color:var(--secondary,var(--muted))
+}
+.silm-manual-page ol.silm-manual-steps{
+ list-style:none;counter-reset:silm-manual-step;margin:0;padding:0;
+ display:grid;gap:0;max-width:var(--silm-manual-reading)
+}
+.silm-manual-page ol.silm-manual-steps>li{
+ counter-increment:silm-manual-step;position:relative;
+ min-height:54px;padding:4px 0 18px 42px;margin:0;line-height:1.7
+}
+.silm-manual-page ol.silm-manual-steps>li:before{
+ content:counter(silm-manual-step,decimal-leading-zero);position:absolute;
+ left:0;top:5px;color:var(--accent);width:30px;
+ font:.8rem/24px Consolas,monospace;border-bottom:1px solid var(--border)
+}
+.silm-manual-page ol.silm-manual-steps>li+li{padding-top:12px;border-top:1px solid var(--border)}
+.silm-manual-page ol.silm-manual-steps>li+li:before{top:13px}
+.silm-manual-page .silm-manual-accordion{
+ margin:0;padding:0;border:0;border-bottom:1px solid var(--border);
+ border-radius:0;background:transparent
+}
+.silm-manual-page .silm-manual-accordion summary{
+ display:flex;align-items:center;min-height:54px;padding:16px 0;
+ text-align:left;gap:16px;border-radius:0;color:var(--text);font-size:.95rem;font-weight:600
+}
+.silm-manual-page .silm-manual-accordion summary:hover{background:var(--panel)}
+.silm-manual-page .silm-manual-accordion>p{padding:0 12px 18px 0;margin:0}
+.silm-manual-page .silm-manual-related{margin-top:32px;padding-top:22px;border-top:1px solid var(--border)}
+.silm-manual-page .silm-manual-related>div{gap:10px 20px}
+.silm-manual-page .silm-manual-related a{font-size:.9rem;text-decoration:underline;text-underline-offset:4px}
+.silm-manual-page .silm-manual-back{
+ display:inline-flex;align-items:center;gap:8px;min-height:44px;
+ margin-top:26px;padding:0;border:0;background:transparent;border-radius:0;
+ color:var(--accent);font-size:.9rem;font-weight:600;text-decoration:underline;
+ text-underline-offset:3px
+}
+.silm-manual-page .silm-manual-back .silm-manual-svg{width:18px;height:18px}
+.silm-manual-page .silm-manual-topic-link{
+ align-items:flex-start;min-width:0;gap:12px;padding:16px;
+ border-radius:var(--radius,10px);background:transparent;min-height:76px
+}
+.silm-manual-page .silm-manual-topic-link:hover{background:var(--panel)}
+.silm-manual-page .silm-manual-topic-link>.silm-manual-symbol{margin:0;min-height:20px;flex:0 0 20px}
+.silm-manual-page .silm-manual-topic-link>.silm-manual-symbol .silm-manual-svg{width:20px;height:20px}
+.silm-manual-page .silm-manual-topic-link>span:nth-child(2){display:block;flex:1;min-width:0}
+.silm-manual-page .silm-manual-topic-link strong{display:block;font-size:.9rem;margin-bottom:6px}
+.silm-manual-page .silm-manual-topic-link>span:nth-child(2)>span{
+ display:block;font-size:.85rem;line-height:1.6;color:var(--secondary,var(--muted))
+}
+.silm-manual-page .silm-manual-topic-link>.silm-manual-topic-arrow{width:16px;height:16px;margin-top:3px;color:var(--accent)}
+.silm-manual-page .silm-manual-results{max-width:870px;margin:auto}
+.silm-manual-page .silm-manual-results h1{
+ font-size:1.6rem;margin:8px 0 14px;overflow-wrap:anywhere
+}
+.silm-manual-page .silm-manual-results>p{color:var(--secondary,var(--muted))}
+.silm-manual-page .silm-manual-search-list{padding:0;list-style:none;margin:24px 0}
+.silm-manual-page .silm-manual-search-list li{border-bottom:1px solid var(--border)}
+.silm-manual-page .silm-manual-search-list li a{
+ display:block;position:relative;padding:20px 38px 20px 0;
+ color:var(--text);text-decoration:none
+}
+.silm-manual-page .silm-manual-search-list li a:hover{background:var(--panel)}
+.silm-manual-page .silm-manual-search-list li h2{margin:8px 0;font-size:1.1rem}
+.silm-manual-page .silm-manual-search-list li p{
+ color:var(--secondary,var(--muted));font-size:.95rem;
+ line-height:1.6;max-width:var(--silm-manual-reading);margin:0
+}
+.silm-manual-page .silm-manual-search-list li .silm-manual-svg{
+ position:absolute;right:6px;top:40px;width:16px;height:16px;color:var(--accent)
+}
+@media(max-width:800px){
+ .silm-manual-page .silm-manual-index a{min-height:44px}
+ .silm-manual-page .silm-manual-index ul ul a{min-height:44px;font-size:.875rem}
+ .silm-manual-page .silm-manual-map-scene{gap:16px}
+}
+@media(max-width:460px){
+ .silm-manual-page .silm-manual-card .silm-manual-symbol{margin-bottom:0}
+ .silm-manual-page .silm-manual-map-scene{gap:12px}
+ .silm-manual-page .silm-manual-lattice{width:92px}
+ .silm-manual-page .silm-manual-map-description strong{font-size:.875rem}
+ .silm-manual-page .silm-manual-map-description span{font-size:.75rem}
+}
+@media(forced-colors:active){
+ .silm-manual-page .silm-manual-svg,.silm-manual-page .silm-manual-lattice{color:LinkText}
+ .silm-manual-page .silm-manual-lattice-center{fill:Highlight;stroke:CanvasText}
+ .silm-manual-page .silm-manual-lattice-node{fill:Canvas;stroke:CanvasText}
+}
+
+/* Divulgação de detalhes e exemplo: mesmas pistas visuais da referência. */
+.silm-manual-page .silm-manual-accordion>summary{list-style:none;justify-content:space-between}
+.silm-manual-page .silm-manual-accordion>summary::-webkit-details-marker{display:none}
+.silm-manual-page .silm-manual-accordion>summary::marker{content:""}
+.silm-manual-page .silm-manual-accordion .silm-manual-disclosure{
+ width:20px;height:20px;margin-left:auto;color:var(--accent);transition:transform .15s ease
+}
+.silm-manual-page .silm-manual-accordion[open] .silm-manual-disclosure{transform:rotate(180deg)}
+.silm-manual-page .silm-manual-example{
+ padding:18px 20px;border-left:3px solid var(--accent);border-radius:0 var(--radius,9px) var(--radius,9px) 0;
+ background:var(--panel);margin:20px 0;max-width:var(--silm-manual-reading)
+}
+.silm-manual-page .silm-manual-example strong{font-size:.8rem;letter-spacing:.02em;color:var(--accent)}
+.silm-manual-page .silm-manual-example p{font-size:.95rem;color:var(--secondary,var(--muted));margin-top:6px}
+@media(prefers-reduced-motion:reduce){.silm-manual-page .silm-manual-accordion .silm-manual-disclosure{transition:none}}

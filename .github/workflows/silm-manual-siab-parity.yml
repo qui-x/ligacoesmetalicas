@@ -56,6 +56,14 @@ jobs:
           PY
       - name: Testar hierarquia, busca, impressão, teclado e responsividade
         run: python .github/scripts/test_manual_siab_parity.py --browser ${{ matrix.browser }}
+      - name: Preservar capturas reais das telas do Manual
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-manual-visual-${{ matrix.browser }}
+          path: artifacts/*.png
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Capturar log do servidor se houver falha
         if: failure()
         run: tail -n 100 /tmp/silm-manual-http.log || true
