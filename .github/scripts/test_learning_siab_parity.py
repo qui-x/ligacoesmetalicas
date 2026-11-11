@@ -26,14 +26,14 @@ def run(browser_name: str, base_url: str) -> None:
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.goto(root + "/#/aprender", wait_until="domcontentloaded")
             expect(page.locator("#silm-themes .silm-content-row")).to_have_count(
-                7, timeout=20000
+                8, timeout=20000
             )
             themes = page.evaluate(
                 """() => window.SILM.themes.registry.map(t => ({
                     id:t.id, investigation:t.investigation
                 }))"""
             )
-            assert len(themes) == 7
+            assert len(themes) == 8
             for theme in themes:
                 study = theme["investigation"]
                 assert study and len(study["actions"]) == 3, theme["id"]
@@ -49,16 +49,18 @@ def run(browser_name: str, base_url: str) -> None:
 
             page.goto(root + "/#/missoes", wait_until="domcontentloaded")
             expect(page.locator("#silm-mission-catalog .silm-content-row")).to_have_count(
-                6, timeout=20000
+                7, timeout=20000
             )
             missions = page.evaluate(
                 """() => window.SILM.missions.registry.map(m => ({
-                    id:m.id, study:m.study
+                    id:m.id, study:m.study, objectives:m.evidenceObjectives
                 }))"""
             )
-            assert len(missions) == 6
+            assert len(missions) == 7
             for mission in missions:
                 study = mission["study"]
+                assert len(mission["objectives"]) >= 2
+                assert any(x["mode"] == "criterion" for x in mission["objectives"])
                 assert study and len(study["questions"]) >= 2, mission["id"]
                 for key in ("context", "question", "prediction", "evidence", "limit"):
                     assert len(study[key]) >= 50, (mission["id"], key)
@@ -68,6 +70,9 @@ def run(browser_name: str, base_url: str) -> None:
                 expect(section).to_contain_text(study["question"])
                 expect(page.locator("#mission-metal")).to_be_visible()
                 expect(page.locator("#mission-mount")).to_be_visible()
+                expect(page.locator(".silm-mission-objectives li")).to_have_count(len(mission["objectives"]))
+                if mission["id"] == "objeto-ao-centro":
+                    expect(page.locator("#mission-metal option")).to_have_count(2)
 
             # Motor real com modelo de teste isolado: evidência científica + conclusão.
             results = page.evaluate(
@@ -97,19 +102,34 @@ def run(browser_name: str, base_url: str) -> None:
                     });
                     const started=session.start('montagem-ordem',29);
                     model.organize();
+                    const beforeObserving=session.ready();
+                    state.structure.crystallography={representation:{view:'cell'}};
+                    session.observe(true);
+                    const afterCell=session.ready();
+                    state.structure.crystallography.representation.view='lattice';
+                    session.observe(true);
+                    const checked=session.missionProgress();
                     const evidenceReady=session.ready();
                     const before=session.complete();
                     const stillActive=session.context()?.status==='active';
                     const stored=session.edit('conclusion','A organização periódica foi observada na estrutura, sem representar uma amostra real.');
                     const after=session.complete();
-                    return {started,evidenceReady,before,stillActive,stored,after};
+                    return {started,beforeObserving,afterCell,checked,evidenceReady,before,stillActive,stored,after};
                 }"""
             )
             assert results["started"] and results["evidenceReady"], results
+            assert results["beforeObserving"] is False and results["afterCell"] is False, results
+            assert len(results["checked"]) == 3 and all(x["met"] for x in results["checked"]), results
             assert results["before"]["ok"] is False, results
             assert "conclusão" in results["before"]["message"].lower(), results
             assert results["stillActive"] and results["stored"], results
             assert results["after"]["ok"] is True, results
+
+            page.goto(root + "/#/aprender?tema=cobre-neodimio")
+            expect(page.locator("#theme-compare-neodimio")).to_be_visible()
+            expect(page.locator(".silm-learning-science-note")).to_contain_text("não calcula o magnetismo")
+            page.goto(root + "/#/missoes?item=objeto-ao-centro")
+            expect(page.locator("#mission-metal option")).to_have_count(2)
 
             if width == 390:
                 for route in ("#/aprender?tema=ligacao-metalica", "#/missoes?item=campo-metal"):
@@ -131,7 +151,7 @@ def run(browser_name: str, base_url: str) -> None:
                     full_page=True,
                 )
             assert not errors, (browser_name, width, errors)
-            print(f"OK: {browser_name} {width}x{height}; 7 temas e 6 missões")
+            print(f"OK: {browser_name} {width}x{height}; 8 temas e 7 missões")
             context.close()
         browser.close()
 
