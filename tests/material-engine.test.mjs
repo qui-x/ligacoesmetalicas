@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const ctx=vm.createContext({console,structuredClone});
 ctx.window=ctx;
-for(const path of ['data/bundle','data-api','crystal','properties','data/material-profile-demo-cu','material-engine']){
+for(const path of ['data/bundle','data-api','crystal','properties','material-profile-registry','data/material-profile-demo-cu','material-engine']){
  vm.runInContext(readFileSync(new URL('../domain/silm/'+path+'.js',import.meta.url),'utf8'),ctx,{filename:path+'.js'});
 }
 const S=ctx.SILM,ENGINE=S.materialEngine;
@@ -41,7 +41,7 @@ test('um perfil óptico demonstrativo valida somente o cobre',()=>{
  assert.equal(cap.mode,'reference-data');
  assert.equal(cap.dataKind,'TABULATED_NK');
  assert.equal(cap.source.doi,'10.1103/PhysRevB.6.4370');
- assert.equal(Object.keys(S.materialPropertyProfiles.byAtomicNumber).length,1);
+ assert.equal(S.materialProfiles.list().length,1);
  const q=ENGINE.optical(29,550,0);
  assert.equal(q.ok,true);assert.equal(q.source.doi,cap.source.doi);
  assert.equal(q.assumptions.includes('sem filme de óxido'),true);
