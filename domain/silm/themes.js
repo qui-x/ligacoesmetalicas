@@ -109,7 +109,8 @@
 
  /* Temas ampliados com suporte dos 65 metais habilitados e seus limites;
     somente redes homologadas são oferecidas nas tarefas de cristalografia. */
- const EXPANDED_THEMES=[
+ const EXPANDED_THEMES=
+[
   {
     "id": "familia-alcalinos",
     "title": "Metais alcalinos e a rede CCC",
@@ -548,412 +549,411 @@
     "evidence": "Registro da passagem real pelas quatro escalas, da vizinhança e da limitação do material ilustrado.",
     "reflection": "Como a escala de estudo muda sem que o desenho determine a microestrutura exata do objeto?"
   },
-{
-  "id": "metais-nobres-conducao",
-  "title": "Condutores nobres: Cu, Ag e Au",
-  "sub": "Cu · Ag · Au",
-  "description": "Condutores, contatos e revestimentos podem utilizar Cu, Ag ou Au por motivos diferentes. A estrutura cristalina não substitui dados elétricos, químicos ou de superfície.",
-  "idea": "Os três metais têm estrutura de referência CFC, mas composição, aplicação, superfície e propriedades não podem ser inferidas apenas da célula.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Cobre, Prata e Ouro: a mesma rede?.",
-  "interpret": "Explicar semelhanças da vizinhança geométrica sem declarar condutividades numéricas inexistentes.",
-  "limits": "O SILM não mede resistência de contato, corrosão ou qualidade de revestimentos; propriedades quantitativas requerem fonte e condições verificadas.",
-  "missions": [
-    "cobre-prata-ouro"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:29,47,79",
-  "track": "aplicacoes",
-  "problem": "Cobre, prata e ouro têm estrutura de referência CFC. Isso basta para dizer que seus usos e propriedades são idênticos?",
-  "prediction": "Preveja o padrão de vizinhança que deve aparecer nos três modelos CFC e uma propriedade que a geometria sozinha não determina.",
-  "actions": [
-    "Escolha um dos metais Cu · Ag · Au e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Cobre, Prata e Ouro: a mesma rede?, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Destaque célula, rede e vizinhos em um dos metais; depois compare os parâmetros e referências dos demais em investigações separadas.",
-  "reflection": "Quais características geométricas são comuns e quais parâmetros ainda variam entre Cu, Ag e Au? Por que a escolha de um contato elétrico depende também de superfície, custo e condições de uso?"
-},
-{
-  "id": "ferro-cobalto-niquel-estruturas",
-  "title": "Fe, Co e Ni: estrutura não é magnetismo",
-  "sub": "Fe · Co · Ni",
-  "description": "Nas condições de referência do banco, Fe é CCC, Co é HC e Ni é CFC. O simulador investiga geometria, não magnetização do material.",
-  "idea": "Fe, Co e Ni possuem redes diferentes na referência, apesar de associações tecnológicas frequentes com fenômenos magnéticos.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Ferro, Cobalto e Níquel: três redes.",
-  "interpret": "Diferenciar estrutura cristalina e propriedades magnéticas que dependem de outras teorias e dados.",
-  "limits": "O SILM não simula domínios, magnetização, histerese nem transformações de fase por temperatura.",
-  "missions": [
-    "ferro-cobalto-niquel"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:26,27,28",
-  "track": "estruturas",
-  "problem": "Fe, Co e Ni aparecem em aplicações magnéticas; por que suas estruturas cristalinas de referência não são todas iguais?",
-  "prediction": "Preveja como a disposição dos centros pode diferir entre CCC, HC e CFC antes de abrir as três células.",
-  "actions": [
-    "Escolha um dos metais Fe · Co · Ni e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Ferro, Cobalto e Níquel: três redes, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Compare a célula e a repetição da rede com Fe, Co ou Ni, e documente a estrutura homologada do metal selecionado.",
-  "reflection": "Que diferença cristalográfica o SILM mostra entre Fe, Co e Ni? Por que uma representação de rede não comprova ferromagnetismo ou curvas de histerese?"
-},
-{
-  "id": "aluminio-cobre-componentes",
-  "title": "Alumínio e Cobre no cotidiano",
-  "sub": "Al · Cu",
-  "description": "Al e Cu podem aparecer como componentes elétricos e estruturais. O objeto completo pode conter ligas, isolantes, conectores e outros metais.",
-  "idea": "Al e Cu podem compartilhar estrutura CFC de referência e, ainda assim, representar papéis diferentes no projeto de um produto.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Alumínio ou Cobre: componentes distintos.",
-  "interpret": "Diferenciar semelhança cristalográfica, identidade do elemento e aplicação de um componente.",
-  "limits": "Não se calculam composição industrial nem desempenho de cabos ou ligas a partir de ilustração e rede do elemento.",
-  "missions": [
-    "aluminio-cobre"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:13,29",
-  "track": "aplicacoes",
-  "problem": "Por que objetos podem utilizar alumínio ou cobre mesmo quando ambos têm rede CFC?",
-  "prediction": "Preveja uma semelhança geométrica dos metais puros e duas informações da aplicação que não estão codificadas na célula.",
-  "actions": [
-    "Escolha um dos metais Al · Cu e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Alumínio ou Cobre: componentes distintos, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Explore a célula CFC e os vizinhos; registre o elemento e o componente do objeto correspondente, sem supor pureza.",
-  "reflection": "A célula cristalina do alumínio determina sozinha a massa e a função de um cabo? Por que distinguir metal puro, liga, peça e produto completo?"
-},
-{
-  "id": "trio-titanio-zirconio-hafnio",
-  "title": "Ti, Zr e Hf: mesma classe, parâmetros distintos",
-  "sub": "Ti · Zr · Hf",
-  "description": "Ti, Zr e Hf são elementos distintos e possuem referências HC no banco. Partilhar um tipo de célula não torna iguais as distâncias cristalográficas.",
-  "idea": "Os três metais têm estrutura HC de referência, mas cada estrutura utiliza parâmetros próprios de origem documentada.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Titânio, Zircônio e Háfnio: redes HC.",
-  "interpret": "Comparar parâmetros em unidades físicas, não comprimentos aparentes no monitor.",
-  "limits": "As medidas pertencem às estruturas de referência, não a uma peça tratada termicamente ou a uma liga real.",
-  "missions": [
-    "titanio-zirconio-hafnio"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:22,40,72",
-  "track": "estruturas",
-  "problem": "Três metais com referência HC apresentam o mesmo parâmetro de rede?",
-  "prediction": "Preveja se a coordenada visual e o parâmetro a serão invariantes ao trocar de metal, mantendo o mesmo tipo de estrutura.",
-  "actions": [
-    "Escolha um dos metais Ti · Zr · Hf e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Titânio, Zircônio e Háfnio: redes HC, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Meça o parâmetro a de um metal; repita em investigação independente para outro e registre unidade e origem dos dados.",
-  "reflection": "O que permanece igual ao usar a classe HC em três elementos? Por que não basta comparar o tamanho dos ícones na tela para inferir distâncias físicas?"
-},
-{
-  "id": "refratarios-ccc-rede",
-  "title": "Cr, Mo e W: estruturas de metais refratários",
-  "sub": "Cr · Mo · W",
-  "description": "Cr, Mo e W compartilham uma estrutura de referência CCC no conjunto de dados, mas aplicações em temperaturas elevadas exigem informações que uma geometria estática não oferece.",
-  "idea": "A estrutura CCC é um ponto de comparação geométrica; aplicações de engenharia exigem propriedades e condições adicionais.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Cromo, Molibdênio e Tungstênio: CCC.",
-  "interpret": "Concluir somente sobre simetria e vizinhança documentadas no modelo.",
-  "limits": "Não se simulam temperatura de fusão, fluência, oxidação nem desempenho de componentes industriais.",
-  "missions": [
-    "cromo-molibdenio-tungstenio"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:24,42,74",
-  "track": "estruturas",
-  "problem": "Quais relações estruturais aproximam Cr, Mo e W e o que a rede CCC não explica?",
-  "prediction": "Preveja a distribuição de vizinhos em uma rede CCC e uma propriedade térmica que não se mede com esse recurso.",
-  "actions": [
-    "Escolha um dos metais Cr · Mo · W e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Cromo, Molibdênio e Tungstênio: CCC, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Identifique célula, rede e vizinhança e anote o metal e o modelo, sem transformar o desenho em um ensaio térmico.",
-  "reflection": "O que a coordenação CCC informa em cada um desses metais? Por que resistência à temperatura e processamento não podem ser deduzidos de CCC?"
-},
-{
-  "id": "niobio-tantalo-ccc",
-  "title": "Nióbio e Tântalo: estrutura e medida",
-  "sub": "Nb · Ta",
-  "description": "O nióbio e o tântalo são usados em materiais tecnológicos por razões específicas, mas o estudo atual se limita ao arranjo de referência de cada elemento.",
-  "idea": "Metais que compartilham estrutura cristalina devem ser comparados com parâmetros de referência próprios.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Nióbio e Tântalo: vizinhos na rede.",
-  "interpret": "Comparar dados de medida sem extrapolar para tecnologias não modeladas.",
-  "limits": "O SILM não reproduz dispositivos supercondutores, capacitores, condições extremas ou composição comercial.",
-  "missions": [
-    "niobio-tantalo"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:41,73",
-  "track": "estruturas",
-  "problem": "Nb e Ta compartilham rede CCC: seus parâmetros de rede precisam ser iguais?",
-  "prediction": "Preveja se a é um valor inerente ao tipo CCC ou se deve ser consultado em cada metal.",
-  "actions": [
-    "Escolha um dos metais Nb · Ta e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Nióbio e Tântalo: vizinhos na rede, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Meça o parâmetro a com a estrutura organizada e confira a referência do metal; faça uma segunda tentativa com outro elemento.",
-  "reflection": "O que significa medir uma constante de rede em vez de uma distância na imagem? Quais informações de aplicação ainda faltam para comparar componentes feitos de Nb e Ta?"
-},
-{
-  "id": "grupo-platina-cfc",
-  "title": "Metais do grupo da platina",
-  "sub": "Rh · Pd · Ir · Pt",
-  "description": "Ródio, paládio, irídio e platina são representados com rede CFC de referência, mas catálise e durabilidade de materiais não são simuladas pela geometria.",
-  "idea": "Os modelos de Rh, Pd, Ir e Pt compartilham estrutura CFC, mas não se confundem em composição e propriedades.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Ródio, Paládio, Irídio e Platina.",
-  "interpret": "Distinguir parâmetro estrutural de processos de superfície e catálise.",
-  "limits": "Nenhuma reação de catálise, adsorção química ou resistência à corrosão é calculada nesta missão.",
-  "missions": [
-    "platinoides-cfc"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:45,46,77,78",
-  "track": "estruturas",
-  "problem": "Como quatro elementos tecnologicamente distintos podem compartilhar uma rede CFC?",
-  "prediction": "Preveja a vizinhança CFC e compare com o comportamento de outro metal da mesma classe estrutural.",
-  "actions": [
-    "Escolha um dos metais Rh · Pd · Ir · Pt e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Ródio, Paládio, Irídio e Platina, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Destaque a célula, sua repetição e o centro com vizinhos, documentando elemento e fonte de referência.",
-  "reflection": "O que o arranjo CFC revela sobre a vizinhança imediata? Por que esse arranjo não explica isoladamente uma atividade catalítica?"
-},
-{
-  "id": "zinco-cadmio-hc",
-  "title": "Zn e Cd: a rede não revela a segurança",
-  "sub": "Zn · Cd",
-  "description": "Zinco e cádmio apresentam estruturas HC de referência; propriedades toxicológicas, controle de exposição e aplicações práticas exigem fontes independentes da simulação.",
-  "idea": "A estrutura HC é comparável, mas identidade química e riscos materiais não se inferem de geometria cristalina.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Zinco e Cádmio: HC com cautelas.",
-  "interpret": "Manter a discussão no domínio da estrutura, remetendo segurança a protocolos especializados.",
-  "limits": "Atividade somente virtual. Não há avaliação toxicológica, corrosão, contaminação nem indicação de segurança laboratorial.",
-  "missions": [
-    "zinco-cadmio"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:30,48",
-  "track": "estruturas",
-  "problem": "A mesma classe de rede HC significa usos e riscos equivalentes para Zn e Cd?",
-  "prediction": "Preveja a coordenação da célula HC e descreva por que a presença da mesma rede não determina segurança de materiais.",
-  "actions": [
-    "Escolha um dos metais Zn · Cd e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Zinco e Cádmio: HC com cautelas, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Observe a célula, a rede e a vizinhança de um dos metais e registre a composição do modelo selecionado.",
-  "reflection": "O que é semelhante nas representações HC de Zn e Cd? Por que o simulador não deve ser usado para decidir práticas de manuseio de cádmio?"
-},
-{
-  "id": "estanho-bismuto-nao-canonicos",
-  "title": "Sn e Bi: tetragonal e romboédrica",
-  "sub": "Sn · Bi",
-  "description": "A referência selecionada para Sn é tetragonal e para Bi é romboédrica, de modo que forçar uma célula canônica em qualquer um deles seria incorreto.",
-  "idea": "Alguns metais fogem às geometrias CCC, CFC e HC; o tipo de célula deve seguir o registro científico.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Estanho e Bismuto: além dos três modelos.",
-  "interpret": "Explicar diferenças geométricas sem generalizar empacotamentos das estruturas canônicas.",
-  "limits": "A missão não calcula transformações alotrópicas por temperatura nem perfis de solidificação de ligas.",
-  "missions": [
-    "estanho-bismuto"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:50,83",
-  "track": "estruturas",
-  "problem": "O que se perde ao tentar descrever estanho e bismuto apenas por CCC, CFC ou HC?",
-  "prediction": "Preveja diferenças de forma de célula e de repetição entre a estrutura tetragonal e a romboédrica.",
-  "actions": [
-    "Escolha um dos metais Sn · Bi e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Estanho e Bismuto: além dos três modelos, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Observe a célula e a rede do elemento e compare seu tipo com o de outro metal em uma nova investigação.",
-  "reflection": "Qual é a referência cristalográfica usada para Sn ou Bi? Por que não aplicar automaticamente o empacotamento ideal de uma estrutura CFC a esses modelos?"
-},
-{
-  "id": "lantanideos-dhcp",
-  "title": "La, Pr e Nd: estruturas DHCP",
-  "sub": "La · Pr · Nd",
-  "description": "Os lantanídeos La, Pr e Nd são apresentados com a referência DHCP, uma estrutura hexagonal de empilhamento duplo distinta do modelo HC usual.",
-  "idea": "La, Pr e Nd compartilham uma estrutura de referência duplo-hexagonal que não deve ser confundida com HC simples.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Lantânio, Praseodímio e Neodímio.",
-  "interpret": "Separar célula do metal puro e aplicação industrial de ligas com terras raras.",
-  "limits": "O SILM não calcula magnetismo, estrutura intermetálica do ímã ou transformações de fase da liga Nd–Fe–B.",
-  "missions": [
-    "lantanideos-dhcp"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:57,59,60",
-  "track": "familias",
-  "problem": "Por que La, Pr e Nd precisam de uma estrutura DHCP em vez de ser reduzidos ao modelo HC convencional?",
-  "prediction": "Preveja por que empilhamento e repetição na rede não se resumem ao número de esferas da célula HC.",
-  "actions": [
-    "Escolha um dos metais La · Pr · Nd e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Lantânio, Praseodímio e Neodímio, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Examine a célula e a rede DHCP de um dos lantanídeos; registre a classificação e a origem do dado.",
-  "reflection": "Que diferença entre HC e DHCP deve permanecer explícita no Manual e na Oficina? Por que um ímã Nd–Fe–B não pode ser representado pela estrutura de referência do Nd puro?"
-},
-{
-  "id": "diversidade-lantanideos",
-  "title": "Lantanídeos não têm uma única rede",
-  "sub": "Ce · Sm · Gd · Tb · Dy · Yb",
-  "description": "O conjunto de referências apresenta Ce e Yb como CFC, Sm como romboédrico e Gd, Tb e Dy como HC; a classe química não fixa uma única geometria.",
-  "idea": "Os lantanídeos investigáveis incluem estruturas HC, CFC, DHCP e romboédricas, dependendo do elemento e da referência.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Lantanídeos: HC, CFC e romboédrica.",
-  "interpret": "Comparar as referências do banco sem afirmar que uma família inteira apresenta o mesmo arranjo.",
-  "limits": "Não há simulação de terras raras como ligas, ímãs ou estados eletrônicos f quantitativos.",
-  "missions": [
-    "lantanideos-diversos"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:58,62,64,65,66,70",
-  "track": "familias",
-  "problem": "Por que não podemos atribuir a todos os lantanídeos uma única célula unitária?",
-  "prediction": "Antes de escolher o elemento, preveja quais tipos de rede aparecerão e quais limites de comparação persistem.",
-  "actions": [
-    "Escolha um dos metais Ce · Sm · Gd · Tb · Dy · Yb e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Lantanídeos: HC, CFC e romboédrica, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Observe a célula e a rede do elemento escolhido e compare classificações em mais de uma investigação.",
-  "reflection": "Quais variações estruturais são registradas entre os lantanídeos selecionados? Por que a rede não prediz automaticamente o comportamento magnético ou óptico de materiais comerciais?"
-},
-{
-  "id": "actinideos-diversidade",
-  "title": "Actinídeos e estruturas não canônicas",
-  "sub": "Th · Pa · Np · Pu",
-  "description": "Th, Pa, Np e Pu têm referências de estruturas diferentes no banco. O tema é estritamente de leitura virtual e interpretação geométrica.",
-  "idea": "Th, Pa, Np e Pu mostram diversidade de formas de célula e evidenciam os limites das classificações simplificadas.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Tório, Protactínio, Netúnio e Plutônio.",
-  "interpret": "Comparar somente modelos e dados de referência, sem extrapolar para protocolos experimentais de radionuclídeos.",
-  "limits": "O SILM não reproduz radioatividade, segurança radiológica, reatividade nem transformações metalúrgicas. Não é instrução de manipulação.",
-  "missions": [
-    "actinideos-estruturas"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:90,91,93,94",
-  "track": "familias",
-  "problem": "Por que os actinídeos requerem referências cristalográficas específicas em vez de um único modelo de rede?",
-  "prediction": "Preveja por que a diversidade de redes exige modelos não canônicos além dos exemplos cúbicos usuais.",
-  "actions": [
-    "Escolha um dos metais Th · Pa · Np · Pu e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Tório, Protactínio, Netúnio e Plutônio, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Selecione apenas uma referência virtual, observe a célula e a rede e identifique a classe estrutural.",
-  "reflection": "Que informações de estrutura o banco disponibiliza para o actinídeo selecionado? Por que a investigação virtual não corresponde a um procedimento físico com material radioativo?"
-},
-{
-  "id": "formas-incomuns-metalicas",
-  "title": "Células incomuns: Mn e Po",
-  "sub": "Mn · Po",
-  "description": "A referência de Mn é cúbica complexa, enquanto Po tem uma referência cúbica simples. Semelhança no adjetivo cúbico não implica a mesma rede.",
-  "idea": "Estruturas cúbicas podem ter bases e padrões de repetição diferentes, como mostram Mn e Po.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Manganês e Polônio: redes incomuns.",
-  "interpret": "Não substituir a geometria complexa por um arranjo de esferas simples nem deduzir segurança de material.",
-  "limits": "Polônio é radioativo: este é um estudo documental virtual, sem orientações de obtenção/manuseio. O SILM não calcula radioatividade.",
-  "missions": [
-    "manganes-polonio"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:25,84",
-  "track": "estruturas",
-  "problem": "Por que uma estrutura cúbica complexa não é equivalente a uma cúbica simples?",
-  "prediction": "Preveja o que muda na célula e na repetição quando a base cristalográfica é diferente.",
-  "actions": [
-    "Escolha um dos metais Mn · Po e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Manganês e Polônio: redes incomuns, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Compare visualmente célula e rede de Mn ou Po e registre o tipo estrutural, sem calcular fatores canônicos automaticamente.",
-  "reflection": "Que informação é ocultada quando chamamos ambas as estruturas apenas de cúbicas? Por que a demonstração de polônio deve ser exclusivamente virtual?"
-},
-{
-  "id": "cfc-familias-diferentes",
-  "title": "CFC além das famílias químicas",
-  "sub": "Al · Ca · Sr · Pb",
-  "description": "Os elementos Al, Ca, Sr e Pb têm referência CFC, embora pertençam a categorias químicas diferentes e exijam informações distintas para discutir segurança e aplicações.",
-  "idea": "Uma estrutura cristalina pode aparecer em elementos de famílias distintas sem determinar sua identidade e comportamento químico.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Uma rede CFC em quatro famílias.",
-  "interpret": "Contrastar estrutura CFC, classificação periódica e limites de aplicações.",
-  "limits": "A representação cristalina não avalia reatividade, toxicidade nem propriedades mecânicas de ligas e peças.",
-  "missions": [
-    "cfc-diferentes-familias"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:13,20,38,82",
-  "track": "familias",
-  "problem": "Al, Ca, Sr e Pb compartilham CFC: por que isso não os transforma em metais equivalentes?",
-  "prediction": "Preveja o que a coordenação local terá em comum e que dados químicos continuarão específicos de cada elemento.",
-  "actions": [
-    "Escolha um dos metais Al · Ca · Sr · Pb e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Uma rede CFC em quatro famílias, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Observe a célula, repita a rede e destaque os vizinhos para o metal escolhido; compare uma segunda referência separadamente.",
-  "reflection": "A mesma célula torna semelhantes as propriedades químicas de Ca e Pb? Qual a diferença entre classificação periódica e tipo de rede?"
-},
-{
-  "id": "magnesio-aluminio-estruturas",
-  "title": "Mg e Al: redes de metais leves",
-  "sub": "Mg · Al",
-  "description": "Mg possui referência HC e Al referência CFC. Componentes com esses elementos podem incluir ligas e tratamentos que a célula do metal puro não descreve.",
-  "idea": "O magnésio e o alumínio têm tipos de referência diferentes, de modo que a classificação de aplicação não define a célula.",
-  "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Magnésio e Alumínio: HC versus CFC.",
-  "interpret": "Explicar diferença HC/CFC e limites de inferir propriedades do componente real.",
-  "limits": "O SILM não determina resistência de ligas Mg–Al, microestruturas reais ou massas de peças a partir do desenho.",
-  "missions": [
-    "magnesio-aluminio"
-  ],
-  "routes": [
-    "ordem-metal"
-  ],
-  "selector": "examples:12,13",
-  "track": "aplicacoes",
-  "problem": "Metais usados em componentes leves precisam apresentar a mesma estrutura cristalina?",
-  "prediction": "Preveja como a repetição cristalina difere entre HC e CFC e por que isso não é uma comparação direta de densidade.",
-  "actions": [
-    "Escolha um dos metais Mg · Al e identifique no catálogo sua estrutura de referência.",
-    "Execute a missão Magnésio e Alumínio: HC versus CFC, registrando as evidências exigidas na Oficina.",
-    "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
-  ],
-  "evidence": "Observe célula e rede de Mg ou Al; registre o tipo e compare com outra investigação sem inferir o comportamento de ligas.",
-  "reflection": "Que diferença geométrica distingue Mg e Al no SILM? Por que desempenho mecânico de uma liga não resulta só da rede do elemento?"
-}
-
+  {
+    "id": "metais-nobres-conducao",
+    "title": "Condutores nobres: Cu, Ag e Au",
+    "sub": "Cu · Ag · Au",
+    "description": "Condutores, contatos e revestimentos podem utilizar Cu, Ag ou Au por motivos diferentes. A estrutura cristalina não substitui dados elétricos, químicos ou de superfície.",
+    "idea": "Os três metais têm estrutura de referência CFC, mas composição, aplicação, superfície e propriedades não podem ser inferidas apenas da célula.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Cobre, Prata e Ouro: a mesma rede?.",
+    "interpret": "Explicar semelhanças da vizinhança geométrica sem declarar condutividades numéricas inexistentes.",
+    "limits": "O SILM não mede resistência de contato, corrosão ou qualidade de revestimentos; propriedades quantitativas requerem fonte e condições verificadas.",
+    "missions": [
+      "cobre-prata-ouro"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:29,47,79",
+    "track": "aplicacoes",
+    "problem": "Cobre, prata e ouro têm estrutura de referência CFC. Isso basta para dizer que seus usos e propriedades são idênticos?",
+    "prediction": "Preveja o padrão de vizinhança que deve aparecer nos três modelos CFC e uma propriedade que a geometria sozinha não determina.",
+    "actions": [
+      "Escolha um dos metais Cu · Ag · Au e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Cobre, Prata e Ouro: a mesma rede?, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Destaque célula, rede e vizinhos em um dos metais; depois compare os parâmetros e referências dos demais em investigações separadas.",
+    "reflection": "Quais características geométricas são comuns e quais parâmetros ainda variam entre Cu, Ag e Au? Por que a escolha de um contato elétrico depende também de superfície, custo e condições de uso?"
+  },
+  {
+    "id": "ferro-cobalto-niquel-estruturas",
+    "title": "Fe, Co e Ni: estrutura não é magnetismo",
+    "sub": "Fe · Co · Ni",
+    "description": "Nas condições de referência do banco, Fe é CCC, Co é HC e Ni é CFC. O simulador investiga geometria, não magnetização do material.",
+    "idea": "Fe, Co e Ni possuem redes diferentes na referência, apesar de associações tecnológicas frequentes com fenômenos magnéticos.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Ferro, Cobalto e Níquel: três redes.",
+    "interpret": "Diferenciar estrutura cristalina e propriedades magnéticas que dependem de outras teorias e dados.",
+    "limits": "O SILM não simula domínios, magnetização, histerese nem transformações de fase por temperatura.",
+    "missions": [
+      "ferro-cobalto-niquel"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:26,27,28",
+    "track": "estruturas",
+    "problem": "Fe, Co e Ni aparecem em aplicações magnéticas; por que suas estruturas cristalinas de referência não são todas iguais?",
+    "prediction": "Preveja como a disposição dos centros pode diferir entre CCC, HC e CFC antes de abrir as três células.",
+    "actions": [
+      "Escolha um dos metais Fe · Co · Ni e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Ferro, Cobalto e Níquel: três redes, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Compare a célula e a repetição da rede com Fe, Co ou Ni, e documente a estrutura homologada do metal selecionado.",
+    "reflection": "Que diferença cristalográfica o SILM mostra entre Fe, Co e Ni? Por que uma representação de rede não comprova ferromagnetismo ou curvas de histerese?"
+  },
+  {
+    "id": "aluminio-cobre-componentes",
+    "title": "Alumínio e Cobre no cotidiano",
+    "sub": "Al · Cu",
+    "description": "Al e Cu podem aparecer como componentes elétricos e estruturais. O objeto completo pode conter ligas, isolantes, conectores e outros metais.",
+    "idea": "Al e Cu podem compartilhar estrutura CFC de referência e, ainda assim, representar papéis diferentes no projeto de um produto.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Alumínio ou Cobre: componentes distintos.",
+    "interpret": "Diferenciar semelhança cristalográfica, identidade do elemento e aplicação de um componente.",
+    "limits": "Não se calculam composição industrial nem desempenho de cabos ou ligas a partir de ilustração e rede do elemento.",
+    "missions": [
+      "aluminio-cobre"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:13,29",
+    "track": "aplicacoes",
+    "problem": "Por que objetos podem utilizar alumínio ou cobre mesmo quando ambos têm rede CFC?",
+    "prediction": "Preveja uma semelhança geométrica dos metais puros e duas informações da aplicação que não estão codificadas na célula.",
+    "actions": [
+      "Escolha um dos metais Al · Cu e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Alumínio ou Cobre: componentes distintos, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Explore a célula CFC e os vizinhos; registre o elemento e o componente do objeto correspondente, sem supor pureza.",
+    "reflection": "A célula cristalina do alumínio determina sozinha a massa e a função de um cabo? Por que distinguir metal puro, liga, peça e produto completo?"
+  },
+  {
+    "id": "trio-titanio-zirconio-hafnio",
+    "title": "Ti, Zr e Hf: mesma classe, parâmetros distintos",
+    "sub": "Ti · Zr · Hf",
+    "description": "Ti, Zr e Hf são elementos distintos e possuem referências HC no banco. Partilhar um tipo de célula não torna iguais as distâncias cristalográficas.",
+    "idea": "Os três metais têm estrutura HC de referência, mas cada estrutura utiliza parâmetros próprios de origem documentada.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Titânio, Zircônio e Háfnio: redes HC.",
+    "interpret": "Comparar parâmetros em unidades físicas, não comprimentos aparentes no monitor.",
+    "limits": "As medidas pertencem às estruturas de referência, não a uma peça tratada termicamente ou a uma liga real.",
+    "missions": [
+      "titanio-zirconio-hafnio"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:22,40,72",
+    "track": "estruturas",
+    "problem": "Três metais com referência HC apresentam o mesmo parâmetro de rede?",
+    "prediction": "Preveja se a coordenada visual e o parâmetro a serão invariantes ao trocar de metal, mantendo o mesmo tipo de estrutura.",
+    "actions": [
+      "Escolha um dos metais Ti · Zr · Hf e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Titânio, Zircônio e Háfnio: redes HC, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Meça o parâmetro a de um metal; repita em investigação independente para outro e registre unidade e origem dos dados.",
+    "reflection": "O que permanece igual ao usar a classe HC em três elementos? Por que não basta comparar o tamanho dos ícones na tela para inferir distâncias físicas?"
+  },
+  {
+    "id": "refratarios-ccc-rede",
+    "title": "Cr, Mo e W: estruturas de metais refratários",
+    "sub": "Cr · Mo · W",
+    "description": "Cr, Mo e W compartilham uma estrutura de referência CCC no conjunto de dados, mas aplicações em temperaturas elevadas exigem informações que uma geometria estática não oferece.",
+    "idea": "A estrutura CCC é um ponto de comparação geométrica; aplicações de engenharia exigem propriedades e condições adicionais.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Cromo, Molibdênio e Tungstênio: CCC.",
+    "interpret": "Concluir somente sobre simetria e vizinhança documentadas no modelo.",
+    "limits": "Não se simulam temperatura de fusão, fluência, oxidação nem desempenho de componentes industriais.",
+    "missions": [
+      "cromo-molibdenio-tungstenio"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:24,42,74",
+    "track": "estruturas",
+    "problem": "Quais relações estruturais aproximam Cr, Mo e W e o que a rede CCC não explica?",
+    "prediction": "Preveja a distribuição de vizinhos em uma rede CCC e uma propriedade térmica que não se mede com esse recurso.",
+    "actions": [
+      "Escolha um dos metais Cr · Mo · W e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Cromo, Molibdênio e Tungstênio: CCC, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Identifique célula, rede e vizinhança e anote o metal e o modelo, sem transformar o desenho em um ensaio térmico.",
+    "reflection": "O que a coordenação CCC informa em cada um desses metais? Por que resistência à temperatura e processamento não podem ser deduzidos de CCC?"
+  },
+  {
+    "id": "niobio-tantalo-ccc",
+    "title": "Nióbio e Tântalo: estrutura e medida",
+    "sub": "Nb · Ta",
+    "description": "O nióbio e o tântalo são usados em materiais tecnológicos por razões específicas, mas o estudo atual se limita ao arranjo de referência de cada elemento.",
+    "idea": "Metais que compartilham estrutura cristalina devem ser comparados com parâmetros de referência próprios.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Nióbio e Tântalo: vizinhos na rede.",
+    "interpret": "Comparar dados de medida sem extrapolar para tecnologias não modeladas.",
+    "limits": "O SILM não reproduz dispositivos supercondutores, capacitores, condições extremas ou composição comercial.",
+    "missions": [
+      "niobio-tantalo"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:41,73",
+    "track": "estruturas",
+    "problem": "Nb e Ta compartilham rede CCC: seus parâmetros de rede precisam ser iguais?",
+    "prediction": "Preveja se a é um valor inerente ao tipo CCC ou se deve ser consultado em cada metal.",
+    "actions": [
+      "Escolha um dos metais Nb · Ta e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Nióbio e Tântalo: vizinhos na rede, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Meça o parâmetro a com a estrutura organizada e confira a referência do metal; faça uma segunda tentativa com outro elemento.",
+    "reflection": "O que significa medir uma constante de rede em vez de uma distância na imagem? Quais informações de aplicação ainda faltam para comparar componentes feitos de Nb e Ta?"
+  },
+  {
+    "id": "grupo-platina-cfc",
+    "title": "Metais do grupo da platina",
+    "sub": "Rh · Pd · Ir · Pt",
+    "description": "Ródio, paládio, irídio e platina são representados com rede CFC de referência, mas catálise e durabilidade de materiais não são simuladas pela geometria.",
+    "idea": "Os modelos de Rh, Pd, Ir e Pt compartilham estrutura CFC, mas não se confundem em composição e propriedades.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Ródio, Paládio, Irídio e Platina.",
+    "interpret": "Distinguir parâmetro estrutural de processos de superfície e catálise.",
+    "limits": "Nenhuma reação de catálise, adsorção química ou resistência à corrosão é calculada nesta missão.",
+    "missions": [
+      "platinoides-cfc"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:45,46,77,78",
+    "track": "estruturas",
+    "problem": "Como quatro elementos tecnologicamente distintos podem compartilhar uma rede CFC?",
+    "prediction": "Preveja a vizinhança CFC e compare com o comportamento de outro metal da mesma classe estrutural.",
+    "actions": [
+      "Escolha um dos metais Rh · Pd · Ir · Pt e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Ródio, Paládio, Irídio e Platina, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Destaque a célula, sua repetição e o centro com vizinhos, documentando elemento e fonte de referência.",
+    "reflection": "O que o arranjo CFC revela sobre a vizinhança imediata? Por que esse arranjo não explica isoladamente uma atividade catalítica?"
+  },
+  {
+    "id": "zinco-cadmio-hc",
+    "title": "Zn e Cd: a rede não revela a segurança",
+    "sub": "Zn · Cd",
+    "description": "Zinco e cádmio apresentam estruturas HC de referência; propriedades toxicológicas, controle de exposição e aplicações práticas exigem fontes independentes da simulação.",
+    "idea": "A estrutura HC é comparável, mas identidade química e riscos materiais não se inferem de geometria cristalina.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Zinco e Cádmio: HC com cautelas.",
+    "interpret": "Manter a discussão no domínio da estrutura, remetendo segurança a protocolos especializados.",
+    "limits": "Atividade somente virtual. Não há avaliação toxicológica, corrosão, contaminação nem indicação de segurança laboratorial.",
+    "missions": [
+      "zinco-cadmio"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:30,48",
+    "track": "estruturas",
+    "problem": "A mesma classe de rede HC significa usos e riscos equivalentes para Zn e Cd?",
+    "prediction": "Preveja a coordenação da célula HC e descreva por que a presença da mesma rede não determina segurança de materiais.",
+    "actions": [
+      "Escolha um dos metais Zn · Cd e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Zinco e Cádmio: HC com cautelas, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Observe a célula, a rede e a vizinhança de um dos metais e registre a composição do modelo selecionado.",
+    "reflection": "O que é semelhante nas representações HC de Zn e Cd? Por que o simulador não deve ser usado para decidir práticas de manuseio de cádmio?"
+  },
+  {
+    "id": "estanho-bismuto-nao-canonicos",
+    "title": "Sn e Bi: tetragonal e romboédrica",
+    "sub": "Sn · Bi",
+    "description": "A referência selecionada para Sn é tetragonal e para Bi é romboédrica, de modo que forçar uma célula canônica em qualquer um deles seria incorreto.",
+    "idea": "Alguns metais fogem às geometrias CCC, CFC e HC; o tipo de célula deve seguir o registro científico.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Estanho e Bismuto: além dos três modelos.",
+    "interpret": "Explicar diferenças geométricas sem generalizar empacotamentos das estruturas canônicas.",
+    "limits": "A missão não calcula transformações alotrópicas por temperatura nem perfis de solidificação de ligas.",
+    "missions": [
+      "estanho-bismuto"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:50,83",
+    "track": "estruturas",
+    "problem": "O que se perde ao tentar descrever estanho e bismuto apenas por CCC, CFC ou HC?",
+    "prediction": "Preveja diferenças de forma de célula e de repetição entre a estrutura tetragonal e a romboédrica.",
+    "actions": [
+      "Escolha um dos metais Sn · Bi e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Estanho e Bismuto: além dos três modelos, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Observe a célula e a rede do elemento e compare seu tipo com o de outro metal em uma nova investigação.",
+    "reflection": "Qual é a referência cristalográfica usada para Sn ou Bi? Por que não aplicar automaticamente o empacotamento ideal de uma estrutura CFC a esses modelos?"
+  },
+  {
+    "id": "lantanideos-dhcp",
+    "title": "La, Pr e Nd: o que o simulador permite observar",
+    "sub": "La · Pr · Nd · limites da estrutura DHCP",
+    "description": "Estude o modelo eletrônico de La, Pr e Nd e diferencie os dados DHCP documentados das redes ainda não homologadas na Oficina.",
+    "idea": "Os registros podem descrever estruturas DHCP, mas a existência de dados de referência não libera automaticamente a montagem cristalográfica interativa.",
+    "observe": "Acompanhe a visualização eletrônica coletiva e seus controles de visibilidade no modo livre.",
+    "interpret": "Distinguir referência cristalográfica documental, modelo eletrônico qualitativo e interação de rede implementada.",
+    "limits": "Não há rede, coordenação ou parâmetro cristalográfico interativo homologado para La, Pr e Nd; o magnetismo da liga Nd–Fe–B não é calculado.",
+    "missions": [
+      "lantanideos-dhcp"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "available-examples:57,59,60",
+    "track": "familias",
+    "problem": "Como estudar três lantanídeos sem interpretar dados DHCP como uma rede acessível no SILM?",
+    "prediction": "Preveja o que a camada de elétrons representa, mesmo quando a estrutura cristalina não está habilitada.",
+    "actions": [
+      "Selecione La, Pr ou Nd no catálogo de metais disponíveis.",
+      "Inicie a missão Lantânio, Praseodímio e Neodímio: elétrons e compare as camadas visíveis e ocultas.",
+      "Interprete o que a representação eletrônica permite concluir e por que a rede DHCP ainda não está acessível."
+    ],
+    "evidence": "Registro da ativação e ocultação da representação eletrônica e explicitação dos limites da rede não homologada.",
+    "reflection": "Por que a visualização de elétrons em La, Pr e Nd não comprova estrutura de liga Nd–Fe–B ou resposta magnética?"
+  },
+  {
+    "id": "diversidade-lantanideos",
+    "title": "Lantanídeos não têm uma única rede",
+    "sub": "Ce · Sm · Gd · Tb · Dy · Yb",
+    "description": "O conjunto de referências apresenta Ce e Yb como CFC, Sm como romboédrico e Gd, Tb e Dy como HC; a classe química não fixa uma única geometria.",
+    "idea": "Os lantanídeos investigáveis incluem estruturas HC, CFC, DHCP e romboédricas, dependendo do elemento e da referência.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Lantanídeos: HC, CFC e romboédrica.",
+    "interpret": "Comparar as referências do banco sem afirmar que uma família inteira apresenta o mesmo arranjo.",
+    "limits": "Não há simulação de terras raras como ligas, ímãs ou estados eletrônicos f quantitativos.",
+    "missions": [
+      "lantanideos-diversos"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:58,62,64,65,66,70",
+    "track": "familias",
+    "problem": "Por que não podemos atribuir a todos os lantanídeos uma única célula unitária?",
+    "prediction": "Antes de escolher o elemento, preveja quais tipos de rede aparecerão e quais limites de comparação persistem.",
+    "actions": [
+      "Escolha um dos metais Ce · Sm · Gd · Tb · Dy · Yb e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Lantanídeos: HC, CFC e romboédrica, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Observe a célula e a rede do elemento escolhido e compare classificações em mais de uma investigação.",
+    "reflection": "Quais variações estruturais são registradas entre os lantanídeos selecionados? Por que a rede não prediz automaticamente o comportamento magnético ou óptico de materiais comerciais?"
+  },
+  {
+    "id": "actinideos-diversidade",
+    "title": "Actinídeos e estruturas não canônicas",
+    "sub": "Th · Pa · Np · Pu",
+    "description": "Th, Pa, Np e Pu têm referências de estruturas diferentes no banco. O tema é estritamente de leitura virtual e interpretação geométrica.",
+    "idea": "Th, Pa, Np e Pu mostram diversidade de formas de célula e evidenciam os limites das classificações simplificadas.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Tório, Protactínio, Netúnio e Plutônio.",
+    "interpret": "Comparar somente modelos e dados de referência, sem extrapolar para protocolos experimentais de radionuclídeos.",
+    "limits": "O SILM não reproduz radioatividade, segurança radiológica, reatividade nem transformações metalúrgicas. Não é instrução de manipulação.",
+    "missions": [
+      "actinideos-estruturas"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:90,91,93,94",
+    "track": "familias",
+    "problem": "Por que os actinídeos requerem referências cristalográficas específicas em vez de um único modelo de rede?",
+    "prediction": "Preveja por que a diversidade de redes exige modelos não canônicos além dos exemplos cúbicos usuais.",
+    "actions": [
+      "Escolha um dos metais Th · Pa · Np · Pu e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Tório, Protactínio, Netúnio e Plutônio, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Selecione apenas uma referência virtual, observe a célula e a rede e identifique a classe estrutural.",
+    "reflection": "Que informações de estrutura o banco disponibiliza para o actinídeo selecionado? Por que a investigação virtual não corresponde a um procedimento físico com material radioativo?"
+  },
+  {
+    "id": "formas-incomuns-metalicas",
+    "title": "Células incomuns: Mn e Po",
+    "sub": "Mn · Po",
+    "description": "A referência de Mn é cúbica complexa, enquanto Po tem uma referência cúbica simples. Semelhança no adjetivo cúbico não implica a mesma rede.",
+    "idea": "Estruturas cúbicas podem ter bases e padrões de repetição diferentes, como mostram Mn e Po.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Manganês e Polônio: redes incomuns.",
+    "interpret": "Não substituir a geometria complexa por um arranjo de esferas simples nem deduzir segurança de material.",
+    "limits": "Polônio é radioativo: este é um estudo documental virtual, sem orientações de obtenção/manuseio. O SILM não calcula radioatividade.",
+    "missions": [
+      "manganes-polonio"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:25,84",
+    "track": "estruturas",
+    "problem": "Por que uma estrutura cúbica complexa não é equivalente a uma cúbica simples?",
+    "prediction": "Preveja o que muda na célula e na repetição quando a base cristalográfica é diferente.",
+    "actions": [
+      "Escolha um dos metais Mn · Po e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Manganês e Polônio: redes incomuns, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Compare visualmente célula e rede de Mn ou Po e registre o tipo estrutural, sem calcular fatores canônicos automaticamente.",
+    "reflection": "Que informação é ocultada quando chamamos ambas as estruturas apenas de cúbicas? Por que a demonstração de polônio deve ser exclusivamente virtual?"
+  },
+  {
+    "id": "cfc-familias-diferentes",
+    "title": "CFC além das famílias químicas",
+    "sub": "Al · Ca · Sr · Pb",
+    "description": "Os elementos Al, Ca, Sr e Pb têm referência CFC, embora pertençam a categorias químicas diferentes e exijam informações distintas para discutir segurança e aplicações.",
+    "idea": "Uma estrutura cristalina pode aparecer em elementos de famílias distintas sem determinar sua identidade e comportamento químico.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Uma rede CFC em quatro famílias.",
+    "interpret": "Contrastar estrutura CFC, classificação periódica e limites de aplicações.",
+    "limits": "A representação cristalina não avalia reatividade, toxicidade nem propriedades mecânicas de ligas e peças.",
+    "missions": [
+      "cfc-diferentes-familias"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:13,20,38,82",
+    "track": "familias",
+    "problem": "Al, Ca, Sr e Pb compartilham CFC: por que isso não os transforma em metais equivalentes?",
+    "prediction": "Preveja o que a coordenação local terá em comum e que dados químicos continuarão específicos de cada elemento.",
+    "actions": [
+      "Escolha um dos metais Al · Ca · Sr · Pb e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Uma rede CFC em quatro famílias, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Observe a célula, repita a rede e destaque os vizinhos para o metal escolhido; compare uma segunda referência separadamente.",
+    "reflection": "A mesma célula torna semelhantes as propriedades químicas de Ca e Pb? Qual a diferença entre classificação periódica e tipo de rede?"
+  },
+  {
+    "id": "magnesio-aluminio-estruturas",
+    "title": "Mg e Al: redes de metais leves",
+    "sub": "Mg · Al",
+    "description": "Mg possui referência HC e Al referência CFC. Componentes com esses elementos podem incluir ligas e tratamentos que a célula do metal puro não descreve.",
+    "idea": "O magnésio e o alumínio têm tipos de referência diferentes, de modo que a classificação de aplicação não define a célula.",
+    "observe": "Selecione o elemento no catálogo da Oficina e execute a missão Magnésio e Alumínio: HC versus CFC.",
+    "interpret": "Explicar diferença HC/CFC e limites de inferir propriedades do componente real.",
+    "limits": "O SILM não determina resistência de ligas Mg–Al, microestruturas reais ou massas de peças a partir do desenho.",
+    "missions": [
+      "magnesio-aluminio"
+    ],
+    "routes": [
+      "ordem-metal"
+    ],
+    "selector": "examples:12,13",
+    "track": "aplicacoes",
+    "problem": "Metais usados em componentes leves precisam apresentar a mesma estrutura cristalina?",
+    "prediction": "Preveja como a repetição cristalina difere entre HC e CFC e por que isso não é uma comparação direta de densidade.",
+    "actions": [
+      "Escolha um dos metais Mg · Al e identifique no catálogo sua estrutura de referência.",
+      "Execute a missão Magnésio e Alumínio: HC versus CFC, registrando as evidências exigidas na Oficina.",
+      "Em outra investigação, selecione um segundo metal do conjunto e compare o tipo de célula, as fontes e as limitações do modelo."
+    ],
+    "evidence": "Observe célula e rede de Mg ou Al; registre o tipo e compare com outra investigação sem inferir o comportamento de ligas.",
+    "reflection": "Que diferença geométrica distingue Mg e Al no SILM? Por que desempenho mecânico de uma liga não resulta só da rede do elemento?"
+  }
 ];
  const metalType=z=>{const e=S.data.get(z);return e?.structures?.find(x=>x.id===e.referenceStructure)?.type||null;};
  const selectMetals=selector=>{
@@ -967,6 +967,7 @@
   else if(selector.startsWith('category-all:'))ids=all.filter(z=>S.data.get(z).classification.category===selector.slice(13));
   else if(selector.startsWith('category:'))ids=solid.filter(z=>S.data.get(z).classification.category===selector.slice(9));
   else if(selector.startsWith('examples:'))ids=selector.slice(9).split(',').map(Number).filter(z=>solid.includes(z));
+  else if(selector.startsWith('available-examples:'))ids=selector.slice(19).split(',').map(Number).filter(z=>all.includes(z));
   else throw Error('Seletor de tema desconhecido: '+selector);
   return [...new Set(ids)].sort((a,b)=>a-b);
  };
