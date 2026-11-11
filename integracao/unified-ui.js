@@ -156,7 +156,11 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
     const option=N('option',e.name+' ('+e.symbol+')');option.value=String(e.atomicNumber);metalFilter.append(option);
    }
    const count=N('p');count.className='silm-learning-count';count.setAttribute('role','status');count.setAttribute('aria-live','polite');
-   controls.append(label,filter,metalLabel,metalFilter,search);host.append(controls,count);
+   const categoryField=N('div');categoryField.className='silm-learning-field';categoryField.append(label,filter);
+   const metalField=N('div');metalField.className='silm-learning-field';metalField.append(metalLabel,metalFilter);
+   const searchField=N('div');searchField.className='silm-learning-field';
+   const searchLabel=N('label','Pesquisar');searchLabel.htmlFor=search.id;searchField.append(searchLabel,search);
+   controls.append(categoryField,metalField,searchField);host.append(controls,count);
    const list=N('div');list.className='silm-content-list silm-learning-catalog';
    const groups=new Map();
    for(const item of S.themes.registry){
