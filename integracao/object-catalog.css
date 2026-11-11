@@ -581,8 +581,8 @@
   min-width:max-content!important;height:auto!important;min-height:0!important;
   margin:0!important;
   grid-template-columns:24px repeat(18,var(--silm-touch-cell))!important;
-  grid-template-rows:18px repeat(7,calc(var(--silm-touch-cell)*1.07))
-   6px repeat(2,calc(var(--silm-touch-cell)*1.07))!important;
+  grid-template-rows:18px repeat(7,clamp(49px,6.15dvh,54px))
+   6px repeat(2,clamp(49px,6.15dvh,54px))!important;
   gap:3px!important
  }
  #si-stage .silm-object-entry-table .periodic-grid .periodic-element{
