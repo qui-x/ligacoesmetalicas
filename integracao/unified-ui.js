@@ -279,7 +279,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   {id:'explorar',title:'Explorar',summary:'Observe elétrons, estruturas e propriedades em diferentes vistas.',group:'Investigue',icon:'◉',topics:['explorar','eletrons-deslocalizados','propriedades-metalicas','vista','vista-3d']},
   {id:'medir',title:'Medir',summary:'Use ferramentas e registre evidências do modelo.',group:'Investigue',icon:'⌁',topics:['medir']},
   {id:'calcular',title:'Calcular',summary:'Relacione parâmetros e dados cristalográficos.',group:'Investigue',icon:'∑',topics:['calcular']},
-  {id:'instrumentos',title:'Instrumentos',summary:'Conheça as técnicas e os limites das medições.',group:'Investigue',icon:'◎',topics:['medir']},
+  {id:'instrumentos',title:'Instrumentos',summary:'Conheça as técnicas e os limites das medições.',group:'Investigue',icon:'◎',topics:['instrumentos']},
   {id:'montagens',title:'Montagens prontas',summary:'Comece por configurações de referência.',group:'Prepare e registre',icon:'▦',topics:['montagens-prontas']},
   {id:'roteiros',title:'Roteiros Experimentais',summary:'Siga investigações com objetivos e orientações.',group:'Prepare e registre',icon:'☷',topics:['atividades']},
   {id:'relatorios',title:'Relatórios',summary:'Organize resultados, interpretação e conclusão.',group:'Prepare e registre',icon:'▤',topics:['relatorio']},
