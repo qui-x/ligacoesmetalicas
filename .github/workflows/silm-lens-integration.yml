@@ -10,6 +10,10 @@ on:
       - 'domain/silm/lens-controller.js'
       - 'integracao/module-shortcuts.js'
       - 'integracao/module-shortcuts.css'
+      - 'integracao/workspace-family.js'
+      - 'integracao/scientific-tools.js'
+      - 'integracao/direct-ver-tools.css'
+      - 'tests/run-direct-ver-tools.mjs'
       - 'integracao/mobile-icon-fit.css'
       - 'integracao/mobile-layout-unificado.css'
       - 'tests/run-cross-regressions.mjs'
@@ -48,6 +52,9 @@ jobs:
           node --check domain/silm/lens-controller.js
           node --check integracao/module-shortcuts.js
           node --check integracao/dock-focus.js
+          node --check integracao/workspace-family.js
+          node --check integracao/scientific-tools.js
+          node --check tests/run-direct-ver-tools.mjs
           node --check tests/run-lens-integration.mjs
           node --check tests/run-lens-gestures.mjs
           node --check sw.js
@@ -74,12 +81,16 @@ jobs:
         run: node tests/run-object-entry-catalog.mjs
       - name: Testar duplo clique e Ctrl+clique na lupa
         run: node tests/run-lens-gestures.mjs
+      - name: Testar ferramentas diretas nos três módulos
+        run: node tests/run-direct-ver-tools.mjs
       - name: Guardar evidências visuais
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: silm-lente-${{ matrix.browser }}
-          path: reports/lente/${{ matrix.browser }}/
+          path: |
+            reports/lente/${{ matrix.browser }}/
+            reports/ver-direto/${{ matrix.browser }}/
           if-no-files-found: warn
           retention-days: 14
       - name: Encerrar servidor
