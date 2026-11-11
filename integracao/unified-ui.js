@@ -242,7 +242,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
     const image=S.metalAtlas?.micro?.(elementId);
     if(image?.path){
      const figure=N('figure');figure.className='silm-manual-micro-figure';
-     const img=N('img');img.src=image.path;img.alt='Ilustração esquemática de grãos de '+metal.name+' sem escala física';img.loading='lazy';img.decoding='async';
+     const img=N('img');img.src=image.path;img.alt='Ilustração esquemática de grãos de '+metal.name+' sem escala física';img.loading='eager';img.decoding='async';
      figure.append(img,N('figcaption',image.caveat));
      section.append(N('h3','Imagem esquemática do atlas'),figure);
     }
