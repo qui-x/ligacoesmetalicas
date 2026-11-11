@@ -475,11 +475,11 @@ async function test(viewport){
   await page.getByRole('button',{name:'Ver',exact:true}).click();
   await page.locator('#silm-direct-actionbar [data-action="property-electrical"]').waitFor({state:'visible'});
   await page.keyboard.down('Control');
-  await page.locator('.silm-observer-action[data-action="property-electrical"]').click();
-  await page.locator('.silm-observer-action[data-action="property-thermal"]').click();
+  await page.locator('#silm-direct-actionbar .silm-observer-action[data-action="property-electrical"]').click();
+  await page.locator('#silm-direct-actionbar .silm-observer-action[data-action="property-thermal"]').click();
   await page.keyboard.up('Control');
   await step.waitFor({state:'visible'});
-  for(const id of ['electrical','thermal'])assert.equal(await page.locator('.silm-observer-action[data-action="property-'+id+'"]').getAttribute('aria-pressed'),'true','Soltar Ctrl desativou uma propriedade do par.');
+  for(const id of ['electrical','thermal'])assert.equal(await page.locator('#silm-direct-actionbar .silm-observer-action[data-action="property-'+id+'"]').getAttribute('aria-pressed'),'true','Soltar Ctrl desativou uma propriedade do par.');
   await page.getByRole('button',{name:'Fechar painel',exact:true}).click();
   assert.match(await reading.textContent(),/Efeito Joule.* · t 0 · /,'Ctrl + E + T não iniciou o mesmo ensaio.');
   await conditions.selectOption('end');
