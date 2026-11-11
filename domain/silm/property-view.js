@@ -102,7 +102,7 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
    channel.value.textContent=(100*v.reflectance).toLocaleString('pt-BR',{maximumFractionDigits:1})+' %';
   }
   const atReference=!!cap.conditionMatch?.ok;
-  opticalNote.textContent='Cobre · interface lisa ideal ar–metal · luz não polarizada · incidência '+angleDeg+'° da normal de referência. Valores ilustram a fonte original, não a cor de uma peça real.';
+  opticalNote.textContent=cap.symbol+' · interface lisa ideal ar–metal · luz não polarizada · incidência '+angleDeg+'° da normal de referência. Valores ilustram a fonte original, não a cor de uma peça real.';
   opticalSource.textContent=(atReference?'Condição CNTP verificada. ':
    'ATENÇÃO: fonte à temperatura ambiente; CNTP (0 °C, 1 atm) não verificada — não interpretar estas porcentagens como previsão em CNTP. ')+
    'Constantes n,k: '+cap.source.authors+' ('+cap.source.year+'). Sem considerar óxido, rugosidade ou filme.';
