@@ -1352,3 +1352,138 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
  #silm-comparison-items .silm-structure-title{font-size:.87rem}
  #silm-comparison-items .silm-structure-composition{font-size:.7rem;line-height:1.25}
 }
+
+/* ================================================================
+   Manual do SILM — mesma arquitetura espacial do Manual do SIAB 1.0
+   1320px / índice 218px / topo + busca + ferramentas / leitura 72ch
+   Breakpoints 1100, 800 e 460px. Estilo local preservado.
+   ================================================================ */
+.silm-manual-page{max-width:1320px;width:100%;margin-inline:auto;padding:24px 32px 64px;--silm-manual-reading:72ch}
+.silm-manual-page #silm-manual{min-width:0}
+.silm-manual-page .silm-manual-bar{display:flex;align-items:center;gap:24px;padding:0 0 20px;margin:0;border-bottom:1px solid var(--border);justify-content:space-between;flex-wrap:nowrap}
+.silm-manual-page .silm-manual-home-link{font-weight:700;font-size:1.1rem;color:var(--text);text-decoration:none;white-space:nowrap;padding:10px 0}
+.silm-manual-page .silm-manual-search{flex:1;max-width:680px;min-width:0;margin:auto;display:grid;gap:5px}
+.silm-manual-page .silm-manual-search label{font-size:.8rem;color:var(--muted)}
+.silm-manual-page .silm-manual-search-row{display:flex;align-items:center;gap:6px}
+.silm-manual-page .silm-manual-search input{height:46px;min-width:0;flex:1;border-radius:9px}
+.silm-manual-page .silm-manual-search button{min-height:44px;flex-shrink:0}
+.silm-manual-page .silm-manual-clear[hidden]{display:none!important}
+.silm-manual-page .silm-manual-clear{width:44px;padding:0;justify-content:center;font-size:1.4rem}
+.silm-manual-page #manual-workspace{flex:none;white-space:nowrap;min-height:44px;display:inline-flex;align-items:center}
+.silm-manual-page .silm-manual-tools{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin:8px 0 16px}
+.silm-manual-page .silm-manual-index-toggle{display:none}
+.silm-manual-page .silm-manual-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.silm-manual-page .silm-manual-shell{display:grid;grid-template-columns:218px minmax(0,1fr);gap:44px;align-items:start}
+.silm-manual-page [data-manual-view="home"] .silm-manual-shell,
+.silm-manual-page [data-manual-view="search"] .silm-manual-shell{display:block}
+.silm-manual-page [data-manual-view="home"] .silm-manual-index,
+.silm-manual-page [data-manual-view="search"] .silm-manual-index{display:none}
+.silm-manual-page .silm-manual-index{position:sticky;top:calc(var(--si-header-height,57px) + 16px);max-height:calc(100dvh - var(--si-header-height,57px) - 36px);overflow-y:auto;padding:0 12px 8px 0;border-right:1px solid var(--border);scrollbar-width:thin}
+.silm-manual-page .silm-manual-index ul{list-style:none;padding:0;margin:12px 0 0}
+.silm-manual-page .silm-manual-index ul ul{margin:0 0 6px 17px;padding-left:9px;border-left:1px solid var(--border)}
+.silm-manual-page .silm-manual-index a{display:flex;align-items:center;min-height:44px;padding:9px 8px;color:var(--muted);text-decoration:none;border-radius:6px;font-size:.875rem;line-height:1.4}
+.silm-manual-page .silm-manual-index a:hover{background:var(--tint);color:var(--text)}
+.silm-manual-page .silm-manual-index a[aria-current="page"]{background:var(--surface);color:var(--accent);font-weight:700;box-shadow:inset 3px 0 currentColor}
+.silm-manual-page .silm-manual-index ul ul a{font-size:.825rem;min-height:38px}
+.silm-manual-page .silm-manual-index-home{font-weight:650}
+.silm-manual-page .silm-manual-content{min-width:0}
+.silm-manual-page .silm-manual-hero-parity{display:grid;grid-template-columns:1.1fr 1fr;gap:42px;align-items:center;max-width:none;padding:8px 0 30px;margin:0}
+.silm-manual-page .silm-manual-hero-parity h1{max-width:14ch;font-size:clamp(1.8rem,3vw,2.8rem);line-height:1.16;margin:14px 0 18px}
+.silm-manual-page .silm-manual-hero-parity>div>p:not(.eyebrow){font-size:1.05rem;line-height:1.7;max-width:49ch}
+.silm-manual-page .silm-manual-hero-parity .silm-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.silm-manual-page .silm-manual-workspace-map{border:1px solid var(--border);border-radius:12px;background:var(--surface);margin:0;padding:22px;min-width:0}
+.silm-manual-page .silm-manual-map-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.silm-manual-page .silm-manual-map-actions a{display:inline-flex;align-items:center;min-height:40px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);text-decoration:none;font-size:.8rem;font-weight:600}
+.silm-manual-page .silm-manual-map-scene{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:174px;gap:4px;text-align:center}
+.silm-manual-page .silm-manual-map-scene div{font-size:4rem;color:var(--accent);line-height:1.25}
+.silm-manual-page .silm-manual-map-scene p{font-weight:700;margin:0}
+.silm-manual-page .silm-manual-map-scene span,.silm-manual-page .silm-manual-workspace-map figcaption{color:var(--muted);font-size:.875rem}
+.silm-manual-page .silm-manual-workspace-map figcaption{line-height:1.55;margin-top:12px}
+.silm-manual-page .silm-manual-quick{padding:18px 0;margin:0 0 30px;gap:10px 20px}
+.silm-manual-page .silm-manual-group{margin:0 0 30px}
+.silm-manual-page .silm-manual-group h2{margin:0 0 14px}
+.silm-manual-page .silm-manual-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(225px,100%),1fr));gap:14px}
+.silm-manual-page .silm-manual-card{padding:20px;gap:8px;align-items:flex-start}
+.silm-manual-page .silm-manual-symbol{display:inline-flex;justify-content:center;align-items:center;min-width:26px;height:28px;color:var(--accent);font-size:1.35rem;margin-bottom:12px}
+.silm-manual-page .silm-manual-card p{line-height:1.55}
+.silm-manual-page .silm-manual-breadcrumb{max-width:var(--silm-manual-reading);margin:0 0 14px;min-height:30px}
+.silm-manual-page .silm-manual-article,.silm-manual-page .silm-manual-category-page{max-width:var(--silm-manual-reading);margin:0;min-width:0}
+.silm-manual-page .silm-manual-article h1,.silm-manual-page .silm-manual-category-page h1{font-size:clamp(1.8rem,3vw,2.4rem);line-height:1.2}
+.silm-manual-page .silm-manual-article .silm-lead{font-size:1.08rem;line-height:1.7;color:var(--muted)}
+.silm-manual-page .silm-manual-article section{margin-top:24px}
+.silm-manual-page .silm-manual-article h2{margin-bottom:10px}
+.silm-manual-page .silm-manual-article p{overflow-wrap:anywhere;line-height:1.7}
+.silm-manual-page .silm-manual-steps li{margin:8px 0;line-height:1.6}
+.silm-manual-page .silm-manual-accordion{margin:8px 0;padding:12px 14px;border:1px solid var(--border);border-radius:9px;background:var(--surface)}
+.silm-manual-page .silm-manual-accordion summary{cursor:pointer;min-height:30px;font-weight:600}
+.silm-manual-page .silm-manual-accordion p{margin:12px 0 0}
+.silm-manual-page .silm-manual-topic-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+.silm-manual-page .silm-manual-topic-link{display:flex;align-items:center;gap:13px;min-height:76px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--text)}
+.silm-manual-page .silm-manual-topic-link>span:first-child{display:inline-flex;align-items:center;justify-content:center;flex:0 0 26px;color:var(--accent);font-size:1.4rem}
+.silm-manual-page .silm-manual-topic-link>span:nth-child(2){display:grid;gap:4px;min-width:0}
+.silm-manual-page .silm-manual-topic-link strong{font-size:.95rem}
+.silm-manual-page .silm-manual-topic-link>span:nth-child(2)>span{font-size:.8rem;color:var(--muted);line-height:1.5;overflow-wrap:anywhere}
+.silm-manual-page .silm-manual-topic-link>span:last-child{margin-left:auto;color:var(--accent)}
+.silm-manual-page .silm-manual-topic-link:hover{border-color:var(--accent)}
+.silm-manual-page .silm-manual-results .silm-manual-topic-list{margin:20px 0 24px}
+.silm-manual-page .silm-manual-back{margin-top:22px;display:inline-flex;min-height:44px}
+.silm-manual-page .silm-manual-print-sheet{display:none}
+@media(max-width:1100px){
+ .silm-manual-page{padding:20px 24px 50px}
+ .silm-manual-page .silm-manual-shell{grid-template-columns:190px minmax(0,1fr);gap:26px}
+ .silm-manual-page .silm-manual-hero-parity{gap:24px}
+ .silm-manual-page .silm-manual-topic-list{grid-template-columns:1fr}
+}
+@media(max-width:800px){
+ .silm-manual-page{padding:18px 16px 40px}
+ .silm-manual-page .silm-manual-bar{flex-wrap:wrap;gap:12px;padding-bottom:14px}
+ .silm-manual-page .silm-manual-home-link{order:0;flex:1}
+ .silm-manual-page #manual-workspace{order:1;min-height:44px;font-size:.8rem}
+ .silm-manual-page .silm-manual-search{order:2;flex:1 0 100%;max-width:none}
+ .silm-manual-page .silm-manual-tools{justify-content:space-between;margin:12px 0 20px}
+ .silm-manual-page .silm-manual-index-toggle{display:inline-flex;min-height:44px}
+ .silm-manual-page .silm-manual-shell{display:block}
+ .silm-manual-page .silm-manual-index{display:none;position:static;max-height:none;border:1px solid var(--border);border-radius:9px;margin:0 0 24px;padding:12px;background:var(--surface)}
+ .silm-manual-page .silm-manual-index-open .silm-manual-index{display:block}
+ .silm-manual-page .silm-manual-index ul ul a{font-size:.875rem;min-height:44px}
+ .silm-manual-page .silm-manual-hero-parity{grid-template-columns:1fr;gap:26px}
+ .silm-manual-page .silm-manual-hero-parity h1{max-width:18ch;font-size:2rem}
+ .silm-manual-page .silm-manual-workspace-map{max-width:600px}
+ .silm-manual-page .silm-manual-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .silm-manual-page .silm-manual-breadcrumb a{min-height:44px;display:inline-flex;align-items:center}
+ .silm-manual-page .silm-manual-article h1{font-size:1.8rem}
+}
+@media(max-width:460px){
+ .silm-manual-page .silm-manual-grid{grid-template-columns:1fr}
+ .silm-manual-page .silm-manual-card{display:grid;grid-template-columns:28px minmax(0,1fr);gap:3px 14px}
+ .silm-manual-page .silm-manual-card .silm-manual-symbol{grid-column:1;grid-row:1/4}
+ .silm-manual-page .silm-manual-card h3,.silm-manual-page .silm-manual-card p,.silm-manual-page .silm-manual-card .silm-manual-card-action{grid-column:2}
+ .silm-manual-page .silm-manual-hero-parity h1{font-size:1.8rem}
+ .silm-manual-page .silm-manual-workspace-map{padding:14px}
+ .silm-manual-page .silm-manual-search-row{gap:4px}
+ .silm-manual-page .silm-manual-search-row .button{padding:8px}
+ .silm-manual-page .silm-manual-map-actions{gap:5px}
+ .silm-manual-page .silm-manual-map-actions a{padding:6px}
+ .silm-manual-page .silm-manual-tools button{font-size:.8rem}
+}
+@media(prefers-reduced-motion:reduce){
+ .silm-manual-page .silm-manual-card{transition:none}
+}
+@media(forced-colors:active){
+ .silm-manual-page .silm-manual-card,.silm-manual-page .silm-manual-index,.silm-manual-page .silm-manual-topic-link{border:1px solid CanvasText;background:Canvas}
+ .silm-manual-page .silm-manual-index a[aria-current="page"]{outline:2px solid Highlight}
+}
+@media print{
+ body.silm-print-manual .side,body.silm-print-manual .topbar,body.silm-print-manual .footer,body.silm-print-manual .si-mobile-bottom-nav{display:none!important}
+ body.silm-print-manual .silm-manual-page{padding:0!important;max-width:none!important}
+ body.silm-print-manual #silm-manual>*:not(.silm-manual-print-sheet){display:none!important}
+ body.silm-print-manual #silm-manual>.silm-manual-print-sheet{display:block!important;color:#111!important;background:#fff!important;font-size:10pt;max-width:none}
+ body.silm-print-manual .silm-manual-print-sheet .silm-manual-article{max-width:none}
+ body.silm-print-manual .silm-manual-print-sheet h1{font-size:21pt}
+ body.silm-print-manual .silm-manual-print-sheet h2{font-size:12pt;break-after:avoid}
+ body.silm-print-manual .silm-manual-print-sheet h3{font-size:10.5pt;break-after:avoid}
+ body.silm-print-manual .silm-manual-print-sheet p,body.silm-print-manual .silm-manual-print-sheet li{font-size:10pt;color:#222!important;line-height:1.55}
+ body.silm-print-manual .silm-manual-print-sheet details>*{display:block!important}
+ body.silm-print-manual .silm-manual-print-category{break-inside:avoid;border-bottom:1px solid #aaa;padding:2mm 0 4mm}
+ body.silm-print-manual .silm-manual-print-sheet a{color:#111!important}
+}
