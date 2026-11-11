@@ -24,6 +24,10 @@ Arquivos inspecionados: `domain/silm/properties.js`, `property-view.js`, `crysta
 - O realce de centros cristalográficos não representa o brilho de uma superfície macroscópica; falta distinguir **rede volumétrica, superfície e corpo de prova**.
 - Existe um corpo de prova **didático para deformação** em `deformation.js`/`crystal-view.js`; ainda não há um modelo geral de superfície óptica parametrizado, independente da rede.
 
+### Restrição de módulo a rever
+
+O catálogo atual define `luster.requires='crystalline'`. Essa exigência é compreensível para o **diagrama atual**, que usa a rede para localizar o alvo da lanterna, mas **não é uma exigência física do brilho**: a resposta óptica de uma amostra metálica macroscópica pode ser observada antes da reconstrução de sua célula unitária. Com o corpo de prova de superfície validado, separar `surfaceAvailable` (sólido com superfície em escala 1) de `crystalAvailable` (rede homologada para escalas 3–4). **Não remover a guarda agora**, porque o renderizador atual depende da geometria cristalina; fazer a migração junto ao novo palco óptico e seus testes.
+
 ## 2. Modelo didático correto para brilho metálico
 
 **Pergunta investigativa:** “Por que esta superfície metálica reflete a luz desse modo, e como material, comprimento de onda, acabamento, orientação da luz e do observador afetam a aparência?”
