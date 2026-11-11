@@ -37,50 +37,108 @@
 
 **Diagnóstico:** a divisão atual `Observar / Camadas / Comparar` separa sobretudo modos de apresentação; não representa o ciclo experimental. Isso cria três camadas de escolha para alcançar o mesmo gesto e faz `Comparar` parecer mais potente do que é.
 
-## 3. Proposta de arquitetura do Ver
+## 3. Arquitetura revista: dois níveis e ativação direta como no SIAB
 
-A hierarquia científica atual permanece `Ver → [Explorar | Medir | Calcular]`. Para **Explorar**, substituir as antigas famílias pela tríade temática:
+**Correção de desenho após a discussão:** a proposta anterior de criar uma faixa
+`Estrutura / Elétrons / Propriedades` **como terceiro nível clicável está rejeitada**.
+No SIAB, os botões `Partículas / Espécies / Equações / Transferência de próton`
+ficam **logo abaixo** de `Observar / Medir / Analisar`. Clicar em uma opção
+seleciona e exibe **imediatamente** a ferramenta ou representação correspondente.
+No SIAB, isso não significa executar automaticamente uma medição ou reação:
+`SIAB.selecionarVer(id)` ativa `state.verTab` e `SIAB.renderVer()`; uma ação
+experimental, como mergulhar a fita, exige seu gesto instrumental próprio.
 
-1. **Estrutura** — *o que constitui o metal e como os centros se organizam?*
-2. **Elétrons** — *como representamos os elétrons de valência deslocalizados?*
-3. **Propriedades** — *o que acontece quando aplicamos uma condição externa?*
+**Paridade correta para o SILM:**
 
-Esses nomes são concretos como `Partículas / Espécies / Equações` no SIAB; não são novos estados científicos. O estudante não precisa escolher uma aba extra `Observar` para finalmente acessar `Estrutura`.
+```text
+Ver · Investigar
+[ Explorar ] [ Medir ] [ Calcular ]      ← módulo científico (primeira faixa)
+[ Centros ] [ Vizinhos ] [ Célula/Rede ] [ Elétrons ] [ Campo ] [ Calor ] ...
+             ↑ botão direto de ferramenta (segunda faixa)
+      [ conteúdo/condições da ferramenta selecionada ]
+A cena central permanece visível e recebe o efeito ou os próximos cliques.
+```
 
-### 3.1 Estrutura: o fenômeno é o foco, não a caixa de camadas
-- Ferramentas de cena: `Identificar centros`, `Mostrar vizinhos`, `Mostrar/ocultar célula`, `Alternar célula e rede`. Os comandos são os já existentes. O clique no centro aciona `setCrystalRepresentation({selectedUnitId})` / navegação por vizinho, nunca uma seleção falsa apenas em CSS.
-- A Travessia e a lente continuam acima e sobre a cena (escala Objeto/Grãos/Rede/Centro); **não duplicar** botões de escala no Ver.
-- Um bloco discreto `Exibição` (recolhível) concentra `rótulos`, `legenda`, `destaque de centros` e `sobreposição da propriedade`, usando o estado persistido que hoje está em Camadas. O modo de apresentação não deve mudar a montagem.
-- Ao selecionar um centro, destacar coerentemente seu papel e os vizinhos, inclusive em tela e leitores de tela. Respeitar o que a geometria realmente determina.
+Não existe uma faixa intermediária de `Estrutura / Elétrons / Propriedades`.
+Esses termos continuam úteis **apenas como categorias de documentação**, não
+como etapas obrigatórias ou abas. Assim, clicar no botão inferior já escolhe
+a funcionalidade que corresponde àquele módulo.
 
-### 3.2 Elétrons: um único gesto científico e uma única apresentação
-- Ferramenta primária: `Mar de elétrons`, ligando/desligando **aparição e movimento juntos**, como decidido na Oficina.
-- Mensagem didática contextual curta: elétrons de valência deslocalizados; **não** representar pares de ligações localizadas nem interpretar a animação como rastreamento real de elétrons.
-- Futura ação de destaque: `Mostrar resposta eletrônica à condição aplicada`, **somente após** ser vinculada ao motor de propriedades e seus estados reais; nunca alterar fisicamente o modelo ao mudar apenas o modo de visualização.
-- O mesmo estado visual (ativo/desligado) aparece na paleta de ações e em Ver, sem comandos paralelos divergentes.
+### 3.1 Tipos de botão direto — não confundir ativar com simular
 
-### 3.3 Propriedades: estímulo → resposta → contexto, no próprio palco
-Apresentar ferramentas por **fenômeno**, não por opções de CSS:
-
-| Ferramenta | Estímulo ou gesto que já existe | Evidência visual/contextual | Requisito |
+| Tipo | Exemplo em Explorar | Efeito imediato do clique | O que não se deve fazer |
 |---|---|---|---|
-| Elétrica | Ativar campo elétrico | resposta didática e estado de campo no modelo | elegibilidade elétrica |
-| Térmica | Ligar fonte de calor | resposta na estrutura e indicação térmica | elegibilidade térmica; testar remoção da fonte e resfriamento |
-| Mecânica | Compressão ou tração | deformação conforme modelo implementado | estrutura e propriedades elegíveis |
-| Óptica | Incidir luz | brilho metálico qualitativo | elegibilidade óptica |
-| Conjugadas | Ctrl+clique ou `Selecionar várias` | efeitos explicitamente homologados | não habilitar pares arbitrários |
-| Joule | Alimentação, condição e passo temporal | balanço e pistas térmico-elétricas disponíveis | não expor como universal |
+| Alternador visual | Centros, Elétrons, Vizinhos, Célula/Rede | Liga/desliga representação e informa estado `aria-pressed` | Criar medição ou modificar metal sem intenção |
+| Estímulo físico/didático | Campo, Calor, Luz, Compressão, Tração | Ativa/desativa condição no motor existente, com motivo se indisponível | Simular propriedade não homologada para o metal atual |
+| Preparação de interação | Selecionar centro, Inspecionar grão | Ativa a ferramenta e sinaliza o que o próximo toque **na cena** fará | Marcar uma seleção falsa no menu sem vínculo com o palco |
+| Ferramenta com parâmetros | Joule, combinação de propriedades | Seleciona a ferramenta e apresenta controles necessários (condições/alimentação), sem nova escolha de categoria | Ligar tensão/corrente arbitrariamente antes de configurar parâmetros |
 
-- O clique na ferramenta **ativa o estímulo na cena existente**. O menu informa estado `ligado/desligado`, motivo de bloqueio e acesso a controles complementares quando já existirem no motor. Os ajustes de estímulo ficam associados à experiência, não enterrados em um painel genérico de visualização.
-- No celular, gesto equivalente ao Ctrl+clique é `Selecionar várias` com aplicação explícita; nunca depender de teclado físico.
-- Os registros só aparecem em Dados se o mecanismo de medida/cálculo realmente os tiver criado. A observação qualitativa não se transforma automaticamente em número experimental.
-- Remover fonte de calor e observar o retorno térmico só pode ser anunciado como mecânica **quando o resfriamento estiver implementado e testado**.
+**Regra:** o clique seleciona a funcionalidade diretamente; se a mecânica
+exigir um segundo gesto na cena, ele é a **operação experimental**, não um
+terceiro nível de navegação. Esta distinção é idêntica à do SIAB: abrir
+`pH` revela o instrumento, mas medir exige usar a fita/pHmetro.
+
+### 3.2 Faixa de ferramentas do Explorar — proposta direta
+
+| Botão visível sob Explorar | Motor/ação já disponível | Feedback necessário |
+|---|---|---|
+| **Centros** | destaque de centros da representação | estados e identificação na cena |
+| **Vizinhos** | `setCrystalRepresentation({neighbors})` | vizinhos do centro selecionado |
+| **Célula/Rede** | `setCrystalRepresentation({view,unitCell})` | transição na visualização |
+| **Elétrons** | `quickActions.toggleElectrons()` | aparição + movimento juntos; ligado/desligado |
+| **Campo** | `quickActions.toggleProperty('electrical')` | condição elétrica e resposta do modelo |
+| **Calor** | `quickActions.toggleProperty('thermal')` | fonte, resposta e desligamento; resfriamento pendente |
+| **Compressão** | `quickActions.toggleProperty('malleability')` | deformação, se aplicável |
+| **Tração** | `quickActions.toggleProperty('ductility')` | deformação, se aplicável |
+| **Luz** | `quickActions.toggleProperty('luster')` | resposta óptica qualitativa |
+| **Joule** | `quickActions.beginJoule()` e ações específicas | controles de alimentação, condições, passo temporal |
+
+A exposição final de cada botão dependerá do contexto: **não mostrar como
+habilitado um comando sem cena elegível, estrutura preparada ou capacidade
+científica correspondente**. `Objeto`, `Grãos`, `Rede` e `Centro`
+continuam controlados pela **Travessia**, não são duplicados na faixa.
+
+O ato de destacar um centro na cena e as opções de exibição (rótulos,
+legenda, sobreposições) devem seguir o estado existente; ficam como ajustes
+locais da ferramenta, sem obrigar o usuário a abrir o antigo grupo `Camadas`.
+
+### 3.3 Como será a interação responsiva
+
+- **Desktop:** uma faixa de botões diretos logo abaixo de Explorar, com ícone,
+  rótulo curto, indicador de ativo e quebra de linha somente quando necessário.
+- **Mobile:** os mesmos botões diretos numa faixa **horizontal rolável**,
+  com alvos mínimos de 44 × 44 px. O módulo permanece fixo no topo do menu
+  `Ver`; o gesto horizontal não desloca a Oficina nem o palco.
+- **Teclado:** setas/Home/End entre itens; Enter/Espaço selecionam/acionam,
+  foco mantido após atualização e estados `aria-pressed` corretos.
+- **Ctrl + clique** para propriedades conjugadas quando houver capacidade;
+  o mobile oferece `Selecionar várias` sem exigir teclado físico.
+- Roteiros/missões continuam determinando disponibilidade. Ao trocar de
+  módulo, o estado científico persiste e o menu recorda a última ferramenta
+  elegível, como no SIAB. Ferramentas não elegíveis devem informar o porquê.
+- A **paleta inferior** pode repetir atalhos úteis, mas ambos acionam o
+  **mesmo comando**, sem duplicação nem divergência de estado.
+
+### 3.4 Medir e Calcular seguem o mesmo padrão
+
+**Medir →** botões diretos `Distância`, `Ângulo`, `Parâmetro`,
+`Coordenação`. O primeiro clique arma a ferramenta; selecionar pontos
+cristalográficos na cena é o gesto instrumental; só então há registro
+de leitura com origem, unidade e validade.
+
+**Calcular →** botões diretos das fórmulas disponíveis (contagem, volume,
+densidade, empacotamento etc.). O clique abre imediatamente a fórmula
+com entradas já verificadas, proveniência, restrições e possibilidade de
+cálculo; o botão não inventa valores experimentais.
+
+**A finalidade é a mesma:** dois níveis visuais para chegar à ferramenta,
+e gestos científicos posteriores apenas quando efetivamente necessários.
 
 ## 4. O que acontece com Camadas e Comparar
 
-**Camadas**: não é descartada; passa a ser preferência contextual `Exibição` dentro de Estrutura/Elétrons/Propriedades, compartilhada, sem uma aba científica inteira.
+**Camadas**: não é descartada; passa a ajustes locais de exibição (rótulos, destaques, legenda e sobreposições) associados às ferramentas diretas. Não pode virar uma terceira faixa de escolha.
 
-**Comparar**: retirar de *primeiro nível* do Explorar. No curto prazo, os cartões existentes ficam acessíveis como `Informação comparativa (conceitual)` ou em Dados, com a identificação explícita de que A/B **não são duas cenas independentes**. Não criar falsa impressão de experimento comparativo.
+**Comparar**: retirar da faixa de ferramentas como se fosse uma experiência dinâmica pronta. No curto prazo, os cartões existentes ficam acessíveis como `Informação comparativa (conceitual)` ou em Dados, com a identificação explícita de que A/B **não são duas cenas independentes**. Não criar falsa impressão de experimento comparativo.
 
 **Comparação dinâmica futura** (depende de motor/registro): `Registrar referência` → `Aplicar estímulo` → `Alternar antes/depois`, usando duas **apresentações do mesmo ensaio e do mesmo contexto científico**. A implementação exige snapshot/identidade de metal e estrutura, condições, proveniência e política de invalidação quando a geometria mudar. Em tela pequena, alternância A/B é preferível a dois palcos minúsculos.
 
@@ -98,7 +156,7 @@ O padrão de navegação SIAB deve ser preservado: seleção por teclado, foco a
 
 ## 6. Plano de execução, em PRs separados
 
-**P1 — Paridade de navegação, sem tocar na ciência.** Catalogar as ações existentes e reorganizar `Ver → Explorar` em `Estrutura / Elétrons / Propriedades`. Remover a aba Camadas, convertendo seus switches em grupo secundário. Reclassificar as comparações como informativas. Preservar a paleta inferior e o estado único. **Testes:** contagem de ferramentas por família, botão ativo, permissões, navegação teclado/touch, nenhum objeto científico alterado pela troca de aba.
+**P1 — Paridade de navegação, sem tocar na ciência.** Catalogar as ações existentes e implementar **duas faixas apenas**: `Ver → [Explorar/Medir/Calcular] → [botões diretos da ferramenta]`. Eliminar `Observar/Camadas/Comparar` como intermediários e **não criar** `Estrutura/Elétrons/Propriedades` como abas. Manter controles de exibição associados às ferramentas e comparações conceituais identificadas. Preservar paleta inferior e estado científico único. **Testes:** contagem de ferramentas por família, botão ativo, permissões, navegação teclado/touch, nenhum objeto científico alterado pela troca de aba.
 
 **P2 — Seleção interligada com o palco.** A ferramenta selecionada em Ver deve levar o foco/realce ao centro ou à representação atual; o clique real na cena deve atualizar a descrição e o comando correspondente. Para mudanças de escala, só transferir a posição relativa, sem inventar correspondência entre grão e átomo. **Testes:** foco, vizinhos, troca de escala, zoom da lupa, acessibilidade.
 
@@ -120,4 +178,4 @@ O padrão de navegação SIAB deve ser preservado: seleção por teclado, foco a
 
 ## 8. Decisão de implementação
 
-**Recomendação:** adotar **Estrutura / Elétrons / Propriedades** como famílias candidatas do Explorar; não recriar a bancada SIAB nem transferir automaticamente para metalurgia seus símbolos e reações. A etapa inicial precisa primeiro estabelecer **paridade de gesto, estado e feedback** usando os mecanismos científicos do SILM. Este documento é deliberadamente um estudo de desenho; **não autoriza afirmar que P1–P5 já foram programadas**.
+**Recomendação revista:** adotar **seleção direta da ferramenta na segunda faixa de Ver**, sem terceira camada de categorias. `Estrutura`, `Elétrons` e `Propriedades` são apenas taxonomia de planejamento, não botões intermediários. Não recriar a bancada SIAB nem transferir automaticamente para metalurgia seus símbolos e reações. A etapa inicial precisa primeiro estabelecer **paridade de gesto, estado e feedback** usando os mecanismos científicos do SILM. Este documento é deliberadamente um estudo de desenho; **não autoriza afirmar que P1–P5 já foram programadas**.
