@@ -258,6 +258,40 @@ try{
  assert.match(optical.text,/Johnson|Christy/,'Falta procedência do Cu');
  assert.match(optical.text,/óxido, rugosidade|não a cor de uma peça real/,'Falta limite da referência');
  evidence.push({name:'cobre-optica-referencia',bands:optical.bands});
+ // PR102 reconstruído: um experimento de superfície, sem átomos fluorescentes,
+ // sem raios obrigatórios e sem copiar dados de Cu para outros metais.
+ const bench=page.locator('#silm-assembly-stage .silm-optical-bench');
+ await bench.waitFor({state:'visible'});
+ await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='aligned');
+ assert.equal(await page.locator('#silm-assembly-stage .silm-crystal-unit[data-lit]').count(),0,
+  'Brilho voltou a pintar centros metálicos individualmente.');
+ const eye=bench.locator('.silm-optical-bench-eye');
+ const rect=await eye.boundingBox();
+ assert.ok(rect?.width>=43.5&&rect.height>=43.5,'Observador não possui alvo de toque de 44 px');
+ await eye.press('End');
+ await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='away');
+ assert.equal(await eye.getAttribute('aria-valuenow'),'80','O observador não chegou a 80 graus');
+ await eye.press('Enter');
+ await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='aligned');
+ const finish=bench.locator('.silm-optical-bench-finish');
+ await finish.click();
+ await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='diffuse');
+ assert.equal(await page.locator('#silm-properties .silm-optical-bands').isVisible(),false,
+  'Dados de superfície ideal lisa apareceram como previsão para acabamento fosco.');
+ await finish.click();
+ await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='aligned');
+ assert.equal(await page.locator('#silm-properties .silm-optical-bands').isVisible(),true);
+ const incident=bench.locator('.silm-optical-bench-incident');
+ assert.equal(await incident.isVisible(),false,'Raios não devem ser obrigatórios.');
+ await bench.locator('.silm-optical-bench-rays').click();
+ assert.equal(await incident.isVisible(),true,'Esquema de raios não foi exibido a pedido.');
+ await bench.locator('.silm-optical-bench-rays').click();
+ assert.equal(await incident.isVisible(),false,'O aluno não conseguiu ocultar o esquema.');
+ await bench.locator('.silm-optical-bench-source').click();
+ await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='off');
+ await bench.locator('.silm-optical-bench-source').click();
+ await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='aligned');
+ evidence.push({name:'brilho-refeito',observer:80,finish:'polished/matte',raysOptional:true,unlit:true});
  assert.deepEqual(errors,[],errors.join(' | '));
  await context.close();
 }catch(e){evidence.push({error:String(e),stack:e.stack});throw e;}
