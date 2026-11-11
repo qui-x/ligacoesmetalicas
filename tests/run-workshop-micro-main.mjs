@@ -473,6 +473,7 @@ async function test(viewport){
  const warm=await value('T média');
  await conditions.selectOption('supply');
  await step.click();
+ await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 1,5 · '),undefined,{timeout:10000});
  assert.match(await reading.textContent(),/corrente imposta.* · t 1,5 · U 0 · I 0 · R [\d,]+ · P Joule 0/);
  assert.ok(await value('T média')<warm,'Desligar a fonte com terminais ao ambiente precisa permitir resfriamento.');
  assert.equal(await electronFlow(),0);
