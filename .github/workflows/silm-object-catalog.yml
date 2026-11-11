@@ -1,0 +1,79 @@
+name: SILM — Objetos: tabela e catálogo modal
+on:
+  push:
+    branches: [feat/silm-parte9-entrada-objetos-tabela-catalogo-20261110]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'domain/silm/periodic-table.js'
+      - 'domain/silm/workshop.js'
+      - 'integracao/adapter.js'
+      - 'integracao/object-catalog.css'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/run-object-entry-catalog.mjs'
+      - '.github/workflows/silm-object-catalog.yml'
+permissions:
+  contents: read
+concurrency:
+  group: silm-object-catalog-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  objeto:
+    name: Objetos / ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Verificar sintaxe e cache
+        run: |
+          node --check domain/silm/periodic-table.js
+          node --check domain/silm/workshop.js
+          node --check integracao/adapter.js
+          node --check tests/run-object-entry-catalog.mjs
+          node --check sw.js
+          grep -q 'integracao/object-catalog.css' sw.js
+      - name: Instalar navegador
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-playwright/node_modules/playwright" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright" install --with-deps "$BROWSER_NAME"
+      - name: Servir aplicação
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-http.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/silm-http.pid"
+          for n in $(seq 1 30); do
+            if curl -sf "$BASE_URL/index.html" >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-http.log"
+          exit 1
+      - name: Ensaiar o fluxo real
+        run: node tests/run-object-entry-catalog.mjs
+      - name: Guardar capturas e métricas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-objetos-${{ matrix.browser }}
+          path: reports/catalogo-objetos/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Parar servidor
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/silm-http.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/silm-http.pid")" 2>/dev/null || true
+          fi

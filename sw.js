@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.10';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='parte9-notificacoes-responsivas-20261110';
+const BUILD='parte9-catalogo-notificacoes-20261110';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "assets/workshop/motor.webp",
@@ -191,6 +191,7 @@ const FILES=[
   "integracao/module-shortcuts.css",
   "integracao/mobile-icon-fit.css",
   "integracao/mobile-layout-unificado.css",
+  "integracao/object-catalog.css",
   "integracao/mobile-notifications.css",
   "integracao/mobile-notifications.js",
   "integracao/module-shortcuts.js",

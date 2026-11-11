@@ -1,12 +1,12 @@
 'use strict';
 window.SILM=window.SILM||{};
 /* Um componente, dois contextos. O callback de investigação é a única escrita científica. */
-SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSources,onSelect=()=>{},onExplore=()=>{},canInvestigate=()=>true,toolbar=null})=>{
+SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSources,onSelect=()=>{},onExplore=()=>{},canInvestigate=()=>true,toolbar=null,entryObjects=false})=>{
  const U=SimCore.ExperienceUI,D=SILM.data,sequence=++SILM.tableSequence,prefix='periodic-'+sequence;
- const root=U.element('section',null,'silm-periodic');root.dataset.context=teacher?'presentation':'investigation';
- const head=U.element('header',null,'periodic-heading'),title=U.element('h1','Tabela Periódica');title.id=prefix+'-title';title.tabIndex=-1;
+ const root=U.element('section',null,'silm-periodic');root.dataset.context=teacher?'presentation':entryObjects?'objects':'investigation';
+ const head=U.element('header',null,'periodic-heading'),title=U.element('h1',entryObjects?'Tabela Periódica · Objetos':'Tabela Periódica');title.id=prefix+'-title';title.tabIndex=-1;
  root.setAttribute('aria-labelledby',title.id);
- const intro=U.element('div');intro.append(U.element('p',teacher?'SILM · APRESENTAÇÃO':'SILM · SELEÇÃO DE METAL','eyebrow'),title);head.append(intro);
+ const intro=U.element('div');intro.append(U.element('p',teacher?'SILM · APRESENTAÇÃO':entryObjects?'ESCOLHA UM METAL PARA EXPLORAR OBJETOS':'SILM · SELEÇÃO DE METAL','eyebrow'),title);head.append(intro);
  const searchBox=U.element('form',null,'periodic-search'),label=U.element('label','Buscar elemento');label.htmlFor=prefix+'-search';
  const input=U.element('input');input.id=prefix+'-search';input.type='search';input.placeholder='Nome, símbolo ou Z';input.autocomplete='off';input.value=state.query||'';input.maxLength=80;
  const find=U.element('button','Localizar','secondary-btn');find.type='submit';searchBox.append(label,input,find);head.append(searchBox);if(toolbar)head.append(toolbar);root.append(head);
@@ -39,8 +39,8 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
  const sources=U.button('Fontes',()=>{const e=D.get(state.selection);if(e)onSources(e);},scope,{id:prefix+'-sources'});actions.append(clear,investigate,explore,sources);foot.append(actions);root.append(foot);host.append(root);
  function update(){
   const e=D.get(state.selection);for(const [z,b]of buttons){b.setAttribute('aria-pressed',String(z===state.selection));b.classList.toggle('is-selected',z===state.selection);}
-  summary.replaceChildren();clear.disabled=!state.selection&&!input.value;sources.hidden=!e;investigate.hidden=!e||e.silmEligibility.status!=='available';investigate.disabled=!canInvestigate();explore.hidden=teacher||!e||e.silmEligibility.status!=='available';explore.disabled=!canInvestigate();
-  if(!e){summary.append(U.element('p',teacher?'Escolha um elemento para apresentar à turma.':'Selecione um metal para iniciar uma investigação.'));return;}
+  summary.replaceChildren();clear.disabled=!state.selection&&!input.value;sources.hidden=!e;investigate.hidden=entryObjects||!e||e.silmEligibility.status!=='available';investigate.disabled=!canInvestigate();explore.hidden=entryObjects||teacher||!e||e.silmEligibility.status!=='available';explore.disabled=!canInvestigate();
+  if(!e){summary.append(U.element('p',teacher?'Escolha um elemento para apresentar à turma.':entryObjects?'Selecione um metal disponível para abrir seus objetos no catálogo.':'Selecione um metal para iniciar uma investigação.'));return;}
   summary.append(U.element('strong',e.symbol+' · '+e.name+' · Z = '+e.atomicNumber),U.element('span',D.categoryLabel(e)));
   const ref=D.structure(e);summary.append(U.element('span',e.silmEligibility.status==='available'?'Disponível · '+(ref?.label||''):D.reason(e)));
   if(e.classification.note)summary.append(U.element('small',e.classification.note));

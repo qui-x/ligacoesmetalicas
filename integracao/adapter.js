@@ -31,6 +31,7 @@
  let lastRoute=null;
  let view=null,scope=null,viewKey='',pending=false,ready=false,selected=null,focusAfterRender=null;
  let workshopSelectionId=null,workshopScale=1;
+ let legacyDiscovery=false,showObjectEntry=false,entryTableScope=null,catalogOpener=null,catalogNavigating=false;
  let routeUI=null;
  const allows=tool=>!routeUI||routeUI.session.allows(tool);
  let representation=S.representation.defaults(null),invalidSavedState=false,unavailable3D=false;
@@ -91,7 +92,7 @@
  }
  const comparison=S.createStructureComparison({storage,host:$('silm-comparison-items'),current:()=>model.state.structure?.units?.length?model.state.investigation?.id:null,open:openStructure,newStructure:()=>{showFocus();openLeft('preparo');},say,confirm:options=>B.confirmDialog(options)});
  const tools=S.createIntegrationTools({model,host:$('silm-tools'),moduleHost:$('silm-module-choice'),history:$('silm-history'),onChange:schedule,say,onModule:m=>B.selectModule(m),activity:()=>routeUI?.session});
- const prepareMetal=z=>{if(routeUI?.session.open()||S.data.get(z)?.silmEligibility.status!=='available')return false;$('silm-metal').value=String(z);selected=String(z);schedule();return true;};
+ const prepareMetal=z=>{if(routeUI?.session.open()||S.data.get(z)?.silmEligibility.status!=='available')return false;legacyDiscovery=true;$('silm-metal').value=String(z);selected=String(z);schedule();return true;};
  const experience=S.createMetallicExperience({model,say,schedule,reduced,allows,prepareMetal,selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
  const workspaceFamily=S.createWorkspaceFamily({model,activity:()=>routeUI?.session,quickActions:experience.quickActions,refreshScene:()=>view?.update()});
  routeUI=S.createRouteUI({model,storage,prepareMetal,view:()=>representation,onView:(value,{persist=true}={})=>{representation=S.representation.sanitize(value,model.state.investigation?.id??null);return persist?saveView():true;},schedule,say,onModule:m=>B.selectModule(m),selectMetal:async z=>{$('silm-metal').value=String(z);selected=String(z);return await start();}});
@@ -222,6 +223,7 @@
   return model.state.structure?.mode==='crystalline'?{ok:true}:{ok:false,reason:'CRYSTAL_NOT_READY'};
  }
  function setWorkshopScale(level){
+  showObjectEntry=false;
   if(!Number.isInteger(level)||level<1||level>4||!element())return false;
   if(level>=3){
    const ready=ensureWorkshopCrystal();if(!ready.ok){const message=ready.reason==='EXPLORE_REQUIRED'?'Prepare a rede no módulo Explorar.':ready.reason==='ACTIVITY_LOCKED'?'A atividade atual não permite preparar outra estrutura cristalina.':(S.crystal.reasons[ready.reason]||'A estrutura cristalina não está disponível.');say(message,'warning');workshopScale=2;updateWorkshopContext();return false;}
@@ -247,6 +249,64 @@
   // A investigação começa no contexto macroscópico. A rede só é construída ao avançar para a escala 3.
   model.setWorkshopContext(item.id,1);workshopScale=1;updateWorkshopContext();schedule();return true;
  }
+ function disposeEntryTable(){entryTableScope?.destroy();entryTableScope=null;}
+ function openObjectCatalog(metal,origin=document.activeElement){
+  if(!metal||metal.silmEligibility.status!=='available')return false;
+  if(routeUI?.session.open()){say('Encerre a atividade orientada para escolher outro objeto.','info');return false;}
+  const dialog=$('silm-objects-dialog'),body=$('silm-objects-body');
+  if(!dialog||!body)return false;
+  catalogOpener=origin;catalogNavigating=false;
+  S.workshop.renderObjectCatalog(body,{element:metal,onInvestigate:chooseObjectFromCatalog});
+  if(!dialog.open)dialog.showModal();
+  dialog.querySelector('#silm-objects-title')?.focus({preventScroll:true});
+  return true;
+ }
+ async function chooseObjectFromCatalog(item){
+  const dialog=$('silm-objects-dialog');
+  const oldSelected=selected,oldValue=$('silm-metal').value,metal=S.data.get(item.atomicNumber);
+  catalogNavigating=true;
+  // A confirmação da Base usa um overlay próprio: fechar o dialog nativo
+  // ANTES de perguntar evita colocar a confirmação atrás da top layer.
+  if(dialog?.open)dialog.close();
+  selected=String(item.atomicNumber);$('silm-metal').value=selected;
+  const accepted=await investigateWorkshopReference(item);
+  if(!accepted){
+   selected=oldSelected;$('silm-metal').value=oldValue;
+   catalogNavigating=false;
+   if(metal)openObjectCatalog(metal,catalogOpener);
+   return false;
+  }
+  legacyDiscovery=false;showObjectEntry=false;
+  showFocus();schedule();
+  requestAnimationFrame(()=>{
+   const target=document.querySelector('#silm-workshop-context .silm-workshop-browse-objects')||
+    document.querySelector('#silm-workshop-context .silm-workshop-scale[data-scale="1"]');
+   target?.focus({preventScroll:true});
+  });
+  return true;
+ }
+ function renderObjectEntry(host,{active=null}={}){
+  disposeEntryTable();host.replaceChildren();host.hidden=false;
+  const area=document.createElement('section');area.className='silm-object-entry';area.id='silm-object-entry';
+  const head=document.createElement('div');head.className='silm-object-entry-head';
+  const title=document.createElement('h2');title.textContent='Objetos do cotidiano';
+  const actions=document.createElement('div');actions.className='silm-object-entry-actions';
+  // Mantém acesso ao diálogo histórico da tabela para apresentação e compatibilidade.
+  const full=document.createElement('button');full.type='button';full.className='button outline';full.textContent='Ampliar tabela';full.title='Abrir a Tabela Periódica em janela ampliada';
+  full.setAttribute('aria-label','Tabela Periódica');full.addEventListener('click',()=> $('silm-open-periodic')?.click());
+  actions.append(full);
+  if(active){const back=document.createElement('button');back.type='button';back.className='button outline';
+   back.textContent='Voltar ao objeto';back.addEventListener('click',()=>{showObjectEntry=false;schedule();});actions.prepend(back);}
+  head.append(title,actions);area.append(head);
+  const tableHost=document.createElement('div');tableHost.className='silm-object-entry-table';area.append(tableHost);
+  host.append(area);entryTableScope=SimCore.createScope();
+  S.createPeriodicTable(tableHost,{scope:entryTableScope,state:{selection:null,query:''},entryObjects:true,
+   canInvestigate:()=>!routeUI?.session.open(),
+   onSelect:metal=>openObjectCatalog(metal),onInvestigate:metal=>openObjectCatalog(metal),
+   onExplore:metal=>openObjectCatalog(metal),
+   onSources:metal=>{const values=S.data.sourceIds(metal).map(id=>S.data.source(id)?.title||id);
+    say(values.slice(0,2).join('; ')||'Consulte as fontes na ficha do elemento.','info');}});
+ }
  function activeWorkshopScale(saved){
   if(saved?.scale>=1&&saved.scale<=4&&(saved.scale!==1||workshopSelectionId||S.workshop.list(element().atomicNumber).length))return saved.scale;
   const structure=model.state.structure;
@@ -263,9 +323,10 @@
  }
  function updateWorkshopContext(){
   const host=$('silm-workshop-context');if(!host||!S.workshop)return;
-  if(routeUI?.session.open()){host.hidden=true;delete host.dataset.key;updateWorkshopViewport(true);$('silm-integration-scene').hidden=false;$('silm-scene-actionbar').hidden=false;$('si-stage').classList.remove('silm-workshop-context-only');return;}
+  if(routeUI?.session.open()){disposeEntryTable();host.hidden=true;delete host.dataset.key;updateWorkshopViewport(true);$('silm-integration-scene').hidden=false;$('silm-scene-actionbar').hidden=false;$('si-stage').classList.remove('silm-workshop-context-only');return;}
   const active=element(),candidate=S.data.get(Number(selected||$('silm-metal')?.value));
   if(active&&candidate&&candidate.atomicNumber!==active.atomicNumber){
+   disposeEntryTable();
    const saved=model.state.metadata.workshop;
   workshopSelectionId=saved&&S.workshop.get(saved.referenceId)?.atomicNumber===active.atomicNumber?saved.referenceId:null;
   workshopScale=activeWorkshopScale(saved);
@@ -276,6 +337,8 @@
   }
   if(!active){
    updateWorkshopViewport(false);
+   if(!legacyDiscovery){const key='entry:initial';if(host.dataset.key!==key){host.dataset.key=key;renderObjectEntry(host);}return;}
+   disposeEntryTable();
    const key='discover:'+String(candidate?.atomicNumber||'none');
    if(host.dataset.key===key)return;
    host.dataset.key=key;host.hidden=false;
@@ -286,6 +349,12 @@
   workshopSelectionId=saved&&S.workshop.get(saved.referenceId)?.atomicNumber===active.atomicNumber?saved.referenceId:null;
   workshopScale=activeWorkshopScale(saved);
   updateWorkshopViewport(true);
+  if(showObjectEntry&&workshopScale===1){
+   const key='entry:active:'+active.atomicNumber;
+   if(host.dataset.key!==key){host.dataset.key=key;renderObjectEntry(host,{active});}
+   return;
+  }
+  disposeEntryTable();
   if(workshopSelectionId&&S.workshop.get(workshopSelectionId)?.atomicNumber!==active.atomicNumber)workshopSelectionId=null;
   const item=S.workshop.get(workshopSelectionId);
   const chosen=item?.atomicNumber===active.atomicNumber?item:(S.workshop.list(active.atomicNumber).find(reference=>reference.atlasPath)||null);
@@ -294,7 +363,9 @@
   host.dataset.key=key;host.hidden=false;
   S.workshop.renderReference(host,{element:active,item:chosen,items:S.workshop.list(active.atomicNumber),scale:workshopScale,
    onChoose:next=>{model.setWorkshopContext(next.id,1);schedule();},
-   onScale:setWorkshopScale,onOpenPeriodic:()=>$('silm-open-periodic')?.click()});
+   onScale:setWorkshopScale,
+   onOpenPeriodic:()=>{if(workshopScale===1){showObjectEntry=true;schedule();}else $('silm-open-periodic')?.click();},
+   onBrowseObjects:()=>openObjectCatalog(active)});
  }
  function text(id,value){if($(id))$(id).textContent=value;}
  function render(){
@@ -335,7 +406,7 @@
   const z=Number($('silm-metal').value);
   if(model.state.investigation){const accepted=await B.confirmDialog({title:'Iniciar outra investigação?',description:'A investigação atual será substituída neste ambiente. Exporte-a em Dados se desejar guardá-la.',confirmText:'Iniciar',cancelText:'Cancelar'});if(!accepted)return;}
   if(!preserveWorkshop){workshopSelectionId=null;workshopScale=1;}
-  if(model.begin(z)){model.beginAssembly();say('Investigação iniciada com '+S.data.get(z).name+'.','success');return true;}return false;
+  if(model.begin(z)){legacyDiscovery=false;model.beginAssembly();say('Investigação iniciada com '+S.data.get(z).name+'.','success');return true;}return false;
  }
  async function clear(){
   if(routeUI.session.open()&&!routeUI.canBuild())return;
@@ -459,6 +530,18 @@
   B.setupWorkspace(()=>({schemaVersion:1,entities:[],selectedId:null}),()=>{});
   if(!specificEntry&&startupChoice()==='ambiente')history.replaceState(null,'','#/ambiente');
   B.setupNavigationDrawer();B.setupMenuReview();B.updateRoute();window.addEventListener('hashchange',B.updateRoute);
+  const objectDialog=$('silm-objects-dialog');
+  objectDialog?.querySelector('#silm-objects-close')?.addEventListener('click',()=>objectDialog.close());
+  objectDialog?.addEventListener('click',event=>{
+   if(event.target.closest('a[href^="#/manual"]'))objectDialog.close();
+  });
+  objectDialog?.addEventListener('close',()=>{if(catalogNavigating)return;
+   const target=catalogOpener;
+   requestAnimationFrame(()=>{
+    if(target?.isConnected&&target.getClientRects().length)target.focus({preventScroll:true});
+    else $('silm-workshop-context')?.querySelector('.silm-workshop-browse-objects')?.focus({preventScroll:true});
+   });
+  });
   const selector=$('silm-metal');
   for(const e of S.data.elements.filter(e=>e.silmEligibility.status==='available')){const o=document.createElement('option');o.value=e.atomicNumber;o.textContent=e.symbol+' — '+e.name;selector.append(o);}
   selected='29';selector.value=selected;selector.addEventListener('change',()=>{selected=selector.value;render();});

@@ -69,6 +69,21 @@ SILM.workshop=(()=>{
   body.append(manualLink('aplicacoes-metalicas',item,'Consultar no Manual composição e fontes de '+item.title));
   const b=node('button','button outline',label);b.type='button';b.addEventListener('click',()=>onAction(item));body.append(b);article.append(art,body);return article;
  }
+ function renderObjectCatalog(host,{element,onInvestigate=()=>{}}={}){
+  host.replaceChildren();
+  if(!element)return 0;
+  const refs=list(element.atomicNumber);
+  const section=node('section','silm-object-catalog');
+  section.append(node('p','silm-workshop-eyebrow','OBJETOS DO COTIDIANO'),
+   node('h2','',element.name+' · '+element.symbol),
+   node('p','silm-object-catalog-note',refs.length+' objeto'+(refs.length===1?'':'s')+' disponível'+(refs.length===1?'':'is')+' para investigação. As imagens são ilustrativas; a composição real depende do produto.'));
+  if(refs.length){
+   const grid=node('div','silm-workshop-grid silm-object-catalog-grid');
+   for(const item of refs)grid.append(itemCard(item,onInvestigate,'Investigar objeto'));
+   section.append(grid);
+  }else section.append(node('p','silm-workshop-empty','Ainda não há objetos disponíveis para este metal.'));
+  host.append(section);return refs.length;
+ }
  function renderDiscovery(host,{element,notice='',onOpenPeriodic=()=>{},onContinue=()=>{},onInvestigate=()=>{},onStartDirect=()=>{}}={}){
   host.replaceChildren();host.hidden=false;const s=node('section','silm-workshop-discovery');
   s.append(node('h2','',element?'Aplicações de '+element.name:'Escolha um metal'),
@@ -82,7 +97,7 @@ SILM.workshop=(()=>{
    const direct=node('button','button outline','Iniciar investigação sem referência');direct.type='button';direct.addEventListener('click',onStartDirect);s.append(direct);host.append(s);return;}
   const grid=node('div','silm-workshop-grid');for(const item of refs)grid.append(itemCard(item,onInvestigate));s.append(grid);host.append(s);
  }
- function renderReference(host,{element,item=null,items=[],scale=1,onChoose=()=>{},onScale=()=>{},onOpenPeriodic=()=>{}}={}){
+ function renderReference(host,{element,item=null,items=[],scale=1,onChoose=()=>{},onScale=()=>{},onOpenPeriodic=()=>{},onBrowseObjects=()=>{}}={}){
   host.replaceChildren();host.hidden=false;
   const s=node('section','silm-workshop-reference');
   if(scale===2){
@@ -138,6 +153,9 @@ SILM.workshop=(()=>{
    summary.append(manualLink('aplicacoes-metalicas',item,'Consultar no Manual composição e fontes de '+item.title));
   }else if(scale===1)summary.append(node('p','silm-workshop-intro','Escolha um objeto para observar o componente metálico.'));
   const table=node('button','button outline');table.setAttribute('aria-label','Tabela Periódica');table.append(node('span','','Tabela'),node('span','silm-workshop-table-long',' Periódica'));table.type='button';table.addEventListener('click',onOpenPeriodic);summary.append(table);
+  if(scale===1){const browse=node('button','button outline silm-workshop-browse-objects','Objetos');
+   browse.type='button';browse.setAttribute('aria-label','Escolher objetos para investigar');
+   browse.addEventListener('click',onBrowseObjects);summary.append(browse);}
   if(stageOnly)summary.append(manualLink('travessia-escalas',item,'Consultar no Manual a interpretação de Rede e Centro'));
   // Trocar a aplicação pertence ao contexto do objeto, não à área do desenho.
   // Um disclosure nativo ocupa apenas um alvo de toque quando recolhido e
@@ -234,5 +252,5 @@ SILM.workshop=(()=>{
   host.append(s);
  }
  if(!valid())throw new Error('Catálogo inicial da Oficina dos Metais inválido.');
- return Object.freeze({references:ALL_REFERENCES,originalReferences:REFERENCES,atlasReferences:ATLAS_REFERENCES,list,get,valid,renderDiscovery,renderReference});
+ return Object.freeze({references:ALL_REFERENCES,originalReferences:REFERENCES,atlasReferences:ATLAS_REFERENCES,list,get,valid,renderDiscovery,renderReference,renderObjectCatalog});
 })();
