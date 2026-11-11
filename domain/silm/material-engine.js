@@ -33,7 +33,7 @@ window.SILM=window.SILM||{};
    conditionMatch:spec?matchConditions(spec.conditions):null,
    // Dados tabelados presentes no registro não são aplicados automaticamente
    // a motores qualitativos sem acoplamento e validação científica específicos.
-   tabulatedValue:material==='TABULATED'?Object.freeze({value:spec.value,unit:spec.unit}):null,
+   tabulatedValue:spec?.evidence==='TABULATED'?Object.freeze({value:spec.value,unit:spec.unit}):null,
    requestedReference:referenceId(),
    reasonCode:numeric?null:'PROPERTY_DATA_MISSING'});
  }
