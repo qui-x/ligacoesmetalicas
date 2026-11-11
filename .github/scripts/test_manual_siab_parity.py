@@ -36,7 +36,7 @@ def run(browser_name: str, base_url: str) -> None:
             expect(page.locator(".silm-manual-hero-parity")).to_be_visible()
             expect(page.locator(".silm-manual-lattice")).to_be_visible()
             expect(page.locator(".silm-manual-lattice circle")).to_have_count(9)
-            expect(page.locator(".silm-manual-card .silm-manual-svg")).to_have_count(13)
+            expect(page.locator(".silm-manual-card > .silm-manual-symbol > .silm-manual-svg")).to_have_count(13)
             assert not page.locator(".silm-manual-card.button").count(), "Cartões herdaram estilo de botão"
             if width == 1440:
                 Path("artifacts").mkdir(exist_ok=True)
