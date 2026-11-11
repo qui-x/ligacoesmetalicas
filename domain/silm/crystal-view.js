@@ -284,6 +284,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const summary=U.element('summary','Ajustes','silm-joule-advanced-summary');
   summary.setAttribute('aria-label','Ajustar ensaio elétrico e térmico');
   const panel=U.element('div',null,'silm-joule-panel');
+  panel.id='silm-joule-popover';panel.hidden=true;
+  summary.setAttribute('aria-controls',panel.id);
   const description=U.element('p','Elétrica → dissipação Joule → calor na rede. Todas as grandezas são relativas; esta simulação não utiliza condutividades individuais em SI.','silm-joule-explanation');
   panel.append(description);
   function addChoice(label,options){
@@ -308,10 +310,13 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    reading.append(U.element('dt',label),value);outputs.set(key,value);
   }
   const note=U.element('p','Balanço: energia elétrica + calor externo = energia armazenada + energia removida, em unidades relativas.','silm-joule-explanation');
-  panel.append(reading,note);advanced.append(summary,panel);
+  panel.append(reading,note);advanced.append(summary);
   jouleControls.append(live,supply,playback,step,advanced);
   navigator.root.after(jouleControls);
-  scope.cleanup(()=>jouleControls.remove());
+  // Portal para fora da faixa rolável: WebKit recorta descendentes fixed
+  // de barras com overflow, mesmo quando o <details> está aberto.
+  document.body.append(panel);
+  scope.cleanup(()=>{jouleControls.remove();panel.remove();});
   function positionPanel(){
    if(!advanced.open)return;
    const pos=summary.getBoundingClientRect(),vw=window.visualViewport?.width||window.innerWidth,vh=window.visualViewport?.height||window.innerHeight;
@@ -325,11 +330,16 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    panel.style.left=Math.max(12,Math.min(pos.left,vw-width-12))+'px';
    panel.style.top=Math.max(12,pos.top-height-8)+'px';
   }
-  scope.listen(advanced,'toggle',positionPanel);
+  scope.listen(advanced,'toggle',()=>{
+   panel.hidden=!advanced.open;
+   if(advanced.open)positionPanel();
+  });
   scope.listen(window,'resize',positionPanel);
   scope.listen(window,'scroll',positionPanel,{capture:true});
-  scope.listen(document,'click',event=>{if(advanced.open&&!advanced.contains(event.target))advanced.open=false;});
-  jouleUI={live,supply,playback,step,mode,boundary,map,extra,outputs,playing:false,advanced};
+  scope.listen(document,'click',event=>{
+   if(advanced.open&&!advanced.contains(event.target)&&!panel.contains(event.target))advanced.open=false;
+  });
+  jouleUI={live,supply,playback,step,mode,boundary,map,extra,outputs,playing:false,advanced,panel};
  }
 
  const pt=p=>{const q=layout.project(D(p));return {x:q.x*100,y:q.y*100,depth:q.depth};};
