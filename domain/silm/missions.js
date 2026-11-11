@@ -1050,6 +1050,11 @@
     "level": "avancado",
     "objectives": [
       [
+        "cell",
+        "Consultar a célula antes do cálculo",
+        "observed"
+      ],
+      [
         "cell-volume",
         "Calcular o volume da célula de referência",
         "criterion"
