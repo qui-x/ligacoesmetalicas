@@ -246,6 +246,11 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   if(layout){if(localFocus)R.center();else R.revealBounds(RD.boundsOf(scene.drawn),layout.project(D(site.cart)),unitFraction*.72);}
  }});
  const cellCart=cart=>scene?.rep.view==='lattice'?navigator.cursor.displayCart(cart):cart;
+ if(localFocus){
+  navigator.root.classList.add('silm-center-navigation');
+  navigator.root.setAttribute('aria-label','Navegar entre centros metálicos');
+  const heading=navigator.root.querySelector('strong');if(heading)heading.textContent='Centro';
+ }
  root.insertBefore(navigator.status,area);
  // Os comandos acompanham a câmera inclusive na vista expandida.
  if(cameraHost)cameraHost.after(navigator.root);
@@ -420,8 +425,12 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
     });
     localShellLayer.append(button);
    }
-   localStatus.textContent=element.symbol+' · centro em foco · '+focusShell.list.length+
-    ' primeiros vizinhos · distância '+(focusShell.distances[0]||0).toLocaleString('pt-BR',{maximumFractionDigits:3})+' Å · modelo cristalográfico';
+   localStatus.textContent=element.symbol+' · '+focusShell.list.length+' vizinhos · d = '+
+    (focusShell.distances[0]||0).toLocaleString('pt-BR',{maximumFractionDigits:3})+' Å';
+   localStatus.setAttribute('aria-label','Centro de '+element.name+' em foco. Primeira camada com '+
+    focusShell.list.length+' centros vizinhos; distância ao vizinho mais próximo '+
+    (focusShell.distances[0]||0).toLocaleString('pt-BR',{maximumFractionDigits:3})+
+    ' ångströms. Representação do modelo cristalográfico.');
    root.dataset.centerSite=localKey;
    root.dataset.coordination=String(focusShell.list.length);
   }
