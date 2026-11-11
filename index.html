@@ -180,11 +180,6 @@
                 <button type="button" class="si-tab" data-scene-view="overview" aria-pressed="false">Visão geral</button>
               </div>
               <span id="si-module-tag" class="si-module-tag">Módulo · Explorar</span>
-              <div class="silm-module-shortcuts" id="silm-module-shortcuts" role="group" aria-label="Módulo científico">
-                <button type="button" class="silm-module-shortcut" data-silm-module-shortcut="explorar" data-silm-module-label="Explorar" aria-label="Explorar" aria-pressed="true" title="Explorar" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg><span class="silm-module-shortcut-label">Explorar</span></button>
-                <button type="button" class="silm-module-shortcut" data-silm-module-shortcut="medir" data-silm-module-label="Medir" aria-label="Medir" aria-pressed="false" title="Medir" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m4 17 13-13 3 3L7 20H4ZM8 13l2 2M11 10l2 2M14 7l2 2"/></svg><span class="silm-module-shortcut-label">Medir</span></button>
-                <button type="button" class="silm-module-shortcut" data-silm-module-shortcut="calcular" data-silm-module-label="Calcular" aria-label="Calcular" aria-pressed="false" title="Calcular" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 10h2m4 0h2m-8 4h2m4 0h2m-8 4h2m4 0h2"/></svg><span class="silm-module-shortcut-label">Calcular</span></button>
-              </div>
               <button type="button" id="si-expand-structure" class="si-tab si-structure-expand" aria-label="Expandir estrutura metálica configurada" aria-controls="si-stage" aria-pressed="false" title="Expandir a estrutura cristalina configurada" disabled>
                 <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
                 <span>Expandir</span>
@@ -230,6 +225,14 @@
               <header class="si-dock-header"><button id="si-dock-viewer-back" type="button" class="si-dock-back" aria-label="Voltar às visualizações" hidden>← Ver</button><h2 id="si-right-title">Ver</h2><button id="si-expand" type="button" class="si-dock-expand" aria-controls="si-dock-right" aria-expanded="false">Expandir painel</button><button type="button" class="si-dock-help" data-dock-help="right" aria-label="Ajuda deste painel" title="Ajuda deste painel">?</button><button type="button" class="si-dock-close" data-close-dock="right" aria-label="Fechar painel">Fechar</button></header>
               <div class="si-dock-scroll" id="si-right-scroll">
                 <div data-right-panel="ver">
+                  <nav class="silm-module-navigation" aria-label="Módulos da investigação">
+                    <div class="silm-module-shortcuts" id="silm-module-shortcuts" role="group" aria-label="Escolher módulo científico" aria-describedby="silm-module-selection-help">
+                <button type="button" class="silm-module-shortcut" data-silm-module-shortcut="explorar" data-silm-module-label="Explorar" aria-label="Explorar" aria-pressed="true" title="Explorar" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg><span class="silm-module-shortcut-label">Explorar</span></button>
+                <button type="button" class="silm-module-shortcut" data-silm-module-shortcut="medir" data-silm-module-label="Medir" aria-label="Medir" aria-pressed="false" title="Medir" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m4 17 13-13 3 3L7 20H4ZM8 13l2 2M11 10l2 2M14 7l2 2"/></svg><span class="silm-module-shortcut-label">Medir</span></button>
+                <button type="button" class="silm-module-shortcut" data-silm-module-shortcut="calcular" data-silm-module-label="Calcular" aria-label="Calcular" aria-pressed="false" title="Calcular" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 10h2m4 0h2m-8 4h2m4 0h2m-8 4h2m4 0h2"/></svg><span class="silm-module-shortcut-label">Calcular</span></button>
+              </div>
+                    <p id="silm-module-selection-help" class="silm-module-selection-help" role="status">Escolha o módulo para consultar suas ferramentas.</p>
+                  </nav>
                   <div id="si-viewer-catalog" class="si-viewer-controls" role="group" aria-label="Visualizações científicas">
                     <div id="si-viewer-families" class="si-viewer-family-tabs" role="tablist" aria-label="Famílias do painel Ver"></div>
                     <div id="si-viewer-family-panel" class="si-viewer-family-panel" role="tabpanel" aria-label="Ferramentas da família escolhida">

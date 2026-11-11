@@ -285,6 +285,17 @@ async function checkMobileNotices(label,width,scale,accessible=false){
 }
 
 async function checkModuleShortcuts(label,width){
+ const launch=page.locator('[data-open-dock="ver"]');
+ if(await launch.getAttribute('aria-expanded')!=='true')await launch.click();
+ await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===false);
+ assert.equal(await page.locator('.si-workspace-toolbar #silm-module-shortcuts').count(),0,
+  label+': controle de módulos ainda está na barra superior');
+ assert.equal(await page.locator('#si-dock-right [data-right-panel="ver"] #silm-module-shortcuts').count(),1,
+  label+': módulo científico não está em Ver');
+ const close=async()=>{
+  await page.locator('[data-close-dock="right"]').click();
+  await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===true);
+ };
  const before=JSON.parse(await scientific());
  const buttons=await page.locator('#silm-module-shortcuts [data-silm-module-shortcut]')
   .evaluateAll(nodes=>nodes.map(n=>{
@@ -294,18 +305,40 @@ async function checkModuleShortcuts(label,width){
   }));
  assert.equal(buttons.length,3,label+': atalhos de módulo ausentes');
  assert.deepEqual(buttons.map(b=>b.id),['explorar','medir','calcular'],label+': ordem dos módulos');
+ const glyphs=await page.locator('#si-dock-right #silm-module-shortcuts svg').evaluateAll(nodes=>
+  nodes.map(n=>{const box=n.getBoundingClientRect(),host=n.closest('button').getBoundingClientRect();
+   return {width:box.width,height:box.height,inside:box.left>=host.left-1&&
+    box.right<=host.right+1&&box.top>=host.top-1&&box.bottom<=host.bottom+1};
+  }));
+ assert.equal(glyphs.length,3,label+': faltam ícones vetoriais dos módulos');
+ assert.ok(glyphs.every(g=>g.width>=15&&g.height>=15&&g.width<=25&&g.height<=25&&g.inside),
+  label+': ícones de Ver deformados '+JSON.stringify(glyphs));
+ assert.ok(await page.locator('#si-dock-right .silm-module-shortcut-label').first().isVisible(),
+  label+': rótulos dos módulos não estão visíveis');
+ if(label==='celular-390'||label==='desktop')
+  await page.screenshot({path:join(evidenceDir,label+'-modulos-no-ver.jpg'),
+   type:'jpeg',quality:70,animations:'disabled'});
+
  assert.deepEqual(buttons.filter(b=>b.pressed==='true').map(b=>b.id),[before.module],
   label+': indicador do módulo ativo incorreto');
  assert.ok(buttons.every(b=>b.width>=43.5&&b.height>=43.5&&b.left>=-2&&b.right<=width+2),
   label+': módulos invisíveis ou comprimidos '+JSON.stringify(buttons));
  const visualWidth=await page.evaluate(()=>document.documentElement.scrollWidth);
  assert.ok(visualWidth<=width+6,label+': atalhos provocaram rolagem global '+visualWidth);
- if(!['celular-390','desktop'].includes(label))return;
+ if(!['celular-390','desktop'].includes(label)){await close();return;}
  for(const target of ['medir','calcular','explorar']){
   const button=page.locator('[data-silm-module-shortcut="'+target+'"]');
   await button.click();
   await page.waitForFunction(mode=>window.SILMIntegration?.snapshot?.()?.module?.active===mode,target);
   await page.waitForFunction(mode=>document.querySelector('#silm-module-shortcuts')?.dataset.activeModule===mode,target);
+  const family=target==='explorar'?'observar':target;
+  await page.waitForFunction(id=>window.BaseDemoSI?.currentViewerFamily?.()===id,family);
+  const families=await page.locator('#si-dock-right #si-viewer-families button').count();
+  assert.ok(families>=1,label+': nenhuma família contextual disponível em Ver');
+  // Um único agrupamento não requer uma segunda aba visual: a lista de
+  // ferramentas permanece presente e acessível para o módulo escolhido.
+  assert.ok(await page.locator('#si-dock-right #si-viewer-buttons button').count()>=1,
+   label+': ferramentas contextuais indisponíveis em '+target);
   const current=JSON.parse(await scientific());
   assert.equal(current.module,target,label+': atalho não alterou o módulo');
   assert.equal(await page.locator('#silm-module').inputValue(),target,
@@ -325,7 +358,17 @@ async function checkModuleShortcuts(label,width){
     label+': editar estrutura deve continuar proibido em '+target);
   }
  }
- assert.equal(await scientific(),JSON.stringify(before),label+': sequência de módulos mudou a investigação');
+ // Teclado: a seleção visual segue o padrão do SIAB.
+ const explorar=page.locator('[data-silm-module-shortcut="explorar"]');
+ await explorar.focus();
+ await explorar.press('ArrowRight');
+ await page.waitForFunction(()=>SILMIntegration.snapshot()?.module?.active==='medir');
+ await page.locator('[data-silm-module-shortcut="medir"]').press('End');
+ await page.waitForFunction(()=>SILMIntegration.snapshot()?.module?.active==='calcular');
+ await page.locator('[data-silm-module-shortcut="calcular"]').press('Home');
+ await page.waitForFunction(()=>SILMIntegration.snapshot()?.module?.active==='explorar');
+ assert.equal(await scientific(),JSON.stringify(before),label+': teclado alterou registros científicos');
+ await close();
 }
 
 try{

@@ -68,3 +68,67 @@
 @media print{
  #si-workspace .silm-module-shortcuts{display:none!important}
 }
+
+/* Parte 9: no SIAB, Investigar tem escolha contextual na própria doca.
+ * No SILM, o primeiro nível alterna os módulos científicos reais;
+ * o segundo nível (famílias/ferramentas) continua com o motor da Base.
+ * Nenhuma cópia dos estados, controles ou formulários científicos. */
+#si-workspace #si-dock-right .silm-module-navigation{
+ box-sizing:border-box;position:sticky;top:0;z-index:5;
+ display:flex;flex-direction:column;gap:6px;min-width:0;
+ margin:0 0 12px;padding:4px 0 9px;
+ background:var(--surface);border-bottom:1px solid var(--border)
+}
+#si-workspace #si-dock-right .silm-module-shortcuts{
+ box-sizing:border-box;display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ width:100%;min-width:0;gap:5px;
+ padding:4px;border-radius:10px
+}
+#si-workspace #si-dock-right .silm-module-shortcut{
+ box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+ min-width:0;width:100%;min-height:48px;
+ padding:7px 5px;gap:5px;font-size:clamp(.69rem,.88vw,.84rem);
+ white-space:normal;line-height:1.1;text-align:center
+}
+#si-workspace #si-dock-right .silm-module-shortcut svg{
+ flex:0 0 18px;width:18px;height:18px
+}
+#si-workspace #si-dock-right .silm-module-shortcut-label{
+ display:inline!important;min-width:0;overflow-wrap:normal;word-break:normal
+}
+#si-workspace #si-dock-right .silm-module-selection-help{
+ font-size:.73rem;line-height:1.25;margin:0;padding:1px 3px;
+ color:var(--secondary);min-height:1.1em
+}
+/* Quando uma única família (Instrumentos ou Cálculos) está habilitada,
+ * a lista de ferramentas já identifica o contexto sem repetir uma aba. */
+#si-workspace #si-dock-right .si-viewer-family-tabs:has(> :only-child){
+ display:none
+}
+@media(max-width:900px){
+ #si-workspace #si-dock-right .silm-module-navigation{
+  margin-bottom:8px;padding-top:0;padding-bottom:7px;
+ }
+ #si-workspace #si-dock-right .silm-module-shortcuts{
+  padding:3px;gap:4px
+ }
+ #si-workspace #si-dock-right .silm-module-shortcut{
+  min-height:48px;min-width:0;width:100%;
+  padding:5px 3px;font-size:.73rem
+ }
+ #si-workspace #si-dock-right .silm-module-shortcut svg{
+  width:18px;height:18px;flex-basis:18px
+ }
+}
+@media(max-width:360px){
+ #si-workspace #si-dock-right .silm-module-shortcut{
+  font-size:.7rem;gap:3px
+ }
+ #si-workspace #si-dock-right .silm-module-shortcut svg{
+  width:16px;height:16px;flex-basis:16px
+ }
+}
+@media(forced-colors:active){
+ #si-workspace #si-dock-right .silm-module-navigation{border-bottom:2px solid CanvasText}
+}
