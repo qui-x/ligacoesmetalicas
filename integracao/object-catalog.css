@@ -231,7 +231,7 @@
 /* Tela estreita: cada página mostra todos os elementos de um grupo. Sem
  * rolagem interna ou miniaturas de toque de 20px; a Oficina poderá rolar
  * verticalmente quando a altura física do aparelho for muito pequena. */
-@media(max-width:1100px){
+@media(max-width:1100px), (max-height:700px){
  #si-stage .silm-object-entry{
   height:auto!important;min-height:0!important;max-height:none!important;
   overflow:visible!important
