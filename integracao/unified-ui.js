@@ -165,17 +165,25 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    article.append(section);
   }
   const actions=N('div');actions.className='silm-actions';
-  const metal=S.data.get(t.relatedMetals[0]),investigate=N('button','Investigar na oficina');investigate.type='button';investigate.className='button primary';investigate.id='theme-investigate';
-  investigate.addEventListener('click',()=>{
-   // Prepara o metal representativo na Montagem; a investigação só começa quando o estudante escolher Iniciar.
-   if(model.state.metal?.atomicNumber===metal.atomicNumber){location.hash='#/ambiente';return;}
-   if(!prepareMetal?.(metal.atomicNumber)){say('Não foi possível preparar '+metal.name+' na Montagem.','warning');return;}
-   location.hash='#/ambiente';say(metal.name+' preparado na Montagem. Escolha Iniciar para começar a investigação.','success');
+  const metal=S.data.get(t.relatedMetals[0]),investigate=N('button',t.comparison?'Preparar Cobre na Oficina':'Investigar na oficina');investigate.type='button';investigate.className='button primary';investigate.id='theme-investigate';
+  const prepare=(z)=>{
+   const selected=S.data.get(z);if(!selected)return;
+   // A seleção não troca automaticamente uma investigação ativa: o fluxo da Montagem mantém o controle do estudante.
+   if(model.state.metal?.atomicNumber===selected.atomicNumber){location.hash='#/ambiente';return;}
+   if(!prepareMetal?.(selected.atomicNumber)){say('Não foi possível preparar '+selected.name+' na Montagem.','warning');return;}
+   location.hash='#/ambiente';say(selected.name+' preparado na Montagem. Escolha Iniciar para começar a investigação.','success');
    requestAnimationFrame(()=>requestAnimationFrame(()=>{const open=document.querySelector('[data-open-dock="montagem"]');if(open&&open.getAttribute('aria-expanded')!=='true')open.click();}));
-  });
+  };
+  investigate.addEventListener('click',()=>prepare(metal.atomicNumber));
   const mark=N('button',progress.completed[t.id]?'Revisado · desmarcar':'Marcar como revisado');mark.type='button';mark.className='button outline silm-quiet';mark.id='theme-complete';mark.setAttribute('aria-pressed',String(!!progress.completed[t.id]));
   mark.addEventListener('click',()=>{if(progress.completed[t.id])delete progress.completed[t.id];else progress.completed[t.id]=t.version;storage.set('learning.themes',progress);themes();$('theme-complete').focus();say(progress.completed[t.id]?'Tema marcado como revisado. Ele continua disponível para revisitar.':'Marcação de revisado removida.','success');});
-  actions.append(investigate,mark);article.append(actions);
+  actions.append(investigate);
+  if(t.comparison){
+   const second=N('button','Preparar Neodímio na Oficina');second.className='button outline';second.type='button';second.id='theme-compare-neodimio';second.addEventListener('click',()=>prepare(60));
+   actions.append(second);
+  }
+  actions.append(mark);article.append(actions);
+  if(t.comparison){const note=N('p',t.comparison.caveat);note.className='silm-learning-science-note';article.append(note);}
   const related=N('section');related.className='silm-related';related.setAttribute('aria-labelledby','theme-related');const rh=N('h2','Conteúdo relacionado');rh.id='theme-related';related.append(rh);
   const group=(label,items)=>{if(!items.length)return;const row=N('div');row.className='silm-related-row';row.append(N('span',label));for(const [text,href] of items)row.append(link(text,href));related.append(row);};
   group(t.relatedMissions.length===1?'Missão relacionada':'Missões relacionadas',t.relatedMissions.map(m=>[S.missions.get(m).title,'#/missoes?item='+m]));
