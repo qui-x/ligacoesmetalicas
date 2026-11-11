@@ -46,13 +46,65 @@ try{
   note('table-'+label,dims);
   if(width<=390)await page.screenshot({path:join(dir,label+'-tabela-inicial.jpg'),type:'jpeg',quality:72,animations:'disabled'});
  }
+ // Um metal com objeto único não pode renderizar uma foto de 230px
+ // flutuando no centro de um cartão quase vazio (regressão Parte 9).
+ await page.setViewportSize({width:1366,height:768});
+ await page.locator('#silm-object-entry .periodic-element[data-z="64"]').click();
+ const gdDialog=page.locator('#silm-objects-dialog');
+ await gdDialog.waitFor({state:'visible'});
+ assert.equal(await gdDialog.locator('.silm-workshop-card').count(),1,
+  'Gadolínio deve apresentar uma aplicação no catálogo');
+ await page.waitForFunction(()=>document.querySelector('#silm-objects-dialog .silm-workshop-card img')?.naturalWidth>0);
+ const singleDesktop=await gdDialog.evaluate(dialog=>{
+  const card=dialog.querySelector('.silm-workshop-card');
+  const art=card.querySelector('.silm-workshop-art');
+  const body=card.querySelector('.silm-workshop-card-body');
+  const img=art.querySelector('img');
+  const r=n=>{const a=n.getBoundingClientRect();return{
+   left:a.left,right:a.right,top:a.top,bottom:a.bottom,width:a.width,height:a.height}};
+  return {card:r(card),art:r(art),body:r(body),img:r(img),
+   pageWidth:document.documentElement.scrollWidth,viewport:innerWidth};
+ });
+ assert.ok(singleDesktop.art.width>=singleDesktop.card.width*.55,
+  'Desktop: a foto única não ocupa a maior área do cartão '+JSON.stringify(singleDesktop));
+ assert.ok(singleDesktop.art.right<=singleDesktop.body.left+5,
+  'Desktop: imagem e informações não ficaram lado a lado');
+ assert.ok(singleDesktop.img.height>=320,
+  'Desktop: imagem única voltou a ser uma miniatura');
+ assert.ok(singleDesktop.pageWidth<=singleDesktop.viewport+5,
+  'Desktop: catálogo provocou rolagem horizontal');
+ note('gd-desktop',singleDesktop);
+ await page.screenshot({path:join(dir,'gd-objeto-unico-desktop.jpg'),type:'jpeg',quality:74,animations:'disabled'});
  await page.setViewportSize({width:390,height:844});
+ const singleMobile=await gdDialog.evaluate(dialog=>{
+  const card=dialog.querySelector('.silm-workshop-card');
+  const art=card.querySelector('.silm-workshop-art').getBoundingClientRect();
+  const body=card.querySelector('.silm-workshop-card-body').getBoundingClientRect();
+  const img=card.querySelector('img').getBoundingClientRect();
+  const button=card.querySelector('button').getBoundingClientRect();
+  return {artWidth:art.width,artBottom:art.bottom,bodyTop:body.top,
+   imageHeight:img.height,buttonHeight:button.height,pageWidth:document.documentElement.scrollWidth};
+ });
+ assert.ok(singleMobile.imageHeight>=210,
+  'Celular: imagem do objeto ficou pequena demais');
+ assert.ok(singleMobile.artBottom<=singleMobile.bodyTop+5,
+  'Celular: as informações precisam ficar abaixo da imagem');
+ assert.ok(singleMobile.pageWidth<=395,
+  'Celular: modal criou rolagem horizontal global');
+ assert.ok(singleMobile.buttonHeight>=43.5,'Botão do objeto menor que 44px');
+ note('gd-mobile',singleMobile);
+ await page.screenshot({path:join(dir,'gd-objeto-unico-mobile.jpg'),type:'jpeg',quality:74,animations:'disabled'});
+ await page.keyboard.press('Escape');
+ await gdDialog.waitFor({state:'hidden'});
+ assert.equal(await snap(),initially,'Consultar o objeto de Gd alterou a investigação');
  await page.locator('#silm-object-entry .periodic-element[data-z="29"]').click();
  const modal=page.locator('#silm-objects-dialog');
  await modal.waitFor({state:'visible'});
  assert.equal(await modal.locator('.silm-workshop-card').count(),3,
   'Cobre deveria oferecer as referências do atlas, motor e latão');
  assert.equal(await modal.locator('.silm-workshop-card[data-reference-id="atlas-cu"]').count(),1);
+ const multiImageHeight=await modal.locator('.silm-workshop-card[data-reference-id="atlas-cu"] img').evaluate(n=>n.getBoundingClientRect().height);
+ assert.ok(multiImageHeight>=210,'Catálogo com múltiplas aplicações voltou a usar miniaturas pequenas');
  assert.equal(await snap(),initially,'Abrir objetos alterou investigação');
  const bounds=await modal.evaluate(n=>{
   const b=n.getBoundingClientRect();return{
