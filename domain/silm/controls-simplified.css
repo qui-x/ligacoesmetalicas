@@ -315,7 +315,7 @@
 }
 #silm-scene-actionbar .silm-joule-advanced>summary{list-style:none}
 #silm-scene-actionbar .silm-joule-advanced>summary::-webkit-details-marker{display:none}
-#silm-scene-actionbar .silm-joule-panel{
+#silm-joule-popover{
  position:fixed!important;z-index:3200;box-sizing:border-box;
  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
  gap:8px 10px;overflow-y:auto;overscroll-behavior:contain;
@@ -323,34 +323,34 @@
  padding:12px;border:1px solid var(--border);border-radius:12px;
  background:var(--surface);color:var(--text);box-shadow:0 12px 34px rgb(0 0 0 / .24)
 }
-#silm-scene-actionbar .silm-joule-advanced:not([open])>.silm-joule-panel{display:none}
-#silm-scene-actionbar .silm-joule-panel .silm-joule-explanation,
-#silm-scene-actionbar .silm-joule-panel .silm-joule-readings{
+#silm-joule-popover[hidden]{display:none!important}
+#silm-joule-popover .silm-joule-explanation,
+#silm-joule-popover .silm-joule-readings{
  grid-column:1/-1
 }
-#silm-scene-actionbar .silm-joule-panel .silm-joule-explanation{
+#silm-joule-popover .silm-joule-explanation{
  margin:0;font-size:.75rem;line-height:1.4;overflow-wrap:anywhere
 }
-#silm-scene-actionbar .silm-joule-panel .silm-joule-setting{
+#silm-joule-popover .silm-joule-setting{
  grid-column:1/-1;display:grid;gap:3px;min-width:0;
  font-size:.77rem;font-weight:700
 }
-#silm-scene-actionbar .silm-joule-panel select{
+#silm-joule-popover select{
  box-sizing:border-box;width:100%;min-width:0;min-height:44px;
  padding:7px 8px;border:1px solid var(--border);border-radius:8px;
  background:var(--surface);color:var(--text);font:inherit
 }
-#silm-scene-actionbar .silm-joule-panel :is(.silm-joule-external,.silm-joule-reset,.silm-joule-end){
+#silm-joule-popover :is(.silm-joule-external,.silm-joule-reset,.silm-joule-end){
  min-width:0;max-width:100%;height:auto;white-space:normal;line-height:1.25
 }
-#silm-scene-actionbar .silm-joule-panel .silm-joule-external{grid-column:1/-1}
-#silm-scene-actionbar .silm-joule-panel .silm-joule-readings{
+#silm-joule-popover .silm-joule-external{grid-column:1/-1}
+#silm-joule-popover .silm-joule-readings{
  display:grid;grid-template-columns:minmax(0,1fr) auto;
  gap:4px 10px;margin:6px 0 0;padding-top:8px;
  border-top:1px solid var(--border);font-size:.76rem
 }
-#silm-scene-actionbar .silm-joule-panel .silm-joule-readings dt{overflow-wrap:anywhere}
-#silm-scene-actionbar .silm-joule-panel .silm-joule-readings dd{
+#silm-joule-popover .silm-joule-readings dt{overflow-wrap:anywhere}
+#silm-joule-popover .silm-joule-readings dd{
  margin:0;text-align:right;white-space:nowrap
 }
 @media(max-width:650px){
@@ -362,7 +362,7 @@
  #silm-scene-actionbar .silm-joule-live{max-width:100px;font-size:.67rem}
 }
 @media(forced-colors:active){
- #silm-scene-actionbar .silm-joule-panel{
+ #silm-joule-popover{
   box-shadow:none;border:2px solid CanvasText;background:Canvas;color:CanvasText
  }
  #silm-scene-actionbar .silm-joule-controls [aria-pressed=true]{outline:2px solid Highlight}
