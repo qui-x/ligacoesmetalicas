@@ -276,21 +276,27 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
  /* Organização do Manual espelhada no SIAB: 13 categorias, quatro grupos,
     índice hierárquico, guia rápido e artigo; os 28 tópicos científicos permanecem intactos. */
  const SIAB_MANUAL_CATEGORIES=[
-  {id:'bancada',title:'Oficina dos Metais',summary:'Prepare o metal, a montagem e as escalas de observação.',group:'Investigue',icon:'⌬',topics:['interface','selecionar-metal','montagem','estruturas-cristalinas','travessia-escalas','aplicacoes-metalicas','graos-microestrutura','reiniciar']},
-  {id:'explorar',title:'Explorar',summary:'Observe elétrons, estruturas e propriedades em diferentes vistas.',group:'Investigue',icon:'◉',topics:['explorar','eletrons-deslocalizados','propriedades-metalicas','vista','vista-3d']},
-  {id:'medir',title:'Medir',summary:'Use ferramentas e registre evidências do modelo.',group:'Investigue',icon:'⌁',topics:['medir']},
-  {id:'calcular',title:'Calcular',summary:'Relacione parâmetros e dados cristalográficos.',group:'Investigue',icon:'∑',topics:['calcular']},
-  {id:'instrumentos',title:'Instrumentos',summary:'Conheça as técnicas e os limites das medições.',group:'Investigue',icon:'◎',topics:['instrumentos']},
-  {id:'montagens',title:'Montagens prontas',summary:'Comece por configurações de referência.',group:'Prepare e registre',icon:'▦',topics:['montagens-prontas']},
-  {id:'roteiros',title:'Roteiros Experimentais',summary:'Siga investigações com objetivos e orientações.',group:'Prepare e registre',icon:'☷',topics:['atividades']},
-  {id:'relatorios',title:'Relatórios',summary:'Organize resultados, interpretação e conclusão.',group:'Prepare e registre',icon:'▤',topics:['relatorio']},
-  {id:'caderno',title:'Caderno',summary:'Guarde hipóteses, registros e descobertas.',group:'Prepare e registre',icon:'▣',topics:['caderno']},
-  {id:'comecar',title:'Comece por aqui',summary:'Conheça o simulador, a navegação e o uso offline.',group:'Orientação',icon:'⌂',topics:['sobre-silm','navegacao','offline']},
-  {id:'acessibilidade',title:'Acessibilidade',summary:'Ajuste leitura, contraste, cores e movimento.',group:'Orientação',icon:'◑',topics:['preferencias','abertura']},
-  {id:'problemas',title:'Ajuda e solução de problemas',summary:'Encontre orientações e ajuda contextual.',group:'Orientação',icon:'?',topics:['problemas','manual','tour']},
-  {id:'professor',title:'Área do Professor',summary:'Prepare atividades e apresentações para a turma.',group:'Para ensinar',icon:'✎',topics:['professor']}
+  {id:'comecar',title:'Comece por aqui',summary:'Conheça o simulador, a navegação e o uso offline.',group:'Orientação',icon:'home',topics:['sobre-silm','navegacao','offline']},
+  {id:'bancada',title:'Oficina dos Metais',summary:'Prepare o metal, a montagem e as escalas de observação.',group:'Investigue',icon:'lab',topics:['interface','selecionar-metal','montagem','estruturas-cristalinas','travessia-escalas','aplicacoes-metalicas','graos-microestrutura','reiniciar']},
+  {id:'explorar',title:'Explorar',summary:'Observe elétrons, estruturas e propriedades em diferentes vistas.',group:'Investigue',icon:'eye',topics:['explorar','eletrons-deslocalizados','propriedades-metalicas','vista','vista-3d']},
+  {id:'medir',title:'Medir',summary:'Use ferramentas e registre evidências do modelo.',group:'Investigue',icon:'ruler',topics:['medir']},
+  {id:'calcular',title:'Calcular',summary:'Relacione parâmetros e dados cristalográficos.',group:'Investigue',icon:'chart',topics:['calcular']},
+  {id:'instrumentos',title:'Instrumentos',summary:'Conheça as técnicas e os limites das medições.',group:'Investigue',icon:'meter',topics:['instrumentos']},
+  {id:'montagens',title:'Montagens prontas',summary:'Comece por configurações de referência.',group:'Prepare e registre',icon:'mount',topics:['montagens-prontas']},
+  {id:'roteiros',title:'Roteiros Experimentais',summary:'Siga investigações com objetivos e orientações.',group:'Prepare e registre',icon:'protocol',topics:['atividades']},
+  {id:'relatorios',title:'Relatórios',summary:'Organize resultados, interpretação e conclusão.',group:'Prepare e registre',icon:'report',topics:['relatorio']},
+  {id:'caderno',title:'Caderno',summary:'Guarde hipóteses, registros e descobertas.',group:'Prepare e registre',icon:'notebook',topics:['caderno']},
+  {id:'acessibilidade',title:'Acessibilidade',summary:'Ajuste leitura, contraste, cores e movimento.',group:'Orientação',icon:'accessibility',topics:['preferencias','abertura']},
+  {id:'problemas',title:'Ajuda e solução de problemas',summary:'Encontre orientações e ajuda contextual.',group:'Orientação',icon:'help',topics:['problemas','manual','tour']},
+  {id:'professor',title:'Área do Professor',summary:'Prepare atividades e apresentações para a turma.',group:'Para ensinar',icon:'professor',topics:['professor']}
  ];
  const SIAB_MANUAL_GROUPS=['Investigue','Prepare e registre','Orientação','Para ensinar'];
+
+ /* Ícones vetoriais semânticos do Manual reproduzem a biblioteca do SIAB. */
+ const SILM_MANUAL_ICON_PATHS={"home":"M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9","lab":"M4 4h8M5 4v14a3 3 0 0 0 6 0V4M5 13h6M18 5c1 2 3 4 3 6a3 3 0 0 1-6 0c0-2 2-4 3-6Z","eye":"M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0","ruler":"M4 17 17 4l3 3L7 20H4ZM8 13l2 2M11 10l2 2M14 7l2 2","chart":"M4 3v17h17M7 16l4-5 4 2 5-8","meter":"M3 4h12v15H3ZM6 7h6v5H6ZM15 7h3a3 3 0 0 1 3 3v4M19 14h3v7h-3ZM6 15h2M11 15h1","mount":"M2 18h20M4 18v3M20 18v3M5 3h6M6 3v10a2 2 0 0 0 4 0V3M6 10h4M16 6v4l-3 5h8l-3-5V6M15 6h4","protocol":"M8 5H5v16h14V5h-3M8 3h8v4H8ZM8 11l1 1 2-2M13 11h3M8 16h8","report":"M5 3h10l4 4v14H5ZM15 3v5h4M8 12h8M8 16h8","notebook":"M6 3h14v18H6ZM3 7h5M3 12h5M3 17h5M11 7h5M11 11h5M11 15h3","accessibility":"M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7","help":"M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0M9 8a3 3 0 1 1 4 3c-1 1-1 1-1 3M12 17h.01","professor":"M8 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M2 20v-5a3 3 0 0 1 6 0v5M13 6h8v15h-9V6h1M14 3h5v5h-5ZM15 12h3M15 16h3","manual":"M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6","arrow":"M4 9v6M4 12h15M13.5 6.5 19 12l-5.5 5.5","back":"M20 9v6M20 12H5M10.5 6.5 5 12l5.5 5.5","tour":"M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M16 8l-3 5-5 3 3-5Z","history":"M4 8a9 9 0 1 1-1 7M3 3v6h6M12 7v6l4 2","table":"M4 4h16v16H4ZM4 9h16M4 14h16M10 4v16","learn":"M8 16c0-3-3-4-3-8a7 7 0 0 1 14 0c0 4-3 5-3 8ZM8 19h8M10 22h4M9 8l3 3 3-3M12 11v5","projector":"M3 4h18v13H3ZM8 22l4-5 4 5M12 17v5","prepare":"M4 3h7M5 3v5l-3 7a3 3 0 0 0 3 4h5a3 3 0 0 0 3-4l-3-7V3M4 13h7M19 9c-1 2-3 4-3 6a3 3 0 0 0 6 0c0-2-2-4-3-6Z"};
+ const manualIcon=(name,extraClass='')=>{
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','silm-manual-svg'+(extraClass?' '+extraClass:''));svg.setAttribute('data-icon',name);svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.8');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',SILM_MANUAL_ICON_PATHS[name]||SILM_MANUAL_ICON_PATHS.help);svg.append(p);return svg;
+ };
  const SIAB_MANUAL_QUICK=[['selecionar-metal','Como escolher um metal'],['medir','Como medir'],['problemas','Por que uma opção não aparece']];
  const manualCategory=id=>SIAB_MANUAL_CATEGORIES.find(c=>c.topics.includes(id));
  const manualNormalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/gi,' ').trim();
@@ -306,10 +312,9 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   if(host.dataset.manualRouteKey!==key)manualDraft=query;
   const previous=manualKey;manualKey=key;host.dataset.manualRouteKey=key;host.replaceChildren();
   const topicHref=x=>'#/manual?topico='+encodeURIComponent(x),catHref=x=>'#/manual?categoria='+encodeURIComponent(x);
-  const nav=(text,to,cls)=>{const a=link(text,to);if(cls)a.className=cls;return a;};
+  const nav=(text,to,cls)=>{const a=N('a',text);a.href=to;if(cls)a.className=cls;return a;};
   const makeTitle=text=>{const h=N('h1',text);h.id='manual-title';h.tabIndex=-1;return h;};
-  const topicLink=t=>{const a=nav('',topicHref(t.id),'silm-manual-topic-link'),category=manualCategory(t.id);
-   const body=N('span');body.append(N('strong',t.title),N('span',operation(t.summary)));a.append(N('span',category?.icon||'◇'),body,N('span','→'));return a;};
+  const topicLink=t=>{const a=nav('',topicHref(t.id),'silm-manual-topic-link'),category=manualCategory(t.id);const symbol=N('span');symbol.className='silm-manual-symbol';symbol.append(manualIcon(category?.icon||'help'));const body=N('span');body.append(N('strong',t.title),N('span',operation(t.summary)));a.append(symbol,body,manualIcon('arrow','silm-manual-topic-arrow'));return a;};
   const bar=N('div');bar.className='silm-manual-bar';
   const homeLink=nav('Manual','#/manual','silm-manual-home-link');
   const form=N('form');form.className='silm-manual-search';form.role='search';form.setAttribute('aria-label','Busca no Manual');
@@ -330,10 +335,13 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   const content=N('div');content.id='manual-conteudo';content.className='silm-manual-content';shell.append(index,content);host.append(bar,tools,status,shell);
   function setIndex(open,focus=false){const state=Boolean(open);host.classList.toggle('silm-manual-index-open',state);toggle.setAttribute('aria-expanded',String(state));toggle.textContent=state?'Fechar índice':'Índice do Manual';if(focus)toggle.focus();}
   function buildIndex(category,selected){
-   index.replaceChildren(nav('Início do Manual','#/manual','silm-manual-index-home'));
-   const root=N('ul');for(const c of SIAB_MANUAL_CATEGORIES){const li=N('li'),a=nav(c.title,catHref(c.id));if(category===c.id&&!selected)a.setAttribute('aria-current','page');li.append(a);
-    if(category===c.id){const inner=N('ul');for(const x of c.topics){const t=find(x);if(!t)continue;const row=N('li'),item=nav(t.title,topicHref(t.id));if(selected===t.id)item.setAttribute('aria-current','page');row.append(item);inner.append(row);}li.append(inner);}
-    root.append(li);}index.append(root);
+   const home=nav('','#/manual','silm-manual-index-home');home.append(manualIcon('manual'),N('span','Início do Manual'));index.replaceChildren(home);
+   const root=N('ul');for(const c of SIAB_MANUAL_CATEGORIES){
+    const li=N('li'),a=nav('',catHref(c.id));a.append(manualIcon(c.icon),N('span',c.title));
+    if(category===c.id&&!selected)a.setAttribute('aria-current','page');li.append(a);
+    if(category===c.id){const inner=N('ul');for(const id of c.topics){const t=find(id);if(!t)continue;const row=N('li'),item=nav(t.title,topicHref(t.id));if(selected===t.id)item.setAttribute('aria-current','page');row.append(item);inner.append(row);}li.append(inner);}
+    root.append(li);
+   }index.append(root);
   }
   function crumbs(category,t){
    const trail=N('nav');trail.className='silm-manual-breadcrumb';trail.setAttribute('aria-label','Caminho do Manual');
@@ -365,15 +373,15 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    const left=N('div'),eyebrow=N('p','MANUAL DO USUÁRIO');eyebrow.className='eyebrow';
    const title=makeTitle('Encontre seu próximo passo.');
    const description=N('p','Uma dúvida na Oficina? Consulte uma ferramenta, entenda um resultado ou descubra por onde começar.');
-   const actions=N('div');actions.className='silm-actions';const start=nav('Começar a usar →',topicHref('interface'),'button primary');start.id='manual-start';const tour=N('button','Iniciar tour da oficina');tour.type='button';tour.id='manual-tour';tour.className='button outline';tour.dataset.tourStart='';actions.append(start,tour);left.append(eyebrow,title,description,actions);
+   const actions=N('div');actions.className='silm-actions';const start=nav('Começar a usar',topicHref('interface'),'button primary');start.append(manualIcon('arrow'));start.id='manual-start';const tour=N('button','Iniciar tour da oficina');tour.type='button';tour.id='manual-tour';tour.className='button outline';tour.dataset.tourStart='';actions.append(start,tour);left.append(eyebrow,title,description,actions);
    const figure=N('figure');figure.className='silm-manual-workspace-map';const mapActions=N('div');mapActions.className='silm-manual-map-actions';mapActions.append(nav('Montagem',topicHref('montagem')),nav('Ver',topicHref('explorar')),nav('Dados',topicHref('medir')));
    const scene=N('div');scene.className='silm-manual-map-scene';scene.append(N('div','⌬'),N('p','Estrutura metálica em foco'),N('span','Explorar · Medir · Calcular'));
    figure.append(mapActions,scene,N('figcaption','Abra uma ferramenta para investigar. Feche o painel para voltar à estrutura.'));
    hero.append(left,figure);
-   const quick=N('nav');quick.className='silm-manual-quick';quick.setAttribute('aria-label','Consultas rápidas');const q=N('p','QUERO SABER');q.className='eyebrow';quick.append(q);for(const [x,label] of SIAB_MANUAL_QUICK)if(find(x))quick.append(nav(label+' →',topicHref(x)));
+   const quick=N('nav');quick.className='silm-manual-quick';quick.setAttribute('aria-label','Consultas rápidas');const q=N('p','QUERO SABER');q.className='eyebrow';quick.append(q);for(const [x,label] of SIAB_MANUAL_QUICK)if(find(x)){const a=nav(label,topicHref(x));a.append(manualIcon('arrow'));quick.append(a);}
    content.append(hero,quick);
    for(const group of SIAB_MANUAL_GROUPS){const categories=SIAB_MANUAL_CATEGORIES.filter(c=>c.group===group);const section=N('section');section.className='silm-manual-group';section.append(N('h2',group));const grid=N('div');grid.className='silm-manual-grid';
-    for(const c of categories){const a=nav('',catHref(c.id),'silm-manual-card');const symbol=N('span',c.icon);symbol.className='silm-manual-symbol';const title=N('h3',c.title),description=N('p',c.summary),action=N('span','Consultar →');action.className='silm-manual-card-action';a.append(symbol,title,description,action);grid.append(a);}section.append(grid);content.append(section);}
+    for(const c of categories){const a=nav('',catHref(c.id),'silm-manual-card');const symbol=N('span');symbol.className='silm-manual-symbol';symbol.append(manualIcon(c.icon));const title=N('h3',c.title),description=N('p',c.summary),action=N('span','Consultar');action.className='silm-manual-card-action';action.append(manualIcon('arrow'));a.append(symbol,title,description,action);grid.append(a);}section.append(grid);content.append(section);}
   }
   function renderBase(){
    content.replaceChildren();status.textContent='';setIndex(false);
