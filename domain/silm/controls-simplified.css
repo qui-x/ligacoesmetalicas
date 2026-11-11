@@ -226,3 +226,23 @@
 #si-stage .silm-center-navigation .silm-lattice-more[open] .silm-lattice-more-controls button[aria-label^="Recuar uma célula"]{
  display:inline-flex!important;align-items:center;justify-content:center
 }
+
+/* Compatibilidade com a barra antiga em grade e o recolhimento móvel:
+   nenhum media query anterior pode apagar o acesso ao disclosure novo. */
+#silm-view-controls .silm-camera-bar.silm-camera-compact,
+#silm-view-controls .silm-camera:not([data-open]) .silm-camera-bar.silm-camera-compact{
+ display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;
+ align-items:center!important;align-content:center!important;justify-content:center!important;
+ gap:5px!important;max-width:none!important;max-height:none!important;
+ overflow:visible!important;grid-template-columns:none!important;
+}
+@media(max-width:600px),(max-height:500px) and (orientation:landscape){
+ #silm-view-controls .silm-camera:not([data-open]) .silm-camera-bar.silm-camera-bar-has-expand.silm-camera-compact{
+  display:flex!important;max-width:min(260px,calc(100vw - 22px))!important;
+  flex-direction:row!important;padding:4px!important;
+ }
+ #silm-view-controls .silm-camera:not([data-open]) .silm-camera-bar.silm-camera-bar-has-expand.silm-camera-compact>:is(
+ .silm-camera-advanced,[id$="-camera-fit"]){
+  display:flex!important;align-items:center;justify-content:center
+ }
+}
