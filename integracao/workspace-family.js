@@ -188,7 +188,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
     const pending=names.join(' + ');
     propertyHelp.textContent='Seleção: '+pending+(multiSelectMode?' · toque em Aplicar seleção':' · solte Ctrl para aplicar');
    }else{
-    propertyHelp.textContent=multiSelectMode?'Selecione duas propriedades compatíveis e toque em Aplicar seleção.':touchCapable?'Para Joule, acione Elétrica e Térmica; Selecionar várias combina outras propriedades.':'Elétrica + Térmica = efeito Joule. Também é possível selecionar juntas com Ctrl + clique.';
+    propertyHelp.textContent=multiSelectMode?'Selecione duas propriedades compatíveis e toque em Aplicar seleção.':touchCapable?'Elétrica + Térmica ativa Joule; Selecionar várias combina outras propriedades.':'Elétrica + Térmica = efeito Joule. Também é possível selecionar juntas com Ctrl + clique.';
    }
    touchModeButton.setAttribute('aria-pressed',String(multiSelectMode));
    touchModeButton.textContent=multiSelectMode?'Seleção múltipla ativa':'Selecionar várias';
