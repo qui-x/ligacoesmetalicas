@@ -19,8 +19,9 @@ try{
  const response=await page.goto(base+'/index.html#/ambiente',{waitUntil:'load',timeout:45000});
  assert.ok(response?.ok(),'Oficina indisponível');
  await page.waitForFunction(()=>!!window.SILM?.lensController?.inspect&&
-  !!document.querySelector('#silm-object-entry .periodic-element[data-z="29"]'));
- await page.locator('#silm-object-entry .periodic-element[data-z="29"]').click();
+  !!document.querySelector('#silm-object-entry .silm-family-picker'));
+ await page.locator('#silm-object-entry .silm-family-picker').selectOption('11');
+ await page.locator('#silm-object-entry .silm-family-element[data-z="29"]').click();
  await page.locator('#silm-objects-dialog').waitFor({state:'visible'});
  await page.locator('#silm-objects-dialog [data-reference-id="atlas-cu"]')
   .getByRole('button',{name:'Investigar objeto'}).click();

@@ -45,8 +45,13 @@
   rootChanges.observe(document.documentElement,{attributes:true,attributeFilter:['class','style']});
   rootChanges.observe(document.body,{attributes:true,attributeFilter:['class']});
   if(stage)new MutationObserver(queue).observe(stage,{attributes:true,childList:true,subtree:true,attributeFilter:['data-workshop-scale']});
+  // Alterações de classe/escala nem sempre informam o WebKit quando a
+  // Travessia se desloca após reconstruir o palco. Recalcular a janela
+  // disponível sempre que um novo aviso entrar no contêiner garante
+  // que nenhum deles cubra os botões de navegação superiores.
   new MutationObserver(()=>{
    if(innerWidth<=900)rail.scrollTop=rail.scrollHeight;
+   queue();
   }).observe(rail,{childList:true});
   queue();
  };
