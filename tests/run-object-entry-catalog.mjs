@@ -194,7 +194,7 @@ try{
  // Abrir novamente a Tabela no palco NÃO substitui a investigação.
  const prior=await snap();
  await page.locator('.silm-workshop-reference-summary').getByRole('button',{name:'Tabela Periódica'}).click();
- await page.locator('#silm-object-entry .periodic-element[data-z="26"]').waitFor({state:'visible'});
+ await page.locator('#silm-object-entry .silm-family-picker').waitFor({state:'visible'});
  assert.equal(await snap(),prior,'Consultar Tabela substituiu a investigação');
  await pickMetal(26,8);
  await modal.waitFor({state:'visible'});
