@@ -170,7 +170,8 @@
    toggle.textContent=active?'◉':'◎';
   }
   if(ring)ring.setAttribute('aria-label','Lente na escala '+(labels[scale]||'')+
-   '. Arraste ou use as setas para mover; Home centraliza; Enter marca a região visual ou grão.');
+   '. Arraste ou use as setas para mover; Home centraliza; Enter marca a região visual ou grão. '+
+   (scale<4?'Duplo clique, Ctrl mais clique ou Ctrl mais Enter aprofunda para a próxima escala.':'Você está na última escala.'));
   if(advance)advance.setAttribute('aria-label','Aprofundar para '+(labels[scale+1]||'próxima escala'));
   if(mark){
    const label=scale===1?'Marcar região visual da ilustração':'Destacar grão sob a lente';
@@ -224,11 +225,21 @@
   if(raf)return;
   raf=root.requestAnimationFrame(sync);
  };
- const deeper=()=>{
-  if(scale>=4)return;
+ const deeper=(carryFocus=false)=>{
+  if(!settings.active||scale<1||scale>=4)return false;
   const step=stage?.querySelector('.silm-workshop-scale[data-scale="'+(scale+1)+'"]');
-  // O click aciona setWorkshopScale e as verificações do próprio motor.
-  if(step&&!step.disabled)step.click();
+  if(!step||step.disabled)return false;
+  // Aprofundar carrega apenas as coordenadas RELATIVAS da lente como
+  // orientação visual; não vincula grãos a átomos nem afirma equivalência
+  // entre pixels, micrografias e coordenadas cristalográficas.
+  if(carryFocus){
+   settings.positions[scale+1]=[...currentPosition()];
+   save();
+  }
+  // O botão original continua sendo o único responsável por validar
+  // e executar a troca de escala no motor SILM.
+  step.click();
+  return true;
  };
  const init=()=>{
   stage=document.getElementById('si-stage');
@@ -263,10 +274,12 @@
    if(settings.active)ring.focus({preventScroll:true});
   });
   reset.addEventListener('click',center);
-  advance.addEventListener('click',deeper);
+  advance.addEventListener('click',()=>deeper(true));
   mark.addEventListener('click',markSelection);
   ring.addEventListener('pointerdown',e=>{
    if(e.button!==0||!settings.active)return;
+   // Ctrl+clique é reservado à navegação, nunca à captura/arraste da lupa.
+   if(e.ctrlKey||e.metaKey){e.stopPropagation();return;}
    drag={id:e.pointerId,x:e.clientX,y:e.clientY};
    ring.setPointerCapture(e.pointerId);
    e.preventDefault();e.stopPropagation();
@@ -285,7 +298,20 @@
   };
   ring.addEventListener('pointerup',release);
   ring.addEventListener('pointercancel',release);
-  ring.addEventListener('click',e=>e.stopPropagation());
+  const navigateByGesture=e=>{
+   if(!settings.active||scale<1||scale>=4||e.button!==0)return;
+   e.preventDefault();e.stopPropagation();
+   deeper(true);
+  };
+  ring.addEventListener('click',e=>{
+   if(settings.active&&(e.ctrlKey||e.metaKey)&&e.button===0){
+    navigateByGesture(e);
+    return;
+   }
+   // Clique simples: NÃO altera a escala nem marca uma amostra.
+   e.stopPropagation();
+  });
+  ring.addEventListener('dblclick',navigateByGesture);
   ring.addEventListener('keydown',e=>{
    const arrows={ArrowLeft:[-12,0],ArrowRight:[12,0],ArrowUp:[0,-12],ArrowDown:[0,12]};
    if(arrows[e.key]){
@@ -294,6 +320,8 @@
     move(dx*step,dy*step);
    }else if(e.key==='Home'){
     e.preventDefault();e.stopPropagation();center();
+   }else if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){
+    e.preventDefault();e.stopPropagation();deeper(true);
    }else if((e.key==='Enter'||e.key===' ')&&scale<=2){
     e.preventDefault();e.stopPropagation();markSelection();
    }
