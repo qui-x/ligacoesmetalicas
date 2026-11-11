@@ -48,19 +48,19 @@
 }
 /* Rede: escolha de vizinhos à vista e deslocamentos cristalográficos em
    uma gaveta. Centro: a cena é a interface; seletor e origem na gaveta. */
-#si-stage .silm-lattice-nav:not([hidden]){gap:6px}
-#si-stage .silm-lattice-more{position:relative;display:inline-block;min-width:0}
-#si-stage .silm-lattice-more>summary{
+#silm-scene-actionbar .silm-lattice-nav:not([hidden]){gap:6px}
+#silm-scene-actionbar .silm-lattice-more{position:relative;display:inline-block;min-width:0}
+#silm-scene-actionbar .silm-lattice-more>summary{
  display:flex;align-items:center;justify-content:center;
  box-sizing:border-box;min-height:44px;min-width:44px;
  padding:6px 10px;border:1px solid var(--border);
  border-radius:9px;background:var(--surface);color:var(--text);
  cursor:pointer;font-size:.75rem;font-weight:700;white-space:normal
 }
-#si-stage .silm-lattice-more>summary:focus-visible{
+#silm-scene-actionbar .silm-lattice-more>summary:focus-visible{
  outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px
 }
-#si-stage .silm-lattice-more-controls{
+#silm-scene-actionbar .silm-lattice-more-controls{
  position:absolute;z-index:55;bottom:calc(100% + 8px);right:0;
  box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;
  justify-content:flex-end;gap:6px;
@@ -68,10 +68,10 @@
  border:1px solid var(--border);border-radius:12px;
  background:var(--panel,var(--surface));box-shadow:0 5px 16px #0003
 }
-#si-stage .silm-lattice-more:not([open]) .silm-lattice-more-controls{display:none}
-#si-stage .silm-lattice-more-controls select{flex:1 1 100%;max-width:100%;min-height:44px}
-#si-stage .silm-lattice-more-controls button{min-width:44px;min-height:44px}
-#si-stage .silm-lattice-nav.silm-center-navigation>strong{display:none}
+#silm-scene-actionbar .silm-lattice-more:not([open]) .silm-lattice-more-controls{display:none}
+#silm-scene-actionbar .silm-lattice-more-controls select{flex:1 1 100%;max-width:100%;min-height:44px}
+#silm-scene-actionbar .silm-lattice-more-controls button{min-width:44px;min-height:44px}
+#silm-scene-actionbar .silm-lattice-nav.silm-center-navigation>strong{display:none}
 /* Apenas o centro traz símbolos: os vizinhos são esferas 3D discretas
    com descrição completa em aria-label e tooltip. Alvo de toque 44px. */
 .silm-crystal[data-local-focus="true"] .silm-center-shell-layer .silm-center-neighbor{
@@ -97,18 +97,18 @@
 }
 @media(max-width:600px){
  #silm-view-controls .silm-camera-advanced-panel{right:-46px;max-width:min(280px,calc(100vw - 16px))}
- #si-stage .silm-lattice-more-controls{right:0}
- #si-stage .silm-lattice-nav:not([hidden])>strong{display:none}
+ #silm-scene-actionbar .silm-lattice-more-controls{right:0}
+ #silm-scene-actionbar .silm-lattice-nav:not([hidden])>strong{display:none}
 }
 @media(forced-colors:active){
  #silm-view-controls .silm-camera-advanced-summary,
- #si-stage .silm-lattice-more>summary{border-color:ButtonText;background:ButtonFace;color:ButtonText}
+ #silm-scene-actionbar .silm-lattice-more>summary{border-color:ButtonText;background:ButtonFace;color:ButtonText}
  .silm-crystal[data-local-focus="true"] .silm-center-shell-layer .silm-center-neighbor::before{
   background:ButtonFace;border:2px solid ButtonText;forced-color-adjust:none
  }
 }
 @media(prefers-reduced-motion:reduce){
- #silm-view-controls .silm-camera-compact *,#si-stage .silm-lattice-more *{
+ #silm-view-controls .silm-camera-compact *,#silm-scene-actionbar .silm-lattice-more *{
   transition:none!important;animation:none!important
  }
 }
@@ -222,8 +222,8 @@
 
 /* O Centro também disponibiliza a translação cristalográfica para
    instrumentos e acessibilidade, mas somente depois de abrir Mais navegação. */
-#si-stage .silm-center-navigation .silm-lattice-more[open] .silm-lattice-more-controls button[aria-label^="Avançar uma célula"],
-#si-stage .silm-center-navigation .silm-lattice-more[open] .silm-lattice-more-controls button[aria-label^="Recuar uma célula"]{
+#silm-scene-actionbar .silm-center-navigation .silm-lattice-more[open] .silm-lattice-more-controls button[aria-label^="Avançar uma célula"],
+#silm-scene-actionbar .silm-center-navigation .silm-lattice-more[open] .silm-lattice-more-controls button[aria-label^="Recuar uma célula"]{
  display:inline-flex!important;align-items:center;justify-content:center
 }
 
@@ -252,10 +252,10 @@
    quando .silm-camera-bar-has-expand aparece; isso ocultava <details>
    enquanto Enquadrar continuava visível por uma regra !important de botão.
    Prioridade explícita aqui evita perder a alternativa a gestos/atalhos. */
-#si-stage #silm-scene-actionbar #silm-view-controls .silm-camera-inline .silm-camera-bar.silm-camera-compact.silm-camera-bar-has-expand{
+#silm-scene-actionbar #silm-view-controls .silm-camera-inline .silm-camera-bar.silm-camera-compact.silm-camera-bar-has-expand{
  max-width:none!important;width:auto!important;padding:0!important;
 }
-#si-stage #silm-scene-actionbar #silm-view-controls .silm-camera-bar.silm-camera-compact>.silm-camera-advanced{
+#silm-scene-actionbar #silm-view-controls .silm-camera-bar.silm-camera-compact>.silm-camera-advanced{
  display:block!important;flex:0 0 auto!important;visibility:visible!important;
 }
 
@@ -265,7 +265,7 @@
  position:relative!important;z-index:120!important;
 }
 #silm-view-controls .silm-camera-advanced-panel,
-#si-stage .silm-lattice-more-controls{
+#silm-scene-actionbar .silm-lattice-more-controls{
  position:fixed!important;top:0;left:0;right:auto!important;bottom:auto!important;
  z-index:3100;max-height:min(320px,65dvh);
  overflow-y:auto;overscroll-behavior:contain;
@@ -273,6 +273,6 @@
 #silm-view-controls .silm-camera-advanced-panel{
  width:min(324px,calc(100vw - 24px));max-width:calc(100vw - 24px);
 }
-#si-stage .silm-lattice-more-controls{
+#silm-scene-actionbar .silm-lattice-more-controls{
  width:min(335px,calc(100vw - 24px));max-width:calc(100vw - 24px);
 }
