@@ -258,3 +258,21 @@
 #si-stage #silm-scene-actionbar #silm-view-controls .silm-camera-bar.silm-camera-compact>.silm-camera-advanced{
  display:block!important;flex:0 0 auto!important;visibility:visible!important;
 }
+
+/* Popovers são ancorados por JS ao summary, mas usam posicionamento fixo:
+   sobrevivem ao overflow-x:auto da ação inferior sem cobrir a cena inteira. */
+#silm-scene-actionbar{
+ position:relative!important;z-index:120!important;
+}
+#silm-view-controls .silm-camera-advanced-panel,
+#si-stage .silm-lattice-more-controls{
+ position:fixed!important;top:0;left:0;right:auto!important;bottom:auto!important;
+ z-index:3100;max-height:min(320px,65dvh);
+ overflow-y:auto;overscroll-behavior:contain;
+}
+#silm-view-controls .silm-camera-advanced-panel{
+ width:min(324px,calc(100vw - 24px));max-width:calc(100vw - 24px);
+}
+#si-stage .silm-lattice-more-controls{
+ width:min(335px,calc(100vw - 24px));max-width:calc(100vw - 24px);
+}
