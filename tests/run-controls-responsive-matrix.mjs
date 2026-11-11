@@ -36,7 +36,6 @@ try{
  await page.locator('#silm-objects-dialog [data-reference-id="atlas-cu"]')
   .getByRole('button',{name:'Investigar objeto'}).click();
  await page.waitForFunction(()=>SILMIntegration.snapshot()?.metal?.atomicNumber===29);
- const initial=await scientific();
  await scale(2);
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
  // Estilo calculado e mecanismos reais da microestrutura, incluindo diálogos.
@@ -71,6 +70,9 @@ try{
  evidence.push({name:'microestutura-estilos',buttons:microAppearance,modalButtons:generated});
  await scale(3);
  await page.waitForFunction(()=>document.querySelector('.silm-crystal[data-local-focus="false"]'));
+ // A construção da primeira geometria é uma mudança científica esperada.
+ // A partir dela, apenas câmera/navegação podem mudar, nunca os resultados.
+ const initial=await scientific();
  // Ações da câmera existem, mas só Enquadrar e um disclosure são primários.
  const bar=page.locator('#silm-view-controls .silm-camera-compact');
  assert.equal(await bar.count(),1,'A barra compacta não foi montada');
