@@ -56,7 +56,10 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
   if(st.properties.active!=='electrical'&&!toggleProperty('electrical',{skipCombination:true}))return false;
   const t=thermal();t?.sync();t?.setHeating(false);t?.reset();
   if(!model.state.properties.electrical.field&&!change({field:true}))return false;
-  coupled={id:st.investigation.id,start:model.state.properties.startedAt,mode:'voltage',boundary:'ambient',external:false,layer:'temperature',run,net,playing:false,timer:null};
+  coupled={id:st.investigation.id,start:model.state.properties.startedAt,mode:'voltage',boundary:'ambient',external:false,layer:'temperature',run,net,playing:!reduced(),timer:null};
+  // A corrente começa a dissipar calor no mesmo instante em que a combinação
+  // é ativada. Preferência de movimento reduzido inicia pausada.
+  if(coupled.playing)startJouleClock(coupled);
   schedule();return true;
  }
  function jouleAction(command,origin=null){
