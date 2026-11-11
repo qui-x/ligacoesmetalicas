@@ -455,6 +455,9 @@ async function test(viewport){
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span').textContent.includes(' · t 0,5 · '));
  const value=async label=>Number((await reading.textContent()).split(' · '+label+' ')[1].split(' · ')[0].replace(',','.'));
  const timeBeforeNavigation=await value('t');
+ // Clicar em Ver fecha corretamente os popovers externos. Reabrir a
+ // navegação avançada para ensaiar a translação após iniciar Joule.
+ if(await details.getAttribute('open')===null)await details.locator('summary').click();
  await page.getByRole('button',{name:'Avançar uma célula no eixo a'}).click();
  assert.equal(await value('t'),timeBeforeNavigation,'Navegar não deve avançar o ensaio.');
  await page.getByRole('button',{name:'Recuar uma célula no eixo a'}).click();
