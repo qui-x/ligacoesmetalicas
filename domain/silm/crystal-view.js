@@ -317,10 +317,13 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    const pos=summary.getBoundingClientRect(),vw=window.visualViewport?.width||window.innerWidth,vh=window.visualViewport?.height||window.innerHeight;
    const width=Math.min(338,vw-24);
    panel.style.width=width+'px';
-   const height=Math.min(panel.scrollHeight,vh-24);
+   // O quadro ocupa somente o espaço acima da barra inferior. Um painel
+   // maior que a cena não pode cobrir os botões Fonte / Pausa / Avançar.
+   const maxHeight=Math.min(vh-24,Math.max(120,pos.top-20));
+   panel.style.maxHeight=maxHeight+'px';
+   const height=Math.min(panel.scrollHeight,maxHeight);
    panel.style.left=Math.max(12,Math.min(pos.left,vw-width-12))+'px';
-   panel.style.top=Math.max(12,Math.min(pos.top-height-8,vh-height-12))+'px';
-   panel.style.maxHeight=Math.max(120,vh-24)+'px';
+   panel.style.top=Math.max(12,pos.top-height-8)+'px';
   }
   scope.listen(advanced,'toggle',positionPanel);
   scope.listen(window,'resize',positionPanel);
