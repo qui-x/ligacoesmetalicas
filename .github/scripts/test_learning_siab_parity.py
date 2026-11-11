@@ -27,22 +27,28 @@ def run(browser_name: str, base_url: str) -> None:
             expect(page.locator("#silm-themes .silm-content-row").first).to_be_visible(timeout=20000)
             expect(page.locator("#silm-themes-filter")).to_be_visible()
             expect(page.locator("#silm-themes-search")).to_be_visible()
+            expect(page.locator("#silm-themes-metal-filter option")).to_have_count(66)
+            expect(page.locator(".silm-learning-count")).to_contain_text("temas")
             page.locator("#silm-themes-filter").select_option("familias")
             assert page.locator("#silm-themes .silm-content-row:visible").count() >= 6
             page.locator("#silm-themes-filter").select_option("all")
             page.locator("#silm-themes-search").fill("neodimio")
             assert page.locator("#silm-themes .silm-content-row:visible").count() >= 1
             page.locator("#silm-themes-search").fill("")
+            page.locator("#silm-themes-metal-filter").select_option("60")
+            assert page.locator("#silm-themes .silm-content-row:visible").count() > 0
+            assert "temas" in page.locator(".silm-learning-count").inner_text()
+            page.locator("#silm-themes-metal-filter").select_option("all")
             themes = page.evaluate(
                 """() => window.SILM.themes.registry.map(t => ({
                     id:t.id, metals:t.relatedMetals, investigation:t.investigation
                 }))"""
             )
-            assert len(themes) >= 24
+            assert len(themes) == 39
             expect(page.locator("#silm-themes .silm-content-row")).to_have_count(len(themes))
             active_themes = themes if width == 1440 else [
                 x for x in themes if x["id"] in
-                ("ligacao-metalica", "familia-alcalinos", "lantanideos-modelos", "cobre-neodimio")
+                ("ligacao-metalica", "familia-alcalinos", "lantanideos-modelos", "cobre-neodimio", "lantanideos-dhcp")
             ]
             for theme in active_themes:
                 study = theme["investigation"]
@@ -71,24 +77,29 @@ def run(browser_name: str, base_url: str) -> None:
             expect(page.locator("#silm-mission-catalog .silm-content-row").first).to_be_visible(timeout=20000)
             expect(page.locator("#silm-missions-filter")).to_be_visible()
             expect(page.locator("#silm-missions-search")).to_be_visible()
+            expect(page.locator("#silm-missions-metal-filter option")).to_have_count(66)
+            expect(page.locator(".silm-learning-count")).to_contain_text("missões")
             page.locator("#silm-missions-filter").select_option("propriedades")
             assert page.locator("#silm-mission-catalog .silm-content-row:visible").count() >= 5
             page.locator("#silm-missions-filter").select_option("all")
             page.locator("#silm-missions-search").fill("neodimio")
             assert page.locator("#silm-mission-catalog .silm-content-row:visible").count() >= 1
             page.locator("#silm-missions-search").fill("")
+            page.locator("#silm-missions-metal-filter").select_option("60")
+            assert page.locator("#silm-mission-catalog .silm-content-row:visible").count() > 0
+            page.locator("#silm-missions-metal-filter").select_option("all")
             missions = page.evaluate(
                 """() => window.SILM.missions.registry.map(m => ({
                     id:m.id, metals:m.metalSelection.atomicNumbers,
                     study:m.study, objectives:m.evidenceObjectives
                 }))"""
             )
-            assert len(missions) >= 27
+            assert len(missions) == 42
             expect(page.locator("#silm-mission-catalog .silm-content-row")).to_have_count(len(missions))
             active_missions = missions if width == 1440 else [
                 x for x in missions if x["id"] in
                 ("montagem-ordem", "lantanideos-eletrons", "calor-metalico",
-                 "objeto-ao-centro", "travessia-metais")
+                 "objeto-ao-centro", "travessia-metais", "lantanideos-dhcp")
             ]
             for mission in active_missions:
                 study = mission["study"]
