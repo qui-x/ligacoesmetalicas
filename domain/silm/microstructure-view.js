@@ -59,8 +59,22 @@ SILM.microstructure=(()=>{
   const status=node('span','silm-workshop-micro-status','Selecione um grão · modelo esquemático');
   const dimension=node('span','silm-workshop-micro-dimension','Tamanho real: indisponível (sem escala em µm)');
   status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');
+  // A câmera dos grãos é bidimensional: segue um polígono sem inventar
+  // profundidade, orientação cristalográfica ou nova amostra. O mesmo
+  // estado visual é usado pela seleção, pelo teclado e pelos botões.
+  function focusGrain(i){
+   const poly=polygons[i];if(!poly?.length)return false;
+   const cx=poly.reduce((sum,p)=>sum+p[0],0)/poly.length;
+   const cy=poly.reduce((sum,p)=>sum+p[1],0)/poly.length;
+   zoom=Math.max(2,zoom);
+   offsetX=zoom*(CX-cx);offsetY=zoom*(CY-cy);
+   update();
+   svg.dataset.focusedGrain=String(i+1);
+   return true;
+  }
   const choose=i=>{
    chosen=i;
+   if(typeof focusButton!=='undefined')focusButton.disabled=i<0;
    paths.forEach((p,j)=>{p.classList.toggle('is-selected',j===i);p.setAttribute('aria-pressed',String(j===i));cells[j]?.classList.toggle('is-selected',j===i);});
    if(sourceData){
     const grain=sourceData.grains[i],area=grain?.areaMicrometers2;
@@ -77,8 +91,10 @@ SILM.microstructure=(()=>{
    const g=svgNode('g',{'class':'silm-micro-cell'}),p=svgNode('path',{d,'class':'silm-micro-grain',tabindex:0,role:'button','aria-label':sourceData?'Selecionar grão segmentado '+sourceData.grains[i].id+' (dados importados não homologados)':'Destacar grão ilustrativo '+(i+1),'aria-pressed':'false'});
    p.style.setProperty('--silm-grain-fill',sourceData?'var(--panel2,var(--surface))':'url(#'+uid+'-material-'+(i%4)+')');
    p.addEventListener('click',()=>{if(!suppressClick)choose(i);});
+   p.addEventListener('dblclick',e=>{e.preventDefault();choose(i);focusGrain(i);});
    p.addEventListener('keydown',e=>{
     if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(i);return;}
+    if(e.key==='f'||e.key==='F'){e.preventDefault();choose(i);focusGrain(i);return;}
     const step=55*(e.shiftKey?2:1);
     if(e.key==='ArrowLeft'||e.key==='ArrowRight'||e.key==='ArrowUp'||e.key==='ArrowDown'){
      e.preventDefault();
@@ -111,7 +127,11 @@ SILM.microstructure=(()=>{
   const setZoom=z=>{zoom=clamp(Math.round(z*4)/4,1,4);if(zoom===1){offsetX=0;offsetY=0;}update();};
   const button=(name,txt,action)=>{const b=node('button','silm-workshop-micro-control',txt);b.type='button';b.setAttribute('aria-label',name);b.addEventListener('click',action);return b;};
   const zoomControls=node('div','silm-workshop-micro-zoom-tools');
-  zoomControls.append(button('Reduzir microestrutura','−',()=>setZoom(zoom-.25)),zoomLabel,button('Ampliar microestrutura','+',()=>setZoom(zoom+.25)),button('Ajustar microestrutura ao quadro','Ajustar',()=>setZoom(1)));
+  const focusButton=button('Aproximar grão selecionado','Focar',()=>{
+   if(chosen>=0)focusGrain(chosen);
+  });
+  focusButton.disabled=true;
+  zoomControls.append(button('Reduzir microestrutura','−',()=>setZoom(zoom-.25)),zoomLabel,button('Ampliar microestrutura','+',()=>setZoom(zoom+.25)),focusButton,button('Ajustar microestrutura ao quadro','Ajustar',()=>setZoom(1)));
   // Informação operacional (grão selecionado + zoom) continua sempre visível.
   // Escala física e limitações científicas ficam num <details> nativo.
   // O aviso "sem escala" é informação essencial e permanece visível mesmo
