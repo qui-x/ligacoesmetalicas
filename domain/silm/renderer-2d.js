@@ -112,10 +112,39 @@ SILM.renderer2d=(()=>{
     for(const child of [...bar.children])if(child!==fitButton)panel.append(child);
     advanced.append(summary,panel);bar.append(advanced);
     fitButton.tabIndex=0;inButton.tabIndex=-1;
+    const positionAdvanced=()=>{
+     if(!advanced.open)return;
+     // Um painel fixo não é recortado pela rolagem horizontal da barra
+     // instrumental. A âncora acompanha o summary e respeita o viewport.
+     const v=window.visualViewport,r=summary.getBoundingClientRect();
+     const vw=v?.width||window.innerWidth,vh=v?.height||window.innerHeight;
+     const width=Math.min(324,Math.max(180,vw-24));
+     const height=Math.min(panel.scrollHeight,Math.max(100,vh*.6));
+     const left=Math.max(12,Math.min(r.right-width,vw-width-12));
+     const above=r.top-height-8,below=r.bottom+8;
+     const top=above>=8?above:Math.min(below,Math.max(8,vh-height-8));
+     panel.style.left=left+'px';panel.style.top=Math.max(8,top)+'px';
+    };
     scope.listen(advanced,'toggle',()=>{
      inButton.tabIndex=advanced.open?0:-1;
-     if(!advanced.open&&panel.contains(document.activeElement))summary.focus({preventScroll:true});
+     if(advanced.open)positionAdvanced();
+     else if(panel.contains(document.activeElement))summary.focus({preventScroll:true});
     });
+    scope.listen(advanced,'keydown',event=>{
+     if(event.key==='Escape'&&advanced.open){
+      event.preventDefault();event.stopPropagation();advanced.open=false;
+      summary.focus({preventScroll:true});
+     }
+    });
+    scope.listen(document,'pointerdown',event=>{
+     if(advanced.open&&!advanced.contains(event.target))advanced.open=false;
+    });
+    scope.listen(window,'resize',positionAdvanced);
+    scope.listen(window,'scroll',positionAdvanced,{capture:true});
+    if(window.visualViewport){
+     scope.listen(window.visualViewport,'resize',positionAdvanced);
+     scope.listen(window.visualViewport,'scroll',positionAdvanced);
+    }
    }
    const shown=()=>buttons.filter(b=>!b.hidden&&b.getClientRects().length>0);
    scope.listen(bar,'keydown',e=>{const list=shown(),k=list.indexOf(document.activeElement);if(k<0)return;const next={ArrowDown:k+1,ArrowRight:k+1,ArrowUp:k-1,ArrowLeft:k-1,Home:0,End:list.length-1}[e.key];
