@@ -5,6 +5,7 @@ Executa sobre a aplicação real servida localmente, com um navegador Playwright
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
 
 GROUPS = ["Investigue", "Prepare e registre", "Orientação", "Para ensinar"]
@@ -33,6 +34,13 @@ def run(browser_name: str, base_url: str) -> None:
             expect(page.locator("#manual-search")).to_be_visible()
             expect(page.locator("#manual-print")).to_be_visible()
             expect(page.locator(".silm-manual-hero-parity")).to_be_visible()
+            expect(page.locator(".silm-manual-lattice")).to_be_visible()
+            expect(page.locator(".silm-manual-lattice circle")).to_have_count(9)
+            expect(page.locator(".silm-manual-card .silm-manual-svg")).to_have_count(13)
+            assert not page.locator(".silm-manual-card.button").count(), "Cartões herdaram estilo de botão"
+            if width == 1440:
+                Path("artifacts").mkdir(exist_ok=True)
+                page.screenshot(path=f"artifacts/manual-home-{browser_name}.png", full_page=True)
 
             overflow = page.evaluate(
                 "() => document.documentElement.scrollWidth - window.innerWidth"
@@ -45,12 +53,28 @@ def run(browser_name: str, base_url: str) -> None:
             expect(page.locator(".silm-manual-category-page h1")).to_have_text(
                 "Oficina dos Metais"
             )
+            expect(page.locator(".silm-manual-category-page .silm-manual-article-head")).to_be_visible()
+            expect(page.locator(".silm-manual-category-page .silm-manual-steps li")).to_have_count(4)
             topic = page.locator(".silm-manual-topic-link").first
             topic.click(force=True)
             expect(page.locator(".silm-manual-article")).to_be_visible()
             expect(page.locator(".silm-manual-breadcrumb")).to_be_visible()
             expect(page.locator(".silm-manual-purpose")).to_be_visible()
             expect(page.locator(".silm-manual-related")).to_be_visible()
+            expect(page.locator(".silm-manual-article-head")).to_be_visible()
+            expect(page.locator(".silm-manual-steps li")).not_to_have_count(0)
+            # O SIAB apresenta números 01, 02, ... e separadores.
+            assert page.locator(".silm-manual-steps li").first.evaluate(
+                """el => getComputedStyle(el, '::before').content"""
+            ).strip('"') == "01"
+            assert not page.locator("#manual-indice a.button").count(), "Links do índice são botões"
+            expect(page.locator("#manual-indice > ul > li")).to_have_count(13)
+            first_category = page.locator("#manual-indice > ul > li").first
+            expect(first_category).to_contain_text("Comece por aqui")
+            expect(first_category.locator("svg[data-icon='home']")).to_have_count(1)
+            expect(page.locator("#manual-indice a[aria-current='page']")).to_have_count(1)
+            if width == 1440:
+                page.screenshot(path=f"artifacts/manual-article-{browser_name}.png", full_page=True)
 
             index = page.locator("#manual-indice")
             toggle = page.locator("#manual-index-toggle")
@@ -68,11 +92,14 @@ def run(browser_name: str, base_url: str) -> None:
             else:
                 expect(index).to_be_visible()
                 assert not toggle.is_visible()
+                assert index.evaluate("""el => Math.abs(el.getBoundingClientRect().width - (window.innerWidth<=1100 ? 190:218))""") <= 3
 
             page.goto(base_url.rstrip("/") + "/#/manual", wait_until="domcontentloaded")
             expect(page.locator(".silm-manual-card")).to_have_count(13)
             page.locator("#manual-search").fill("eletrons")
             expect(page.locator(".silm-manual-results")).to_be_visible()
+            expect(page.locator(".silm-manual-search-list > li")).not_to_have_count(0)
+            assert not page.locator(".silm-manual-results .silm-manual-topic-link").count()
             expect(page.locator(".silm-manual-results")).to_contain_text(
                 "Elétrons deslocalizados"
             )
