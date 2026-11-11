@@ -349,11 +349,18 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    if(t){trail.append(nav(category?.title||'Investigue',catHref(category?.id||'bancada')),N('span','/'));}
    const current=N('span',t?t.title:category?.title||'Manual');current.setAttribute('aria-current','page');trail.append(current);trail.querySelectorAll('span').forEach(s=>{if(s.textContent==='/')s.setAttribute('aria-hidden','true');});return trail;
   }
+  function appendExplanation(article,text){
+   const paragraphs=String(text||'').split(/\n\s*\n/).map(p=>p.trim()).filter(Boolean);
+   if(!paragraphs.length)return;
+   const section=N('section');section.className='silm-manual-explanation';section.append(N('h2','Entenda'));
+   for(const paragraph of paragraphs)section.append(N('p',operation(paragraph)));
+   article.append(section);
+  }
   function renderArticle(t){
    const category=manualCategory(t.id),article=N('article');article.className='silm-reading silm-manual-article';article.dataset.manualTopic=t.id;
    const eyebrow=N('p',category?.title||'Manual');eyebrow.className='eyebrow';const lead=N('p',operation(t.summary));lead.className='silm-lead';const heading=N('header');heading.className='silm-manual-article-head';heading.append(eyebrow,makeTitle(t.title),lead);article.append(heading);
-   const purpose=N('section');purpose.className='silm-manual-purpose';purpose.append(N('h2','Para que serve'),N('p',operation(t.purpose||t.content||t.summary)));article.append(purpose);
-   if(t.content&&t.content!==t.purpose){const sec=N('section');sec.className='silm-manual-explanation';sec.append(N('h2','Entenda'),N('p',operation(t.content)));article.append(sec);}
+   const purpose=N('section');purpose.className='silm-manual-purpose';purpose.append(N('h2','Para que serve'),N('p',operation(t.purpose||t.summary||t.content)));article.append(purpose);
+   if(t.content&&t.content!==t.purpose)appendExplanation(article,t.content);
    renderReferenceContext(article,t.id,referenceId);
    if(t.steps?.length){const how=N('section');how.className='silm-manual-how';const steps=N('ol');steps.className='silm-manual-steps';for(const s of t.steps)steps.append(N('li',operation(s)));how.append(N('h2','Como usar'),steps);article.append(how);}
    if(t.example){const example=N('aside');example.className='silm-manual-example';example.setAttribute('aria-label','Exemplo');example.append(N('strong','Exemplo'),N('p',operation(t.example)));article.append(example);}
@@ -372,7 +379,8 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    const primary=find(category.topics[0]);
    if(primary){
     const purpose=N('section');purpose.className='silm-manual-purpose';
-    purpose.append(N('h2','Para que serve'),N('p',operation(primary.purpose||primary.content||primary.summary)));article.append(purpose);
+    purpose.append(N('h2','Para que serve'),N('p',operation(primary.purpose||primary.summary||primary.content)));article.append(purpose);
+    if(primary.content&&primary.content!==primary.purpose)appendExplanation(article,primary.content);
     if(primary.steps?.length){const how=N('section');how.className='silm-manual-how',ol=N('ol');ol.className='silm-manual-steps';for(const step of primary.steps)ol.append(N('li',operation(step)));how.append(N('h2','Como usar'),ol);article.append(how);}
    }
    const more=N('section');more.className='silm-manual-more';more.append(N('h2','Nesta categoria'));
