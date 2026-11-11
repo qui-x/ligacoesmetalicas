@@ -342,3 +342,40 @@
 .silm-assembly.silm-crystal .silm-assembly-footer,.silm-assembly.silm-crystal .silm-assembly-bar{display:none!important}
 .silm-assembly.silm-crystal .silm-assembly-stage{border-radius:0;border-inline:0;width:var(--stage);height:var(--stage)}
 @media(max-width:900px){.silm-assembly.silm-crystal .silm-assembly-stage{border-radius:8px;border:1px solid var(--silm-soft-border)}}
+
+
+/* Joule: leitura causal compacta na cena, sem criar uma segunda bancada.
+   Destaque pontilhado: sítios VISÍVEIS com maior potência dissipada agora.
+   Anéis de calor já existentes continuam depois de desligar a alimentação. */
+.silm-crystal-stage>.silm-joule-story{
+ position:absolute;top:8px;left:8px;z-index:80;
+ max-width:min(65%,330px);box-sizing:border-box;
+ margin:0;padding:5px 8px;border:1px solid var(--border);
+ border-inline-start:3px solid var(--scientific-accent);
+ border-radius:8px;background:var(--surface);color:var(--text);
+ font-size:clamp(.67rem,1.15vw,.78rem);font-weight:700;line-height:1.3;
+ pointer-events:none;user-select:none;
+ box-shadow:0 2px 8px rgb(0 0 0 / .1);
+ overflow-wrap:anywhere
+}
+.silm-crystal-stage>.silm-joule-story[hidden]{display:none!important}
+.silm-crystal-stage>.silm-joule-story[data-phase="residual"]{
+ border-inline-start-style:dashed;border-inline-start-color:var(--silm-heat)
+}
+.silm-crystal-unit[data-joule-peak]>.silm-unit-body{
+ outline:2px dotted var(--scientific-accent);
+ outline-offset:3px;border-radius:50%;
+}
+@media(max-width:450px){
+ .silm-crystal-stage>.silm-joule-story{
+  max-width:65%;top:5px;left:5px;padding:4px 5px;font-size:.68rem
+ }
+}
+@media(forced-colors:active){
+ .silm-crystal-stage>.silm-joule-story{
+  border-color:CanvasText;background:Canvas;color:CanvasText;box-shadow:none
+ }
+ .silm-crystal-unit[data-joule-peak]>.silm-unit-body{
+  outline:2px dotted Highlight
+ }
+}
