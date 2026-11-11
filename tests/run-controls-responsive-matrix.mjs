@@ -153,8 +153,12 @@ try{
   'Centro oferece ocultar vizinhos embora a camada seja obrigatória');
  assert.equal(await direct.locator('[data-action="electrons"]').count(),1,
   'Centro perdeu exploração eletrônica');
- assert.equal(await direct.locator('[data-action="joule"]').count(),1,
-  'Joule perdeu entrada no menu Ver');
+ assert.equal(await direct.locator('[data-action="joule"]').count(),0,
+  'Joule reapareceu como simulador independente no menu Ver');
+ assert.equal(await direct.locator('[data-action="property-electrical"]').count(),1);
+ assert.equal(await direct.locator('[data-action="property-thermal"]').count(),1);
+ assert.match(await page.locator('.silm-observer-selection-status').first().textContent(),
+  /Elétrica \+ Térmica/,'A combinação Joule não está explicada na navegação');
  await page.locator('[data-silm-module-shortcut="medir"]').click();
  assert.ok(await direct.locator('[data-silm-direct-tool="medir:distance"]').count()===1,
   'Medir deixou de oferecer instrumento direto');
