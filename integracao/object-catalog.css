@@ -555,7 +555,7 @@
   display:none!important
  }
  #si-stage .silm-object-entry-table .silm-periodic{
-  --silm-touch-cell:clamp(58px,calc((100dvh - 290px)/9),68px);
+  --silm-touch-cell:clamp(58px,8dvh,68px);
   box-sizing:border-box;display:flex;flex-direction:column;
   width:100%;max-width:100%;min-width:0;
   height:auto!important;min-height:0!important;gap:4px!important
