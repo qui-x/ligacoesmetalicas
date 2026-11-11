@@ -496,6 +496,11 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const coupled=propertyOptions?.jouleReading?.(S);
   if(jouleControls){
   jouleControls.hidden=!coupled;
+  // A camada flutuante pertence somente ao acoplamento ativo.
+  if(!coupled&&jouleUI){
+   jouleUI.advanced.open=false;
+   jouleUI.panel.hidden=true;
+  }
   if(coupled&&jouleUI){
    const {input,values}=coupled;
    jouleUI.live.textContent='Joule · t '+formatRelative(values.time)+' · P '+formatRelative(values.power)+' · ΔT '+formatRelative(values.mean);
