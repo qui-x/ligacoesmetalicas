@@ -334,7 +334,28 @@
  }
  function updateWorkshopContext(){
   const host=$('silm-workshop-context');if(!host||!S.workshop)return;
-  if(routeUI?.session.open()){disposeEntryTable();host.hidden=true;delete host.dataset.key;updateWorkshopViewport(true);$('silm-integration-scene').hidden=false;$('silm-scene-actionbar').hidden=false;$('si-stage').classList.remove('silm-workshop-context-only');return;}
+  if(routeUI?.session.open()){
+   disposeEntryTable();
+   const activity=routeUI.session.context(),metal=element();
+   if(activity.type==='mission'&&metal){
+    const saved=model.state.metadata.workshop;
+    const items=S.workshop.list(metal.atomicNumber);
+    const chosen=S.workshop.get(saved?.referenceId)||items[0]||null;
+    workshopSelectionId=chosen?.atomicNumber===metal.atomicNumber?chosen.id:null;
+    workshopScale=activeWorkshopScale(saved);
+    const displayScale=workshopScale||3;
+    const key='guided:'+activity.id+':'+metal.atomicNumber+':'+(workshopSelectionId||'')+':'+displayScale;
+    if(host.dataset.key!==key){
+     host.dataset.key=key;
+     S.workshop.renderReference(host,{element:metal,item:chosen,items,scale:displayScale,guided:true,onScale:setWorkshopScale});
+    }
+    updateWorkshopViewport(true);
+    return;
+   }
+   host.hidden=true;delete host.dataset.key;updateWorkshopViewport(true);
+   $('silm-integration-scene').hidden=false;$('silm-scene-actionbar').hidden=false;
+   $('si-stage').classList.remove('silm-workshop-context-only');return;
+  }
   const active=element(),candidate=S.data.get(Number(selected||$('silm-metal')?.value));
   if(active&&candidate&&candidate.atomicNumber!==active.atomicNumber){
    disposeEntryTable();

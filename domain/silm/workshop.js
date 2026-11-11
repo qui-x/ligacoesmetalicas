@@ -97,9 +97,9 @@ SILM.workshop=(()=>{
    const direct=node('button','button outline','Iniciar investigação sem referência');direct.type='button';direct.addEventListener('click',onStartDirect);s.append(direct);host.append(s);return;}
   const grid=node('div','silm-workshop-grid');for(const item of refs)grid.append(itemCard(item,onInvestigate));s.append(grid);host.append(s);
  }
- function renderReference(host,{element,item=null,items=[],scale=1,onChoose=()=>{},onScale=()=>{},onOpenPeriodic=()=>{},onBrowseObjects=()=>{}}={}){
+ function renderReference(host,{element,item=null,items=[],scale=1,guided=false,onChoose=()=>{},onScale=()=>{},onOpenPeriodic=()=>{},onBrowseObjects=()=>{}}={}){
   host.replaceChildren();host.hidden=false;
-  const s=node('section','silm-workshop-reference');
+  const s=node('section','silm-workshop-reference');if(guided)s.classList.add('silm-workshop-guided');
   if(scale===2){
    s.classList.add('silm-workshop-micro-mode');
    const heading=node('div','silm-workshop-micro-heading'),titles=node('div','silm-workshop-micro-titles');
@@ -107,8 +107,8 @@ SILM.workshop=(()=>{
    microHeading.setAttribute('aria-label','Microestrutura de '+element.name);
    titles.append(microHeading);
    const table=node('button','button outline','Tabela');table.type='button';table.setAttribute('aria-label','Tabela Periódica');table.title='Abrir Tabela Periódica';table.addEventListener('click',onOpenPeriodic);
-   heading.append(titles,table,
-    manualLink('graos-microestrutura',item,'Consultar no Manual grãos, escala e referências de '+element.name));
+   heading.append(titles);if(!guided)heading.append(table);
+   heading.append(manualLink('graos-microestrutura',item,'Consultar no Manual grãos, escala e referências de '+element.name));
    s.append(heading);
    const viewer=SILM.microstructure?.create?.({element,item})||null;
    if(viewer)s.append(viewer);
@@ -152,15 +152,15 @@ SILM.workshop=(()=>{
    // mantém apenas a referência necessária para observar a imagem.
    summary.append(manualLink('aplicacoes-metalicas',item,'Consultar no Manual composição e fontes de '+item.title));
   }else if(scale===1)summary.append(node('p','silm-workshop-intro','Escolha um objeto para observar o componente metálico.'));
-  const table=node('button','button outline');table.setAttribute('aria-label','Tabela Periódica');table.append(node('span','','Tabela'),node('span','silm-workshop-table-long',' Periódica'));table.type='button';table.addEventListener('click',onOpenPeriodic);summary.append(table);
-  if(scale===1){const browse=node('button','button outline silm-workshop-browse-objects','Objetos');
+  const table=node('button','button outline');table.setAttribute('aria-label','Tabela Periódica');table.append(node('span','','Tabela'),node('span','silm-workshop-table-long',' Periódica'));table.type='button';table.addEventListener('click',onOpenPeriodic);if(!guided)summary.append(table);
+  if(scale===1&&!guided){const browse=node('button','button outline silm-workshop-browse-objects','Objetos');
    browse.type='button';browse.setAttribute('aria-label','Escolher objetos para investigar');
    browse.addEventListener('click',onBrowseObjects);summary.append(browse);}
   if(stageOnly)summary.append(manualLink('travessia-escalas',item,'Consultar no Manual a interpretação de Rede e Centro'));
   // Trocar a aplicação pertence ao contexto do objeto, não à área do desenho.
   // Um disclosure nativo ocupa apenas um alvo de toque quando recolhido e
   // preserva os mesmos handlers científicos de seleção da Oficina.
-  if(scale===1){
+  if(scale===1&&!guided){
    const others=items.filter(other=>other.id!==item?.id);
    if(others.length){
     const alt=node('details','silm-workshop-alternatives');

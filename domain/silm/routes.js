@@ -19,7 +19,7 @@
   for(const r of registry){
    if(!r||!/^[-a-z0-9]{3,60}$/.test(r.id)||ids.has(r.id)||!Number.isInteger(r.version)||r.version<1)return {ok:false,reason:'IDENTITY_INVALID'};ids.add(r.id);
    if(!['explorar','medir','calcular'].includes(r.module)||r.secondaryModule!==undefined)return {ok:false,reason:'MODULE_INVALID'};
-   const criteria=['cell-and-lattice','electrons','deform-and-restore','measure-a','cell-volume','crystalline','neighbors','electrons-motion','property-field','packing-factor'];
+   const criteria=['cell-and-lattice','electrons','deform-and-restore','measure-a','cell-volume','crystalline','neighbors','electrons-motion','property-field','packing-factor','property-heating','property-light','property-elongation'];
    if(!criteria.includes(r.completionCriteria)||!r.initialState||r.initialState.mode!==r.structureRequirements||!['free','crystalline'].includes(r.initialState.mode)||!Number.isInteger(r.initialState.units)||r.initialState.units<1)return {ok:false,reason:'CONTEXT_INVALID'};
    if(!r.title||!r.subtitle||!r.description||!r.objectives?.length||!r.guidance?.criterion||!r.completionCriteria)return {ok:false,reason:'CONTENT_INVALID'};
    if(!Array.isArray(r.allowedTools)||!r.allowedTools.length||r.allowedTools.some(t=>!knownTools.has(t)))return {ok:false,reason:'TOOLS_INVALID'};
