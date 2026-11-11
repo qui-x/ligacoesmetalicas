@@ -239,6 +239,21 @@ try{
  evidence.push({name:'texto-150-390',...zoomedFont});
  assert.ok(zoomedFont.camera>=43.5&&zoomedFont.nav>=43.5,
   'Alvos comprimidos em 150% '+JSON.stringify(zoomedFont));
+ // Demonstração óptica: a Oficina carrega apenas o perfil experimental de Cu.
+ // O painel distingue dado de referência de aparência macroscópica real.
+ await page.evaluate(()=>document.documentElement.style.fontSize='');
+ await page.locator('[data-open-dock="ver"]').click();
+ await direct.locator('[data-action="property-luster"]').click();
+ await page.waitForFunction(()=>document.querySelector('#silm-properties .silm-optical-sample')?.dataset.evidence==='tabulated');
+ const optical=await page.locator('#silm-properties .silm-optical-sample').evaluate(node=>({
+  text:node.textContent,bands:[...node.querySelectorAll('meter')].map(m=>m.value),
+  shown:getComputedStyle(node).display!=='none'
+ }));
+ assert.ok(optical.shown&&optical.bands.length===3&&optical.bands.every(n=>n>0&&n<1),
+  'Perfil óptico Cu não foi exposto sem inventar refletâncias: '+JSON.stringify(optical));
+ assert.match(optical.text,/Johnson|Christy/,'Falta procedência do Cu');
+ assert.match(optical.text,/óxido, rugosidade|não a cor de uma peça real/,'Falta limite da referência');
+ evidence.push({name:'cobre-optica-referencia',bands:optical.bands});
  assert.deepEqual(errors,[],errors.join(' | '));
  await context.close();
 }catch(e){evidence.push({error:String(e),stack:e.stack});throw e;}
