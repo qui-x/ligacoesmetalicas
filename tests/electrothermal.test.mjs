@@ -64,3 +64,21 @@ for(const ref of S.readyAssemblies.list())test('rede de '+ref.element.symbol+' u
  close([...flux].reduce((sum,v,i)=>sum+(net.terminal[i]===0?v:0),0),-obs.current);
  close(obs.storedEnergy,obs.jouleEnergy+obs.externalEnergy-obs.removedEnergy);
 });
+
+test('cobre: desligar alimentação em corrente imposta mantém avanço e resfriamento',()=>{
+ const ref=S.readyAssemblies.list().find(x=>x.element.symbol==='Cu');
+ assert.ok(ref,'referência Cu indisponível');
+ const net=ET.buildNetwork(S.crystal.geometry(ref.element));
+ assert.ok(net,'rede de Joule do cobre indisponível');
+ const run=ET.createRun(net);
+ const on={mode:'current',level:1,boundary:'ambient',external:false};
+ assert.ok(run.advance(on,.5),'primeiro intervalo de aquecimento recusado');
+ assert.ok(run.advance(on,.5),'segundo intervalo de aquecimento recusado');
+ const off={...on,level:0},hot=run.observe(off);
+ close(hot.time,1);
+ assert.ok(run.advance(off,.5),'intervalo após desligar a fonte deveria permitir resfriamento');
+ const cold=run.observe(off);
+ close(cold.time,1.5);close(cold.voltage,0);close(cold.current,0);close(cold.power,0);
+ assert.ok(cold.mean<hot.mean,'a amostra deveria resfriar com terminais ao ambiente');
+ close(cold.storedEnergy,cold.jouleEnergy+cold.externalEnergy-cold.removedEnergy,1e-7);
+});
