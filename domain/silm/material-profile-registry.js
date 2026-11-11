@@ -18,8 +18,8 @@ window.SILM=window.SILM||{};
    throw new TypeError('Perfil sem número atômico válido');
   if(profiles.has(record.atomicNumber))
    throw new TypeError('Perfil duplicado para Z='+record.atomicNumber);
-  if(!record.optical&&typeof record!=='object')
-   throw new TypeError('Perfil científico inválido');
+  if(typeof record.element!=='string'||!record.element.trim())
+   throw new TypeError('Perfil sem símbolo do metal');
   if(record.optical){
    const p=record.optical;
    if(p.evidence!=='TABULATED_NK'||!Array.isArray(p.points)||p.points.length<2||
