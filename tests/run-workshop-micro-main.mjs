@@ -455,7 +455,10 @@ async function test(viewport){
   await panel.waitFor({state:'visible'});
  };
  const reading=page.locator('.silm-lattice-status span');
+ const causal=page.locator('#silm-assembly-stage .silm-joule-story');
+ const hotspots=page.locator('#silm-assembly-stage .silm-crystal-unit[data-joule-peak]');
  await step.waitFor({state:'visible'});
+ await causal.waitFor({state:'visible'});
  assert.equal(await step.evaluate(b=>!!b.closest('#silm-scene-actionbar')),true,
   'Joule não acompanha os controles do palco nas escalas da rede e do centro');
  const stepBox=await step.boundingBox();
@@ -470,8 +473,13 @@ async function test(viewport){
  assert.equal(await supply.getAttribute('aria-pressed'),'false','Reiniciar deve desligar alimentação');
  await supply.click();
  await page.waitForFunction(()=>document.querySelector('.silm-joule-supply')?.getAttribute('aria-pressed')==='true');
+ assert.equal(await causal.getAttribute('data-phase'),'generating','Corrente no instante inicial ainda não deve ser descrita como calor acumulado.');
  await step.click();
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 0,5 · '));
+ assert.equal(await causal.getAttribute('data-phase'),'heating','A potência Joule não foi conectada ao aquecimento na cena.');
+ assert.match(await causal.textContent(),/Corrente.*Joule.*aquecimento/);
+ assert.ok(await hotspots.count()>0,'A dissipação local calculada não destacou nenhum centro no palco.');
+ assert.match(await reading.textContent(),/P local [\d,]+/,'Falta potência Joule no centro em evidência.');
  const value=async label=>Number((await reading.textContent()).split(' · '+label+' ')[1].split(' · ')[0].replace(',','.'));
  const timeBeforeNavigation=await value('t');
  // A translação do cristal não pode afetar o avanço da malha térmica.
@@ -494,6 +502,11 @@ async function test(viewport){
  const warm=await value('T média');
  await supply.click();
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · U 0 · I 0 · '),undefined,{timeout:10000});
+ assert.equal(await causal.getAttribute('data-phase'),'residual','Desligar a alimentação não distinguiu calor remanescente da dissipação.');
+ assert.match(await causal.textContent(),/calor residual/);
+ assert.equal(await hotspots.count(),0,'A dissipação Joule visual continua ativa com corrente zero.');
+ assert.ok(await page.locator('#silm-assembly-stage .silm-crystal-unit[data-heat]:not([data-heat="0"])').count()>0,
+  'O calor armazenado desapareceu imediatamente ao desligar a corrente.');
  await step.click();
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 1,5 · '),undefined,{timeout:10000});
  assert.match(await reading.textContent(),/corrente imposta.* · t 1,5 · U 0 · I 0 · R [\d,]+ · P Joule 0/);
@@ -512,6 +525,8 @@ async function test(viewport){
  assert.match(await reading.textContent(),/corrente imposta/,'Reiniciar mudou a condição elétrica.');
  await panel.getByRole('button',{name:'Voltar à elétrica simples'}).click();
  assert.equal(await step.isVisible(),false);
+ assert.equal(await causal.isVisible(),false,'A pista Joule permaneceu na cena após retirar o acoplamento.');
+ assert.equal(await hotspots.count(),0,'Sobraram anéis de dissipação da experiência anterior.');
  assert.equal(await page.locator('.silm-crystal').getAttribute('data-field-map'),null,
   'Encerrar o acoplamento deixou o mapa Joule na cena.');
  if(viewport.width>1100){
