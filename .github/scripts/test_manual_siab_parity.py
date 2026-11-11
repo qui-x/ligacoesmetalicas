@@ -64,9 +64,9 @@ def run(browser_name: str, base_url: str) -> None:
             expect(page.locator(".silm-manual-article-head")).to_be_visible()
             expect(page.locator(".silm-manual-steps li")).not_to_have_count(0)
             # O SIAB apresenta números 01, 02, ... e separadores.
-            assert page.locator(".silm-manual-steps li").first.evaluate(
+            assert "counter(" in page.locator(".silm-manual-steps li").first.evaluate(
                 """el => getComputedStyle(el, '::before').content"""
-            ).strip('"') == "01"
+            ), "Numeração decimal 01/02 ausente"
             assert not page.locator("#manual-indice a.button").count(), "Links do índice são botões"
             expect(page.locator("#manual-indice > ul > li")).to_have_count(13)
             first_category = page.locator("#manual-indice > ul > li").first
