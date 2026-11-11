@@ -155,6 +155,15 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   const eyebrow=N('p','APRENDER · TEMA');eyebrow.className='eyebrow';const title=N('h1',t.title);title.id='theme-title';title.tabIndex=-1;
   const idea=t.concepts.find(c=>c.title==='Ideia principal'),lead=N('p',idea?idea.text:t.description);lead.className='silm-lead';
   article.append(eyebrow,title,lead,N('p',t.subtitle+'. '+t.description));
+  if(t.investigation){
+   const study=t.investigation,section=N('section');section.className='silm-theme-inquiry';
+   const heading=N('h2','Investigue este tema'),prompt=N('p',study.problem);
+   section.append(heading,prompt,N('h3','Antes de começar'),N('p',study.prediction));
+   const steps=N('ol');steps.className='silm-theme-inquiry-steps';
+   for(const action of study.actions)steps.append(N('li',action));
+   section.append(N('h3','Percurso na Oficina'),steps,N('h3','Que evidência registrar?'),N('p',study.evidence),N('h3','Interprete'),N('p',study.reflection));
+   article.append(section);
+  }
   const actions=N('div');actions.className='silm-actions';
   const metal=S.data.get(t.relatedMetals[0]),investigate=N('button','Investigar na oficina');investigate.type='button';investigate.className='button primary';investigate.id='theme-investigate';
   investigate.addEventListener('click',()=>{
