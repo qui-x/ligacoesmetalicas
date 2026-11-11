@@ -1666,3 +1666,19 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
  .silm-manual-page .silm-manual-lattice-center{fill:Highlight;stroke:CanvasText}
  .silm-manual-page .silm-manual-lattice-node{fill:Canvas;stroke:CanvasText}
 }
+
+/* Divulgação de detalhes e exemplo: mesmas pistas visuais da referência. */
+.silm-manual-page .silm-manual-accordion>summary{list-style:none;justify-content:space-between}
+.silm-manual-page .silm-manual-accordion>summary::-webkit-details-marker{display:none}
+.silm-manual-page .silm-manual-accordion>summary::marker{content:""}
+.silm-manual-page .silm-manual-accordion .silm-manual-disclosure{
+ width:20px;height:20px;margin-left:auto;color:var(--accent);transition:transform .15s ease
+}
+.silm-manual-page .silm-manual-accordion[open] .silm-manual-disclosure{transform:rotate(180deg)}
+.silm-manual-page .silm-manual-example{
+ padding:18px 20px;border-left:3px solid var(--accent);border-radius:0 var(--radius,9px) var(--radius,9px) 0;
+ background:var(--panel);margin:20px 0;max-width:var(--silm-manual-reading)
+}
+.silm-manual-page .silm-manual-example strong{font-size:.8rem;letter-spacing:.02em;color:var(--accent)}
+.silm-manual-page .silm-manual-example p{font-size:.95rem;color:var(--secondary,var(--muted));margin-top:6px}
+@media(prefers-reduced-motion:reduce){.silm-manual-page .silm-manual-accordion .silm-manual-disclosure{transition:none}}
