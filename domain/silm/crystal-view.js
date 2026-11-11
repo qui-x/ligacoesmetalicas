@@ -132,6 +132,10 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  // Elétrons e propriedades mantêm seus controles completos no painel Ver; o palco recebe somente as camadas visuais.
  // 0.7.x: a sobreposição da experiência permanece sobre a cena; comandos ficam em Ver → Observar.
  const P=SILM.properties,overlay=SILM.createPropertyOverlay(stage,{before:units});R.layer('properties',overlay.root);
+ // Pista causal não interativa: identifica o que está sendo produzido
+ // agora (dissipação) versus o que já ficou armazenado (calor).
+ const jouleStory=U.element('p',null,'silm-joule-story');jouleStory.hidden=true;
+ jouleStory.setAttribute('aria-live','off');stage.append(jouleStory);
  const notesHost=document.getElementById('silm-structure-notes');
  if(notesHost){notesHost.replaceChildren();SILM.createSceneNotes(notesHost,{scope,items:[instructions,cameraHelp,legend,electronLegend,cellStatus,kind]});}
  let deform=null,heatTimer=false,nearest=null,lastControls=0;const D=c=>deform?deform(c):c;
@@ -309,8 +313,9 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    const value=U.element('dd','0');value.dataset.quantity=key;
    reading.append(U.element('dt',label),value);outputs.set(key,value);
   }
+  const interpretation=U.element('p','','silm-joule-explanation');
   const note=U.element('p','Balanço: energia elétrica + calor externo = energia armazenada + energia removida, em unidades relativas.','silm-joule-explanation');
-  panel.append(reading,note);advanced.append(summary);
+  panel.append(interpretation,reading,note);advanced.append(summary);
   jouleControls.append(live,supply,playback,step,advanced);
   navigator.root.after(jouleControls);
   // Portal para fora da faixa rolável: WebKit recorta descendentes fixed
@@ -339,7 +344,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   scope.listen(document,'click',event=>{
    if(advanced.open&&!advanced.contains(event.target)&&!panel.contains(event.target))advanced.open=false;
   });
-  jouleUI={live,supply,playback,step,mode,boundary,map,extra,outputs,playing:false,advanced,panel};
+  jouleUI={live,supply,playback,step,mode,boundary,map,extra,outputs,playing:false,advanced,panel,interpretation};
  }
 
  const pt=p=>{const q=layout.project(D(p));return {x:q.x*100,y:q.y*100,depth:q.depth};};
@@ -494,6 +499,13 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const refCentres=list.map(u=>refLayout.project(D(g.site(u.site).cart))),refSpacing=d*refLayout.scale;
   // Calor + corrente (0.17.x): a mesma fonte de calor também na condutividade elétrica (transitória, sem gravar).
   const coupled=propertyOptions?.jouleReading?.(S);
+  const flow=coupled?SILM.electrothermal?.explainFlow(coupled.input,coupled.values):null;
+  jouleStory.hidden=!flow;
+  if(flow){
+   jouleStory.textContent=flow.short;
+   jouleStory.title=flow.message+' '+flow.boundary;
+   jouleStory.dataset.phase=flow.phase;
+  }else{delete jouleStory.dataset.phase;jouleStory.textContent='';}
   if(jouleControls){
   jouleControls.hidden=!coupled;
   // A camada flutuante pertence somente ao acoplamento ativo.
@@ -515,6 +527,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    jouleUI.extra.textContent=input.external?'Retirar calor externo':'Adicionar calor externo';
    jouleUI.extra.setAttribute('aria-pressed',String(!!input.external));
    for(const [key,output] of jouleUI.outputs)output.textContent=formatRelative(values[key]);
+   jouleUI.interpretation.textContent=flow?flow.message+' '+flow.boundary:'';
   }
  }
   if(coupled){navigator.reading.setAttribute('aria-live','polite');navigator.reading.tabIndex=0;}
@@ -544,6 +557,13 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
    thermalCtl.sync();const heatOn=thermalCtl.reading().on;thermalCtl.setPinned(heatOn?near:[]);temps=thermalCtl.temperatures();heated=active==='thermal'||[...temps.values()].some(v=>v>.01);scene.heatOn=heatOn;
    const pinned=new Set(heatOn?near.map(i=>ids[i]):[]);levels=list.map(u=>TH.level(temps.get(X.key(u.site))||0));sources=list.map(u=>pinned.has(X.key(u.site)));scene.heatTemps=temps;
   }else{scene.heatTemps=null;if(heated){levels=P.heat(refCentres,refSpacing,pr.thermal.stage);sources=P.heatSources(refCentres);}}
+  // A malha fornece potência instantânea por sítio. Destacar alguns dos
+  // maiores pontos de dissipação VISÍVEIS, independentemente do calor já
+  // acumulado; remover o destaque imediatamente ao cortar a corrente.
+  const dissipations=coupled?.values?.profiles?.dissipation;
+  const visiblePower=coupled&&flow?.activeDissipation?
+   list.map(u=>dissipations?.get(X.key(u.site))||0):[];
+  const peakPower=Math.max(0,...visiblePower);
   const lit=new Set(),surface=[];if(active==='luster'){const zs=list.map(u=>g.site(u.site).cart[2]),top=Math.max(...zs);list.forEach((u,i)=>{if(zs[i]>=top-.05){surface.push(i);if(pr.luster.light)lit.add(u.id);}});}scene.surfaceIdx=surface;
   // As fontes (região aquecida) ficam marcadas em qualquer projeção; a faixa "calor" só aparece onde elas estiverem à esquerda.
   list.forEach((u,i)=>{const node=nodes.get(u.id),k=X.key(u.site),value=scene.fieldMap?.get(k);
@@ -552,6 +572,14 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
     node.setAttribute('aria-label',node.getAttribute('aria-label')+', '+fieldNames[coupled.layer]+' relativa '+formatRelative(value));
    }else{delete node.dataset.fieldValue;node.style.removeProperty('--field-strength');}
    if(heated&&(!coupled||value!==undefined)){node.dataset.heat=String(levels[i]);if(temps)node.style.setProperty('--heat',(temps.get(X.key(u.site))||0).toFixed(3));node.setAttribute('aria-label',node.getAttribute('aria-label')+', energia térmica '+P.heatWord(levels[i])+(sources[i]?(continuous?', sob a fonte de calor':', na região aquecida'):''));}else{delete node.dataset.heat;node.style.removeProperty('--heat');}
+   if(coupled){
+    const localPower=dissipations?.get(k)||0;
+    node.setAttribute('aria-label',node.getAttribute('aria-label')+', potência Joule local relativa '+formatRelative(localPower));
+    if(peakPower>1e-10&&localPower>=.82*peakPower){
+     node.dataset.joulePeak='';
+     node.setAttribute('aria-label',node.getAttribute('aria-label')+', região de maior dissipação na vista');
+    }else delete node.dataset.joulePeak;
+   }else delete node.dataset.joulePeak;
    if(sources[i])node.dataset.heatSource='';else delete node.dataset.heatSource;
    if(lit.has(u.id))node.dataset.lit='';else delete node.dataset.lit;});
   const sourcePts=drawn.filter((_,i)=>sources[i]),xs=drawn.map(p=>p.x),xMin=Math.min(...xs),xSpan=Math.max(1e-9,Math.max(...xs)-xMin);
@@ -594,6 +622,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
     const {input,values,field}=coupled,localT=field.get(navigator.cursor.site.key);
     const parameters=[['t',values.time],['U',values.voltage],['I',values.current],['R',values.resistance],['P Joule',values.power],['T média',values.mean]];
     if(localT!==undefined)parameters.push(['T local',localT]);
+    const localPower=values.profiles.dissipation.get(navigator.cursor.site.key);
+    if(localPower!==undefined)parameters.push(['P local',localPower]);
     info=['Efeito Joule · grandezas relativas',input.mode==='voltage'?'tensão imposta':'corrente imposta',
      input.boundary==='ambient'?'terminais à temperatura ambiente':'amostra isolada',
      ...(input.external?['calor externo ligado']:[]),...parameters.map(([label,val])=>label+' '+formatRelative(val))].join(' · ');
