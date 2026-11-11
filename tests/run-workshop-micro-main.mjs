@@ -505,8 +505,15 @@ async function test(viewport){
  assert.equal(await causal.getAttribute('data-phase'),'residual','Desligar a alimentação não distinguiu calor remanescente da dissipação.');
  assert.match(await causal.textContent(),/calor residual/);
  assert.equal(await hotspots.count(),0,'A dissipação Joule visual continua ativa com corrente zero.');
- assert.ok(await page.locator('#silm-assembly-stage .silm-crystal-unit[data-heat]:not([data-heat="0"])').count()>0,
-  'O calor armazenado desapareceu imediatamente ao desligar a corrente.');
+ // A câmera está no Centro: ele pode coincidir com um terminal frio,
+ // embora a malha completa contenha calor. Não forçar brilho em um átomo
+ // localmente frio apenas para satisfazer um teste visual.
+ assert.ok(await value('T média')>0,'O motor perdeu o calor armazenado ao desligar a corrente.');
+ await openAdvanced();
+ const residualEnergy=Number((await panel.locator('[data-quantity="storedEnergy"]').textContent()).replace(',','.'));
+ assert.ok(residualEnergy>0,'O balanço não preservou o calor remanescente da malha.');
+ assert.match(await panel.textContent(),/calor já acumulado continua a se redistribuir/,
+  'Falta explicação de por que o calor pode persistir fora do centro visível.');
  await step.click();
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 1,5 · '),undefined,{timeout:10000});
  assert.match(await reading.textContent(),/corrente imposta.* · t 1,5 · U 0 · I 0 · R [\d,]+ · P Joule 0/);
