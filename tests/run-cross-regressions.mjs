@@ -358,9 +358,8 @@ async function checkModuleShortcuts(label,width){
    label+': módulo livre ficou bloqueado');
   for(const key of ['metal','investigationId','structure','properties','electrons','measurements','calculations'])
    assert.deepEqual(current[key],before[key],label+': mudar módulo alterou '+key);
-  const allowed=await page.evaluate(()=>window.BaseDemoSI?.availableViewerFamilies?.()||[]);
-  assert.ok(allowed.includes(target==='explorar'?'observar':target),
-   label+': ferramentas do módulo ficaram indisponíveis');
+  // A disponibilidade agora é verificada pelos botões científicos diretos
+  // acima. A API legada de famílias não faz parte da navegação pública.
   if(target!=='explorar'){
    assert.equal(await page.locator('#scene-undo').isDisabled(),true,
     label+': editar estrutura deve continuar proibido em '+target);
