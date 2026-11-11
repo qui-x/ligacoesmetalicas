@@ -69,7 +69,13 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    host.append(list);if(lastMission){const back=$('mission-card-'+lastMission);lastMission=null;if(back)requestAnimationFrame(()=>back.focus());}return;}
   const article=N('article');article.className='silm-reading';article.setAttribute('aria-labelledby','mission-title');
   const eyebrow=N('p','MISSÃO · '+missionState(doc,r));eyebrow.className='eyebrow';const title=N('h1',r.title);title.id='mission-title';title.tabIndex=-1;
-  const lead=N('p',r.subtitle+'.');lead.className='silm-lead';article.append(eyebrow,title,lead,N('h2','O problema'),N('p',r.description));
+  const lead=N('p',r.subtitle+'.');lead.className='silm-lead';
+  article.append(eyebrow,title,lead,N('h2','O problema'),N('p',r.study?.context||r.description));
+  if(r.study){
+   const question=N('section');question.className='silm-mission-inquiry';
+   question.append(N('h2','Pergunta de investigação'),N('p',r.study.question),N('h3','Antes de agir'),N('p',r.study.prediction),N('h3','Evidência a procurar'),N('p',r.study.evidence));
+   article.append(question);
+  }
   const rules=N('ul');for(const item of ['Módulo fixo: '+moduleName(r.module)+'.','Recursos liberados: '+toolNames(r.allowedTools)+'.',...r.prerequisites,'A missão é concluída quando o critério científico é atendido na Oficina; sua conclusão escrita vai para o Caderno.'])rules.append(N('li',item));
   article.append(N('h2','Objetivo e regras'),rules);
   const selection=N('select');selection.id='mission-metal';for(const z of r.metalSelection.atomicNumbers){const e=S.data.get(z),o=N('option',e.name+' ('+e.symbol+')');o.value=z;selection.append(o);}
@@ -89,16 +95,29 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  function missionPanel(host,c,r){
   const done=c.status==='completed',ready=session.ready();
   const eyebrow=N('p',(session.teacher()?'ATIVIDADE DO PROFESSOR · ':'')+'MISSÃO · '+(done?'Concluído':'Em andamento'));eyebrow.className='eyebrow';
-  host.append(eyebrow,N('h3',session.title()),N('h4','O problema'),N('p',r.description),N('h4','Objetivo e regras'),N('p','Módulo fixo: '+moduleName(r.module)+'. Recursos liberados: '+toolNames(session.teacher()?.tools||r.allowedTools)+'. Registre a evidência na Oficina e escreva uma conclusão.'));
+  host.append(eyebrow,N('h3',session.title()),N('h4','O problema'),N('p',r.study?.context||r.description));
+  if(r.study){
+   host.append(N('h4','Pergunta da investigação'),N('p',r.study.question));
+   const plan=N('details');plan.className='silm-mission-inquiry';
+   plan.append(N('summary','Hipótese e orientações'),N('p',r.study.prediction),N('p',r.study.evidence));
+   host.append(plan);
+  }
+  host.append(N('h4','Objetivo e regras'),N('p','Módulo fixo: '+moduleName(r.module)+'. Recursos liberados: '+toolNames(session.teacher()?.tools||r.allowedTools)+'. Registre a evidência na Oficina e escreva uma conclusão.'));
   const evidence=N('ul');evidence.className='silm-evidence';const item=N('li');item.dataset.objective=r.completionCriteria;item.dataset.met=String(done||ready);
   const state=N('strong',done||ready?'Atendida':'Pendente');item.append(N('span',evidenceLabels[r.completionCriteria]||r.guidance.criterion),state);evidence.append(item);host.append(N('h4','Evidência'),evidence);
   const hint=N('details');hint.append(N('summary','Dica para investigar'),N('p',r.guidance.hint));host.append(hint);
+  if(r.study){
+   const questions=N('details');questions.className='silm-mission-questions';
+   questions.append(N('summary','Perguntas para interpretar'));
+   const list=N('ol');for(const question of r.study.questions)list.append(N('li',question));
+   questions.append(list,N('p',r.study.limit));host.append(questions);
+  }
   // O campo de conclusão é o mesmo nó entre redesenhos: digitar nunca perde o foco nem o cursor.
   if(!conclusionField||conclusionFor!==c.id){conclusionFor=c.id;conclusionField=N('textarea');conclusionField.id='mission-conclusion';conclusionField.rows=4;conclusionField.maxLength=6000;
    conclusionField.addEventListener('input',()=>{if(!session.edit('conclusion',conclusionField.value))say('Não foi possível guardar a conclusão nesta sessão.','warning');});}
   const saved=session.report()?.report?.conclusion||'';if(document.activeElement!==conclusionField)conclusionField.value=saved;conclusionField.disabled=done;
   const label=N('label','Conclusão');label.htmlFor='mission-conclusion';const field=N('div');field.className='silm-field';field.append(label,conclusionField);host.append(field);
-  const feedback=N('p',done?'Concluído. A conclusão foi registrada no Caderno.':ready?'Critério atendido. Revise sua conclusão e conclua a missão.':'Ainda falta a evidência. Use os recursos liberados na Oficina.');feedback.id='mission-feedback';feedback.setAttribute('role','status');host.append(feedback);
+  const feedback=N('p',done?'Concluído. A conclusão foi registrada no Caderno.':ready?'Critério científico atendido. Responda à pergunta com evidências na conclusão antes de encerrar.':'Ainda falta a evidência científica. Use os recursos liberados na Oficina.');feedback.id='mission-feedback';feedback.setAttribute('role','status');host.append(feedback);
   const actions=N('div');actions.className='silm-actions';
   if(done)actions.append(N('strong','Concluído'));else{const b=button('Concluir missão',complete,'mission-complete');b.classList.replace('outline','primary');b.disabled=!ready;actions.append(b);}
   actions.append(button('Encerrar missão',async()=>{if(await B.confirmDialog({title:'Encerrar atividade?',description:'A investigação livre será restaurada. Uma tentativa ainda não concluída ficará disponível para retomada.',confirmText:'Encerrar'}))close();},'mission-close'));
