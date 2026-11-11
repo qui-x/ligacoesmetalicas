@@ -49,6 +49,7 @@ jobs:
           node --check integracao/module-shortcuts.js
           node --check integracao/dock-focus.js
           node --check tests/run-lens-integration.mjs
+          node --check tests/run-lens-gestures.mjs
           node --check sw.js
           grep -q 'domain/silm/lens-controller.js' sw.js
           grep -q 'domain/silm/lens.css' sw.js
@@ -71,6 +72,8 @@ jobs:
         run: node tests/run-lens-integration.mjs
       - name: Homologar entrada por Tabela e catálogo de objetos
         run: node tests/run-object-entry-catalog.mjs
+      - name: Testar duplo clique e Ctrl+clique na lupa
+        run: node tests/run-lens-gestures.mjs
       - name: Guardar evidências visuais
         if: always()
         uses: actions/upload-artifact@v4
