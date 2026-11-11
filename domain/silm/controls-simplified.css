@@ -219,3 +219,10 @@
   transition:none!important
  }
 }
+
+/* O Centro também disponibiliza a translação cristalográfica para
+   instrumentos e acessibilidade, mas somente depois de abrir Mais navegação. */
+#si-stage .silm-center-navigation .silm-lattice-more[open] .silm-lattice-more-controls button[aria-label^="Avançar uma célula"],
+#si-stage .silm-center-navigation .silm-lattice-more[open] .silm-lattice-more-controls button[aria-label^="Recuar uma célula"]{
+ display:inline-flex!important;align-items:center;justify-content:center
+}
