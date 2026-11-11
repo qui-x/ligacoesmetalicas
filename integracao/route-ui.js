@@ -32,7 +32,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  /* Roteiro Experimental como no SIAB: "Montar na oficina" prepara a oficina LIVRE com o metal, a estrutura inicial e o
     módulo do roteiro e guarda qual roteiro foi montado (título e proposta do relatório). Não há trava nem "concluir": o
     estudante usa todos os painéis e termina no relatório (Dados → Relatório). Em atividade restrita, não monta. */
- async function mountRoute(r,z,identity){
+ async function mountRoute(r,z,identity,hypothesis=''){
   if(session.open()){say('Montagem definida pela atividade em andamento. Encerre a atividade para montar outro roteiro.','warning');return false;}
   // Mesma confirmação de "Iniciar outra investigação" (e das Montagens prontas) quando já há uma investigação na oficina.
   if(!await selectMetal(Number(z)))return false;
@@ -40,7 +40,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   for(let i=0;ok&&i<r.initialState.units;i++)ok=model.addUnit().ok;
   if(ok&&r.initialState.mode==='crystalline')ok=model.organize().ok;
   if(!ok||!model.setModule(r.module)){say('Não foi possível preparar esta investigação.','warning');return false;}
-  storage.set('route.experiment',{route:r.id,version:r.version,investigation:model.state.investigation.id,createdAt:new Date().toISOString()});
+  storage.set('route.experiment',{route:r.id,version:r.version,investigation:model.state.investigation.id,createdAt:new Date().toISOString(),hypothesis:String(hypothesis||'').trim().slice(0,2000)});
   for(const [k,v] of Object.entries(identity||{}))if(v)unified.editReport(k,v);
   onModule(r.module);location.hash='#/ambiente';sync();say('Roteiro montado na oficina: '+sentence(r.title)+' Quando terminar, abra Dados → Relatório.','success');return true;
  }
@@ -188,11 +188,53 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   if(key===routeKey&&host.childElementCount)return;const previous=routeKey.split('|')[0];routeKey=key;host.replaceChildren();head.hidden=!!r;
   if(id&&!r)say('Roteiro não encontrado. Escolha um roteiro da lista.','warning');
   if(!r){
-   const list=N('div');list.className='silm-content-list';
-   for(const item of S.routes.registry){const row=N('a');row.className='silm-content-row';row.href=url(item.id);row.id='route-card-'+item.id;
-    const text=N('span');text.append(N('strong',item.title),N('small',item.subtitle+'.'));const state=routeState(doc,item);
-    const status=N('span',moduleName(item.module)+(state?' · '+state:''));status.className='silm-row-status silm-row-next';status.insertAdjacentHTML('beforeend','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>');row.append(text,status);list.append(row);}
-   host.append(list);if(lastRoute){const back=$('route-card-'+lastRoute);lastRoute=null;if(back)requestAnimationFrame(()=>back.focus());}return;}
+   const categories={fundamentos:'Fundamentos',familias:'Famílias de metais',estruturas:'Estruturas cristalinas',propriedades:'Propriedades metálicas',medicoes:'Medir',calculos:'Calcular',aplicacoes:'Aplicações e escalas'};
+   const controls=N('div');controls.className='silm-learning-filters';
+   const groupField=N('div');groupField.className='silm-learning-field';
+   const groupLabel=N('label','Assunto');groupLabel.htmlFor='silm-routes-filter';
+   const group=N('select');group.id='silm-routes-filter';
+   for(const [value,label] of [['all','Todos os assuntos'],...Object.entries(categories)]){const opt=N('option',label);opt.value=value;group.append(opt);}
+   groupField.append(groupLabel,group);
+   const metalField=N('div');metalField.className='silm-learning-field';
+   const metalLabel=N('label','Metal disponível');metalLabel.htmlFor='silm-routes-metal-filter';
+   const metal=N('select');metal.id='silm-routes-metal-filter';
+   const all=N('option','Todos os metais');all.value='all';metal.append(all);
+   for(const element of S.data.elements.filter(e=>e.silmEligibility.status==='available')){const opt=N('option',element.name+' ('+element.symbol+')');opt.value=String(element.atomicNumber);metal.append(opt);}
+   metalField.append(metalLabel,metal);
+   const searchField=N('div');searchField.className='silm-learning-field';
+   const searchLabel=N('label','Pesquisar');searchLabel.htmlFor='silm-routes-search';
+   const search=N('input');search.type='search';search.id='silm-routes-search';search.placeholder='Pesquisar roteiro ou metal';search.setAttribute('aria-label','Pesquisar roteiros experimentais');
+   searchField.append(searchLabel,search);
+   controls.append(groupField,metalField,searchField);
+   const count=N('p');count.className='silm-learning-count';count.setAttribute('role','status');count.setAttribute('aria-live','polite');
+   host.append(controls,count);
+   const list=N('div');list.className='silm-content-list silm-learning-catalog';
+   const byGroup=new Map(),headings=new Map(),rows=[];
+   const normalize=value=>String(value).normalize('NFD').replace(/\p{M}/gu,'').toLowerCase();
+   for(const item of S.routes.registry){const type=item.category||'fundamentos';if(!byGroup.has(type))byGroup.set(type,[]);byGroup.get(type).push(item);}
+   for(const [category,items] of byGroup){
+    const heading=N('h2',categories[category]||category);heading.className='silm-catalog-group-heading';headings.set(category,heading);list.append(heading);
+    for(const item of items){
+     const row=N('a');row.className='silm-content-row';row.href=url(item.id);row.id='route-card-'+item.id;
+     const text=N('span');const sub=item.subtitle+' · '+moduleName(item.module)+' · '+item.metalSelection.atomicNumbers.length+' '+(item.metalSelection.atomicNumbers.length===1?'metal':'metais');
+     text.append(N('strong',item.title),N('small',sub));
+     const state=routeState(doc,item);const status=N('span',state||'Investigar');status.className='silm-row-status silm-row-next';status.insertAdjacentHTML('beforeend','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>');
+     row.append(text,status);list.append(row);
+     const names=item.metalSelection.atomicNumbers.map(z=>{const e=S.data.get(z);return e.name+' '+e.symbol;}).join(' ');
+     rows.push({row,category,metals:item.metalSelection.atomicNumbers,haystack:normalize(item.title+' '+item.subtitle+' '+item.description+' '+names)});
+    }
+   }
+   const apply=()=>{
+    const q=normalize(search.value.trim()),counts=new Map();
+    for(const row of rows){const visible=(group.value==='all'||group.value===row.category)&&(metal.value==='all'||row.metals.includes(Number(metal.value)))&&(!q||row.haystack.includes(q));row.row.hidden=!visible;if(visible)counts.set(row.category,(counts.get(row.category)||0)+1);}
+    for(const [category,heading] of headings)heading.hidden=!counts.get(category);
+    count.textContent=Array.from(counts.values()).reduce((sum,value)=>sum+value,0)+' de '+rows.length+' roteiros';
+   };
+   group.addEventListener('change',apply);metal.addEventListener('change',apply);search.addEventListener('input',apply);
+   host.append(list);apply();
+   if(lastRoute){const back=$('route-card-'+lastRoute);lastRoute=null;if(back&&!back.hidden)requestAnimationFrame(()=>back.focus());}
+   return;
+  }
   const article=N('article');article.className='silm-reading';article.setAttribute('aria-labelledby','route-title');
   const title=N('h1',r.title);title.id='route-title';title.tabIndex=-1;const lead=N('p',r.subtitle+'.');lead.className='silm-lead';const tag=N('p',moduleName(r.module)+(routeState(doc,r)?' · '+routeState(doc,r):''));tag.className='eyebrow';
   article.append(title,lead,tag);
