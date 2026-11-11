@@ -82,3 +82,19 @@ test('cobre: desligar alimentação em corrente imposta mantém avanço e resfri
  assert.ok(cold.mean<hot.mean,'a amostra deveria resfriar com terminais ao ambiente');
  close(cold.storedEnergy,cold.jouleEnergy+cold.externalEnergy-cold.removedEnergy,1e-7);
 });
+
+test('cobre: alternar de tensão para corrente e desligar a fonte conserva relógio e balanço',()=>{
+ const ref=S.readyAssemblies.list().find(x=>x.element.symbol==='Cu');
+ const run=ET.createRun(ET.buildNetwork(S.crystal.geometry(ref.element)));
+ const voltage={mode:'voltage',level:.6,boundary:'ambient',external:false};
+ const current={...voltage,mode:'current'};
+ assert.ok(run.advance(voltage,.5),'aquecimento inicial sob tensão recusado');
+ assert.ok(run.advance(current,.5),'mudança para corrente imposta recusada');
+ const off={...current,level:0},before=run.observe(off);
+ close(before.time,1);
+ assert.ok(run.advance(off,.5),'a malha recusou resfriar sem alimentação após mudar de modo');
+ const after=run.observe(off);
+ close(after.time,1.5);
+ assert.ok(after.mean<before.mean,'a amostra aquecida precisa resfriar');
+ close(after.storedEnergy,after.jouleEnergy+after.externalEnergy-after.removedEnergy,1e-7);
+});
