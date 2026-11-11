@@ -449,8 +449,10 @@ async function test(viewport){
  const controls=page.locator('#silm-scene-actionbar .silm-joule-controls');
  const playback=controls.locator('.silm-joule-play');
  const advanced=controls.locator('details.silm-joule-advanced');
+ const panel=page.locator('#silm-joule-popover');
  const openAdvanced=async()=>{
   if(await advanced.getAttribute('open')===null)await advanced.locator('summary').click();
+  await panel.waitFor({state:'visible'});
  };
  const reading=page.locator('.silm-lattice-status span');
  await step.waitFor({state:'visible'});
@@ -462,7 +464,7 @@ async function test(viewport){
  // valores, balanço e o avanço único sem corridas com o timer.
  if(await playback.getAttribute('aria-pressed')==='true')await playback.click();
  await openAdvanced();
- await advanced.getByRole('button',{name:'Reiniciar evolução'}).click();
+ await panel.getByRole('button',{name:'Reiniciar evolução'}).click();
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 0 · '));
  const supply=controls.locator('.silm-joule-supply');
  assert.equal(await supply.getAttribute('aria-pressed'),'false','Reiniciar deve desligar alimentação');
@@ -478,10 +480,10 @@ async function test(viewport){
  assert.equal(await value('t'),timeBeforeNavigation,'Navegar não deve avançar o ensaio.');
  await page.getByRole('button',{name:'Recuar uma célula no eixo a'}).click();
  await openAdvanced();
- const jouleMap=advanced.getByLabel('Mapa no metal');
+ const jouleMap=panel.getByLabel('Mapa no metal');
  await jouleMap.selectOption('potential');
  assert.match(await reading.textContent(),/Mapa: Potencial elétrico/);
- await advanced.getByLabel('Fonte elétrica').selectOption('current');
+ await panel.getByLabel('Fonte elétrica').selectOption('current');
  const currentBefore=await value('I');
  const electronFlow=()=>page.locator('.silm-electron-canvas').evaluate(n=>n.silmElectrons.snapshot().currentFactor);
  const flowBefore=await electronFlow();
@@ -498,17 +500,17 @@ async function test(viewport){
  assert.ok(await value('T média')<warm,'Desligar a fonte com terminais ao ambiente precisa permitir resfriamento.');
  assert.equal(await electronFlow(),0);
  await openAdvanced();
- const quantity=async key=>Number((await advanced.locator('[data-quantity="'+key+'"]').textContent()).replace(',','.'));
+ const quantity=async key=>Number((await panel.locator('[data-quantity="'+key+'"]').textContent()).replace(',','.'));
  assert.equal(await quantity('power'),0);
  const balance=await quantity('jouleEnergy')+await quantity('externalEnergy')-await quantity('removedEnergy')-await quantity('storedEnergy');
  assert.ok(Math.abs(balance)<.00005,'Leituras de energia não fecham o balanço.');
- assert.match(await advanced.textContent(),/energia elétrica \+ calor externo = energia armazenada \+ energia removida/i);
- await advanced.getByRole('button',{name:'Reiniciar evolução'}).click();
+ assert.match(await panel.textContent(),/energia elétrica \+ calor externo = energia armazenada \+ energia removida/i);
+ await panel.getByRole('button',{name:'Reiniciar evolução'}).click();
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 0 · '));
  assert.equal(await value('T média'),0);
  assert.equal(await value('I'),0);
  assert.match(await reading.textContent(),/corrente imposta/,'Reiniciar mudou a condição elétrica.');
- await advanced.getByRole('button',{name:'Voltar à elétrica simples'}).click();
+ await panel.getByRole('button',{name:'Voltar à elétrica simples'}).click();
  assert.equal(await step.isVisible(),false);
  assert.equal(await page.locator('.silm-crystal').getAttribute('data-field-map'),null,
   'Encerrar o acoplamento deixou o mapa Joule na cena.');
