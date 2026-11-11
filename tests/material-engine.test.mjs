@@ -20,9 +20,14 @@ test('o motor geral atende todos os 65 metais, sem copiar o perfil de Cu',()=>{
    assert.equal(cap.property,property);
    assert.ok(['qualitative','reference-data',undefined].includes(cap.mode));
    if(el.atomicNumber!==29&&property==='luster'){
-    assert.equal(cap.mode,'qualitative',el.symbol);
-    assert.equal(ENGINE.optical(el.atomicNumber,550).ok,false,el.symbol);
-    assert.equal(ENGINE.optical(el.atomicNumber,550).reasonCode,'OPTICAL_DATA_NOT_HOMOLOGATED');
+    // Alguns dos 65 metais são investigáveis na Oficina, mas não habilitados
+    // para esta experiência específica (fase, estrutura etc.). Não forçar
+    // disponibilidade nem dados do Cu sobre um metal inelegível.
+    assert.notEqual(cap.mode,'reference-data',el.symbol);
+    const result=ENGINE.optical(el.atomicNumber,550);
+    assert.equal(result.ok,false,el.symbol);
+    assert.equal(result.reasonCode,
+     cap.ok?'OPTICAL_DATA_NOT_HOMOLOGATED':cap.reasonCode,el.symbol);
    }
   }
  }
