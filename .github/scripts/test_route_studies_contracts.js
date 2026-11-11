@@ -17,7 +17,7 @@ assert.equal(S.routes.validate(scripts).ok,true);
 const ids=new Set(),eligible=S.data.elements.filter(e=>e.silmEligibility.status==='available');
 const covered=new Set(scripts.flatMap(x=>x.metalSelection.atomicNumbers));
 assert.equal(eligible.length,65);
-assert.deepEqual(eligible.filter(e=>!covered.has(e.atomicNumber)).map(e=>e.symbol),[]);
+assert.deepEqual(Array.from(eligible.filter(e=>!covered.has(e.atomicNumber)),e=>e.symbol),[]);
 for(const route of scripts){
  assert.ok(!ids.has(route.id),'Roteiro duplicado: '+route.id);ids.add(route.id);
  assert.equal(route.version,1,'Não invalidar versões históricas');
