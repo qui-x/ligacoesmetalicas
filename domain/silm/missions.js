@@ -92,6 +92,141 @@
   if(!study||!study.context||!study.question||!study.prediction||!study.evidence||!study.limit||!study.questions?.length||!study.teacher)throw Error('Sequência didática ausente: '+mission.id);
   mission.study=study;
  }
+
+ /* Cada evidência vem de um sinal observável do motor, não de clique arbitrário.
+    'criterion' e 'current' devem continuar válidos no estado atual;
+    'observed' guarda a visita/ação documentada na tentativa. */
+ const EVIDENCE_OBJECTIVES={
+  "montagem-ordem": [
+    [
+      "crystalline",
+      "Organizar uma estrutura cristalina válida",
+      "criterion"
+    ],
+    [
+      "cell",
+      "Observar a célula unitária",
+      "observed"
+    ],
+    [
+      "lattice",
+      "Observar a rede além da célula",
+      "observed"
+    ]
+  ],
+  "vizinhos-metal": [
+    [
+      "cell",
+      "Identificar a célula de referência",
+      "observed"
+    ],
+    [
+      "lattice",
+      "Examinar a rede",
+      "observed"
+    ],
+    [
+      "neighbors",
+      "Selecionar um centro e destacar sua vizinhança",
+      "criterion"
+    ]
+  ],
+  "eletrons-movimento": [
+    [
+      "electrons-visible",
+      "Mostrar a distribuição de elétrons deslocalizados",
+      "observed"
+    ],
+    [
+      "electrons-hidden",
+      "Ocultar a camada depois de observá-la",
+      "observed"
+    ],
+    [
+      "electrons-motion",
+      "Voltar a mostrar a distribuição e observar movimento ou a versão estática acessível",
+      "criterion"
+    ]
+  ],
+  "campo-metal": [
+    [
+      "electrons-visible",
+      "Identificar a camada eletrônica coletiva",
+      "observed"
+    ],
+    [
+      "property-field",
+      "Ativar a propriedade elétrica e aplicar o campo",
+      "criterion"
+    ]
+  ],
+  "medida-rede": [
+    [
+      "cell",
+      "Examinar a célula de referência",
+      "observed"
+    ],
+    [
+      "measure-a",
+      "Registrar uma medição científica válida de a",
+      "criterion"
+    ]
+  ],
+  "espaco-ocupado": [
+    [
+      "cell-volume",
+      "Calcular o volume da célula",
+      "current"
+    ],
+    [
+      "radius",
+      "Registrar o raio geométrico do modelo",
+      "current"
+    ],
+    [
+      "packing-factor",
+      "Calcular o fator de empacotamento",
+      "criterion"
+    ]
+  ],
+  "objeto-ao-centro": [
+    [
+      "scale-1",
+      "Investigar o objeto e o componente metálico",
+      "observed"
+    ],
+    [
+      "scale-2",
+      "Observar os grãos da representação didática",
+      "observed"
+    ],
+    [
+      "scale-3",
+      "Investigar a rede cristalina",
+      "observed"
+    ],
+    [
+      "scale-4",
+      "Chegar ao centro metálico",
+      "observed"
+    ],
+    [
+      "neighbors",
+      "Destacar a vizinhança do centro escolhido",
+      "criterion"
+    ]
+  ]
+};
+ list.push({
+  ...make('objeto-ao-centro','Do Objeto ao Centro','Quatro escalas de investigação','Objeto, grãos, rede e centro','explorar',['structure','unitCell','neighbors'],'free','neighbors','Percorra as quatro escalas, selecione um centro e destaque seus vizinhos.','estrutura-metais',[29,60]),
+  version:1,study:{"context":"Um condutor de cobre e um ímã de liga Nd–Fe–B exemplificam funções de materiais muito diferentes. A imagem do objeto não revela sozinha a estrutura interna nem a composição completa.","question":"O que aprendemos ao atravessar as representações Objeto, Grãos, Rede e Centro sem supor uma ampliação experimental contínua?","prediction":"Antes de navegar, preveja o que cada escala pode explicar e o que exigiria uma medida real da amostra.","evidence":"Observe as quatro escalas do material escolhido e destaque a vizinhança de um centro na rede de referência.","questions":["Por que o cobre de um enrolamento não equivale ao motor inteiro?","Por que o ímã Nd–Fe–B não representa neodímio puro? O SILM já calcula magnetismo ou só mostra estruturas de referência?"],"limit":"Grãos esquemáticos e centros da rede descrevem modelos didáticos; não são micrografia e difração da mesma amostra. Magnetismo de Nd–Fe–B não é calculado nesta versão.","teacher":"Comparar Cobre (Cu) e Neodímio (Nd) em duas tentativas; não afirmar que a cena do Nd representa a fase Nd₂Fe₁₄B nem confundir a liga com metal puro."},initialState:{mode:'free',units:4,workshopScale:1},
+  comparison:{metals:[29,60],note:'Investigações separadas. Cu puro não é o motor; Nd puro não é a liga Nd–Fe–B.'}
+ });
+ for(const mission of list){
+  const entries=EVIDENCE_OBJECTIVES[mission.id];
+  if(!entries?.length||!entries.some(x=>x[2]==='criterion')||new Set(entries.map(x=>x[0])).size!==entries.length)throw Error('Evidências inválidas: '+mission.id);
+  mission.evidenceObjectives=entries.map(([id,label,mode])=>({id,label,mode}));
+ }
  const checked=S.routes.validate(list);if(!checked.ok)throw Error('Missões inválidas: '+checked.reason);
  const freeze=x=>{if(x&&typeof x==='object'){Object.values(x).forEach(freeze);Object.freeze(x);}return x;};
  S.missions=Object.freeze({registry:freeze(list),get:id=>list.find(m=>m.id===id),validate:items=>S.routes.validate(items)});
