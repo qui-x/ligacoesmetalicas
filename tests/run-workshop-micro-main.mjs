@@ -421,6 +421,10 @@ async function test(viewport){
  await units.first().waitFor({state:'visible'});
  const sites=()=>units.evaluateAll(nodes=>nodes.map(n=>n.dataset.site));
  const original=await sites();
+ // Translação por eixos é ação avançada na escala Centro.
+ const details=page.locator('#silm-scene-actionbar .silm-lattice-more');
+ await details.locator('summary').click();
+ assert.equal(await details.getAttribute('open'),'','Navegação acessível não abriu.');
  for(const [axis,letter] of ['a','b','c'].entries()){
   await page.getByRole('button',{name:'Avançar uma célula no eixo '+letter}).click();
   const expected=original.map(key=>{
@@ -433,7 +437,15 @@ async function test(viewport){
  }
  assert.match(await status.textContent(),/Célula \[0, 0, 0\]/);
  assert.equal(await page.locator('#silm-scene-actionbar .silm-lattice-nav').count(),1);
- await page.getByLabel('Aplicar estímulo na rede').selectOption('joule');
+ // O estímulo passa ao menu Ver; as condições/leituras do ensaio
+ // permanecem na ferramenta científica existente.
+ await page.locator('[data-open-dock="ver"]').click();
+ await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===false);
+ const startJoule=page.locator('#silm-direct-actionbar [data-action="joule"]');
+ await startJoule.waitFor({state:'visible'});
+ assert.equal(await startJoule.isEnabled(),true,'Joule indisponível no menu Ver');
+ await startJoule.click();
+ await page.locator('[data-open-dock="ver"]').click();
  const step=page.getByRole('button',{name:'Avançar meio intervalo no efeito Joule'}),conditions=page.getByLabel('Condições do efeito Joule');
  const reading=page.locator('.silm-lattice-status span');
  await step.locator('svg.silm-action-icon').waitFor({state:'visible'});
