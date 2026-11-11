@@ -337,6 +337,9 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   if(!record){const empty=N('div');empty.className='silm-report-empty';empty.append(N('h1','Relatório'),N('p','Inicie uma investigação na Oficina ou monte um roteiro experimental para abrir o relatório.'));host.append(empty);return;}
   const exp=!archived&&record.activityContext.type==='free'?unified.experiment():null;
   const r=registry.get(record.activityContext.id)||(exp?{...exp,id:'laboratorio',type:'free',module:record.checkpoint.module.active}:null)||{id:'laboratorio',title:archived?.title||'Investigação livre',subtitle:'Registros da Oficina',module:archived?.module||record.checkpoint.module.active,sources:[]},s=record.checkpoint,e=S.data.get(s.metal.atomicNumber),free=record.activityContext.type==='free',editable=!archived&&(free||session.context()?.id===r.id);
+  // A hipótese pertence à investigação livre montada, nunca a uma tentativa anterior.
+  const experimentRecord=free&&exp?storage.get('route.experiment',null):null;
+  const initialHypothesis=experimentRecord?.route===exp?.id&&experimentRecord?.investigation===s.investigation?.id&&typeof experimentRecord?.hypothesis==='string'?experimentRecord.hypothesis.slice(0,2000):'';
   // "Atividade de análise" é preparação do Professor: só fora de uma atividade e nunca num relatório arquivado (como no SIAB).
   const teacher=!archived&&!session.open(),key=archived?'arquivo:'+archiveKey:free?'livre:'+(s.investigation?.id||'sem-investigacao'):'atividade:'+r.id;
   const config=reportConfig(key);if(config.mode==='analise'&&!teacher)config.mode='completo';
@@ -384,6 +387,12 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   else if(r.description){proposal.append(N('p',r.description));if(r.objectives?.length){const ul=N('ul');for(const o of r.objectives)ul.append(N('li',o));proposal.append(ul);}}
   else proposal.append(N('p','Investigação livre: descreva a questão investigada na resposta à investigação.'));
   if(mode==='analise'&&config.question)proposal.append(N('h3','Questão para investigar'),N('p',config.question));
+  else if(r.study?.question)proposal.append(N('h3','Pergunta central do roteiro'),N('p',r.study.question));
+  if(initialHypothesis)proposal.append(N('h3','Hipótese inicial registrada'),N('p',initialHypothesis));
+  if(r.study?.observe?.length){
+   const obs=N('ul');for(const item of r.study.observe)obs.append(N('li',item));
+   proposal.append(N('h3','Plano de observações'),obs);
+  }
   const note=N('p','Dados do modelo SILM: dado tabelado, medida do modelo e cálculo do SILM aparecem identificados separadamente.');note.className='silm-report-note';proposal.append(note);
   // 3. Condições de referência: metal e estrutura como dados tabelados, montagem como representação didática.
   if(inc('conditions')){const sec=section(3,'Condições de referência','condicoes'),structure=S.data.structure(e),crystalline=s.structure?.mode==='crystalline';
@@ -408,9 +417,16 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    else if(mode==='completo'){const l=N('label',label);l.className='sr-only';l.htmlFor='report-'+k;const ta=N('textarea');ta.id=l.htmlFor;ta.value=record.report[k]||'';ta.readOnly=!editable;ta.maxLength=10000;const print=N('div',ta.value);print.className='silm-print-value';ta.addEventListener('input',()=>{if(free?unified.editReport(k,ta.value):session.edit(k,ta.value))print.textContent=ta.value;});box.append(l,ta,print);}
    else box.append(N('p',record.report[k]||'—'));sec.append(box);};
   field(section(7,'Observações','observacoes'),'observations','Observações');
-  const analysis=section(8,'Análise / interpretação','analise');field(analysis,'analysis','Análise');field(analysis,'interpretation','Interpretação');
+  const analysis=section(8,'Análise / interpretação','analise');
+  if(r.study?.interpretation?.length){
+   analysis.append(N('h3','Questões para interpretar'));
+   const questions=N('ol');for(const question of r.study.interpretation)questions.append(N('li',question));analysis.append(questions);
+  }
+  field(analysis,'analysis','Análise');field(analysis,'interpretation','Interpretação');
   field(section(9,'Resposta à investigação','resposta'),'answer','Resposta');
-  field(section(10,'Conclusão','conclusao'),'conclusion','Conclusão');
+  const conclusion=section(10,'Conclusão','conclusao');
+  if(r.study?.limits){const limit=N('p','Limite científico: '+r.study.limits);limit.className='silm-report-note';conclusion.append(limit);}
+  field(conclusion,'conclusion','Conclusão');
   // Fontes e nota sobre o modelo.
   const sources=new Set([...S.data.sourceIds(e),...(r.sources||[]),...s.calculations.flatMap(c=>c.provenance.references)]),sourceSec=section(0,'Fontes','fontes'),list=N('ul');
   for(const sid of sources){const src=S.data.source(sid);if(src)list.append(N('li',src.institution+' — '+src.title+(src.url?' · '+src.url:'')));}sourceSec.append(list);
