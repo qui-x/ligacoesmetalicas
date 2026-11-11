@@ -222,8 +222,9 @@ try{
   camera:document.querySelector('.silm-camera-advanced-summary')?.getBoundingClientRect().width,
   nav:document.querySelector('.silm-center-navigation summary')?.getBoundingClientRect().height}));
  assert.ok(zoomedFont.pageWidth<=397,'Texto ampliado gerou overflow global '+JSON.stringify(zoomedFont));
- assert.ok(zoomedFont.camera>=43.5&&zoomedFont.nav>=43.5,'Alvos comprimidos em 150%');
  evidence.push({name:'texto-150-390',...zoomedFont});
+ assert.ok(zoomedFont.camera>=43.5&&zoomedFont.nav>=43.5,
+  'Alvos comprimidos em 150% '+JSON.stringify(zoomedFont));
  assert.deepEqual(errors,[],errors.join(' | '));
  await context.close();
 }catch(e){evidence.push({error:String(e),stack:e.stack});throw e;}
