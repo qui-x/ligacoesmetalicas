@@ -269,7 +269,10 @@ async function test(viewport){
   return {items,barHeight:rect.height,barBottom:rect.bottom,scrollable:bar.scrollWidth>bar.clientWidth};
  });
  let toolbarState=await sampleSceneButtons();
- assert.ok(toolbarState.items.length>=6,'Faltam botões da câmera na faixa instrumental.');
+ assert.ok(toolbarState.items.length>=1&&toolbarState.items.length<=4,
+  'A câmera precisa manter Enquadrar e recolher os controles redundantes: '+JSON.stringify(toolbarState.items));
+ assert.equal(await page.locator('#silm-view-controls .silm-camera-advanced').getAttribute('open'),null,
+  'A câmera avançada deve iniciar recolhida.');
  assert.ok(toolbarState.items.every(b=>Math.abs(b.width-44)<1&&Math.abs(b.height-44)<1),'Botões instrumentais ficaram menores ou maiores do que 44 px.');
  assert.ok(toolbarState.items.every(b=>Math.abs(b.cy-toolbarState.items[0].cy)<2),'Ícones de câmera perderam o alinhamento vertical.');
  assert.ok(Math.abs(toolbarState.barHeight-60)<2,'A faixa científica não conservou uma altura fixa.');
@@ -279,15 +282,20 @@ async function test(viewport){
   const toolbarNav=page.locator('#silm-scene-actionbar');
   await toolbarNav.waitFor({state:'visible'});
   await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar')?.dataset.toolbarNavigation==='ready');
-  await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar')?.dataset.toolbarOverflow==='true');
-  const nextTool=toolbarNav.getByRole('button',{name:'Mostrar próximas ferramentas'});
-  await nextTool.waitFor({state:'visible'});
-  await nextTool.click();
-  await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar').scrollLeft>10);
-  const prevTool=toolbarNav.getByRole('button',{name:'Mostrar ferramentas anteriores'});
-  await prevTool.waitFor({state:'visible'});
-  await prevTool.click();
-  await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar').scrollLeft<10);
+  const overflow=await toolbarNav.evaluate(n=>n.scrollWidth>n.clientWidth+2);
+  if(overflow){
+   const nextTool=toolbarNav.getByRole('button',{name:'Mostrar próximas ferramentas'});
+   await nextTool.waitFor({state:'visible'});
+   await nextTool.click();
+   await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar').scrollLeft>10);
+   const prevTool=toolbarNav.getByRole('button',{name:'Mostrar ferramentas anteriores'});
+   await prevTool.waitFor({state:'visible'});
+   await prevTool.click();
+   await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar').scrollLeft<10);
+  }else{
+   assert.equal(await toolbarNav.locator('#silm-view-controls [id$="-camera-fit"]').isVisible(),true,
+    'Sem rolagem, Enquadrar precisa continuar visível e acessível.');
+  }
   const barBox=await toolbarNav.boundingBox();
   assert.ok(barBox.height<=62,'A barra instrumental aumentou de altura no celular.');
   await page.setViewportSize(previousSize);
@@ -309,7 +317,7 @@ async function test(viewport){
   assert.equal(await expand.getAttribute('aria-pressed'),'false','O botão não voltou ao estado recolhido.');
   assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'A expansão alterou dados científicos.');
  }else{
-  assert.ok(toolbarState.scrollable,'Faixa móvel precisa rolar, nunca comprimir controles instrumentais.');
+  assert.ok(toolbarState.items.length>=1,'Ações essenciais da câmera ficaram indisponíveis.');
  }
 
  await page.locator('[data-scene-view="overview"]').click();
