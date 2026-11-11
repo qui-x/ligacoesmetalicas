@@ -1,0 +1,82 @@
+name: SILM — Paridade didática de Missões e Temas com SIAB
+
+on:
+  pull_request:
+    paths:
+      - 'domain/silm/missions.js'
+      - 'domain/silm/themes.js'
+      - 'domain/silm/route-session.js'
+      - 'integracao/route-ui.js'
+      - 'integracao/unified-ui.js'
+      - 'integracao/integration.css'
+      - '.github/scripts/test_learning_siab_parity.py'
+      - '.github/workflows/silm-learning-siab-parity.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'domain/silm/missions.js'
+      - 'domain/silm/themes.js'
+      - 'domain/silm/route-session.js'
+      - 'integracao/route-ui.js'
+      - 'integracao/unified-ui.js'
+      - 'integracao/integration.css'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  investigar:
+    name: Missões e temas / ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar Playwright
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install playwright
+          python -m playwright install --with-deps ${{ matrix.browser }}
+      - name: Servir SILM em localhost
+        run: |
+          python -m http.server 8765 --bind 127.0.0.1 >/tmp/silm-learning-http.log 2>&1 &
+          echo $! > /tmp/silm-learning-http.pid
+          python - <<'PY'
+          import time, urllib.request
+          for attempt in range(60):
+              try:
+                  urllib.request.urlopen('http://127.0.0.1:8765/', timeout=1)
+                  break
+              except OSError:
+                  time.sleep(.3)
+          else:
+              raise SystemExit('Servidor não iniciou')
+          PY
+      - name: Verificar 7 temas, 6 missões, motor e responsividade
+        run: python .github/scripts/test_learning_siab_parity.py --browser ${{ matrix.browser }}
+      - name: Preservar capturas de temas e missões
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-temas-missoes-${{ matrix.browser }}
+          path: artifacts/temas-aprofundados-*.png
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Preservar capturas das missões
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-missoes-${{ matrix.browser }}
+          path: artifacts/missao-aprofundada-*.png
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Log de servidor em falha
+        if: failure()
+        run: tail -n 100 /tmp/silm-learning-http.log || true
