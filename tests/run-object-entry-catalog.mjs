@@ -34,7 +34,7 @@ try{
    await page.locator('#silm-object-entry .silm-family-element[data-z="'+z+'"]').click();
   }else await page.locator('#silm-object-entry .periodic-element[data-z="'+z+'"]').click();
  };
- for(const [label,width,height] of [['mobile-320',320,568],['mobile-390',390,844],['desktop',1366,768]]){
+ for(const [label,width,height] of [['mobile-320',320,568],['mobile-390',390,844],['tablet-1024',1024,768],['short-desktop',1440,650],['desktop',1366,768],['desktop-wide',1649,927]]){
   await page.setViewportSize({width,height});
   await page.waitForTimeout(90);
   const dims=await page.locator('#silm-object-entry').evaluate(n=>{
@@ -46,7 +46,7 @@ try{
   });
   assert.ok(dims.left>=-4&&dims.right<=width+4,label+': a Tabela extrapola a janela');
   assert.ok(dims.pageWidth<=width+6,label+': rolagem horizontal global');
-  if(width<=900){
+  if(width<=1100||height<=700){
    const family=page.locator('#silm-object-entry .silm-periodic-family');
    assert.ok(await family.isVisible(),label+': falta modo por famílias');
    const scroller=page.locator('#silm-object-entry .periodic-scroll');
@@ -93,9 +93,47 @@ try{
    assert.ok(panorama.elements.every(e=>e.inside&&e.width>10&&e.height>12),
     label+': alguns períodos/séries não cabem integralmente '+JSON.stringify(panorama));
    note('panorama-'+label,panorama);
+   const readability=await page.locator('#silm-object-entry').evaluate(root=>{
+    const q=el=>{const r=el.getBoundingClientRect(),c=getComputedStyle(el);
+     return {height:r.height,width:r.width,top:r.top,bottom:r.bottom,
+      fontSize:parseFloat(c.fontSize),display:c.display,visibility:c.visibility};};
+    const scroll=root.querySelector('.periodic-scroll');
+    const cu=root.querySelector('.periodic-element[data-z="29"]');
+    const gd=root.querySelector('.periodic-element[data-z="64"]');
+    return {searchHoisted:!!root.querySelector('.silm-object-entry-head .periodic-search'),
+     header:q(root.querySelector('.silm-object-entry-head')),
+     grid:q(scroll),cu:q(cu),gd:q(gd),
+     number:q(cu.querySelector('.element-z')),
+     symbol:q(cu.querySelector('.element-symbol')),
+     name:q(cu.querySelector('.element-name')),
+     footer:q(root.querySelector('.periodic-footer')),
+     area:q(root)};
+   });
+   assert.ok(readability.searchHoisted,label+': busca ainda está em uma linha separada');
+   assert.ok(readability.name.display!=='none'&&readability.name.height>=9,
+    label+': o nome do elemento continua oculto '+JSON.stringify(readability));
+   assert.ok(readability.name.fontSize>=9,
+    label+': fonte do nome ainda ilegível '+JSON.stringify(readability));
+   assert.ok(readability.number.fontSize>=9,
+    label+': número atômico ilegível '+JSON.stringify(readability));
+   assert.ok(readability.symbol.fontSize>=16,
+    label+': símbolo ilegível '+JSON.stringify(readability));
+   assert.ok(readability.number.bottom<=readability.symbol.top+3,
+    label+': número atômico sobreposto ao símbolo '+JSON.stringify(readability));
+   assert.ok(readability.symbol.bottom<=readability.name.top+3,
+    label+': símbolo sobreposto ao nome '+JSON.stringify(readability));
+   assert.ok(readability.cu.height>=37,
+    label+': células compactadas demais '+JSON.stringify(readability));
+   if(width>=1600){
+    assert.ok(readability.cu.height>=45,
+     label+': em desktop grande a Tabela não aproveitou a altura '+JSON.stringify(readability));
+    assert.ok(readability.footer.height<=75,
+     label+': rodapé consome a área de leitura '+JSON.stringify(readability));
+   }
+   note('legibilidade-'+label,readability);
   }
   note('table-'+label,dims);
-  if(width<=390)await page.screenshot({path:join(dir,label+'-tabela-inicial.jpg'),type:'jpeg',quality:72,animations:'disabled'});
+  await page.screenshot({path:join(dir,label+'-tabela-inicial.jpg'),type:'jpeg',quality:72,animations:'disabled'});
  }
  // Um metal com objeto único não pode renderizar uma foto de 230px
  // flutuando no centro de um cartão quase vazio (regressão Parte 9).
