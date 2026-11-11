@@ -373,6 +373,12 @@ try{
  // Parte 8: a lente acompanha a Oficina unificada e nunca cria outro motor.
  // As mudanças de módulo usam o seletor científico original do SILM.
  await page.setViewportSize({width:1366,height:768});
+ assert.equal(await page.locator('.si-workspace-toolbar #silm-module-shortcuts').count(),0,
+  'A área principal ainda contém o seletor de módulos');
+ await page.locator('[data-open-dock="ver"]').click();
+ await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===false);
+ assert.equal(await page.locator('#si-dock-right [data-right-panel="ver"] #silm-module-shortcuts').count(),1,
+  'Os três módulos devem estar no topo do menu Ver');
  const stableBeforeModules=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
  const shortcuts=page.locator('#silm-module-shortcuts [data-silm-module-shortcut]');
  assert.equal(await shortcuts.count(),3,'Travessia integrada perdeu os três módulos');
@@ -400,6 +406,8 @@ try{
  assert.deepEqual(scientificWithoutAuditTime(stableAfterModules),
   scientificWithoutAuditTime(stableBeforeModules),
   'Módulos alteraram estrutura, metal, propriedades, medições ou contexto');
+ await page.locator('[data-close-dock="right"]').click();
+ await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===true);
  // Abrir os painéis originais não pode instanciar outras lentes nem docas extras.
  for(const section of ['montagem','ver','dados']){
   await page.locator('[data-open-dock="'+section+'"]').click();
