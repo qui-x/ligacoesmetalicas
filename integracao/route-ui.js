@@ -62,11 +62,35 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   if(key===missionKey&&host.childElementCount)return;const previous=missionKey.split('|')[0];missionKey=key;host.replaceChildren();head.hidden=!!r;
   if(id&&!r)say('Missão não encontrada. Escolha uma missão da lista.','warning');
   if(!r){
-   const list=N('div');list.className='silm-content-list';
-   for(const item of S.missions.registry){const row=N('a');row.className='silm-content-row';row.href=url(item.id);row.id='mission-card-'+item.id;
-    const text=N('span');text.append(N('strong',item.title),N('small',item.subtitle+'. '+moduleName(item.module)+' · '+item.concept+'.'));
-    const status=N('span',missionState(doc,item));status.className='silm-row-status';row.append(text,status);list.append(row);}
-   host.append(list);if(lastMission){const back=$('mission-card-'+lastMission);lastMission=null;if(back)requestAnimationFrame(()=>back.focus());}return;}
+   const categories={fundamentos:'Missões fundamentais',familias:'Famílias de metais',estruturas:'Estruturas cristalinas',propriedades:'Propriedades metálicas',medicoes:'Medir',calculos:'Calcular',aplicacoes:'Aplicações e escalas'};
+   const filters=N('div');filters.className='silm-learning-filters';
+   const label=N('label','Filtrar missões');label.htmlFor='silm-missions-filter';
+   const filter=N('select');filter.id='silm-missions-filter';
+   for(const [cat,title] of [['all','Todos os assuntos'],...Object.entries(categories)]){const option=N('option',title);option.value=cat;filter.append(option);}
+   const search=N('input');search.type='search';search.id='silm-missions-search';search.placeholder='Pesquisar missão ou metal';search.setAttribute('aria-label','Pesquisar missões');
+   filters.append(label,filter,search);host.append(filters);
+   const groups=new Map();for(const mission of S.missions.registry){const cat=mission.category||'fundamentos';if(!groups.has(cat))groups.set(cat,[]);groups.get(cat).push(mission);}
+   const list=N('div');list.className='silm-content-list silm-learning-catalog';const headings=new Map(),rows=[];
+   const normalize=x=>String(x).normalize('NFD').replace(/\p{M}/gu,'').toLowerCase();
+   for(const [category,missions] of groups){
+    const heading=N('h2',categories[category]||category);heading.className='silm-catalog-group-heading';list.append(heading);headings.set(category,heading);
+    for(const item of missions){
+     const row=N('a');row.className='silm-content-row';row.href=url(item.id);row.id='mission-card-'+item.id;
+     const subtitle=item.subtitle+'. '+moduleName(item.module)+' · '+item.concept+' · '+item.metalSelection.atomicNumbers.length+' '+(item.metalSelection.atomicNumbers.length===1?'metal':'metais');
+     const body=N('span');body.append(N('strong',item.title),N('small',subtitle));
+     const status=N('span',missionState(doc,item));status.className='silm-row-status';row.append(body,status);list.append(row);
+     const names=item.metalSelection.atomicNumbers.map(z=>{const metal=S.data.get(z);return metal.name+' '+metal.symbol;}).join(' ');
+     rows.push({row,category,haystack:normalize(item.title+' '+item.subtitle+' '+item.concept+' '+names)});
+    }
+   }
+   const apply=()=>{
+    const q=normalize(search.value.trim()),counts=new Map();
+    for(const item of rows){const show=(filter.value==='all'||filter.value===item.category)&&(!q||item.haystack.includes(q));item.row.hidden=!show;if(show)counts.set(item.category,(counts.get(item.category)||0)+1);}
+    for(const [cat,heading] of headings)heading.hidden=!counts.get(cat);
+   };
+   filter.addEventListener('change',apply);search.addEventListener('input',apply);
+   host.append(list);if(lastMission){const back=$('mission-card-'+lastMission);lastMission=null;if(back)requestAnimationFrame(()=>back.focus());}return;
+  }
   const article=N('article');article.className='silm-reading';article.setAttribute('aria-labelledby','mission-title');
   const eyebrow=N('p','MISSÃO · '+missionState(doc,r));eyebrow.className='eyebrow';const title=N('h1',r.title);title.id='mission-title';title.tabIndex=-1;
   const lead=N('p',r.subtitle+'.');lead.className='silm-lead';
@@ -79,7 +103,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const rules=N('ul');for(const item of ['Módulo fixo: '+moduleName(r.module)+'.','Recursos liberados: '+toolNames(r.allowedTools)+'.',...r.prerequisites,'Para concluir, reúna todas as evidências exigidas na Oficina e registre uma conclusão escrita.'])rules.append(N('li',item));
   article.append(N('h2','Objetivo e regras'),rules);
   if(r.evidenceObjectives?.length){const objectives=N('section');objectives.className='silm-mission-objectives';objectives.append(N('h2','Etapas verificáveis'));const list=N('ol');for(const step of r.evidenceObjectives)list.append(N('li',step.label));objectives.append(list);article.append(objectives);}
-  const selection=N('select');selection.id='mission-metal';for(const z of r.metalSelection.atomicNumbers){const e=S.data.get(z),o=N('option',e.name+' ('+e.symbol+')');o.value=z;selection.append(o);}
+  const selection=N('select');selection.id='mission-metal';for(const z of r.metalSelection.atomicNumbers){const e=S.data.get(z),elig=S.crystal.eligibility(e),o=N('option',e.name+' ('+e.symbol+')'+(elig.status!=='available'?' · rede não disponível':''));o.value=z;selection.append(o);}
   selection.value=r.metalSelection.atomicNumbers.includes(29)?'29':String(r.metalSelection.atomicNumbers[0]);if(session.context()?.id===r.id){selection.value=String(model.state.metal.atomicNumber);selection.disabled=true;}
   const field=N('div');field.className='silm-field';const label=N('label','Metal da investigação');label.htmlFor=selection.id;field.append(label,selection);article.append(field);
   const actions=N('div');actions.className='silm-actions';
