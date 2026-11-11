@@ -83,6 +83,8 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   const validated=cap?.ok&&cap.mode==='reference-data';
   spectralBars.hidden=!validated;
   opticalSection.dataset.evidence=validated?'tabulated':'qualitative';
+  opticalSection.dataset.reference=validated?
+   (cap.conditionMatch?.ok?'cntp-verified':'source-conditions-only'):'unavailable';
   if(!validated){
    opticalNote.textContent='Modelo geométrico qualitativo. Sem perfil óptico homologado para este metal: não são exibidas porcentagens nem uma cor calculada.';
    opticalSource.textContent='A luz e a superfície continuam como esquema, não como previsão da aparência.';
@@ -99,8 +101,11 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
    const v=values[i],channel=channels[i];channel.meter.value=v.reflectance;
    channel.value.textContent=(100*v.reflectance).toLocaleString('pt-BR',{maximumFractionDigits:1})+' %';
   }
-  opticalNote.textContent='Cobre · interface lisa ideal ar–metal · luz não polarizada · incidência '+angleDeg+'° da normal de referência. Dados ilustram refletância por comprimento de onda, não a cor de uma peça real.';
-  opticalSource.textContent='Constantes n,k experimentais: '+cap.source.authors+' ('+cap.source.year+'). Fresnel calculado; sem considerar óxido, rugosidade ou filme.';
+  const atReference=!!cap.conditionMatch?.ok;
+  opticalNote.textContent='Cobre · interface lisa ideal ar–metal · luz não polarizada · incidência '+angleDeg+'° da normal de referência. Valores ilustram a fonte original, não a cor de uma peça real.';
+  opticalSource.textContent=(atReference?'Condição CNTP verificada. ':
+   'ATENÇÃO: fonte à temperatura ambiente; CNTP (0 °C, 1 atm) não verificada — não interpretar estas porcentagens como previsão em CNTP. ')+
+   'Constantes n,k: '+cap.source.authors+' ('+cap.source.year+'). Sem considerar óxido, rugosidade ou filme.';
  }
 
  const button=(id,label,run,opts={})=>{const b=SILM.actionButton(label,run,scope,{id:prefix+'-'+id,...opts});return b;};
