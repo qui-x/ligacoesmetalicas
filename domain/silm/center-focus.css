@@ -6,6 +6,15 @@
 .silm-crystal[data-local-focus="true"] .silm-ghost-layer{
  display:none!important
 }
+/* A camada de unidades reais ocupa o palco inteiro e fica acima dos
+   vizinhos: só o centro destacado recebe toque. O fundo fica transparente
+   para os botões de vizinhos (não usar z-index acima das ferramentas). */
+.silm-crystal[data-local-focus="true"] .silm-assembly-units{
+ pointer-events:none
+}
+.silm-crystal[data-local-focus="true"] .silm-crystal-unit[data-local-center]{
+ pointer-events:auto
+}
 .silm-crystal[data-local-focus="true"] .silm-crystal-unit:not([data-local-center]){
  opacity:0!important;visibility:hidden!important;pointer-events:none!important
 }
