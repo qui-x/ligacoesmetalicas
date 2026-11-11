@@ -81,6 +81,7 @@
     "reflection": "Por que o fator de empacotamento do modelo de esferas rígidas não equivale à densidade de um metal comercial?"
   }
 };
+ INVESTIGATIONS['cobre-neodimio']={"problem":"Por que o cobre de um enrolamento e um ímã permanente Nd–Fe–B exigem explicações diferentes, embora ambos envolvam materiais metálicos?","prediction":"Antes de investigar, diferencie o metal puro (Cu ou Nd), a peça do objeto e o material de liga. Preveja quais modelos cristalográficos o SILM pode mostrar.","actions":["Explore um exemplo de cobre no Objeto e atravesse as escalas até a rede e o centro; registre a estrutura cristalina de referência e a função do componente.","Conclua ou encerre essa investigação antes de preparar o neodímio. Na segunda tentativa, compare Objeto, Grãos, Rede e Centro, lembrando que a imagem do ímã representa uma liga Nd–Fe–B.","Compare os registros e explique por que a cena do elemento Nd não demonstra estrutura, propriedade magnética ou composição do ímã comercial."],"evidence":"Apresente dois registros separados, identificando o elemento (Cu ou Nd), o objeto de origem, a estrutura de referência e uma limitação científica em cada caso.","reflection":"Por que a elevada condutividade do cobre não basta para explicar a função de um ímã Nd–Fe–B? Quais dados e técnicas seriam necessários para discutir o magnetismo da liga?"};
  const list=[
  make('ligacao-metalica','Ligação Metálica','Uma organização coletiva','Conecte estrutura, elétrons e propriedades.','O modelo representa centros metálicos positivos envolvidos por elétrons de valência deslocalizados.','Mostre os centros e a distribuição eletrônica no laboratório.','A interação é coletiva: o sólido não é descrito como um conjunto de moléculas metálicas isoladas.','Esferas e pontos são representações didáticas, não imagens de partículas individuais.',['eletrons-movimento','campo-metal'],['eletrons-metal']),
  make('estrutura-metais','Estrutura dos Metais','Ordem e vizinhança','Investigue relações entre centros e organização espacial.','A vizinhança descreve centros próximos no modelo estrutural adotado.','Selecione um centro e destaque os vizinhos.','Diferencie a vizinhança local da repetição de toda a rede.','A montagem livre não tem escala física nem determina sozinha a estrutura real.',['vizinhos-metal','montagem-ordem'],['ordem-metal']),
@@ -90,6 +91,21 @@
  make('medindo-estruturas','Medindo Estruturas','Escala e origem da medida','Diferencie modelo, tela e dado tabelado.','Uma medida do modelo usa coordenadas cristalográficas, não o tamanho em pixels.','Meça a e altere zoom ou projeção.','A unidade de apresentação muda sem alterar o comprimento canônico registrado.','Uma medida do modelo não é uma medição experimental de uma amostra.',['medida-rede'],['medindo-ordem']),
  make('estrutura-calculo','Da Estrutura ao Cálculo','Relações geométricas','Use entradas identificadas e resultados rastreáveis.','Fórmulas relacionam parâmetros, contagens e grandezas derivadas do modelo adotado.','Calcule volume, raio e fator de empacotamento usando o catálogo central.','Confira a origem das entradas e a célula adotada antes de interpretar o resultado.','O empacotamento de esferas rígidas não é a fração ocupada pela densidade eletrônica real.',['espaco-ocupado'],['volume-celula'])
  ];
+
+ const comparison=make(
+  'cobre-neodimio','Cobre e Neodímio','Condutor metálico × aplicação de liga com terras raras',
+  'Compare os metais puros e os materiais usados em um motor ou alto-falante, sem confundir a liga Nd–Fe–B com neodímio elementar.',
+  'O cobre metálico costuma ser empregado em condutores elétricos, enquanto ímãs Nd–Fe–B dependem da composição e do processamento de uma fase intermetálica.',
+  'Percorra as quatro escalas com Cu e depois com Nd, em investigações separadas.',
+  'Associe as propriedades e os dados de referência a cada elemento. O magnetismo da liga não é simulado pelo SILM.',
+  'O objeto representado não é amostra calibrada; as propriedades de Nd puro não são as do ímã Nd–Fe–B.',
+  ['objeto-ao-centro'],['ordem-metal'],[29,60]
+ );
+ comparison.comparison={
+  metals:[29,60],
+  caveat:'A aplicação Nd–Fe–B é uma liga baseada em Nd, Fe e B. O SILM apresenta o elemento Nd e sua estrutura de referência, não calcula o magnetismo da liga. Conclua ou encerre uma investigação antes de iniciar a outra.'
+ };
+ list.push(comparison);
  for(const theme of list){
   const study=INVESTIGATIONS[theme.id];
   if(!study||!study.problem||!study.prediction||!Array.isArray(study.actions)||study.actions.length<2||!study.evidence||!study.reflection)throw Error('Percurso do tema ausente: '+theme.id);
