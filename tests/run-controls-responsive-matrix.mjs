@@ -39,6 +39,36 @@ try{
  const initial=await scientific();
  await scale(2);
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
+ // Estilo calculado e mecanismos reais da microestrutura, incluindo diálogos.
+ const microButtons=page.locator('.silm-workshop-micro-zoom-tools .silm-workshop-micro-control');
+ const microAppearance=await microButtons.evaluateAll(all=>all.map(b=>{
+  const css=getComputedStyle(b),rect=b.getBoundingClientRect();
+  return{label:b.getAttribute('aria-label'),icon:!!b.querySelector('svg[aria-hidden="true"]'),
+   width:rect.width,height:rect.height,borderRadius:css.borderRadius,
+   background:css.backgroundColor,cursor:css.cursor};
+ }));
+ assert.ok(microAppearance.length>=6&&microAppearance.every(x=>
+  x.icon&&x.width>=43.5&&x.height>=43.5&&x.borderRadius!=='0px'&&x.background!=='rgba(0, 0, 0, 0)'),
+  'Controles da microestrutura sem estilo/ícones ou muito pequenos: '+JSON.stringify(microAppearance));
+ const gen=page.getByRole('button',{name:'Abrir gerador de formações de grãos'});
+ await gen.click();
+ const formationDialog=page.locator('.silm-micro-generator-dialog');
+ await formationDialog.waitFor({state:'visible'});
+ const generated=await formationDialog.locator('.silm-workshop-micro-control').evaluateAll(all=>all.map(b=>({
+  aria:b.getAttribute('aria-label'),icon:!!b.querySelector('svg'),height:b.getBoundingClientRect().height,
+  css:getComputedStyle(b).borderRadius
+ })));
+ assert.ok(generated.length===4&&generated.every(x=>x.icon&&x.height>=43.5&&x.css!=='0px'),
+  'Botões do gerador de formações permanecem sem estilo '+JSON.stringify(generated));
+ await formationDialog.getByRole('button',{name:'Fechar configurações de formação'}).click();
+ const data=page.getByRole('button',{name:'Abrir dados segmentados'});
+ await data.click();
+ const dataDialog=page.locator('.silm-micro-data-dialog');
+ await dataDialog.waitFor({state:'visible'});
+ assert.equal(await dataDialog.locator('.silm-workshop-micro-control svg').count(),2,
+  'A importação de microestrutura mantém botões sem ícones');
+ await dataDialog.getByRole('button',{name:'Fechar importação de dados'}).click();
+ evidence.push({name:'microestutura-estilos',buttons:microAppearance,modalButtons:generated});
  await scale(3);
  await page.waitForFunction(()=>document.querySelector('.silm-crystal[data-local-focus="false"]'));
  // Ações da câmera existem, mas só Enquadrar e um disclosure são primários.
