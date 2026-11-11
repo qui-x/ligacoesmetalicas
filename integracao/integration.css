@@ -1682,3 +1682,11 @@ body.si-structure-expanded #silm-integration-scene .silm-assembly-area{min-heigh
 .silm-manual-page .silm-manual-example strong{font-size:.8rem;letter-spacing:.02em;color:var(--accent)}
 .silm-manual-page .silm-manual-example p{font-size:.95rem;color:var(--secondary,var(--muted));margin-top:6px}
 @media(prefers-reduced-motion:reduce){.silm-manual-page .silm-manual-accordion .silm-manual-disclosure{transition:none}}
+
+/* Explicações dos tópicos: parágrafos independentes, leitura contínua SIAB. */
+.silm-manual-page .silm-manual-explanation p{
+  max-width:72ch;line-height:1.7;overflow-wrap:break-word;
+}
+.silm-manual-page .silm-manual-explanation p + p{
+  margin-top:15px;
+}
