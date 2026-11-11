@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const ctx=vm.createContext({console,structuredClone});
 ctx.window=ctx;
-for(const path of ['data/bundle','data-api','crystal','properties','material-profile-registry','data/material-profile-demo-cu','material-engine']){
+for(const path of ['data/bundle','data-api','crystal','properties','reference-conditions','material-profile-registry','data/material-profile-demo-cu','material-engine']){
  vm.runInContext(readFileSync(new URL('../domain/silm/'+path+'.js',import.meta.url),'utf8'),ctx,{filename:path+'.js'});
 }
 const S=ctx.SILM,ENGINE=S.materialEngine;
@@ -41,6 +41,9 @@ test('um perfil óptico demonstrativo valida somente o cobre',()=>{
  assert.equal(cap.mode,'reference-data');
  assert.equal(cap.dataKind,'TABULATED_NK');
  assert.equal(cap.source.doi,'10.1103/PhysRevB.6.4370');
+ assert.equal(cap.requestedReference,'CNTP_BR_0C_1ATM');
+ assert.equal(cap.conditionMatch.ok,false);
+ assert.equal(cap.conditionMatch.reasonCode,'CONDITIONS_UNVERIFIED');
  assert.equal(S.materialProfiles.list().length,1);
  const q=ENGINE.optical(29,550,0);
  assert.equal(q.ok,true);assert.equal(q.source.doi,cap.source.doi);
@@ -76,4 +79,46 @@ test('fora da faixa ou com entrada inválida não há extrapolação',()=>{
   assert.equal(res.reasonCode,'INVALID_OPTICAL_INPUT');
  }
  assert.equal(ENGINE.optical(29,Number.NaN).reasonCode,'INVALID_OPTICAL_INPUT');
+});
+
+test('CNTP Brasil e STP IUPAC são condições distintas, não sinônimas',()=>{
+ const reference=S.referenceConditions;
+ const br=reference.standards.CNTP_BR_0C_1ATM;
+ const international=reference.standards.STP_IUPAC_0C_1BAR;
+ assert.equal(br.temperatureK,273.15);
+ assert.equal(br.pressurePa,101325);
+ assert.equal(international.temperatureK,273.15);
+ assert.equal(international.pressurePa,100000);
+ assert.equal(reference.compare({...br,basis:br.id}).ok,true);
+ assert.equal(reference.compare({...international,basis:international.id}).reasonCode,'CONDITIONS_MISMATCH');
+ assert.equal(reference.compare({...br,basis:br.id},international.id).reasonCode,'CONDITIONS_MISMATCH');
+ assert.equal(reference.validate({basis:'CNTP_BR_0C_1ATM',temperatureK:298.15,pressurePa:101325}).reasonCode,'CONDITIONS_STANDARD_MISMATCH');
+ assert.equal(reference.validate({basis:'CNTP_BR_0C_1ATM',temperatureK:273.15,pressurePa:100000}).reasonCode,'CONDITIONS_STANDARD_MISMATCH');
+ assert.equal(reference.validate('CNTP').reasonCode,'CONDITIONS_UNSTRUCTURED');
+});
+
+test('Cu experimental em temperatura ambiente não é certificado como CNTP',()=>{
+ const q=ENGINE.optical(29,550,0);
+ assert.equal(q.ok,true);
+ assert.equal(q.conditionMatch.ok,false);
+ assert.equal(q.conditionMatch.reasonCode,'CONDITIONS_UNVERIFIED');
+ assert.equal(q.conditions.basis,'SOURCE_REPORTED');
+ assert.equal(q.conditions.temperatureK,null);
+ assert.equal(q.conditions.pressurePa,null);
+ const strict=ENGINE.opticalForReference(29,550);
+ assert.equal(strict.ok,false);
+ assert.equal(strict.reasonCode,'CONDITIONS_UNVERIFIED');
+ assert.equal(strict.requestedReference,'CNTP_BR_0C_1ATM');
+ assert.equal(Object.hasOwn(strict,'reflectance'),false);
+});
+
+test('o registro recusa dados rotulados CNTP com T e P inconsistentes',()=>{
+ const P=S.materialProfiles;
+ const valid={basis:'CNTP_BR_0C_1ATM',temperatureK:273.15,pressurePa:101325};
+ const wrong={basis:'CNTP_BR_0C_1ATM',temperatureK:273.15,pressurePa:100000};
+ assert.throws(()=>P.register({atomicNumber:47,element:'Ag',properties:{
+  electrical:{evidence:'TABULATED',value:1,unit:'S/m',source:{title:'Teste'},conditions:wrong}
+ }}),/CONDITIONS_STANDARD_MISMATCH/);
+ assert.equal(P.list().length,1);
+ assert.equal(S.referenceConditions.compare(valid).ok,true);
 });
