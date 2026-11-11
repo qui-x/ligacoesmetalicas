@@ -6,6 +6,7 @@ e python .github/scripts/test_routes_siab_parity.py --browser chromium
 from __future__ import annotations
 
 import argparse
+import re
 from pathlib import Path
 
 from playwright.sync_api import expect, sync_playwright
@@ -90,9 +91,7 @@ def run(browser_name: str, root: str) -> None:
             page.locator("#route-hypothesis").fill(prediction)
             page.locator("#route-metal").select_option("29")
             page.locator("#route-mount").click()
-            expect(page).to_have_url(
-                lambda url: "#/ambiente" in url, timeout=10000
-            )
+            expect(page).to_have_url(re.compile(r".*#/ambiente.*"), timeout=10000)
             free = page.evaluate("""() => ({
                 experiment: BaseDemoSI.storage.get('route.experiment',null),
                 route: window.SILM.routes.get('roteiro-cu-nd')
