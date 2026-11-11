@@ -148,6 +148,7 @@ const FILES=[
   "domain/silm/electrothermal.js",
   "domain/silm/drive.js",
   "domain/silm/properties.js",
+  "domain/silm/material-profile-registry.js",
   "domain/silm/data/material-profile-demo-cu.js",
   "domain/silm/material-engine.js",
   "domain/silm/measurements.js",
