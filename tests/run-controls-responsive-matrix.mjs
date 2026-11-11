@@ -162,6 +162,11 @@ try{
  assert.ok(await direct.locator('[data-silm-direct-tool^="calcular:"]').count()>=1,
   'Calcular deixou de oferecer fórmulas');
  await page.locator('[data-silm-module-shortcut="explorar"]').click();
+ // O painel Ver no mobile usa uma folha modal. Fechar a folha antes da
+ // travessia evita clicar através do backdrop (bloqueio correto do produto).
+ await page.locator('[data-open-dock="ver"]').click();
+ await page.waitForFunction(()=>document.querySelector('#si-sheet-backdrop')?.hidden||
+  getComputedStyle(document.querySelector('#si-sheet-backdrop')).display==='none');
  await scale(3);
  await page.waitForFunction(()=>document.querySelector('.silm-crystal[data-local-focus="false"]'));
  assert.equal(await direct.locator('[data-action="neighbors"]').count(),1,
