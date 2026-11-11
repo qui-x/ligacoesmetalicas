@@ -103,9 +103,9 @@ try{
  const next=axes.locator('button[aria-label="Avançar uma célula no eixo a"]');
  assert.equal(await next.isVisible(),true,'Translação científica por eixo deixou de ser acessível');
  if(!await next.isDisabled()){
-  const prev=await nav.locator('output').textContent();
+  const prev=await page.locator('.silm-lattice-status output').textContent();
   await next.click();
-  await page.waitForFunction(old=>document.querySelector('.silm-lattice-nav output')?.textContent!==old,prev);
+  await page.waitForFunction(old=>document.querySelector('.silm-lattice-status output')?.textContent!==old,prev);
   assert.equal(await scientific(),initial,'Mover referência pela rede mudou propriedades/medições');
  }
  await axes.locator('summary').click();
