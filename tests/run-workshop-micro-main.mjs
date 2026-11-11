@@ -472,6 +472,7 @@ async function test(viewport){
  assert.equal(await electronFlow(),flowBefore,'A pista visual aplicou o efeito térmico duas vezes sob corrente imposta.');
  const warm=await value('T média');
  await conditions.selectOption('supply');
+ await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · U 0 · I 0 · '),undefined,{timeout:10000});
  await step.click();
  await page.waitForFunction(()=>document.querySelector('.silm-lattice-status span')?.textContent.includes(' · t 1,5 · '),undefined,{timeout:10000});
  assert.match(await reading.textContent(),/corrente imposta.* · t 1,5 · U 0 · I 0 · R [\d,]+ · P Joule 0/);
