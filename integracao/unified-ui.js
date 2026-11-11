@@ -371,20 +371,38 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    content.append(crumbs(category,t),article);
   }
   function renderCategory(category){
-   const article=N('article');article.className='silm-reading silm-manual-category-page';
+   const guide=S.manual.categoryGuides?.[category.id];
+   const article=N('article');article.className='silm-reading silm-manual-category-page';article.dataset.manualCategory=category.id;
    const head=N('header');head.className='silm-manual-article-head';
    const eyebrow=N('p',category.group.toUpperCase());eyebrow.className='eyebrow';
    const lead=N('p',category.summary);lead.className='silm-lead';
    head.append(eyebrow,makeTitle(category.title),lead);article.append(head);
-   const primary=find(category.topics[0]);
-   if(primary){
-    const purpose=N('section');purpose.className='silm-manual-purpose';
-    purpose.append(N('h2','Para que serve'),N('p',operation(primary.purpose||primary.summary||primary.content)));article.append(purpose);
-    if(primary.content&&primary.content!==primary.purpose)appendExplanation(article,primary.content);
-    if(primary.steps?.length){const how=N('section');how.className='silm-manual-how',ol=N('ol');ol.className='silm-manual-steps';for(const step of primary.steps)ol.append(N('li',operation(step)));how.append(N('h2','Como usar'),ol);article.append(how);}
+   const first=find(category.topics[0]);
+   const purposeText=guide?.purpose||first?.purpose||category.summary;
+   const explanationText=guide?.content||first?.content||category.summary;
+   const purpose=N('section');purpose.className='silm-manual-purpose';
+   purpose.append(N('h2','Para que serve'),N('p',operation(purposeText)));article.append(purpose);
+   appendExplanation(article,explanationText);
+   const steps=guide?.steps?.length?guide.steps:(first?.steps||[]);
+   if(steps.length){
+    const how=N('section');how.className='silm-manual-how';
+    const ol=N('ol');ol.className='silm-manual-steps';
+    for(const step of steps)ol.append(N('li',operation(step)));
+    how.append(N('h2','Como usar'),ol);article.append(how);
+   }
+   if(guide?.details?.length){
+    const section=N('section');section.className='silm-manual-details';
+    section.append(N('h2','Detalhes importantes'));
+    for(const d of guide.details){
+     const details=N('details');details.className='silm-manual-accordion';
+     const summary=N('summary');summary.append(N('span',d.title),manualIcon('dropdown','silm-manual-disclosure'));
+     details.append(summary,N('p',operation(d.text)));section.append(details);
+    }
+    article.append(section);
    }
    const more=N('section');more.className='silm-manual-more';more.append(N('h2','Nesta categoria'));
-   const list=N('div');list.className='silm-manual-topic-list';for(const id of category.topics){const t=find(id);if(t)list.append(topicLink(t));}
+   const list=N('div');list.className='silm-manual-topic-list';
+   for(const id of category.topics){const t=find(id);if(t)list.append(topicLink(t));}
    more.append(list);article.append(more);
    const back=nav('','#/manual','silm-manual-back');back.append(manualIcon('back'),N('span','Voltar ao início do Manual'));article.append(back);
    content.append(crumbs(category),article);
