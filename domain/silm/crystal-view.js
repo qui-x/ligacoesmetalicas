@@ -492,8 +492,11 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // A órbita atualiza a região projetada sem interromper a animação eletrônica.
   // Calor + corrente: cada centro leva a temperatura local (0 sem calor) para o espalhamento dos elétrons.
   const tOf=k=>scene.heatTemps?.get(k)||0;
-  const centersT=[...(localFocus?[]:drawn.map((q,i)=>({x:q.x,y:q.y,t:tOf(X.key(list[i].site))))),
-   ...electronSites.map(s=>({x:s.q.x,y:s.q.y,t:tOf(s.key)}))];
+  const centersT=[];
+  if(!localFocus)for(const [i,q] of drawn.entries())
+   centersT.push({x:q.x,y:q.y,t:tOf(X.key(list[i].site))});
+  for(const site of electronSites)
+   centersT.push({x:site.q.x,y:site.q.y,t:tOf(site.key)});
   // Deriva média relativa (seta "elétrons (média)"): calor e defeitos reduzem; a intensidade do campo aumenta.
   scene.driftFactor=ET?(centersT.reduce((a,c)=>a+ET.drift(c.t),0)/Math.max(1,centersT.length))*ET.defectDrift(defects):1;
   // Pista visual da corrente total calculada: não representa trajetórias locais nem velocidade em SI.
