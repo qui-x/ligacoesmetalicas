@@ -16,7 +16,11 @@ window.SILM=window.SILM||{};
   optical:{
      evidence:'TABULATED_NK',
      sample:'Cobre - referência espectral experimental',
-     conditions:'Temperatura ambiente; resposta de interface lisa idealizada; não representa óxidos ou acabamento',
+     conditions:{
+      basis:'SOURCE_REPORTED',temperatureK:null,pressurePa:null,
+      description:'Temperatura ambiente (room temperature) conforme Johnson e Christy (1972); valores numéricos exatos de T e P não informados neste registro. Não CNTP verificada.',
+      surface:'Interface lisa idealizada para cálculo de Fresnel; não representa óxidos nem acabamento de uma peça real'
+     },
      source:Object.freeze({
       title:'Optical constants of the noble metals',
       authors:'P. B. Johnson; R. W. Christy',year:1972,
