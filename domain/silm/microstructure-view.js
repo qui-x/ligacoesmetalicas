@@ -8,7 +8,7 @@ SILM.microstructure=(()=>{
  const node=(tag,cls='',txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;};
  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
  let serial=0;
- function create({element,item=null}={}){
+ function create({element,item=null,model=null,toggleLight=()=>{}}={}){
   const section=node('section','silm-workshop-micro-viewer'),viewport=node('div','silm-workshop-micro-viewport');
   const synthetic=SILM.microstructureSynthetic;
   const appearance=SILM.microstructureAppearance?.get(element?.atomicNumber)||null;
@@ -51,9 +51,16 @@ SILM.microstructure=(()=>{
    for(const [offset,color] of stops)g.append(svgNode('stop',{offset,'stop-color':color}));
    defs.append(g);
   }
+  // Gradiente aplicado ao CAMPO de grãos existente. É iluminação didática
+  // sobre a superfície, e não refletância diferente inventada para cada grão.
+  const lightGradient=svgNode('linearGradient',{id:uid+'-luster-light',
+   gradientUnits:'objectBoundingBox',x1:'0%',y1:'0%',x2:'100%',y2:'100%'});
+  const lightStart=svgNode('stop',{offset:'0%','stop-color':'#ffffff','stop-opacity':'.95'});
+  const lightEnd=svgNode('stop',{offset:'100%','stop-color':'#ffffff','stop-opacity':'0'});
+  lightGradient.append(lightStart,lightEnd);defs.append(lightGradient);
   svg.append(defs);
   const plane=svgNode('g',{'class':'silm-micro-plane'});svg.append(plane);
-  let paths=[],cells=[];
+  let paths=[],cells=[],microLightOverlay=null;
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
   let sourceData=null; // Mapa importado = análise de polígonos fornecidos, não homologação.
   const status=node('span','silm-workshop-micro-status','Selecione um grão · modelo esquemático');
@@ -109,6 +116,13 @@ SILM.microstructure=(()=>{
    const bevel=svgNode('path',{d,'class':'silm-micro-highlight','pointer-events':'none'});
    g.append(p,bevel,hatch);plane.append(g);paths[i]=p;cells[i]=g;
    });
+   // A iluminação ocupa a mesma superfície vetorial, sem pintar centros,
+   // atribuir cor química ou alterar o caminho/área de qualquer grão.
+   microLightOverlay=svgNode('rect',{x:0,y:0,width:W,height:H,
+    fill:'url(#'+uid+'-luster-light)',class:'silm-micro-optical-light',
+    'pointer-events':'none','aria-hidden':'true'});
+   plane.append(microLightOverlay);
+   refreshOptical();
    if(chosen>=polygons.length)chosen=polygons.length-1;
    if(chosen>=0)choose(chosen);else status.textContent=sourceData?'Selecione um grão segmentado · dados importados não homologados':'Selecione um grão · modelo esquemático';
    offsetX=0;offsetY=0;update();fitViewport();
@@ -167,6 +181,87 @@ SILM.microstructure=(()=>{
   // O aviso "sem escala" é informação essencial e permanece visível mesmo
   // com a seção explicativa recolhida. Isso preserva o contrato didático.
   toolbar.append(status,dimension,zoomControls);
+  // Propriedade compartilhada com Rede e célula. O aluno escolhe Brilho em
+  // Ver, inclusive antes de organizar a estrutura; esta barra NÃO inicia
+  // uma segunda investigação nem contém outra superfície ou câmera.
+  const drive=model?SILM.drive?.controller(model):null;
+  const opticalTools=node('div','silm-micro-optical-tools');
+  opticalTools.hidden=true;opticalTools.setAttribute('role','group');
+  opticalTools.setAttribute('aria-label','Experiência de brilho na superfície metalográfica');
+  const lightButton=node('button','silm-workshop-micro-control silm-micro-light-toggle','Luz');
+  lightButton.type='button';lightButton.setAttribute('aria-label','Ligar ou desligar iluminação da microestrutura');
+  const finishButton=node('button','silm-workshop-micro-control silm-micro-finish-toggle','Acabamento');
+  finishButton.type='button';finishButton.setAttribute('aria-label','Alternar acabamento didático da superfície');
+  const angleInput=(key,label,min)=>{
+   const wrap=node('label','silm-micro-optical-angle');
+   const text=node('span','',label),input=node('input');
+   input.type='range';input.min=String(min);input.max='80';input.step='1';
+   input.setAttribute('aria-label',label+' em graus da normal');
+   input.dataset.opticalAngle=key;
+   wrap.append(text,input);
+   input.addEventListener('input',()=>{
+    if(!drive)return;
+    if(key==='lamp')drive.setAngle(Number(input.value));
+    else drive.setObserverAngle(Number(input.value));
+    refreshOptical();
+   });
+   return {wrap,input};
+  };
+  const sourceAngle=angleInput('lamp','Lanterna',5);
+  const viewAngle=angleInput('eye','Observador',0);
+  const opticalNote=node('span','silm-micro-optical-note',
+   'Iluminação qualitativa; os tons dos grãos não são refletâncias medidas.');
+  opticalNote.setAttribute('role','status');opticalNote.setAttribute('aria-live','polite');
+  opticalTools.append(lightButton,finishButton,sourceAngle.wrap,viewAngle.wrap,opticalNote);
+  toolbar.append(opticalTools);
+  lightButton.addEventListener('click',()=>{
+   if(model?.state.properties.active!=='luster')return;
+   toggleLight();
+   refreshOptical();
+  });
+  finishButton.addEventListener('click',()=>{
+   if(drive)drive.setFinish(drive.finish==='matte'?'polished':'matte');
+   refreshOptical();
+  });
+  function refreshOptical(){
+   const state=model?.state,active=state?.module?.active==='explorar'&&
+    state?.properties?.active==='luster',light=!!state?.properties?.luster?.light;
+   opticalTools.hidden=!active;
+   section.dataset.opticalStudy=active?'active':'inactive';
+   if(!active||!drive||!microLightOverlay){
+    if(microLightOverlay)microLightOverlay.style.opacity='0';
+    delete section.dataset.opticalAppearance;
+    return;
+   }
+   const reading=SILM.opticalObservation?.observe({
+    illuminated:light,incidenceDeg:drive.angle,observerDeg:drive.observerAngle,
+    finish:drive.finish
+   });
+   if(!reading)return;
+   section.dataset.opticalAppearance=reading.appearance;
+   section.dataset.opticalLight=light?'on':'off';
+   section.dataset.opticalFinish=drive.finish;
+   lightButton.textContent=light?'Apagar luz':'Incidir luz';
+   lightButton.setAttribute('aria-pressed',String(light));
+   finishButton.textContent=drive.finish==='matte'?'Fosco':'Polido';
+   finishButton.setAttribute('aria-pressed',String(drive.finish==='matte'));
+   sourceAngle.input.value=String(drive.angle);
+   viewAngle.input.value=String(drive.observerAngle);
+   // Apenas a diferença qualitativa do destaque, nunca brilho por grão.
+   const opacity={off:0,aligned:.56,near:.26,away:.04,diffuse:.12}[reading.appearance]||0;
+   microLightOverlay.style.opacity=String(opacity);
+   lightGradient.setAttribute('x1',(50-50*Math.sin(drive.angle*Math.PI/180))+'%');
+   lightGradient.setAttribute('y1',(50-50*Math.cos(drive.angle*Math.PI/180))+'%');
+   lightGradient.setAttribute('x2',(50+50*Math.sin(drive.angle*Math.PI/180))+'%');
+   lightGradient.setAttribute('y2',(50+50*Math.cos(drive.angle*Math.PI/180))+'%');
+   // Para o fosco, mostrar uma luz difusa geral sem criar textura de fase.
+   lightEnd.setAttribute('stop-opacity',drive.finish==='matte'?'.55':'0');
+   opticalNote.textContent=reading.description+
+    ' Sobreposição esquemática; não altera grãos, fases, composição ou refletância real.';
+  }
+  // Reutilizado pelo renderizador global quando Ver muda a propriedade,
+  // sem destruir mapa, seleção, zoom nem semente da microestrutura.
+  section.silmMicroOpticalRefresh=refreshOptical;
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
   svg.addEventListener('pointerdown',e=>{
    if(e.button!==0||!viewport.classList.contains('is-pannable'))return;
