@@ -97,7 +97,7 @@ SILM.workshop=(()=>{
    const direct=node('button','button outline','Iniciar investigação sem referência');direct.type='button';direct.addEventListener('click',onStartDirect);s.append(direct);host.append(s);return;}
   const grid=node('div','silm-workshop-grid');for(const item of refs)grid.append(itemCard(item,onInvestigate));s.append(grid);host.append(s);
  }
- function renderReference(host,{element,item=null,items=[],scale=1,guided=false,onChoose=()=>{},onScale=()=>{},onOpenPeriodic=()=>{},onBrowseObjects=()=>{}}={}){
+ function renderReference(host,{element,item=null,items=[],scale=1,guided=false,model=null,toggleLight=()=>{},onChoose=()=>{},onScale=()=>{},onOpenPeriodic=()=>{},onBrowseObjects=()=>{}}={}){
   host.replaceChildren();host.hidden=false;
   const s=node('section','silm-workshop-reference');if(guided)s.classList.add('silm-workshop-guided');
   if(scale===2){
@@ -110,7 +110,7 @@ SILM.workshop=(()=>{
    heading.append(titles);if(!guided)heading.append(table);
    heading.append(manualLink('graos-microestrutura',item,'Consultar no Manual grãos, escala e referências de '+element.name));
    s.append(heading);
-   const viewer=SILM.microstructure?.create?.({element,item})||null;
+   const viewer=SILM.microstructure?.create?.({element,item,model,toggleLight})||null;
    if(viewer)s.append(viewer);
    else{const fallback=node('div','silm-workshop-reference-art');fallback.innerHTML=MICRO;s.append(fallback);}
    // Imagens alternativas e proveniência metalográfica são lidas no
