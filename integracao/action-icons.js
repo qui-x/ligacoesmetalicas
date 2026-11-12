@@ -18,6 +18,8 @@ window.SILMActionIcons=(()=>{
  refresh:'<path d="M20 7v5h-5M4 17v-5h5M5.5 9A7 7 0 0 1 19 7l1 5M4 12l1 5a7 7 0 0 0 13.5-2"/>',
  expand:'<path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/>',
  fit:'<path d="M8 3H3v5m18 0V3h-5M3 16v5h5m13-5v5h-5M8 8h8v8H8z"/>',
+ compress:'<path d="M12 3v7m-4-4 4 4 4-4M12 21v-7m-4 4 4-4 4 4M3 12h18"/>',
+ stretch:'<path d="M12 3v7m-4-4 4-3 4 3M12 21v-7m-4 4 4 3 4-3M3 12h18"/>',
  zoomIn:'<circle cx="11" cy="11" r="7"/><path d="m16 16 5 5M8 11h6M11 8v6"/>',
  zoomOut:'<circle cx="11" cy="11" r="7"/><path d="m16 16 5 5M8 11h6"/>',
  eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
@@ -109,6 +111,11 @@ window.SILMActionIcons=(()=>{
   const text=button.textContent.trim().replace(/\s+/g,' ');
   let spec;
   if(button.matches('.silm-structure-layout'))spec=/lista/i.test(button.getAttribute('aria-label')||text)?['list','icon']:['grid','icon'];
+  else if(button.matches('.silm-micro-mechanical-pulse')){
+   // Não aplicar o ícone "Ajustar à tela" a uma ação de deformação.
+   // Preservar rótulo textual e aria-label fornecido pelo controlador.
+   spec=/Tração|Tracionar/i.test(button.getAttribute('aria-label')||text)?['stretch','label']:['compress','label'];
+  }else if(button.matches('.silm-micro-mechanical-reset'))spec=['refresh','label'];
   else if(button.matches('.silm-workshop-micro-control')){
    const name=button.getAttribute('aria-label')||text;
    spec=/Reduzir/i.test(name)?['zoomOut','icon']:/Ampliar/i.test(name)?['zoomIn','icon']:['fit','icon'];
