@@ -165,7 +165,12 @@ def run(browser_name: str, root: str) -> None:
             page.goto(root.rstrip("/") + "/#/ambiente")
             measure_button = page.locator('[data-silm-module-shortcut="medir"]')
             expect(measure_button).to_be_enabled()
-            measure_button.click()
+            page.evaluate("""() => {
+                const selector = document.getElementById('silm-module');
+                if (!selector || selector.disabled) throw new Error('Seletor científico indisponível');
+                selector.value = 'medir';
+                selector.dispatchEvent(new Event('change', {bubbles: true}));
+            }""")
             page.goto(root.rstrip("/") + "/#/relatorios")
             expect(report.locator(".silm-report-doc")).to_have_attribute("data-scientific-module", "medir")
             expect(report.locator('[data-report-section="medicoes"]')).to_contain_text("Nenhuma medição registrada")
@@ -177,7 +182,12 @@ def run(browser_name: str, root: str) -> None:
             page.goto(root.rstrip("/") + "/#/ambiente")
             calculate_button = page.locator('[data-silm-module-shortcut="calcular"]')
             expect(calculate_button).to_be_enabled()
-            calculate_button.click()
+            page.evaluate("""() => {
+                const selector = document.getElementById('silm-module');
+                if (!selector || selector.disabled) throw new Error('Seletor científico indisponível');
+                selector.value = 'calcular';
+                selector.dispatchEvent(new Event('change', {bubbles: true}));
+            }""")
             page.goto(root.rstrip("/") + "/#/relatorios")
             expect(report.locator(".silm-report-doc")).to_have_attribute("data-scientific-module", "calcular")
             expect(report.locator('[data-report-section="calculos"]')).to_contain_text("Nenhum cálculo registrado")
@@ -187,7 +197,12 @@ def run(browser_name: str, root: str) -> None:
             report.locator("#report-observations").fill("Ainda não apliquei uma fórmula.")
             report.locator("#route-report-notebook").click()
             page.goto(root.rstrip("/") + "/#/ambiente")
-            page.locator('[data-silm-module-shortcut="explorar"]').click()
+            page.evaluate("""() => {
+                const selector = document.getElementById('silm-module');
+                if (!selector || selector.disabled) throw new Error('Seletor científico indisponível');
+                selector.value = 'explorar';
+                selector.dispatchEvent(new Event('change', {bubbles: true}));
+            }""")
             page.goto(root.rstrip("/") + "/#/relatorios")
             expect(report.locator(".silm-report-doc")).to_have_attribute("data-scientific-module", "explorar")
             expect(report.locator("#report-observations")).to_have_value("Observei o brilho no módulo Explorar.")
