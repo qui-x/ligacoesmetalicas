@@ -274,7 +274,7 @@ self.addEventListener('fetch',event=>{
   if(networkFirst){
    try{
     const fresh=await fetch(new Request(req,{cache:'no-cache'}));
-    if(fresh.ok){await cache.put(key,fresh.clone());return fresh;}
+    if(fresh.ok){try{await cache.put(key,fresh.clone());}catch(error){/* Falha de quota não deve devolver JS antigo se a rede respondeu. */}return fresh;}
     const fallback=await cache.match(key,{ignoreSearch:true});
     return fallback||fresh;
    }catch(error){
@@ -286,7 +286,7 @@ self.addEventListener('fetch',event=>{
   const cached=await cache.match(key,{ignoreSearch:true});
   if(cached)return cached;
   const response=await fetch(req);
-  if(response.ok)await cache.put(key,response.clone());
+  if(response.ok)try{await cache.put(key,response.clone());}catch(error){/* Ainda entregar o recurso recebido online. */}
   return response;
  })());
 });
