@@ -15,6 +15,9 @@ on:
       - '.github/scripts/test_teacher_pedagogy_parity.py'
       - 'integracao/route-ui.js'
       - 'domain/silm/report-modules.js'
+      - 'domain/silm/report-property-history.js'
+      - '.github/scripts/test_report_property_history_contracts.js'
+      - 'integracao/adapter.js'
       - '.github/scripts/test_report_modules_contracts.js'
       - 'index.html'
       - 'integracao/action-icons.js'
@@ -38,6 +41,9 @@ on:
       - 'integracao/teacher-ui.js'
       - 'integracao/route-ui.js'
       - 'domain/silm/report-modules.js'
+      - 'domain/silm/report-property-history.js'
+      - '.github/scripts/test_report_property_history_contracts.js'
+      - 'integracao/adapter.js'
       - '.github/scripts/test_report_modules_contracts.js'
       - 'index.html'
       - 'integracao/action-icons.js'
@@ -65,6 +71,8 @@ jobs:
         run: node .github/scripts/test_session_continuity_contracts.js
       - name: Auditar exclusividade dos relatórios por módulo
         run: node .github/scripts/test_report_modules_contracts.js
+      - name: Auditar eventos de propriedades no histórico e Caderno
+        run: node .github/scripts/test_report_property_history_contracts.js
       - name: Auditar semântica dos ícones metálicos e identidade do relatório
         run: node .github/scripts/test_metallic_icon_semantics.js
 

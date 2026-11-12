@@ -106,6 +106,13 @@ def run(browser_name: str, root: str) -> None:
             page.locator("#route-metal").select_option("29")
             page.locator("#route-mount").click()
             expect(page).to_have_url(re.compile(r".*#/ambiente.*"), timeout=10000)
+            # A ação vem do motor real e alimenta o histórico; nenhuma
+            # entrada do diário é fabricada pelo teste.
+            page.evaluate("""() => {
+                const button = document.querySelector('#silm-direct-actionbar [data-action="property-electrical"]');
+                if (!button || button.disabled) throw new Error('Condutividade elétrica indisponível na Oficina');
+                button.click();
+            }""")
             page.goto(root.rstrip("/") + "/#/relatorios")
             report = page.locator("#silm-route-report")
             expect(report).to_contain_text("Hipótese inicial registrada")
@@ -123,6 +130,10 @@ def run(browser_name: str, root: str) -> None:
             expect(header.locator(".silm-report-provenance")).to_contain_text("Representação qualitativa")
             expect(report.locator(".silm-report-doc")).to_have_attribute("data-scientific-module", "explorar")
             expect(report.locator('[data-report-section="propriedades"]')).to_contain_text("Propriedades disponíveis")
+            expect(report.locator(".silm-report-property-history")).to_contain_text("Histórico de interações")
+            expect(report.locator(".silm-report-property-history")).to_contain_text("Condutividade elétrica")
+            expect(report.locator(".silm-report-property-history")).to_contain_text("Início")
+            expect(report.locator(".silm-report-property-history")).to_contain_text("Não são medidas experimentais")
             expect(report.locator('[data-report-section="medicoes"]')).to_have_count(0)
             expect(report.locator('[data-report-section="calculos"]')).to_have_count(0)
             expect(report.locator('[data-report-section="condicoes"]')).to_contain_text("Condições de referência")
@@ -162,6 +173,15 @@ def run(browser_name: str, root: str) -> None:
             # Um mesmo experimento pode mudar de módulo sem misturar os textos
             # autorais, os registros científicos ou as fontes de cada área.
             report.locator("#report-observations").fill("Observei o brilho no módulo Explorar.")
+            report.locator("#route-report-notebook").click()
+            # O histórico acompanha o arquivo no Caderno, independente dos
+            # registros científicos posteriores da investigação.
+            archive = page.evaluate("""() => {
+                const store = JSON.parse(localStorage.getItem('silm-base-integration:documents-v1') || '{}').documents || {};
+                return Object.values(store).map(v => { try { return JSON.parse(v); } catch { return null; } })
+                    .find(v => v?.propertyHistory?.events?.some(x => x.property === 'electrical'));
+            }""")
+            assert archive and archive["propertyHistory"]["events"], (browser_name, width, "sem histórico arquivado")
             page.goto(root.rstrip("/") + "/#/ambiente")
             measure_button = page.locator('[data-silm-module-shortcut="medir"]')
             expect(measure_button).to_be_enabled()
