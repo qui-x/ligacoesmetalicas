@@ -1,6 +1,8 @@
 // Regressão isolada da apresentação da microestrutura no SILM main.
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
+import {mkdirSync} from 'node:fs';
+import {join} from 'node:path';
 const require=createRequire(import.meta.url),playwright=require(process.env.PLAYWRIGHT_MODULE);
 const browserName=process.env.BROWSER_NAME||'chromium',base=process.env.BASE_URL||'http://127.0.0.1:8765';
 const browser=await playwright[browserName].launch({headless:true});
@@ -90,11 +92,14 @@ async function test(viewport){
  const mech=viewer.locator('.silm-micro-mechanical-tools');
  await mech.waitFor({state:'visible'});
  const grip=viewer.locator('.silm-micro-mechanical-top');
+ const mechanicalDir=join('reports','micro-deformation',browserName);
+ mkdirSync(mechanicalDir,{recursive:true});
  assert.ok((await grip.boundingBox())?.height>=44,'Alça da prensa não alcança 44 px.');
  await mech.getByRole('button',{name:'Aplicar compressão'}).click();
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='1');
  assert.match(await viewer.locator('.silm-micro-mechanical-field').getAttribute('transform'),/scale\(/,
   'Compressão não modifica a representação no mesmo mapa.');
+ await viewer.screenshot({path:join(mechanicalDir,'compressao-'+viewport.width+'.png'),animations:'disabled'});
  assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),activeGrain,
   'Comprimir apagou o grão selecionado.');
  await grip.focus();await grip.press('Enter');
@@ -111,6 +116,7 @@ async function test(viewport){
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='1');
  assert.match(await mech.locator('.silm-micro-mechanical-reading').textContent(),
   /Tração.*passo ilustrativo 1\/4.*não representa deformação medida/);
+ await viewer.screenshot({path:join(mechanicalDir,'tracao-'+viewport.width+'.png'),animations:'disabled'});
  await mech.getByRole('button',{name:'Restaurar deformação'}).click();
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='0');
  await page.getByRole('button',{name:'Ver',exact:true}).click();
