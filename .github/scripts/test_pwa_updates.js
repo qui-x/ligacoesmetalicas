@@ -57,6 +57,13 @@ const perform=async(name,request)=>{
  online=false;
  const fallback=await perform('fetch',script);
  assert.equal(await fallback.text(),'ATUAL:'+normalized(script),'Offline deve usar a revisão mais recente');
+ online=true;
+ const complete=new Request(scope+'completo.html');
+ await cache.put(complete,new Response('STANDALONE ANTIGO'));
+ const latestComplete=await perform('fetch',complete);
+ assert.equal(await latestComplete.text(),'ATUAL:'+normalized(complete),'Standalone deve ser revalidado');
+ online=false;
+ assert.equal(await (await perform('fetch',complete)).text(),'ATUAL:'+normalized(complete),'Standalone deve funcionar offline');
  const nav=await perform('fetch',{url:scope,method:'GET',mode:'navigate'});
  assert.ok(await nav.text(),'A navegação offline deve recuperar a entrada');
  assert.ok(calls.length>=9,'Pré-cache essencial deve ter sido consultado');
