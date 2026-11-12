@@ -17,8 +17,8 @@ window.SILM=window.SILM||{};
  const catalog=Object.freeze({
   electrical:{id:'electrical',title:'Condutividade elétrica',requires:'electrons',limitation:'O movimento visual dos elétrons sob campo é uma representação qualitativa e não corresponde diretamente à velocidade real dos portadores de carga. Com a fonte de calor, o aumento do espalhamento e a redução da deriva nas regiões quentes seguem a regra de Matthiessen (Callister & Rethwisch) de forma qualitativa, com fatores didáticos iguais para todos os metais. A intensidade do campo vai de 5 % a 100 %, sem unidade: a deriva é proporcional a ela (v ∝ E) e não usa a condutividade do metal.'},
   thermal:{id:'thermal',title:'Condutividade térmica',requires:'crystalline',limitation:'Representação qualitativa: a energia passa entre vizinhos imediatos pela equação do calor discreta, com um coeficiente didático único (igual para todos os metais) e troca simplificada com o ambiente durante o resfriamento. A escala de tempo é a da animação, não a do metal, e não há comparação entre metais.'},
-  malleability:{id:'malleability',title:'Maleabilidade',requires:'crystalline',limitation:DEFORMATION_LIMITS},
-  ductility:{id:'ductility',title:'Ductilidade',requires:'crystalline',limitation:DEFORMATION_LIMITS},
+  malleability:{id:'malleability',title:'Maleabilidade',requires:'structure',limitation:DEFORMATION_LIMITS+' Na escala de microestrutura, a mudança da forma dos grãos é uma transformação geométrica global ilustrativa; não fornece tensão, textura ou deslizamento medidos por grão.'},
+  ductility:{id:'ductility',title:'Ductilidade',requires:'structure',limitation:DEFORMATION_LIMITS+' Na escala de microestrutura, o alongamento dos grãos é uma transformação geométrica ilustrativa; não prevê ruptura, estricção nem alongamento percentual real.'},
   luster:{id:'luster',title:'Brilho metálico',requires:'crystalline',limitation:'A bancada óptica é uma ilustração qualitativa de uma superfície: a direção especular obedece θr = θi, mas os destaques polido/fosco não são refletância, cor, luminância ou rugosidade calculadas. Os dados n,k experimentais do Cu permanecem referência de interface ideal lisa à temperatura ambiente (CNTP não verificada); não se aplicam automaticamente a outros metais.'}
  });
  const reasons=Object.freeze({
@@ -62,7 +62,7 @@ window.SILM=window.SILM||{};
    else if(solidOnly&&ph.value==='liquid'){status='unavailable';reasonCode='LIQUID_AT_REFERENCE_CONDITION';}
    else if(solidOnly&&ph.value!=='solid'){status='unavailable';reasonCode='REFERENCE_PHASE_UNSUPPORTED';}
    else if(!investigable){status='unavailable';reasonCode='METAL_NOT_INVESTIGABLE';}
-   else if(c.requires==='crystalline'&&crystal.status!=='available'){status='unavailable';reasonCode='MODEL_NOT_APPLICABLE';}
+   else if((c.requires==='crystalline'||(['malleability','ductility'].includes(id)&&c.requires==='structure'))&&crystal.status!=='available'){status='unavailable';reasonCode='MODEL_NOT_APPLICABLE';}
    // 0.16.x: no modelo geral, condução térmica e brilho continuam qualitativos; a deformação didática não se aplica.
    else if(crystal?.general&&['malleability','ductility'].includes(id)){status='unavailable';reasonCode='DEFORMATION_MODEL_NOT_APPLICABLE';}
    else if(d)status='available';
