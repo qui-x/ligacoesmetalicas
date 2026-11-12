@@ -276,38 +276,44 @@
     "limits": "O estudo não valida manuseio de Pb ou Po; radioatividade e toxicidade não são simuladas."
   },
   {
-    "id": "roteiro-lantanideos",
-    "title": "Terras Raras: ver o que é possível",
-    "subtitle": "Lantanídeos e representação eletrônica",
-    "category": "familias",
-    "difficulty": "intermediario",
-    "selector": "category-all:lanthanide",
-    "module": "explorar",
-    "mode": "free",
-    "criterion": "electrons",
-    "tools": [
-      "electrons"
-    ],
-    "question": "Como estudar os lantanídeos quando nem todas as redes estão liberadas?",
-    "context": "Os 14 lantanídeos disponíveis no SILM permitem exploração do modelo eletrônico, mas La, Pr e Nd não têm rede interativa homologada.",
-    "hypothesis": "Preveja o que uma representação coletiva dos elétrons esclarece e o que exige geometria cristalográfica validada.",
-    "tasks": [
-      "Selecione um lantanídeo e confira a disponibilidade da rede de referência.",
-      "Ative e oculte a camada eletrônica no módulo Explorar.",
-      "Registre como a visualização se apresenta sem interpretar pontos como trajetórias quânticas.",
-      "Compare o limite do elemento escolhido com outro lantanídeo em outra investigação."
-    ],
-    "observe": [
-      "Metal e elegibilidade cristalográfica",
-      "Distribuição eletrônica visível/oculta",
-      "Limites da representação"
-    ],
-    "interpretation": [
-      "Por que um dado DHCP do Nd não habilita automaticamente sua rede interativa?",
-      "Por que Nd puro não é o ímã comercial Nd–Fe–B?"
-    ],
-    "limits": "Não se calcula magnetismo nem a estrutura de ligas Nd–Fe–B; redes não homologadas não devem ser exigidas."
-  },
+  "id": "roteiro-lantanideos",
+  "title": "Terras Raras: explorar os metais e suas propriedades",
+  "subtitle": "Sc, Y e lantanídeos · do objeto aos elétrons",
+  "category": "familias",
+  "difficulty": "intermediario",
+  "selector": "rare-earths",
+  "module": "explorar",
+  "mode": "free",
+  "criterion": "electrons",
+  "tools": [
+    "electrons",
+    "electrical"
+  ],
+  "question": "O que podemos descobrir sobre as terras raras explorando objetos, grãos, elétrons e a resposta elétrica dos metais?",
+  "context": "As terras raras são 17 elementos: escândio (Sc), ítrio (Y) e os 15 lantanídeos, de La a Lu. No SILM, 16 estão disponíveis para investigação; o promécio (Pm) permanece indisponível. Investigue as representações de cada elemento, observe uma aplicação e compare o modelo de ligação metálica com a resposta elétrica qualitativa. A exploração começa na Oficina, não em uma lista de restrições.",
+  "hypothesis": "Escolha uma terra rara e preveja como a distribuição dos elétrons e a resposta visual a um campo elétrico poderão ajudar a compreender seu caráter metálico. Em que aspectos você espera semelhanças com outro elemento do grupo?",
+  "tasks": [
+    "Escolha Sc, Y ou um lantanídeo disponível. Abra Objeto, examine a aplicação ilustrada e identifique o componente metálico que será investigado.",
+    "Percorra a escala Grãos, examine as regiões da microestrutura ilustrativa e descreva quais diferenças visuais você percebe em relação ao objeto.",
+    "No módulo Explorar, mostre e oculte os elétrons deslocalizados. Observe sua distribuição representada junto aos centros metálicos, sem tratá-los como órbitas de partículas individuais.",
+    "Ative a propriedade elétrica e aplique um campo. Compare o estado com e sem campo e registre o comportamento qualitativo exibido pela Oficina.",
+    "Para elementos com rede habilitada, avance até Rede e Centro: examine a célula, navegue pelos centros e destaque vizinhos. Registre as descobertas e, depois, investigue uma segunda terra rara em uma nova sessão."
+  ],
+  "observe": [
+    "Terra rara escolhida, símbolo, objeto ilustrado e componente investigado",
+    "Regiões de grãos representadas e características da microestrutura ilustrativa",
+    "Representação de elétrons deslocalizados visível e oculta",
+    "Resposta elétrica qualitativa antes e depois de aplicar o campo",
+    "Rede, célula e vizinhança quando habilitadas; observações para comparar outra terra rara"
+  ],
+  "interpretation": [
+    "Como a visualização de elétrons deslocalizados e a resposta ao campo ajudam a compreender a ligação metálica?",
+    "Que semelhanças e diferenças surgem ao explorar outra terra rara, considerando objeto, microestrutura, rede e respostas disponíveis?",
+    "Quais características do material você investigaria a seguir, e por quê?"
+  ],
+  "limits": "Os gráficos e as respostas de campo são representações didáticas. La, Pr e Nd ainda não permitem navegar na rede cristalográfica interativa; nesse caso, prossiga pelas escalas e recursos disponíveis. O modelo não calcula magnetismo de ligas Nd–Fe–B nem estrutura eletrônica quantitativa.",
+  "teacher": "Comece pelo objeto e incentive a manipulação livre de elétrons e campo elétrico. Organize comparações em duas investigações registradas separadamente. Explique que as terras raras incluem Sc, Y e quinze lantanídeos; Pm não está habilitado. Trate diferenças de disponibilidade de ferramentas como orientação pontual, não como objetivo central."
+},
   {
     "id": "roteiro-actinideos",
     "title": "Actinídeos: estruturas sem experimento físico",
@@ -859,6 +865,7 @@
   let picked=[];
   if(selector==='crystalline')picked=solid;
   else if(selector==='canonical')picked=canonical;
+  else if(selector==='rare-earths')picked=[21,39,...Array.from({length:15},(_,i)=>57+i)].filter(z=>all.includes(z));
   else if(selector==='general')picked=solid.filter(z=>S.crystal.eligibility(S.data.get(z)).general);
   else if(selector.startsWith('category-all:'))picked=all.filter(z=>S.data.get(z).classification.category===selector.slice(13));
   else if(selector.startsWith('category:'))picked=solid.filter(z=>S.data.get(z).classification.category===selector.slice(9));
