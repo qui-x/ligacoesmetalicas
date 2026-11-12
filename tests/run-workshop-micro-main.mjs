@@ -84,6 +84,21 @@ async function test(viewport){
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.opticalStudy==='active');
  const optics=viewer.locator('.silm-micro-optical-tools');
  assert.equal(await optics.isVisible(),true,'Controles ópticos não aparecem na microestrutura.');
+ if(viewport.width<=560){
+  const layout=await viewer.evaluate(root=>{
+   const row=root.querySelector('.silm-workshop-micro-zoom-tools');
+   const parent=root.querySelector('.silm-workshop-micro-toolbar');
+   const limits=parent.getBoundingClientRect();
+   const buttons=[...row.querySelectorAll('button')].map(button=>{
+    const r=button.getBoundingClientRect();return{left:r.left,right:r.right,width:r.width};
+   });
+   return {panel:limits.width,buttons,
+    overflow:buttons.some(button=>button.left<limits.left-2||button.right>limits.right+2)};
+  });
+  assert.equal(layout.overflow,false,
+   'Botões da microestrutura recortados no celular: '+JSON.stringify(layout));
+ }
+
  assert.equal(await viewer.locator('.silm-micro-optical-light').count(),1,
   'A iluminação foi recriada fora do mesmo mapa de grãos.');
  // Evidência visual para impedir novo recurso sobreposto/sem integração.
