@@ -277,8 +277,18 @@ try{
   document.addEventListener('keydown',e=>window.__silmKeyProbe.events.push('document-keydown:'+e.key),true);
   return {connected:node.isConnected,value:node.value};
  });
- await eye.focus();
- await eye.press('End');
+ // A cena pode ser remontada após trocar a propriedade ativa. Um foco colocado
+ // no controle anterior não deve ser confundido com falha do teclado nativo.
+ // Reobter o alvo e repetir a tecla real somente se ocorreu substituição do nó.
+ let keyboardAttempts=0;
+ for(;keyboardAttempts<3;keyboardAttempts++){
+  const target=await eye.elementHandle();
+  await eye.focus();
+  await eye.press('End');
+  if(await eye.inputValue()==='80')break;
+  const stillSame=await eye.evaluate((node,original)=>node===original,target).catch(()=>false);
+  if(stillSame)break; // Se o nó permaneceu, é defeito funcional, não corrida de montagem.
+ }
  const keyProbe=await eye.evaluate(node=>({
   ...window.__silmKeyProbe,after:node.value,focused:document.activeElement===node,
   connected:node.isConnected,bench:node.closest('.silm-optical-bench')?.dataset.appearance,
