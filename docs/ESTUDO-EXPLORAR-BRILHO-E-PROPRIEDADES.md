@@ -108,3 +108,63 @@ A combinação de propriedades exige semântica própria: **elétrica+térmica**
 - Roos, A.; Bergkvist, M.; Ribbing, C. G. (1989). [*Optical scattering from oxidized metals. 1*](https://doi.org/10.1364/AO.28.001360). Camadas oxidadas e espalhamento.
 
 **Decisão pendente:** avaliar a solução **superfície/observador primeiro**, sem preservar o diagrama de dois feixes como vista principal. Não integrar motor espectral novo sem homologação dos dados e da representação didática.
+
+---
+
+## 7. Reorganização multiescala — 12/11/2026 (diretriz atual)
+
+**Esta seção prevalece sobre os trechos históricos deste estudo que proponham uma bancada óptica independente ou a criação de mecânicas novas para objetos na escala 1.** A investigação é uma só; não deve criar segundos palcos, motores científicos ou painéis flutuantes. O PR #113 eliminou a minibancada. O PR #115 (rascunho) inicia o brilho diretamente na microestrutura.
+
+### 7.1. Responsabilidade das quatro escalas
+
+| Escala | Papel da propriedade | Intervenção prevista |
+|---|---|---|
+| 1. Objeto e componente | Contextualização visual na vida prática | **Somente atualizar imagens, referências e conexões** entre objetos, metal estudado e as próximas escalas. **Não implementar mecânicas novas**: serão produzidas separadamente pelo autor. |
+| 2. Microestrutura | **Principal área de manipulação e demonstração de propriedades** | Aplicar campos, estímulos e deformações no **mesmo mapa de grãos**. Preservar zoom, seleção, navegação, geometria importada e controles inferiores. |
+| 3. Rede e célula | Mecanismos coletivos que explicam a observação | Reutilizar motores existentes: deriva dos elétrons, difusão de energia, deslizamento de planos e propagação do campo. |
+| 4. Centro metálico | Ambiente local e interações | Mostrar coordenação, vizinhos, vibração e rearranjo relativo. Não atribuir brilho, tensão, temperatura macroscópica ou condutividade a um átomo isolado. |
+
+A escolha da propriedade continua no menu **Ver**; ao navegar pelas escalas ela permanece selecionada. Cada escala fornece uma visualização/gesto correspondente **sem reiniciar a investigação**. Manter os controles na barra inferior e a cena central predominante.
+
+### 7.2. Propriedades na microestrutura
+
+**Brilho — PR #115, primeiro incremento:** a lanterna e o observador controlam a mesma experiência óptica usada na rede. O acabamento atua sobre a superfície inteira, e não define uma refletância individual por grão. Distinguir **polido/fosco** (espalhamento qualitativo) de **preparação metalográfica/ataque** (revelação de grãos por contraste). Nunca inferir cor, fase, orientação, composição, rugosidade numérica ou espectro a partir da tesselação.
+
+**Maleabilidade — próximo PR recomendado:** permitir comprimir o conjunto no mesmo mapa vetorial; transformar temporariamente os polígonos existentes, preservando topologia/identidade e permitindo restaurar. Indicar direção da carga e deslocamento/achatamento qualitativos. Não inventar tensão de escoamento, sistemas de deslizamento particulares, orientação cristalográfica nem plasticidade real de cada grão. Na rede, mostrar o deslizamento coletivo; no centro, apenas o rearranjo de vizinhos.
+
+**Ductilidade — agrupar com maleabilidade no PR mecânico:** tracionar o mesmo corpo de prova esquemático, visualizar alongamento e comparar estado inicial/final. Não simular estricção, ruptura, porcentagem de alongamento ou curva tensão–deformação sem um modelo específico e dados homologados. O motor e o comando mecânicos devem ser compartilhados com a rede, sem sobrescrever a geometria ou a calibração de um mapa importado.
+
+**Condutividade térmica — PR seguinte:** posicionar fonte numa região da microestrutura, iniciar/parar, ver um **campo térmico relativo** atravessando os grãos e resfriar ao desligar a fonte. Cor térmica precisa de legenda distinta da cor dos grãos. Na ausência de dados de interface, não aplicar bloqueio ou resistência térmica fictícia a cada contorno; utilizar coeficientes didáticos iguais ou uma projeção conceitual do controlador térmico existente. Na rede, difusão entre vizinhos e participação de elétrons/vibrações; no centro, vibração local ilustrativa. Efeito Joule deve compartilhar a mesma sessão e o mesmo balanço de energia, jamais um segundo relógio/solver independente.
+
+**Condutividade elétrica — PR seguinte:** contatos nas bordas do mapa, direção do campo e continuidade do transporte. Destacar contornos como **possíveis regiões de espalhamento**, não como resistores individuais com valor inventado. Quantificar efeitos de contorno somente se houver caracterização de material/condição, comprimento característico e coeficientes do modelo. Na rede, deriva coletiva e colisões qualitativas; no centro, coordenação e comportamento coletivo da ligação, sem trilhas determinadas para um elétron. Os módulos elétrico+térmico usam o **mesmo Joule** já implementado.
+
+### 7.3. Contratos científicos e de interface
+
+- **Estado único:** manter o estado central de propriedades e os controladores compartilhados de luz, temperatura, deformação e eletrotermia; camadas da microestrutura são representações, não novas investigações.
+- **Mapa intacto:** zoom, pan, semente, grão selecionado e polígonos de referência/importados permanecem imutáveis sob overlays óptico, elétrico e térmico; deformação visual deve ser reversível e guardar origem intacta.
+- **Proveniência:** distinguir esquema D0, estudo contextual de literatura, mapa importado não homologado e dados quantitativos medidos/homologados. Não converter uma imagem de objeto em micrografia nem um grão sintético em prova de propriedades.
+- **Semântica da cor:** só usar paleta de **composição** para dados químicos calibrados (ex.: mapa EDS), e paleta de **orientação** para EBSD com legenda. Tom mais escuro não equivale universalmente a maior concentração.
+- **Realismo sem números falsos:** a mesma classe de interação pode existir nos 65 elementos sólidos habilitados, mas parâmetros e grandezas precisam ser ligados ao metal e às condições reais apenas quando registrados e validados.
+- **Sem nova UI paralela:** ativar propriedade em Ver; manipular em cena; ações em barra inferior única; orientação pedagógica no Manual/roteiros/missões existentes; nada de nova janela ou segundo mini-simulador.
+- **Escala 1 reservada:** apenas substituir imagens dos itens por fontes identificadas e metadados corretos, melhorar transições de navegação e manter referência a objetos/metais. **Nenhuma mecânica interativa nova para esta escala nesta etapa.**
+
+### 7.4. Sequência e testes
+
+1. Concluir e reconciliar PR #115 com a main atual, validando mobile e os três navegadores antes de merge.
+2. PR mecânico: maleabilidade + ductilidade, com transformações visuais reversíveis no mesmo mapa e vínculo didático com rede/centro.
+3. PR térmico: aquecedor, campo adimensional, difusão e resfriamento coerentes com o controlador já presente.
+4. PR elétrico/Joule: campo, contatos, contornos explicativos e uma única sessão eletrotérmica.
+5. PR de travessia de escalas e Manual/missões; manter a escala 1 limitada às imagens e aos vínculos contextuais.
+6. Atualização de imagens de objetos licenciadas e verificáveis; a implementação interativa própria da escala 1 permanece fora deste escopo.
+
+**Critérios obrigatórios para cada PR:** Chromium, Firefox e WebKit; testes em 320/390/768/1366/1920 px; teclado, toque, contraste, redução de movimento; controles de 44 px; nenhuma perda de seleção, câmera, semente ou medidas; preservar cache offline, dados importados, outras propriedades e mudança de escala; capturas reais da propriedade em uso, não somente cliques aprovados.
+
+### 7.5. Referências para limites físicos
+
+- ASM International, *Plastic Deformation Structures* (2005): https://doi.org/10.31399/asm.hb.v14a.a0004018
+- Bakonyi (2021), análise do efeito de contornos em Cu/Ni: https://link.springer.com/article/10.1140/epjp/s13360-021-01303-4
+- Mayadas e Shatzkes (1970), modelo de espalhamento em contornos sob condições específicas: https://doi.org/10.1103/PhysRevB.1.1382
+- Oxford Instruments, natureza dos mapas EBSD e distinção de tamanho, contornos, fase e orientação: https://www.ebsd.com/ebsd-techniques/displaying-ebsd-data
+- Leica, preparo e contraste metalográficos: https://www.leica-microsystems.com/science-lab/industrial/metallography-an-introduction/
+
+**Decisão:** escala 2 é o foco da investigação das propriedades; escala 3 explica mecanismos coletivos; escala 4 explica ambientes locais. Escala 1: imagens e vínculos contextuais apenas, até a interação independente estar pronta.
