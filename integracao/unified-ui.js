@@ -107,12 +107,13 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
  function recordReport(record,route){
   if(!record?.checkpoint||!record.activityContext||!route)return 'error';
   const state=record.checkpoint,report=record.report||{},free=record.activityContext.type==='free';
-  const token=String((free?'livre':record.activityContext.id)+'-'+(state.investigation?.id||('metal-'+(state.metal?.atomicNumber||'unknown')))).toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-|-+$/g,'').slice(0,40)||'livre';
+  const reportModule=free?state.module?.active||'explorar':route.module||state.module?.active||'explorar';
+  const token=String((free?'livre-'+reportModule:record.activityContext.id)+'-'+(state.investigation?.id||('metal-'+(state.metal?.atomicNumber||'unknown')))).toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-|-+$/g,'').slice(0,40)||'livre';
   const attemptId='attempt-silm-report-'+token;
   if(journal.snapshot().notes.some(n=>n.attemptId===attemptId))return 'duplicate';
   const e=state.metal?S.data.get(state.metal.atomicNumber):null;
   const activityTitle=record.activityContext.teacher?.title||route.title;
-  const reportModule=free?state.module?.active||'explorar':route.module||state.module?.active||'explorar';
+
   const structure=(t=>t&&S.crystal.isGeneral(t)?S.crystal.label(t,e):t)(state.structure?.crystallography?.structureType)||(state.structure?.mode==='crystalline'?'Estrutura cristalina':'Montagem livre');
   const short=(value,max=220)=>String(value||'').trim().slice(0,max);
   const lines=[
