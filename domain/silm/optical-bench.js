@@ -144,13 +144,21 @@ window.SILM=window.SILM||{};
    node.addEventListener('keydown',onKeydown);
    scope.cleanup(()=>node.removeEventListener('keydown',onKeydown));
   }
-  scope.listen(source,'click',()=>toggleLight?.());
-  scope.listen(finish,'click',()=>{
+  // Controles da bancada usam listeners próprios, como os ranges nativos.
+  // Não dependem do repasse dos gestos da cena cristalográfica.
+  const onSource=event=>{event.stopPropagation();toggleLight?.();};
+  const onFinish=event=>{
+   event.stopPropagation();
    if(drive?.setFinish(drive.finish==='matte'?'polished':'matte'))update(lastState);
-  });
-  scope.listen(rays,'click',()=>{
+  };
+  const onRays=event=>{
+   event.stopPropagation();
    if(drive?.setRays(!drive.rays))update(lastState);
-  });
+  };
+  for(const [button,handler] of [[source,onSource],[finish,onFinish],[rays,onRays]]){
+   button.addEventListener('click',handler);
+   scope.cleanup(()=>button.removeEventListener('click',handler));
+  }
   function update({visible=false,illuminated=false}={}){
    lastState={visible,illuminated};
    root.hidden=!visible;
