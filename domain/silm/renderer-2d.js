@@ -218,7 +218,8 @@ SILM.renderer2d=(()=>{
    const pointers=new Map();let pan=null,pinch=null,press=null,swallowUntil=0,pointerAt=0;
    // Controles sobrepostos ao palco não são gestos da câmera. Em especial,
    // ranges e botões da bancada óptica não podem capturar o ponteiro da vista.
-   const ignore=e=>e.button>0||!!e.target.closest?.('.silm-camera,.silm-optical-bench,button,input,select,textarea,a,[role="slider"],[role="button"]');
+   const ignore=e=>e.button>0||(!e.target.closest?.('.silm-unit[data-unit-id]')&&
+    !!e.target.closest?.('.silm-camera,.silm-optical-bench,button,input,select,textarea,a,[role="slider"],[role="button"]'));
    const capture=id=>{try{viewport.setPointerCapture(id);}catch(_){}};
    scope.listen(viewport,'pointerdown',e=>{
     pointerAt=performance.now();swallowUntil=0;   // um novo toque nunca é engolido
