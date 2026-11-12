@@ -243,6 +243,9 @@ try{
  evidence.push({name:'texto-150-390',...zoomedFont});
  assert.ok(zoomedFont.camera>=43.5&&zoomedFont.nav>=43.5,
   'Alvos comprimidos em 150% '+JSON.stringify(zoomedFont));
+ // O brilho superficial é investigado na rede, NÃO em um centro isolado.
+ await scale(3);
+ await page.waitForFunction(()=>document.querySelector('.silm-crystal[data-local-focus="false"]'));
  // Demonstração óptica: a Oficina carrega apenas o perfil experimental de Cu.
  // O painel distingue dado de referência de aparência macroscópica real.
  await page.evaluate(()=>document.documentElement.style.fontSize='');
