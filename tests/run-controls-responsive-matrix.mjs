@@ -270,9 +270,21 @@ try{
  const rect=await eyeHandle.boundingBox(),rangeRect=await eye.boundingBox();
  assert.ok(rect?.width>=43.5&&rect.height>=43.5,'Observador direto perdeu alvo de toque de 44 px');
  assert.ok(rangeRect?.height>=43.5,'A escala angular nativa não tem alvo de toque adequado.');
+ const beforeKey=await eye.evaluate(node=>{
+  window.__silmKeyProbe={events:[],before:node.value};
+  node.addEventListener('keydown',e=>window.__silmKeyProbe.events.push('target-keydown:'+e.key),true);
+  node.addEventListener('input',()=>window.__silmKeyProbe.events.push('target-input:'+node.value),true);
+  document.addEventListener('keydown',e=>window.__silmKeyProbe.events.push('document-keydown:'+e.key),true);
+  return {connected:node.isConnected,value:node.value};
+ });
  await eye.focus();
  await eye.press('End');
- assert.equal(await eye.inputValue(),'80','O controle angular nativo não respondeu à tecla End');
+ const keyProbe=await eye.evaluate(node=>({
+  ...window.__silmKeyProbe,after:node.value,focused:document.activeElement===node,
+  connected:node.isConnected,bench:node.closest('.silm-optical-bench')?.dataset.appearance,
+  selectorCount:document.querySelectorAll('#silm-assembly-stage .silm-optical-bench-angle-eye').length
+ }));
+ assert.equal(await eye.inputValue(),'80','O controle angular nativo não respondeu à tecla End: '+JSON.stringify({beforeKey,keyProbe}));
  await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='away');
  // Alinhar a visão por gesto real no controle de faixa.
  await page.mouse.click(rangeRect.x+rangeRect.width*.43,rangeRect.y+rangeRect.height/2);
