@@ -498,7 +498,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    if(available.length){
     const rows=available.map(p=>{
      const isTable=p.data?.kind==='TABULATED'&&Number.isFinite(p.data.value);
-     const reference=isTable?decimal(p.data.value)+' '+p.data.unit:'Representação qualitativa; sem valor numérico homologado aqui';
+     const reference=isTable?decimal(p.data.value)+' '+p.data.unit:p.data?.kind==='CALCULATED'?'Valor derivado de referência; não é medida da exploração':'Representação qualitativa; sem valor numérico tabelado neste módulo';
      return [p.title,p.active?'Em exploração':p.status==='available'?'Disponível':'Modelo qualitativo',reference];
     });
     sec.append(reportTable('Disponibilidade das propriedades no SILM',['Propriedade','Situação','Referência'],rows));
