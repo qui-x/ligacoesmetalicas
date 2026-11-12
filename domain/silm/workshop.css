@@ -1129,3 +1129,38 @@
 @media(prefers-reduced-motion:reduce){
  .silm-micro-mechanical-field{transition:none!important}
 }
+
+
+/* Revisão visual: em 320–560 px nenhum comando da faixa de grãos
+   pode ficar recortado. Os rótulos acessíveis ficam nos aria-labels. */
+@media(max-width:560px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:stretch;
+  gap:3px 0;padding:4px;min-width:0;overflow:visible
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-status,
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-dimension{
+  flex:1 1 100%;max-width:100%;min-width:0;order:0
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-dimension{order:1}
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools{
+  display:flex;flex:1 1 100%;order:2;width:100%;max-width:100%;
+  min-width:0;margin:0;justify-content:space-between;align-items:center;
+  flex-wrap:nowrap;gap:2px;overflow:visible
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools .silm-workshop-micro-control{
+  flex:0 0 44px;width:44px;max-width:44px;min-width:44px;min-height:44px;
+  padding:3px;display:grid;place-items:center;box-sizing:border-box
+ }
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools .silm-micro-button-label{display:none}
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom{
+  flex:0 0 35px;min-width:35px;font-size:.74rem;text-align:center
+ }
+ #si-stage[data-workshop-scale="2"] .silm-micro-mechanical-tools{
+  width:100%;max-width:100%;order:3
+ }
+}
+@media(max-width:360px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools{gap:0}
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom{flex-basis:32px;min-width:32px}
+}
