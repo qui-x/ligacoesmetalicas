@@ -71,6 +71,30 @@ window.SILM=window.SILM||{};
    metals:c.type==='preset'?metalNames(c.metals)[0]:all?'O aluno escolhe entre os '+req.metals.length+' metais elegíveis':c.metals.length===1?metalNames(c.metals)[0]:'O aluno escolhe entre: '+metalNames(c.metals).join(', '),
    tools:c.type==='preset'?'Os da oficina livre':toolNames(c.tools),navigation:NAVIGATION[c.navigation]};
  }
+ /* Indicadores para observação docente, derivados dos estudos existentes.
+    Nenhum indicador atribui nota, comprova domínio ou modifica o relatório do aluno. */
+ function formative(activity){
+  const x=typeof activity==='string'?(S.activities?.get(activity)||S.readyAssemblies?.catalog?.find(a=>a.id===activity)):activity;
+  if(!x||typeof x!=='object')return null;
+  const study=x.study||{},criteria=[];
+  const add=(id,focus,reference)=>{
+   const value=typeof reference==='string'?reference.trim():Array.isArray(reference)?reference.filter(Boolean).join(' · '):'';
+   if(value)criteria.push(Object.freeze({id,focus,reference:value}));
+  };
+  add('question','Delimitação do problema',study.question||x.description||x.objective);
+  add('prediction','Hipótese ou previsão inicial',study.hypothesis||study.prediction||x.objective);
+  add('method','Procedimento e uso dos recursos',study.tasks||x.steps||x.guidance?.action);
+  add('observations','Registros e observações',study.observe||study.evidence||x.guidance?.hint);
+  add('interpretation','Interpretação e argumentação',study.interpretation||study.questions||x.guidance?.criterion||x.objective);
+  if(x.type==='mission')for(const objective of x.evidenceObjectives||[])
+   add('evidence-'+objective.id,'Evidência observável: '+objective.label,objective.label);
+  add('limits','Limitações do modelo',study.limits||study.limit||'Distinguir dados tabelados, medidas do modelo, cálculos e representações didáticas.');
+  add('conclusion','Conclusão fundamentada',x.guidance?.criterion||study.question||x.objective);
+  const identifiers=new Set();
+  if(criteria.some(a=>identifiers.has(a.id)||!identifiers.add(a.id)))throw Error('Indicadores de avaliação duplicados.');
+  return Object.freeze({title:x.title||'Investigação livre',criteria:Object.freeze(criteria),
+   notice:'Ficha de mediação docente: os critérios orientam a análise das evidências. O SILM não atribui nota, não corrige respostas e não infere aprendizagem a partir de cliques ou cálculos.'});
+ }
  /* Guia do professor composto com o conteúdo existente do SILM. */
  function manualDetail(topicId,prefix){const t=S.manual?.topics?.find(x=>x.id===topicId);const d=t?.details?.find(x=>x.title.startsWith(prefix));return d?d.text:null;}
  function limitations(tools,module){
@@ -117,15 +141,25 @@ window.SILM=window.SILM||{};
     add('Mediação do professor',[study.teacher]);
     add('Evidências verificáveis da missão',['O motor existente confere as evidências; a interpretação e a conclusão são do estudante.'],(x.evidenceObjectives||[]).map(e=>e.label));
    }
+   const followUp=formative(x);
+   if(followUp)add('Ficha de acompanhamento formativo',[followUp.notice,
+    'Para cada indicador, anote evidência concreta, dúvida remanescente e próximo encaminhamento. A constatação do motor não substitui a interpretação do professor.'],
+    followUp.criteria.map(k=>k.focus+': '+k.reference));
    add('Critério de conclusão',[x.guidance.criterion,'O SILM confere esse critério no modelo; a conclusão escrita é do estudante.']);
    if(themes.length)add('Como interpretar (temas relacionados)',[],themes.map(t=>concept(t,'Como interpretar')).filter(Boolean));
    add('Limites do modelo',[...new Set([x.study?.limits||x.study?.limit,...themes.map(t=>concept(t,'Limites do modelo')).filter(Boolean),...limitations(c.tools,req.module)].filter(Boolean))]);
   }
-  if(c.type==='preset')add('Limites do modelo',limitations(c.tools,req.module));
+  if(c.type==='preset'){
+   const followUp=formative(x);
+   add('Ficha de acompanhamento formativo',[followUp.notice,
+    'Anote as observações e os próximos passos sem alterar a montagem ou produzir uma nota automática.'],
+    followUp.criteria.map(k=>k.focus+': '+k.reference));
+   add('Limites do modelo',limitations(c.tools,req.module));
+  }
   const sources=[...new Set([...(x.sources||[]),'src-silm-conventions'])].map(id=>S.data.source(id)?.title||id);
   add('Fontes',['Os dados de cada metal (estrutura, parâmetros e condições) têm a fonte registrada no banco do SILM e aparecem em Dados → Fontes.'],sources);
   add('Observação',['Experiência virtual educacional. As orientações não constituem procedimento de laboratório real.']);
   return {title:c.title,subtitle:s.type+' · '+s.itemTitle+' · Módulo '+s.module,sections};
  }
- S.teacherActivities=Object.freeze({schema:SCHEMA,maxLibrary:MAX_LIBRARY,types:TYPES,navigation:NAVIGATION,toolLabels:TOOL_LABELS,required:REQUIRED,catalog,item,requirements,validate,newId,encode,decode,library,exportDocument,importDocument,summary,guide,toolNames,metalNames});
+ S.teacherActivities=Object.freeze({schema:SCHEMA,maxLibrary:MAX_LIBRARY,types:TYPES,navigation:NAVIGATION,toolLabels:TOOL_LABELS,required:REQUIRED,catalog,item,requirements,validate,newId,encode,decode,library,exportDocument,importDocument,summary,guide,formative,toolNames,metalNames});
 })();
