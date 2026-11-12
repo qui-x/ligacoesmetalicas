@@ -324,7 +324,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
     do modelo, cálculo do SILM e texto do estudante. O SILM não cria dados hipotéticos: a análise usa os dados da investigação. */
  const REPORT_TEXTS=[['observations','Observações'],['analysis','Análise'],['interpretation','Interpretação'],['answer','Resposta à investigação'],['conclusion','Conclusão']];
  const REPORT_DATA={conditions:'Condições de referência',measurements:'Medições do modelo',calculations:'Cálculos do SILM',state:'Estado da investigação'};
- const REPORT_MODES={completo:'Relatório completo',mao:'Para preencher à mão',analise:'Atividade de análise · Professor'};
+ const REPORT_MODES={completo:'Relatório completo',mao:'Para preencher à mão',analise:'Atividade de análise · Professor',formativa:'Ficha de acompanhamento · Professor'};
  const REPORT_LINES=[5,10,15,20,25],MODULE_NAMES={explorar:'Explorar',medir:'Medir',calcular:'Calcular'};
  const reportDefaults=()=>({mode:'completo',lines:10,include:Object.fromEntries(Object.keys(REPORT_DATA).map(k=>[k,true])),blank:Object.fromEntries(REPORT_TEXTS.map(([k])=>[k,true])),proposal:'',question:''});
  function reportConfig(key){
@@ -352,7 +352,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const initialHypothesis=matchingExperiment?(typeof savedHypothesis==='string'&&savedHypothesis?savedHypothesis.slice(0,2000):typeof experimentRecord?.hypothesis==='string'?experimentRecord.hypothesis.slice(0,2000):''):'';
   // "Atividade de análise" é preparação do Professor: só fora de uma atividade e nunca num relatório arquivado (como no SIAB).
   const teacher=!archived&&!session.open(),key=archived?'arquivo:'+archiveKey:free?'livre:'+(s.investigation?.id||'sem-investigacao'):'atividade:'+r.id;
-  const config=reportConfig(key);if(config.mode==='analise'&&!teacher)config.mode='completo';
+  const config=reportConfig(key);if(['analise','formativa'].includes(config.mode)&&!teacher)config.mode='completo';
   const save=(patch,focus)=>{storage.set('report.config:'+key,{...config,...patch});report();if(focus)$(focus)?.focus();};
   const mode=config.mode,inc=k=>mode!=='analise'||config.include[k]!==false,blankField=k=>mode==='mao'||(mode==='analise'&&config.blank[k]!==false);
   /* Ações, na ordem do SIAB. */
@@ -370,7 +370,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const st=N('h2','Preparar relatório');st.id='report-settings-title';settings.append(st);
   const grid=N('div');grid.className='silm-report-setting-grid';
   const select=(id,label,options,value,onChange)=>{const f=N('div');f.className='silm-field';const l=N('label',label);l.htmlFor=id;const sel=N('select');sel.id=id;for(const [v,t] of options){const o=N('option',t);o.value=String(v);o.selected=String(v)===String(value);sel.append(o);}sel.addEventListener('change',()=>onChange(sel.value));f.append(l,sel);grid.append(f);};
-  select('report-mode','Modo',Object.entries(REPORT_MODES).filter(([v])=>v!=='analise'||teacher),mode,v=>save({mode:v},'report-mode'));
+  select('report-mode','Modo',Object.entries(REPORT_MODES).filter(([v])=>!['analise','formativa'].includes(v)||teacher),mode,v=>save({mode:v},'report-mode'));
   if(mode!=='completo')select('report-lines','Linhas por resposta',REPORT_LINES.map(n=>[n,n+' linhas']),config.lines,v=>save({lines:Number(v)},'report-lines'));
   settings.append(grid);
   if(mode==='analise'){
@@ -379,13 +379,57 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    group('Incluir dados',Object.entries(REPORT_DATA),'include',config.include);group('Deixar em branco',REPORT_TEXTS,'blank',config.blank);settings.append(boxes);
    for(const [k,label,tag,max] of [['proposal','Proposta para a turma','textarea',2000],['question','Questão para investigar','input',500]]){const f=N('div');f.className='silm-field';const l=N('label',label);l.htmlFor='report-'+k;const input=N(tag);input.id='report-'+k;input.maxLength=max;input.value=config[k];input.addEventListener('change',()=>save({[k]:input.value.slice(0,max)},input.id));f.append(l,input);settings.append(f);}
   }
-  const hint=N('p',{completo:'Os dados da investigação são automáticos. Identificação e textos são salvos enquanto você escreve.',mao:'Os dados científicos permanecem na folha. Identificação e respostas ficam em linhas para escrever à mão.',analise:'Escolha os dados desta investigação que a turma vai interpretar e as respostas que ficam em branco. O SILM não cria dados hipotéticos.'}[mode]);hint.className='silm-report-hint';settings.append(hint);
+  const hint=N('p',{completo:'Os dados da investigação são automáticos. Identificação e textos são salvos enquanto você escreve.',mao:'Os dados científicos permanecem na folha. Identificação e respostas ficam em linhas para escrever à mão.',analise:'Escolha os dados desta investigação que a turma vai interpretar e as respostas que ficam em branco. O SILM não cria dados hipotéticos.',formativa:'Ficha opcional para análise humana das evidências, sem notas automáticas ou alterações nos registros do estudante. Imprima para registrar a devolutiva do professor.'}[mode]);hint.className='silm-report-hint';settings.append(hint);
   /* Documento. */
   const doc=N('article');doc.className='silm-report-doc';doc.dataset.reportMode=mode;
   const head=N('header');head.className='silm-report-doc-head';const brand=N('div');brand.className='silm-report-brand';const logo=N('img');logo.src=document.querySelector('.si-global-brand img')?.getAttribute('src')||'';logo.alt='';logo.width=36;logo.height=36;brand.append(logo,N('strong','SILM'));
   const eyebrow=N('p',REPORT_MODES[mode].replace(' · Professor',''));eyebrow.className='eyebrow';
   head.append(brand,eyebrow,N('h1','Relatório — '+(record.activityContext.teacher?.title||r.title)),N('p',r.subtitle+' · Módulo '+(MODULE_NAMES[r.module]||r.module)+' · SILM '+B.manifest.version));doc.append(head);
   const section=(n,title,name)=>{const sec=N('section');sec.dataset.reportSection=name;sec.append(N('h2',(n?n+'. ':'')+title));doc.append(sec);return sec;};
+  /* Ficha de avaliação formativa: material docente independente do relatório.
+     Os campos científicos e as respostas do aluno não são alterados nem avaliados automaticamente.
+     A ficha pode ser impressa para acompanhamento presencial. */
+  if(mode==='formativa'){
+   doc.classList.add('silm-report-formative');
+   head.querySelector('h1').textContent='Ficha de acompanhamento formativo — '+(record.activityContext.teacher?.title||r.title);
+   const indicator=S.teacherActivities?.formative(r);
+   const idSection=section(1,'Identificação da investigação','identificacao');
+   const values=[['Atividade',record.activityContext.teacher?.title||r.title],['Metal',e.name+' ('+e.symbol+')'],
+    ['Nome do estudante',record.report.name||'________________'],['Turma',record.report.className||'________________'],
+    ['Data',record.report.date||'________________'],['Professor',record.report.teacher||'________________']];
+   idSection.append(reportTable('Identificação docente',['Campo','Registro'],values));
+   const criteria=section(2,'Indicadores para observação docente','indicadores');
+   criteria.append(N('p',indicator?.notice||'Acompanhamento qualitativo: a análise das evidências cabe ao professor, não ao simulador.'));
+   if(indicator?.criteria.length){
+    const table=reportTable('Critérios de acompanhamento',['Foco da análise','Referência investigativa','Registro e encaminhamento do professor'],
+     indicator.criteria.map(k=>[k.focus,k.reference,'________________________________']));
+    table.id='report-formative-rubric';criteria.append(table);
+   }else criteria.append(N('p','Nesta investigação livre, registre a pergunta, as observações e a interpretação construída pela turma.'));
+   const evidence=section(3,'Registros disponíveis para discussão','registros');
+   evidence.append(N('p','Os valores abaixo informam apenas a presença de registros; não indicam acerto, proficiência ou aprendizagem.'));
+   const reportFields=[['Observações','observations'],['Análise','analysis'],['Interpretação','interpretation'],['Resposta à investigação','answer'],['Conclusão','conclusion']];
+   const rows=reportFields.map(([label,key])=>[label,String(record.report?.[key]||'').trim()?'Texto registrado':'Sem texto registrado']);
+   rows.push(['Medições do modelo',String(s.measurements?.length||0)+' registro(s)'],['Cálculos do SILM',String(s.calculations?.length||0)+' registro(s)']);
+   if(record.activityContext.type==='mission'&&r.evidenceObjectives?.length){
+    for(const objective of r.evidenceObjectives){
+     if(objective.mode!=='observed')continue;
+     const seen=objective.id==='cell'?record.evidence?.cell:objective.id==='lattice'?record.evidence?.lattice:record.evidence?.mission?.[objective.id];
+     rows.push(['Observação do motor: '+objective.label,seen===true?'Evidência visual registrada':'Sem registro visual']);
+    }
+   }
+   evidence.append(reportTable('Registros do relatório',['Registro','Situação'],rows));
+   const follow=section(4,'Devolutiva e próximos passos','devolutiva');
+   for(const title of ['Evidência discutida com a turma','Dúvida ou conceito a retomar','Próxima investigação ou intervenção']){
+    const block=N('div');block.className='silm-report-author';block.append(N('h3',title));
+    const space=N('div');space.className='silm-writing';space.setAttribute('role','img');space.setAttribute('aria-label',title+': campo para escrita do professor');
+    for(let i=0;i<5;i++){const line=N('div');line.className='silm-writing-line';space.append(line);}
+    block.append(space);follow.append(block);
+   }
+   const noteSection=section(0,'Como utilizar a ficha','nota');
+   noteSection.append(N('p','Instrumento docente qualitativo, preenchido manualmente. A presença de registros científicos e autorais não demonstra, por si só, a aprendizagem. O SILM não realiza correção automática. Esta ficha não altera a investigação nem se torna parte do relatório salvo do estudante.'));
+   host.append(actions,settings,doc);
+   return;
+  }
   // 1. Identificação.
   const ident=section(1,'Identificação','identificacao'),idFields=[['name','Nome'],['className','Turma'],['date','Data'],['teacher','Professor'],['group','Grupo']];
   if(mode==='completo'){const fs=N('fieldset');fs.className='silm-identity';fs.append(N('legend','Identificação'));

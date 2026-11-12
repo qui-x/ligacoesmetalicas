@@ -552,6 +552,17 @@ dialog.silm-dialog::backdrop{background:rgba(6,9,14,.72);backdrop-filter:blur(6p
 .silm-report-model-note{border-top:1px solid var(--border);margin-top:14px;font-size:.85rem;color:var(--muted)}
 .silm-report-model-note h2{font-size:1rem}
 .silm-report-empty{border:1px solid var(--border);border-radius:12px;padding:24px;background:var(--panel)}
+/* Ficha docente: tabela navegável em telas pequenas e paginada no papel. */
+.silm-report-formative #report-formative-rubric table{table-layout:fixed;min-width:580px}
+.silm-report-formative #report-formative-rubric th:first-child{width:24%}
+.silm-report-formative #report-formative-rubric th:last-child{width:23%}
+.silm-report-formative .silm-report-author{margin-top:14px}
+@media print{
+ .silm-report-formative #report-formative-rubric table{min-width:0;table-layout:fixed}
+ .silm-report-formative .silm-report-table th,.silm-report-formative .silm-report-table td{overflow-wrap:anywhere}
+ .silm-report-formative .silm-report-author{break-inside:avoid}
+}
+
 @media(max-width:640px){.silm-report-ident{grid-template-columns:minmax(0,1fr)}.silm-report-doc{padding:20px 14px}.silm-report-actions .button{flex:1 1 100%}}
 @media print{
  .silm-report-settings,.silm-report-actions{display:none!important}

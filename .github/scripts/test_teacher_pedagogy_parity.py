@@ -25,12 +25,16 @@ def run(browser_name: str, root: str) -> None:
             expect(guide).to_contain_text("Hipótese inicial para discussão")
             expect(guide).to_contain_text("Plano de observações")
             expect(guide).to_contain_text("Mediação do professor")
+            expect(guide).to_contain_text("Ficha de acompanhamento formativo")
+            expect(guide).to_contain_text("Delimitação do problema")
             page.locator("#silm-teacher-guide-close").click()
             page.locator("#teacher-type").select_option("mission")
             page.locator("#teacher-item").select_option("montagem-ordem")
             page.locator("#teacher-material-open").click()
             expect(guide).to_contain_text("Previsão inicial para discussão")
             expect(guide).to_contain_text("Evidências verificáveis da missão")
+            expect(guide).to_contain_text("Ficha de acompanhamento formativo")
+            expect(guide).to_contain_text("Evidência observável")
             page.locator("#silm-teacher-guide-close").click()
             for typ, item_id, heading in (
                 ("route", "ordem-metal", "Plano de investigação"),
