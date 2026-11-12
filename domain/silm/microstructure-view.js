@@ -231,7 +231,9 @@ SILM.microstructure=(()=>{
    bottomGrip.textContent=mode==='malleability'?'↑':'↓';
    for(const grip of [topGrip,bottomGrip])grip.setAttribute('aria-label',mode==='malleability'?
     'Comprimir o campo de grãos':'Tracionar o campo de grãos');
-   mechanicalPulse.textContent=mode==='malleability'?'Comprimir':'Tracionar';
+   const pulseLabel=mode==='malleability'?'Comprimir':'Tracionar';
+   // Evitar reconstruir o ícone em toda atualização do controlador.
+   if(mechanicalPulse.textContent.trim()!==pulseLabel)mechanicalPulse.textContent=pulseLabel;
    mechanicalPulse.setAttribute('aria-label',mode==='malleability'?'Aplicar compressão':'Aplicar tração');
    mechanicalPulse.disabled=step>=max;
    mechanicalReset.disabled=!step&&!load;
