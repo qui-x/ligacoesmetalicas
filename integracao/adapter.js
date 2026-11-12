@@ -347,7 +347,7 @@
     const key='guided:'+activity.id+':'+metal.atomicNumber+':'+(workshopSelectionId||'')+':'+displayScale;
     if(host.dataset.key!==key){
      host.dataset.key=key;
-     S.workshop.renderReference(host,{element:metal,item:chosen,items,scale:displayScale,guided:true,model,onScale:setWorkshopScale});
+     S.workshop.renderReference(host,{element:metal,item:chosen,items,scale:displayScale,guided:true,onScale:setWorkshopScale});
     }
     updateWorkshopViewport(true);
     return;
