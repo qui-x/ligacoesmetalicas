@@ -12,11 +12,11 @@ window.SILM=window.SILM||{};
  const S=SILM,SCHEMA=1,MAX_TOKEN=8000,MAX_LIBRARY=50;
  const TYPES=Object.freeze({route:'Roteiro Experimental',mission:'Missão',preset:'Montagem pronta'});
  const NAVIGATION=Object.freeze({restrita:'Restrita à atividade',livre:'Livre'});
- const TOOL_LABELS=Object.freeze({structure:'Estrutura cristalina',unitCell:'Célula unitária',neighbors:'Vizinhança',electrons:'Elétrons deslocalizados',malleability:'Maleabilidade',distance:'Distância',latticeParameter:'Parâmetro de rede',coordination:'Coordenação',electrical:'Condutividade elétrica',radius:'Raio do modelo',packingFactor:'Fator de empacotamento',cellVolume:'Volume da célula',effectiveAtoms:'Contagem geométrica de átomos'});
+ const TOOL_LABELS=Object.freeze({structure:'Estrutura cristalina',unitCell:'Célula unitária',neighbors:'Vizinhança',electrons:'Elétrons deslocalizados',malleability:'Maleabilidade',distance:'Distância',latticeParameter:'Parâmetro de rede',coordination:'Coordenação',electrical:'Condutividade elétrica',thermal:'Condução térmica',luster:'Brilho metálico',ductility:'Ductilidade',radius:'Raio do modelo',packingFactor:'Fator de empacotamento',cellVolume:'Volume da célula',effectiveAtoms:'Contagem geométrica de átomos'});
  /* Recursos de que o critério de conclusão (route-session.ready) depende: não podem ser retirados pelo professor. */
  const REQUIRED=Object.freeze({crystalline:['structure'],neighbors:['neighbors'],'electrons-motion':['electrons'],'property-field':['electrons','electrical'],
   'packing-factor':['cellVolume','radius','packingFactor'],'cell-and-lattice':['structure','unitCell'],electrons:['electrons'],'deform-and-restore':['malleability'],
-  'measure-a':['latticeParameter'],'cell-volume':['cellVolume']});
+  'measure-a':['latticeParameter'],'cell-volume':['cellVolume'],'property-heating':['thermal'],'property-light':['luster'],'property-elongation':['ductility']});
  const MODULE=Object.freeze({explorar:'Explorar',medir:'Medir',calcular:'Calcular'});
  const IDENTITY=Object.freeze(['className','teacher','date']);
  const fail=message=>{throw new Error(message);};
