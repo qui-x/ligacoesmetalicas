@@ -38,7 +38,7 @@ SILM.createTeacherUI=({model,storage,session,say,start,applyPreset})=>{
   metalMode=field(form,'Metal',select('teacher-metal-mode',[['all','O aluno escolhe entre os metais elegíveis'],['fixed','Um metal definido pelo professor']],'all'));
   metalSelect=field(form,'Metal definido',select('teacher-metal',[]));
   toolsBox=N('fieldset',null,'silm-teacher-tools');toolsBox.id='teacher-tools';form.append(toolsBox);
-  navigationSelect=field(form,'Navegação',select('teacher-navigation',Object.entries(T.navigation),'restrita'),'Restrita: durante a atividade ficam o Início, a Oficina, o Manual e o relatório. A restrição organiza a aula; não é proteção contra edição do código.');
+  navigationSelect=field(form,'Navegação',select('teacher-navigation',Object.entries(T.navigation),'restrita'),'Restrita: durante a atividade ficam o Início, a Oficina, o Manual, o Caderno e o relatório. A restrição organiza a aula; não é proteção contra edição do código.');
   errorBox=N('p',null,'silm-teacher-error');errorBox.id='teacher-error';errorBox.setAttribute('role','alert');
   const actions=N('div',null,'silm-teacher-actions');cancel=button('Cancelar edição',cancelEdit,'button outline','teacher-cancel-edit');cancel.hidden=true;
   submit=N('button','Validar e gerar atividade','button primary');submit.type='submit';submit.id='teacher-submit';actions.append(cancel,submit);form.append(errorBox,actions);
