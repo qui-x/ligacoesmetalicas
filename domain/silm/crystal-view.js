@@ -184,7 +184,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  /* 0.17.x (SILM.drive, transitórios): alça de intensidade na seta E (P3) e lanterna do brilho (P4). Arraste ou teclado. */
  const DR=SILM.drive,driveCtl=DR?DR.controller(model):null;
  if(driveCtl)scope.cleanup(driveCtl.subscribe(()=>{if(scope.active)render();}));
- const opticalBench=SILM.createOpticalBench?.(stage,{
+ const opticalStage=SILM.createOpticalSceneControls?.(stage,{
   scope,drive:driveCtl,toolbarHost:quickHost,
   toggleLight:()=>propertyOptions?.toggleLight?.()
  });
@@ -665,21 +665,20 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   // das MESMAS unidades e da MESMA câmera do cristal. Não existe minipalco.
   // Trata-se de orientação óptica qualitativa sobre a amostra, não um átomo
   // luminoso, tampouco uma previsão de refletância ou rugosidade real.
-  const opticalActive=active==='luster'&&scene.module==='explorar'&&!!driveCtl;
+  const opticalActive=active==='luster'&&!localFocus&&scene.module==='explorar'&&!!driveCtl;
   const projected=opticalActive?drawn.map((p,i)=>({p:R.toView(p),id:list[i].id}))
    .filter(item=>item.p.x>=.06&&item.p.x<=.94&&item.p.y>=.06&&item.p.y<=.94):[];
-  const highlighted=projected.filter(item=>scene.lit.has(item.id));
-  const candidates=highlighted.length?highlighted:projected;
+  // Região coletiva da amostra: não escolher um átomo individual como
+  // emissor/espelho. A âncora usa o centro da projeção de sítios visíveis,
+  // e permanece atualizada quando a câmera muda.
   let opticalPoint=null;
-  if(candidates.length){
-   const top=Math.min(...candidates.map(item=>item.p.y));
-   const band=candidates.filter(item=>item.p.y<=top+.16);
+  if(projected.length){
    opticalPoint={
-    x:band.reduce((sum,item)=>sum+item.p.x,0)/band.length*100,
-    y:band.reduce((sum,item)=>sum+item.p.y,0)/band.length*100
+    x:projected.reduce((sum,item)=>sum+item.p.x,0)/projected.length*100,
+    y:projected.reduce((sum,item)=>sum+item.p.y,0)/projected.length*100
    };
   }
-  const beam=opticalBench?.update({
+  const beam=opticalStage?.update({
    visible:opticalActive,illuminated:!!pr.luster.light,point:opticalPoint
   })||null;
   const knobOn=!!driveCtl&&!!scene.fieldOn&&scene.module==='explorar';fieldKnob.hidden=!knobOn;
