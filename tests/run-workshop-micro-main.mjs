@@ -1,6 +1,8 @@
 // Regressão isolada da apresentação da microestrutura no SILM main.
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
+import {mkdirSync} from 'node:fs';
+import {join} from 'node:path';
 const require=createRequire(import.meta.url),playwright=require(process.env.PLAYWRIGHT_MODULE);
 const browserName=process.env.BROWSER_NAME||'chromium',base=process.env.BASE_URL||'http://127.0.0.1:8765';
 const browser=await playwright[browserName].launch({headless:true});
@@ -84,6 +86,14 @@ async function test(viewport){
  assert.equal(await optics.isVisible(),true,'Controles ópticos não aparecem na microestrutura.');
  assert.equal(await viewer.locator('.silm-micro-optical-light').count(),1,
   'A iluminação foi recriada fora do mesmo mapa de grãos.');
+ // Evidência visual para impedir novo recurso sobreposto/sem integração.
+ const opticalDir=join('reports','micro-optica',browserName);
+ mkdirSync(opticalDir,{recursive:true});
+ await viewer.screenshot({
+  path:join(opticalDir,'brilho-microestrutura-'+viewport.width+'.png'),
+  animations:'disabled'
+ });
+
  assert.equal(await page.locator('.silm-optical-bench').count(),0,
   'Uma bancada flutuante não pode reaparecer na microestrutura.');
  const opticalSnapshot=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
