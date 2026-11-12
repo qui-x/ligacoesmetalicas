@@ -681,7 +681,43 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
  function professor(){if(table)return;const scope=SimCore.createScope();table=S.createPeriodicTable($('silm-professor-table'),{scope,state:{selection:model.state.metal?.atomicNumber||29,query:''},teacher:true,canInvestigate:()=>!session.open(),onInvestigate:async e=>{if(await selectMetal(e.atomicNumber))location.hash='#/ambiente';},onSources:e=>{$('silm-professor-sources').textContent=S.data.sourceIds(e).map(id=>{const s=S.data.source(id);return s.institution+' — '+s.title;}).join('\n');}});}
  /* Roteiro montado na investigação atual (como "experiencia" na bancada do SIAB): só vale para a mesma investigação. */
  function experiment(){const x=storage.get('route.experiment',null),inv=model.state.investigation?.id;const r=x&&inv&&x.investigation===inv?S.routes.get(x.route):null;return r||null;}
- function freeReport(){if(!model.state.investigation)return null;const saved=storage.get('report.free:'+model.state.investigation.id,{}),report={...fields};for(const k of Object.keys(report))if(typeof saved[k]==='string')report[k]=saved[k].slice(0,10000);return {activityContext:{id:'laboratorio',type:'free'},checkpoint:model.snapshot(),evidence:{cell:false,lattice:false,deformation:false},report};}
- function editReport(key,value){if(!Object.hasOwn(fields,key)||value.length>10000)return false;const r=freeReport()?.report||{...fields};r[key]=value;return storage.set('report.free:'+model.state.investigation.id,r);}
+ /* Textos autorais da investigação livre são separados por módulo; identificação
+    continua comum. Os dados legados não desaparecem: ficam vinculados ao primeiro
+    módulo consultado após a migração, já que o formato antigo não registrava o módulo. */
+ const reportTextKeys=new Set(['observations','analysis','interpretation','answer','conclusion']);
+ function freeDocument(){
+  const investigation=model.state.investigation;if(!investigation)return null;
+  const key='report.free:'+investigation.id,raw=storage.get(key,{});
+  const saved=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
+  const module=model.state.module.active;
+  const legacyText=[...reportTextKeys].some(k=>typeof saved[k]==='string'&&saved[k].trim());
+  if(legacyText&&!saved.legacyOwner){
+   const updated={...saved,legacyOwner:module};
+   if(storage.set(key,updated))return {key,saved:updated,module};
+  }
+  return {key,saved,module};
+ }
+ function freeReport(){
+  const doc=freeDocument();if(!doc)return null;
+  const {saved,module}=doc,report={...fields};
+  for(const k of Object.keys(report)){
+   const authored=reportTextKeys.has(k);
+   const v=authored
+    ?saved.moduleReports?.[module]?.[k]??(saved.legacyOwner===module?saved[k]:undefined)
+    :saved[k];
+   if(typeof v==='string')report[k]=v.slice(0,10000);
+  }
+  return {activityContext:{id:'laboratorio',type:'free'},checkpoint:model.snapshot(),evidence:{cell:false,lattice:false,deformation:false},report};
+ }
+ function editReport(key,value){
+  if(!Object.hasOwn(fields,key)||typeof value!=='string'||value.length>10000)return false;
+  const doc=freeDocument();if(!doc)return false;
+  const {saved,module}=doc;let next;
+  if(reportTextKeys.has(key)){
+   const previous=saved.moduleReports?.[module]||{};
+   next={...saved,moduleReports:{...(saved.moduleReports||{}),[module]:{...previous,[key]:value}}};
+  }else next={...saved,[key]:value};
+  return storage.set(doc.key,next);
+ }
  return {init,experiment,freeReport,editReport,recordActivity,recordReport,archivedReport,render(){home();const page=B.currentRoute(location.hash);if(page==='aprender')themes();if(page==='manual')manual();if(page==='caderno'&&!$('notebook-text'))notebook();if(page==='professor')professor();if(page==='montagens')readyAssemblies();},applyReadyAssembly};
 };
