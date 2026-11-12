@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - 'domain/silm/routes.js'
+      - 'domain/silm/teacher-activities.js'
+      - 'integracao/teacher-ui.js'
+      - '.github/scripts/test_teacher_pedagogy_contracts.js'
+      - '.github/scripts/test_teacher_pedagogy_parity.py'
       - 'integracao/route-ui.js'
       - 'integracao/integration.css'
       - 'sw.js'
@@ -14,6 +18,8 @@ on:
     branches: [main]
     paths:
       - 'domain/silm/routes.js'
+      - 'domain/silm/teacher-activities.js'
+      - 'integracao/teacher-ui.js'
       - 'integracao/route-ui.js'
       - 'integracao/integration.css'
       - 'sw.js'
@@ -31,6 +37,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Auditar 26 roteiros e elegibilidade dos 65 metais
         run: node .github/scripts/test_route_studies_contracts.js
+      - name: Auditar paridade dos materiais docentes
+        run: node .github/scripts/test_teacher_pedagogy_contracts.js
 
   playwright:
     name: Roteiros / ${{ matrix.browser }}
@@ -65,6 +73,8 @@ jobs:
           PY
       - name: Testar catálogos, hipótese, montagem e relatório
         run: python .github/scripts/test_routes_siab_parity.py --browser ${{ matrix.browser }}
+      - name: Conferir professor e aluno em todas as resoluções
+        run: python .github/scripts/test_teacher_pedagogy_parity.py --browser ${{ matrix.browser }}
       - name: Capturas para conferência visual
         if: always()
         uses: actions/upload-artifact@v4
