@@ -185,7 +185,7 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const DR=SILM.drive,driveCtl=DR?DR.controller(model):null;
  if(driveCtl)scope.cleanup(driveCtl.subscribe(()=>{if(scope.active)render();}));
  const opticalBench=SILM.createOpticalBench?.(stage,{
-  scope,drive:driveCtl,elementSymbol:element.symbol,
+  scope,drive:driveCtl,toolbarHost:quickHost,
   toggleLight:()=>propertyOptions?.toggleLight?.()
  });
  const slider=(cls,label,min,max)=>{const n=U.element('div',null,cls);n.hidden=true;n.tabIndex=0;n.setAttribute('role','slider');n.setAttribute('aria-label',label);n.setAttribute('aria-valuemin',String(min));n.setAttribute('aria-valuemax',String(max));stage.append(n);return n;};
@@ -661,17 +661,31 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   electronLayer.setCamera?.(R.camera);
   // Margens em % para as alças (raio em px) ficarem inteiras dentro da cena, também no celular.
   const pct=px=>px/(R.size||stage.clientWidth||300)*100,lampEdge=()=>Math.max(4,pct(24)),fieldY=Math.max(4.5,pct(20));
-  // Mini-bancada superficial ancorada na área da cena; independente
-  // de câmera, sítios e zoom. Os raios são opcionais e didáticos.
-  const beam=null;
-  opticalBench?.update({
-   visible:active==='luster'&&scene.module==='explorar',
-   illuminated:!!pr.luster.light
-  });
+  // Reflexão sobre a região superficial da estrutura em foco: o alvo deriva
+  // das MESMAS unidades e da MESMA câmera do cristal. Não existe minipalco.
+  // Trata-se de orientação óptica qualitativa sobre a amostra, não um átomo
+  // luminoso, tampouco uma previsão de refletância ou rugosidade real.
+  const opticalActive=active==='luster'&&scene.module==='explorar'&&!!driveCtl;
+  const projected=opticalActive?drawn.map((p,i)=>({p:R.toView(p),id:list[i].id}))
+   .filter(item=>item.p.x>=.06&&item.p.x<=.94&&item.p.y>=.06&&item.p.y<=.94):[];
+  const highlighted=projected.filter(item=>scene.lit.has(item.id));
+  const candidates=highlighted.length?highlighted:projected;
+  let opticalPoint=null;
+  if(candidates.length){
+   const top=Math.min(...candidates.map(item=>item.p.y));
+   const band=candidates.filter(item=>item.p.y<=top+.16);
+   opticalPoint={
+    x:band.reduce((sum,item)=>sum+item.p.x,0)/band.length*100,
+    y:band.reduce((sum,item)=>sum+item.p.y,0)/band.length*100
+   };
+  }
+  const beam=opticalBench?.update({
+   visible:opticalActive,illuminated:!!pr.luster.light,point:opticalPoint
+  })||null;
   const knobOn=!!driveCtl&&!!scene.fieldOn&&scene.module==='explorar';fieldKnob.hidden=!knobOn;
   if(knobOn){const I=driveCtl.intensity;fieldKnob.style.left=(55+25*I)+'%';fieldKnob.style.top=fieldY+'%';fieldKnob.setAttribute('aria-valuenow',String(Math.round(I*100)));fieldKnob.setAttribute('aria-valuetext',Math.round(I*100)+' %');
    fieldKnob.setAttribute('aria-label',scene.coupled?(scene.coupled.input.mode==='voltage'?'Tensão imposta':'Corrente imposta')+' (escala relativa)':'Intensidade do campo elétrico');}
-  let light=null;if(!beam&&scene.lit.size){const tops=list.map((u,i)=>[u,drawn[i]]).filter(([u])=>scene.lit.has(u.id)).map(([,c])=>c),mean={x:tops.reduce((a,c)=>a+c.x,0)/tops.length,y:tops.reduce((a,c)=>a+c.y,0)/tops.length},v=R.toView(mean);light={x:v.x*100,y:v.y*100};}   // centro da face superior
+  let light=null;if(!beam&&active!=='luster'&&scene.lit.size){const tops=list.map((u,i)=>[u,drawn[i]]).filter(([u])=>scene.lit.has(u.id)).map(([,c])=>c),mean={x:tops.reduce((a,c)=>a+c.x,0)/tops.length,y:tops.reduce((a,c)=>a+c.y,0)/tops.length},v=R.toView(mean);light={x:v.x*100,y:v.y*100};}   // centro da face superior
   const sourceX=scene.heatSources.length?Math.min(...scene.heatSources.map(p=>p.x)):Math.min(...drawn.map(p=>p.x)),left=R.toView({x:sourceX-unitFraction,y:.5}).x;
   // Prensa (compressão) ou garras (tração) nas faces de cima e de baixo da amostra, acompanhando a forma a cada quadro.
   const reading=deformCtl?.reading();let plates=null;
