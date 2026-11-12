@@ -14,7 +14,7 @@ window.SILM=window.SILM||{};
   return node;
  };
  const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
- SILM.createOpticalBench=(stage,{scope,drive,toggleLight,toolbarHost}={})=>{
+ SILM.createOpticalSceneControls=(stage,{scope,drive,toggleLight,toolbarHost}={})=>{
   const root=make('div','silm-optical-interaction');
   root.hidden=true;
   root.setAttribute('role','group');
