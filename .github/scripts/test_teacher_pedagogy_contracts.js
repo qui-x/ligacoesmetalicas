@@ -30,6 +30,18 @@ for(const [type,collection]of [['route',S.routes.registry],['mission',S.missions
    assert.ok(sections.has(heading),item.id+' sem '+heading);
    assert.ok([...sections.get(heading).paragraphs,...(sections.get(heading).list||[])].some(s=>s.includes(needle)),item.id+' sem conteúdo '+needle);
   };
+  const formative=T.formative(item);
+  assert.equal(formative.title,item.title);
+  assert.ok(formative.criteria.length>=5,item.id+' sem critérios formativos suficientes');
+  assert.equal(new Set(formative.criteria.map(k=>k.id)).size,formative.criteria.length,item.id+' com critérios duplicados');
+  assert.ok(formative.criteria.every(k=>typeof k.focus==='string'&&k.focus&&typeof k.reference==='string'&&k.reference));
+  assert.ok(/não atribui nota/.test(formative.notice),item.id+' deve rejeitar avaliação automática');
+  assert.ok(formative.criteria.some(k=>k.id==='limits'),item.id+' precisa delimitar o modelo');
+  assert.ok(formative.criteria.some(k=>k.id==='conclusion'),item.id+' precisa tratar da conclusão');
+  assert.ok(sections.has('Ficha de acompanhamento formativo'),item.id+' sem ficha docente');
+  assert.ok(sections.get('Ficha de acompanhamento formativo').list.length>=5,item.id+' sem indicadores no guia');
+  if(type==='mission')
+   assert.equal(formative.criteria.filter(k=>k.id.startsWith('evidence-')).length,item.evidenceObjectives.length);
   assert.equal(g.title,item.title);
   assert.ok(sections.has('Objetivo pedagógico'));
   assert.ok(sections.has('Critério de conclusão'));
@@ -63,4 +75,4 @@ for(const [type,collection]of [['route',S.routes.registry],['mission',S.missions
   assert.throws(()=>T.validate({...c,tools:[...c.tools,'ferramenta-inexistente']}),/Recursos fora/);
  }
 }
-console.log('OK: Guia do Professor cobre 26 roteiros e 42 missões, sem ampliar ferramentas nem metais elegíveis.');
+console.log('OK: 26 roteiros e 42 missões possuem ficha formativa sem nota automática e sem ampliar ferramentas ou metais.');
