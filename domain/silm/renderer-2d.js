@@ -216,7 +216,9 @@ SILM.renderer2d=(()=>{
   const gesture={pinching:()=>false};
   if(!readOnly){
    const pointers=new Map();let pan=null,pinch=null,press=null,swallowUntil=0,pointerAt=0;
-   const ignore=e=>e.target.closest?.('.silm-camera')||e.button>0;
+   // Controles sobrepostos ao palco não são gestos da câmera. Em especial,
+   // ranges e botões da bancada óptica não podem capturar o ponteiro da vista.
+   const ignore=e=>e.button>0||!!e.target.closest?.('.silm-camera,.silm-optical-bench,button,input,select,textarea,a,[role="slider"],[role="button"]');
    const capture=id=>{try{viewport.setPointerCapture(id);}catch(_){}};
    scope.listen(viewport,'pointerdown',e=>{
     pointerAt=performance.now();swallowUntil=0;   // um novo toque nunca é engolido
@@ -235,7 +237,7 @@ SILM.renderer2d=(()=>{
     if(!unit)capture(e.pointerId);
    });
    // O clique que o navegador gera ao fim de um deslocamento não seleciona nada (Enter e Espaço têm detail 0 e passam).
-   scope.listen(viewport,'click',e=>{if(e.detail>0&&performance.now()<swallowUntil){swallowUntil=0;e.stopPropagation();e.preventDefault();}},{capture:true});
+   scope.listen(viewport,'click',e=>{if(ignore(e))return;if(e.detail>0&&performance.now()<swallowUntil){swallowUntil=0;e.stopPropagation();e.preventDefault();}},{capture:true});
    scope.listen(viewport,'focusin',e=>{const node=e.target.closest?.('[data-unit-id]');if(!node||performance.now()-pointerAt<800)return;const it=items().find(i=>i.id===node.dataset.unitId);if(it)ensureVisible(it);});
    scope.listen(viewport,'pointermove',e=>{
     const p=pointers.get(e.pointerId);if(p){p.x=e.clientX;p.y=e.clientY;}
