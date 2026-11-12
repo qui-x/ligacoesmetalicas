@@ -43,7 +43,7 @@ for(const id of ['ordem-metal','eletrons-metal','deformacao-metal','medindo-orde
  assert.equal(route.version,1);
 }
 for(const [id,selected,mode] of [
- ['roteiro-lantanideos',14,'free'],['roteiro-objeto-centro',62,'free'],['roteiro-campo-eletrico',62,'free'],
+ ['roteiro-lantanideos',16,'free'],['roteiro-objeto-centro',62,'free'],['roteiro-campo-eletrico',62,'free'],
  ['roteiro-ccc',15,'crystalline'],['roteiro-cfc',16,'crystalline'],['roteiro-hc',22,'crystalline'],
  ['roteiro-gerais',9,'crystalline'],['roteiro-empacotamento',53,'crystalline'],
  ['roteiro-comparar-cu-al',2,'crystalline'],['roteiro-cu-nd',2,'free']
@@ -53,7 +53,16 @@ for(const [id,selected,mode] of [
  assert.equal(route.structureRequirements,mode,id);
 }
 assert.deepEqual(Array.from(S.routes.get('roteiro-cu-nd').metalSelection.atomicNumbers),[29,60]);
-assert.ok(S.routes.get('roteiro-lantanideos').metalSelection.atomicNumbers.includes(60));
+const rareEarth=S.routes.get('roteiro-lantanideos');
+assert.deepEqual(Array.from(rareEarth.metalSelection.atomicNumbers),[21,39,57,58,59,60,62,63,64,65,66,67,68,69,70,71]);
+assert.ok(rareEarth.metalSelection.atomicNumbers.includes(21),'Escândio deve fazer parte das terras raras');
+assert.ok(rareEarth.metalSelection.atomicNumbers.includes(39),'Ítrio deve fazer parte das terras raras');
+assert.ok(!rareEarth.metalSelection.atomicNumbers.includes(61),'Pm não está disponível');
+assert.equal(rareEarth.module,'explorar');
+assert.equal(rareEarth.study.tasks.length,5);
+assert.ok(rareEarth.study.question.includes('explorando objetos'));
+assert.ok(rareEarth.allowedTools.includes('electrons'));
+assert.ok(rareEarth.allowedTools.includes('electrical'));
 assert.ok(!S.routes.get('roteiro-objeto-centro').metalSelection.atomicNumbers.includes(60));
 assert.equal(S.crystal.eligibility(S.data.get(60)).status,'unavailable');
 console.log('OK: 26 roteiros, 65 metais, 62 redes; pergunta, hipótese, passos, registros, critérios científicos e versões históricas.');

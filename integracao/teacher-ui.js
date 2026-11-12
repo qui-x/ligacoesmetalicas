@@ -179,6 +179,28 @@ SILM.createTeacherUI=({model,storage,session,say,start,applyPreset})=>{
   const ul=N('ul');ul.append(N('li','Metal: '+s.metals+'.'),N('li','Recursos: '+s.tools+'.'),N('li','Navegação: '+s.navigation+'.'));
   const id=config.identification;if(id.className||id.teacher||id.date)ul.append(N('li','Identificação: '+[id.className&&'Turma '+id.className,id.teacher&&'Professor '+id.teacher,id.date].filter(Boolean).join(' · ')+'.'));
   sec('Na oficina',ul);
+  // A proposta recebida pelo aluno usa o mesmo estudo que aparece no catálogo,
+  // no guia docente e no relatório. Não cria um procedimento paralelo.
+  if(config.type!=='preset'&&req.item.study){
+   const study=req.item.study;
+   if(study.context||study.question)sec('Problema para investigar',N('p',[study.context,study.question].filter(Boolean).join(' ')));
+   const prediction=study.hypothesis||study.prediction;
+   if(prediction)sec('Antes de começar',N('p',prediction));
+   const list=(tag,items)=>{const node=N(tag);for(const text of items||[])node.append(N('li',text));return node;};
+   const steps=config.type==='route'?study.tasks:(study.evidence?[study.evidence]:[]);
+   const observations=config.type==='route'?study.observe:(req.item.evidenceObjectives||[]).map(x=>x.label);
+   const questions=study.interpretation||study.questions;
+   if(steps?.length||observations?.length||questions?.length){
+    const details=N('details');details.className='silm-student-investigation';
+    details.append(N('summary','Ver etapas, registros e interpretação'));
+    if(steps?.length)details.append(N('h3','Procedimento'),list('ol',steps));
+    if(observations?.length)details.append(N('h3','O que registrar'),list('ul',observations));
+    if(questions?.length)details.append(N('h3','Questões para analisar'),list('ol',questions));
+    sec('Plano de investigação',details);
+   }
+   const limit=study.limits||study.limit;
+   if(limit)sec('Limite do modelo',N('p',limit));
+  }
   const action=N('form',null,'silm-student-start');action.noValidate=true;let pick=null;
   if(config.type!=='preset'&&config.metals.length>1){pick=select('student-metal',config.metals.map(z=>{const e=S.data.get(z);return [String(z),e.name+' ('+e.symbol+')'];}));field(action,'Escolha o metal',pick);}
   const go=N('button',config.type==='preset'?'Montar na oficina':'Começar atividade','button primary');go.type='submit';go.id='student-start';action.append(go);

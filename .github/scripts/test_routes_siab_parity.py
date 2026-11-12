@@ -81,6 +81,20 @@ def run(browser_name: str, root: str) -> None:
                 )
                 expect(page.locator("#route-mount")).to_be_visible()
 
+            # Terras raras = 15 lantanídeos + Sc + Y (17 no total);
+            # 16 selecionáveis, pois Pm permanece indisponível.
+            page.goto(root.rstrip("/") + "/#/roteiros?item=roteiro-lantanideos")
+            expect(page.locator("#route-metal option")).to_have_count(16)
+            metals = page.locator("#route-metal option").evaluate_all(
+                "(options) => options.map(option => Number(option.value))"
+            )
+            assert 21 in metals and 39 in metals and 60 in metals
+            assert 61 not in metals
+            article = page.locator("#silm-route-catalog .silm-reading")
+            expect(article).to_contain_text("Terras Raras: explorar os metais")
+            expect(article).to_contain_text("campo elétrico")
+            expect(page.locator(".silm-experiment-observation-row")).to_have_count(5)
+
             # O roteiro continua uma atividade livre: hipótese registrada, sem
             # alterar os valores científicos ou aplicar trava de missão.
             page.goto(root.rstrip("/") + "/#/roteiros?item=roteiro-cu-nd")
