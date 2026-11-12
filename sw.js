@@ -258,14 +258,14 @@ self.addEventListener('fetch',event=>{
  const req=event.request,url=new URL(req.url);
  if(req.method!=='GET'||url.origin!==ROOT.origin||!url.pathname.startsWith(ROOT.pathname))return;
  const relative=url.pathname.slice(ROOT.pathname.length);
- const navigation=req.mode==='navigate'&&['','index.html'].includes(relative);
+ const navigation=req.mode==='navigate'&&['','index.html','completo.html'].includes(relative);
  const structural=FILES.some(file=>local(file).pathname===url.pathname);
  const moduleResource=relative.startsWith('domain/');
  if(!navigation&&!structural&&!moduleResource)return;
  event.respondWith((async()=>{
   const cache=await caches.open(structural||navigation?CACHE:DOMAINS);
-  const key=navigation?new URL('index.html',ROOT):req;
-  const networkFirst=navigation||/\.(?:js|css|json|webmanifest)$/i.test(relative);
+  const key=navigation?new URL(relative==='completo.html'?'completo.html':'index.html',ROOT):req;
+  const networkFirst=navigation||/\.(?:js|css|html|json|webmanifest)$/i.test(relative);
   if(networkFirst){
    try{
     const fresh=await fetch(new Request(req,{cache:'no-cache'}));
