@@ -120,7 +120,11 @@ def run(browser_name: str, root: str) -> None:
             expect(header.locator(".silm-report-element")).to_contain_text("Cu")
             expect(header.locator(".silm-report-element")).to_contain_text("Cobre")
             expect(header.locator(".silm-report-meta")).to_contain_text("Montagem livre")
-            expect(header.locator(".silm-report-provenance")).to_contain_text("Medida do modelo")
+            expect(header.locator(".silm-report-provenance")).to_contain_text("Representação qualitativa")
+            expect(report.locator(".silm-report-doc")).to_have_attribute("data-scientific-module", "explorar")
+            expect(report.locator('[data-report-section="propriedades"]')).to_contain_text("Propriedades disponíveis")
+            expect(report.locator('[data-report-section="medicoes"]')).to_have_count(0)
+            expect(report.locator('[data-report-section="calculos"]')).to_have_count(0)
             expect(report.locator('[data-report-section="condicoes"]')).to_contain_text("Condições de referência")
             assert page.evaluate("""() => {
                 const doc = document.querySelector('.silm-report-doc');
@@ -155,6 +159,45 @@ def run(browser_name: str, root: str) -> None:
             page.locator("#report-mode").select_option("completo")
             expect(report).to_contain_text("Hipótese inicial registrada")
             expect(report).to_contain_text(prediction)
+            # Um mesmo experimento pode mudar de módulo sem misturar os textos
+            # autorais, os registros científicos ou as fontes de cada área.
+            report.locator("#report-observations").fill("Observei o brilho no módulo Explorar.")
+            page.goto(root.rstrip("/") + "/#/ambiente")
+            measure_button = page.locator('[data-silm-module-shortcut="medir"]')
+            expect(measure_button).to_be_enabled()
+            measure_button.click()
+            page.goto(root.rstrip("/") + "/#/relatorios")
+            expect(report.locator(".silm-report-doc")).to_have_attribute("data-scientific-module", "medir")
+            expect(report.locator('[data-report-section="medicoes"]')).to_contain_text("Nenhuma medição registrada")
+            expect(report.locator('[data-report-section="propriedades"]')).to_have_count(0)
+            expect(report.locator('[data-report-section="calculos"]')).to_have_count(0)
+            expect(report.locator("#report-observations")).to_have_value("")
+            report.locator("#report-observations").fill("A régua do modelo não foi usada.")
+            report.locator("#route-report-notebook").click()
+            page.goto(root.rstrip("/") + "/#/ambiente")
+            calculate_button = page.locator('[data-silm-module-shortcut="calcular"]')
+            expect(calculate_button).to_be_enabled()
+            calculate_button.click()
+            page.goto(root.rstrip("/") + "/#/relatorios")
+            expect(report.locator(".silm-report-doc")).to_have_attribute("data-scientific-module", "calcular")
+            expect(report.locator('[data-report-section="calculos"]')).to_contain_text("Nenhum cálculo registrado")
+            expect(report.locator('[data-report-section="propriedades"]')).to_have_count(0)
+            expect(report.locator('[data-report-section="medicoes"]')).to_have_count(0)
+            expect(report.locator("#report-observations")).to_have_value("")
+            report.locator("#report-observations").fill("Ainda não apliquei uma fórmula.")
+            report.locator("#route-report-notebook").click()
+            page.goto(root.rstrip("/") + "/#/ambiente")
+            page.locator('[data-silm-module-shortcut="explorar"]').click()
+            page.goto(root.rstrip("/") + "/#/relatorios")
+            expect(report.locator(".silm-report-doc")).to_have_attribute("data-scientific-module", "explorar")
+            expect(report.locator("#report-observations")).to_have_value("Observei o brilho no módulo Explorar.")
+            expect(report.locator('[data-report-section="medicoes"]')).to_have_count(0)
+            expect(report.locator('[data-report-section="calculos"]')).to_have_count(0)
+            assert page.evaluate("""() => {
+                const s = window.SILMIntegration?.snapshot?.();
+                return s?.module?.active === 'explorar' && Array.isArray(s.measurements) &&
+                    Array.isArray(s.calculations);
+            }"""), (browser_name, width, "dados científicos perdidos ao alternar módulo")
             if width == 1440:
                 Path("artifacts").mkdir(exist_ok=True)
                 page.goto(root.rstrip("/") + "/#/roteiros")
