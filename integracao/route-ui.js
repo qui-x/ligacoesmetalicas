@@ -422,7 +422,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    for(const title of ['Evidência discutida com a turma','Dúvida ou conceito a retomar','Próxima investigação ou intervenção']){
     const block=N('div');block.className='silm-report-author';block.append(N('h3',title));
     const space=N('div');space.className='silm-writing';space.setAttribute('role','img');space.setAttribute('aria-label',title+': campo para escrita do professor');
-    for(let i=0;i<5;i++)space.append(N('div',null,'silm-writing-line'));
+    for(let i=0;i<5;i++){const line=N('div');line.className='silm-writing-line';space.append(line);}
     block.append(space);follow.append(block);
    }
    const noteSection=section(0,'Como utilizar a ficha','nota');
