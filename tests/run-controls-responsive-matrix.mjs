@@ -302,6 +302,8 @@ try{
  await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='aligned');
  const finish=bench.locator('.silm-optical-bench-finish');
  await finish.click();
+ await page.waitForFunction(()=>document.querySelector('#silm-properties .silm-optical-bands')?.hidden===true);
+ // O painel é atualizado de forma limitada a dez vezes por segundo.
  // A folha Ver permanece fechada no mobile durante o experimento.
  // Inspecionar o estado semântico intrínseco do painel oculto (não isVisible,
  // que seria sempre false devido ao ancestral #si-dock-right[hidden]).
@@ -318,6 +320,7 @@ try{
  assert.equal(matteState.spectralHidden,true,
   'Dados de superfície ideal lisa apareceram como previsão para acabamento fosco: '+JSON.stringify(matteState));
  await finish.click();
+ await page.waitForFunction(()=>document.querySelector('#silm-properties .silm-optical-bands')?.hidden===false);
  const polishedState=await opticalState();
  assert.equal(polishedState.benchFinish,'polished','Acabamento polido não foi restaurado: '+JSON.stringify(polishedState));
  assert.equal(polishedState.appearance,'aligned','Destaque especular não retornou: '+JSON.stringify(polishedState));
