@@ -349,6 +349,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const experimentRecord=free&&exp?storage.get('route.experiment',null):null;
   const matchingExperiment=experimentRecord?.route===exp?.id&&experimentRecord?.investigation===s.investigation?.id;
   const reportModule=S.reportModules.resolve(record,r,archived),reportPolicy=S.reportModules.modules[reportModule];
+  const propertyHistory=reportModule==='explorar'?(archived?archived.propertyHistory??null:S.reportPropertyHistory.read(storage,s.investigation?.id,s.metal?.atomicNumber)):null;
   const routeAligned=!free||!r.module||r.module===reportModule,study=routeAligned?r.study:null;
   const savedHypothesis=matchingExperiment?storage.get('route.hypothesis.investigation:'+s.investigation.id,''):'';
   const initialHypothesis=matchingExperiment?(typeof savedHypothesis==='string'&&savedHypothesis?savedHypothesis.slice(0,2000):typeof experimentRecord?.hypothesis==='string'?experimentRecord.hypothesis.slice(0,2000):''):'';
@@ -443,7 +444,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    evidence.append(N('p','Os valores abaixo informam apenas a presença de registros; não indicam acerto, proficiência ou aprendizagem.'));
    const reportFields=[['Observações','observations'],['Análise','analysis'],['Interpretação','interpretation'],['Resposta à investigação','answer'],['Conclusão','conclusion']];
    const rows=reportFields.map(([label,key])=>[label,String(record.report?.[key]||'').trim()?'Texto registrado':'Sem texto registrado']);
-   if(reportModule==='explorar')rows.push(['Propriedade em exploração',S.reportModules.context(s)?.title||'Nenhuma experiência ativa']);
+   if(reportModule==='explorar'){rows.push(['Propriedade em exploração',S.reportModules.context(s)?.title||'Nenhuma experiência ativa']);rows.push(['Interações com propriedades registradas',propertyHistory?propertyHistory.events.length+' registro(s)':'Histórico indisponível']);}
    if(reportModule==='medir')rows.push(['Medições do modelo',String(s.measurements?.length||0)+' registro(s)']);
    if(reportModule==='calcular')rows.push(['Cálculos do SILM',String(s.calculations?.length||0)+' registro(s)']);
    if(record.activityContext.type==='mission'&&r.evidenceObjectives?.length){
@@ -508,7 +509,20 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
     sec.append(N('p',active.title+' — '+active.action),N('p',active.note));
     const limitation=S.properties.catalog[active.id]?.limitation;
     if(limitation){const limit=N('p','Limite do modelo: '+limitation);limit.className='silm-report-note';sec.append(limit);}
-   }else sec.append(N('p','Nenhuma propriedade está em exploração neste estado salvo. Experiências anteriores não são reconstruídas automaticamente.'));
+   }else sec.append(N('p','Nenhuma propriedade está ativa no estado salvo. O histórico abaixo registra somente ações efetivamente realizadas desde que este recurso foi habilitado.'));
+   const historySection=N('div');historySection.className='silm-report-property-history';
+   historySection.append(N('h3','Histórico de interações com as propriedades'));
+   const caution=N('p','As linhas documentam ações realizadas no simulador (ativar, alterar, restaurar e encerrar propriedades). Não são medidas experimentais, observações automáticas nem comprovação de aprendizagem.');
+   caution.className='silm-report-note';historySection.append(caution);
+   if(propertyHistory?.events.length){
+    const types={iniciada:'Início',alterada:'Manipulação',restaurada:'Restauração',encerrada:'Encerramento'};
+    historySection.append(reportTable('Ações registradas no módulo Explorar',['Momento','Propriedade','Ação','Registro do motor'],
+     propertyHistory.events.map(ev=>[new Date(ev.at).toLocaleString('pt-BR'),S.properties.catalog[ev.property].title,types[ev.kind],ev.summary])));
+    if(propertyHistory.discarded){
+     historySection.append(N('p','Histórico limitado aos últimos '+S.reportPropertyHistory.limit+' eventos; '+propertyHistory.discarded+' registro(s) anterior(es) foram descartados por limite de armazenamento.'));
+    }
+   }else historySection.append(N('p',propertyHistory?'Nenhuma interação com propriedades foi registrada nesta investigação. Ações anteriores à instalação deste recurso não podem ser reconstruídas.':'Este arquivo foi criado antes do histórico de propriedades; não há dados anteriores verificáveis.'));
+   sec.append(historySection);
    const observed=[];
    if(record.evidence?.cell)observed.push('Célula unitária observada');
    if(record.evidence?.lattice)observed.push('Rede cristalina observada');
@@ -555,7 +569,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   for(const sid of sources){const src=S.data.source(sid);if(src)list.append(N('li',src.institution+' — '+src.title+(src.url?' · '+src.url:'')));}sourceSec.append(list);
   const modelNote=section(0,'Nota sobre o modelo','nota');modelNote.classList.add('silm-report-model-note');
   const moduleNotes={
-   explorar:'O metal e a estrutura de referência são dados tabelados. A rede, os elétrons deslocalizados e as propriedades são representações didáticas qualitativas; a situação exibida é somente a do estado salvo. Não são resultados experimentais nem cálculos.',
+   explorar:'O metal e a estrutura de referência são dados tabelados. A rede, os elétrons deslocalizados e as propriedades são representações didáticas qualitativas. A situação atual corresponde ao estado salvo, enquanto o histórico apresenta apenas comandos efetivamente registrados desde a sua implantação; nenhuma ação equivale a medição ou observação científica automática.',
    medir:'O metal e a estrutura de referência são dados tabelados. As medidas são valores do modelo, obtidos das coordenadas científicas da estrutura e de instrumentos virtuais, não de uma amostra real.',
    calcular:'O metal e a estrutura de referência são dados tabelados. Os resultados são cálculos do SILM baseados nas fórmulas e entradas identificadas, com origem e limites dos modelos; não são medidas experimentais.'
   };

@@ -41,6 +41,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   if(typeof id!=='string'||!id.startsWith('attempt-silm-report-'))return null;
   const archive=storage.get('report.archive:'+id,null);
   if(!archive||!archive.record?.checkpoint||!archive.record?.activityContext)return null;
+  if(archive.propertyHistory!==undefined&&!S.reportPropertyHistory.valid(archive.propertyHistory,archive.record.checkpoint.investigation?.id,archive.record.checkpoint.metal?.atomicNumber))return null;
   return archive;
  }
  function exportNotebook(){
@@ -56,7 +57,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   if(!reports||typeof reports!=='object'||Array.isArray(reports)||Object.keys(reports).length>500)throw Error('Arquivos de relatório inválidos.');
   for(const [id,archive]of Object.entries(reports)){
    const record=archive?.record;
-   if(!/^attempt-silm-report-[a-z0-9-]+$/.test(id)||!record?.activityContext||!S.validateScientificState(record.checkpoint).ok||typeof archive.title!=='string'||archive.title.length>300||!record.report||!['name','date','observations','interpretation','conclusion'].every(k=>typeof record.report[k]==='string'&&record.report[k].length<=10000))throw Error('Relatório incompatível; os dados atuais foram preservados.');
+   if(!/^attempt-silm-report-[a-z0-9-]+$/.test(id)||!record?.activityContext||!S.validateScientificState(record.checkpoint).ok||typeof archive.title!=='string'||archive.title.length>300||!record.report||!['name','date','observations','interpretation','conclusion'].every(k=>typeof record.report[k]==='string'&&record.report[k].length<=10000)||(archive.propertyHistory!==undefined&&!S.reportPropertyHistory.valid(archive.propertyHistory,record.checkpoint.investigation?.id,record.checkpoint.metal?.atomicNumber)))throw Error('Relatório incompatível; os dados atuais foram preservados.');
   }
   for(const note of value.document.notes)if(note.attemptId?.startsWith('attempt-silm-report-')&&!reports[note.attemptId]){
    if(value.format==='base-demo-si-journal-v1'&&archivedReport(note.attemptId))reports[note.attemptId]=archivedReport(note.attemptId);
@@ -133,7 +134,9 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    short(report.conclusion)?'Conclusão: '+short(report.conclusion):''
   ].filter(Boolean);
   const body=lines.join('\n').slice(0,1200);
-  const archive={record,title:activityTitle||'Investigação livre',module:reportModule,archivedAt:new Date().toISOString()};
+  const propertyHistory=reportModule==='explorar'?S.reportPropertyHistory.read(storage,state.investigation?.id,state.metal?.atomicNumber):null;
+  if(reportModule==='explorar'&&!propertyHistory)return 'error';
+  const archive={record,title:activityTitle||'Investigação livre',module:reportModule,archivedAt:new Date().toISOString(),...(reportModule==='explorar'?{propertyHistory}:{})};
   const saved=storage.transaction(()=>{if(!storage.set('report.archive:'+attemptId,archive)||!journal.addNote({kind:'observacao',body},notebookScene(state),attemptId))throw Error('Falha ao arquivar');},{onRollback:()=>{journal=B.createJournalStore(B.storage);}});
   if(!saved.ok)return 'error';
   home();notebookRefresh?.();return 'added';

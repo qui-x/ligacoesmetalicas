@@ -53,7 +53,7 @@
  const model=S.protectScientificModel(S.createScientificState(),storage,{onFailure:()=>say('Não foi possível salvar a alteração. O estado anterior foi preservado.','warning')});
  function storageStatus(){const status=storage.status();if($('silm-storage-status'))$('silm-storage-status').textContent=status.conflict?'Edição bloqueada. Recarregue os dados antes de continuar.':status.ok&&!invalidSavedState?'Investigação salva neste navegador. Exporte em JSON para guardar uma cópia.':'Não foi possível salvar todos os documentos. Estado anterior preservado. Documentos: '+(status.documents.join(', ')||'investigação inválida')+'.';}
  function schedule(){if(!ready||pending)return;pending=true;queueMicrotask(()=>{pending=false;render();});}
- model.connect({storage,emit(name,detail){if(name==='investigation:updated'){if(detail?.change!=='storage:rollback'&&routeUI?.session.open()&&!routeUI.session.inTransition)routeUI.session.observe(false);schedule();}}});
+ model.connect({storage,emit(name,detail){if(name==='investigation:updated'){if(detail?.change?.startsWith('properties:')&&!S.reportPropertyHistory.capture(storage,detail.change,detail.previous,detail.current))throw Error('PROPERTY_HISTORY_SAVE_FAILED');if(detail?.change!=='storage:rollback'&&routeUI?.session.open()&&!routeUI.session.inTransition)routeUI.session.observe(false);schedule();}}});
  const report=r=>{if(r?.ok===false)say(S.crystal.reasons[r.reason]||'Esta operação não está disponível no contexto atual.','warning');schedule();return r;};
  function element(){return model.state.metal?S.data.get(model.state.metal.atomicNumber):null;}
  const rep={
