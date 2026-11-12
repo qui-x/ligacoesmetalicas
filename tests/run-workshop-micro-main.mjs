@@ -68,6 +68,50 @@ async function test(viewport){
  assert.equal(await viewer.getAttribute('data-measurement-status'),'unavailable','Medidas experimentais não devem estar disponíveis para esquema gerado.');
  assert.doesNotMatch(await viewer.locator('.silm-workshop-micro-status').textContent(),/\d+[,.]?\d*\s*%/,'O grão não deve exibir porcentagem de composição ou fração sem dados experimentais.');
  assert.match(await viewer.locator('.silm-workshop-micro-caveat').textContent(),/sem composição, fração de fase ou tamanho medidos/,'Aviso científico ausente para mapa esquemático.');
+ // A propriedade óptica deve começar nesta escala, mesmo antes de a
+ // estrutura livre ser organizada em rede cristalina.
+ const originalGrainPaths=await viewer.locator('.silm-micro-grain').evaluateAll(
+  nodes=>nodes.slice(0,8).map(n=>n.getAttribute('d')).join('|'));
+ await page.locator('[data-open-dock="ver"]').click();
+ const lustre=page.locator('[data-action="property-luster"]');
+ await lustre.waitFor({state:'visible'});
+ assert.notEqual(await lustre.getAttribute('aria-disabled'),'true',
+  'O brilho ainda exige organizar a rede antes de investigar a superfície.');
+ await lustre.click();
+ await page.locator('#si-dock-right [data-close-dock="right"]').click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.opticalStudy==='active');
+ const optics=viewer.locator('.silm-micro-optical-tools');
+ assert.equal(await optics.isVisible(),true,'Controles ópticos não aparecem na microestrutura.');
+ assert.equal(await viewer.locator('.silm-micro-optical-light').count(),1,
+  'A iluminação foi recriada fora do mesmo mapa de grãos.');
+ assert.equal(await page.locator('.silm-optical-bench').count(),0,
+  'Uma bancada flutuante não pode reaparecer na microestrutura.');
+ const opticalSnapshot=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
+ await optics.getByRole('slider',{name:'Lanterna em graus da normal'}).focus();
+ await optics.getByRole('slider',{name:'Lanterna em graus da normal'}).press('End');
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.opticalAppearance==='away');
+ await optics.getByRole('slider',{name:'Observador em graus da normal'}).focus();
+ await optics.getByRole('slider',{name:'Observador em graus da normal'}).press('End');
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.opticalAppearance==='aligned');
+ await optics.getByRole('button',{name:'Alternar acabamento didático da superfície'}).click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.opticalAppearance==='diffuse');
+ assert.match(await optics.locator('.silm-micro-optical-note').textContent(),/sem valores medidos|não altera grãos/);
+ await optics.getByRole('button',{name:'Alternar acabamento didático da superfície'}).click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.opticalAppearance==='aligned');
+ assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),opticalSnapshot,
+  'Ângulos e acabamento transitórios alteraram o estado científico.');
+ const currentGrains=await viewer.locator('.silm-micro-grain').evaluateAll(
+  nodes=>nodes.slice(0,8).map(n=>n.getAttribute('d')).join('|'));
+ assert.equal(currentGrains,originalGrainPaths,
+  'Interação óptica modificou arbitrariamente a geometria dos grãos.');
+ await optics.getByRole('button',{name:'Ligar ou desligar iluminação da microestrutura'}).click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.opticalAppearance==='off');
+ await page.locator('[data-open-dock="ver"]').click();
+ await lustre.click();
+ await page.locator('#si-dock-right [data-close-dock="right"]').click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.opticalStudy==='inactive');
+ assert.equal(await optics.isVisible(),false,'Controles ópticos persistiram após encerrar a experiência.');
+
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  await viewer.getByRole('button',{name:'Ampliar microestrutura'}).click();
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-zoom'),'1.25','Zoom não funciona');
