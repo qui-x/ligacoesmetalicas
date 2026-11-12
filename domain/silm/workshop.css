@@ -1073,3 +1073,97 @@
  #si-stage .silm-workshop-manual-link{border:2px solid CanvasText;background:Canvas;color:CanvasText}
  .silm-manual-reference{border:2px solid CanvasText;background:Canvas;color:CanvasText}
 }
+
+/* Brilho na ESCALA 2: iluminação sobre os próprios polígonos do mapa.
+   Nunca codifica refletância, composição, orientação ou fase por grão. */
+.silm-micro-optical-light{
+ pointer-events:none;mix-blend-mode:screen;
+ transition:opacity .15s ease
+}
+.silm-micro-optical-tools[hidden]{display:none!important}
+.silm-micro-optical-tools{
+ grid-column:1/-1;display:flex;align-items:center;gap:8px;
+ flex-wrap:wrap;min-width:0;padding:7px 0 2px;
+ border-top:1px solid var(--border)
+}
+.silm-micro-optical-tools>.silm-workshop-micro-control{
+ flex:0 0 auto;min-height:44px;font-size:.76rem
+}
+.silm-micro-optical-angle{
+ display:flex;align-items:center;gap:5px;
+ flex:1 1 165px;min-width:0;
+ font-size:.75rem;font-weight:650
+}
+.silm-micro-optical-angle span{white-space:nowrap}
+.silm-micro-optical-angle input[type=range]{
+ flex:1;min-width:62px;max-width:100%;height:44px;
+ margin:0;accent-color:var(--accent)
+}
+.silm-micro-optical-angle input[type=range]:focus-visible{
+ outline:3px solid var(--ring,var(--accent));outline-offset:2px
+}
+.silm-micro-optical-note{
+ flex-basis:100%;font-size:.72rem;line-height:1.35;
+ color:var(--muted);overflow-wrap:anywhere
+}
+@media(max-width:560px){
+ .silm-micro-optical-tools{gap:4px 7px}
+ .silm-micro-optical-angle{flex-basis:calc(50% - 7px);min-width:125px;flex-wrap:wrap}
+ .silm-micro-optical-angle span{flex-basis:100%}
+ .silm-micro-optical-angle input[type=range]{width:100%;flex-basis:100%}
+}
+@media(forced-colors:active){
+ .silm-micro-optical-light{display:none!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .silm-micro-optical-light{transition:none!important}
+}
+
+/* Escala 2 mobile: não cortar Formações/Dados nem sobrepor os ângulos.
+   Ícones preservam aria-label completo; controles não perdem alvo de 44 px. */
+@media(max-width:560px){
+ .silm-workshop-micro-mode .silm-workshop-micro-toolbar{
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:5px;align-items:stretch;overflow:visible
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-status{
+  max-width:100%;min-width:0;order:0
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-dimension{
+  min-width:0;overflow-wrap:anywhere
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-zoom-tools{
+  width:100%;min-width:0;display:flex;justify-content:space-between;
+  gap:2px;flex-wrap:nowrap;overflow-x:visible
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-zoom-tools .silm-workshop-micro-control{
+  flex:0 0 44px;min-width:44px;width:44px;min-height:44px;
+  padding:4px;display:grid;place-items:center
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-zoom-tools .silm-micro-button-label{
+  display:none
+ }
+ .silm-workshop-micro-mode .silm-workshop-micro-zoom{
+  flex:0 0 38px;min-width:38px;font-size:.8rem
+ }
+ .silm-workshop-micro-mode .silm-micro-optical-tools{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px 8px;align-items:center
+ }
+ .silm-workshop-micro-mode .silm-micro-optical-tools>.silm-workshop-micro-control{
+  width:100%;min-width:0
+ }
+ .silm-workshop-micro-mode .silm-micro-optical-angle{
+  grid-column:1/-1;display:flex;flex-wrap:nowrap;align-items:center;
+  min-width:0;gap:8px
+ }
+ .silm-workshop-micro-mode .silm-micro-optical-angle span{
+  flex:0 0 80px;min-width:0;font-size:.74rem
+ }
+ .silm-workshop-micro-mode .silm-micro-optical-angle input[type=range]{
+  flex:1 1 auto;min-width:0;width:auto
+ }
+ .silm-workshop-micro-mode .silm-micro-optical-note{
+  grid-column:1/-1;min-width:0
+ }
+}

@@ -68,6 +68,14 @@ jobs:
         run: |
           node tests/run-workshop-micro-main.mjs
           node tests/run-atlas-applications.mjs
+      - name: Guardar capturas da microestrutura com brilho
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-micro-optica-${{ matrix.browser }}
+          path: reports/micro-optica/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Encerrar servidor local
         if: always()
         run: |
