@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.10';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='parte10-joule-dissipacao-calor-20261111-offline-revalidation-r1-professor-roteiros-r1';
+const BUILD='parte10-joule-dissipacao-calor-20261111-offline-revalidation-r1-professor-roteiros-r1-pr111-optics-v5';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "assets/workshop/motor.webp",
@@ -147,6 +147,9 @@ const FILES=[
   "domain/silm/thermal.js",
   "domain/silm/electrothermal.js",
   "domain/silm/drive.js",
+  "domain/silm/optical-observation.js",
+  "domain/silm/optical-bench.js",
+  "domain/silm/optical-bench.css",
   "domain/silm/properties.js",
   "domain/silm/reference-conditions.js",
   "domain/silm/material-profile-registry.js",

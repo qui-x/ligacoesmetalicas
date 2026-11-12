@@ -248,6 +248,14 @@ try{
  await page.evaluate(()=>document.documentElement.style.fontSize='');
  await page.locator('[data-open-dock="ver"]').click();
  await direct.locator('[data-action="property-luster"]').click();
+ // Ver é uma folha modal no mobile: enquanto aberta, #si-stage fica inert
+ // intencionalmente para não permitir interação com a cena por trás do painel.
+ // Fechar a folha antes de operar a bancada, como já fazemos ao trocar escala.
+ assert.equal(await page.locator('#si-stage').evaluate(node=>node.inert),true,
+  'Ver aberto deveria proteger a cena com inert no mobile.');
+ await page.locator('#si-dock-right [data-close-dock="right"]').click();
+ await page.waitForFunction(()=>!document.querySelector('#si-stage')?.inert&&
+  document.querySelector('#si-dock-right')?.hidden===true);
  await page.waitForFunction(()=>document.querySelector('#silm-properties .silm-optical-sample')?.dataset.evidence==='tabulated');
  const optical=await page.locator('#silm-properties .silm-optical-sample').evaluate(node=>({
   text:node.textContent,bands:[...node.querySelectorAll('meter')].map(m=>m.value),
@@ -258,6 +266,80 @@ try{
  assert.match(optical.text,/Johnson|Christy/,'Falta procedência do Cu');
  assert.match(optical.text,/óxido, rugosidade|não a cor de uma peça real/,'Falta limite da referência');
  evidence.push({name:'cobre-optica-referencia',bands:optical.bands});
+ // PR102 reconstruído: um experimento de superfície, sem átomos fluorescentes,
+ // sem raios obrigatórios e sem copiar dados de Cu para outros metais.
+ const bench=page.locator('#silm-assembly-stage .silm-optical-bench');
+ await bench.waitFor({state:'visible'});
+ await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='aligned');
+ assert.equal(await page.locator('#silm-assembly-stage .silm-crystal-unit[data-lit]').count(),0,
+  'Brilho voltou a pintar centros metálicos individualmente.');
+ const eyeHandle=bench.locator('.silm-optical-bench-eye');
+ const eye=bench.locator('.silm-optical-bench-angle-eye');
+ const rect=await eyeHandle.boundingBox(),rangeRect=await eye.boundingBox();
+ assert.ok(rect?.width>=43.5&&rect.height>=43.5,'Observador direto perdeu alvo de toque de 44 px');
+ assert.ok(rangeRect?.height>=43.5,'A escala angular nativa não tem alvo de toque adequado.');
+ const beforeKey=await eye.evaluate(node=>{
+  window.__silmKeyProbe={events:[],before:node.value};
+  node.addEventListener('keydown',e=>window.__silmKeyProbe.events.push('target-keydown:'+e.key),true);
+  node.addEventListener('input',()=>window.__silmKeyProbe.events.push('target-input:'+node.value),true);
+  document.addEventListener('keydown',e=>window.__silmKeyProbe.events.push('document-keydown:'+e.key),true);
+  return {connected:node.isConnected,value:node.value};
+ });
+ // Com a folha modal fechada, a faixa angular deve receber foco real.
+ await eye.focus();
+ assert.equal(await eye.evaluate(node=>document.activeElement===node),true,
+  'A faixa angular não recebeu foco, embora Ver esteja fechado.');
+ await eye.press('End');
+ const keyProbe=await eye.evaluate(node=>({
+  ...window.__silmKeyProbe,after:node.value,focused:document.activeElement===node,
+  connected:node.isConnected,bench:node.closest('.silm-optical-bench')?.dataset.appearance,
+  selectorCount:document.querySelectorAll('#silm-assembly-stage .silm-optical-bench-angle-eye').length
+ }));
+ assert.equal(await eye.inputValue(),'80','O controle angular nativo não respondeu à tecla End: '+JSON.stringify({beforeKey,keyProbe}));
+ await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='away');
+ // Alinhar a visão por gesto real no controle de faixa.
+ await page.mouse.click(rangeRect.x+rangeRect.width*.43,rangeRect.y+rangeRect.height/2);
+ await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='aligned');
+ const finish=bench.locator('.silm-optical-bench-finish');
+ // Inspecionar a cena antes de aguardar o painel, para diagnosticar
+ // separadamente um clique ignorado e um painel de dados desatualizado.
+ const opticalState=()=>page.evaluate(()=>({
+  benchFinish:document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.finish,
+  appearance:document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance,
+  light:document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.light,
+  spectralHidden:document.querySelector('#silm-properties .silm-optical-bands')?.hidden,
+  sampleHidden:document.querySelector('#silm-properties .silm-optical-sample')?.hidden,
+  sampleFinish:document.querySelector('#silm-properties .silm-optical-sample')?.dataset.finish,
+  dockHidden:document.querySelector('#si-dock-right')?.hidden,
+  stageInert:document.querySelector('#si-stage')?.inert
+ }));
+ await finish.click();
+ const matteState=await opticalState();
+ console.log('SILM_OPTICAL_MATTE',JSON.stringify(matteState));
+ assert.equal(matteState.benchFinish,'matte','Clique no acabamento não alterou o motor da bancada: '+JSON.stringify(matteState));
+ assert.equal(matteState.appearance,'diffuse','Acabamento fosco não produziu espalhamento qualitativo: '+JSON.stringify(matteState));
+ // O painel pode ser atualizado até 100 ms depois da bancada.
+ await page.waitForFunction(()=>document.querySelector('#silm-properties .silm-optical-bands')?.hidden===true);
+ assert.equal(await page.locator('#silm-properties .silm-optical-bands').evaluate(node=>node.hidden),true,
+  'Dados de superfície ideal lisa apareceram como previsão para acabamento fosco.');
+ await finish.click();
+ await page.waitForFunction(()=>document.querySelector('#silm-properties .silm-optical-bands')?.hidden===false);
+ const polishedState=await opticalState();
+ assert.equal(polishedState.benchFinish,'polished','Acabamento polido não foi restaurado: '+JSON.stringify(polishedState));
+ assert.equal(polishedState.appearance,'aligned','Destaque especular não retornou: '+JSON.stringify(polishedState));
+ assert.equal(polishedState.spectralHidden,false,
+  'A referência óptica da interface polida não foi restaurada: '+JSON.stringify(polishedState));
+ const incident=bench.locator('.silm-optical-bench-incident');
+ assert.equal(await incident.isVisible(),false,'Raios não devem ser obrigatórios.');
+ await bench.locator('.silm-optical-bench-rays').click();
+ assert.equal(await incident.isVisible(),true,'Esquema de raios não foi exibido a pedido.');
+ await bench.locator('.silm-optical-bench-rays').click();
+ assert.equal(await incident.isVisible(),false,'O aluno não conseguiu ocultar o esquema.');
+ await bench.locator('.silm-optical-bench-source').click();
+ await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='off');
+ await bench.locator('.silm-optical-bench-source').click();
+ await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='aligned');
+ evidence.push({name:'brilho-refeito',observer:80,finish:'polished/matte',raysOptional:true,unlit:true});
  assert.deepEqual(errors,[],errors.join(' | '));
  await context.close();
 }catch(e){evidence.push({error:String(e),stack:e.stack});throw e;}

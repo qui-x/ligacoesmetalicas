@@ -82,18 +82,25 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  const opticalSource=U.element('p','','silm-optical-source');
  opticalSection.append(opticalHeading,opticalNote,spectralBars,opticalSource);
  box.append(head,row,status,readings,opticalSection,list);container.append(box);
- function updateOptical(state,angle){
+ function updateOptical(state,driveState){
   const service=SILM.materialEngine;
+  const angle=driveState?.angle??35,finish=driveState?.finish??'polished';
   const numeric=state.metal?.atomicNumber;
   const cap=service?.capability(numeric,'luster');
   const validated=cap?.ok&&cap.mode==='reference-data';
-  spectralBars.hidden=!validated;
+  spectralBars.hidden=!validated||finish==='matte';
   opticalSection.dataset.evidence=validated?'tabulated':'qualitative';
+  opticalSection.dataset.finish=finish;
   opticalSection.dataset.reference=validated?
    (cap.conditionMatch?.ok?'cntp-verified':'source-conditions-only'):'unavailable';
   if(!validated){
-   opticalNote.textContent='Modelo geométrico qualitativo. Sem perfil óptico homologado para este metal: não são exibidas porcentagens nem uma cor calculada.';
-   opticalSource.textContent='A luz e a superfície continuam como esquema, não como previsão da aparência.';
+   opticalNote.textContent='A bancada na cena permite comparar reflexão polida e espalhamento fosco apenas qualitativamente. Não há perfil óptico quantitativo homologado para este metal.';
+   opticalSource.textContent='Não atribuímos ao metal a refletância nem a cor de outro elemento. Mova lanterna e observador na cena.';
+   return;
+  }
+  if(finish==='matte'){
+   opticalNote.textContent='Acabamento fosco: o espalhamento na bancada é ilustrativo. Os valores n,k da fonte permitem modelar uma interface ideal lisa, não prever a luz vista na superfície fosca.';
+   opticalSource.textContent='Referência de '+cap.symbol+': '+cap.source.authors+' ('+cap.source.year+'), temperatura ambiente; CNTP não verificada.';
    return;
   }
   const angleDeg=Number.isFinite(angle)?angle:0,values=channels.map(row=>service.optical(numeric,row.nm,angleDeg));
@@ -108,7 +115,7 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
    channel.value.textContent=(100*v.reflectance).toLocaleString('pt-BR',{maximumFractionDigits:1})+' %';
   }
   const atReference=!!cap.conditionMatch?.ok;
-  opticalNote.textContent=cap.symbol+' · interface lisa ideal ar–metal · luz não polarizada · incidência '+angleDeg+'° da normal de referência. Valores ilustram a fonte original, não a cor de uma peça real.';
+  opticalNote.textContent=cap.symbol+' · interface lisa ideal ar–metal · luz não polarizada · incidência '+angleDeg+'°. As porcentagens são propriedades ópticas da fonte, NÃO intensidade vista pelo observador nem aparência de uma peça real.';
   opticalSource.textContent=(atReference?'Condição CNTP verificada. ':
    'ATENÇÃO: fonte à temperatura ambiente; CNTP (0 °C, 1 atm) não verificada — não interpretar estas porcentagens como previsão em CNTP. ')+
    'Constantes n,k: '+cap.source.authors+' ('+cap.source.year+'). Sem considerar óxido, rugosidade ou filme.';
@@ -125,7 +132,7 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   const {state,eligibility,editable,reduced,availability,joule}=info(),pr=state.properties,active=pr?.active;
   readings.hidden=!joule||compact;
   opticalSection.hidden=active!=='luster'||compact;
-  if(!opticalSection.hidden)updateOptical(state,info().drive?.angle);
+  if(!opticalSection.hidden)updateOptical(state,info().drive);
   box.dataset.active=active||'';list.hidden=!!active||compact;row.hidden=!active;
   if(!active){head.textContent=compact?'':'Escolha uma propriedade para investigar.';status.textContent=compact?'':'Uma experiência por vez; as experiências não alteram a estrutura científica.';
    for(const id of P.ids){const el=eligibility[id],able=availability(id),ok=el.status!=='unavailable'&&able.ok&&editable;starts[id].setAttribute('aria-disabled',String(!ok));
