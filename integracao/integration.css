@@ -629,6 +629,21 @@ dialog.silm-dialog::backdrop{background:rgba(6,9,14,.72);backdrop-filter:blur(6p
  .silm-writing-line{border-bottom-color:#777}
  .silm-report-table tr,.silm-report-calc,.silm-report-author{break-inside:avoid}
 }
+/* Registro histórico de ações do modelo no relatório Explorar. */
+.silm-report-property-history{margin-top:20px;padding:14px 16px;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+.silm-report-property-history h3{margin:0 0 12px}
+.silm-report-property-history .silm-report-table{margin-top:12px}
+.silm-report-property-history .silm-report-table table{min-width:540px}
+.silm-report-property-history .silm-report-table th:first-child{min-width:106px}
+.silm-report-property-history>p{line-height:1.5;font-size:.87rem}
+@media(max-width:640px){.silm-report-property-history{padding:12px}.silm-report-property-history .silm-report-table table{min-width:530px}}
+@media print{
+ .silm-report-property-history{background:#fff;border-color:#aaa;break-inside:auto}
+ .silm-report-property-history .silm-report-table{overflow:visible}
+ .silm-report-property-history .silm-report-table table{min-width:0;table-layout:auto}
+ .silm-report-property-history .silm-report-table td,
+ .silm-report-property-history .silm-report-table th{overflow-wrap:anywhere}
+}
 /* ===== Etapa 10 — Tour e ajuda contextual (paridade SIAB 1.0.0) ===== */
 .si-dock-header .si-dock-help{min-width:44px;width:44px;padding:0;font-size:16px;font-weight:700;border-radius:50%;flex:none}
 .silm-help-dialog{width:min(560px,calc(100vw - 32px))}
