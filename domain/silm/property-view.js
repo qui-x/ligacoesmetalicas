@@ -47,12 +47,32 @@ SILM.createPropertyOverlay=(stage,{before=null}={})=>{
   else if(force==='compress'&&level){for(const x of [38,50,62]){arrow(forceG,x,1,x,7,'silm-force-arrow');arrow(forceG,x,99,x,93,'silm-force-arrow');}el('text',{x:66,y:5.5,class:'silm-overlay-label silm-overlay-small'},forceG,'compressão');}
   else if(force==='stretch'&&level){for(const x of [44,56]){arrow(forceG,x,8,x,1,'silm-force-arrow');arrow(forceG,x,92,x,99,'silm-force-arrow');}el('text',{x:60,y:5.5,class:'silm-overlay-label silm-overlay-small'},forceG,'tração');}
   if(heat){el('rect',{x:heatX,y:8,width:5,height:84,fill:'url(#'+uid+'-hatch)',class:'silm-heat-band'},heatG);el('text',{x:heatX+6.5,y:12,class:'silm-overlay-label silm-overlay-small'},heatG,'calor');}
-  // 0.17.x (P4): normal da superfície, feixe incidente da lanterna e feixe refletido com θr = θi (sem feixe transmitido).
-  if(beam){const {point:P,lantern:L,end:E,angle,on}=beam,len=Math.hypot(L.x-P.x,L.y-P.y);
-   el('line',{x1:P.x,y1:P.y,x2:P.x,y2:Math.max(1,P.y-len),class:'silm-normal-line'},lightG);el('text',{x:P.x+1,y:Math.max(3,P.y-len+2),class:'silm-overlay-label silm-overlay-small'},lightG,'normal');
-   if(on){el('line',{x1:L.x,y1:L.y,x2:P.x,y2:P.y,class:'silm-light-in-line'},lightG);el('line',{x1:P.x,y1:P.y,x2:E.x,y2:E.y,class:'silm-light-out-line'},lightG);
-    el('text',{x:Math.max(1,(L.x+P.x)/2-12),y:(L.y+P.y)/2,class:'silm-overlay-label silm-overlay-small'},lightG,'θᵢ = '+angle+'°');
-    el('text',{x:Math.min(86,(E.x+P.x)/2+2),y:(E.y+P.y)/2,class:'silm-overlay-label silm-overlay-small'},lightG,'θᵣ = '+angle+'°');}}
+  // Brilho: o alvo acompanha a região superficial da estrutura projetada
+  // pela câmera. Sem átomo emissor, superfície fictícia ou outra bancada.
+  if(beam){
+   const {point:P,lantern:L,end:E,observer:O,angle,on,rays,finish,appearance}=beam;
+   el('ellipse',{cx:P.x,cy:P.y,rx:7,ry:2.5,
+    class:'silm-optical-surface-marker'},lightG);
+   if(on&&finish==='polished'&&['aligned','near'].includes(appearance)){
+    el('ellipse',{cx:P.x,cy:P.y,rx:appearance==='aligned'?6:3,ry:1.7,
+     class:'silm-optical-highlight'},lightG);
+   }
+   if(on&&finish==='matte'){
+    // Espalhamento explicitamente qualitativo, sem rugosidade ou BRDF.
+    for(const delta of [-40,-20,0,20,40]){
+     const a=(angle+delta)*Math.PI/180;
+     el('line',{x1:P.x,y1:P.y,x2:P.x+9*Math.sin(a),
+      y2:P.y-9*Math.cos(a),class:'silm-optical-diffuse-ray'},lightG);
+    }
+   }
+   if(rays){
+    el('line',{x1:P.x,y1:P.y,x2:P.x,y2:P.y-15,class:'silm-optical-normal'},lightG);
+    if(on){
+     el('line',{x1:L.x,y1:L.y,x2:P.x,y2:P.y,class:'silm-optical-incidence'},lightG);
+     el('line',{x1:P.x,y1:P.y,x2:E.x,y2:E.y,class:'silm-optical-reflection'},lightG);
+    }
+   }
+  }
   else if(light){const {x,y}=light;el('polygon',{points:`0,2 12,2 ${x+3},${y} ${x-3},${y}`,class:'silm-light-in',fill:'url(#'+uid+'-rays)'},lightG);
    el('polygon',{points:`${x-3},${y} ${x+3},${y} 100,2 88,2`,class:'silm-light-out'},lightG);el('text',{x:2,y:9,class:'silm-overlay-label silm-overlay-small'},lightG,'luz incidente');el('text',{x:98,y:9,'text-anchor':'end',class:'silm-overlay-label silm-overlay-small'},lightG,'luz refletida');}
  }

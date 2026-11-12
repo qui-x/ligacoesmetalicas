@@ -1,111 +1,62 @@
 'use strict';
 window.SILM=window.SILM||{};
 /*
- * Bancada de reflexão sobre uma amostra esquemática dentro do palco.
- * Uma única interface: a lanterna e o observador compartilham a superfície.
- * Não desenha reflexos por átomo, não estima cor/luminância nem rugosidade.
+ * Investigação óptica DIRETAMENTE sobre a estrutura já projetada pelo SILM.
+ * Não cria amostra, minipalco, janela ou geometria científica independentes.
+ * A âncora é a região superficial esquemática da amostra, entregue pela cena.
+ * O controlador transitório SILM.drive continua sendo a única fonte de estado.
  */
 (()=>{
- const svgNS='http://www.w3.org/2000/svg';
- const element=(tag,className,text)=>{
+ const make=(tag,cls,label)=>{
   const node=document.createElement(tag);
-  if(className)node.className=className;
-  if(text!==undefined)node.textContent=text;
+  node.className=cls;
+  if(label!==undefined)node.textContent=label;
   return node;
  };
- const svg=(tag,attrs,parent)=>{
-  const node=document.createElementNS(svgNS,tag);
-  for(const [name,value] of Object.entries(attrs||{}))node.setAttribute(name,String(value));
-  if(parent)parent.append(node);
-  return node;
- };
- const pct=(v,total)=>v/total*100+'%';
- SILM.createOpticalBench=(stage,{scope,drive,elementSymbol,toggleLight})=>{
-  const root=element('section','silm-optical-bench');root.hidden=true;
-  root.setAttribute('role','group');root.setAttribute('aria-label','Experiência óptica sobre superfície metálica');
-  const heading=element('strong','silm-optical-bench-title',
-   'Brilho · '+elementSymbol+' · superfície ilustrativa');
-  const area=element('div','silm-optical-bench-area');
-  const graphic=svg('svg',{viewBox:'0 0 240 140','aria-hidden':'true',
-   class:'silm-optical-bench-svg',preserveAspectRatio:'none'},area);
-  const normal=svg('line',{x1:120,y1:93,x2:120,y2:24,
-   class:'silm-optical-bench-normal'},graphic);
-  const incident=svg('line',{x1:92,y1:36,x2:120,y2:93,
-   class:'silm-optical-bench-incident'},graphic);
-  const reflected=svg('line',{x1:120,y1:93,x2:148,y2:36,
-   class:'silm-optical-bench-reflected'},graphic);
-  const surface=svg('rect',{x:40,y:91,width:160,height:18,rx:3,
-   class:'silm-optical-bench-surface'},graphic);
-  const shine=svg('ellipse',{cx:120,cy:92,rx:17,ry:4,
-   class:'silm-optical-bench-shine'},graphic);
-  const scatter=svg('g',{class:'silm-optical-bench-scatter'},graphic);
-  for(const i of [-3,-2,-1,0,1,2,3])svg('line',{
-   x1:120+i*15,y1:89,x2:120+i*15+8,y2:82-Math.abs(i)*2
-  },scatter);
-  const lamp=element('div','silm-optical-bench-lamp','🔦');
-  const eye=element('div','silm-optical-bench-eye','◉');
-  const handles=[lamp,eye];
-  for(const h of handles){
-   h.tabIndex=0;h.setAttribute('role','slider');h.setAttribute('aria-valuemin','0');
-   h.setAttribute('aria-valuemax','80');area.append(h);
+ const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+ SILM.createOpticalSceneControls=(stage,{scope,drive,toggleLight,toolbarHost}={})=>{
+  const root=make('div','silm-optical-interaction');
+  root.hidden=true;
+  root.setAttribute('role','group');
+  root.setAttribute('aria-label','Investigação da reflexão na região da estrutura');
+  // As duas alças ficam NO palco: sua posição é recalculada pela mesma
+  // projeção e câmera da rede. Nenhum cartão cobre a investigação.
+  const lamp=make('button','silm-optical-handle silm-optical-lamp','🔦');
+  const eye=make('button','silm-optical-handle silm-optical-eye','◉');
+  for(const [node,name,min] of [[lamp,'Lanterna',5],[eye,'Observador',0]]){
+   node.type='button';node.setAttribute('role','slider');
+   node.setAttribute('aria-label','Ângulo de '+name.toLowerCase()+' em relação à normal');
+   node.setAttribute('aria-valuemin',String(min));node.setAttribute('aria-valuemax','80');
+   root.append(node);
   }
-  lamp.setAttribute('aria-valuemin','5');
-  lamp.setAttribute('aria-label','Ângulo da lanterna em relação à normal');
-  eye.setAttribute('aria-label','Ângulo do observador em relação à normal');
-  const controls=element('div','silm-optical-bench-controls');
-  const source=element('button','silm-optical-bench-source','Apagar luz');
-  const finish=element('button','silm-optical-bench-finish','Polida');
-  const rays=element('button','silm-optical-bench-rays','Mostrar raios');
-  for(const button of [source,finish,rays])button.type='button';
-  controls.append(source,finish,rays);
-  // Faixas nativas são a alternativa de teclado/toque aos gestos diretos
-  // sobre a amostra; ambas alteram as MESMAS variáveis transitórias.
-  const angles=element('div','silm-optical-bench-angles');
-  const angleInput=(name,kind,min)=>{
-   const label=element('label','silm-optical-bench-angle-label',name);
-   const input=document.createElement('input');input.type='range';
-   input.className='silm-optical-bench-angle-'+kind;input.min=String(min);
-   input.max='80';input.step='1';input.value='35';
-   input.setAttribute('aria-label',name+' em graus da normal');
-   label.append(input);angles.append(label);
-   const changed=()=>setAngle(kind,Number(input.value));
-   const keys=event=>{
-    if(event.key!=='End'&&event.key!=='Home')return;
-    event.preventDefault();event.stopPropagation();
-    input.value=event.key==='End'?'80':String(min);
-    changed();
-   };
-   input.addEventListener('input',changed);
-   input.addEventListener('keydown',keys,true);
-   scope.cleanup(()=>{
-    input.removeEventListener('input',changed);
-    input.removeEventListener('keydown',keys,true);
-   });
-   return input;
-  };
-  const lampRange=angleInput('Lanterna','lamp',5);
-  const eyeRange=angleInput('Observador','eye',0);
-  const status=element('p','silm-optical-bench-status');
-  status.setAttribute('aria-live','polite');
-  const limitation=element('small','silm-optical-bench-limitation',
-   'Destaque qualitativo: não representa cor nem refletância medida.');
-  root.append(heading,area,angles,controls,status,limitation);
+  const status=make('p','sr-only silm-optical-status');
+  status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+  root.append(status);
   stage.append(root);
   scope.cleanup(()=>root.remove());
-  let lastState={visible:false,illuminated:false};
-  const setAngle=(kind,angle)=>{
-   const changed=kind==='lamp'?drive?.setAngle(angle):drive?.setObserverAngle(angle);
-   // Atualiza a bancada imediatamente mesmo quando a cena maior estiver
-   // aguardando um frame do renderizador/escopo. Não toca no modelo científico.
-   if(changed)update(lastState);
-   return changed;
+
+  // Opções no MESMO conjunto de controles inferiores da rede, sem outro menu.
+  const actions=make('div','silm-optical-inline-actions');
+  actions.hidden=true;actions.setAttribute('role','group');
+  actions.setAttribute('aria-label','Opções de reflexão');
+  const finish=make('button','silm-optical-finish','◐ Fosco');
+  const rays=make('button','silm-optical-rays','↗ Raios');
+  for(const button of [finish,rays]){button.type='button';actions.append(button);}
+  toolbarHost?.append(actions);
+  scope.cleanup(()=>actions.remove());
+
+  let last={visible:false,illuminated:false,point:null};
+  const setAngle=(kind,number)=>{
+   if(!drive)return;
+   if(kind==='lamp')drive.setAngle(number);
+   else drive.setObserverAngle(number);
   };
-  const currentAngle=kind=>kind==='lamp'?drive?.angle:drive?.observerAngle;
-  const angleOf=(kind,event)=>{
-   const box=area.getBoundingClientRect();
-   const x=(event.clientX-box.left)/Math.max(1,box.width)*240;
-   const y=(event.clientY-box.top)/Math.max(1,box.height)*140;
-   return Math.atan2(Math.abs(x-120),Math.max(1,93-y))*180/Math.PI;
+  const current=kind=>kind==='lamp'?drive?.angle:drive?.observerAngle;
+  const eventAngle=(event)=>{
+   const rect=stage.getBoundingClientRect(),x=(event.clientX-rect.left)/Math.max(1,rect.width)*100,
+    y=(event.clientY-rect.top)/Math.max(1,rect.height)*100,P=last.point;
+   if(!P)return 35;
+   return Math.round(Math.atan2(Math.abs(x-P.x),Math.max(1,P.y-y))*180/Math.PI);
   };
   for(const [node,kind] of [[lamp,'lamp'],[eye,'eye']]){
    let pointer=null;
@@ -119,90 +70,67 @@ window.SILM=window.SILM||{};
     if(!pointer||pointer.id!==event.pointerId)return;
     event.preventDefault();event.stopPropagation();
     if(Math.hypot(event.clientX-pointer.x,event.clientY-pointer.y)>4)pointer.moved=true;
-    if(pointer.moved)setAngle(kind,angleOf(kind,event));
+    if(pointer.moved)setAngle(kind,eventAngle(event));
    });
-   const finishPointer=event=>{
+   const release=event=>{
     if(!pointer||event.pointerId!==pointer.id)return;
     event.preventDefault();event.stopPropagation();
     const moved=pointer.moved;pointer=null;
     if(!moved&&kind==='lamp'&&event.type==='pointerup')toggleLight?.();
    };
-   for(const type of ['pointerup','pointercancel','lostpointercapture'])
-    scope.listen(node,type,finishPointer);
-   const onKeydown=event=>{
+   for(const type of ['pointerup','pointercancel','lostpointercapture'])scope.listen(node,type,release);
+   scope.listen(node,'keydown',event=>{
     const k=event.key;
-    node.dataset.lastKey=k;
-    const delta={ArrowLeft:-5,ArrowRight:5,ArrowUp:5,ArrowDown:-5,PageUp:10,PageDown:-10}[k];
-    if(delta!==undefined){event.preventDefault();event.stopPropagation();
-     setAngle(kind,(currentAngle(kind)||0)+delta);}
-    else if(k==='Home'||k==='End'){event.preventDefault();event.stopPropagation();
-     setAngle(kind,k==='End'?80:kind==='lamp'?5:0);}
+    const step={ArrowLeft:-5,ArrowDown:-5,ArrowRight:5,ArrowUp:5,PageDown:-10,PageUp:10}[k];
+    if(step!==undefined){event.preventDefault();event.stopPropagation();setAngle(kind,(current(kind)||0)+step);}
+    else if(k==='Home'||k==='End'){event.preventDefault();event.stopPropagation();setAngle(kind,k==='End'?80:kind==='lamp'?5:0);}
     else if(k==='Enter'||k===' '){event.preventDefault();event.stopPropagation();
      if(kind==='lamp')toggleLight?.();
-     else setAngle('eye',drive.angle);}
-   };
-   node.addEventListener('keydown',onKeydown);
-   scope.cleanup(()=>node.removeEventListener('keydown',onKeydown));
+     else setAngle('eye',drive?.angle||35);
+    }
+   });
   }
-  // Controles da bancada usam listeners próprios, como os ranges nativos.
-  // Não dependem do repasse dos gestos da cena cristalográfica.
-  const onSource=event=>{event.stopPropagation();toggleLight?.();};
-  const onFinish=event=>{
-   event.stopPropagation();
-   if(drive?.setFinish(drive.finish==='matte'?'polished':'matte'))update(lastState);
-  };
-  const onRays=event=>{
-   event.stopPropagation();
-   if(drive?.setRays(!drive.rays))update(lastState);
-  };
-  for(const [button,handler] of [[source,onSource],[finish,onFinish],[rays,onRays]]){
-   button.addEventListener('click',handler);
-   scope.cleanup(()=>button.removeEventListener('click',handler));
-  }
-  function update({visible=false,illuminated=false}={}){
-   lastState={visible,illuminated};
-   root.hidden=!visible;
-   if(!visible||!drive)return;
-   const a=drive.angle,b=drive.observerAngle;
-   const view=SILM.opticalObservation?.observe({
+  scope.listen(finish,'click',()=>{if(drive)drive.setFinish(drive.finish==='matte'?'polished':'matte');});
+  scope.listen(rays,'click',()=>{if(drive)drive.setRays(!drive.rays);});
+
+  function update({visible=false,illuminated=false,point=null}={}){
+   last={visible,illuminated,point};
+   root.hidden=!visible||!point;actions.hidden=!visible;
+   if(!visible||!drive||!point)return null;
+   const a=drive.angle,b=drive.observerAngle,P={x:clamp(point.x,3,97),y:clamp(point.y,3,97)};
+   const result=SILM.opticalObservation?.observe({
     illuminated,incidenceDeg:a,observerDeg:b,finish:drive.finish
    });
-   if(!view)return;
-   root.dataset.appearance=view.appearance;root.dataset.finish=drive.finish;
+   if(!result)return null;
+   root.dataset.appearance=result.appearance;
+   root.dataset.finish=drive.finish;
    root.dataset.light=illuminated?'on':'off';
-   const lampR=58,eyeR=57,rad=Math.PI/180;
-   const lampP={x:120-lampR*Math.sin(a*rad),y:93-lampR*Math.cos(a*rad)};
-   const eyeP={x:120+eyeR*Math.sin(b*rad),y:93-eyeR*Math.cos(b*rad)};
-   // Keep handles distinguishable when both angles are close to the normal.
-   if(a<15&&b<15)eyeP.y+=17;
-   lamp.style.left=pct(lampP.x,240);lamp.style.top=pct(lampP.y,140);
-   eye.style.left=pct(eyeP.x,240);eye.style.top=pct(eyeP.y,140);
-   // Não sobrescrever o valor enquanto a pessoa ajusta o controle nativo.
-   // Isso preserva o evento de teclado antes da próxima atualização da cena.
-   if(document.activeElement!==lampRange&&lampRange.value!==String(a))lampRange.value=String(a);
-   if(document.activeElement!==eyeRange&&eyeRange.value!==String(b))eyeRange.value=String(b);
-   for(const [node,value,label] of [[lamp,a,'Lanterna'],[eye,b,'Observador']]){
+   // O raio é uma construção didática relativa à superfície local; não
+   // representa luz emitida pelos centros, rugosidade medida ou BRDF.
+   const radius=clamp(Math.min(23,P.y-7,P.x-7,93-P.x),9,23),rad=Math.PI/180;
+   const L={x:P.x-radius*Math.sin(a*rad),y:P.y-radius*Math.cos(a*rad)};
+   const O={x:P.x+radius*Math.sin(b*rad),y:P.y-radius*Math.cos(b*rad)};
+   const E={x:P.x+radius*Math.sin(a*rad),y:P.y-radius*Math.cos(a*rad)};
+   if(a<12&&b<12)O.y+=6; // Alças distinguíveis próximas da normal.
+   for(const [node,pos,value,name] of [[lamp,L,a,'Lanterna'],[eye,O,b,'Observador']]){
+    node.style.left=clamp(pos.x,3,97)+'%';
+    node.style.top=clamp(pos.y,3,97)+'%';
     node.setAttribute('aria-valuenow',String(value));
-    node.setAttribute('aria-valuetext',label+' a '+value+' graus da normal');
-    node.title=label+': '+value+'°. Arraste ou use setas; Enter '+(node===lamp?'alterna luz':'alinha ao reflexo');
+    node.setAttribute('aria-valuetext',name+' a '+value+' graus');
+    node.title=name+' · '+value+'°. Arraste ou use as setas.';
    }
-   const rayOn=drive.rays&&illuminated;
-   // SVGElement.hidden não é refletido de modo confiável pelos navegadores.
-   // Usar display para que raios opcionais e destaque realmente desapareçam.
-   for(const line of [normal,incident,reflected])line.style.display=rayOn?'':'none';
-   incident.setAttribute('x1',lampP.x);incident.setAttribute('y1',lampP.y);
-   const refl={x:120+lampR*Math.sin(a*rad),y:93-lampR*Math.cos(a*rad)};
-   reflected.setAttribute('x2',refl.x);reflected.setAttribute('y2',refl.y);
-   shine.style.display=illuminated&&['aligned','near'].includes(view.appearance)?'':'none';
-   scatter.style.display=illuminated&&view.appearance==='diffuse'?'':'none';
-   if(status.textContent!==view.description)status.textContent=view.description;
-   source.textContent=illuminated?'Apagar luz':'Ligar luz';
-   source.setAttribute('aria-pressed',String(illuminated));
-   finish.textContent='Acabamento: '+(drive.finish==='polished'?'polido':'fosco');
+   lamp.setAttribute('aria-description','Toque para ligar ou desligar a luz; arraste para ajustar a incidência.');
+   eye.setAttribute('aria-description','Arraste para observar outro ângulo; Enter alinha ao reflexo.');
+   finish.textContent=drive.finish==='polished'?'◐ Polido':'◑ Fosco';
+   finish.setAttribute('aria-label','Alternar acabamento, atual: '+(drive.finish==='polished'?'polido':'fosco'));
    finish.setAttribute('aria-pressed',String(drive.finish==='matte'));
-   rays.textContent=drive.rays?'Ocultar raios':'Mostrar raios';
    rays.setAttribute('aria-pressed',String(drive.rays));
+   rays.textContent=drive.rays?'↗ Ocultar':'↗ Raios';
+   rays.setAttribute('aria-label',drive.rays?'Ocultar raios':'Mostrar raios');
+   status.textContent=result.description+' Esquema acoplado à estrutura; não constitui medição óptica.';
+   return {point:P,lantern:L,end:E,observer:O,angle:a,on:illuminated,
+    appearance:result.appearance,finish:drive.finish,rays:drive.rays};
   }
-  return Object.freeze({root,update,lamp,eye,lampRange,eyeRange,status});
+  return Object.freeze({root,update,lamp,eye,actions,finish,rays,status});
  };
 })();
