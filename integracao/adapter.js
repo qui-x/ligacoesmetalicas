@@ -347,7 +347,7 @@
     const key='guided:'+activity.id+':'+metal.atomicNumber+':'+(workshopSelectionId||'')+':'+displayScale;
     if(host.dataset.key!==key){
      host.dataset.key=key;
-     S.workshop.renderReference(host,{element:metal,item:chosen,items,scale:displayScale,guided:true,onScale:setWorkshopScale});
+     S.workshop.renderReference(host,{element:metal,item:chosen,items,scale:displayScale,guided:true,model,onScale:setWorkshopScale});
     }
     updateWorkshopViewport(true);
     return;
@@ -391,9 +391,9 @@
   const item=S.workshop.get(workshopSelectionId);
   const chosen=item?.atomicNumber===active.atomicNumber?item:(S.workshop.list(active.atomicNumber).find(reference=>reference.atlasPath)||null);
   const key='active:'+active.atomicNumber+':'+(chosen?.id||'')+':'+workshopScale;
-  if(host.dataset.key===key)return;
+  if(host.dataset.key===key){host.querySelector('.silm-workshop-micro-viewer')?.silmMicroMechanicalRefresh?.();return;}
   host.dataset.key=key;host.hidden=false;
-  S.workshop.renderReference(host,{element:active,item:chosen,items:S.workshop.list(active.atomicNumber),scale:workshopScale,
+  S.workshop.renderReference(host,{element:active,item:chosen,items:S.workshop.list(active.atomicNumber),scale:workshopScale,model,
    onChoose:next=>{model.setWorkshopContext(next.id,1);schedule();},
    onScale:setWorkshopScale,
    onOpenPeriodic:()=>{if(workshopScale===1){showObjectEntry=true;schedule();}else $('silm-open-periodic')?.click();},
