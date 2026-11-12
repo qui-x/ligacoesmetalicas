@@ -70,10 +70,10 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  }
  const actionIcons={
   view:'M3 7 12 3l9 4-9 4-9-4ZM3 12l9 4 9-4M3 17l9 4 9-4',
-  cell:'M4 4h16v16H4zM4 9h16M9 4v16',
-  neighbors:'M6 12a2 2 0 1 0 0-.01M18 6a2 2 0 1 0 0-.01M18 18a2 2 0 1 0 0-.01M8 11l8-4M8 13l8 4',
-  centers:'M12 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM5 17a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM19 17a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM12 9v3M7 17l3-4M17 17l-3-4',
-  electrons:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM7 12h10M12 7v10M12 12l5-5',
+  cell:'M3 8 9 4l12 4v12l-6 4-12-4ZM3 8l12 4 6-4M15 12v8M9 4v12',
+  neighbors:'M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6M5 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4M19 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4',
+  centers:'M5 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4M12 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4M19 3a2 2 0 1 0 0 4a2 2 0 1 0 0-4M5 10a2 2 0 1 0 0 4a2 2 0 1 0 0-4M19 10a2 2 0 1 0 0 4a2 2 0 1 0 0-4M5 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4M12 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4M19 17a2 2 0 1 0 0 4a2 2 0 1 0 0-4M9 9h6v6H9z',
+  electrons:'M5 4a2 2 0 1 0 0 4a2 2 0 1 0 0-4M19 4a2 2 0 1 0 0 4a2 2 0 1 0 0-4M5 16a2 2 0 1 0 0 4a2 2 0 1 0 0-4M19 16a2 2 0 1 0 0 4a2 2 0 1 0 0-4M12 2h.01M11 11h.01M13 15h.01M12 22h.01M4 12h.01M20 12h.01',
   electrical:'M13 2 4 14h7l-1 8 10-13h-7z',
   thermal:'M14 14.8V5a2 2 0 0 0-4 0v9.8a5 5 0 1 0 4 0ZM12 11v7',
   malleability:'M4 8h16M4 16h16M8 4l-4 4 4 4M16 12l4 4-4 4',

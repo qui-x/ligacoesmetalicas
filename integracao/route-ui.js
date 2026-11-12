@@ -382,10 +382,39 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const hint=N('p',{completo:'Os dados da investigação são automáticos. Identificação e textos são salvos enquanto você escreve.',mao:'Os dados científicos permanecem na folha. Identificação e respostas ficam em linhas para escrever à mão.',analise:'Escolha os dados desta investigação que a turma vai interpretar e as respostas que ficam em branco. O SILM não cria dados hipotéticos.',formativa:'Ficha opcional para análise humana das evidências, sem notas automáticas ou alterações nos registros do estudante. Imprima para registrar a devolutiva do professor.'}[mode]);hint.className='silm-report-hint';settings.append(hint);
   /* Documento. */
   const doc=N('article');doc.className='silm-report-doc';doc.dataset.reportMode=mode;
-  const head=N('header');head.className='silm-report-doc-head';const brand=N('div');brand.className='silm-report-brand';const logo=N('img');logo.src=document.querySelector('.si-global-brand img')?.getAttribute('src')||'';logo.alt='';logo.width=36;logo.height=36;brand.append(logo,N('strong','SILM'));
+  const head=N('header');head.className='silm-report-doc-head';
+  const brand=N('div');brand.className='silm-report-brand';
+  const logo=N('img');logo.src=document.querySelector('.si-global-brand img')?.getAttribute('src')||'assets/silm-icone.svg';logo.alt='';logo.width=36;logo.height=36;
+  brand.append(logo,N('strong','SILM'));
+  const mast=N('div');mast.className='silm-report-mast';
+  const edition=N('span','DOCUMENTAÇÃO CIENTÍFICA · LIGAÇÕES METÁLICAS');edition.className='silm-report-edition';mast.append(brand,edition);
+  const hero=N('div');hero.className='silm-report-hero';
+  const titleColumn=N('div');titleColumn.className='silm-report-title-column';
   const eyebrow=N('p',REPORT_MODES[mode].replace(' · Professor',''));eyebrow.className='eyebrow';
-  head.append(brand,eyebrow,N('h1','Relatório — '+(record.activityContext.teacher?.title||r.title)),N('p',r.subtitle+' · Módulo '+(MODULE_NAMES[r.module]||r.module)+' · SILM '+B.manifest.version));doc.append(head);
-  const section=(n,title,name)=>{const sec=N('section');sec.dataset.reportSection=name;sec.append(N('h2',(n?n+'. ':'')+title));doc.append(sec);return sec;};
+  const heading=N('h1','Relatório — '+(record.activityContext.teacher?.title||r.title));
+  const tagline=N('p',r.subtitle||'Registros da investigação dos metais');tagline.className='silm-report-description';
+  titleColumn.append(eyebrow,heading,tagline);
+  const elementTile=N('div');elementTile.className='silm-report-element';
+  elementTile.setAttribute('aria-label','Elemento investigado: '+e.name+', número atômico '+e.atomicNumber);
+  const atomicNo=N('span',String(e.atomicNumber));atomicNo.className='silm-report-atomic-number';
+  const elementSymbol=N('strong',e.symbol);elementSymbol.className='silm-report-element-symbol';
+  const elementName=N('span',e.name);elementName.className='silm-report-element-name';
+  elementTile.append(atomicNo,elementSymbol,elementName);
+  hero.append(titleColumn,elementTile);
+  const crystalType=s.structure?.mode==='crystalline'
+   ?S.crystal.label(s.structure.crystallography?.structureType,e):'Montagem livre';
+  const meta=N('dl');meta.className='silm-report-meta';
+  for(const [label,value]of [
+   ['Módulo',MODULE_NAMES[r.module]||r.module],
+   ['Estrutura',crystalType],
+   ['Registro',archived?'Arquivado':free?'Investigação livre':'Investigação orientada'],
+   ['Versão','SILM '+B.manifest.version]
+  ]){const cell=N('div');cell.append(N('dt',label),N('dd',value));meta.append(cell);}
+  const provenance=N('div');provenance.className='silm-report-provenance';
+  provenance.setAttribute('aria-label','Legenda de proveniência científica');
+  provenance.append(N('span','Dado tabelado'),N('span','Medida do modelo'),N('span','Cálculo do SILM'));
+  head.append(mast,hero,meta,provenance);doc.append(head);
+  const section=(n,title,name)=>{const sec=N('section');sec.className='silm-report-section';sec.dataset.reportSection=name;if(n)sec.dataset.sectionNumber=String(n);sec.append(N('h2',(n?n+'. ':'')+title));doc.append(sec);return sec;};
   /* Ficha de avaliação formativa: material docente independente do relatório.
      Os campos científicos e as respostas do aluno não são alterados nem avaliados automaticamente.
      A ficha pode ser impressa para acompanhamento presencial. */

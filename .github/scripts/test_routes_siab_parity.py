@@ -113,6 +113,25 @@ def run(browser_name: str, root: str) -> None:
             expect(report).to_contain_text("Pergunta central do roteiro")
             expect(report).to_contain_text("Plano de observações")
             expect(report).to_contain_text("Questões para interpretar")
+            # A identidade do relatório reflete o metal estudado, sem desenhar
+            # moléculas orgânicas ou inventar parâmetros cristalográficos.
+            header = report.locator(".silm-report-doc-head")
+            expect(header.locator(".silm-report-mast")).to_contain_text("LIGAÇÕES METÁLICAS")
+            expect(header.locator(".silm-report-element")).to_contain_text("Cu")
+            expect(header.locator(".silm-report-element")).to_contain_text("Cobre")
+            expect(header.locator(".silm-report-meta")).to_contain_text("Montagem livre")
+            expect(header.locator(".silm-report-provenance")).to_contain_text("Medida do modelo")
+            expect(report.locator('[data-report-section="condicoes"]')).to_contain_text("Condições de referência")
+            assert page.evaluate("""() => {
+                const doc = document.querySelector('.silm-report-doc');
+                return document.documentElement.scrollWidth - innerWidth <= 2 &&
+                    doc.scrollWidth - doc.clientWidth <= 2;
+            }"""), (browser_name, width, "relatório com rolagem horizontal")
+            page.emulate_media(media="print")
+            assert page.locator(".silm-report-element").is_visible()
+            assert not page.locator(".silm-report-settings").is_visible()
+            assert page.locator(".silm-report-doc").is_visible()
+            page.emulate_media(media="screen")
             # A ficha docente apresenta critérios e presença de registros, sem
             # alterar o relatório original nem simular correção automática.
             before = page.evaluate("""() => {

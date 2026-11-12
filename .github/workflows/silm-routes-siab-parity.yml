@@ -14,6 +14,9 @@ on:
       - '.github/scripts/test_teacher_pedagogy_contracts.js'
       - '.github/scripts/test_teacher_pedagogy_parity.py'
       - 'integracao/route-ui.js'
+      - 'integracao/action-icons.js'
+      - 'integracao/workspace-family.js'
+      - '.github/scripts/test_metallic_icon_semantics.js'
       - 'integracao/integration.css'
       - 'sw.js'
       - '.github/scripts/test_route_studies_contracts.js'
@@ -31,6 +34,9 @@ on:
       - 'domain/silm/teacher-activities.js'
       - 'integracao/teacher-ui.js'
       - 'integracao/route-ui.js'
+      - 'integracao/action-icons.js'
+      - 'integracao/workspace-family.js'
+      - '.github/scripts/test_metallic_icon_semantics.js'
       - 'integracao/integration.css'
       - 'sw.js'
   workflow_dispatch:
@@ -51,6 +57,8 @@ jobs:
         run: node .github/scripts/test_teacher_pedagogy_contracts.js
       - name: Auditar retomada e migração de sessões
         run: node .github/scripts/test_session_continuity_contracts.js
+      - name: Auditar semântica dos ícones metálicos e identidade do relatório
+        run: node .github/scripts/test_metallic_icon_semantics.js
 
   playwright:
     name: Roteiros / ${{ matrix.browser }}
