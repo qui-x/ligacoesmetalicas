@@ -113,6 +113,29 @@ def run(browser_name: str, root: str) -> None:
             expect(report).to_contain_text("Pergunta central do roteiro")
             expect(report).to_contain_text("Plano de observações")
             expect(report).to_contain_text("Questões para interpretar")
+            # A ficha docente apresenta critérios e presença de registros, sem
+            # alterar o relatório original nem simular correção automática.
+            before = page.evaluate("""() => {
+                const doc = JSON.parse(localStorage.getItem('silm-base-integration:documents-v1') || '{}').documents || {};
+                return JSON.stringify(Object.fromEntries(Object.entries(doc).filter(
+                    ([key]) => key === 'scientific.state' || key.startsWith('report.free:') || key === 'route.session'
+                )));
+            }""")
+            page.locator("#report-mode").select_option("formativa")
+            expect(report.locator('[data-report-section="indicadores"]')).to_contain_text("Indicadores para observação docente")
+            expect(report.locator("#report-formative-rubric")).to_contain_text("Limitações do modelo")
+            expect(report.locator('[data-report-section="registros"]')).to_contain_text("presença de registros")
+            expect(report.locator('[data-report-section="devolutiva"]')).to_contain_text("Próxima investigação ou intervenção")
+            expect(report).to_contain_text("não realiza correção automática")
+            assert page.evaluate("""() => {
+                const doc = JSON.parse(localStorage.getItem('silm-base-integration:documents-v1') || '{}').documents || {};
+                return JSON.stringify(Object.fromEntries(Object.entries(doc).filter(
+                    ([key]) => key === 'scientific.state' || key.startsWith('report.free:') || key === 'route.session'
+                )));
+            }""") == before
+            page.locator("#report-mode").select_option("completo")
+            expect(report).to_contain_text("Hipótese inicial registrada")
+            expect(report).to_contain_text(prediction)
             if width == 1440:
                 Path("artifacts").mkdir(exist_ok=True)
                 page.goto(root.rstrip("/") + "/#/roteiros")
