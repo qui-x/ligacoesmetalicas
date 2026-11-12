@@ -44,6 +44,21 @@ async function test(viewport){
  const toolbar=await viewer.locator('.silm-workshop-micro-toolbar').boundingBox();
  const image=await frame.boundingBox();
  assert.ok(nav&&toolbar&&image&&image.y>=nav.y+nav.height-2&&toolbar.y>=image.y+image.height-2,'Os controles devem ficar abaixo do desenho e as escalas no topo.');
+ if(viewport.width<=560){
+  const inspect=await viewer.locator('.silm-workshop-micro-zoom-tools').evaluate(row=>{
+   const parent=row.closest('.silm-workshop-micro-toolbar').getBoundingClientRect();
+   const buttons=[...row.querySelectorAll('button')].map(btn=>{
+    const r=btn.getBoundingClientRect();
+    return {name:btn.getAttribute('aria-label'),left:r.left,right:r.right,width:r.width,
+     clipped:r.left<parent.left-2||r.right>parent.right+2};
+   });
+   return {width:parent.width,buttons};
+  });
+  assert.ok(inspect.buttons.length>=6,'Formações e Dados precisam continuar acessíveis.');
+  assert.ok(inspect.buttons.every(x=>!x.clipped&&x.width>=43.5),
+   'Controles da microestrutura recortados ou menores que 44 px: '+JSON.stringify(inspect));
+ }
+
  if(viewport.width>800){
   assert.ok(image.height>=390,'A área central ficou baixa no desktop.');
   assert.ok(toolbar.y+toolbar.height<=viewport.height-8,'Os controles inferiores ficaram fora da janela desktop.');
