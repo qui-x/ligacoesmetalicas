@@ -4,7 +4,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  const button=(label,fn,id)=>{const b=N('button',label);b.type='button';b.className='button outline';if(id)b.id=id;b.addEventListener('click',fn);return b;};
  const session=S.createRouteSession({model,storage,view,onView,say});
  const unified=S.createUnifiedUI({model,storage,session,selectMetal,prepareMetal,say});
- const teacherUI=S.createTeacherUI({model,storage,session,say,start:(config,z)=>enterTeacher(config,z),applyPreset:id=>unified.applyReadyAssembly(id)});
+ const teacherUI=S.createTeacherUI({model,storage,session,say,start:(config,z,options)=>enterTeacher(config,z,options),applyPreset:id=>unified.applyReadyAssembly(id)});
  const url=id=>'#/'+(registry.get(id)?.type==='mission'?'missoes':'roteiros')+'?item='+encodeURIComponent(id);
  const isMission=()=>session.context()?.type==='mission';
  const noun=()=>isMission()?'Missão':'Roteiro';
@@ -27,8 +27,8 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  // Números no relatório com vírgula decimal (pt-BR), inclusive os que vêm do banco como texto ("298.15 K"). As constantes
  // (por exemplo, N_A) aparecem com a grafia exata do próprio dado.
  const decimal=v=>typeof v==='number'?String(v).replace('.',','):String(v).replace(/(\d)\.(\d)/g,'$1,$2');
- function enterTeacher(config,z){if(session.open()){say('Encerre a atividade em curso antes de abrir outra.','warning');return false;}const r=registry.get(config.item);if(!r)return false;
-  if(!session.start(r.id,z,{teacher:config})){say('Não foi possível preparar esta atividade.','warning');return false;}onModule(r.module);location.hash='#/ambiente';sync();say('Atividade do professor: '+sentence(config.title)+' O módulo '+moduleName(r.module)+' fica fixo durante a atividade.');return true;}
+ function enterTeacher(config,z,{resume=false}={}){if(session.open()){say('Encerre a atividade em curso antes de abrir outra.','warning');return false;}const r=registry.get(config.item);if(!r)return false;
+  if(!session.start(r.id,z,{teacher:config,resume})){say('Não foi possível preparar esta atividade.','warning');return false;}onModule(r.module);location.hash='#/ambiente';sync();say((resume?'Atividade retomada: ':'Atividade do professor: ')+sentence(config.title)+' O módulo '+moduleName(r.module)+' fica fixo durante a atividade.');return true;}
  /* Roteiro Experimental como no SIAB: "Montar na oficina" prepara a oficina LIVRE com o metal, a estrutura inicial e o
     módulo do roteiro e guarda qual roteiro foi montado (título e proposta do relatório). Não há trava nem "concluir": o
     estudante usa todos os painéis e termina no relatório (Dados → Relatório). Em atividade restrita, não monta. */
@@ -40,7 +40,14 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   for(let i=0;ok&&i<r.initialState.units;i++)ok=model.addUnit().ok;
   if(ok&&r.initialState.mode==='crystalline')ok=model.organize().ok;
   if(!ok||!model.setModule(r.module)){say('Não foi possível preparar esta investigação.','warning');return false;}
-  storage.set('route.experiment',{route:r.id,version:r.version,investigation:model.state.investigation.id,createdAt:new Date().toISOString(),hypothesis:String(hypothesis||'').trim().slice(0,2000)});
+  const investigation=model.state.investigation.id,prediction=String(hypothesis||'').trim().slice(0,2000);
+  // A hipótese pertence à investigação, não ao último roteiro aberto.
+  // Contexto e previsão são gravados atomicamente no documento durável.
+  const saved=storage.transaction(()=>{
+   if(!storage.set('route.experiment',{route:r.id,version:r.version,investigation,createdAt:new Date().toISOString(),hypothesis:prediction}))throw Error('CONTEXT_SAVE_FAILED');
+   if(!storage.set('route.hypothesis.investigation:'+investigation,prediction))throw Error('HYPOTHESIS_SAVE_FAILED');
+  });
+  if(!saved.ok){say('A montagem foi preparada, mas não foi possível salvar o contexto e a hipótese. Exporte os dados antes de continuar.','warning');return false;}
   for(const [k,v] of Object.entries(identity||{}))if(v)unified.editReport(k,v);
   onModule(r.module);location.hash='#/ambiente';sync();say('Roteiro montado na oficina: '+sentence(r.title)+' Quando terminar, abra Dados → Relatório.','success');return true;
  }
@@ -270,6 +277,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    const hypothesis=N('textarea');hypothesis.id='route-hypothesis';hypothesis.name='hypothesis';hypothesis.rows=3;hypothesis.maxLength=2000;hypothesis.placeholder='Registre sua previsão antes de usar os instrumentos.';
    const previousHypothesis=storage.get('route.hypothesis:'+r.id,'');hypothesis.value=typeof previousHypothesis==='string'?previousHypothesis.slice(0,2000):'';
    hypothesisField.append(hypothesisLabel,hypothesis);
+   hypothesis.addEventListener('input',()=>storage.set('route.hypothesis:'+r.id,hypothesis.value.slice(0,2000)));
    const selection=N('select');selection.id='route-metal';for(const z of r.metalSelection.atomicNumbers){const e=S.data.get(z),o=N('option',e.name+' ('+e.symbol+')');o.value=z;selection.append(o);}selection.value=r.metalSelection.atomicNumbers.includes(29)?'29':String(r.metalSelection.atomicNumbers[0]);
    const mf=N('div');mf.className='silm-field';const ml=N('label','Metal da investigação');ml.htmlFor='route-metal';mf.append(ml,selection);
    const actions=N('div');actions.className='silm-actions';
@@ -339,7 +347,9 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const r=registry.get(record.activityContext.id)||(exp?{...exp,id:'laboratorio',type:'free',module:record.checkpoint.module.active}:null)||{id:'laboratorio',title:archived?.title||'Investigação livre',subtitle:'Registros da Oficina',module:archived?.module||record.checkpoint.module.active,sources:[]},s=record.checkpoint,e=S.data.get(s.metal.atomicNumber),free=record.activityContext.type==='free',editable=!archived&&(free||session.context()?.id===r.id);
   // A hipótese pertence à investigação livre montada, nunca a uma tentativa anterior.
   const experimentRecord=free&&exp?storage.get('route.experiment',null):null;
-  const initialHypothesis=experimentRecord?.route===exp?.id&&experimentRecord?.investigation===s.investigation?.id&&typeof experimentRecord?.hypothesis==='string'?experimentRecord.hypothesis.slice(0,2000):'';
+  const matchingExperiment=experimentRecord?.route===exp?.id&&experimentRecord?.investigation===s.investigation?.id;
+  const savedHypothesis=matchingExperiment?storage.get('route.hypothesis.investigation:'+s.investigation.id,''):'';
+  const initialHypothesis=matchingExperiment?(typeof savedHypothesis==='string'&&savedHypothesis?savedHypothesis.slice(0,2000):typeof experimentRecord?.hypothesis==='string'?experimentRecord.hypothesis.slice(0,2000):''):'';
   // "Atividade de análise" é preparação do Professor: só fora de uma atividade e nunca num relatório arquivado (como no SIAB).
   const teacher=!archived&&!session.open(),key=archived?'arquivo:'+archiveKey:free?'livre:'+(s.investigation?.id||'sem-investigacao'):'atividade:'+r.id;
   const config=reportConfig(key);if(config.mode==='analise'&&!teacher)config.mode='completo';
@@ -448,7 +458,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const finish=$('si-activity-finish');if(finish){finish.querySelector('span').textContent=isMission()?'Concluir missão':'Concluir roteiro';finish.disabled=!!context&&(context.status==='completed'||!session.ready());}
  }
  /* Durante uma atividade, a navegação fica no Início (com a retomada), na Oficina, na própria atividade, nos relatórios e no Manual. */
- function guard(){if(!session.open()||session.teacher()?.navigation==='livre')return;const route=B.currentRoute(location.hash),id=new URLSearchParams(location.hash.split('?')[1]||'').get('item');if(!['inicio','ambiente',isMission()?'missoes':'roteiros','relatorios','manual'].includes(route)||['roteiros','missoes'].includes(route)&&id!==session.context().id){location.replace(url(session.context().id));say('Durante '+(isMission()?'a missão':'o roteiro')+', ficam disponíveis o Início, a Oficina, o Manual e os relatórios. Encerre a atividade para abrir outras telas.');}}
+ function guard(){if(!session.open()||session.teacher()?.navigation==='livre')return;const route=B.currentRoute(location.hash),id=new URLSearchParams(location.hash.split('?')[1]||'').get('item');if(!['inicio','ambiente',isMission()?'missoes':'roteiros','relatorios','caderno','manual'].includes(route)||['roteiros','missoes'].includes(route)&&id!==session.context().id){location.replace(url(session.context().id));say('Durante '+(isMission()?'a missão':'o roteiro')+', ficam disponíveis o Início, a Oficina, o Manual, o Caderno e os relatórios. Encerre a atividade para abrir outras telas.');}}
  function init(){unified.init();for(const b of document.querySelectorAll('[data-left-tab]'))b.addEventListener('click',schedule);$('nav-toggle').addEventListener('click',()=>requestAnimationFrame(()=>{if(session.open()){$('si-now-description').textContent='Investigação orientada · '+session.route().module;$('si-activity-context').textContent=session.title()+' · '+(session.context().status==='completed'?'Concluído':'Em investigação');}}));document.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(session.open()&&a&&a.target!=='_blank'&&!a.getAttribute('href').startsWith('#')&&new URL(a.href).origin===location.origin){event.preventDefault();say('Encerre a atividade para abrir outra interface.','warning');}},true);const restored=session.load();if(restored){onModule(session.lockedModule());location.hash=url(session.context().id);}window.addEventListener('hashchange',guard);window.addEventListener('hashchange',schedule);window.addEventListener('si-route-changed',()=>{guard();schedule();});sync();}
  return {session,init,render,canBuild,experiment:()=>unified.experiment()};
 };

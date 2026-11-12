@@ -4,6 +4,11 @@ on:
   pull_request:
     paths:
       - 'domain/silm/routes.js'
+      - 'domain/silm/route-session.js'
+      - 'integracao/unified-ui.js'
+      - 'integracao/durable-storage.js'
+      - '.github/scripts/test_session_continuity_contracts.js'
+      - '.github/scripts/test_session_continuity_parity.py'
       - 'domain/silm/teacher-activities.js'
       - 'integracao/teacher-ui.js'
       - '.github/scripts/test_teacher_pedagogy_contracts.js'
@@ -18,6 +23,11 @@ on:
     branches: [main]
     paths:
       - 'domain/silm/routes.js'
+      - 'domain/silm/route-session.js'
+      - 'integracao/unified-ui.js'
+      - 'integracao/durable-storage.js'
+      - '.github/scripts/test_session_continuity_contracts.js'
+      - '.github/scripts/test_session_continuity_parity.py'
       - 'domain/silm/teacher-activities.js'
       - 'integracao/teacher-ui.js'
       - 'integracao/route-ui.js'
@@ -39,6 +49,8 @@ jobs:
         run: node .github/scripts/test_route_studies_contracts.js
       - name: Auditar paridade dos materiais docentes
         run: node .github/scripts/test_teacher_pedagogy_contracts.js
+      - name: Auditar retomada e migração de sessões
+        run: node .github/scripts/test_session_continuity_contracts.js
 
   playwright:
     name: Roteiros / ${{ matrix.browser }}
@@ -75,6 +87,8 @@ jobs:
         run: python .github/scripts/test_routes_siab_parity.py --browser ${{ matrix.browser }}
       - name: Conferir professor e aluno em todas as resoluções
         run: python .github/scripts/test_teacher_pedagogy_parity.py --browser ${{ matrix.browser }}
+      - name: Conferir Caderno, relatório e retomada do aluno
+        run: python .github/scripts/test_session_continuity_parity.py --browser ${{ matrix.browser }}
       - name: Capturas para conferência visual
         if: always()
         uses: actions/upload-artifact@v4
