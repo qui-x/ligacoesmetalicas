@@ -32,6 +32,10 @@ const fetch=async request=>{
 const ctx=vm.createContext({self,caches,fetch,URL,Request,Response,Promise,Set,Map,Array,Object,Error,TypeError,Number,String});
 vm.runInContext(fs.readFileSync('sw.js','utf8'),ctx,{filename:'sw.js'});
 assert.ok(events.install&&events.activate&&events.fetch);
+const mandatory=vm.runInContext('Array.from(CORE)',ctx);
+assert.ok(mandatory.length>=90,'Núcleo offline deve manter os módulos e estilos');
+for(const file of mandatory.filter(file=>file!=='./'))
+ assert.ok(fs.existsSync(file),'Recurso obrigatório ausente: '+file);
 const perform=async(name,request)=>{
  let pending;
  const evt=name==='fetch'?{request,respondWith(p){pending=p}}:{waitUntil(p){pending=p}};
