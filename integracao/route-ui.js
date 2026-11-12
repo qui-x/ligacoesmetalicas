@@ -387,7 +387,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const logo=N('img');logo.src=document.querySelector('.si-global-brand img')?.getAttribute('src')||'assets/silm-icone.svg';logo.alt='';logo.width=36;logo.height=36;
   brand.append(logo,N('strong','SILM'));
   const mast=N('div');mast.className='silm-report-mast';
-  mast.append(brand,N('span','DOCUMENTAÇÃO CIENTÍFICA · LIGAÇÕES METÁLICAS','silm-report-edition'));
+  const edition=N('span','DOCUMENTAÇÃO CIENTÍFICA · LIGAÇÕES METÁLICAS');edition.className='silm-report-edition';mast.append(brand,edition);
   const hero=N('div');hero.className='silm-report-hero';
   const titleColumn=N('div');titleColumn.className='silm-report-title-column';
   const eyebrow=N('p',REPORT_MODES[mode].replace(' · Professor',''));eyebrow.className='eyebrow';
@@ -396,9 +396,9 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   titleColumn.append(eyebrow,heading,tagline);
   const elementTile=N('div');elementTile.className='silm-report-element';
   elementTile.setAttribute('aria-label','Elemento investigado: '+e.name+', número atômico '+e.atomicNumber);
-  const atomicNo=N('span',String(e.atomicNumber),'silm-report-atomic-number');
+  const atomicNo=N('span',String(e.atomicNumber));atomicNo.className='silm-report-atomic-number';
   const elementSymbol=N('strong',e.symbol);elementSymbol.className='silm-report-element-symbol';
-  const elementName=N('span',e.name,'silm-report-element-name');
+  const elementName=N('span',e.name);elementName.className='silm-report-element-name';
   elementTile.append(atomicNo,elementSymbol,elementName);
   hero.append(titleColumn,elementTile);
   const crystalType=s.structure?.mode==='crystalline'
