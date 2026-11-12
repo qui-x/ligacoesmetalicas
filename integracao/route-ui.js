@@ -4,7 +4,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  const button=(label,fn,id)=>{const b=N('button',label);b.type='button';b.className='button outline';if(id)b.id=id;b.addEventListener('click',fn);return b;};
  const session=S.createRouteSession({model,storage,view,onView,say});
  const unified=S.createUnifiedUI({model,storage,session,selectMetal,prepareMetal,say});
- const teacherUI=S.createTeacherUI({model,storage,session,say,start:(config,z)=>enterTeacher(config,z),applyPreset:id=>unified.applyReadyAssembly(id)});
+ const teacherUI=S.createTeacherUI({model,storage,session,say,start:(config,z,options)=>enterTeacher(config,z,options),applyPreset:id=>unified.applyReadyAssembly(id)});
  const url=id=>'#/'+(registry.get(id)?.type==='mission'?'missoes':'roteiros')+'?item='+encodeURIComponent(id);
  const isMission=()=>session.context()?.type==='mission';
  const noun=()=>isMission()?'Missão':'Roteiro';
@@ -27,8 +27,8 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
  // Números no relatório com vírgula decimal (pt-BR), inclusive os que vêm do banco como texto ("298.15 K"). As constantes
  // (por exemplo, N_A) aparecem com a grafia exata do próprio dado.
  const decimal=v=>typeof v==='number'?String(v).replace('.',','):String(v).replace(/(\d)\.(\d)/g,'$1,$2');
- function enterTeacher(config,z){if(session.open()){say('Encerre a atividade em curso antes de abrir outra.','warning');return false;}const r=registry.get(config.item);if(!r)return false;
-  if(!session.start(r.id,z,{teacher:config})){say('Não foi possível preparar esta atividade.','warning');return false;}onModule(r.module);location.hash='#/ambiente';sync();say('Atividade do professor: '+sentence(config.title)+' O módulo '+moduleName(r.module)+' fica fixo durante a atividade.');return true;}
+ function enterTeacher(config,z,{resume=false}={}){if(session.open()){say('Encerre a atividade em curso antes de abrir outra.','warning');return false;}const r=registry.get(config.item);if(!r)return false;
+  if(!session.start(r.id,z,{teacher:config,resume})){say('Não foi possível preparar esta atividade.','warning');return false;}onModule(r.module);location.hash='#/ambiente';sync();say((resume?'Atividade retomada: ':'Atividade do professor: ')+sentence(config.title)+' O módulo '+moduleName(r.module)+' fica fixo durante a atividade.');return true;}
  /* Roteiro Experimental como no SIAB: "Montar na oficina" prepara a oficina LIVRE com o metal, a estrutura inicial e o
     módulo do roteiro e guarda qual roteiro foi montado (título e proposta do relatório). Não há trava nem "concluir": o
     estudante usa todos os painéis e termina no relatório (Dados → Relatório). Em atividade restrita, não monta. */
