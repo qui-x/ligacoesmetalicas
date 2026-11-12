@@ -301,24 +301,27 @@ try{
  await page.mouse.click(rangeRect.x+rangeRect.width*.43,rangeRect.y+rangeRect.height/2);
  await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='aligned');
  const finish=bench.locator('.silm-optical-bench-finish');
- await finish.click();
- await page.waitForFunction(()=>document.querySelector('#silm-properties .silm-optical-bands')?.hidden===true);
- // O painel é atualizado de forma limitada a dez vezes por segundo.
- // A folha Ver permanece fechada no mobile durante o experimento.
- // Inspecionar o estado semântico intrínseco do painel oculto (não isVisible,
- // que seria sempre false devido ao ancestral #si-dock-right[hidden]).
+ // Inspecionar a cena antes de aguardar o painel, para diagnosticar
+ // separadamente um clique ignorado e um painel de dados desatualizado.
  const opticalState=()=>page.evaluate(()=>({
   benchFinish:document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.finish,
   appearance:document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance,
   light:document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.light,
   spectralHidden:document.querySelector('#silm-properties .silm-optical-bands')?.hidden,
+  sampleHidden:document.querySelector('#silm-properties .silm-optical-sample')?.hidden,
+  sampleFinish:document.querySelector('#silm-properties .silm-optical-sample')?.dataset.finish,
+  dockHidden:document.querySelector('#si-dock-right')?.hidden,
   stageInert:document.querySelector('#si-stage')?.inert
  }));
+ await finish.click();
  const matteState=await opticalState();
+ console.log('SILM_OPTICAL_MATTE',JSON.stringify(matteState));
  assert.equal(matteState.benchFinish,'matte','Clique no acabamento não alterou o motor da bancada: '+JSON.stringify(matteState));
  assert.equal(matteState.appearance,'diffuse','Acabamento fosco não produziu espalhamento qualitativo: '+JSON.stringify(matteState));
- assert.equal(matteState.spectralHidden,true,
-  'Dados de superfície ideal lisa apareceram como previsão para acabamento fosco: '+JSON.stringify(matteState));
+ // O painel pode ser atualizado até 100 ms depois da bancada.
+ await page.waitForFunction(()=>document.querySelector('#silm-properties .silm-optical-bands')?.hidden===true);
+ assert.equal(await page.locator('#silm-properties .silm-optical-bands').evaluate(node=>node.hidden),true,
+  'Dados de superfície ideal lisa apareceram como previsão para acabamento fosco.');
  await finish.click();
  await page.waitForFunction(()=>document.querySelector('#silm-properties .silm-optical-bands')?.hidden===false);
  const polishedState=await opticalState();
