@@ -84,6 +84,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   if(!route||!activity?.checkpoint)return 'error';
   const state=activity.checkpoint,e=state.metal?S.data.get(state.metal.atomicNumber):null,type=route.type==='mission'?'Missão':'Roteiro',participle=route.type==='mission'?'concluída':'concluído';
   const activityTitle=activity.activityContext?.teacher?.title||route.title;
+  const reportModule=route.module||state.module?.active||'explorar';
   const key=String(route.id+'-'+(state.investigation?.id||Date.now().toString(36))).toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-|-+$/g,'').slice(0,40);
   const attemptId='attempt-silm-complete-'+key;
   if(journal.snapshot().notes.some(n=>n.attemptId===attemptId))return 'duplicate';
@@ -91,12 +92,12 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   const lines=[
    'Título: '+type+' '+participle+': '+activityTitle,
    'Atividade: '+activityTitle,
-   'Módulo: '+route.module,
+   'Módulo: '+reportModule,
    e?'Metal: '+e.name+' ('+e.symbol+')':'',
    'Estrutura: '+structure,
    'Unidades na montagem: '+(state.structure?.units?.length||0),
-   'Medições registradas: '+(state.measurements?.length||0),
-   'Cálculos registrados: '+(state.calculations?.length||0),
+   reportModule==='medir'?'Medições registradas: '+(state.measurements?.length||0):'',
+   reportModule==='calcular'?'Cálculos registrados: '+(state.calculations?.length||0):'',
    'Critério de conclusão: '+(route.guidance?.criterion||route.completionCriteria||'Atividade concluída'),
    String(activity.report?.conclusion||'').trim()?'Conclusão do estudante: '+String(activity.report.conclusion).trim().slice(0,600):''
   ].filter(Boolean);
@@ -106,22 +107,24 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
  function recordReport(record,route){
   if(!record?.checkpoint||!record.activityContext||!route)return 'error';
   const state=record.checkpoint,report=record.report||{},free=record.activityContext.type==='free';
-  const token=String((free?'livre':record.activityContext.id)+'-'+(state.investigation?.id||('metal-'+(state.metal?.atomicNumber||'unknown')))).toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-|-+$/g,'').slice(0,40)||'livre';
+  const reportModule=free?state.module?.active||'explorar':route.module||state.module?.active||'explorar';
+  const token=String((free?'livre-'+reportModule:record.activityContext.id)+'-'+(state.investigation?.id||('metal-'+(state.metal?.atomicNumber||'unknown')))).toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-|-+$/g,'').slice(0,40)||'livre';
   const attemptId='attempt-silm-report-'+token;
   if(journal.snapshot().notes.some(n=>n.attemptId===attemptId))return 'duplicate';
   const e=state.metal?S.data.get(state.metal.atomicNumber):null;
   const activityTitle=record.activityContext.teacher?.title||route.title;
+
   const structure=(t=>t&&S.crystal.isGeneral(t)?S.crystal.label(t,e):t)(state.structure?.crystallography?.structureType)||(state.structure?.mode==='crystalline'?'Estrutura cristalina':'Montagem livre');
   const short=(value,max=220)=>String(value||'').trim().slice(0,max);
   const lines=[
    'Título: Relatório registrado: '+(activityTitle||'Investigação livre'),
    'Atividade: '+(activityTitle||'Investigação livre'),
-   'Módulo: '+(route.module||state.module?.active||'explorar'),
+   'Módulo: '+reportModule,
    e?'Metal: '+e.name+' ('+e.symbol+')':'',
    'Estrutura: '+structure,
    'Unidades na montagem: '+(state.structure?.units?.length||0),
-   'Medições registradas: '+(state.measurements?.length||0),
-   'Cálculos registrados: '+(state.calculations?.length||0),
+   reportModule==='medir'?'Medições registradas: '+(state.measurements?.length||0):'',
+   reportModule==='calcular'?'Cálculos registrados: '+(state.calculations?.length||0):'',
    [report.name,report.className,report.group].some(x=>short(x))?'Identificação: '+[report.name,report.className&&('Turma '+report.className),report.group&&('Grupo '+report.group),report.teacher&&('Professor '+report.teacher)].map(x=>short(x,80)).filter(Boolean).join(' · '):'',
    short(report.observations)?'Observações: '+short(report.observations):'',
    short(report.analysis)?'Análise: '+short(report.analysis):'',
@@ -130,7 +133,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    short(report.conclusion)?'Conclusão: '+short(report.conclusion):''
   ].filter(Boolean);
   const body=lines.join('\n').slice(0,1200);
-  const archive={record,title:activityTitle||'Investigação livre',module:route.module||state.module?.active||'explorar',archivedAt:new Date().toISOString()};
+  const archive={record,title:activityTitle||'Investigação livre',module:reportModule,archivedAt:new Date().toISOString()};
   const saved=storage.transaction(()=>{if(!storage.set('report.archive:'+attemptId,archive)||!journal.addNote({kind:'observacao',body},notebookScene(state),attemptId))throw Error('Falha ao arquivar');},{onRollback:()=>{journal=B.createJournalStore(B.storage);}});
   if(!saved.ok)return 'error';
   home();notebookRefresh?.();return 'added';
@@ -679,7 +682,43 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
  function professor(){if(table)return;const scope=SimCore.createScope();table=S.createPeriodicTable($('silm-professor-table'),{scope,state:{selection:model.state.metal?.atomicNumber||29,query:''},teacher:true,canInvestigate:()=>!session.open(),onInvestigate:async e=>{if(await selectMetal(e.atomicNumber))location.hash='#/ambiente';},onSources:e=>{$('silm-professor-sources').textContent=S.data.sourceIds(e).map(id=>{const s=S.data.source(id);return s.institution+' — '+s.title;}).join('\n');}});}
  /* Roteiro montado na investigação atual (como "experiencia" na bancada do SIAB): só vale para a mesma investigação. */
  function experiment(){const x=storage.get('route.experiment',null),inv=model.state.investigation?.id;const r=x&&inv&&x.investigation===inv?S.routes.get(x.route):null;return r||null;}
- function freeReport(){if(!model.state.investigation)return null;const saved=storage.get('report.free:'+model.state.investigation.id,{}),report={...fields};for(const k of Object.keys(report))if(typeof saved[k]==='string')report[k]=saved[k].slice(0,10000);return {activityContext:{id:'laboratorio',type:'free'},checkpoint:model.snapshot(),evidence:{cell:false,lattice:false,deformation:false},report};}
- function editReport(key,value){if(!Object.hasOwn(fields,key)||value.length>10000)return false;const r=freeReport()?.report||{...fields};r[key]=value;return storage.set('report.free:'+model.state.investigation.id,r);}
+ /* Textos autorais da investigação livre são separados por módulo; identificação
+    continua comum. Os dados legados não desaparecem: ficam vinculados ao primeiro
+    módulo consultado após a migração, já que o formato antigo não registrava o módulo. */
+ const reportTextKeys=new Set(['observations','analysis','interpretation','answer','conclusion']);
+ function freeDocument(){
+  const investigation=model.state.investigation;if(!investigation)return null;
+  const key='report.free:'+investigation.id,raw=storage.get(key,{});
+  const saved=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
+  const module=model.state.module.active;
+  const legacyText=[...reportTextKeys].some(k=>typeof saved[k]==='string'&&saved[k].trim());
+  if(legacyText&&!saved.legacyOwner){
+   const updated={...saved,legacyOwner:module};
+   if(storage.set(key,updated))return {key,saved:updated,module};
+  }
+  return {key,saved,module};
+ }
+ function freeReport(){
+  const doc=freeDocument();if(!doc)return null;
+  const {saved,module}=doc,report={...fields};
+  for(const k of Object.keys(report)){
+   const authored=reportTextKeys.has(k);
+   const v=authored
+    ?saved.moduleReports?.[module]?.[k]??(saved.legacyOwner===module?saved[k]:undefined)
+    :saved[k];
+   if(typeof v==='string')report[k]=v.slice(0,10000);
+  }
+  return {activityContext:{id:'laboratorio',type:'free'},checkpoint:model.snapshot(),evidence:{cell:false,lattice:false,deformation:false},report};
+ }
+ function editReport(key,value){
+  if(!Object.hasOwn(fields,key)||typeof value!=='string'||value.length>10000)return false;
+  const doc=freeDocument();if(!doc)return false;
+  const {saved,module}=doc;let next;
+  if(reportTextKeys.has(key)){
+   const previous=saved.moduleReports?.[module]||{};
+   next={...saved,moduleReports:{...(saved.moduleReports||{}),[module]:{...previous,[key]:value}}};
+  }else next={...saved,[key]:value};
+  return storage.set(doc.key,next);
+ }
  return {init,experiment,freeReport,editReport,recordActivity,recordReport,archivedReport,render(){home();const page=B.currentRoute(location.hash);if(page==='aprender')themes();if(page==='manual')manual();if(page==='caderno'&&!$('notebook-text'))notebook();if(page==='professor')professor();if(page==='montagens')readyAssemblies();},applyReadyAssembly};
 };
