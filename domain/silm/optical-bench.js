@@ -187,12 +187,14 @@ window.SILM=window.SILM||{};
     node.title=label+': '+value+'°. Arraste ou use setas; Enter '+(node===lamp?'alterna luz':'alinha ao reflexo');
    }
    const rayOn=drive.rays&&illuminated;
-   normal.hidden=incident.hidden=reflected.hidden=!rayOn;
+   // SVGElement.hidden não é refletido de modo confiável pelos navegadores.
+   // Usar display para que raios opcionais e destaque realmente desapareçam.
+   for(const line of [normal,incident,reflected])line.style.display=rayOn?'':'none';
    incident.setAttribute('x1',lampP.x);incident.setAttribute('y1',lampP.y);
    const refl={x:120+lampR*Math.sin(a*rad),y:93-lampR*Math.cos(a*rad)};
    reflected.setAttribute('x2',refl.x);reflected.setAttribute('y2',refl.y);
-   shine.hidden=!illuminated||!['aligned','near'].includes(view.appearance);
-   scatter.hidden=!illuminated||view.appearance!=='diffuse';
+   shine.style.display=illuminated&&['aligned','near'].includes(view.appearance)?'':'none';
+   scatter.style.display=illuminated&&view.appearance==='diffuse'?'':'none';
    if(status.textContent!==view.description)status.textContent=view.description;
    source.textContent=illuminated?'Apagar luz':'Ligar luz';
    source.setAttribute('aria-pressed',String(illuminated));
