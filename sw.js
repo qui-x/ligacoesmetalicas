@@ -1,7 +1,7 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.10';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='parte10-joule-dissipacao-calor-20261111-roteiro-terras-raras-17-r2';
+const BUILD='parte10-joule-dissipacao-calor-20261111-offline-revalidation-r1';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
   "assets/workshop/motor.webp",
@@ -208,8 +208,34 @@ const FILES=[
   "integracao/legacy-entry.js"
 ];
 const local=value=>{const url=new URL(value,ROOT);if(url.origin!==ROOT.origin||!url.pathname.startsWith(ROOT.pathname))throw new TypeError('Recurso fora do escopo');return url;};
-self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES.map(file=>new Request(local(file),{cache:'reload'})))).then(()=>self.skipWaiting())));
-self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith(PREFIX)&&![CACHE,DOMAINS].includes(key)).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
+/* Ativação resiliente: HTML/JS/CSS/dados necessários à execução são obrigatórios.
+   Imagens opcionais ausentes não bloqueiam instalação nem impedem uso offline. */
+const CORE=FILES.filter(file=>!/\.(?:webp|png|jpe?g|gif|svg|ico)$/i.test(file));
+const BOOT=['index.html','integracao/unified-ui.js','integracao/route-ui.js','domain/silm/routes.js','domain/silm/data/bundle.js','domain/silm/data-api.js','integracao/integration.css','integracao/pwa.js','domain/silm/manual.js'];
+if(BOOT.some(path=>!CORE.includes(path)))throw new Error('Pré-cache central incompleto');
+const stage=(file,cache)=>fetch(new Request(local(file),{cache:'reload'})).then(async response=>{
+ if(!response.ok)throw new Error('Falha de pré-cache: '+file+' ('+response.status+')');
+ await cache.put(local(file),response);
+});
+self.addEventListener('install',event=>event.waitUntil((async()=>{
+ const cache=await caches.open(CACHE);
+ await Promise.all(CORE.map(file=>stage(file,cache)));
+ await self.skipWaiting();
+})()));
+self.addEventListener('activate',event=>event.waitUntil((async()=>{
+ await self.clients.claim();
+ const cache=await caches.open(CACHE);
+ const pending=FILES.filter(file=>!CORE.includes(file));
+ /* Limitar requisições paralelas para não saturar navegadores mobile. */
+ let index=0;
+ const worker=async()=>{while(index<pending.length){const file=pending[index++];try{
+  if(!await cache.match(local(file)))await stage(file,cache);
+ }catch(error){/* Recurso opcional pode ser obtido numa próxima visita online. */}
+ }};
+ await Promise.all(Array.from({length:6},worker));
+ const keys=await caches.keys();
+ await Promise.all(keys.filter(key=>key.startsWith(PREFIX)&&![CACHE,DOMAINS].includes(key)).map(key=>caches.delete(key)));
+})()));
 self.addEventListener('message',event=>{if(event.data?.type!=='CACHE_DOMAIN')return;event.waitUntil((async()=>{try{
  const resources=event.data.resources;if(!Array.isArray(resources)||resources.length>100)throw new TypeError('Lista inválida');
  const urls=resources.map(local),cache=await caches.open(DOMAINS),structural=await caches.open(CACHE);
@@ -226,6 +252,36 @@ self.addEventListener('message',event=>{if(event.data?.type!=='CACHE_DOMAIN')ret
  }
  event.ports[0]?.postMessage({ok:true});
  }catch(error){event.ports[0]?.postMessage({ok:false});}})());});
-self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(event.request.method!=='GET'||url.origin!==ROOT.origin||!url.pathname.startsWith(ROOT.pathname))return;const relative=url.pathname.slice(ROOT.pathname.length),navigation=event.request.mode==='navigate'&&['','index.html'].includes(relative);const structural=FILES.some(file=>local(file).pathname===url.pathname);const moduleResource=relative.startsWith('domain/');if(!navigation&&!structural&&!moduleResource)return;
- event.respondWith((async()=>{const cached=await(await caches.open(structural||navigation?CACHE:DOMAINS)).match(navigation?new URL('index.html',ROOT):event.request,{ignoreSearch:true});if(cached)return cached;try{return await fetch(event.request);}catch(error){if(navigation)return(await caches.open(CACHE)).match(new URL('index.html',ROOT));throw error;}})());
+/* HTML, scripts e estilos são revalidados online em vez de ficarem
+   permanentemente presos à primeira resposta armazenada; offline usa cache. */
+self.addEventListener('fetch',event=>{
+ const req=event.request,url=new URL(req.url);
+ if(req.method!=='GET'||url.origin!==ROOT.origin||!url.pathname.startsWith(ROOT.pathname))return;
+ const relative=url.pathname.slice(ROOT.pathname.length);
+ const navigation=req.mode==='navigate'&&['','index.html','completo.html'].includes(relative);
+ const structural=FILES.some(file=>local(file).pathname===url.pathname);
+ const moduleResource=relative.startsWith('domain/');
+ if(!navigation&&!structural&&!moduleResource)return;
+ event.respondWith((async()=>{
+  const cache=await caches.open(structural||navigation?CACHE:DOMAINS);
+  const key=navigation?new URL(relative==='completo.html'?'completo.html':'index.html',ROOT):req;
+  const networkFirst=navigation||/\.(?:js|css|html|json|webmanifest)$/i.test(relative);
+  if(networkFirst){
+   try{
+    const fresh=await fetch(new Request(req,{cache:'no-cache'}));
+    if(fresh.ok){try{await cache.put(key,fresh.clone());}catch(error){/* Falha de quota não deve devolver JS antigo se a rede respondeu. */}return fresh;}
+    const fallback=await cache.match(key,{ignoreSearch:true});
+    return fallback||fresh;
+   }catch(error){
+    const fallback=await cache.match(key,{ignoreSearch:true});
+    if(fallback)return fallback;
+    throw error;
+   }
+  }
+  const cached=await cache.match(key,{ignoreSearch:true});
+  if(cached)return cached;
+  const response=await fetch(req);
+  if(response.ok)try{await cache.put(key,response.clone());}catch(error){/* Ainda entregar o recurso recebido online. */}
+  return response;
+ })());
 });

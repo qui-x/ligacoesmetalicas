@@ -27,6 +27,17 @@
    if(controlled)updateNotice();
    controlled=true;
   });
-  navigator.serviceWorker.register('sw.js').catch(()=>BaseDemoSI.notify('Modo offline indisponível nesta sessão.','warning'));
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+   // Verificar uma revisão nova ao abrir, ao voltar à aba e quando a conexão retorna.
+   // Nunca recarregar automaticamente: manter intacto o estado da investigação.
+   let lastCheck=0;
+   const check=()=>{if(!navigator.onLine)return;const now=Date.now();
+    if(now-lastCheck<60000)return;lastCheck=now;
+    reg.update().catch(()=>{});
+   };
+   check();
+   document.addEventListener('visibilitychange',()=>{if(!document.hidden)check();});
+   window.addEventListener('online',check);
+  }).catch(()=>BaseDemoSI.notify('Modo offline indisponível nesta sessão.','warning'));
  }
 })();

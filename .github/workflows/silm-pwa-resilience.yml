@@ -1,0 +1,35 @@
+name: SILM — Atualização offline resiliente
+
+on:
+  pull_request:
+    paths:
+      - 'sw.js'
+      - 'integracao/pwa.js'
+      - '.github/scripts/test_pwa_updates.js'
+      - '.github/workflows/silm-pwa-resilience.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'sw.js'
+      - 'integracao/pwa.js'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-update:
+    name: Instalação resiliente e revalidação do cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Testar instalação, revalidação e fallback offline
+        run: node .github/scripts/test_pwa_updates.js
+      - name: Validar sintaxe do Service Worker e PWA
+        run: |
+          node --check sw.js
+          node --check integracao/pwa.js
