@@ -98,9 +98,28 @@ window.SILM=window.SILM||{};
    if(themes.length)add('Conceitos (temas do Aprender)',[],themes.map(t=>t.title+': '+t.description));
    add('Preparação',[],['Módulo único: '+s.module+'.',x.initialState.mode==='free'?'Começa em montagem livre com '+x.initialState.units+' unidades.':'Começa com a estrutura cristalina de referência do metal escolhido.','Metais: '+s.metals+'.','Recursos liberados: '+s.tools+'.','Navegação: '+s.navigation+'.']);
    add('Desenvolvimento',[x.guidance.action,x.guidance.hint]);
+   // O mesmo estudo serve ao roteiro, à missão e à mediação docente.
+   if(c.type==='route'&&x.study){
+    const study=x.study;
+    add('Contexto e pergunta investigativa',[study.context,study.question]);
+    add('Hipótese inicial para discussão',[study.hypothesis]);
+    add('Procedimento investigativo',[],study.tasks);
+    add('Plano de observações',[],study.observe);
+    add('Questões para interpretar',[],study.interpretation);
+    add('Mediação do professor',[study.teacher]);
+    add('Avaliação formativa',['Confronte hipótese, registros e pergunta central; diferencie observação de interpretação. Não atribua nota automaticamente.']);
+   }else if(c.type==='mission'&&x.study){
+    const study=x.study;
+    add('Contexto e pergunta investigativa',[study.context,study.question]);
+    add('Previsão inicial para discussão',[study.prediction]);
+    add('Evidências a procurar',[study.evidence]);
+    add('Questões para interpretar',[],study.questions);
+    add('Mediação do professor',[study.teacher]);
+    add('Evidências verificáveis da missão',['O motor existente confere as evidências; a interpretação e a conclusão são do estudante.'],(x.evidenceObjectives||[]).map(e=>e.label));
+   }
    add('Critério de conclusão',[x.guidance.criterion,'O SILM confere esse critério no modelo; a conclusão escrita é do estudante.']);
    if(themes.length)add('Como interpretar (temas relacionados)',[],themes.map(t=>concept(t,'Como interpretar')).filter(Boolean));
-   add('Limites do modelo',[...new Set([...themes.map(t=>concept(t,'Limites do modelo')).filter(Boolean),...limitations(c.tools,req.module)])]);
+   add('Limites do modelo',[...new Set([x.study?.limits||x.study?.limit,...themes.map(t=>concept(t,'Limites do modelo')).filter(Boolean),...limitations(c.tools,req.module)].filter(Boolean))]);
   }
   if(c.type==='preset')add('Limites do modelo',limitations(c.tools,req.module));
   const sources=[...new Set([...(x.sources||[]),'src-silm-conventions'])].map(id=>S.data.source(id)?.title||id);
