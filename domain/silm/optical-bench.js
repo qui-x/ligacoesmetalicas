@@ -69,8 +69,18 @@ window.SILM=window.SILM||{};
    input.setAttribute('aria-label',name+' em graus da normal');
    label.append(input);angles.append(label);
    const changed=()=>setAngle(kind,Number(input.value));
+   const keys=event=>{
+    if(event.key!=='End'&&event.key!=='Home')return;
+    event.preventDefault();event.stopPropagation();
+    input.value=event.key==='End'?'80':String(min);
+    changed();
+   };
    input.addEventListener('input',changed);
-   scope.cleanup(()=>input.removeEventListener('input',changed));
+   input.addEventListener('keydown',keys,true);
+   scope.cleanup(()=>{
+    input.removeEventListener('input',changed);
+    input.removeEventListener('keydown',keys,true);
+   });
    return input;
   };
   const lampRange=angleInput('Lanterna','lamp',5);
@@ -159,8 +169,10 @@ window.SILM=window.SILM||{};
    if(a<15&&b<15)eyeP.y+=17;
    lamp.style.left=pct(lampP.x,240);lamp.style.top=pct(lampP.y,140);
    eye.style.left=pct(eyeP.x,240);eye.style.top=pct(eyeP.y,140);
-   if(lampRange.value!==String(a))lampRange.value=String(a);
-   if(eyeRange.value!==String(b))eyeRange.value=String(b);
+   // Não sobrescrever o valor enquanto a pessoa ajusta o controle nativo.
+   // Isso preserva o evento de teclado antes da próxima atualização da cena.
+   if(document.activeElement!==lampRange&&lampRange.value!==String(a))lampRange.value=String(a);
+   if(document.activeElement!==eyeRange&&eyeRange.value!==String(b))eyeRange.value=String(b);
    for(const [node,value,label] of [[lamp,a,'Lanterna'],[eye,b,'Observador']]){
     node.setAttribute('aria-valuenow',String(value));
     node.setAttribute('aria-valuetext',label+' a '+value+' graus da normal');
