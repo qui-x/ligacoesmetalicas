@@ -338,8 +338,15 @@ try{
  await page.waitForFunction(()=>document.querySelector('.silm-optical-interaction')?.dataset.appearance==='off');
  await lamp.press('Enter');
  await page.waitForFunction(()=>document.querySelector('.silm-optical-interaction')?.dataset.appearance==='aligned');
+ // Capturas obrigatórias para revisão visual da integração (antes não havia).
+ await page.screenshot({path:join(dir,'brilho-integrado-mobile-390.jpg'),type:'jpeg',quality:77,animations:'disabled'});
+ await page.setViewportSize({width:1366,height:768});
+ await page.waitForFunction(()=>document.querySelector('.silm-optical-interaction')?.hidden===false&&
+  document.querySelector('.silm-optical-surface-marker'));
+ await page.screenshot({path:join(dir,'brilho-integrado-desktop-1366.jpg'),type:'jpeg',quality:80,animations:'disabled'});
  evidence.push({name:'brilho-integrado',surfaceLinked:true,separateBench:false,
-  observerKeyboard:true,finish:'polished/matte',raysOptional:true,unlit:true});
+  observerKeyboard:true,finish:'polished/matte',raysOptional:true,unlit:true,
+  visualEvidence:['brilho-integrado-mobile-390.jpg','brilho-integrado-desktop-1366.jpg']});
  assert.deepEqual(errors,[],errors.join(' | '));
  await context.close();
 }catch(e){evidence.push({error:String(e),stack:e.stack});throw e;}
