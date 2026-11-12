@@ -302,12 +302,27 @@ try{
  await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='aligned');
  const finish=bench.locator('.silm-optical-bench-finish');
  await finish.click();
- await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='diffuse');
- assert.equal(await page.locator('#silm-properties .silm-optical-bands').isVisible(),false,
-  'Dados de superfície ideal lisa apareceram como previsão para acabamento fosco.');
+ // A folha Ver permanece fechada no mobile durante o experimento.
+ // Inspecionar o estado semântico intrínseco do painel oculto (não isVisible,
+ // que seria sempre false devido ao ancestral #si-dock-right[hidden]).
+ const opticalState=()=>page.evaluate(()=>({
+  benchFinish:document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.finish,
+  appearance:document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance,
+  light:document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.light,
+  spectralHidden:document.querySelector('#silm-properties .silm-optical-bands')?.hidden,
+  stageInert:document.querySelector('#si-stage')?.inert
+ }));
+ const matteState=await opticalState();
+ assert.equal(matteState.benchFinish,'matte','Clique no acabamento não alterou o motor da bancada: '+JSON.stringify(matteState));
+ assert.equal(matteState.appearance,'diffuse','Acabamento fosco não produziu espalhamento qualitativo: '+JSON.stringify(matteState));
+ assert.equal(matteState.spectralHidden,true,
+  'Dados de superfície ideal lisa apareceram como previsão para acabamento fosco: '+JSON.stringify(matteState));
  await finish.click();
- await page.waitForFunction(()=>document.querySelector('#silm-assembly-stage .silm-optical-bench')?.dataset.appearance==='aligned');
- assert.equal(await page.locator('#silm-properties .silm-optical-bands').isVisible(),true);
+ const polishedState=await opticalState();
+ assert.equal(polishedState.benchFinish,'polished','Acabamento polido não foi restaurado: '+JSON.stringify(polishedState));
+ assert.equal(polishedState.appearance,'aligned','Destaque especular não retornou: '+JSON.stringify(polishedState));
+ assert.equal(polishedState.spectralHidden,false,
+  'A referência óptica da interface polida não foi restaurada: '+JSON.stringify(polishedState));
  const incident=bench.locator('.silm-optical-bench-incident');
  assert.equal(await incident.isVisible(),false,'Raios não devem ser obrigatórios.');
  await bench.locator('.silm-optical-bench-rays').click();
