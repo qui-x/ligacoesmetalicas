@@ -84,6 +84,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   if(!route||!activity?.checkpoint)return 'error';
   const state=activity.checkpoint,e=state.metal?S.data.get(state.metal.atomicNumber):null,type=route.type==='mission'?'Missão':'Roteiro',participle=route.type==='mission'?'concluída':'concluído';
   const activityTitle=activity.activityContext?.teacher?.title||route.title;
+  const reportModule=route.module||state.module?.active||'explorar';
   const key=String(route.id+'-'+(state.investigation?.id||Date.now().toString(36))).toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-|-+$/g,'').slice(0,40);
   const attemptId='attempt-silm-complete-'+key;
   if(journal.snapshot().notes.some(n=>n.attemptId===attemptId))return 'duplicate';
@@ -91,12 +92,12 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   const lines=[
    'Título: '+type+' '+participle+': '+activityTitle,
    'Atividade: '+activityTitle,
-   'Módulo: '+route.module,
+   'Módulo: '+reportModule,
    e?'Metal: '+e.name+' ('+e.symbol+')':'',
    'Estrutura: '+structure,
    'Unidades na montagem: '+(state.structure?.units?.length||0),
-   'Medições registradas: '+(state.measurements?.length||0),
-   'Cálculos registrados: '+(state.calculations?.length||0),
+   reportModule==='medir'?'Medições registradas: '+(state.measurements?.length||0):'',
+   reportModule==='calcular'?'Cálculos registrados: '+(state.calculations?.length||0):'',
    'Critério de conclusão: '+(route.guidance?.criterion||route.completionCriteria||'Atividade concluída'),
    String(activity.report?.conclusion||'').trim()?'Conclusão do estudante: '+String(activity.report.conclusion).trim().slice(0,600):''
   ].filter(Boolean);
@@ -111,17 +112,18 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
   if(journal.snapshot().notes.some(n=>n.attemptId===attemptId))return 'duplicate';
   const e=state.metal?S.data.get(state.metal.atomicNumber):null;
   const activityTitle=record.activityContext.teacher?.title||route.title;
+  const reportModule=free?state.module?.active||'explorar':route.module||state.module?.active||'explorar';
   const structure=(t=>t&&S.crystal.isGeneral(t)?S.crystal.label(t,e):t)(state.structure?.crystallography?.structureType)||(state.structure?.mode==='crystalline'?'Estrutura cristalina':'Montagem livre');
   const short=(value,max=220)=>String(value||'').trim().slice(0,max);
   const lines=[
    'Título: Relatório registrado: '+(activityTitle||'Investigação livre'),
    'Atividade: '+(activityTitle||'Investigação livre'),
-   'Módulo: '+(route.module||state.module?.active||'explorar'),
+   'Módulo: '+reportModule,
    e?'Metal: '+e.name+' ('+e.symbol+')':'',
    'Estrutura: '+structure,
    'Unidades na montagem: '+(state.structure?.units?.length||0),
-   'Medições registradas: '+(state.measurements?.length||0),
-   'Cálculos registrados: '+(state.calculations?.length||0),
+   reportModule==='medir'?'Medições registradas: '+(state.measurements?.length||0):'',
+   reportModule==='calcular'?'Cálculos registrados: '+(state.calculations?.length||0):'',
    [report.name,report.className,report.group].some(x=>short(x))?'Identificação: '+[report.name,report.className&&('Turma '+report.className),report.group&&('Grupo '+report.group),report.teacher&&('Professor '+report.teacher)].map(x=>short(x,80)).filter(Boolean).join(' · '):'',
    short(report.observations)?'Observações: '+short(report.observations):'',
    short(report.analysis)?'Análise: '+short(report.analysis):'',
@@ -130,7 +132,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
    short(report.conclusion)?'Conclusão: '+short(report.conclusion):''
   ].filter(Boolean);
   const body=lines.join('\n').slice(0,1200);
-  const archive={record,title:activityTitle||'Investigação livre',module:route.module||state.module?.active||'explorar',archivedAt:new Date().toISOString()};
+  const archive={record,title:activityTitle||'Investigação livre',module:reportModule,archivedAt:new Date().toISOString()};
   const saved=storage.transaction(()=>{if(!storage.set('report.archive:'+attemptId,archive)||!journal.addNote({kind:'observacao',body},notebookScene(state),attemptId))throw Error('Falha ao arquivar');},{onRollback:()=>{journal=B.createJournalStore(B.storage);}});
   if(!saved.ok)return 'error';
   home();notebookRefresh?.();return 'added';
