@@ -208,16 +208,11 @@ const FILES=[
   "integracao/legacy-entry.js"
 ];
 const local=value=>{const url=new URL(value,ROOT);if(url.origin!==ROOT.origin||!url.pathname.startsWith(ROOT.pathname))throw new TypeError('Recurso fora do escopo');return url;};
-/* Ativação resiliente: somente o núcleo bloqueia a instalação. Uma imagem
-   opcional ausente não pode manter o navegador indefinidamente na versão antiga. */
-const CORE=[
- 'index.html',
- 'integracao/unified-ui.js','integracao/route-ui.js',
- 'domain/silm/routes.js','domain/silm/data/bundle.js',
- 'domain/silm/data-api.js','integracao/integration.css',
- 'integracao/pwa.js','domain/silm/manual.js'
-];
-if(CORE.some(path=>!FILES.includes(path)))throw new Error('Pré-cache central incompleto');
+/* Ativação resiliente: HTML/JS/CSS/dados necessários à execução são obrigatórios.
+   Imagens opcionais ausentes não bloqueiam instalação nem impedem uso offline. */
+const CORE=FILES.filter(file=>!/\.(?:webp|png|jpe?g|gif|svg|ico)$/i.test(file));
+const BOOT=['index.html','integracao/unified-ui.js','integracao/route-ui.js','domain/silm/routes.js','domain/silm/data/bundle.js','domain/silm/data-api.js','integracao/integration.css','integracao/pwa.js','domain/silm/manual.js'];
+if(BOOT.some(path=>!CORE.includes(path)))throw new Error('Pré-cache central incompleto');
 const stage=(file,cache)=>fetch(new Request(local(file),{cache:'reload'})).then(async response=>{
  if(!response.ok)throw new Error('Falha de pré-cache: '+file+' ('+response.status+')');
  await cache.put(local(file),response);
