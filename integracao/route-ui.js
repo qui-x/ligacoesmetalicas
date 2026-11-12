@@ -349,6 +349,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const experimentRecord=free&&exp?storage.get('route.experiment',null):null;
   const matchingExperiment=experimentRecord?.route===exp?.id&&experimentRecord?.investigation===s.investigation?.id;
   const reportModule=S.reportModules.resolve(record,r,archived),reportPolicy=S.reportModules.modules[reportModule];
+  const routeAligned=!free||!r.module||r.module===reportModule,study=routeAligned?r.study:null;
   const savedHypothesis=matchingExperiment?storage.get('route.hypothesis.investigation:'+s.investigation.id,''):'';
   const initialHypothesis=matchingExperiment?(typeof savedHypothesis==='string'&&savedHypothesis?savedHypothesis.slice(0,2000):typeof experimentRecord?.hypothesis==='string'?experimentRecord.hypothesis.slice(0,2000):''):'';
   // "Atividade de análise" é preparação do Professor: só fora de uma atividade e nunca num relatório arquivado (como no SIAB).
@@ -473,12 +474,12 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   // 2. Proposta da investigação.
   const proposal=section(2,'Proposta da investigação','proposta');
   if(mode==='analise'&&config.proposal)proposal.append(N('p',config.proposal));
-  else if(r.description){proposal.append(N('p',r.description));if(r.objectives?.length){const ul=N('ul');for(const o of r.objectives)ul.append(N('li',o));proposal.append(ul);}}
-  else proposal.append(N('p','Investigação livre: descreva a questão investigada na resposta à investigação.'));
+  else if(routeAligned&&r.description){proposal.append(N('p',r.description));if(r.objectives?.length){const ul=N('ul');for(const o of r.objectives)ul.append(N('li',o));proposal.append(ul);}}
+  else proposal.append(N('p','Investigação no módulo '+reportPolicy.label+': descreva a pergunta e as observações próprias desta etapa.'));
   if(mode==='analise'&&config.question)proposal.append(N('h3','Questão para investigar'),N('p',config.question));
-  else if(r.study?.question)proposal.append(N('h3','Pergunta central do roteiro'),N('p',r.study.question));
+  else if(study?.question)proposal.append(N('h3','Pergunta central do roteiro'),N('p',r.study.question));
   if(initialHypothesis)proposal.append(N('h3','Hipótese inicial registrada'),N('p',initialHypothesis));
-  if(r.study?.observe?.length){
+  if(study?.observe?.length){
    const obs=N('ul');for(const item of r.study.observe)obs.append(N('li',item));
    proposal.append(N('h3','Plano de observações'),obs);
   }
@@ -534,14 +535,14 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    else box.append(N('p',record.report[k]||'—'));sec.append(box);};
   field(section(7,'Observações','observacoes'),'observations','Observações');
   const analysis=section(8,'Análise / interpretação','analise');
-  if(r.study?.interpretation?.length){
+  if(study?.interpretation?.length){
    analysis.append(N('h3','Questões para interpretar'));
    const questions=N('ol');for(const question of r.study.interpretation)questions.append(N('li',question));analysis.append(questions);
   }
   field(analysis,'analysis','Análise');field(analysis,'interpretation','Interpretação');
   field(section(9,'Resposta à investigação','resposta'),'answer','Resposta');
   const conclusion=section(10,'Conclusão','conclusao');
-  if(r.study?.limits){const limit=N('p','Limite científico: '+r.study.limits);limit.className='silm-report-note';conclusion.append(limit);}
+  if(study?.limits){const limit=N('p','Limite científico: '+r.study.limits);limit.className='silm-report-note';conclusion.append(limit);}
   field(conclusion,'conclusion','Conclusão');
   // Fontes e nota sobre o modelo.
   const moduleSources=reportModule==='calcular'?s.calculations.flatMap(c=>c.provenance.references):
