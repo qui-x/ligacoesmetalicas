@@ -114,12 +114,12 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   opticalSection.dataset.reference=validated?
    (cap.conditionMatch?.ok?'cntp-verified':'source-conditions-only'):'unavailable';
   if(!validated){
-   opticalNote.textContent='A bancada na cena permite comparar reflexão polida e espalhamento fosco apenas qualitativamente. Não há perfil óptico quantitativo homologado para este metal.';
-   opticalSource.textContent='Não atribuímos ao metal a refletância nem a cor de outro elemento. Mova lanterna e observador na cena.';
+   opticalNote.textContent='A superfície na escala de microestrutura e na rede permite comparar reflexão polida e espalhamento fosco apenas qualitativamente. Não há perfil óptico quantitativo homologado para este metal.';
+   opticalSource.textContent='Não atribuímos ao metal a refletância nem a cor de outro elemento. Ajuste a iluminação e a observação na escala ativa.';
    return;
   }
   if(finish==='matte'){
-   opticalNote.textContent='Acabamento fosco: o espalhamento na bancada é ilustrativo. Os valores n,k da fonte permitem modelar uma interface ideal lisa, não prever a luz vista na superfície fosca.';
+   opticalNote.textContent='Acabamento fosco: o espalhamento representado na superfície é ilustrativo. Os valores n,k da fonte permitem modelar uma interface ideal lisa, não prever a luz vista na superfície fosca.';
    opticalSource.textContent='Referência de '+cap.symbol+': '+cap.source.authors+' ('+cap.source.year+'), temperatura ambiente; CNTP não verificada.';
    return;
   }
