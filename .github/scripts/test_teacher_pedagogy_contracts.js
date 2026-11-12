@@ -53,6 +53,12 @@ for(const [type,collection]of [['route',S.routes.registry],['mission',S.missions
    has('Limites do modelo',item.study.limit);
    has('Evidências verificáveis da missão',item.evidenceObjectives[0].label);
   }
+  const mandatory={'property-heating':'thermal','property-light':'luster',
+   'property-elongation':'ductility'}[item.completionCriteria];
+  if(mandatory){
+   assert.ok(T.requirements(type,item.id).required.includes(mandatory),item.id+' sem ferramenta obrigatória');
+   assert.throws(()=>T.validate({...c,tools:c.tools.filter(t=>t!==mandatory)}),/Faltam recursos necessários/);
+  }
   assert.throws(()=>T.validate({...c,metals:[0]}),/Metais fora/);
   assert.throws(()=>T.validate({...c,tools:[...c.tools,'ferramenta-inexistente']}),/Recursos fora/);
  }
