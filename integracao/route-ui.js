@@ -40,7 +40,14 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   for(let i=0;ok&&i<r.initialState.units;i++)ok=model.addUnit().ok;
   if(ok&&r.initialState.mode==='crystalline')ok=model.organize().ok;
   if(!ok||!model.setModule(r.module)){say('Não foi possível preparar esta investigação.','warning');return false;}
-  storage.set('route.experiment',{route:r.id,version:r.version,investigation:model.state.investigation.id,createdAt:new Date().toISOString(),hypothesis:String(hypothesis||'').trim().slice(0,2000)});
+  const investigation=model.state.investigation.id,prediction=String(hypothesis||'').trim().slice(0,2000);
+  // A hipótese pertence à investigação, não ao último roteiro aberto.
+  // Contexto e previsão são gravados atomicamente no documento durável.
+  const saved=storage.transaction(()=>{
+   if(!storage.set('route.experiment',{route:r.id,version:r.version,investigation,createdAt:new Date().toISOString(),hypothesis:prediction}))throw Error('CONTEXT_SAVE_FAILED');
+   if(!storage.set('route.hypothesis.investigation:'+investigation,prediction))throw Error('HYPOTHESIS_SAVE_FAILED');
+  });
+  if(!saved.ok){say('A montagem foi preparada, mas não foi possível salvar o contexto e a hipótese. Exporte os dados antes de continuar.','warning');return false;}
   for(const [k,v] of Object.entries(identity||{}))if(v)unified.editReport(k,v);
   onModule(r.module);location.hash='#/ambiente';sync();say('Roteiro montado na oficina: '+sentence(r.title)+' Quando terminar, abra Dados → Relatório.','success');return true;
  }
@@ -270,6 +277,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    const hypothesis=N('textarea');hypothesis.id='route-hypothesis';hypothesis.name='hypothesis';hypothesis.rows=3;hypothesis.maxLength=2000;hypothesis.placeholder='Registre sua previsão antes de usar os instrumentos.';
    const previousHypothesis=storage.get('route.hypothesis:'+r.id,'');hypothesis.value=typeof previousHypothesis==='string'?previousHypothesis.slice(0,2000):'';
    hypothesisField.append(hypothesisLabel,hypothesis);
+   hypothesis.addEventListener('input',()=>storage.set('route.hypothesis:'+r.id,hypothesis.value.slice(0,2000)));
    const selection=N('select');selection.id='route-metal';for(const z of r.metalSelection.atomicNumbers){const e=S.data.get(z),o=N('option',e.name+' ('+e.symbol+')');o.value=z;selection.append(o);}selection.value=r.metalSelection.atomicNumbers.includes(29)?'29':String(r.metalSelection.atomicNumbers[0]);
    const mf=N('div');mf.className='silm-field';const ml=N('label','Metal da investigação');ml.htmlFor='route-metal';mf.append(ml,selection);
    const actions=N('div');actions.className='silm-actions';
@@ -339,7 +347,9 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const r=registry.get(record.activityContext.id)||(exp?{...exp,id:'laboratorio',type:'free',module:record.checkpoint.module.active}:null)||{id:'laboratorio',title:archived?.title||'Investigação livre',subtitle:'Registros da Oficina',module:archived?.module||record.checkpoint.module.active,sources:[]},s=record.checkpoint,e=S.data.get(s.metal.atomicNumber),free=record.activityContext.type==='free',editable=!archived&&(free||session.context()?.id===r.id);
   // A hipótese pertence à investigação livre montada, nunca a uma tentativa anterior.
   const experimentRecord=free&&exp?storage.get('route.experiment',null):null;
-  const initialHypothesis=experimentRecord?.route===exp?.id&&experimentRecord?.investigation===s.investigation?.id&&typeof experimentRecord?.hypothesis==='string'?experimentRecord.hypothesis.slice(0,2000):'';
+  const matchingExperiment=experimentRecord?.route===exp?.id&&experimentRecord?.investigation===s.investigation?.id;
+  const savedHypothesis=matchingExperiment?storage.get('route.hypothesis.investigation:'+s.investigation.id,''):'';
+  const initialHypothesis=matchingExperiment?(typeof savedHypothesis==='string'&&savedHypothesis?savedHypothesis.slice(0,2000):typeof experimentRecord?.hypothesis==='string'?experimentRecord.hypothesis.slice(0,2000):''):'';
   // "Atividade de análise" é preparação do Professor: só fora de uma atividade e nunca num relatório arquivado (como no SIAB).
   const teacher=!archived&&!session.open(),key=archived?'arquivo:'+archiveKey:free?'livre:'+(s.investigation?.id||'sem-investigacao'):'atividade:'+r.id;
   const config=reportConfig(key);if(config.mode==='analise'&&!teacher)config.mode='completo';
