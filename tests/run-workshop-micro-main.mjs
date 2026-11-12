@@ -86,6 +86,8 @@ async function test(viewport){
    id+' indisponível na escala de microestrutura antes da rede.');
   await item.click();
   await page.locator('#si-dock-right [data-close-dock="right"]').click();
+  await page.waitForFunction(()=>!document.querySelector('#si-stage')?.inert&&
+   document.querySelector('#si-dock-right')?.hidden===true);
   await page.waitForFunction(id=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStudy===id,id);
  };
  await openProperty('malleability');
@@ -95,7 +97,10 @@ async function test(viewport){
  const mechanicalDir=join('reports','micro-deformation',browserName);
  mkdirSync(mechanicalDir,{recursive:true});
  assert.ok((await grip.boundingBox())?.height>=44,'Alça da prensa não alcança 44 px.');
- await mech.getByRole('button',{name:'Aplicar compressão'}).click();
+ const pulse=mech.locator('.silm-micro-mechanical-pulse');
+ assert.equal(await pulse.getAttribute('aria-label'),'Aplicar compressão',
+  'Botão de compressão não recebeu o nome acessível: '+await pulse.evaluate(n=>n.outerHTML));
+ await pulse.click();
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='1');
  assert.match(await viewer.locator('.silm-micro-mechanical-field').getAttribute('transform'),/scale\(/,
   'Compressão não modifica a representação no mesmo mapa.');
@@ -112,7 +117,9 @@ async function test(viewport){
   nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|')),initialGrainShapes,
   'A operação alterou os contornos originais.');
  await openProperty('ductility');
- await mech.getByRole('button',{name:'Aplicar tração'}).click();
+ assert.equal(await pulse.getAttribute('aria-label'),'Aplicar tração',
+  'Botão de tração não recebeu o nome acessível.');
+ await pulse.click();
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='1');
  assert.match(await mech.locator('.silm-micro-mechanical-reading').textContent(),
   /Tração.*passo ilustrativo 1\/4.*não representa deformação medida/);
