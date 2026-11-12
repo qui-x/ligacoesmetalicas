@@ -38,7 +38,7 @@ SILM.createTeacherUI=({model,storage,session,say,start,applyPreset})=>{
   metalMode=field(form,'Metal',select('teacher-metal-mode',[['all','O aluno escolhe entre os metais elegíveis'],['fixed','Um metal definido pelo professor']],'all'));
   metalSelect=field(form,'Metal definido',select('teacher-metal',[]));
   toolsBox=N('fieldset',null,'silm-teacher-tools');toolsBox.id='teacher-tools';form.append(toolsBox);
-  navigationSelect=field(form,'Navegação',select('teacher-navigation',Object.entries(T.navigation),'restrita'),'Restrita: durante a atividade ficam o Início, a Oficina, o Manual e o relatório. A restrição organiza a aula; não é proteção contra edição do código.');
+  navigationSelect=field(form,'Navegação',select('teacher-navigation',Object.entries(T.navigation),'restrita'),'Restrita: durante a atividade ficam o Início, a Oficina, o Manual, o Caderno e o relatório. A restrição organiza a aula; não é proteção contra edição do código.');
   errorBox=N('p',null,'silm-teacher-error');errorBox.id='teacher-error';errorBox.setAttribute('role','alert');
   const actions=N('div',null,'silm-teacher-actions');cancel=button('Cancelar edição',cancelEdit,'button outline','teacher-cancel-edit');cancel.hidden=true;
   submit=N('button','Validar e gerar atividade','button primary');submit.type='submit';submit.id='teacher-submit';actions.append(cancel,submit);form.append(errorBox,actions);
@@ -204,10 +204,13 @@ SILM.createTeacherUI=({model,storage,session,say,start,applyPreset})=>{
   const action=N('form',null,'silm-student-start');action.noValidate=true;let pick=null;
   if(config.type!=='preset'&&config.metals.length>1){pick=select('student-metal',config.metals.map(z=>{const e=S.data.get(z);return [String(z),e.name+' ('+e.symbol+')'];}));field(action,'Escolha o metal',pick);}
   const go=N('button',config.type==='preset'?'Montar na oficina':'Começar atividade','button primary');go.type='submit';go.id='student-start';action.append(go);
+  const selectedMetal=()=>pick?Number(pick.value):config.metals[0];
+  const updateResume=()=>{if(config.type!=='preset')go.textContent=session.resumable(config.item,selectedMetal(),config)?'Retomar atividade':'Começar atividade';};
+  pick?.addEventListener('change',updateResume);updateResume();
   if(session.open()){go.disabled=true;const note=N('p',session.teacher()?.id===config.id?'Esta atividade já está em andamento. Use “Atividade em andamento” para voltar à oficina.':'Encerre a atividade em curso antes de abrir outra.','silm-setup-locked');note.id='student-locked';go.setAttribute('aria-describedby',note.id);action.append(note);}
   action.addEventListener('submit',async event=>{event.preventDefault();if(session.open())return;
    if(config.type==='preset'){if(await applyPreset(config.item))say('Atividade do professor: '+config.title+'.','success');return;}
-   start(config,pick?Number(pick.value):config.metals[0]);});
+   const metal=selectedMetal();start(config,metal,{resume:session.resumable(config.item,metal,config)});});
   host.append(action);
  }
  function render(page){if(page==='professor'){build();syncProjector();}if(page==='atividade')renderStudent();}
