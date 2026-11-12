@@ -353,7 +353,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const savedHypothesis=matchingExperiment?storage.get('route.hypothesis.investigation:'+s.investigation.id,''):'';
   const initialHypothesis=matchingExperiment?(typeof savedHypothesis==='string'&&savedHypothesis?savedHypothesis.slice(0,2000):typeof experimentRecord?.hypothesis==='string'?experimentRecord.hypothesis.slice(0,2000):''):'';
   // "Atividade de análise" é preparação do Professor: só fora de uma atividade e nunca num relatório arquivado (como no SIAB).
-  const teacher=!archived&&!session.open(),key=archived?'arquivo:'+archiveKey:free?'livre:'+(s.investigation?.id||'sem-investigacao'):'atividade:'+r.id;
+  const teacher=!archived&&!session.open(),key=archived?'arquivo:'+archiveKey:free?'livre:'+(s.investigation?.id||'sem-investigacao')+':'+reportModule:'atividade:'+r.id;
   const config=reportConfig(key);if(['analise','formativa'].includes(config.mode)&&!teacher)config.mode='completo';
   const save=(patch,focus)=>{storage.set('report.config:'+key,{...config,...patch});report();if(focus)$(focus)?.focus();};
   const mode=config.mode,inc=k=>mode!=='analise'||config.include[k]!==false,blankField=k=>mode==='mao'||(mode==='analise'&&config.blank[k]!==false);
@@ -548,7 +548,10 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
   const moduleSources=reportModule==='calcular'?s.calculations.flatMap(c=>c.provenance.references):
    reportModule==='medir'?s.measurements.map(m=>m.source.latticeSourceId):
    S.reportModules.properties(s,e).map(p=>p.data?.kind==='TABULATED'?p.data.sourceId:null).filter(Boolean);
-  const sources=new Set([...S.data.sourceIds(e),...(r.sources||[]),...moduleSources]),sourceSec=section(0,'Fontes','fontes'),list=N('ul');
+  const origins=[e.identityProvenance?.atomicNumber?.sourceId,s.structure?.crystallography?.sourceId,
+   ...(reportModule==='explorar'&&s.electrons?.representation?.visible?[e.valenceModel?.sourceId,e.electronConfiguration?.sourceId]:[]),
+   ...(routeAligned?r.sources||[]:[]),...moduleSources].filter(Boolean);
+  const sources=new Set(origins),sourceSec=section(0,'Fontes','fontes'),list=N('ul');
   for(const sid of sources){const src=S.data.source(sid);if(src)list.append(N('li',src.institution+' — '+src.title+(src.url?' · '+src.url:'')));}sourceSec.append(list);
   const modelNote=section(0,'Nota sobre o modelo','nota');modelNote.classList.add('silm-report-model-note');
   const moduleNotes={
