@@ -95,7 +95,7 @@ window.SILM=window.SILM||{};
 
   function update({visible=false,illuminated=false,point=null}={}){
    last={visible,illuminated,point};
-   root.hidden=!visible;actions.hidden=!visible;
+   root.hidden=!visible||!point;actions.hidden=!visible;
    if(!visible||!drive||!point)return null;
    const a=drive.angle,b=drive.observerAngle,P={x:clamp(point.x,3,97),y:clamp(point.y,3,97)};
    const result=SILM.opticalObservation?.observe({
