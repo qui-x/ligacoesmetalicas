@@ -53,8 +53,7 @@ const perform=async(name,request)=>{
  online=false;
  const fallback=await perform('fetch',script);
  assert.equal(await fallback.text(),'ATUAL:'+normalized(script),'Offline deve usar a revisão mais recente');
- const home=new Request(scope,{headers:{Accept:'text/html'}});
- const nav=await perform('fetch',new Request(scope,{mode:'navigate'}));
+ const nav=await perform('fetch',{url:scope,method:'GET',mode:'navigate'});
  assert.ok(await nav.text(),'A navegação offline deve recuperar a entrada');
  assert.ok(calls.length>=9,'Pré-cache essencial deve ter sido consultado');
  const sw=fs.readFileSync('sw.js','utf8'),pwa=fs.readFileSync('integracao/pwa.js','utf8');
