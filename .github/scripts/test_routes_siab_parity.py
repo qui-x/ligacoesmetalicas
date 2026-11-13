@@ -122,7 +122,7 @@ def run(browser_name: str, root: str) -> None:
                 const hypothesis = JSON.parse(docs['route.hypothesis.investigation:' + experiment?.investigation] || 'null');
                 return experiment?.hypothesis === prediction &&
                     hypothesis === prediction && state?.investigation?.id === experiment.investigation;
-            }""", prediction, timeout=15000)
+            }""", arg=prediction, timeout=15000)
             page.goto(root.rstrip("/") + "/#/relatorios")
             report = page.locator("#silm-route-report")
             try:
