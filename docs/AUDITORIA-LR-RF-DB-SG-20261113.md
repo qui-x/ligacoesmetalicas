@@ -52,7 +52,7 @@ O artigo de **Atta-Fynn e Ray (2015)**, [DOI 10.1016/j.ssc.2014.10.025](https://
 
 ### Dados mínimos para concluir cada ficha
 
-1. **Lr HC:** parâmetro a ou volume de equilíbrio atômico V do modelo EMTO; usar a razão c/a=1,58 **somente** se o a/V vier do mesmo método e da mesma fase. Quando houver volume por átomo, reconstruir a e c usando `V = (√3/4) a²c` para a célula primitiva de dois átomos HC, ou `V_atom = (√3/4) a²c`, portanto `a = [4V_atom/(√3(c/a))]^(1/3)`, `c=(c/a)a`.
+1. **Lr HC:** parâmetro a ou volume de equilíbrio atômico V do modelo EMTO; usar a razão c/a=1,58 **somente** se o a/V vier do mesmo método e da mesma fase. A célula primitiva HC de dois átomos tem volume `V_célula=(√3/2)a²c`; o volume por átomo é `V_atom=(√3/4)a²c`. Assim, `a=[4V_atom/(√3(c/a))]^(1/3)` e `c=(c/a)a`.
 2. **Db e Sg CCC:** valor numérico de a ou V por átomo correspondente ao mínimo CCC; se V for por átomo, `a=(2V_atom)^(1/3)` e dois sítios convencionais nas coordenadas (0,0,0) e (1/2,1/2,1/2).
 3. Registrar método, funcional, relatividade, unidade, condição de cálculo e DOI; não classificar a previsão como medida experimental, não extrapolar a CNTP e não liberar propriedades elétricas, ópticas, térmicas ou mecânicas por analogia.
 4. Só atualizar `silmEligibility` quando a fonte quantitativa estiver verificada, o motor `SILM.crystal` aceitar a geometria e os três navegadores passarem.
