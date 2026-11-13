@@ -56,7 +56,7 @@ try{
    await tiSelect.selectOption('1');
    const tiMetrics=await page.locator('#test-multi-ti .silm-research-metrics').innerText();
    assert.match(tiMetrics,/998/);
-   assert.match(tiMetrics,/1040/);
+   assert.match(tiMetrics,/1\.040/);
    assert.match(tiMetrics,/6 %/);
    const coText=await page.locator('#test-multi-co .silm-research-note').allTextContents();
    assert.match(coText.join(' '),/NÃO medem, por si só, a maleabilidade/);
