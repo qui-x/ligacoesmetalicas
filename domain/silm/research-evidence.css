@@ -31,3 +31,17 @@
  .silm-research-reference{padding:.55rem}
  .silm-research-table{font-size:.73rem}
 }
+
+/* Perfil documental por metal integrado ao painel original (sem menu lateral). */
+.silm-research-multistage{contain:layout style;max-width:100%;overflow-wrap:anywhere}
+.silm-research-multistage .silm-research-metrics{
+ display:grid;grid-template-columns:minmax(0,1fr) auto;
+ gap:.32rem .75rem;max-width:100%;font-size:.83rem;margin:.5rem 0;
+}
+.silm-research-metrics dt{min-width:0}
+.silm-research-metrics dd{text-align:right;margin:0;font-variant-numeric:tabular-nums;font-weight:600}
+.silm-research-multistage .silm-research-extra{font-size:.8rem;line-height:1.45;max-height:11rem;overflow:auto}
+.silm-research-multistage details summary{cursor:pointer;font-size:.8rem;padding:.25rem 0}
+.silm-research-multistage a{overflow-wrap:anywhere}
+
+.silm-research-multistage .silm-research-condition{font-size:.82rem;line-height:1.4;margin:.35rem 0 .6rem}
