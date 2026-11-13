@@ -10,9 +10,9 @@ for(const path of ['data/bundle','data-api','crystal','properties','reference-co
 const S=ctx.SILM,ENGINE=S.materialEngine;
 const close=(actual,expected,tolerance=1e-3)=>assert.ok(Math.abs(actual-expected)<=tolerance,actual+' != '+expected);
 
-test('o motor geral atende 69 metais (Pm, Ga, In e U estruturais), sem copiar o perfil de Cu',()=>{
+test('o motor geral atende 73 metais (8 com escopo estrutural), sem copiar o perfil de Cu',()=>{
  const metals=S.data.elements.filter(e=>e.silmEligibility.status==='available');
- assert.equal(metals.length,69);
+ assert.equal(metals.length,73);
  for(const el of metals){
   for(const property of ENGINE.propertyIds){
    const cap=ENGINE.capability(el.atomicNumber,property);
