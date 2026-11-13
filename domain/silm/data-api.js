@@ -13,5 +13,19 @@ window.SILM=window.SILM||{};
  /* Fontes dos dados que o SILM usa. As fichas só consultadas pela auditoria (reviewedCandidates: "complementar",
     "substituída", "não homologada") ficam fora: citá-las no relatório ou em "Fontes" sugeriria que foram usadas. */
  const sourceIds=e=>{const ids=new Set();const scan=o=>{if(!o||typeof o!=='object')return;Object.entries(o).forEach(([k,v])=>{if(k==='reviewedCandidates')return;if(/sourceId$/i.test(k))ids.add(v);else if(typeof v==='object')scan(v);});};scan(e);return [...ids];};
- SILM.data=Object.freeze({...data,get,source:id=>sourceMap.get(id),sourceIds,reason,label,categoryLabel:e=>categories[e.classification.category],structure:e=>e.structures.find(s=>s.id===e.referenceStructure)||null,search(query){const q=normalize(query);if(!q)return data.elements;const exact=data.elements.filter(e=>normalize(e.symbol)===q||String(e.atomicNumber)===q||normalize(e.name)===q);return exact.length?exact:data.elements.filter(e=>normalize(e.name).includes(q)||normalize(e.symbol).includes(q));}});
+ /* Evidências experimentais e computacionais têm a mesma elegibilidade funcional, quando
+    a ficha cristalográfica é completa e validada. A natureza da fonte permanece visível. */
+ const evidenceLabels=Object.freeze({
+  experimental:'Estrutura determinada experimentalmente',
+  evaluated:'Estrutura avaliada em fonte científica',
+  computed:'Estrutura prevista computacionalmente',
+  convention:'Estrutura por convenção cristalográfica'
+ });
+ const structureEvidence=e=>{
+  const ref=e?.structures?.find(s=>s.id===e.referenceStructure);
+  if(!ref)return null;
+  const type=ref.evidenceType||'unreported';
+  return {type,label:evidenceLabels[type]||'Origem da estrutura não classificada',sourceId:ref.sourceId||null};
+ };
+ SILM.data=Object.freeze({...data,get,source:id=>sourceMap.get(id),sourceIds,structureEvidence,reason,label,categoryLabel:e=>categories[e.classification.category],structure:e=>e.structures.find(s=>s.id===e.referenceStructure)||null,search(query){const q=normalize(query);if(!q)return data.elements;const exact=data.elements.filter(e=>normalize(e.symbol)===q||String(e.atomicNumber)===q||normalize(e.name)===q);return exact.length?exact:data.elements.filter(e=>normalize(e.name).includes(q)||normalize(e.symbol).includes(q));}});
 })();
