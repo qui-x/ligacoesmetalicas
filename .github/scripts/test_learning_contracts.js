@@ -22,7 +22,7 @@ assert.ok(missions.length>=27,'O catálogo deve preservar pelo menos 27 missões
 assert.ok(themes.length>=24,'O catálogo deve preservar pelo menos 24 temas');
 assert.equal(S.missions.validate(missions).ok,true);
 assert.equal(S.themes.validate().ok,true);
-const eligible=S.data.elements.filter(e=>e.silmEligibility.status==='available');
+const eligible=S.data.elements.filter(e=>e.silmEligibility.status==='available'&&e.silmEligibility.scope!=='structure-only');
 const crystals=eligible.filter(e=>S.crystal.eligibility(e).status==='available');
 assert.equal(eligible.length,65);
 assert.equal(crystals.length,62);
