@@ -56,12 +56,12 @@ for(const row of records){
   }
  });
 }
-test('lote 2 permanece íntegro no catálogo de 74 com Fr computacional',()=>{
+test('lote 2 permanece íntegro no catálogo de 77 com Fm Md No estimados',()=>{
  assert.equal(S.data.elements.length,118);
  const available=S.data.elements.filter(e=>e.silmEligibility.status==='available');
- assert.equal(available.length,74);
+ assert.equal(available.length,77);
  assert.deepEqual(Array.from(available.filter(e=>e.silmEligibility.scope==='structure-only'),e=>e.symbol).sort(),
- ['Bk','Cf','Cm','Es','Fr','Ga','In','Pm','U']);
+ ['Bk','Cf','Cm','Es','Fm','Fr','Ga','In','Md','No','Pm','U']);
  for(let z=104;z<=116;z++)
   assert.equal(S.data.get(z).silmEligibility.status,'unavailable','Superpesado Z='+z);
 });

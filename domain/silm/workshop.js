@@ -83,10 +83,10 @@ SILM.workshop=(()=>{
    section.append(grid);
   }else{
    // A referência científica pode permitir estrutura sem imagem de objeto.
-   // Não inventar aplicações macroscópicas para o Pm radioativo.
+   // Não inventar aplicações macroscópicas para elementos sem objetos homologados.
    section.append(node('p','silm-workshop-empty',
     element.silmEligibility?.scope==='structure-only'?
-    'Sem objetos cotidianos homologados. A estrutura cristalina pode ser explorada com a fonte experimental registrada.':
+    'Sem objetos cotidianos homologados. '+(SILM.data.structureEvidence?.(element)?.method==='empirical-geometric'?'A célula é uma hipótese geométrica derivada de raios estimados; não uma estrutura medida ou otimizada por DFT.':SILM.data.structureEvidence?.(element)?.type==='computed'?'A estrutura é prevista computacionalmente; não foi medida experimentalmente.':'A estrutura cristalina possui referência experimental registrada.'):
     'Ainda não há objetos disponíveis para este metal.'));
    if(element.silmEligibility?.scope==='structure-only'){
     const structural=node('button','button primary','Investigar estrutura cristalina');
