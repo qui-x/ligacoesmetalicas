@@ -1,0 +1,61 @@
+name: SILM — Auditoria quantitativa MPDD de Db e Sg
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit-db-sg-mpdd.mjs'
+      - 'tests/db-sg-mpdd-gate.test.mjs'
+      - '.github/workflows/silm-db-sg-mpdd-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validar-auditor:
+    name: Testar portao de proveniencia e conversoes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar sintaxe e contratos do auditor
+        run: |
+          node --check scripts/audit-db-sg-mpdd.mjs
+          node --test tests/db-sg-mpdd-gate.test.mjs
+
+  consultar-mpdd:
+    name: Consultar MPDD online (diagnostico nao bloqueante)
+    needs: validar-auditor
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Consultar base sem alterar dados homologados
+        shell: bash
+        run: |
+          mkdir -p reports/db-sg-mpdd
+          set +e
+          node scripts/audit-db-sg-mpdd.mjs > reports/db-sg-mpdd/consulta.txt 2>&1
+          EXIT_CODE=$?
+          set -e
+          cat reports/db-sg-mpdd/consulta.txt
+          echo "Exit code da consulta externa: $EXIT_CODE" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$EXIT_CODE" -eq 0 ]; then
+            echo "Consulta acessivel; registros sao candidatos, NAO homologados." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Consulta indeterminada por falha na API; Db e Sg continuam bloqueados." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Arquivar resposta e erros para auditoria manual
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-db-sg-mpdd-consulta
+          path: reports/db-sg-mpdd/
+          if-no-files-found: warn
+          retention-days: 14
