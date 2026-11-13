@@ -957,7 +957,7 @@
 ];
  const metalType=z=>{const e=S.data.get(z);return e?.structures?.find(x=>x.id===e.referenceStructure)?.type||null;};
  const selectMetals=selector=>{
-  const all=S.data.elements.filter(e=>e.silmEligibility.status==='available').map(e=>e.atomicNumber);
+  const all=S.data.elements.filter(e=>e.silmEligibility.status==='available'&&e.silmEligibility.scope!=='structure-only').map(e=>e.atomicNumber);
   const solid=all.filter(z=>S.crystal.eligibility(S.data.get(z)).status==='available');
   let ids=[];
   if(selector==='canonical')ids=solid.filter(z=>!S.crystal.eligibility(S.data.get(z)).general);

@@ -78,7 +78,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    const metalLabel=N('label','Metal disponível');metalLabel.htmlFor='silm-missions-metal-filter';
    const metalFilter=N('select');metalFilter.id='silm-missions-metal-filter';metalFilter.setAttribute('aria-label','Filtrar por metal disponível');
    const allMetals=N('option','Todos os metais');allMetals.value='all';metalFilter.append(allMetals);
-   for(const e of S.data.elements.filter(e=>e.silmEligibility.status==='available')){
+   for(const e of S.data.elements.filter(e=>e.silmEligibility.status==='available'&&e.silmEligibility.scope!=='structure-only')){
     const option=N('option',e.name+' ('+e.symbol+')');option.value=String(e.atomicNumber);metalFilter.append(option);
    }
    const count=N('p');count.className='silm-learning-count';count.setAttribute('role','status');count.setAttribute('aria-live','polite');
@@ -206,7 +206,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    const metalLabel=N('label','Metal disponível');metalLabel.htmlFor='silm-routes-metal-filter';
    const metal=N('select');metal.id='silm-routes-metal-filter';
    const all=N('option','Todos os metais');all.value='all';metal.append(all);
-   for(const element of S.data.elements.filter(e=>e.silmEligibility.status==='available')){const opt=N('option',element.name+' ('+element.symbol+')');opt.value=String(element.atomicNumber);metal.append(opt);}
+   for(const element of S.data.elements.filter(e=>e.silmEligibility.status==='available'&&e.silmEligibility.scope!=='structure-only')){const opt=N('option',element.name+' ('+element.symbol+')');opt.value=String(element.atomicNumber);metal.append(opt);}
    metalField.append(metalLabel,metal);
    const searchField=N('div');searchField.className='silm-learning-field';
    const searchLabel=N('label','Pesquisar');searchLabel.htmlFor='silm-routes-search';

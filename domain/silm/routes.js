@@ -1,7 +1,7 @@
 'use strict';
 /* Roteiros descrevem o uso dos serviços existentes; não possuem estado ou fórmulas científicas próprios. */
 (()=>{
- const S=SILM,eligible=S.data.elements.filter(e=>e.silmEligibility.status==='available'),crystals=eligible.filter(e=>S.crystal.eligibility(e).status==='available');
+ const S=SILM,eligible=S.data.elements.filter(e=>e.silmEligibility.status==='available'&&e.silmEligibility.scope!=='structure-only'),crystals=eligible.filter(e=>S.crystal.eligibility(e).status==='available');
  const all=eligible.map(e=>e.atomicNumber),solid=crystals.map(e=>e.atomicNumber);
  /* Deformação didática (maleabilidade) só nos modelos canônicos CCC, CFC e HC: no modelo geral ela não é homologada. */
  const canonical=crystals.filter(e=>!S.crystal.eligibility(e).general).map(e=>e.atomicNumber);

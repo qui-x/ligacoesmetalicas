@@ -262,10 +262,31 @@
   const dialog=$('silm-objects-dialog'),body=$('silm-objects-body');
   if(!dialog||!body)return false;
   catalogOpener=origin;catalogNavigating=false;
-  S.workshop.renderObjectCatalog(body,{element:metal,onInvestigate:chooseObjectFromCatalog});
+  S.workshop.renderObjectCatalog(body,{element:metal,onInvestigate:chooseObjectFromCatalog,onStartStructure:investigateStructureOnly});
   if(!dialog.open)dialog.showModal();
   dialog.querySelector('#silm-objects-title')?.focus({preventScroll:true});
   return true;
+ }
+ async function investigateStructureOnly(metal){
+  if(!metal||metal.silmEligibility?.status!=='available'||metal.silmEligibility?.scope!=='structure-only')return false;
+  if(routeUI?.session.open())return false;
+  // Fechar o diálogo nativo ANTES de start(), que pode pedir confirmação.
+  // Caso contrário a confirmação ficaria atrás da top layer modal.
+  const dialog=$('silm-objects-dialog');
+  if(dialog?.open)dialog.close();
+  const previous=selected,previousValue=$('silm-metal').value;
+  selected=String(metal.atomicNumber);$('silm-metal').value=selected;
+  if(!(await start())){
+   selected=previous;$('silm-metal').value=previousValue;showObjectEntry=true;schedule();
+   return false;
+  }
+  legacyDiscovery=false;showObjectEntry=false;showFocus();
+  if(!setWorkshopScale(3)){
+   say('A estrutura do promécio não pôde ser organizada. A montagem livre foi preservada para revisão.','warning');
+   schedule();return false;
+  }
+  say('Estrutura cristalina de '+metal.name+' · os dados físicos específicos permanecem indisponíveis.','success');
+  schedule();return true;
  }
  async function chooseObjectFromCatalog(item){
   const dialog=$('silm-objects-dialog');
