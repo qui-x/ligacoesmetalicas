@@ -78,7 +78,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    const metalLabel=N('label','Metal disponível');metalLabel.htmlFor='silm-missions-metal-filter';
    const metalFilter=N('select');metalFilter.id='silm-missions-metal-filter';metalFilter.setAttribute('aria-label','Filtrar por metal disponível');
    const allMetals=N('option','Todos os metais');allMetals.value='all';metalFilter.append(allMetals);
-   for(const e of S.data.elements.filter(e=>e.silmEligibility.status==='available')){
+   for(const e of S.data.elements.filter(e=>e.silmEligibility.status==='available'&&e.silmEligibility.scope!=='structure-only')){
     const option=N('option',e.name+' ('+e.symbol+')');option.value=String(e.atomicNumber);metalFilter.append(option);
    }
    const count=N('p');count.className='silm-learning-count';count.setAttribute('role','status');count.setAttribute('aria-live','polite');
