@@ -56,13 +56,13 @@ for(const row of records){
   }
  });
 }
-test('lote 2 permanece íntegro no catálogo de 74 com Fr computacional',()=>{
+test('lote 2 permanece íntegro no catálogo de 75 com Fr e Rf computacionais',()=>{
  assert.equal(S.data.elements.length,118);
  const available=S.data.elements.filter(e=>e.silmEligibility.status==='available');
- assert.equal(available.length,74);
+ assert.equal(available.length,75);
  assert.deepEqual(Array.from(available.filter(e=>e.silmEligibility.scope==='structure-only'),e=>e.symbol).sort(),
- ['Bk','Cf','Cm','Es','Fr','Ga','In','Pm','U']);
- for(let z=104;z<=116;z++)
+ ['Bk','Cf','Cm','Es','Fr','Ga','In','Pm','Rf','U']);
+ for(let z=105;z<=116;z++)
   assert.equal(S.data.get(z).silmEligibility.status,'unavailable','Superpesado Z='+z);
 });
 test('a fase documentada de Es não representa material macroscópico nem fase ambiente universal',()=>{
