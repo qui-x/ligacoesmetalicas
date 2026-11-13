@@ -60,7 +60,7 @@ test('catálogo cresce de 66 para 69 sem habilitar os 13 superpesados',()=>{
  const available=S.data.elements.filter(e=>e.silmEligibility.status==='available');
  assert.equal(available.length,69);
  const structural=available.filter(e=>e.silmEligibility.scope==='structure-only');
- assert.deepEqual(structural.map(e=>e.symbol).sort(),['Ga','In','Pm','U']);
+ assert.deepEqual(Array.from(structural,e=>e.symbol).sort(),['Ga','In','Pm','U']);
  for(let z=104;z<=116;z++){
   assert.equal(S.data.get(z)?.silmEligibility?.status,'unavailable','Superpesado Z='+z);
  }
