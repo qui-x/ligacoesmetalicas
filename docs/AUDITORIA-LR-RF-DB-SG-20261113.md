@@ -35,3 +35,27 @@
 5. Executar testes científicos, navegador, acessibilidade e cache offline antes da integração à `main`.
 
 A autorização de uso científico é funcional, mas a interface e o relatório devem distinguir **previsão computacional** de **determinação experimental**, mesmo quando ambas estão disponíveis para investigação.
+
+## Segunda auditoria — seleção de fase e lacunas quantitativas (13/11/2026)
+
+A análise da fonte primária **Östlin e Vitos (2011)**, [DOI 10.1103/PhysRevB.84.113104](https://doi.org/10.1103/PhysRevB.84.113104), e da síntese do próprio autor no [doutorado KTH (2015), seção 6.2, Figura 6.3 e Tabela 6.2](https://www.diva-portal.org/smash/get/diva2%3A813035/FULLTEXT01.pdf) separa a **estrutura energeticamente preferida** dos cálculos de uma *estrutura testada*. O artigo possui [errata de dezembro de 2011, DOI 10.1103/PhysRevB.84.239905](https://doi.org/10.1103/PhysRevB.84.239905), que deve ser conferida na íntegra antes da homologação definitiva.
+
+| Metal | Fase candidata na síntese de Östlin (EMTO/LDA escalar-relativístico) | Número de grupo espacial do protótipo | Dado numérico realmente acessível | Impedimento |
+|---|---|---:|---|---|
+| Laurêncio (Lr, 103) | HC (hexagonal compacta) | 194 (P6₃/mmc) | c/a calculado **1,58** para a estrutura HC | Falta o valor numérico do **a** ou volume atômico **do mesmo cálculo HC** |
+| Dúbnio (Db, 105) | CCC (cúbica de corpo centrado) | 229 (Im-3m) | c/a=**1,71**, mas **somente para uma estrutura HC alternativa** | Falta o **a** ou volume atômico da **CCC de equilíbrio**, não HC |
+| Seabórgio (Sg, 106) | CCC (cúbica de corpo centrado) | 229 (Im-3m) | c/a=**1,74**, também **somente para uma estrutura HC alternativa** | Falta o **a** ou volume atômico da **CCC de equilíbrio** |
+
+**Nenhuma das razões c/a de Db e Sg deve ser usada para construir a fase de equilíbrio.** O texto que acompanha a Tabela 6.2 afirma expressamente que esses dois elementos não estabilizam a fase HC nesse estudo. Os raios de Wigner–Seitz aparecem na Figura 6.2, porém a tabela numérica subjacente não foi recuperada. Extrair valores de uma figura sem escala digitalizada, margem de erro e identificação da curva não permite atribuir coordenadas a três casas decimais. O acesso à imagem integral esteve indisponível nesta revisão.
+
+O artigo de **Atta-Fynn e Ray (2015)**, [DOI 10.1016/j.ssc.2014.10.025](https://doi.org/10.1016/j.ssc.2014.10.025), compara quatro níveis de teoria (DFT, DFT+spin–órbita, troca exata e combinação). Suas tabelas de constantes de rede devem ser recuperadas e confrontadas **sem misturar uma simetria obtida por um método com o parâmetro calculado por outro**. Também consultar **Gyanchandani e Sikka (2011)**, [DOI 10.1103/PhysRevB.83.172101](https://doi.org/10.1103/PhysRevB.83.172101).
+
+### Dados mínimos para concluir cada ficha
+
+1. **Lr HC:** parâmetro a ou volume de equilíbrio atômico V do modelo EMTO; usar a razão c/a=1,58 **somente** se o a/V vier do mesmo método e da mesma fase. A célula primitiva HC de dois átomos tem volume `V_célula=(√3/2)a²c`; o volume por átomo é `V_atom=(√3/4)a²c`. Assim, `a=[4V_atom/(√3(c/a))]^(1/3)` e `c=(c/a)a`.
+2. **Db e Sg CCC:** valor numérico de a ou V por átomo correspondente ao mínimo CCC; se V for por átomo, `a=(2V_atom)^(1/3)` e dois sítios convencionais nas coordenadas (0,0,0) e (1/2,1/2,1/2).
+3. Registrar método, funcional, relatividade, unidade, condição de cálculo e DOI; não classificar a previsão como medida experimental, não extrapolar a CNTP e não liberar propriedades elétricas, ópticas, térmicas ou mecânicas por analogia.
+4. Só atualizar `silmEligibility` quando a fonte quantitativa estiver verificada, o motor `SILM.crystal` aceitar a geometria e os três navegadores passarem.
+
+**Resultado:** revisão científica anexada ao banco com `reviewedCandidates.decision='needs-quantitative-lattice'`. Os três continuam **indisponíveis**, e a cobertura permanece **78/92 (84,8%)**. As referências ainda em auditoria não são listadas indevidamente como fontes usadas em relatórios do SILM.
+
