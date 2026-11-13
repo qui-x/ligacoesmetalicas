@@ -70,6 +70,7 @@ jobs:
           node --check tests/run-cm-bk-cf-es-structure.mjs
           node --check tests/run-francium-computed.mjs
           node --check tests/run-fm-md-no-model.mjs
+          node --check tests/run-rf-dft-structure.mjs
           node --check tests/run-four-scales-responsive.mjs
           node --check tests/run-cross-regressions.mjs
           node --check tests/run-controls-responsive-matrix.mjs
@@ -113,6 +114,9 @@ jobs:
       - name: Auditar estimativas geométricas de Fm Md No nas escalas 3 e 4
         run: node tests/run-fm-md-no-model.mjs
 
+      - name: Homologar visualização HC computacional de Rf na Rede e Centro
+        run: node tests/run-rf-dft-structure.mjs
+
       - name: Validar ocupação visual e navegação das quatro escalas
         run: node tests/run-four-scales-responsive.mjs
 
@@ -134,6 +138,15 @@ jobs:
           else
             echo "Auditoria de $BROWSER_NAME interrompida antes de produzir relatório." >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Guardar capturas de Rf · DFT relativística
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-rf-hcp-${{ matrix.browser }}
+          path: reports/rutherfordium-dft/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Guardar capturas de Fm Md No · modelo geométrico
         if: always()
