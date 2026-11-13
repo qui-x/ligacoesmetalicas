@@ -1,6 +1,8 @@
 // Regressão isolada da apresentação da microestrutura no SILM main.
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
+import {mkdirSync} from 'node:fs';
+import {join} from 'node:path';
 const require=createRequire(import.meta.url),playwright=require(process.env.PLAYWRIGHT_MODULE);
 const browserName=process.env.BROWSER_NAME||'chromium',base=process.env.BASE_URL||'http://127.0.0.1:8765';
 const browser=await playwright[browserName].launch({headless:true});
@@ -42,6 +44,21 @@ async function test(viewport){
  const toolbar=await viewer.locator('.silm-workshop-micro-toolbar').boundingBox();
  const image=await frame.boundingBox();
  assert.ok(nav&&toolbar&&image&&image.y>=nav.y+nav.height-2&&toolbar.y>=image.y+image.height-2,'Os controles devem ficar abaixo do desenho e as escalas no topo.');
+ if(viewport.width<=560){
+  const inspect=await viewer.locator('.silm-workshop-micro-zoom-tools').evaluate(row=>{
+   const parent=row.closest('.silm-workshop-micro-toolbar').getBoundingClientRect();
+   const buttons=[...row.querySelectorAll('button')].map(btn=>{
+    const r=btn.getBoundingClientRect();
+    return {name:btn.getAttribute('aria-label'),left:r.left,right:r.right,width:r.width,
+     clipped:r.left<parent.left-2||r.right>parent.right+2};
+   });
+   return {width:parent.width,buttons};
+  });
+  assert.ok(inspect.buttons.length>=6,'Formações e Dados precisam continuar acessíveis.');
+  assert.ok(inspect.buttons.every(x=>!x.clipped&&x.width>=43.5),
+   'Controles da microestrutura recortados ou menores que 44 px: '+JSON.stringify(inspect));
+ }
+
  if(viewport.width>800){
   assert.ok(image.height>=390,'A área central ficou baixa no desktop.');
   assert.ok(toolbar.y+toolbar.height<=viewport.height-8,'Os controles inferiores ficaram fora da janela desktop.');
@@ -68,6 +85,75 @@ async function test(viewport){
  assert.equal(await viewer.getAttribute('data-measurement-status'),'unavailable','Medidas experimentais não devem estar disponíveis para esquema gerado.');
  assert.doesNotMatch(await viewer.locator('.silm-workshop-micro-status').textContent(),/\d+[,.]?\d*\s*%/,'O grão não deve exibir porcentagem de composição ou fração sem dados experimentais.');
  assert.match(await viewer.locator('.silm-workshop-micro-caveat').textContent(),/sem composição, fração de fase ou tamanho medidos/,'Aviso científico ausente para mapa esquemático.');
+ // Propriedades mecânicas agora atuam diretamente na escala de grãos,
+ // ANTES de organizar a rede, sem substituir polígonos ou criar minipalco.
+ assert.equal(await page.evaluate(()=>SILMIntegration.snapshot().structure?.mode),'free',
+  'A microestrutura deveria permitir deformação antes da rede cristalina.');
+ const initialGrainShapes=await viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
+  nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|'));
+ const initialSeed=await viewer.getAttribute('data-synthetic-seed');
+ const activeGrain=await viewer.locator('.silm-micro-cell.is-selected').count();
+ const openProperty=async id=>{
+  await page.getByRole('button',{name:'Ver',exact:true}).click();
+  const item=page.locator('[data-action="property-'+id+'"]');
+  await item.waitFor({state:'visible'});
+  assert.notEqual(await item.getAttribute('aria-disabled'),'true',
+   id+' indisponível na escala de microestrutura antes da rede.');
+  await item.click();
+  await page.locator('#si-dock-right [data-close-dock="right"]').click();
+  await page.waitForFunction(()=>!document.querySelector('#si-stage')?.inert&&
+   document.querySelector('#si-dock-right')?.hidden===true);
+  await page.waitForFunction(id=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStudy===id,id);
+ };
+ await openProperty('malleability');
+ const mech=viewer.locator('.silm-micro-mechanical-tools');
+ await mech.waitFor({state:'visible'});
+ const grip=viewer.locator('.silm-micro-mechanical-top');
+ const mechanicalDir=join('reports','micro-deformation',browserName);
+ mkdirSync(mechanicalDir,{recursive:true});
+ assert.ok((await grip.boundingBox())?.height>=44,'Alça da prensa não alcança 44 px.');
+ const pulse=mech.locator('.silm-micro-mechanical-pulse');
+ assert.equal(await pulse.getAttribute('aria-label'),'Aplicar compressão',
+  'Botão de compressão não recebeu o nome acessível: '+await pulse.evaluate(n=>n.outerHTML));
+ await pulse.click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='1');
+ assert.match(await viewer.locator('.silm-micro-mechanical-field').getAttribute('transform'),/scale\(/,
+  'Compressão não modifica a representação no mesmo mapa.');
+ await viewer.screenshot({path:join(mechanicalDir,'compressao-'+viewport.width+'.png'),animations:'disabled'});
+ assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),activeGrain,
+  'Comprimir apagou o grão selecionado.');
+ await grip.focus();await grip.press('Enter');
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='2');
+ await mech.getByRole('button',{name:'Restaurar deformação'}).click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='0');
+ assert.equal(await viewer.locator('.silm-micro-mechanical-field').getAttribute('transform'),null,
+  'Restaurar deixou grãos ainda deformados.');
+ assert.equal(await viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
+  nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|')),initialGrainShapes,
+  'A operação alterou os contornos originais.');
+ await openProperty('ductility');
+ assert.equal(await pulse.getAttribute('aria-label'),'Aplicar tração',
+  'Botão de tração não recebeu o nome acessível.');
+ await pulse.click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='1');
+ assert.match(await mech.locator('.silm-micro-mechanical-reading').textContent(),
+  /Tração.*passo ilustrativo 1\/4.*não representa deformação medida/);
+ await viewer.screenshot({path:join(mechanicalDir,'tracao-'+viewport.width+'.png'),animations:'disabled'});
+ await mech.getByRole('button',{name:'Restaurar deformação'}).click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='0');
+ await page.getByRole('button',{name:'Ver',exact:true}).click();
+ await page.locator('[data-action="property-ductility"]').click();
+ await page.locator('#si-dock-right [data-close-dock="right"]').click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStudy==='inactive');
+ assert.equal(await viewer.locator('.silm-micro-mechanical-tools').isVisible(),false,
+  'A deformação ficou na interface depois de encerrar a propriedade.');
+ assert.equal(await viewer.getAttribute('data-synthetic-seed'),initialSeed,'A ação mecânica alterou a semente.');
+ assert.equal(await viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
+  nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|')),initialGrainShapes);
+ assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),activeGrain);
+ assert.equal(await page.locator('.silm-optical-bench').count(),0,
+  'A mecânica recriou um palco paralelo na microestrutura.');
+
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  await viewer.getByRole('button',{name:'Ampliar microestrutura'}).click();
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-zoom'),'1.25','Zoom não funciona');

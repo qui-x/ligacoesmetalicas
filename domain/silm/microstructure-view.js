@@ -8,7 +8,7 @@ SILM.microstructure=(()=>{
  const node=(tag,cls='',txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;};
  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
  let serial=0;
- function create({element,item=null}={}){
+ function create({element,item=null,model=null}={}){
   const section=node('section','silm-workshop-micro-viewer'),viewport=node('div','silm-workshop-micro-viewport');
   const synthetic=SILM.microstructureSynthetic;
   const appearance=SILM.microstructureAppearance?.get(element?.atomicNumber)||null;
@@ -53,6 +53,8 @@ SILM.microstructure=(()=>{
   }
   svg.append(defs);
   const plane=svgNode('g',{'class':'silm-micro-plane'});svg.append(plane);
+  // A transformação didática é uma camada REVERSÍVEL sobre os mesmos caminhos.
+  const mechanicalField=svgNode('g',{'class':'silm-micro-mechanical-field'});plane.append(mechanicalField);
   let paths=[],cells=[];
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
   let sourceData=null; // Mapa importado = análise de polígonos fornecidos, não homologação.
@@ -86,7 +88,7 @@ SILM.microstructure=(()=>{
    svg.setAttribute('data-selected-grain',String(i+1));
   };
   function drawGrains(){
-   paths=[];cells=[];plane.replaceChildren();
+   paths=[];cells=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField);
    polygons.forEach((poly,i)=>{
    if(poly.length<3)return;
    const d='M'+poly.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')+' Z';
@@ -107,11 +109,12 @@ SILM.microstructure=(()=>{
    });
    const hatch=svgNode('path',{d,'class':'silm-micro-hatching',fill:'url(#'+uid+'-pattern-'+(i%4)+')','pointer-events':'none'});
    const bevel=svgNode('path',{d,'class':'silm-micro-highlight','pointer-events':'none'});
-   g.append(p,bevel,hatch);plane.append(g);paths[i]=p;cells[i]=g;
+   g.append(p,bevel,hatch);mechanicalField.append(g);paths[i]=p;cells[i]=g;
    });
    if(chosen>=polygons.length)chosen=polygons.length-1;
    if(chosen>=0)choose(chosen);else status.textContent=sourceData?'Selecione um grão segmentado · dados importados não homologados':'Selecione um grão · modelo esquemático';
    offsetX=0;offsetY=0;update();fitViewport();
+   if(typeof refreshMechanical==='function')refreshMechanical();
   }
   const toolbar=node('div','silm-workshop-micro-toolbar'),zoomLabel=node('output','silm-workshop-micro-zoom','100%');
   zoomLabel.setAttribute('aria-label','Ampliação da microestrutura');
@@ -166,7 +169,140 @@ SILM.microstructure=(()=>{
   // Escala física e limitações científicas ficam num <details> nativo.
   // O aviso "sem escala" é informação essencial e permanece visível mesmo
   // com a seção explicativa recolhida. Isso preserva o contrato didático.
+
   toolbar.append(status,dimension,zoomControls);
+  // PR mecânico: o MESMO controlador de deformação da rede fornece carga e
+  // os passos discretos. A microestrutura só representa o resultado visual.
+  const deformCtl=model?SILM.deformation?.controller(model):null;
+  const mechanicalTools=node('div','silm-micro-mechanical-tools');
+  mechanicalTools.hidden=true;mechanicalTools.setAttribute('role','group');
+  mechanicalTools.setAttribute('aria-label','Deformação na microestrutura');
+  const mechanicalPulse=node('button','silm-workshop-micro-control silm-micro-mechanical-pulse','Comprimir');
+  mechanicalPulse.type='button';
+  const mechanicalReset=node('button','silm-workshop-micro-control silm-micro-mechanical-reset','Restaurar');
+  mechanicalReset.type='button';
+  mechanicalReset.setAttribute('aria-label','Restaurar deformação');
+  const mechanicalStatus=node('output','silm-micro-mechanical-reading','');
+  mechanicalStatus.setAttribute('role','status');mechanicalStatus.setAttribute('aria-live','polite');
+  mechanicalTools.append(mechanicalPulse,mechanicalReset,mechanicalStatus);
+  toolbar.append(mechanicalTools);
+
+  // Alças operáveis no próprio mapa (não em diálogo ou mini-palco).
+  // As posições seguem a borda da área exibida; o campo de grãos fica no
+  // mesmo SVG e preserva os polígonos originais, zoom e grão selecionado.
+  const topGrip=node('button','silm-micro-mechanical-grip silm-micro-mechanical-top','↓');
+  const bottomGrip=node('button','silm-micro-mechanical-grip silm-micro-mechanical-bottom','↑');
+  for(const grip of [topGrip,bottomGrip]){
+   grip.type='button';grip.hidden=true;grip.title='Arraste para aplicar força; Enter ou Espaço aplica um passo';
+   grip.style.touchAction='none';
+  }
+  let mechanicsMode=null;
+  const getMode=()=>{
+   const st=model?.state,mode=st?.properties?.active;
+   return st?.module?.active==='explorar'&&['malleability','ductility'].includes(mode)?mode:null;
+  };
+  function refreshMechanical(){
+   const mode=getMode(),st=model?.state,active=!!mode;
+   mechanicsMode=mode;
+   mechanicalTools.hidden=!active;
+   topGrip.hidden=bottomGrip.hidden=!active;
+   section.dataset.mechanicalStudy=mode||'inactive';
+   if(!active){
+    mechanicalField.removeAttribute('transform');
+    delete section.dataset.mechanicalStep;
+    delete section.dataset.mechanicalLoad;
+    return;
+   }
+   const step=mode==='malleability'?st.properties.malleability.compression:st.properties.ductility.elongation;
+   const max=SILM.properties.limits[mode==='malleability'?'compression':'elongation'];
+   const state=deformCtl?.reading?.()||{load:0,regime:'rest'};
+   const load=clamp(Number(state.load)||0,0,1),p=step/max;
+   // Envelope geométrico abstrato, sem módulo elástico, tensão ou
+   // porcentagem de deformação atribuídos à amostra/material.
+   const x=mode==='malleability'?1+.16*p+.04*load:1-.12*p-.025*load;
+   const y=mode==='malleability'?1-.16*p-.04*load:1+.22*p+.05*load;
+   if(step||load){
+    mechanicalField.setAttribute('transform','translate('+CX+' '+CY+') scale('+x+' '+y+') translate('+(-CX)+' '+(-CY)+')');
+   }else mechanicalField.removeAttribute('transform');
+   section.dataset.mechanicalStep=String(step);
+   section.dataset.mechanicalLoad=String(Math.round(load*100));
+   section.dataset.mechanicalRegime=state.regime||'rest';
+   topGrip.textContent=mode==='malleability'?'↓':'↑';
+   bottomGrip.textContent=mode==='malleability'?'↑':'↓';
+   for(const grip of [topGrip,bottomGrip])grip.setAttribute('aria-label',mode==='malleability'?
+    'Comprimir o campo de grãos':'Tracionar o campo de grãos');
+   const pulseLabel=mode==='malleability'?'Comprimir':'Tracionar';
+   // Evitar reconstruir o ícone em toda atualização do controlador.
+   if(mechanicalPulse.textContent.trim()!==pulseLabel)mechanicalPulse.textContent=pulseLabel;
+   mechanicalPulse.setAttribute('aria-label',mode==='malleability'?'Aplicar compressão':'Aplicar tração');
+   mechanicalPulse.disabled=step>=max;
+   mechanicalReset.disabled=!step&&!load;
+   mechanicalStatus.textContent=(mode==='malleability'?'Compressão':'Tração')+
+    ' · passo ilustrativo '+step+'/'+max+(load?' · força relativa '+Math.round(load*100)+' %':'')+
+    ' · não representa deformação medida por grão';
+  }
+  const mechanicalPulseStep=()=>{
+   const mode=getMode(),st=model?.state;
+   if(!mode||!deformCtl||!st?.structure)return false;
+   const done=deformCtl.pulse();
+   refreshMechanical();return done;
+  };
+  mechanicalPulse.addEventListener('click',mechanicalPulseStep);
+  mechanicalReset.addEventListener('click',()=>{
+   if(!getMode())return;
+   deformCtl?.setLoad(0);
+   model?.restoreProperty();refreshMechanical();
+  });
+  for(const [grip,upper] of [[topGrip,true],[bottomGrip,false]]){
+   let dragged=null;
+   const direction=()=>{
+    const pressing=getMode()==='malleability';
+    return upper?(pressing?1:-1):(pressing?-1:1);
+   };
+   grip.addEventListener('pointerdown',event=>{
+    if(event.button!==0||!getMode()||!deformCtl)return;
+    event.preventDefault();event.stopPropagation();
+    dragged={id:event.pointerId,y:event.clientY,moved:false};
+    try{grip.setPointerCapture(event.pointerId);}catch{}
+   });
+   grip.addEventListener('pointermove',event=>{
+    if(!dragged||event.pointerId!==dragged.id)return;
+    event.preventDefault();event.stopPropagation();
+    const diff=(event.clientY-dragged.y)*direction();
+    if(Math.abs(event.clientY-dragged.y)>3)dragged.moved=true;
+    if(dragged.moved){
+     deformCtl.setLoad(clamp(diff/Math.max(44,viewport.clientHeight*.25),0,1));
+     refreshMechanical();
+    }
+   });
+   const release=event=>{
+    if(!dragged||event.pointerId!==dragged.id)return;
+    event.preventDefault();event.stopPropagation();
+    const tap=!dragged.moved;dragged=null;
+    deformCtl?.setLoad(0);
+    if(tap&&event.type==='pointerup')mechanicalPulseStep();
+    refreshMechanical();
+   };
+   for(const ev of ['pointerup','pointercancel','lostpointercapture'])grip.addEventListener(ev,release);
+   grip.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();});
+   grip.addEventListener('keydown',event=>{
+    if(!getMode())return;
+    if(['Enter',' ','ArrowUp','ArrowDown'].includes(event.key)){
+     event.preventDefault();event.stopPropagation();mechanicalPulseStep();
+    }else if(event.key==='Escape'){event.preventDefault();deformCtl?.setLoad(0);refreshMechanical();}
+   });
+  }
+  // A seleção de Ver pode mudar sem refazer o mapa e a animação pode
+  // atualizar a carga entre os ciclos globais de renderização.
+  section.silmMicroMechanicalRefresh=refreshMechanical;
+  if(deformCtl){
+   let everAttached=false;
+   const off=deformCtl.subscribe(()=>{
+    if(section.isConnected){everAttached=true;refreshMechanical();}
+    else if(everAttached)off();
+   });
+  }
+  refreshMechanical();
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
   svg.addEventListener('pointerdown',e=>{
    if(e.button!==0||!viewport.classList.contains('is-pannable'))return;
@@ -190,7 +326,7 @@ SILM.microstructure=(()=>{
    if(suppressClick)queueMicrotask(()=>{suppressClick=false;});
   };
   svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);
-  viewport.append(svg);
+  viewport.append(svg,topGrip,bottomGrip);
   const note=node('p','silm-workshop-micro-caveat',
    'Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.');
   // Mudanças de formação são explícitas. Redimensionar, ampliar ou mudar
