@@ -16,7 +16,7 @@ SILM.createMultistageResearchPanel=({prefix='silm-multistage'}={})=>{
  const picker=document.createElement('select');picker.id=prefix+'-record';
  picker.setAttribute('aria-label','Escolher condição documental do metal');
  pickerLabel.htmlFor=picker.id;pickerLabel.append(picker);
- const recordTitle=document.createElement('p');recordTitle.className='silm-research-purity';
+ const recordTitle=document.createElement('p');recordTitle.className='silm-research-condition';
  const metrics=document.createElement('dl');metrics.className='silm-research-metrics';
  const conditions=document.createElement('p');conditions.className='silm-research-note';
  const source=document.createElement('a');source.target='_blank';source.rel='noopener noreferrer';
