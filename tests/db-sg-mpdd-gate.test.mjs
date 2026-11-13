@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {auditMPDDResponse,makeQueryURL,safeNextPage,queryMPDD} from '../scripts/audit-db-sg-mpdd.mjs';
+import {auditMPDDResponse,makeQueryURL,safeNextPage,queryMPDD,knownMPDDEndpoints,auditAcrossEndpoints} from '../scripts/audit-db-sg-mpdd.mjs';
 
 const record=(symbol,overrides={})=>({
   id:'fixture-'+symbol,
@@ -80,4 +80,47 @@ test('consulta percorre paginas de mesmo provedor sem assumir completude do prim
 test('erro remoto e indeterminado, nao ausencia de fase',async()=>{
   await assert.rejects(queryMPDD('https://optimade.mpdd.org','Db',
     async()=>({ok:false,status:503})),/API HTTP 503/);
+});
+
+
+test('fallback conhece as origens MPDD e exige opt-in para transporte HTTP',()=>{
+  const defaults=knownMPDDEndpoints();
+  assert.equal(defaults.length,2);
+  assert.ok(defaults.every(url=>url.startsWith('https://')));
+  const withHTTP=knownMPDDEndpoints({allowHTTP:true});
+  assert.equal(withHTTP.length,3);
+  assert.ok(withHTTP.some(url=>url.startsWith('http://')));
+  assert.deepEqual(knownMPDDEndpoints({base:'https://custom.example'}),['https://custom.example']);
+});
+
+test('falha no endpoint principal nao impede consulta ao espelho HTTPS',async()=>{
+  const requests=[];
+  const fetchImpl=async url=>{
+    requests.push(url);
+    if(url.startsWith('https://primary.test/')) throw Error('timeout principal');
+    return {ok:true,json:async()=>({data:[record('Db')],links:{next:null}})};
+  };
+  const out=await auditAcrossEndpoints('Db',{endpoints:['https://primary.test','https://alternate.test'],fetchImpl});
+  assert.equal(requests.length,2);
+  assert.equal(out.count,1);
+  assert.equal(out.attempts[0].outcome,'unavailable');
+  assert.equal(out.attempts[1].outcome,'queried');
+  assert.equal(out.sourceTransport,'https');
+  assert.equal(out.homologated,false);
+});
+
+test('falha completa nao produz falsa ausencia de candidatos',async()=>{
+  const out=await auditAcrossEndpoints('Sg',{endpoints:['https://a.test','https://b.test'],
+    fetchImpl:async()=>{throw Error('sem conexao');}});
+  assert.equal(out.outcome,'indeterminate-all-endpoints-failed');
+  assert.equal(out.count,null);
+  assert.equal(out.attempts.length,2);
+  assert.equal(out.homologated,false);
+});
+
+test('HTTP autorizado segue como candidato nao homologado',async()=>{
+  const out=await auditAcrossEndpoints('Sg',{endpoints:['http://backup.test'],
+    fetchImpl:async()=>({ok:true,json:async()=>({data:[record('Sg')],links:{next:null}})})});
+  assert.equal(out.sourceTransport,'http-unverified');
+  assert.equal(out.candidates[0].homologated,false);
 });

@@ -44,3 +44,19 @@ Para cada elemento, abrir ficha separada contendo:
 - Testes cientificos, E2E desktop/mobile (Chromium, Firefox, WebKit) e cache offline.
 
 **Decisao atual:** Db e Sg continuam com silmEligibility.status='unavailable'. Estimativa de raio atomico/covalente de portal generalista **nao** substitui raio metalico ou volume de equilibrio. Nao usar analogia com Ta/W como se fosse o calculo relativistico dos superpesados.
+
+## Terceira auditoria (13/11/2026) — fontes secundarias conflitantes e fallback
+
+O provedor MPDD confirma em seu repositorio de projetos (https://github.com/PhasesResearchLab/SoftwareProjects) que publica OPTIMADE em mpddoptimade.phaseslab.org, mas sua API nativa e o codigo do banco nao sao abertos. O painel OPTIMADE documenta endpoint em http://mpddoptimade.phaseslab.org, enquanto https://optimade.mpdd.org responde como pagina institucional. Na execucao anterior do GitHub Actions, Db e Sg no dominio principal expiraram. Esse erro nao prova ausencia de calculos.
+
+**Comparacao critica — NAO apta para homologacao:**
+
+- A Royal Society of Chemistry classifica a densidade experimental de Db e Sg como desconhecida: https://periodic-table.rsc.org/element/105/dubnium e https://periodic-table.rsc.org/element/106/seaborgium .
+- O WebElements indica, para Db, densidade prevista de 21.600 kg/m³ e volume molar estimado grosseiramente em ~12 cm³/mol (https://winter.group.shef.ac.uk/webelements/dubnium/). Nao fornece celula CCC de minimo energetico nem nivel de DFT.
+- CompareNature (https://metals.comparenature.com/en/atomic-structure-of-dubnium/model-70-5) lista 22,80 cm³/mol como volume molar de Db e estrutura BCC, mas nao fornece calculo primario correspondente e diverge da estimativa WebElements.
+- A diferenca pode ser demonstrada **somente matematicamente**: se V_m=12 cm³/mol, a_CCC≈3,42 Å; se V_m=22,8 cm³/mol, a_CCC≈4,23 Å. Formula: V_atomo[Å³]=V_m[cm³/mol]×10²⁴/N_A; a=(2V_atomo)^(1/3). **Nenhum desses dois valores de a e um resultado DFT homologado para Db e nenhum entra no bundle.**
+- Sg tambem aparece com estimativas conflitantes em fontes generalistas sem modelo, tabela e proveniencia. Nao confundir densidade (g/cm³) com volume molar (cm³/mol).
+
+**Acao de engenharia:** o script agora consulta duas rotas HTTPS do mesmo provedor MPDD; o endereco HTTP e liberado so mediante MPDD_ALLOW_INSECURE_HTTP=1, explicitamente como recuperacao de baixa confianca e **sem habilitacao automatica**. Cada tentativa e registrada. Falha de todos os endpoints resulta em count:null e outcome:'indeterminate-all-endpoints-failed', nunca count:0.
+
+**Criterio preservado:** Db/Sg so serao habilitados com fonte primaria que identifique parametro a e/ou V por atomo de uma mesma fase CCC, aproximacao DFT, condicoes e referencia numerica verificavel. Admitir previsao computacional NAO autoriza preencher lacunas com dados de proveniencia incerta. A cobertura do catalogo permanece **79/92**.
