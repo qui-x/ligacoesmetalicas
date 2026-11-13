@@ -101,7 +101,53 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  });
  const opticalSource=U.element('p','','silm-optical-source');
  opticalSection.append(opticalHeading,opticalNote,spectralBars,opticalSource);
- box.append(head,row,status,readings,opticalSection,list);container.append(box);
+ // Evidencia de pesquisa incorporada no mesmo painel "Explorar > Ductilidade".
+ // Selecionar amostra altera APENAS a tabela documental; nao altera o motor.
+ const researchSection=U.element('section',null,'silm-research-reference');researchSection.hidden=true;
+ researchSection.setAttribute('aria-label','Ensaio primario de tracao: referencia documental');
+ const researchTitle=U.element('strong','Ensaios documentados de tração · Fe');
+ const researchNote=U.element('p','Fonte primária NIST · 21 ± 3 °C · pressão de ensaio não registrada. Valores exclusivos das amostras e taxas testadas, NÃO homologados na CNTP (0 °C, 1 atm). Estes números não calibram a animação.','silm-research-note');
+ const researchPickerLabel=U.element('label','Amostra de ferro: ','silm-research-label');
+ const researchPicker=document.createElement('select');researchPicker.id=prefix+'-research-sample';
+ researchPickerLabel.htmlFor=researchPicker.id;
+ researchPicker.setAttribute('aria-label','Selecionar amostra de ferro do ensaio NIST');
+ researchPickerLabel.append(researchPicker);
+ const researchPurity=U.element('p','','silm-research-purity');
+ const researchScroll=U.element('div',null,'silm-research-scroll');
+ const researchTable=U.element('table',null,'silm-research-table');
+ const researchHead=document.createElement('thead'),researchHeadRow=document.createElement('tr');
+ for(const heading of ['Taxa (s⁻¹)','Escoamento (MPa)','Resistência (MPa)','Ruptura (%)','Redução de área (%)']){
+  const cell=document.createElement('th');cell.scope='col';cell.textContent=heading;researchHeadRow.append(cell);
+ }
+ researchHead.append(researchHeadRow);
+ const researchBody=document.createElement('tbody');researchTable.append(researchHead,researchBody);
+ researchScroll.append(researchTable);
+ const researchSource=document.createElement('a');researchSource.href='https://doi.org/10.6028/NIST.TN.1879';researchSource.target='_blank';researchSource.rel='noopener noreferrer';
+ researchSource.textContent='Fonte: NIST Technical Note 1879, Tabela 6';
+ const scientificEvidence=SILM.researchEvidence;
+ if(scientificEvidence)for(const sample of Object.values(scientificEvidence.samples)){
+  const option=document.createElement('option');option.value=sample.code;option.textContent=sample.code+' · '+sample.name;
+  researchPicker.append(option);
+ }
+ const fmt=value=>Number(value).toLocaleString('pt-BR',{maximumFractionDigits:6});
+ function updateResearchRows(){
+  if(!scientificEvidence)return;
+  const selected=scientificEvidence.samples[researchPicker.value]||scientificEvidence.samples.K05;
+  researchPurity.textContent=selected.name+' · pureza estimada a partir das impurezas declaradas: '+fmt(selected.purityPercent)+' %.';
+  researchBody.replaceChildren();
+  const rates=new Map([[1e-3,'10⁻³'],[1e-4,'10⁻⁴'],[1e-5,'10⁻⁵']]);
+  for(const profile of scientificEvidence.bySample(26,selected.code)){
+   const tr=document.createElement('tr');
+   const vals=[rates.get(profile.strainRatePerSecond)||fmt(profile.strainRatePerSecond),
+    profile.yieldStrengthMPa,profile.tensileStrengthMPa,
+    profile.elongationAtFracturePercent,profile.reductionOfAreaPercent];
+   for(const value of vals){const td=document.createElement('td');td.textContent=String(value);tr.append(td);}
+   researchBody.append(tr);
+  }
+ }
+ researchPicker.addEventListener('change',updateResearchRows);
+ researchSection.append(researchTitle,researchNote,researchPickerLabel,researchPurity,researchScroll,researchSource);
+ box.append(head,row,status,readings,opticalSection,researchSection,list);container.append(box);
  function updateOptical(state,driveState){
   const service=SILM.materialEngine;
   const angle=driveState?.angle??35,finish=driveState?.finish??'polished';
@@ -153,6 +199,8 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   readings.hidden=!joule||compact;
   opticalSection.hidden=active!=='luster'||compact;
   if(!opticalSection.hidden)updateOptical(state,info().drive);
+  researchSection.hidden=active!=='ductility'||compact||state.metal?.atomicNumber!==26||!scientificEvidence;
+  if(!researchSection.hidden)updateResearchRows();
   box.dataset.active=active||'';list.hidden=!!active||compact;row.hidden=!active;
   if(!active){head.textContent=compact?'':'Escolha uma propriedade para investigar.';status.textContent=compact?'':'Uma experiência por vez; as experiências não alteram a estrutura científica.';
    for(const id of P.ids){const el=eligibility[id],able=availability(id),ok=el.status!=='unavailable'&&able.ok&&editable;starts[id].setAttribute('aria-disabled',String(!ok));

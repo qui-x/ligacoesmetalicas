@@ -1,0 +1,33 @@
+/* Dado experimental integrado ao controle existente de Explorar > Ductilidade.
+   Nao e uma pagina, modal, ou motor alternativo. */
+.silm-research-reference{
+ margin-block:.7rem 0;padding:.7rem .85rem;
+ border:1px solid var(--border-color, rgba(127,127,127,.35));
+ border-radius:.45rem;max-width:100%;min-width:0;
+ color:var(--text-primary,inherit);
+}
+.silm-research-reference[hidden]{display:none!important}
+.silm-research-reference strong{display:block;margin-bottom:.35rem}
+.silm-research-note,.silm-research-purity{
+ font-size:.82rem;line-height:1.4;margin:.35rem 0 .6rem;
+}
+.silm-research-reference .silm-research-label{
+ display:block;font-size:.85rem;font-weight:600;margin-block:.3rem .5rem;
+}
+.silm-research-reference select{
+ display:block;width:100%;max-width:28rem;min-height:2.5rem;
+ padding:.45rem;color:inherit;background:var(--panel-bg,transparent);
+ border:1px solid currentColor;border-radius:.35rem;
+}
+.silm-research-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.silm-research-table{width:100%;border-collapse:collapse;font-size:.76rem;font-variant-numeric:tabular-nums}
+.silm-research-table th,.silm-research-table td{
+ padding:.35rem .4rem;text-align:center;border-bottom:1px solid rgba(127,127,127,.22);
+ white-space:nowrap;
+}
+.silm-research-table th{font-weight:600;white-space:normal;min-width:4.2rem}
+.silm-research-reference a{display:inline-block;margin-top:.5rem;text-decoration:underline;font-size:.8rem}
+@media(max-width:480px){
+ .silm-research-reference{padding:.55rem}
+ .silm-research-table{font-size:.73rem}
+}
