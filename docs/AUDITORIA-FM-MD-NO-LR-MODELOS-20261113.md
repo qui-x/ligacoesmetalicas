@@ -50,3 +50,7 @@ A publicação *Density functional theory Studies of condensed Phases of 6d supe
 **Não** habilitar superpesados automaticamente sem identificar grupo espacial, volume/parâmetros de rede, base e método correspondente por elemento. Cn pode não exibir o comportamento metálico típico: isso exige revisão da própria elegibilidade de propriedades.
 
 Estas fichas não representam validação de estabilidade termodinâmica nem medição de um sólido existente.
+
+## Atualização posterior — Lr por cenário CCC empírico-geométrico (13/11/2026)
+
+O Lr, antes mantido bloqueado por falta da célula **HC** DFT, passou a ter uma **representação alternativa CCC** independente, construída da Tabela IV de Hübener (CCC hipotética, raio estimado 1,66 Å, `a=4r/√3≈3,834 Å`). Essa alternativa **não invalida o mínimo HC** reportado por Östlin e Vitos e **não o substitui como previsão de fase fundamental**. É apenas cenário de geometria CCC explicitamente rotulado no SILM, sem propriedades específicas. Consultar `docs/AUDITORIA-LR-CCC-EMPIRICO-20261113.md`. Db, Sg e outros superpesados permanecem bloqueados.

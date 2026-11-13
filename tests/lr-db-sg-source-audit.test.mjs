@@ -11,7 +11,6 @@ for(const path of ['data/bundle','data-api','crystal','properties']){
 const S=context.SILM;
 const auditSource='src-ostlin-2015-thesis-sixd';
 const expected=[
- {z:103,symbol:'Lr',phase:'HC',spaceGroup:194,cOverA:1.58},
  {z:105,symbol:'Db',phase:'CCC',spaceGroup:229,cOverA:null},
  {z:106,symbol:'Sg',phase:'CCC',spaceGroup:229,cOverA:null}
 ];
@@ -39,6 +38,21 @@ for(const info of expected){
  });
 }
 
+test('Lr mantém HC-EMTO apenas em investigação e não combina c/a HC com o raio CCC',()=>{
+ const l=S.data.get(103),c=S.data.structure(l);
+ const alternative=l.reviewedCandidates.find(x=>x.sourceId===auditSource);
+ assert.equal(l.silmEligibility.status,'available');
+ assert.equal(l.silmEligibility.scope,'structure-only');
+ assert.equal(c.type,'CCC');
+ assert.equal(c.predictionMethod,'empirical-geometric');
+ assert.equal(c.derivation.metallicRadius.sourceId,'src-huebener-actinide-metals-2003');
+ assert.equal(alternative.decision,'needs-quantitative-lattice');
+ assert.equal(alternative.candidatePhase,'HC');
+ assert.equal(alternative.tentativeCOverA,1.58);
+ assert.ok(!('cOverAPublished' in c.derivation));
+ assert.ok(S.data.sourceIds(l).includes(auditSource),'A tese HC citada como contexto deve aparecer nas referências do modelo');
+});
+
 test('as referências computacionais de Lr–Sg incluem estudo principal, errata e estudo independente',()=>{
  const names=[
   auditSource,'src-ostlin-vitos-2011-sixd-stability',
@@ -54,12 +68,12 @@ test('as referências computacionais de Lr–Sg incluem estudo principal, errata
   '10.1103/PhysRevB.84.239905');
 });
 
-test('auditoria documental não reduz nem amplia indevidamente 78 metais homologados',()=>{
+test('auditoria documental preserva 79 metais com Lr hipotético, sem liberar Db Sg',()=>{
  const eligible=S.data.elements.filter(e=>e.silmEligibility.status==='available');
- assert.equal(eligible.length,78);
+ assert.equal(eligible.length,79);
  assert.equal(S.data.get(104).silmEligibility.status,'available','Rf permanece homologado');
  assert.equal(S.data.get(80).silmEligibility.status,'unavailable');
  for(let z=105;z<=116;z++)assert.equal(S.data.get(z).silmEligibility.status,'unavailable');
  const structural=eligible.filter(e=>e.silmEligibility.scope==='structure-only');
- assert.equal(structural.length,13);
+ assert.equal(structural.length,14);
 });

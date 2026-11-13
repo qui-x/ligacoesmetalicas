@@ -38,7 +38,7 @@ A autorização de uso científico é funcional, mas a interface e o relatório 
 
 ## Segunda auditoria — seleção de fase e lacunas quantitativas (13/11/2026)
 
-A análise da fonte primária **Östlin e Vitos (2011)**, [DOI 10.1103/PhysRevB.84.113104](https://doi.org/10.1103/PhysRevB.84.113104), e da síntese do próprio autor no [doutorado KTH (2015), seção 6.2, Figura 6.3 e Tabela 6.2](https://www.diva-portal.org/smash/get/diva2%3A813035/FULLTEXT01.pdf) separa a **estrutura energeticamente preferida** dos cálculos de uma *estrutura testada*. O artigo possui [errata de dezembro de 2011, DOI 10.1103/PhysRevB.84.239905](https://doi.org/10.1103/PhysRevB.84.239905), que deve ser conferida na íntegra antes da homologação definitiva.
+A análise da fonte primária **Östlin e Vitos (2011)**, [DOI 10.1103/PhysRevB.84.113104](https://doi.org/10.1103/PhysRevB.84.113104), e da síntese do próprio autor no [doutorado KTH (2015), seção 6.2, Figura 6.3 e Tabela 6.2](https://www.diva-portal.org/smash/get/diva2%3A813035/FULLTEXT01.pdf) separa a **estrutura energeticamente preferida** dos cálculos de uma *estrutura testada*. O artigo possui [errata de dezembro de 2011, DOI 10.1103/PhysRevB.84.239905](https://doi.org/10.1103/PhysRevB.84.239905), que foi verificada integralmente: acrescenta apenas a referência bibliográfica de Gyanchandani e Sikka (2011), sem corrigir valores nem fases.
 
 | Metal | Fase candidata na síntese de Östlin (EMTO/LDA escalar-relativístico) | Número de grupo espacial do protótipo | Dado numérico realmente acessível | Impedimento |
 |---|---|---:|---|---|
@@ -57,5 +57,5 @@ O artigo de **Atta-Fynn e Ray (2015)**, [DOI 10.1016/j.ssc.2014.10.025](https://
 3. Registrar método, funcional, relatividade, unidade, condição de cálculo e DOI; não classificar a previsão como medida experimental, não extrapolar a CNTP e não liberar propriedades elétricas, ópticas, térmicas ou mecânicas por analogia.
 4. Só atualizar `silmEligibility` quando a fonte quantitativa estiver verificada, o motor `SILM.crystal` aceitar a geometria e os três navegadores passarem.
 
-**Resultado:** revisão científica anexada ao banco com `reviewedCandidates.decision='needs-quantitative-lattice'`. Os três continuam **indisponíveis**, e a cobertura permanece **78/92 (84,8%)**. As referências ainda em auditoria não são listadas indevidamente como fontes usadas em relatórios do SILM.
+**Resultado histórico do PR #130:** Lr, Db e Sg permaneciam bloqueados; a cobertura era 78/92. **Atualização de 13/11/2026 (lote posterior):** Lr recebeu um *modelo CCC empírico-geométrico independente*, com raio estimado de Hübener, **sem homologar o mínimo HC de DFT**. Db e Sg continuam bloqueados. Consultar `docs/AUDITORIA-LR-CCC-EMPIRICO-20261113.md` para o escopo e ressalvas; após aprovação do PR subsequente, a cobertura será 79/92.
 
