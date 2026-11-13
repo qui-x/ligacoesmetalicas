@@ -69,3 +69,25 @@ test('os demais metais preservam elegibilidade científica',()=>{
  assert.notEqual(S.properties.eligibility(copper).electrical.status,'unavailable');
  assert.equal(S.data.elements.filter(e=>e.silmEligibility.status==='available').length,66);
 });
+
+test('fonte computacional tem elegibilidade cristalográfica equivalente, mas proveniência distinta',()=>{
+ const predicted=JSON.parse(JSON.stringify(Pm));
+ predicted.atomicNumber=187; // espécime sintético de teste, não um elemento publicado
+ predicted.structures[0].evidenceType='computed';
+ predicted.structures[0].conditions.temperature={
+  value:0,unit:'K',kind:'CALCULATED',sourceId:'src-computational-test',
+  display:'0 K · condição do modelo',qualifier:'model-condition'
+ };
+ predicted.structures[0].sourceId='src-computational-test';
+ const observed=S.crystal.eligibility(Pm),computed=S.crystal.eligibility(predicted);
+ assert.equal(computed.status,observed.status);
+ assert.equal(computed.structureType,observed.structureType);
+ assert.equal(computed.atomsPerCell,observed.atomsPerCell);
+ assert.equal(S.crystal.geometry(predicted).model.id,'DHCP');
+ assert.equal(S.data.structureEvidence(Pm).type,'experimental');
+ assert.equal(S.data.structureEvidence(predicted).type,'computed');
+ assert.match(S.data.structureEvidence(predicted).label,/prevista computacionalmente/);
+ for(const property of S.properties.ids){
+  assert.equal(S.properties.eligibility(predicted)[property].reasonCode,'STRUCTURE_ONLY_REFERENCE');
+ }
+});
