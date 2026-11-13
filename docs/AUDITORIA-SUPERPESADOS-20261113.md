@@ -10,6 +10,7 @@ Data: 13/11/2026.
 - **Não confundir a coluna SR:** a=3,302 Å, c/a=1,575. **Não confundir os 72 GPa SR ou aproximadamente 50 GPa SR+SO da transição HC→CCC** com condições da estrutura HC de referência.
 - Dados estruturais são `CALCULATED` com `evidenceType=computed`. Posições geométricas vêm da simetria do protótipo HC, não de difração experimental.
 - A fonte também calcula bandas eletrônicas com caráter metálico do cristal Rf; isso **não autoriza** condutividade ou propriedades mecânicas quantitativas em qualquer temperatura.
+- A configuração prevista do **átomo neutro** Rf é [Rn] 5f14 6d2 7s2, também descrita na fonte (introdução). A interface requer explicitamente os campos `electronConfiguration` e `valenceModel` ao habilitar um metal. Eles devem ter fonte e classificação computacional e **não** podem ser deixados nulos, como eram nas fichas bloqueadas de superpesados.
 - `scope=structure-only` habilita exploração de Rede e Centro sem objetos cotidianos atribuídos ao metal. Simulações específicas de calor, óptica, mecânica e eletricidade continuam bloqueadas.
 
 ## Outros transactinídeos e Lr: panorama bibliográfico sem habilitação automática
