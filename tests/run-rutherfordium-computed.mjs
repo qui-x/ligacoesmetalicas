@@ -43,11 +43,14 @@ try{
     return {crystal:SILM.crystal.eligibility(element).status,
      evidence:SILM.data.structureEvidence(element).type,
      a:ref.latticeParameters.a.value,c:ref.latticeParameters.c.value,
+     electronic:e.electronConfiguration?.display??null, valence:e.valenceModel?.display??null,
      temperature:ref.conditions.temperature.display,
      properties:Object.values(SILM.properties.eligibility(element)).map(x=>x.status)};
    });
    assert.equal(science.crystal,'available');
    assert.equal(science.evidence,'computed');
+   assert.equal(science.electronic,'[Rn] 5f14 6d2 7s2');
+   assert.ok(science.valence);
    assert.equal(science.a,3.269);
    assert.equal(science.c,5.198);
    assert.match(science.temperature,/0 K/);
