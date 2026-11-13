@@ -9,6 +9,8 @@ import {pathToFileURL} from 'node:url';
 
 const TARGETS = Object.freeze(['Db', 'Sg']);
 const DEFAULT_ENDPOINT = 'https://optimade.mpdd.org';
+const PROVIDER_ALTERNATE_HTTPS = 'https://mpddoptimade.phaseslab.org';
+const PROVIDER_ALTERNATE_HTTP = 'http://mpddoptimade.phaseslab.org';
 const MAX_PAGES = 10;
 
 function positive(value) {
@@ -130,18 +132,63 @@ export async function queryMPDD(base, symbol, fetchImpl=fetch) {
   };
 }
 
-async function main() {
-  const base = process.env.MPDD_OPTIMADE_BASE || DEFAULT_ENDPOINT;
-  let failures = 0;
-  for (const symbol of TARGETS) {
+/**
+ * Testa endpoints documentados do MESMO provedor (nao mistura banco MPDD com MPDS).
+ * Um endereco HTTP pode ser consultado SOMENTE se o operador o permitir
+ * explicitamente; retorno nao criptografado jamais tem status de homologacao.
+ * Falha em todos os endpoints => resultado indeterminado, nunca contagem zero.
+ */
+export function knownMPDDEndpoints(overrides={}) {
+  if (overrides.base) return [overrides.base];
+  const bases=[DEFAULT_ENDPOINT,PROVIDER_ALTERNATE_HTTPS];
+  if (overrides.allowHTTP === true) bases.push(PROVIDER_ALTERNATE_HTTP);
+  return bases;
+}
+
+export async function auditAcrossEndpoints(symbol, options={}) {
+  const endpoints=options.endpoints ?? knownMPDDEndpoints({base:options.base,allowHTTP:options.allowHTTP});
+  if (!Array.isArray(endpoints) || !endpoints.length) throw new Error('Nenhum endpoint configurado');
+  const attempts=[];
+  for (const base of endpoints) {
     try {
-      const result = await queryMPDD(base, symbol);
-      console.log(JSON.stringify({provider:'MPDD/OPTIMADE',retrievedAt:new Date().toISOString(),...result},null,2));
+      const result=await queryMPDD(base,symbol,options.fetchImpl ?? fetch);
+      attempts.push({base,outcome:'queried',pagesRead:result.pagesRead,
+        count:result.count,incompletePagination:result.incompletePagination});
+      return {
+        ...result,
+        attempts,
+        sourceTransport:base.startsWith('https:')?'https':'http-unverified',
+        homologated:false
+      };
     } catch (error) {
-      failures++;
-      console.error(JSON.stringify({symbol, outcome:'indeterminate-api-failure', error:error.message,
-        homologated:false, warning:'Falha de acesso nao equivale a ausencia de estrutura.'}));
+      attempts.push({base,outcome:'unavailable',message:error.message});
     }
+  }
+  return {
+    symbol,
+    outcome:'indeterminate-all-endpoints-failed',
+    attempts,
+    count:null,
+    candidates:[],
+    homologated:false,
+    warning:'Falha dos endpoints nao significa que nao haja estrutura.'
+  };
+}
+
+async function main() {
+  const endpoints=knownMPDDEndpoints({
+    base:process.env.MPDD_OPTIMADE_BASE,
+    allowHTTP:process.env.MPDD_ALLOW_INSECURE_HTTP==='1'
+  });
+  let failures=0;
+  for (const symbol of TARGETS) {
+    const result=await auditAcrossEndpoints(symbol,{endpoints});
+    console.log(JSON.stringify({
+      provider:'MPDD/OPTIMADE',
+      retrievedAt:new Date().toISOString(),
+      ...result
+    },null,2));
+    if (result.outcome==='indeterminate-all-endpoints-failed') failures++;
   }
   if (failures) process.exitCode=1;
 }
