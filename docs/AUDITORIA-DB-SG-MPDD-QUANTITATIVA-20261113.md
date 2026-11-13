@@ -9,7 +9,7 @@
 2. **Gyanchandani e Sikka (2011)**, *Physical Review B* 83, 172101, DOI https://doi.org/10.1103/PhysRevB.83.172101, calculam estrutura e volumes de equilibrio de metais 6d. O artigo completo/tabela numerica de Db e Sg nao foi recuperado nesta auditoria.
 3. **Atta-Fynn e Ray (2015)**, *Solid State Communications* 201, 88–94, DOI https://doi.org/10.1016/j.ssc.2014.10.025, comparam niveis de DFT e calculam constantes de rede. O resumo acessivel **nao permite vincular um valor numerico de Db/Sg a uma fase e nivel teorico especificos**.
 4. **Krajewski (2024)**, tese *Efficient Materials Informatics between Rockets and Electrons*, https://arxiv.org/abs/2407.04648, descreve ingestao de estruturas dos elementos Lr–Rg no **MPDD**, citando os trabalhos de Gyanchandani e Sikka. Trata-se de **caminho de recuperacao secundario, nao comprovacao de identidade de cada registro**.
-5. O **registro de provedor OPTIMADE** https://www.optimade.org/providers-dashboard/providers/mpdd.html documenta os campos de volume por atomo (_mpdd_atomicvolume, Å³), volume da estrutura (_mpdd_volume, Å³), grupo espacial (_mpdd_spacegroupn) e metadados de origem (_mpdd_metadata). A interface publica https://mpdd.org/ informa que a API OPTIMADE esta disponivel ao publico. Nesta sessao as requisicoes diretas aos registros de Db e Sg **nao puderam ser completadas**; nao ha novos parametros homologados.
+5. O **registro de provedor OPTIMADE** https://www.optimade.org/providers-dashboard/providers/mpdd.html documenta os campos de volume por atomo (_mpdd_atomicvolume, Å³), volume da estrutura (_mpdd_volume, Å³), grupo espacial (_mpdd_spacegroupn) ; **_mpdd_metadata nao consta na lista publica de propriedades servidas e nao e solicitado pelo auditor**. O DOI/método original permanecem como verificacao independente. A interface publica https://mpdd.org/ informa que a API OPTIMADE esta disponivel ao publico. Nesta sessao as requisicoes diretas aos registros de Db e Sg **nao puderam ser completadas**; nao ha novos parametros homologados.
 
 ## Rotina de auditoria quantitativa (somente leitura)
 
@@ -20,13 +20,16 @@ Executar com Node 22+ em ambiente com acesso a internet:
     node scripts/audit-db-sg-mpdd.mjs
 
 Se necessario, selecionar base alternativa por MPDD_OPTIMADE_BASE (raiz HTTPS do provedor).
-O script consulta separadamente Db e Sg com filtro de elemento unico, periodicidade tridimensional, grupo espacial 229 e volume atomico disponivel. Cada registro passa por um controle de consistencia:
+O script consulta separadamente Db e Sg com filtro de elemento unico e periodicidade tridimensional, validando posteriormente grupo espacial 229 e volume atomico disponivel. Cada registro passa por um controle de consistencia:
 
 - **Nao misturar estruturas:** CCC = Im-3m (229), dois atomos por celula convencional; c/a da HC nao se aplica.
 - **Conversao valida para CCC:** V_convencional = 2 × V_atomo; a = (2 × V_atomo)^(1/3), com V em Å³ e a em Å.
 - **Checagem interna:** quando existem V_atomo e V_celula, conferir a razao V_celula/nsites contra V_atomo e exigir concordancia ate 1% antes de propor a derivacao.
 - **A fonte MPDD e secundaria:** verificar o DOI, tabela, funcional, inclusao de spin-orbita, fase e minimo de energia no trabalho **primario** para cada identificador MPDD.
-- **Paginacao:** se hasNextPage=true, a primeira pagina nao e uma busca exaustiva. Reconsultar paginas antes de concluir ausencia.
+- **Paginacao:** o auditor consulta ate 10 paginas, so aceita links da mesma origem e marca `incompletePagination=true` quando ha paginas restantes. Nao concluir ausencia a partir de lote incompleto.
+- **Origem e verificacao:** podem existir relacionamentos com referencias na resposta, mas isso NAO confirma que o volume corresponde a CCC de menor energia na mesma aproximacao teorica.
+- **Diagnostico online:** o workflow `.github/workflows/silm-db-sg-mpdd-audit.yml` roda o teste de contratos e executa a consulta publica num runner; registra o resultado ou erro em artefato. Falha da API e **indeterminado**, jamais `nenhum candidato`.
+- **Esquema da API:** campos personalizados seguem o painel do provedor; a implementacao pode devolver HTTP 500 em algumas requisicoes (relatorio publico de conformidade OPTIMADE), portanto o cliente nao pode inferir ausencia a partir de falha HTTP.
 - **Criterio de saida:** qualquer estrutura encontrada e apenas "candidate-requires-primary-source-check"; o script nunca altera bundle.js, disponibilidade do metal, propriedades ou cache.
 
 ## Portao para eventual habilitacao
