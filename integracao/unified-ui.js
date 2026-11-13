@@ -329,7 +329,7 @@ SILM.createUnifiedUI=({model,storage,session,selectMetal,prepareMetal,say})=>{
     if(crystal){
      paragraph('Rede de referência: '+(crystal.type||'não registrada')+(crystal.spaceGroupNumber?' · grupo espacial '+crystal.spaceGroupNumber:'')+'. A liga ou produto pode ter outras condições e fases.');
      const evidence=S.data?.structureEvidence?.(refElement);
-     if(evidence)paragraph('Origem dos dados: '+evidence.label+'.'+(evidence.type==='computed'?' É uma previsão do modelo citado, não uma medição experimental.':''));
+     if(evidence)paragraph('Origem dos dados: '+evidence.label+'.'+(evidence.method==='empirical-geometric'?' Parâmetros derivados de raios metálicos estimados com hipótese CFC de esferas tangentes; não são valores obtidos por DFT ou difração.':evidence.type==='computed'?' É uma previsão do modelo citado, não uma medição experimental.':''));
      const crystalSource=crystal.sourceId?S.data?.source?.(crystal.sourceId):null;
      const src=sourceLink('Fonte cristalográfica',crystalSource?.url);if(src)section.append(src);
     }
