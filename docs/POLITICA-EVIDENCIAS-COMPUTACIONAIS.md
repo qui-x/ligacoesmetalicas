@@ -24,7 +24,7 @@ Dados que não forem encontrados ficam `null`/não reportados — **jamais** pre
 
 - Uma estrutura `computed` homologada pode ter `silmEligibility.status='available'` e `scope='structure-only'`, mesmo sem determinação experimental.
 - O motor de cristais usa a mesma geometria e os mesmos testes aplicados a entradas experimentais. O campo `evidenceType` altera a **explicação e proveniência**, não a mecânica.
-- Propriedades elétricas, térmicas, ópticas e mecânicas exigem validação **individual** e referência adequada à propriedade. A estrutura computacional isolada não autoriza automaticamente valores ou efeitos específicos.
+- **Propriedades numéricas calculadas também recebem a mesma validade funcional de dados medidos** quando a fonte, o método, a grandeza, a unidade, as condições e as limitações forem verificáveis. Registrar `evidenceType='computed'` no dado e não tratar valores a 0 K como medições em CNTP. A estrutura computacional isolada não autoriza automaticamente propriedades elétricas, térmicas, ópticas ou mecânicas específicas.
 - Estruturas superpesadas e elementos anteriormente bloqueados podem ser reavaliados por essa regra, mas o bloqueio existente só é alterado **por elemento**, após homologação completa. Não habilitar em massa por analogia com outros elementos.
 - Roteiros/missões/temas que dependam de propriedades não homologadas permanecem bloqueados para `structure-only`.
 - Cenas, relatórios e Manual devem exibir “**Estrutura prevista computacionalmente**” e a fonte. Informar a condição de cálculo e possíveis fases concorrentes.
