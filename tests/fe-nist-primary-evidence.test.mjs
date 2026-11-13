@@ -6,6 +6,7 @@ import {readFileSync} from 'node:fs';
 const root=new URL('../',import.meta.url);
 const read=p=>readFileSync(new URL(p,root),'utf8');
 const context=vm.createContext({window:{SILM:{}}});
+context.SILM=context.window.SILM;
 vm.runInContext(read('domain/silm/data/research-evidence-fe-nist.js'),context);
 const evidence=context.window.SILM.researchEvidence;
 
