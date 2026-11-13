@@ -113,9 +113,33 @@ def run(browser_name: str, root: str) -> None:
                 if (!button || button.disabled) throw new Error('Condutividade elétrica indisponível na Oficina');
                 button.click();
             }""")
+            # Conferir documentos duráveis antes da recarga (intermitência no WebKit).
+            page.wait_for_function("""(prediction) => {
+                const payload = JSON.parse(localStorage.getItem('silm-base-integration:documents-v1') || '{}');
+                const docs = payload.documents || {};
+                const experiment = JSON.parse(docs['route.experiment'] || 'null');
+                const state = JSON.parse(docs['scientific.state'] || 'null');
+                const hypothesis = JSON.parse(docs['route.hypothesis.investigation:' + experiment?.investigation] || 'null');
+                return experiment?.hypothesis === prediction &&
+                    hypothesis === prediction && state?.investigation?.id === experiment.investigation;
+            }""", prediction, timeout=15000)
             page.goto(root.rstrip("/") + "/#/relatorios")
             report = page.locator("#silm-route-report")
-            expect(report).to_contain_text("Hipótese inicial registrada")
+            try:
+                expect(report).to_contain_text("Hipótese inicial registrada")
+            except AssertionError:
+                diagnostics = page.evaluate("""() => {
+                    const payload = JSON.parse(localStorage.getItem('silm-base-integration:documents-v1') || '{}');
+                    const docs = payload.documents || {};
+                    return {
+                        route: JSON.parse(docs['route.experiment'] || 'null'),
+                        scientific: JSON.parse(docs['scientific.state'] || 'null')?.investigation,
+                        live: window.SILMIntegration?.snapshot?.()?.investigation,
+                        hypothesisKeys: Object.keys(docs).filter(k => k.startsWith('route.hypothesis.investigation:')),
+                        currentUrl: location.href
+                    };
+                }""")
+                raise AssertionError(f"Roteiro sem hipótese após navegação: {diagnostics}") from None
             expect(report).to_contain_text(prediction)
             expect(report).to_contain_text("Pergunta central do roteiro")
             expect(report).to_contain_text("Plano de observações")
