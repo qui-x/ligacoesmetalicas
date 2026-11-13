@@ -14,7 +14,7 @@ vm.runInContext(fs.readFileSync('domain/silm/routes.js','utf8'),ctx,{filename:'r
 const scripts=S.routes.registry;
 assert.equal(scripts.length,26,'Os 26 roteiros devem aparecer no catálogo');
 assert.equal(S.routes.validate(scripts).ok,true);
-const ids=new Set(),eligible=S.data.elements.filter(e=>e.silmEligibility.status==='available');
+const ids=new Set(),eligible=S.data.elements.filter(e=>e.silmEligibility.status==='available'&&e.silmEligibility.scope!=='structure-only');
 const covered=new Set(scripts.flatMap(x=>x.metalSelection.atomicNumbers));
 assert.equal(eligible.length,65);
 assert.deepEqual(Array.from(eligible.filter(e=>!covered.has(e.atomicNumber)),e=>e.symbol),[]);
@@ -57,7 +57,7 @@ const rareEarth=S.routes.get('roteiro-lantanideos');
 assert.deepEqual(Array.from(rareEarth.metalSelection.atomicNumbers),[21,39,57,58,59,60,62,63,64,65,66,67,68,69,70,71]);
 assert.ok(rareEarth.metalSelection.atomicNumbers.includes(21),'Escândio deve fazer parte das terras raras');
 assert.ok(rareEarth.metalSelection.atomicNumbers.includes(39),'Ítrio deve fazer parte das terras raras');
-assert.ok(!rareEarth.metalSelection.atomicNumbers.includes(61),'Pm não está disponível');
+assert.ok(!rareEarth.metalSelection.atomicNumbers.includes(61),'Pm só está homologado para cristalografia livre, não para roteiros');
 assert.equal(rareEarth.module,'explorar');
 assert.equal(rareEarth.study.tasks.length,5);
 assert.ok(rareEarth.study.question.includes('explorando objetos'));
