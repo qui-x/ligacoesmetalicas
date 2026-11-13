@@ -43,7 +43,7 @@ try{
     return {crystal:SILM.crystal.eligibility(element).status,
      evidence:SILM.data.structureEvidence(element).type,
      a:ref.latticeParameters.a.value,c:ref.latticeParameters.c.value,
-     electronic:e.electronConfiguration?.display??null, valence:e.valenceModel?.display??null,
+     electronic:element.electronConfiguration?.display??null, valence:element.valenceModel?.display??null,
      temperature:ref.conditions.temperature.display,
      properties:Object.values(SILM.properties.eligibility(element)).map(x=>x.status)};
    });
