@@ -73,12 +73,12 @@ test('Fr mantém propriedades elétricas térmicas ópticas e mecânicas bloquea
  }
 });
 
-test('74 metais habilitados; Fm Md No Lr e todos os 13 superpesados permanecem indisponíveis',()=>{
+test('77 metais habilitados; Lr e todos os 13 superpesados permanecem indisponíveis',()=>{
  assert.equal(S.data.elements.length,118);
  const available=S.data.elements.filter(e=>e.silmEligibility.status==='available');
- assert.equal(available.length,74);
+ assert.equal(available.length,77);
  assert.deepEqual(Array.from(available.filter(e=>e.silmEligibility.scope==='structure-only'),e=>e.symbol).sort(),
- ['Bk','Cf','Cm','Es','Fr','Ga','In','Pm','U']);
- for(const z of [100,101,102,103])assert.equal(S.data.get(z).silmEligibility.status,'unavailable');
+ ['Bk','Cf','Cm','Es','Fm','Fr','Ga','In','Md','No','Pm','U']);
+ assert.equal(S.data.get(103).silmEligibility.status,'unavailable');
  for(let z=104;z<=116;z++)assert.equal(S.data.get(z).silmEligibility.status,'unavailable');
 });
