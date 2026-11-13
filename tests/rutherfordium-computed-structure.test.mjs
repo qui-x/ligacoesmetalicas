@@ -13,6 +13,11 @@ const source='src-rf-gyanchandani-sikka-2012';
 test('Rf é o único superpesado habilitado, com proveniência computacional explícita',()=>{
  assert.equal(rf.symbol,'Rf');
  assert.equal(rf.classification.metallic,true);
+ assert.equal(rf.electronConfiguration.display,'[Rn] 5f14 6d2 7s2');
+ assert.equal(rf.electronConfiguration.evidenceType,'computed');
+ assert.equal(rf.electronConfiguration.sourceId,source);
+ assert.equal(rf.valenceModel.configurationSourceId,source);
+ assert.match(rf.valenceModel.explanation,/não deve ser utilizada como contagem literal/);
  assert.equal(rf.silmEligibility.status,'available');
  assert.equal(rf.silmEligibility.scope,'structure-only');
  assert.equal(ref.type,'HC');
