@@ -70,6 +70,7 @@ jobs:
           node --check tests/run-cm-bk-cf-es-structure.mjs
           node --check tests/run-francium-computed.mjs
           node --check tests/run-fm-md-no-model.mjs
+          node --check tests/run-rutherfordium-computed.mjs
           node --check tests/run-four-scales-responsive.mjs
           node --check tests/run-cross-regressions.mjs
           node --check tests/run-controls-responsive-matrix.mjs
@@ -113,6 +114,9 @@ jobs:
       - name: Auditar estimativas geométricas de Fm Md No nas escalas 3 e 4
         run: node tests/run-fm-md-no-model.mjs
 
+      - name: Auditar Rutherfórdio computacional nas escalas 3 e 4
+        run: node tests/run-rutherfordium-computed.mjs
+
       - name: Validar ocupação visual e navegação das quatro escalas
         run: node tests/run-four-scales-responsive.mjs
 
@@ -141,6 +145,15 @@ jobs:
         with:
           name: silm-fm-md-no-${{ matrix.browser }}
           path: reports/fm-md-no-model/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Guardar capturas do Rutherfórdio computacional
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-rutherfordium-${{ matrix.browser }}
+          path: reports/rutherfordium-computed/${{ matrix.browser }}/
           if-no-files-found: warn
           retention-days: 14
 
