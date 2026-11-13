@@ -114,15 +114,31 @@ def run(browser_name: str, root: str) -> None:
                 button.click();
             }""")
             # Conferir documentos duráveis antes da recarga (intermitência no WebKit).
-            page.wait_for_function("""(prediction) => {
-                const payload = JSON.parse(localStorage.getItem('silm-base-integration:documents-v1') || '{}');
-                const docs = payload.documents || {};
-                const experiment = JSON.parse(docs['route.experiment'] || 'null');
-                const state = JSON.parse(docs['scientific.state'] || 'null');
-                const hypothesis = JSON.parse(docs['route.hypothesis.investigation:' + experiment?.investigation] || 'null');
-                return experiment?.hypothesis === prediction &&
-                    hypothesis === prediction && state?.investigation?.id === experiment.investigation;
-            }""", arg=prediction, timeout=15000)
+            try:
+                page.wait_for_function("""(prediction) => {
+                    const payload = JSON.parse(localStorage.getItem('silm-base-integration:documents-v1') || '{}');
+                    const docs = payload.documents || {};
+                    const experiment = JSON.parse(docs['route.experiment'] || 'null');
+                    const state = JSON.parse(docs['scientific.state'] || 'null');
+                    const hypothesis = JSON.parse(docs['route.hypothesis.investigation:' + experiment?.investigation] || 'null');
+                    return experiment?.hypothesis === prediction &&
+                        hypothesis === prediction && state?.investigation?.id === experiment.investigation;
+                }""", arg=prediction, timeout=10000)
+            except Exception:
+                details = page.evaluate("""() => {
+                    const payload = JSON.parse(localStorage.getItem('silm-base-integration:documents-v1') || '{}');
+                    const docs = payload.documents || {};
+                    const experiment = JSON.parse(docs['route.experiment'] || 'null');
+                    return {
+                        keys: Object.keys(docs),
+                        route: experiment,
+                        savedInvestigation: JSON.parse(docs['scientific.state'] || 'null')?.investigation,
+                        liveInvestigation: window.SILMIntegration?.snapshot?.()?.investigation,
+                        hypothesis: JSON.parse(docs['route.hypothesis.investigation:' + experiment?.investigation] || 'null'),
+                        url: location.href
+                    };
+                }""")
+                raise AssertionError(f"Contexto do roteiro não foi salvo como esperado: {details}") from None
             page.goto(root.rstrip("/") + "/#/relatorios")
             report = page.locator("#silm-route-report")
             try:
