@@ -28,6 +28,7 @@ window.SILM=window.SILM||{};
   INSUFFICIENT_VALIDATION:'O comportamento mecânico real deste metal não está homologado no banco: a experiência mostra o mecanismo didático, não a resposta específica do metal.',
   LIQUID_AT_REFERENCE_CONDITION:'Líquido na condição de referência registrada: deformação de rede sólida, condução pela rede e superfície sólida não se aplicam.',
   METAL_NOT_INVESTIGABLE:'Metal não habilitado para investigação no SILM.',
+  STRUCTURE_ONLY_REFERENCE:'Esta ficha autoriza apenas a investigação cristalográfica. Os dados necessários para demonstrar esta propriedade do metal ainda não foram homologados.',
   DEFORMATION_MODEL_NOT_APPLICABLE:'A representação de deformação do SILM (deslizamento coletivo de planos) foi construída para as estruturas CCC, CFC e HC. Nesta estrutura complexa ela não foi homologada, e vários desses metais são frágeis à temperatura ambiente; a experiência fica indisponível.'
  });
  /* Fase na condição de referência: da estrutura de referência (sólida) ou do dado de fase registrado no banco. */
@@ -62,6 +63,7 @@ window.SILM=window.SILM||{};
    else if(solidOnly&&ph.value==='liquid'){status='unavailable';reasonCode='LIQUID_AT_REFERENCE_CONDITION';}
    else if(solidOnly&&ph.value!=='solid'){status='unavailable';reasonCode='REFERENCE_PHASE_UNSUPPORTED';}
    else if(!investigable){status='unavailable';reasonCode='METAL_NOT_INVESTIGABLE';}
+   else if(e.silmEligibility?.scope==='structure-only'){status='unavailable';reasonCode='STRUCTURE_ONLY_REFERENCE';}
    else if((c.requires==='crystalline'||(['malleability','ductility'].includes(id)&&c.requires==='structure'))&&crystal.status!=='available'){status='unavailable';reasonCode='MODEL_NOT_APPLICABLE';}
    // 0.16.x: no modelo geral, condução térmica e brilho continuam qualitativos; a deformação didática não se aplica.
    else if(crystal?.general&&['malleability','ductility'].includes(id)){status='unavailable';reasonCode='DEFORMATION_MODEL_NOT_APPLICABLE';}
