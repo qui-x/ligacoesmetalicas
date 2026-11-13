@@ -55,12 +55,12 @@ for(const t of cases){
   }
  });
 }
-test('catálogo cresce de 66 para 69 sem habilitar os 13 superpesados',()=>{
+test('catálogo preserva Ga In U em 73 metais, com os superpesados bloqueados',()=>{
  assert.equal(S.data.elements.length,118);
  const available=S.data.elements.filter(e=>e.silmEligibility.status==='available');
- assert.equal(available.length,69);
+ assert.equal(available.length,73);
  const structural=available.filter(e=>e.silmEligibility.scope==='structure-only');
- assert.deepEqual(Array.from(structural,e=>e.symbol).sort(),['Ga','In','Pm','U']);
+ assert.deepEqual(Array.from(structural,e=>e.symbol).sort(),['Bk','Cf','Cm','Es','Ga','In','Pm','U']);
  for(let z=104;z<=116;z++){
   assert.equal(S.data.get(z)?.silmEligibility?.status,'unavailable','Superpesado Z='+z);
  }
