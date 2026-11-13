@@ -36,7 +36,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Consultar base sem alterar dados homologados
+      - name: Consultar rotas alternativas do provedor sem alterar dados homologados
+        env:
+          # HTTP: rota legada publica SEM credenciais, apenas diagnostico; NUNCA homologar dados HTTP.
+          MPDD_ALLOW_INSECURE_HTTP: '1'
         shell: bash
         run: |
           mkdir -p reports/db-sg-mpdd
