@@ -282,7 +282,7 @@
   }
   legacyDiscovery=false;showObjectEntry=false;showFocus();
   if(!setWorkshopScale(3)){
-   say('A estrutura do promécio não pôde ser organizada. A montagem livre foi preservada para revisão.','warning');
+   say('A estrutura de '+metal.name+' não pôde ser organizada. A montagem livre foi preservada para revisão.','warning');
    schedule();return false;
   }
   say('Estrutura cristalina de '+metal.name+' · os dados físicos específicos permanecem indisponíveis.','success');
