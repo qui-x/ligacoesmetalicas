@@ -55,13 +55,13 @@ for(const t of cases){
   }
  });
 }
-test('catálogo preserva Ga In U em 74 metais, com os superpesados bloqueados',()=>{
+test('catálogo preserva Ga In U entre 75 metais, com somente Rf liberado dos superpesados',()=>{
  assert.equal(S.data.elements.length,118);
  const available=S.data.elements.filter(e=>e.silmEligibility.status==='available');
- assert.equal(available.length,74);
+ assert.equal(available.length,75);
  const structural=available.filter(e=>e.silmEligibility.scope==='structure-only');
- assert.deepEqual(Array.from(structural,e=>e.symbol).sort(),['Bk','Cf','Cm','Es','Fr','Ga','In','Pm','U']);
- for(let z=104;z<=116;z++){
+ assert.deepEqual(Array.from(structural,e=>e.symbol).sort(),['Bk','Cf','Cm','Es','Fr','Ga','In','Pm','Rf','U']);
+ for(let z=105;z<=116;z++){
   assert.equal(S.data.get(z)?.silmEligibility?.status,'unavailable','Superpesado Z='+z);
  }
 });
