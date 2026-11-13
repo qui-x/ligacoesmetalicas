@@ -72,6 +72,7 @@ jobs:
           node --check tests/run-fm-md-no-model.mjs
           node --check tests/run-rf-dft-structure.mjs
           node --check tests/run-lr-empirical-bcc.mjs
+          node --check tests/run-fe-nist-evidence.mjs
           node --check tests/run-four-scales-responsive.mjs
           node --check tests/run-cross-regressions.mjs
           node --check tests/run-controls-responsive-matrix.mjs
@@ -121,6 +122,9 @@ jobs:
       - name: Auditar hipótese CCC geométrica de Lr sem liberação de Db Sg
         run: node tests/run-lr-empirical-bcc.mjs
 
+      - name: Verificar dados documentais Fe no modulo Explorar Ductilidade
+        run: node tests/run-fe-nist-evidence.mjs
+
       - name: Validar ocupação visual e navegação das quatro escalas
         run: node tests/run-four-scales-responsive.mjs
 
@@ -142,6 +146,15 @@ jobs:
           else
             echo "Auditoria de $BROWSER_NAME interrompida antes de produzir relatório." >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Guardar capturas NIST Fe · ductilidade documental
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-fe-nist-evidence-${{ matrix.browser }}
+          path: reports/fe-nist-evidence/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Guardar capturas de Lr · hipótese CCC geométrica
         if: always()
