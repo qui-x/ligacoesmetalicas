@@ -67,6 +67,7 @@ jobs:
           node --check tests/run-periodic-responsive.mjs
           node --check tests/run-promethium-structure.mjs
           node --check tests/run-ga-in-u-structure.mjs
+          node --check tests/run-cm-bk-cf-es-structure.mjs
           node --check tests/run-four-scales-responsive.mjs
           node --check tests/run-cross-regressions.mjs
           node --check tests/run-controls-responsive-matrix.mjs
@@ -101,6 +102,9 @@ jobs:
       - name: Validar exploração de Ga In U na Rede e Célula Unitária
         run: node tests/run-ga-in-u-structure.mjs
 
+      - name: Verificar Cm Bk Cf Es em Rede e Centro Metálico
+        run: node tests/run-cm-bk-cf-es-structure.mjs
+
       - name: Validar ocupação visual e navegação das quatro escalas
         run: node tests/run-four-scales-responsive.mjs
 
@@ -122,6 +126,15 @@ jobs:
           else
             echo "Auditoria de $BROWSER_NAME interrompida antes de produzir relatório." >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Guardar capturas de Cm Bk Cf Es
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-cm-bk-cf-es-${{ matrix.browser }}
+          path: reports/cm-bk-cf-es/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Guardar capturas de Ga In U
         if: always()
