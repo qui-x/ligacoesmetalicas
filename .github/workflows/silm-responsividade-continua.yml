@@ -68,6 +68,7 @@ jobs:
           node --check tests/run-promethium-structure.mjs
           node --check tests/run-ga-in-u-structure.mjs
           node --check tests/run-cm-bk-cf-es-structure.mjs
+          node --check tests/run-francium-computed.mjs
           node --check tests/run-four-scales-responsive.mjs
           node --check tests/run-cross-regressions.mjs
           node --check tests/run-controls-responsive-matrix.mjs
@@ -105,6 +106,9 @@ jobs:
       - name: Verificar Cm Bk Cf Es em Rede e Centro Metálico
         run: node tests/run-cm-bk-cf-es-structure.mjs
 
+      - name: Validar Frâncio computacional na Rede e Centro Metálico
+        run: node tests/run-francium-computed.mjs
+
       - name: Validar ocupação visual e navegação das quatro escalas
         run: node tests/run-four-scales-responsive.mjs
 
@@ -126,6 +130,15 @@ jobs:
           else
             echo "Auditoria de $BROWSER_NAME interrompida antes de produzir relatório." >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Guardar capturas do Frâncio computacional
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-francium-${{ matrix.browser }}
+          path: reports/francium-computed/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Guardar capturas de Cm Bk Cf Es
         if: always()

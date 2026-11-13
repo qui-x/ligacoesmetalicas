@@ -67,7 +67,7 @@ test('os demais metais preservam elegibilidade científica',()=>{
  assert.equal(copper.silmEligibility.status,'available');
  assert.equal(S.crystal.eligibility(copper).status,'available');
  assert.notEqual(S.properties.eligibility(copper).electrical.status,'unavailable');
- assert.equal(S.data.elements.filter(e=>e.silmEligibility.status==='available').length,73);
+ assert.equal(S.data.elements.filter(e=>e.silmEligibility.status==='available').length,74);
 });
 
 test('fonte computacional tem elegibilidade cristalográfica equivalente, mas proveniência distinta',()=>{

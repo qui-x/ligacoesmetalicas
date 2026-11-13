@@ -56,12 +56,12 @@ for(const row of records){
   }
  });
 }
-test('lote 2 eleva cobertura estrutural a 73 mantendo 13 superpesados indisponíveis',()=>{
+test('lote 2 permanece íntegro no catálogo de 74 com Fr computacional',()=>{
  assert.equal(S.data.elements.length,118);
  const available=S.data.elements.filter(e=>e.silmEligibility.status==='available');
- assert.equal(available.length,73);
+ assert.equal(available.length,74);
  assert.deepEqual(Array.from(available.filter(e=>e.silmEligibility.scope==='structure-only'),e=>e.symbol).sort(),
- ['Bk','Cf','Cm','Es','Ga','In','Pm','U']);
+ ['Bk','Cf','Cm','Es','Fr','Ga','In','Pm','U']);
  for(let z=104;z<=116;z++)
   assert.equal(S.data.get(z).silmEligibility.status,'unavailable','Superpesado Z='+z);
 });
