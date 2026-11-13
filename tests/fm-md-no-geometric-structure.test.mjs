@@ -64,13 +64,13 @@ for(const row of rows){
   }
  });
 }
-test('total de 77 habilitados, 12 apenas estruturais; Lr e superpesados seguem bloqueados',()=>{
+test('total de 78 habilitados, 13 apenas estruturais; Lr e 12 superpesados seguem bloqueados',()=>{
  assert.equal(S.data.elements.length,118);
  const avail=S.data.elements.filter(e=>e.silmEligibility.status==='available');
- assert.equal(avail.length,77);
+ assert.equal(avail.length,78);
  assert.deepEqual(Array.from(avail.filter(e=>e.silmEligibility.scope==='structure-only'),e=>e.symbol).sort(),
- ['Bk','Cf','Cm','Es','Fm','Fr','Ga','In','Md','No','Pm','U']);
+ ['Bk','Cf','Cm','Es','Fm','Fr','Ga','In','Md','No','Pm','Rf','U']);
  assert.equal(S.data.get(103).silmEligibility.status,'unavailable');
  assert.equal(S.data.get(80).silmEligibility.status,'unavailable');
- for(let z=104;z<=116;z++)assert.equal(S.data.get(z).silmEligibility.status,'unavailable');
+ for(let z=105;z<=116;z++)assert.equal(S.data.get(z).silmEligibility.status,'unavailable');
 });
