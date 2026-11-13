@@ -55,7 +55,7 @@ try{
    assert.equal(info.evidence,'computed');
    assert.equal(info.method,'empirical-geometric');
    assert.equal(info.a,metal.a);
-   assert.notEqual(await page.locator('#silm-object-entry .periodic-element[data-z="105"]').getAttribute('data-availability'),'available','Db não deveria ser habilitado');
+   assert.equal(await page.evaluate(()=>SILM.data.get(105).silmEligibility.status),'unavailable','Db não deveria ser habilitado');
    assert.ok(info.props.every(s=>s==='unavailable'),'Propriedades indevidas em '+metal.name);
    await page.locator('.silm-workshop-scale[data-scale="4"]').click();
    await page.waitForFunction(()=>window.SILMIntegration?.snapshot?.()?.metadata?.workshop?.scale===4);
