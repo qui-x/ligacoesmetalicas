@@ -206,7 +206,7 @@ SILM.createRouteUI=({model,storage,view,onView,schedule,say,onModule,selectMetal
    const metalLabel=N('label','Metal disponível');metalLabel.htmlFor='silm-routes-metal-filter';
    const metal=N('select');metal.id='silm-routes-metal-filter';
    const all=N('option','Todos os metais');all.value='all';metal.append(all);
-   for(const element of S.data.elements.filter(e=>e.silmEligibility.status==='available')){const opt=N('option',element.name+' ('+element.symbol+')');opt.value=String(element.atomicNumber);metal.append(opt);}
+   for(const element of S.data.elements.filter(e=>e.silmEligibility.status==='available'&&e.silmEligibility.scope!=='structure-only')){const opt=N('option',element.name+' ('+element.symbol+')');opt.value=String(element.atomicNumber);metal.append(opt);}
    metalField.append(metalLabel,metal);
    const searchField=N('div');searchField.className='silm-learning-field';
    const searchLabel=N('label','Pesquisar');searchLabel.htmlFor='silm-routes-search';
