@@ -65,6 +65,7 @@ jobs:
         run: |
           node --check tests/run-responsive-audit.mjs
           node --check tests/run-periodic-responsive.mjs
+          node --check tests/run-promethium-structure.mjs
           node --check tests/run-four-scales-responsive.mjs
           node --check tests/run-cross-regressions.mjs
           node --check tests/run-controls-responsive-matrix.mjs
@@ -93,6 +94,9 @@ jobs:
       - name: Validar 118 elementos, alvos de toque e rolagem confinada
         run: node tests/run-periodic-responsive.mjs
 
+      - name: Verificar entrada estrutural de Pm e ausência de propriedades inventadas
+        run: node tests/run-promethium-structure.mjs
+
       - name: Validar ocupação visual e navegação das quatro escalas
         run: node tests/run-four-scales-responsive.mjs
 
@@ -114,6 +118,15 @@ jobs:
           else
             echo "Auditoria de $BROWSER_NAME interrompida antes de produzir relatório." >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Guardar capturas da estrutura de Pm (DHCP)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-promethium-${{ matrix.browser }}
+          path: reports/promethium/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Guardar capturas e diagnóstico
         if: always()
