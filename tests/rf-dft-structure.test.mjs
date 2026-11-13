@@ -70,14 +70,14 @@ test('Rf não libera efeitos térmicos elétricos ópticos ou mecânicos especí
  }
 });
 
-test('78 metais habilitados, 13 apenas estruturais; Lr Db Sg permanecem bloqueados',()=>{
+test('79 metais habilitados, 14 apenas estruturais; Db Sg permanecem bloqueados',()=>{
  assert.equal(S.data.elements.length,118);
  const metals=S.data.elements.filter(e=>e.classification?.metallic);
  const available=metals.filter(e=>e.silmEligibility.status==='available');
  assert.equal(metals.length,92);
- assert.equal(available.length,78);
+ assert.equal(available.length,79);
  assert.deepEqual(Array.from(available.filter(e=>e.silmEligibility.scope==='structure-only'),e=>e.symbol).sort(),
- ['Bk','Cf','Cm','Es','Fm','Fr','Ga','In','Md','No','Pm','Rf','U']);
- for(const z of [103,105,106])assert.equal(S.data.get(z).silmEligibility.status,'unavailable');
+ ['Bk','Cf','Cm','Es','Fm','Fr','Ga','In','Lr','Md','No','Pm','Rf','U']);
+ for(const z of [105,106])assert.equal(S.data.get(z).silmEligibility.status,'unavailable');
  for(let z=105;z<=116;z++)assert.equal(S.data.get(z).silmEligibility.status,'unavailable');
 });
