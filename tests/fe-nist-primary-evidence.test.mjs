@@ -41,7 +41,7 @@ test('doze medias da Tabela 6 NIST preservadas por taxa e amostra',()=>{
   A11:[[1e-3,68,201,71,95],[1e-4,44,188,67,95],[1e-5,28,178,58,95]]
  };
  for(const [sample,values]of Object.entries(expected)){
-  const got=evidence.bySample(26,sample).map(p=>[p.strainRatePerSecond,p.yieldStrengthMPa,p.tensileStrengthMPa,p.elongationAtFracturePercent,p.reductionOfAreaPercent]);
+  const got=Array.from(evidence.bySample(26,sample),p=>[p.strainRatePerSecond,p.yieldStrengthMPa,p.tensileStrengthMPa,p.elongationAtFracturePercent,p.reductionOfAreaPercent]);
   assert.deepEqual(got,values);
  }
  assert.deepEqual(Object.keys(evidence.samples),['K05','K02','S11','A11']);
