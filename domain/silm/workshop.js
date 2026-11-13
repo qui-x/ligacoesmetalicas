@@ -69,7 +69,7 @@ SILM.workshop=(()=>{
   body.append(manualLink('aplicacoes-metalicas',item,'Consultar no Manual composição e fontes de '+item.title));
   const b=node('button','button outline',label);b.type='button';b.addEventListener('click',()=>onAction(item));body.append(b);article.append(art,body);return article;
  }
- function renderObjectCatalog(host,{element,onInvestigate=()=>{}}={}){
+ function renderObjectCatalog(host,{element,onInvestigate=()=>{},onStartStructure=()=>{}}={}){
   host.replaceChildren();
   if(!element)return 0;
   const refs=list(element.atomicNumber);
@@ -81,7 +81,21 @@ SILM.workshop=(()=>{
    const grid=node('div','silm-workshop-grid silm-object-catalog-grid');
    for(const item of refs)grid.append(itemCard(item,onInvestigate,'Investigar objeto'));
    section.append(grid);
-  }else section.append(node('p','silm-workshop-empty','Ainda não há objetos disponíveis para este metal.'));
+  }else{
+   // A referência científica pode permitir estrutura sem imagem de objeto.
+   // Não inventar aplicações macroscópicas para o Pm radioativo.
+   section.append(node('p','silm-workshop-empty',
+    element.silmEligibility?.scope==='structure-only'?
+    'Sem objetos cotidianos homologados. A estrutura cristalina pode ser explorada com a fonte experimental registrada.':
+    'Ainda não há objetos disponíveis para este metal.'));
+   if(element.silmEligibility?.scope==='structure-only'){
+    const structural=node('button','button primary','Investigar estrutura cristalina');
+    structural.type='button';
+    structural.setAttribute('aria-label','Investigar estrutura cristalina de '+element.name);
+    structural.addEventListener('click',()=>onStartStructure(element));
+    section.append(structural);
+   }
+  }
   host.append(section);return refs.length;
  }
  function renderDiscovery(host,{element,notice='',onOpenPeriodic=()=>{},onContinue=()=>{},onInvestigate=()=>{},onStartDirect=()=>{}}={}){
