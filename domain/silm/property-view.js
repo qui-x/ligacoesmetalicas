@@ -164,7 +164,7 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  researchPicker.addEventListener('change',updateResearchRows);
  researchSection.append(researchTitle,researchNote,researchPickerLabel,researchPurity,researchScroll,researchSource);
  const multistageEvidence=SILM.createMultistageResearchPanel?.({prefix});
- box.append(head,row,status,readings,opticalSection,thermalSection,researchSection,...(multistageEvidence?[multistageEvidence.root]:[]),list);container.append(box);
+ box.append(head,row,status,readings,opticalSection,researchSection,thermalSection,...(multistageEvidence?[multistageEvidence.root]:[]),list);container.append(box);
  function updateOptical(state,driveState){
   const service=SILM.materialEngine;
   const angle=driveState?.angle??35,finish=driveState?.finish??'polished';
