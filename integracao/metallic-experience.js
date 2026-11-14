@@ -237,6 +237,7 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
  host.append(dl);
  const heading=el('h3','Propriedades do metal');host.append(heading);
  for(const id of Properties.ids){const ref=Properties.data(e,id),p=el('p');p.textContent=Properties.catalog[id].title+': '+(ref?(ref.display??ref.value)+' '+ref.unit+' · '+(ref.kind==='CALCULATED'?'Calculado pelo SILM':'Dado tabelado'):(['electrical','thermal'].includes(id)?'Sem valor numérico homologado; experiência qualitativa conforme elegibilidade.':'Experiência qualitativa; não representa uma medida numérica da amostra.'));host.append(p);}
+ if(S.rareEarthReference?.renderData)S.rareEarthReference.renderData(host,e);
  const sources=el('details');sources.append(el('summary','Fontes e condições'));
  for(const id of Data.sourceIds(e)){const s=Data.source(id);if(!s)continue;const p=el('p',s.institution+' — '+s.title+(s.year?' ('+s.year+')':''));if(s.url){const a=el('a','Consultar fonte');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';p.append(document.createTextNode(' · '),a);}sources.append(p);}
  if(condition?.notes)sources.append(el('p',condition.notes));host.append(sources);
