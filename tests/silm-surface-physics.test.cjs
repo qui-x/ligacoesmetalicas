@@ -7,7 +7,7 @@ const path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const files=fs.readFileSync(path.join(root,'index.html'),'utf8');
 function engine(){
- const box={window:{SILM:{}}};
+ const box={window:{SILM:{}}};box.SILM=box.window.SILM;
  vm.runInNewContext(fs.readFileSync(path.join(root,'domain/silm/surface-physics.js'),'utf8'),box);
  return box.window.SILM.surfacePhysics;
 }
