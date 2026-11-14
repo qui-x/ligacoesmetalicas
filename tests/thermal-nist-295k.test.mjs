@@ -45,7 +45,7 @@ test('referencia de calor aparece no painel existente e nao calibra o solver',()
  assert.ok(cache.includes(path));
  assert.match(view,/SILM\.researchThermalNIST\?\.get/);
  assert.match(view,/thermalSection\.hidden=!thermalReference/);
- assert.match(view,/opticalSection,researchSection,thermalSection/,'painel Fe deve preceder novo painel NIST');
+ assert.match(view,/opticalSection,researchSection,.*thermalSection/,'painel Fe deve preceder novo painel NIST mesmo com outras referências');
  assert.match(view,/NÃO calibra a animação de calor/);
  assert.ok(!load('domain/silm/thermal.js').includes('researchThermalNIST'));
  assert.ok(!load('domain/silm/material-engine.js').includes('researchThermalNIST'));
