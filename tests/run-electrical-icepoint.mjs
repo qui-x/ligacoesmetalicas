@@ -42,7 +42,7 @@ try{
       count:panel?.querySelectorAll('select option').length||0,
       evidence:panel?.dataset.scientificStatus,
       link:panel?.querySelector('a')?.href,
-      contents:panel?.querySelector('.silm-research-metrics')?.textContent||''};
+      contents:panel?.querySelector('.silm-electrical-metrics')?.textContent||''};
     }
     return {cu:mount(29),be:mount(4),ca:mount(20),pd:mount(46),
      fe:mount(26),sn:mount(50),ra:mount(88),mn:mount(25)};
@@ -69,7 +69,7 @@ try{
    assert.match(found.mn.plain,/APENAS fase alfa/);
    // Alternar a fonte do Cu nao altera o motor nem faz media.
    await page.locator('#test-electrical-29-source').selectOption('1');
-   const other=await page.locator('#test-electrical-29 .silm-research-metrics').innerText();
+   const other=await page.locator('#test-electrical-29 .silm-electrical-metrics').innerText();
    assert.match(other,/1,553 µΩ·cm/);
    assert.match(await page.locator('#test-electrical-29 .silm-electrical-evidence a').getAttribute('href'),/nbstechnicalnote1053\.pdf/);
    const audit=await page.evaluate(()=>({
