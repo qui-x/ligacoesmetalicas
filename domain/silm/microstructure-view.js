@@ -246,10 +246,15 @@ SILM.microstructure=(()=>{
    const saveContact=()=>model?.setMechanicalContact?.(contactPosition,contactWidth);
    contactLabel.input.addEventListener('change',saveContact);
    widthLabel.input.addEventListener('change',saveContact);
-   function warpGrains(field,amplitude){
-    const map=field&&amplitude>1e-4?(x,y)=>{
-     const p=field.sample(x/W,y/H,amplitude);
-     return{x:x+p.dx*W,y:y+p.dy*H};
+   function warpGrains(field,amplitude,marks=[]){
+    const elasticOn=!!field&&amplitude>1e-4;
+    const relief=SILM.specimenRelief,permanentOn=!!relief&&marks.length>0;
+    const map=elasticOn||permanentOn?(x,y)=>{
+     const u=x/W,v=y/H;
+     const elastic=elasticOn?field.sample(u,v,amplitude):{dx:0,dy:0};
+     const permanent=permanentOn?relief.residual(marks,u,v):{dx:0,dy:0};
+     return{x:x+(elastic.dx+permanent.dx)*W,
+      y:y+(elastic.dy+permanent.dy)*H};
     }:null;
     const coordinate=(x,y)=>{const p=map?map(x,y):{x,y};return p.x.toFixed(1)+' '+p.y.toFixed(1);};
     for(let i=0;i<polygons.length;i++){
@@ -273,6 +278,7 @@ SILM.microstructure=(()=>{
     for(let i=19;i>=0;i--)border.push([W*i/20,H]);
     for(let i=11;i>=1;i--)border.push([0,H*i/12]);
     if(specimenOutline)specimenOutline.setAttribute('d','M'+border.map(p=>coordinate(p[0],p[1])).join(' L')+' Z');
+    section.dataset.mechanicalResidualField=permanentOn?'localized':'legacy-or-none';
     surfaceMicro?.setWarp(map);
    }
   const getMode=()=>{
@@ -292,7 +298,10 @@ SILM.microstructure=(()=>{
    if(!residual)return;
    const load=active?clamp(Number(motion.load)||0,0,1):0;
    const maxStrain=SILM.deformation?.EPS_YIELD||.06;
-   const amplitude=active?clamp(Math.abs(Number(motion.strain)||0)/maxStrain,0,1):0;
+   // Aplicar carga deve deformar a amostra imediatamente, mesmo antes
+   // do próximo passo temporal do controlador da rede.
+   const strainFactor=active?Math.abs(Number(motion.strain)||0)/maxStrain:0;
+   const amplitude=active?clamp(Math.max(strainFactor,.88*load),0,1):0;
    const field=active?SILM.specimenLocal?.field({
     mode:mode==='malleability'?'compression':'tension',
     position:contactPosition,width:contactWidth}):null;
@@ -305,12 +314,15 @@ SILM.microstructure=(()=>{
    specimenFeedback.hidden=!(active||residual.hasResidual);
    apparatusField.setAttribute('visibility',active?'visible':'hidden');
    topGrip.style.left=bottomGrip.style.left=String(Math.round(contactPosition*100))+'%';
-   // Deformação plástica é global e persistente nesta etapa; a parcela
-   // elástica transitória é variável no espaço (FEM).
-   if(residual.hasResidual)mechanicalField.setAttribute('transform','translate('+CX+' '+CY+
-    ') scale('+residual.scaleX+' '+residual.scaleY+') translate('+(-CX)+' '+(-CY)+')');
+   // Nesta revisão, plasticidade visual depende do local da prensa/garra.
+   // Investigações antigas, sem contatos históricos, mantêm o fallback.
+   const marks=Array.isArray(st.metadata?.mechanicalImprints)?st.metadata.mechanicalImprints:[];
+   const local=marks.length>0&&!!SILM.specimenRelief;
+   if(residual.hasResidual&&!local)
+    mechanicalField.setAttribute('transform','translate('+CX+' '+CY+
+     ') scale('+residual.scaleX+' '+residual.scaleY+') translate('+(-CX)+' '+(-CY)+')');
    else mechanicalField.removeAttribute('transform');
-   warpGrains(field,amplitude);
+   warpGrains(field,amplitude,marks);
    surfaceMicro?.setDeformationLight?.({
     mode:active?(mode==='malleability'?'compression':'tension'):null,
     contact:{position:contactPosition,width:contactWidth},
