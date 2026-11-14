@@ -114,6 +114,12 @@ SILM.validateScientificState=(value,data=SILM.data)=>{
  if(!value.conditions||value.conditions.temperature!==null||value.conditions.pressure!==null||!value.representation||value.representation.dimension!==null||!Array.isArray(value.representation.layers)||value.representation.layers.length)return fail('CONDITIONS_INVALID');
  if(!value.metadata||typeof value.metadata!=='object'||Array.isArray(value.metadata))return fail('METADATA_INVALID');
   if(value.metadata.surface!==undefined&&!SILM.surfacePhysics?.validState(value.metadata.surface))return fail('SURFACE_STATE_INVALID');
+  if(value.metadata.mechanicalContact!==undefined){
+   const c=value.metadata.mechanicalContact;
+   if(!c||!Number.isFinite(c.position)||c.position<.1||c.position>.9||
+      !Number.isFinite(c.width)||c.width<.1||c.width>.8)
+    return fail('MECHANICAL_CONTACT_INVALID');
+  }
  if(value.investigation===null){if(value.metal!==null||value.structure!==null||value.electrons!==null)return fail('ORPHAN_METAL');}
  else{
   const i=value.investigation,m=value.metal;
@@ -297,6 +303,19 @@ SILM.createScientificState=()=>{
   if(!state.structure)return false;
   return persistSurface({...SILM.surfacePhysics.current(state),strokes:[]},'reset');
  }
+ /* Contato mecânico da mesma amostra, persistente ao alternar escalas.
+    Os valores são frações relativas de imagem, não dimensões medidas. */
+ function setMechanicalContact(position,width){
+  if(!state.investigation||!state.structure||state.module.active!=='explorar'||
+     ![position,width].every(Number.isFinite)||position<.1||position>.9||
+     width<.1||width>.8)return false;
+  const next={position:Math.round(position*1000)/1000,width:Math.round(width*1000)/1000};
+  if(JSON.stringify(state.metadata.mechanicalContact)===JSON.stringify(next))return true;
+  const previous=snapshot();
+  state.metadata.mechanicalContact=next;state.investigation.updatedAt=now();
+  publish('mechanical:contact',previous,{contact:next});
+  return true;
+ }
  /* A restauração virtual é diferente de simplesmente retirar a força:
     descarregar mantém a deformação plástica da amostra. */
  function resetMechanicalSpecimen(){
@@ -432,7 +451,7 @@ SILM.createScientificState=()=>{
  return Object.freeze({get state(){return snapshot();},snapshot,connect,begin,setWorkshopContext,setModule,resetInvestigation,close,setStatus,restore,
   checkpoint:()=>({state:snapshot(),history:JSON.parse(JSON.stringify(history))}),
   rollback(value){replace(JSON.parse(JSON.stringify(value.state)));history=JSON.parse(JSON.stringify(value.history));emit?.('investigation:updated',{current:snapshot(),change:'storage:rollback'});},
-  beginAssembly,addUnit,moveUnit,undo,clearStructure,setAssistance,setAssemblyStatus,organize,restoreFree,setCrystalRepresentation,activateElectrons,setElectronRepresentation,startProperty,setPropertyParams,restoreProperty,endProperty,propertyAvailability,applySurfaceTreatment,setSurfaceLight,resetSurface,resetMechanicalSpecimen,addMeasurement,removeMeasurement,clearMeasurements,measurementAvailability,addCalculation,removeCalculation,clearCalculations,calculationAvailability,
+  beginAssembly,addUnit,moveUnit,undo,clearStructure,setAssistance,setAssemblyStatus,organize,restoreFree,setCrystalRepresentation,activateElectrons,setElectronRepresentation,startProperty,setPropertyParams,restoreProperty,endProperty,propertyAvailability,applySurfaceTreatment,setSurfaceLight,resetSurface,resetMechanicalSpecimen,setMechanicalContact,addMeasurement,removeMeasurement,clearMeasurements,measurementAvailability,addCalculation,removeCalculation,clearCalculations,calculationAvailability,
   get canUndo(){return !!state.structure&&free()&&history.length>0;},get historySize(){return history.length;},
   get lastAction(){const last=history[history.length-1];return state.structure&&last?{type:last.type,unitId:last.unitId}:null;},
   load(){const missing={};const saved=storage?.get('scientific.state',missing);if(saved===missing)return {ok:true,empty:true};const result=restore(saved);if(!result.ok){history=[];replace(SILM.emptyScientificState());persist();return result;}return result;}
