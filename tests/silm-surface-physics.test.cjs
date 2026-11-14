@@ -57,6 +57,16 @@ test('sem n,k homologados a saída é qualitativa',()=>{
  assert.equal(q.calibration,'qualitative');
  assert.ok(q.specularRelative>=0&&q.specularRelative<=1);
 });
+
+test('contadores direcionais suportam novos estados e arquivos legados',()=>{
+ const e=engine(),old={...e.base()};
+ delete old.compressionSteps;delete old.tensionSteps;
+ assert.equal(e.validState(old),true);
+ const specimen={...e.base(),compressionSteps:3,tensionSteps:2,plasticSteps:5};
+ assert.equal(e.validState(specimen),true);
+ assert.equal(e.validState({...specimen,compressionSteps:-1}),false);
+ assert.equal(e.sample(specimen,.5,.5).plasticSteps,5);
+});
 test('limita histórico e rejeita traçados inválidos',()=>{
  const e=engine(),s=e.base(),stroke={tool:'polish',x0:0,y0:0,x1:1,y1:1,radius:.05};
  assert.equal(e.validStroke({...stroke,radius:1}),false);
