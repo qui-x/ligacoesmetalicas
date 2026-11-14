@@ -1,0 +1,74 @@
+name: SILM — Dados do metal (sete metais)
+on:
+  push:
+    branches: [fix/silm-data-panel-seven-metals-main-latest-20261114]
+  pull_request:
+    paths:
+      - 'integracao/metallic-experience.js'
+      - 'domain/silm/research-evidence.css'
+      - 'sw.js'
+      - 'tests/silm-metal-data-seven.test.cjs'
+      - 'tests/run-metal-data-seven.mjs'
+      - '.github/workflows/silm-metal-data-seven.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contrato:
+    name: Dados 7x5 · integridade e fontes
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar JavaScript e ficha científica no painel
+        run: |
+          node --check integracao/metallic-experience.js
+          node --check sw.js
+          node --check tests/run-metal-data-seven.mjs
+          node --test tests/silm-metal-data-seven.test.cjs tests/stage78-seven-condition-profiles.test.cjs
+  navegadores:
+    name: Dados metal · ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Instalar navegador de teste
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-playwright/node_modules/playwright" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright" install --with-deps "$BROWSER_NAME"
+      - name: Iniciar servidor
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-http.log" 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS "$BASE_URL/index.html" >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-http.log"
+          exit 1
+      - name: Verificar dados no painel real do SILM
+        run: node tests/run-metal-data-seven.mjs
+      - name: Arquivar capturas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-metal-data-${{ matrix.browser }}
+          path: reports/metal-data-seven/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14

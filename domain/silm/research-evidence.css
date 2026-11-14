@@ -137,3 +137,32 @@
 @media(max-width:480px){
  .silm-seven-condition-reference .silm-seven-condition-metrics{column-gap:.4rem}
 }
+
+/* Dados do metal: referências científicas específicas de cada amostra.
+ * Convivem com o painel nativo sem criar outra tela nem ocultar condições. */
+#silm-data .silm-metal-data-observation{
+ margin:.55rem 0;padding:.55rem .6rem;
+ border-inline-start:2px solid var(--accent-color,currentColor);
+ border-block-end:1px solid var(--border-color,rgba(127,127,127,.2));
+ overflow-wrap:anywhere;min-width:0;line-height:1.45;
+}
+#silm-data .silm-metal-data-observation strong{
+ display:block;font-size:.84rem;margin-bottom:.16rem;
+}
+#silm-data .silm-metal-data-observation span{
+ display:block;font-size:.88rem;font-weight:600;font-variant-numeric:tabular-nums;
+}
+#silm-data .silm-metal-data-observation small,
+#silm-data .silm-metal-data-source small{
+ display:block;font-size:.76rem;line-height:1.4;margin-top:.22rem;
+ color:var(--text-muted,inherit);
+}
+#silm-data .silm-metal-data-source{
+ overflow-wrap:anywhere;margin:.65rem 0;padding-block-end:.5rem;
+ border-bottom:1px solid var(--border-color,rgba(127,127,127,.2));
+}
+#silm-data .silm-metal-data-source strong{font-size:.83rem}
+#silm-data .silm-metal-data-source a{
+ display:inline-block;font-size:.8rem;max-width:100%;margin-top:.25rem;
+ overflow-wrap:anywhere;
+}
