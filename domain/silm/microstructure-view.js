@@ -55,7 +55,7 @@ SILM.microstructure=(()=>{
   const plane=svgNode('g',{'class':'silm-micro-plane'});svg.append(plane);
   // A transformação didática é uma camada REVERSÍVEL sobre os mesmos caminhos.
   const mechanicalField=svgNode('g',{'class':'silm-micro-mechanical-field'});plane.append(mechanicalField);
-  let paths=[],cells=[];
+  let paths=[],cells=[];let surfaceMicro=null;
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
   let sourceData=null; // Mapa importado = análise de polígonos fornecidos, não homologação.
   const status=node('span','silm-workshop-micro-status','Selecione um grão · modelo esquemático');
@@ -111,6 +111,7 @@ SILM.microstructure=(()=>{
    const bevel=svgNode('path',{d,'class':'silm-micro-highlight','pointer-events':'none'});
    g.append(p,bevel,hatch);mechanicalField.append(g);paths[i]=p;cells[i]=g;
    });
+   surfaceMicro?.rebuild();
    if(chosen>=polygons.length)chosen=polygons.length-1;
    if(chosen>=0)choose(chosen);else status.textContent=sourceData?'Selecione um grão segmentado · dados importados não homologados':'Selecione um grão · modelo esquemático';
    offsetX=0;offsetY=0;update();fitViewport();
@@ -303,6 +304,8 @@ SILM.microstructure=(()=>{
    });
   }
   refreshMechanical();
+  surfaceMicro=SILM.surfaceMicro?.attach({section,svg,mechanicalField,toolbar,model,element,getSize:()=>({width:W,height:H})})||null;
+  section.silmMicroSurfaceRefresh=()=>surfaceMicro?.refresh();
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
   svg.addEventListener('pointerdown',e=>{
    if(e.button!==0||!viewport.classList.contains('is-pannable'))return;
