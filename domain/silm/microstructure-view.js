@@ -250,7 +250,7 @@ SILM.microstructure=(()=>{
    if(mechanicalPulse.textContent.trim()!==pulseLabel)mechanicalPulse.textContent=pulseLabel;
    mechanicalPulse.setAttribute('aria-label',mode==='malleability'?'Aplicar compressão':'Aplicar tração');
    mechanicalPulse.disabled=step>=max;
-   mechanicalReset.disabled=!step&&!load;
+   mechanicalReset.disabled=!step&&!load&&!residual;
    mechanicalStatus.textContent=(mode==='malleability'?'Compressão':'Tração')+
     ' · passo ilustrativo '+step+'/'+max+(load?' · força relativa '+Math.round(load*100)+' %':'')+
     ' · não representa deformação medida por grão';
