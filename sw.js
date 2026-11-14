@@ -1,9 +1,11 @@
 /* Cache por escopo, instalação e ativação adaptados da baseline 0.1.0. */
 const VERSION='0.15.10';
 // BUILD identifica esta revisão da distribuição e força a atualização do cache offline.
-const BUILD='optical-original-YAML-30-550nm-verification-r1-optical-stage65-58-metals-59-candidate-profiles-r1-research-stage65-19-supplement-7-qualified-9-pending-r1-pgm-intrinsic-rh-ir-ru-os-tabulated-r1-nbs-icepoint-electrical-29-observations-24-metals-r1-nist-295k-six-metals-thermal-reference-r1-stage43-tc-optical-conditional-nk-500-600-r1-research-multistage-138-records-r1-fe-nist-primary-evidence-table6-r1-parte10-joule-dissipacao-calor-20261111-offline-revalidation-r1-professor-roteiros-r1-pr111-optics-v5-session-continuity-r1-optical-stage-integrated-r2-formative-r1-report-metal-icons-r1-report-modules-r1-explore-history-r1-micro-mechanics-r1-promethium-dhcp-r1-ga-in-u-structural-r1-cm-bk-cf-es-r1-fr-fcc-computed-r1-fm-md-no-model-r1-rf-hcp-dft-r1-lr-db-sg-sources-r1-lr-bcc-empirical-r1';
+const BUILD='surface-multiscale-poc-20261114-r1-optical-original-YAML-30-550nm-verification-r1-optical-stage65-58-metals-59-candidate-profiles-r1-research-stage65-19-supplement-7-qualified-9-pending-r1-pgm-intrinsic-rh-ir-ru-os-tabulated-r1-nbs-icepoint-electrical-29-observations-24-metals-r1-nist-295k-six-metals-thermal-reference-r1-stage43-tc-optical-conditional-nk-500-600-r1-research-multistage-138-records-r1-fe-nist-primary-evidence-table6-r1-parte10-joule-dissipacao-calor-20261111-offline-revalidation-r1-professor-roteiros-r1-pr111-optics-v5-session-continuity-r1-optical-stage-integrated-r2-formative-r1-report-metal-icons-r1-report-modules-r1-explore-history-r1-micro-mechanics-r1-promethium-dhcp-r1-ga-in-u-structural-r1-cm-bk-cf-es-r1-fr-fcc-computed-r1-fm-md-no-model-r1-rf-hcp-dft-r1-lr-db-sg-sources-r1-lr-bcc-empirical-r1';
 const ROOT=new URL(self.registration.scope),PREFIX=`silm@${ROOT.href}::`,CACHE=PREFIX+VERSION+'+'+BUILD,DOMAINS=CACHE+'::domains';
 const FILES=[
+  "domain/silm/surface-physics.js",
+  "domain/silm/surface-micro.js",
   "assets/workshop/motor.webp",
   "assets/workshop/fitting.webp",
   "assets/workshop/screw.webp",
