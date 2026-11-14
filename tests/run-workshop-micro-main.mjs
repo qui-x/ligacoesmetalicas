@@ -196,9 +196,13 @@ async function test(viewport){
 
  // A escova também funciona sem arrastar o mouse: seleciona-se o grão
  // e usa-se o botão acessível, que atualiza a mesma amostra.
+ await viewer.locator('.silm-micro-grain').nth(25).focus();
+ await viewer.locator('.silm-micro-grain').nth(25).press('Enter');
  await opticalTools.getByRole('combobox',{name:'Ferramenta superficial'}).selectOption('brush');
  await opticalTools.getByRole('button',{name:'Aplicar ferramenta ao grão selecionado'}).click();
- await page.waitForFunction(()=>SILMIntegration.snapshot().metadata.surface.strokes.length===2);
+ const finished=await page.evaluate(()=>SILMIntegration.snapshot());
+ assert.equal(finished.metadata.surface.strokes.length,2,
+  'Ferramenta por teclado não registrou a região: '+JSON.stringify({active:finished.properties.active,strokes:finished.metadata.surface.strokes.length}));
  await opticalTools.getByRole('combobox',{name:'Ferramenta superficial'}).selectOption('observe');
  await openProperty('malleability');
  assert.equal(await viewer.getAttribute('data-surface-coobservation'),'active',
