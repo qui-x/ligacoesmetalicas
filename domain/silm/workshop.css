@@ -1230,3 +1230,26 @@
  .silm-micro-press-plate{fill:CanvasText;stroke:CanvasText;opacity:1}
  .silm-micro-specimen-feedback{background:Canvas;color:CanvasText;border-color:CanvasText;box-shadow:none}
 }
+
+
+/* Posição e largura do contato da prensa/garra na MESMA cena. */
+#si-stage[data-workshop-scale="2"] .silm-micro-contact-control{
+ display:flex;align-items:center;gap:6px;min-width:150px;flex:1 1 155px;
+ color:var(--text);font-size:.73rem;line-height:1.35;
+}
+.silm-micro-contact-control span{flex:0 1 100px;min-width:65px}
+.silm-micro-contact-control input[type="range"]{
+ flex:1 1 95px;min-width:60px;width:100%;accent-color:var(--accent);min-height:35px
+}
+.silm-micro-press-plate{transition:none}
+.silm-workshop-micro-viewer[data-mechanical-solver="elastic-local-2d"] .silm-micro-specimen-outline{
+ stroke-dasharray:5 3;
+}
+@media(max-width:560px){
+ #si-stage[data-workshop-scale="2"] .silm-micro-contact-control{
+  grid-column:span 1;flex-wrap:wrap;min-width:0;gap:1px
+ }
+ .silm-micro-contact-control span{flex:1 1 100%;min-width:0}
+ .silm-micro-contact-control input[type="range"]{flex:1 1 100%;min-width:0}
+}
+@media(forced-colors:active){.silm-micro-contact-control input[type="range"]{accent-color:Highlight}}
