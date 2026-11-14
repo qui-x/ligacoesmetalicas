@@ -33,7 +33,7 @@ SILM.createOpticalCandidatePanel=({prefix='silm-optical-candidate'}={})=>{
  const conclusion=document.createElement('p');conclusion.className='silm-research-note';
  const auditStatus=document.createElement('p');auditStatus.className='silm-optical-yaml-status silm-research-note';
  const auditLink=document.createElement('a');auditLink.target='_blank';auditLink.rel='noopener noreferrer';auditLink.className='silm-optical-yaml-doi';
- section.append(heading,notice,selectLabel,result,details,sample,provenance,auditStatus,auditLink,source,conclusion);
+ section.append(heading,notice,selectLabel,result,details,sample,provenance,source,auditStatus,auditLink,conclusion);
  const study=SILM.opticalResearchCandidates;
  const fmt=(x,d=2)=>Number(x).toLocaleString('pt-BR',{maximumFractionDigits:d});
  let symbol=null,profiles=[];
