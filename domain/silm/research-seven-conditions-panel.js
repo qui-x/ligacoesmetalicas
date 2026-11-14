@@ -32,7 +32,13 @@ SILM.createSevenConditionPanel=({prefix='silm-seven'}={})=>{
   'historical-compilation':'Compilação histórica',
   'processing-only':'Histórico de processamento, NÃO coeficiente de maleabilidade',
   'secondary-pending':'Transcrição SECUNDÁRIA pendente de fonte original',
-  'optical-derived':'R(550 nm) calculada/compilada para interface ideal'
+  'optical-derived':'R(550 nm) calculada/compilada para interface ideal',
+  'recommended-evaluated':'Referência recomendada por avaliação institucional de medições',
+  'recommended-impure':'Referência avaliada com impurezas experimentais significativas',
+  'provisional-evaluated':'Referência PROVISÓRIA da compilação institucional',
+  'fit-derived':'Número CALCULADO a partir de ajuste/razão experimental, não ponto medido',
+  'historical-impure':'Medição histórica de amostra contaminada (não metal puro)',
+  'historical-specimen':'Medição histórica com amostra e preparo documentados'
  });
  const fmt=n=>Number(n).toLocaleString('pt-BR',{maximumFractionDigits:8});
  let previous='';
