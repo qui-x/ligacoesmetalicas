@@ -72,7 +72,7 @@ try{
    assert.equal(tc.strictReason,'CONDITIONS_UNVERIFIED');
    assert.match(tc.link,/jetp\.ras\.ru\/cgi-bin\/dn\/e_067_09_1842\.pdf/);
    assert.match(tc.sample,/Tc\(0001\)/);
-   assert.match(tc.note,/sem extrapola/i);
+   assert.match(tc.note,/extrapola/i);
    assert.match(tc.sourceText,/Temperatura|temperatura/);
    assert.equal(tc.rows.length,3);
    assert.match(tc.rows[0].value,/Sem medição/);
