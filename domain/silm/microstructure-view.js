@@ -86,6 +86,7 @@ SILM.microstructure=(()=>{
     status.textContent='Grão '+grain.id+(area===null?' · sem calibração':' · área segmentada '+fmt(area)+' µm²')+' · dados importados não homologados';
    }else status.textContent='Grão '+(i+1)+' selecionado · modelo esquemático';
    svg.setAttribute('data-selected-grain',String(i+1));
+   surfaceMicro?.refresh();
   };
   function drawGrains(){
    paths=[];cells=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField);
@@ -304,7 +305,13 @@ SILM.microstructure=(()=>{
    });
   }
   refreshMechanical();
-  surfaceMicro=SILM.surfaceMicro?.attach({section,svg,mechanicalField,toolbar,model,element,getSize:()=>({width:W,height:H})})||null;
+  surfaceMicro=SILM.surfaceMicro?.attach({section,svg,mechanicalField,toolbar,model,element,
+   getSize:()=>({width:W,height:H}),
+   getSelectedPoint:()=>{
+    const poly=polygons[chosen];if(!poly?.length)return null;
+    return{x:clamp(poly.reduce((sum,p)=>sum+p[0],0)/(poly.length*W)),
+     y:clamp(poly.reduce((sum,p)=>sum+p[1],0)/(poly.length*H))};
+   }})||null;
   section.silmMicroSurfaceRefresh=()=>surfaceMicro?.refresh();
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
   svg.addEventListener('pointerdown',e=>{
