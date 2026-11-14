@@ -53,7 +53,7 @@ SILM.sevenConditionResearch=(()=>{
  ['Zr','luster',0.307085150797,'fração','Refletância ideal R(550 nm)',null,'temperatura não rastreada','optical-derived','https://github.com/polyanskiy/refractiveindex.info-database/blob/main/database/data/main/Zr/nk/Palm.yml','Filme tratado; n,k e Fresnel não medem brilho em superfície maciça']
  ];
  const ATOMIC=Object.freeze({Co:27,Er:68,Hf:72,Ta:73,Tc:43,Th:90,Zr:40});
- const strict=new Set(['primary-report','primary-conditional','primary-transcription','primary-applied','primary-bound','primary-approximate']);
+ const strict=new Set(['primary-report','primary-conditional','primary-transcription']);
  const records=Object.freeze(observations.map(([symbol,property,value,unit,quantity,temperatureK,temperatureText,grade,sourceURL,sample],i)=>{
   if(!KEYS.includes(property)||!Number.isFinite(value)||!(symbol in ATOMIC)||temperatureK!==null&&!Number.isFinite(temperatureK))throw Error('Etapa78: registro inválido '+i);
   return Object.freeze({id:'stage78-'+symbol.toLowerCase()+'-'+property,atomicNumber:ATOMIC[symbol],symbol,property,value,unit,quantity,temperatureK,pressurePa:null,temperatureText,grade,sourceURL,sample,sourceTracked:!!sourceURL,
