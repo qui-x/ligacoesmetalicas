@@ -23,7 +23,7 @@ try{
      host.style.cssText='max-width:700px;max-height:80vh;overflow:auto;padding:12px;margin:8px auto;'+
       'background:var(--surface,#fff);color:var(--text-primary,#222)';
      document.body.append(host);
-     const state={metal:SILM.data.get(z),properties:{active,luster:{light:false}},
+     const state={metal:SILM.data.get(z),properties:{active,luster:{light:false},ductility:{elongation:0},malleability:{compression:0}},
       electrons:{representation:{visible:false}}};
      const info=()=>({state,eligibility:SILM.properties.eligibility(state.metal),
       editable:true,reduced:true,availability:()=>({ok:true}),deformation:null,
