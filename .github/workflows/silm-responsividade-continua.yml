@@ -77,6 +77,8 @@ jobs:
           node --check tests/run-multistage-evidence.mjs
           node --check domain/silm/data/research-evidence-stage65.js
           node --check tests/run-stage65-mechanical-evidence.mjs
+          node --check domain/silm/data/research-compression-stage73.js
+          node --check tests/run-stage73-compression.mjs
           node --check domain/silm/data/research-optical-candidates-stage65.js
           node --check domain/silm/research-optical-candidates-panel.js
           node --check tests/run-optical-candidates-stage65.mjs
@@ -153,6 +155,9 @@ jobs:
 
       - name: Verificar Bi Pu Lu Co e transcricoes Th em Explorar (Etapa 65)
         run: node tests/run-stage65-mechanical-evidence.mjs
+
+      - name: Verificar compressao documental Etapa 73 no Explorar
+        run: node tests/run-stage73-compression.mjs
 
       - name: Validar 59 candidatos R550 no controle Brilho sem parametrizar motor
         run: node tests/run-optical-candidates-stage65.mjs
@@ -245,6 +250,15 @@ jobs:
         with:
           name: silm-optical-candidates-${{ matrix.browser }}
           path: reports/optical-candidates-stage65/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Arquivar evidencias de compressao Etapa 73
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-compression-stage73-${{ matrix.browser }}
+          path: reports/compression-stage73/${{ matrix.browser }}/
           if-no-files-found: warn
           retention-days: 14
 
