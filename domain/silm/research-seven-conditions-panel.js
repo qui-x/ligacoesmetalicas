@@ -11,7 +11,7 @@ SILM.createSevenConditionPanel=({prefix='silm-seven'}={})=>{
  root.hidden=true;
  const title=document.createElement('strong');
  const status=document.createElement('p');status.className='silm-research-note';
- const qty=document.createElement('dl');qty.className='silm-research-metrics';
+ const qty=document.createElement('dl');qty.className='silm-seven-condition-metrics';
  const conditions=document.createElement('p');conditions.className='silm-research-note';
  const source=document.createElement('a');source.rel='noopener noreferrer';source.target='_blank';
  const detail=document.createElement('details'),summary=document.createElement('summary');
