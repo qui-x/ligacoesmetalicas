@@ -39,7 +39,11 @@ window.SILM=window.SILM||{};
  }
  function spectralProfile(atomicNumber){
   const spec=profile(atomicNumber)?.optical;
-  if(!spec||spec.evidence!=='TABULATED_NK'||!spec.source?.doi||!spec.conditions||
+  if(!spec||spec.evidence!=='TABULATED_NK'||
+   !(spec.source?.doi||
+    (typeof spec.source?.url==='string'&&spec.source.url.startsWith('https://')&&
+     spec.source.table&&spec.source.title&&spec.source.authors&&Number.isInteger(spec.source.year)))||
+   !spec.conditions||
    !Array.isArray(spec.points)||spec.points.length<2)return null;
   const rows=spec.points;
   for(let i=0;i<rows.length;i++){
