@@ -1222,8 +1222,8 @@
       "review": "FASE_EXPERIMENTAL_FRIA_NAO_CNTP",
       "sourceEvidence": [
         {
-          "url": "https://doi.org/10.1016/j.ssc.2014.02.004",
-          "role": "revisao experimental de estrutura e estabilidade; a = 3.005 Å, ângulo = 70.53°"
+          "url": "https://doi.org/10.1016/j.ssc.2014.01.025",
+          "role": "estudo relativístico da estabilidade cristalina de Hg; revisa evidência experimental de a = 3.005 Å e ângulo = 70.53°"
         },
         {
           "url": "https://doi.org/10.1103/PhysRevB.74.094102",
