@@ -82,6 +82,9 @@ jobs:
           node --check domain/silm/data/research-electrical-icepoint.js
           node --check domain/silm/research-electrical-panel.js
           node --check tests/run-electrical-icepoint.mjs
+          node --check domain/silm/data/research-electrical-intrinsic-pgm.js
+          node --check domain/silm/research-electrical-intrinsic-panel.js
+          node --check tests/run-pgm-intrinsic.mjs
           node --check tests/run-four-scales-responsive.mjs
           node --check tests/run-cross-regressions.mjs
           node --check tests/run-controls-responsive-matrix.mjs
@@ -146,6 +149,9 @@ jobs:
       - name: Validar referencias eletricas 273,15 K e comparacao de amostras
         run: node tests/run-electrical-icepoint.mjs
 
+      - name: Validar curva intrinseca de Ru Rh Os Ir sem extrapolar Joule
+        run: node tests/run-pgm-intrinsic.mjs
+
       - name: Validar ocupação visual e navegação das quatro escalas
         run: node tests/run-four-scales-responsive.mjs
 
@@ -167,6 +173,15 @@ jobs:
           else
             echo "Auditoria de $BROWSER_NAME interrompida antes de produzir relatório." >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Guardar capturas de resistividade intrinseca PGM
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-intrinsic-pgm-${{ matrix.browser }}
+          path: reports/pgm-intrinsic/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Guardar capturas eletricas NBS Matula Chi no ponto de gelo
         if: always()
