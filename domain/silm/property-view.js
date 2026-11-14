@@ -164,8 +164,9 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  researchPicker.addEventListener('change',updateResearchRows);
  researchSection.append(researchTitle,researchNote,researchPickerLabel,researchPurity,researchScroll,researchSource);
  const electricalEvidence=SILM.createElectricalEvidencePanel?.({prefix});
+ const intrinsicEvidence=SILM.createPGMIntrinsicPanel?.({prefix});
  const multistageEvidence=SILM.createMultistageResearchPanel?.({prefix});
- box.append(head,row,status,readings,opticalSection,researchSection,thermalSection,...(electricalEvidence?[electricalEvidence.root]:[]),...(multistageEvidence?[multistageEvidence.root]:[]),list);container.append(box);
+ box.append(head,row,status,readings,opticalSection,researchSection,thermalSection,...(electricalEvidence?[electricalEvidence.root]:[]),...(intrinsicEvidence?[intrinsicEvidence.root]:[]),...(multistageEvidence?[multistageEvidence.root]:[]),list);container.append(box);
  function updateOptical(state,driveState){
   const service=SILM.materialEngine;
   const angle=driveState?.angle??35,finish=driveState?.finish??'polished';
@@ -249,6 +250,7 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   if(!researchSection.hidden)updateResearchRows();
   if(multistageEvidence)multistageEvidence.update({atomicNumber:compact?null:state.metal?.atomicNumber,active});
   if(electricalEvidence)electricalEvidence.update({atomicNumber:compact?null:state.metal?.atomicNumber,active});
+  if(intrinsicEvidence)intrinsicEvidence.update({atomicNumber:compact?null:state.metal?.atomicNumber,active});
   box.dataset.active=active||'';list.hidden=!!active||compact;row.hidden=!active;
   if(!active){head.textContent=compact?'':'Escolha uma propriedade para investigar.';status.textContent=compact?'':'Uma experiência por vez; as experiências não alteram a estrutura científica.';
    for(const id of P.ids){const el=eligibility[id],able=availability(id),ok=el.status!=='unavailable'&&able.ok&&editable;starts[id].setAttribute('aria-disabled',String(!ok));
