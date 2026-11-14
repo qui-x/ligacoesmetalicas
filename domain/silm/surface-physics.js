@@ -9,7 +9,7 @@ window.SILM=window.SILM||{};
 (()=>{
  const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
  const TOOLS=Object.freeze(['brush','sand','polish']);
- const BASE=Object.freeze({version:1,light:false,strokes:[],plasticSteps:0,heatEvents:0,electricEvents:0});
+ const BASE=Object.freeze({version:1,light:false,strokes:[],plasticSteps:0,compressionSteps:0,tensionSteps:0,heatEvents:0,electricEvents:0});
  const copy=v=>JSON.parse(JSON.stringify(v));
  const base=()=>copy(BASE);
  function validStroke(s){
@@ -20,7 +20,9 @@ window.SILM=window.SILM||{};
  function validState(value){
   return !!value&&value.version===1&&typeof value.light==='boolean'&&
    Array.isArray(value.strokes)&&value.strokes.length<=160&&value.strokes.every(validStroke)&&
-   ['plasticSteps','heatEvents','electricEvents'].every(k=>Number.isInteger(value[k])&&value[k]>=0&&value[k]<=10000);
+   ['plasticSteps','heatEvents','electricEvents'].every(k=>Number.isInteger(value[k])&&value[k]>=0&&value[k]<=10000)&&
+   ['compressionSteps','tensionSteps'].every(k=>value[k]===undefined||
+    (Number.isInteger(value[k])&&value[k]>=0&&value[k]<=10000));
  }
  const current=state=>validState(state?.metadata?.surface)?state.metadata.surface:base();
  function applyStroke(data,s){
