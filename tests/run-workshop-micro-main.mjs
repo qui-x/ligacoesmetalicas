@@ -142,13 +142,27 @@ async function test(viewport){
  const mechanicalDir=join('reports','micro-deformation',browserName);
  mkdirSync(mechanicalDir,{recursive:true});
  assert.ok((await grip.boundingBox())?.height>=44,'Alça da prensa não alcança 44 px.');
+ await contactDetails.locator('summary').click();
+ const force=mech.locator('.silm-micro-force-input');
+ await force.evaluate(input=>{input.value='50';input.dispatchEvent(new Event('input',{bubbles:true}));});
+ await page.waitForFunction(()=>Number(document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalLoad)>=50);
+ assert.notEqual(await viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
+  nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|')),initialGrainShapes,
+  'A aplicação contínua de carga não deformou a peça.');
+ await mech.getByRole('button',{name:'Retirar carga mantendo deformação plástica'}).click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalLoad==='0');
+ await contactDetails.locator('summary').click();
  const pulse=mech.locator('.silm-micro-mechanical-pulse');
  assert.equal(await pulse.getAttribute('aria-label'),'Aplicar compressão',
   'Botão de compressão não recebeu o nome acessível: '+await pulse.evaluate(n=>n.outerHTML));
  await pulse.click();
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='1');
- assert.match(await viewer.locator('.silm-micro-mechanical-field').getAttribute('transform'),/scale\(/,
-  'Compressão não modifica a representação no mesmo mapa.');
+ assert.equal(await viewer.getAttribute('data-mechanical-residual-field'),'localized',
+  'Deformação plástica deve conservar o ponto da prensa.');
+ const deformedGrains=await viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
+  nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|'));
+ assert.notEqual(deformedGrains,initialGrainShapes,
+  'Compressão não deformou localmente a microestrutura.');
  await viewer.screenshot({path:join(mechanicalDir,'compressao-'+viewport.width+'.png'),animations:'disabled'});
  assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),activeGrain,
   'Comprimir apagou o grão selecionado.');
@@ -246,6 +260,38 @@ async function test(viewport){
   ['compression'],'A marca visual de compressão não foi registrada na amostra.');
  assert.notEqual(await viewer.locator('.silm-micro-contact-shadow').first().getAttribute('opacity'),'0',
   'Não surgiu sombreamento localizado após a compressão.');
+
+ assert.ok(await viewer.locator('.silm-micro-local-relief rect').count()>=450,
+  'Camada de iluminação de relevo não foi montada na microestrutura.');
+ assert.ok(Number(await viewer.getAttribute('data-mechanical-shadow-contrast'))>.075,
+  'O relevo calculado não gerou contraste de luz/sombra.');
+ // Checar o resultado RENDERIZADO: elementos SVG existentes não bastam.
+ const shading=viewer.locator('.silm-micro-deformation-shading'),microMap=viewer.locator('svg.silm-workshop-micro-map');
+ const shadedPng=(await microMap.screenshot({animations:'disabled'})).toString('base64');
+ await shading.evaluate(el=>{el.style.visibility='hidden'});
+ const plainPng=(await microMap.screenshot({animations:'disabled'})).toString('base64');
+ await shading.evaluate(el=>{el.style.removeProperty('visibility')});
+ const visualDiff=await page.evaluate(async ({withShade,withoutShade})=>{
+  const read=src=>new Promise((resolve,reject)=>{
+   const pic=new Image();pic.onload=()=>resolve(pic);pic.onerror=reject;pic.src='data:image/png;base64,'+src;
+  });
+  const [A,B]=await Promise.all([read(withShade),read(withoutShade)]);
+  const canvas=document.createElement('canvas');canvas.width=A.width;canvas.height=A.height;
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(A,0,0);const x=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(B,0,0);
+  const y=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  let changed=0,total=0;
+  for(let yy=0;yy<canvas.height*.55;yy+=3)for(let xx=0;xx<canvas.width;xx+=3){
+   const k=(Math.floor(yy)*canvas.width+Math.floor(xx))*4;
+   const diff=(Math.abs(x[k]-y[k])+Math.abs(x[k+1]-y[k+1])+Math.abs(x[k+2]-y[k+2]))/3;
+   total++;if(diff>8)changed++;
+  }
+  return{changed,total,fraction:changed/Math.max(1,total)};
+ },{withShade:shadedPng,withoutShade:plainPng});
+ assert.ok(visualDiff.fraction>.012,
+  'A camada óptica não alterou pixels visíveis: '+JSON.stringify(visualDiff));
+
  assert.equal(await viewer.getAttribute('data-mechanical-permanent'),'active',
   'A compressão plástica não produziu geometria residual na amostra.');
  await openProperty('ductility');
@@ -261,8 +307,11 @@ async function test(viewport){
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.surfaceOptical==='active');
  assert.equal(await viewer.getAttribute('data-mechanical-permanent'),'active',
   'A deformação residual desapareceu ao investigar o brilho da superfície.');
- assert.ok((await viewer.locator('.silm-micro-mechanical-field').getAttribute('transform'))?.includes('scale('),
-  'Grãos e superfície não acompanharam a deformação da mesma amostra.');
+ assert.equal(await viewer.getAttribute('data-mechanical-residual-field'),'localized',
+  'Perdeu-se o campo plástico localizado ao voltar para o brilho.');
+ assert.notEqual(await viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
+  nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|')),initialGrainShapes,
+  'O brilho apagou a deformação local da peça.');
  assert.equal(await page.evaluate(()=>SILMIntegration.snapshot().metadata.surface.strokes.length),2,
   'Força aplicada não deve apagar a preparação óptica.');
  assert.equal(await viewer.getAttribute('data-mechanical-shadow-zones'),'2',
