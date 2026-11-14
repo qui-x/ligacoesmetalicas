@@ -41,10 +41,18 @@ SILM.createMultistageResearchPanel=({prefix='silm-multistage'}={})=>{
   reduction_area_pct:'Redução de área',
   compression_strain_pct:'Deformação máxima em compressão',
   rolling_reduction_pct:'Redução durante laminação (processamento)',
-  elong_break_reported_max_pct:'Máximo de alongamento relatado (não valor típico)'
+  elong_break_reported_max_pct:'Máximo de alongamento relatado (não valor típico)',
+  compression_reported_epsilon_tested:'Deformação ε aplicada no ensaio (não limite)',
+  compression_true_strain_tested:'Deformação verdadeira avaliada (não limite)',
+  compression_yield_strength_MPa:'Escoamento em compressão da amostra (não maleabilidade)',
+  compression_hardening_transition_strain_approx:'Deformação da mudança de encruamento (aprox.)',
+  compression_reported_strain_pct:'Compressão aplicada no estudo (não limite)',
+  compression_asymptotic_model_MPa:'Tensão assintótica AJUSTADA (não escoamento inicial)'
  };
  const fmt=value=>Number(value).toLocaleString('pt-BR',{maximumFractionDigits:5});
- const unitFor=key=>key.endsWith('_MPa')?'MPa':'%';
+ const unitFor=key=>key.endsWith('_MPa')?'MPa':
+  ['compression_reported_epsilon_tested','compression_true_strain_tested',
+   'compression_hardening_transition_strain_approx'].includes(key)?'(adimensional)':'%';
  let currentKey='',visible=[];
  function draw(){
   const p=visible[Number(picker.value)]||visible[0];
@@ -57,6 +65,14 @@ SILM.createMultistageResearchPanel=({prefix='silm-multistage'}={})=>{
   statusNote.hidden=p.studyStage<58;
   if(!statusNote.hidden){
    const qual=p.sourceStatus;
+   if(p.studyStage===73){
+    statusNote.textContent='Fonte primária '+(
+     p.sourceReview==='open-access-full-text-checked'?'com artigo aberto inspecionado':
+     p.sourceReview==='report-text-and-curves-descriptions-checked'?'com texto do relatório consultado':
+     'com resumo e trechos verificáveis, sem auditoria completa do artigo')+
+     '. Medida específica da amostra: deformação relatada NÃO é limite de maleabilidade;'+
+     ' valor ajustado de modelo NÃO é medição de escoamento. Pressão CNTP não comprovada.';
+   }else{
    statusNote.textContent=qual==='primary-fulltext-confirmed'?
     'Fonte primária conferida, com amostra e temperatura do ensaio declaradas; NÃO é CNTP.':
     qual==='maximum-from-primary-abstract'?
@@ -68,6 +84,7 @@ SILM.createMultistageResearchPanel=({prefix='silm-multistage'}={})=>{
     qual==='historical-patent-reproduction'?
     'Transcrição secundária em patente histórica: fase cristalina e condições não foram verificadas; NÃO atribuir à fase HC automaticamente.':
     'Referência condicional não homologada na CNTP.';
+   }
   }
   metrics.replaceChildren();
   for(const [key,value] of Object.entries(p.metrics)){
@@ -88,6 +105,7 @@ SILM.createMultistageResearchPanel=({prefix='silm-multistage'}={})=>{
    '. Classificação da auditoria: '+(p.reviewStatus||'não informada')+
    '. Ressalvas: '+(p.qualifier||'sem qualificador adicional')+
    (p.notes?'. Notas: '+p.notes:'')+
+   (p.additionalBound?'. Limite reportado na fonte: m ≤0,009 (expoente da sensibilidade à taxa; NÃO valor exato).':'')+
    '. Registro exclusivo para consulta; NÃO é parâmetro de motor nem extrapolação entre temperaturas.';
  }
  picker.addEventListener('change',draw);
@@ -101,7 +119,8 @@ SILM.createMultistageResearchPanel=({prefix='silm-multistage'}={})=>{
    const all=SILM.multistageResearch?.bySymbol?.[symbol]||[];
    const supplement=SILM.stage65Evidence;
    const approvedSupplement=supplement?.numericBySymbol?.[symbol]||[];
-   visible=[...all,...approvedSupplement].filter(p=>{
+   const primaryCompression=SILM.compressionStage73?.bySymbol?.[symbol]||[];
+   visible=[...all,...approvedSupplement,...(active==='malleability'?primaryCompression:[])].filter(p=>{
     const test=String(p.test).toLowerCase(),hasComp=Object.hasOwn(p.metrics,'compression_strain_pct');
     if(active==='malleability')return test.includes('compress')||hasComp;
     // Ensaio de tração: não converter valores de compressão ou laminação em ductilidade.
@@ -141,7 +160,7 @@ SILM.createMultistageResearchPanel=({prefix='silm-multistage'}={})=>{
     link.target='_blank';link.rel='noopener noreferrer';li.append(link);pendingList.append(li);
    }
    heading.textContent='Referências documentais · '+symbol;
-   description.textContent=visible.length+' condição(ões) da pesquisa científica (etapas 10–65). '+
+   description.textContent=visible.length+' condição(ões) da pesquisa científica (etapas 10–73). '+
     (active==='malleability'?'Ensaios de compressão NÃO medem, por si só, a maleabilidade.':
      'Valores de tração dependem de composição e processamento.')+
      ' Fontes primárias, compilações e transcrições pendentes são identificadas individualmente. A animação não utiliza estes números.';
