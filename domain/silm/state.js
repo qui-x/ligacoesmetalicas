@@ -114,6 +114,12 @@ SILM.validateScientificState=(value,data=SILM.data)=>{
  if(!value.conditions||value.conditions.temperature!==null||value.conditions.pressure!==null||!value.representation||value.representation.dimension!==null||!Array.isArray(value.representation.layers)||value.representation.layers.length)return fail('CONDITIONS_INVALID');
  if(!value.metadata||typeof value.metadata!=='object'||Array.isArray(value.metadata))return fail('METADATA_INVALID');
   if(value.metadata.surface!==undefined&&!SILM.surfacePhysics?.validState(value.metadata.surface))return fail('SURFACE_STATE_INVALID');
+  if(value.metadata.mechanicalImprints!==undefined){
+   const marks=value.metadata.mechanicalImprints;
+   if(!Array.isArray(marks)||marks.length>(SILM.specimenVisualLight?.maxMarks||16)||
+      marks.some(m=>!SILM.specimenVisualLight?.validMark(m)))
+    return fail('MECHANICAL_IMPRINT_INVALID');
+  }
   if(value.metadata.mechanicalContact!==undefined){
    const c=value.metadata.mechanicalContact;
    if(!c||!Number.isFinite(c.position)||c.position<.1||c.position>.9||
@@ -325,6 +331,7 @@ SILM.createScientificState=()=>{
   const previous=snapshot(),surface={...SILM.surfacePhysics.current(state),
     plasticSteps:0,compressionSteps:0,tensionSteps:0};
   state.metadata.surface=surface;
+  state.metadata.mechanicalImprints=[];
   state.properties={...state.properties,[id]:JSON.parse(JSON.stringify(P.defaults[id]))};
   state.investigation.updatedAt=now();
   publish('specimen:restored',previous,{property:id});
@@ -361,15 +368,26 @@ SILM.createScientificState=()=>{
    // Acumular eventos didáticos da mesma amostra. Não atribuir unidades
    // de deformação/tempo ao número de passos ou ciclos.
    const surface={...SILM.surfacePhysics.current(state)};
+   const appendImprint=(mode,amount)=>{
+    const contact=state.metadata.mechanicalContact||{position:.5,width:.3};
+    const previousMarks=Array.isArray(state.metadata.mechanicalImprints)?state.metadata.mechanicalImprints:[];
+    const mark={mode,position:contact.position,width:contact.width};
+    const limit=SILM.specimenVisualLight?.maxMarks||16;
+    state.metadata.mechanicalImprints=[
+     ...previousMarks,...Array.from({length:Math.min(8,amount)},()=>({...mark}))
+    ].slice(-limit);
+   };
    if(id==='malleability'&&next.malleability.compression>pr.malleability.compression){
     const amount=next.malleability.compression-pr.malleability.compression;
     surface.plasticSteps=Math.min(10000,surface.plasticSteps+amount);
     surface.compressionSteps=Math.min(10000,(surface.compressionSteps||0)+amount);
+    appendImprint('compression',amount);
    }
    if(id==='ductility'&&next.ductility.elongation>pr.ductility.elongation){
     const amount=next.ductility.elongation-pr.ductility.elongation;
     surface.plasticSteps=Math.min(10000,surface.plasticSteps+amount);
     surface.tensionSteps=Math.min(10000,(surface.tensionSteps||0)+amount);
+    appendImprint('tension',amount);
    }
    if(id==='thermal'&&next.thermal.heating&&!pr.thermal.heating)
     surface.heatEvents=Math.min(10000,surface.heatEvents+1);
