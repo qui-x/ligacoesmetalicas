@@ -109,7 +109,7 @@ window.SILM=window.SILM||{};
    if(memo)return memo;const st=model.state,p=st.properties,id=p?.active==='malleability'||p?.active==='ductility'?p.active:null;let g=null;
    if(id&&st.metal&&st.structure?.mode==='crystalline'){try{g=S.crystal.geometry(S.data.get(st.metal.atomicNumber));}catch{g=null;}}
    const sys=g?system(g):null,sign=id==='ductility'?1:-1;if(sys){lastSys=sys;lastSign=sign;}
-   memo={id,sys,sign,count:id==='malleability'?p.malleability.compression:id==='ductility'?p.ductility.elongation:0,key:(st.investigation?.id||'')+'|'+(st.metal?.atomicNumber||'')+'|'+(st.structure?.mode||'')};
+   memo={id,sys,sign,atomicNumber:st.metal?.atomicNumber||null,count:id==='malleability'?p.malleability.compression:id==='ductility'?p.ductility.elongation:0,key:(st.investigation?.id||'')+'|'+(st.metal?.atomicNumber||'')+'|'+(st.structure?.mode||'')};
    queueMicrotask(()=>{memo=null;});return memo;
   }
   const notify=()=>{for(const f of listeners)try{f();}catch(error){console.error(error);}};
@@ -148,7 +148,8 @@ window.SILM=window.SILM||{};
    pulse(){memo=null;const c=ctx();if(!c.id||c.count>=LIMIT)return false;if(!commit(c,c.count+1))return false;if(!reducedMotion()){pulse={t:0};wake();}else snap(c);notify();return true;},
    // Ao encerrar ou restaurar, o retorno também é animado: o último sistema vale até a forma voltar à de referência.
    transform(camera=null){const c=ctx(),s=c.sys||lastSys;if(!s||(!c.id&&orient<1e-4&&progress.every(v=>v<1e-4)))return null;return transform(s,{progress,sign:c.id?c.sign:lastSign,strain,orient,camera});},
-   reading(){const c=ctx();return {active:c.id,load,strain,regime:!c.id?null:load>YIELD||pulse?'plastic':load>0?'elastic':Math.abs(strain)>.002?'returning':'rest',count:c.count,limit:LIMIT,limitReached,sliding:moving(c),orient,system:c.sys};},
+   reading(){const c=ctx();return {active:c.id,load,strain,regime:!c.id?null:load>YIELD||pulse?'plastic':load>0?'elastic':Math.abs(strain)>.002?'returning':'rest',count:c.count,limit:LIMIT,limitReached,sliding:moving(c),orient,system:c.sys,
+    constitutive:c.id?S.mechanicalConstitutive?.capability(c.atomicNumber,c.id)||null:null};},
    get load(){return load;}
   };
   controllers.set(model,api);return api;
