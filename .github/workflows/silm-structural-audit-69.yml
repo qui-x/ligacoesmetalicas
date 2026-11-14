@@ -1,0 +1,25 @@
+name: SILM — Auditoria 92 metais (Etapa 69)
+on:
+  push:
+    paths:
+      - 'docs/science/silm-etapa69-*'
+      - 'tests/structural-audit-69.test.cjs'
+      - 'domain/silm/data/bundle.js'
+      - '.github/workflows/silm-structural-audit-69.yml'
+  pull_request:
+    paths:
+      - 'docs/science/silm-etapa69-*'
+      - 'tests/structural-audit-69.test.cjs'
+      - 'domain/silm/data/bundle.js'
+      - '.github/workflows/silm-structural-audit-69.yml'
+jobs:
+  audit:
+    name: Integridade científica dos 92 metais
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar dados e bloqueios
+        run: node --test tests/structural-audit-69.test.cjs
