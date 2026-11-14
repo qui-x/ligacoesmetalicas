@@ -88,7 +88,7 @@ SILM.researchElectricalIcepoint=(()=>{
    conductivitySM:1/rhoSI,conductivityDerived:true,
    temperatureK:273.15,temperatureBasis:'ice-point-or-explicit-273.15K',
    pressurePa:null,
-   sourceConditionsVerified:true,
+   sourceTemperatureVerified:true,
    CNTPhomologated:false,engineRelease:false,referenceOnly:true
   });
  }));
