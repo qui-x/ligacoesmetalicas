@@ -1319,3 +1319,24 @@
 @media(prefers-reduced-motion:reduce){
  .silm-micro-contact-shadow,.silm-micro-contact-highlight{transition:none}
 }
+
+
+/* Relevo local desenhado na MESMA cena de grãos: pista perceptiva,
+ * sem pretensão de profundidade real medida pela FEM 2D. */
+.silm-micro-deformation-shading{isolation:isolate;pointer-events:none}
+.silm-micro-local-relief{pointer-events:none}
+.silm-micro-relief-shadow,.silm-micro-relief-highlight{pointer-events:none}
+.silm-micro-contact-shadow{mix-blend-mode:normal}
+.silm-micro-contact-highlight{mix-blend-mode:normal}
+.silm-workshop-micro-viewer[data-mechanical-residual-field="localized"] .silm-micro-specimen-outline{
+ stroke-opacity:.92;stroke-dasharray:none;stroke-width:2.5
+}
+:root.si-highcontrast .silm-micro-local-relief,
+:root.si-highcontrast .silm-micro-deformation-shading{display:none}
+@media(forced-colors:active){
+ .silm-micro-local-relief,.silm-micro-deformation-shading{display:none}
+ .silm-micro-specimen-outline{stroke:CanvasText;stroke-dasharray:5 3}
+}
+@media(prefers-reduced-motion:reduce){
+ .silm-micro-local-relief,.silm-micro-deformation-shading{transition:none}
+}
