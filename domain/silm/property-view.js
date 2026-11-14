@@ -163,10 +163,11 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  }
  researchPicker.addEventListener('change',updateResearchRows);
  researchSection.append(researchTitle,researchNote,researchPickerLabel,researchPurity,researchScroll,researchSource);
+ const opticalCandidate=SILM.createOpticalCandidatePanel?.({prefix});
  const electricalEvidence=SILM.createElectricalEvidencePanel?.({prefix});
  const intrinsicEvidence=SILM.createPGMIntrinsicPanel?.({prefix});
  const multistageEvidence=SILM.createMultistageResearchPanel?.({prefix});
- box.append(head,row,status,readings,opticalSection,researchSection,thermalSection,...(electricalEvidence?[electricalEvidence.root]:[]),...(intrinsicEvidence?[intrinsicEvidence.root]:[]),...(multistageEvidence?[multistageEvidence.root]:[]),list);container.append(box);
+ box.append(head,row,status,readings,opticalSection,...(opticalCandidate?[opticalCandidate.root]:[]),researchSection,thermalSection,...(electricalEvidence?[electricalEvidence.root]:[]),...(intrinsicEvidence?[intrinsicEvidence.root]:[]),...(multistageEvidence?[multistageEvidence.root]:[]),list);container.append(box);
  function updateOptical(state,driveState){
   const service=SILM.materialEngine;
   const angle=driveState?.angle??35,finish=driveState?.finish??'polished';
@@ -236,6 +237,7 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   readings.hidden=!joule||compact;
   opticalSection.hidden=active!=='luster'||compact;
   if(!opticalSection.hidden)updateOptical(state,info().drive);
+  if(opticalCandidate)opticalCandidate.update({atomicNumber:compact?null:state.metal?.atomicNumber,active});
   const thermalReference=(!compact&&active==='thermal')?
    SILM.researchThermalNIST?.get?.(state.metal?.atomicNumber):null;
   thermalSection.hidden=!thermalReference;
