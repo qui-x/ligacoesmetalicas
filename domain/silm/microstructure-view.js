@@ -55,6 +55,10 @@ SILM.microstructure=(()=>{
   const plane=svgNode('g',{'class':'silm-micro-plane'});svg.append(plane);
   // A transformação didática é uma camada REVERSÍVEL sobre os mesmos caminhos.
   const mechanicalField=svgNode('g',{'class':'silm-micro-mechanical-field'});plane.append(mechanicalField);
+  const apparatusField=svgNode('g',{'class':'silm-micro-apparatus','pointer-events':'none'});
+  const topPlate=svgNode('rect',{'class':'silm-micro-press-plate','pointer-events':'none'});
+  const bottomPlate=svgNode('rect',{'class':'silm-micro-press-plate','pointer-events':'none'});
+  apparatusField.append(topPlate,bottomPlate);plane.append(apparatusField);
   let paths=[],cells=[];let surfaceMicro=null;
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
   let sourceData=null; // Mapa importado = análise de polígonos fornecidos, não homologação.
@@ -89,7 +93,7 @@ SILM.microstructure=(()=>{
    surfaceMicro?.refresh();
   };
   function drawGrains(){
-   paths=[];cells=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField);
+   paths=[];cells=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField,apparatusField);
    polygons.forEach((poly,i)=>{
    if(poly.length<3)return;
    const d='M'+poly.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')+' Z';
@@ -112,7 +116,7 @@ SILM.microstructure=(()=>{
    const bevel=svgNode('path',{d,'class':'silm-micro-highlight','pointer-events':'none'});
    g.append(p,bevel,hatch);mechanicalField.append(g);paths[i]=p;cells[i]=g;
    });
-   const specimen=svgNode('rect',{x:W*.04,y:H*.04,width:W*.92,height:H*.92,
+   const specimen=svgNode('rect',{x:W*.14,y:H*.14,width:W*.72,height:H*.72,
     rx:Math.min(W,H)*.025,ry:Math.min(W,H)*.025,
     'class':'silm-micro-specimen-outline',fill:'none','pointer-events':'none'});
    mechanicalField.append(specimen);
@@ -188,9 +192,12 @@ SILM.microstructure=(()=>{
   const mechanicalReset=node('button','silm-workshop-micro-control silm-micro-mechanical-reset','Restaurar');
   mechanicalReset.type='button';
   mechanicalReset.setAttribute('aria-label','Restaurar deformação');
+  const mechanicalLoadMeter=node('meter','silm-micro-mechanical-load-meter');
+  mechanicalLoadMeter.min=0;mechanicalLoadMeter.max=100;mechanicalLoadMeter.value=0;
+  mechanicalLoadMeter.setAttribute('aria-label','Carga mecânica relativa no corpo de prova');
   const mechanicalStatus=node('output','silm-micro-mechanical-reading','');
   mechanicalStatus.setAttribute('role','status');mechanicalStatus.setAttribute('aria-live','polite');
-  mechanicalTools.append(mechanicalPulse,mechanicalReset,mechanicalStatus);
+  mechanicalTools.append(mechanicalPulse,mechanicalReset,mechanicalLoadMeter,mechanicalStatus);
   toolbar.append(mechanicalTools);
 
   // Alças operáveis no próprio mapa (não em diálogo ou mini-palco).
@@ -202,6 +209,8 @@ SILM.microstructure=(()=>{
    grip.type='button';grip.hidden=true;grip.title='Arraste para aplicar força; Enter ou Espaço aplica um passo';
    grip.style.touchAction='none';
   }
+  const specimenFeedback=node('output','silm-micro-specimen-feedback','');
+  specimenFeedback.setAttribute('aria-live','off');specimenFeedback.hidden=true;
   let mechanicsMode=null;
   const getMode=()=>{
    const st=model?.state,mode=st?.properties?.active;
@@ -214,46 +223,61 @@ SILM.microstructure=(()=>{
    topGrip.hidden=bottomGrip.hidden=!active;
    section.dataset.mechanicalStudy=mode||'inactive';
    const surface=SILM.surfacePhysics?.current(st);
-   const comp=Math.min(4,surface?.compressionSteps||0),tens=Math.min(4,surface?.tensionSteps||0);
-   const residual=comp+tens>0;
+   const motion=active?(deformCtl?.reading?.()||{load:0,strain:0,regime:'rest'}):{};
+   const response=SILM.deformation?.specimenResponse?.(surface,motion);
+   if(!response)return;
+   const residual=response.hasResidual,load=response.force;
    section.dataset.mechanicalPermanent=residual?'active':'inactive';
+   section.dataset.mechanicalRegime=active?response.regime:residual?'residual':'rest';
+   section.dataset.mechanicalElastic=String(Math.round(response.elasticAxial*1000));
+   specimenFeedback.hidden=!(active||residual);
+   apparatusField.setAttribute('visibility',active?'visible':'hidden');
+   // As placas ficam fora do grupo deformado; acompanham a borda do corpo
+   // de prova, mas nunca se tornam grãos ou centros metálicos.
+   const h=Math.max(4,H*.016),w=W*.74,px=(W-w)/2;
+   const half=H*.36*response.scaleY;
+   for(const [plate,y] of [[topPlate,CY-half-h*1.5],[bottomPlate,CY+half+h*.5]]){
+    plate.setAttribute('x',String(px));plate.setAttribute('y',String(y));
+    plate.setAttribute('width',String(w));plate.setAttribute('height',String(h));
+    plate.setAttribute('rx',String(h*.2));
+   }
+   if(residual||response.hasTransient)
+    mechanicalField.setAttribute('transform','translate('+CX+' '+CY+') scale('+
+     response.scaleX+' '+response.scaleY+') translate('+(-CX)+' '+(-CY)+')');
+   else mechanicalField.removeAttribute('transform');
    if(!active){
-    // Retirar a força não apaga a deformação plástica já registrada.
-    if(residual){
-     const x=1+.045*comp-.035*tens,y=1-.045*comp+.055*tens;
-     mechanicalField.setAttribute('transform','translate('+CX+' '+CY+') scale('+x+' '+y+') translate('+(-CX)+' '+(-CY)+')');
-    }else mechanicalField.removeAttribute('transform');
     delete section.dataset.mechanicalStep;
     delete section.dataset.mechanicalLoad;
+    specimenFeedback.textContent=residual?'Amostra com deformação plástica residual · sem carga':'';
     return;
    }
    const step=mode==='malleability'?st.properties.malleability.compression:st.properties.ductility.elongation;
    const max=SILM.properties.limits[mode==='malleability'?'compression':'elongation'];
-   const state=deformCtl?.reading?.()||{load:0,regime:'rest'};
-   const load=clamp(Number(state.load)||0,0,1),p=step/max;
-   // Envelope geométrico abstrato, sem módulo elástico, tensão ou
-   // porcentagem de deformação atribuídos à amostra/material.
-   const x=1+.045*comp-.035*tens+(mode==='malleability'?.04:-.025)*load;
-   const y=1-.045*comp+.055*tens+(mode==='malleability'?-.04:.05)*load;
-   if(step||load||residual){
-    mechanicalField.setAttribute('transform','translate('+CX+' '+CY+') scale('+x+' '+y+') translate('+(-CX)+' '+(-CY)+')');
-   }else mechanicalField.removeAttribute('transform');
+   const relative=Math.round(load*100);
    section.dataset.mechanicalStep=String(step);
-   section.dataset.mechanicalLoad=String(Math.round(load*100));
-   section.dataset.mechanicalRegime=state.regime||'rest';
+   section.dataset.mechanicalLoad=String(relative);
+   mechanicalLoadMeter.value=relative;
    topGrip.textContent=mode==='malleability'?'↓':'↑';
    bottomGrip.textContent=mode==='malleability'?'↑':'↓';
-   for(const grip of [topGrip,bottomGrip])grip.setAttribute('aria-label',mode==='malleability'?
-    'Comprimir o campo de grãos':'Tracionar o campo de grãos');
+   for(const grip of [topGrip,bottomGrip])grip.setAttribute('aria-label',
+    mode==='malleability'?'Acionar prensa: comprimir o corpo de prova':'Acionar garra: tracionar o corpo de prova');
    const pulseLabel=mode==='malleability'?'Comprimir':'Tracionar';
-   // Evitar reconstruir o ícone em toda atualização do controlador.
    if(mechanicalPulse.textContent.trim()!==pulseLabel)mechanicalPulse.textContent=pulseLabel;
    mechanicalPulse.setAttribute('aria-label',mode==='malleability'?'Aplicar compressão':'Aplicar tração');
    mechanicalPulse.disabled=step>=max;
    mechanicalReset.disabled=!step&&!load&&!residual;
-   mechanicalStatus.textContent=(mode==='malleability'?'Compressão':'Tração')+
-    ' · passo ilustrativo '+step+'/'+max+(load?' · força relativa '+Math.round(load*100)+' %':'')+
-    ' · não representa deformação medida por grão';
+   const regime=response.regime==='plastic'?'regime plástico didático':
+    response.regime==='elastic'?'deformação elástica':
+    response.regime==='returning'?'recuperação elástica':
+    residual?'deformação residual':'sem carga';
+   const experiment=mode==='malleability'?'Compressão':'Tração';
+   specimenFeedback.textContent=experiment+' · '+regime+
+    (load?' · carga relativa '+relative+'%':'');
+   mechanicalStatus.textContent=experiment+' · '+regime+
+    ' · '+step+'/'+max+' passo(s) ilustrativos'+
+    (load?' · carga relativa '+relative+'%':'')+
+    (residual?' · alteração permanente registrada':'')+
+    ' · sem tensão ou alongamento experimental calculado';
   }
   const mechanicalPulseStep=()=>{
    const mode=getMode(),st=model?.state;
@@ -348,7 +372,7 @@ SILM.microstructure=(()=>{
    if(suppressClick)queueMicrotask(()=>{suppressClick=false;});
   };
   svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);
-  viewport.append(svg,topGrip,bottomGrip);
+  viewport.append(svg,topGrip,bottomGrip,specimenFeedback);
   const note=node('p','silm-workshop-micro-caveat',
    'Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.');
   // Mudanças de formação são explícitas. Redimensionar, ampliar ou mudar
