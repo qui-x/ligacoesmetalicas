@@ -1178,3 +1178,7 @@
 @media(max-width:560px){#si-stage[data-workshop-scale="2"] .silm-micro-surface-tools{order:4;gap:4px}.silm-micro-surface-select{flex:1 1 100%}.silm-micro-surface-angle{flex:1 1 calc(50% - 4px);flex-wrap:wrap}.silm-micro-surface-angle span{flex-basis:100%}.silm-micro-surface-angle input{flex-basis:100%;min-height:36px}}
 @media(forced-colors:active){.silm-micro-surface-field{display:none}}
 @media(prefers-reduced-motion:reduce){.silm-micro-surface-field{transition:none}}
+
+/* Registro de preparação da mesma amostra em Rede e Centro. */
+.silm-surface-cross-scale-note[hidden]{display:none!important}
+.silm-surface-cross-scale-note{font-size:.75rem;line-height:1.38;color:var(--muted);padding:4px 10px;margin:0 6px 4px;overflow-wrap:anywhere}
