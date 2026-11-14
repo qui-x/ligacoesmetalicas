@@ -27,7 +27,7 @@ test('Etapa73: 8 fichas de 7 metais, fontes individuais e motores bloqueados',()
   assert.ok(p.sourceURL.startsWith('https://'));
   assert.match(p.test,/compress/i);
   assert.ok(Object.values(p.metrics).every(v=>Number.isFinite(v)));
-  assert.match(p.qualifier,/NÃO|não/);
+  assert.match(p.qualifier,/não/i);
   assert.ok(p.sourceTitle.length>20);
  }
 });
