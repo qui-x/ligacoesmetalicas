@@ -15,7 +15,7 @@ SILM.createElectricalEvidencePanel=({prefix='silm-electrical'}={})=>{
  const picker=document.createElement('select');picker.id=prefix+'-source';
  picker.setAttribute('aria-label','Referência elétrica: metal e amostra');
  label.htmlFor=picker.id;label.append(picker);
- const dl=document.createElement('dl');dl.className='silm-research-metrics';
+ const dl=document.createElement('dl');dl.className='silm-electrical-metrics';
  const note=document.createElement('p');note.className='silm-research-note';
  const source=document.createElement('a');source.target='_blank';source.rel='noopener noreferrer';
  source.textContent='Consultar publicação original';
