@@ -167,9 +167,10 @@ async function test(viewport){
  await opticalTools.waitFor({state:'visible'});
  assert.ok(await viewer.locator('.silm-micro-surface-field rect').count()>=300,
   'Campo óptico não está integrado ao SVG da microestrutura.');
+ const previousLight=await page.evaluate(()=>SILMIntegration.snapshot().metadata.surface.light);
  await opticalTools.getByRole('button',{name:'Alternar luz sobre a superfície'}).click();
- assert.equal(await page.evaluate(()=>SILMIntegration.snapshot().metadata.surface.light),true,
-  'Luz não persistiu no estado da investigação.');
+ assert.equal(await page.evaluate(()=>SILMIntegration.snapshot().metadata.surface.light),!previousLight,
+  'A luz não alternou ou não persistiu no estado da investigação.');
  await opticalTools.getByRole('combobox',{name:'Ferramenta superficial'}).selectOption('brush');
  const surfaceArea=await viewer.locator('svg.silm-workshop-micro-map').boundingBox();
  const x=surfaceArea.x+surfaceArea.width*.33,y=surfaceArea.y+surfaceArea.height*.45;
