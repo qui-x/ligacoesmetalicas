@@ -108,6 +108,25 @@ async function test(viewport){
  await openProperty('malleability');
  const mech=viewer.locator('.silm-micro-mechanical-tools');
  await mech.waitFor({state:'visible'});
+
+ // O contato da prensa tem posição e largura próprias. A mesma amostra
+ // conserva essas escolhas ao mudar de escala.
+ assert.equal(await viewer.getAttribute('data-mechanical-solver'),'elastic-local-2d',
+  'Solver FEM elástico local não foi ligado à microestrutura.');
+ const position=mech.locator('.silm-micro-contact-position');
+ const contactWidth=mech.locator('.silm-micro-contact-width');
+ const pressBounds=await viewer.locator('.silm-micro-press-plate').first().boundingBox();
+ await position.evaluate(el=>{el.value='20';el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));});
+ await page.waitForFunction(()=>SILMIntegration.snapshot().metadata.mechanicalContact?.position===.2);
+ assert.equal(await viewer.getAttribute('data-mechanical-contact'),'20',
+  'Contato mecânico não se deslocou para a região escolhida.');
+ await contactWidth.evaluate(el=>{el.value='60';el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));});
+ await page.waitForFunction(()=>SILMIntegration.snapshot().metadata.mechanicalContact?.width===.6);
+ const newPressBounds=await viewer.locator('.silm-micro-press-plate').first().boundingBox();
+ assert.ok(newPressBounds.width>pressBounds.width*1.3,
+  'A largura de contato não modificou a placa de compressão.');
+ assert.equal(await viewer.getAttribute('data-mechanical-contact-width'),'60');
+
  const grip=viewer.locator('.silm-micro-mechanical-top');
  const mechanicalDir=join('reports','micro-deformation',browserName);
  mkdirSync(mechanicalDir,{recursive:true});
