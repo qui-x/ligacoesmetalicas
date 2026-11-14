@@ -1,0 +1,22 @@
+name: SILM — Pesquisa mecânica Etapa 76
+on:
+  pull_request:
+    paths:
+      - 'docs/science/silm-etapa76-mecanica-eu-lu.json'
+      - 'docs/science/silm-etapa76-mecanica-eu-lu.md'
+      - 'tests/stage76-mechanical-eu-lu.test.cjs'
+      - '.github/workflows/silm-stage76-research.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Testar proveniência, duplicação e bloqueio dos motores
+        run: node --test tests/stage76-mechanical-eu-lu.test.cjs
