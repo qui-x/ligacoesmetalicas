@@ -18,6 +18,7 @@ test('Etapa73: 8 fichas de 7 metais, fontes individuais e motores bloqueados',()
  assert.equal(R.sourceFullTextCheckedCount,1);
  for(const p of R.records){
   assert.equal(p.stage,73);
+  assert.equal(p.studyStage,73,'o seletor de amostras requer studyStage');
   assert.equal(p.CNTPhomologated,false);
   assert.equal(p.engineRelease,false);
   assert.equal(p.numericSimulatorApproval,false);
