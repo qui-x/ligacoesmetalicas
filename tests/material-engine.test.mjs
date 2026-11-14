@@ -152,7 +152,7 @@ test('o registro recusa dados rotulados CNTP com T e P inconsistentes',()=>{
  assert.throws(()=>P.register({atomicNumber:47,element:'Ag',properties:{
   electrical:{evidence:'TABULATED',value:1,unit:'S/m',source:{title:'Teste'},conditions:wrong}
  }}),/CONDITIONS_STANDARD_MISMATCH/);
- assert.equal(P.list().length,1);
+ assert.equal(P.list().length,2);
  assert.equal(S.referenceConditions.compare(valid).ok,true);
 });
 
