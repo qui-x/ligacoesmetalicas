@@ -358,7 +358,7 @@ SILM.microstructure=(()=>{
     ' · contato em '+Math.round(contactPosition*100)+'% · largura '+Math.round(contactWidth*100)+'%'+
     ' · passo ilustrativo '+step+'/'+max+
     (load?' · carga relativa '+relative+'%':'')+
-    ' · sombra e relevo apenas visuais; sem profundidade 3D, tensão MPa ou deformação medida por grão';
+    ' · não representa deformação medida por grão; elasticidade plana normalizada, sem MPa; sombras ilustrativas sem profundidade 3D';
   }
   const mechanicalPulseStep=()=>{
    const mode=getMode(),st=model?.state;
