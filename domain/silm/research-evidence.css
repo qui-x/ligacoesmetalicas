@@ -61,16 +61,16 @@
    Apenas leitura documental; não há simulador paralelo ou valores CNTP inventados. */
 .silm-electrical-evidence{max-width:100%;min-width:0;overflow-wrap:anywhere}
 .silm-electrical-evidence[hidden]{display:none!important}
-.silm-electrical-evidence .silm-research-metrics{
+.silm-electrical-evidence .silm-electrical-metrics{
  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.35rem 1rem;
  max-width:100%;font-size:.83rem;margin:.6rem 0;
 }
-.silm-electrical-evidence .silm-research-metrics dt{min-width:0}
-.silm-electrical-evidence .silm-research-metrics dd{
+.silm-electrical-evidence .silm-electrical-metrics dt{min-width:0}
+.silm-electrical-evidence .silm-electrical-metrics dd{
  margin:0;text-align:right;font-variant-numeric:tabular-nums;font-weight:600
 }
 .silm-electrical-evidence select{margin:.3rem 0 .55rem}
 .silm-electrical-evidence a{overflow-wrap:anywhere}
 @media (max-width:480px){
- .silm-electrical-evidence .silm-research-metrics{gap:.3rem .5rem;font-size:.77rem}
+ .silm-electrical-evidence .silm-electrical-metrics{gap:.3rem .5rem;font-size:.77rem}
 }
