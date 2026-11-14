@@ -154,6 +154,47 @@ async function test(viewport){
  assert.equal(await page.locator('.silm-optical-bench').count(),0,
   'A mecânica recriou um palco paralelo na microestrutura.');
 
+ // Superfície: brilho na escala 2 sem obrigar organização da rede.
+ await page.getByRole('button',{name:'Ver',exact:true}).click();
+ const luster=page.locator('[data-action="property-luster"]');
+ await luster.waitFor({state:'visible'});
+ assert.notEqual(await luster.getAttribute('aria-disabled'),'true',
+  'Brilho não deveria exigir rede organizada na escala de grãos.');
+ await luster.click();
+ await page.locator('#si-dock-right [data-close-dock="right"]').click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.surfaceOptical==='active');
+ const opticalTools=viewer.locator('.silm-micro-surface-tools');
+ await opticalTools.waitFor({state:'visible'});
+ assert.ok(await viewer.locator('.silm-micro-surface-field rect').count()>=300,
+  'Campo óptico não está integrado ao SVG da microestrutura.');
+ const previousLight=await page.evaluate(()=>SILMIntegration.snapshot().metadata.surface.light);
+ await opticalTools.getByRole('button',{name:'Alternar luz sobre a superfície'}).click();
+ assert.equal(await page.evaluate(()=>SILMIntegration.snapshot().metadata.surface.light),!previousLight,
+  'A luz não alternou ou não persistiu no estado da investigação.');
+ await opticalTools.getByRole('combobox',{name:'Ferramenta superficial'}).selectOption('brush');
+ const surfaceArea=await viewer.locator('svg.silm-workshop-micro-map').boundingBox();
+ const x=surfaceArea.x+surfaceArea.width*.33,y=surfaceArea.y+surfaceArea.height*.45;
+ await page.mouse.move(x,y);await page.mouse.down();
+ await page.mouse.move(x+Math.min(surfaceArea.width*.25,80),y,{steps:6});await page.mouse.up();
+ await page.waitForFunction(()=>SILMIntegration.snapshot().metadata.surface?.strokes?.length===1);
+ assert.equal(await viewer.getAttribute('data-surface-strokes'),'1');
+ assert.equal(await viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
+  nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|')),initialGrainShapes,
+  'Preparação de superfície alterou os polígonos gerados.');
+ await opticalTools.getByRole('combobox',{name:'Ferramenta superficial'}).selectOption('observe');
+ await page.getByRole('button',{name:'Ver',exact:true}).click();
+ await page.locator('[data-action="property-luster"]').click();
+ await page.locator('#si-dock-right [data-close-dock="right"]').click();
+ assert.equal(await page.evaluate(()=>SILMIntegration.snapshot().metadata.surface.strokes.length),1,
+  'Encerrar a ferramenta não deve apagar tratamento da amostra.');
+ await page.getByRole('button',{name:'Ver',exact:true}).click();
+ await page.locator('[data-action="property-luster"]').click();
+ await page.locator('#si-dock-right [data-close-dock="right"]').click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.surfaceOptical==='active');
+ assert.equal(await viewer.getAttribute('data-surface-strokes'),'1',
+  'Reativar o brilho perdeu acabamento persistente.');
+
+
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  await viewer.getByRole('button',{name:'Ampliar microestrutura'}).click();
  assert.equal(await viewer.locator('svg.silm-workshop-micro-map').getAttribute('data-zoom'),'1.25','Zoom não funciona');

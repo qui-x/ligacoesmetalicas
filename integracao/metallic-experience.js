@@ -160,7 +160,7 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
    if(model.state.electrons)model.setElectronRepresentation({visible:true,motion:true});
    actions.field();
   }else if(id==='thermal')actions.heat();
-  else if(id==='luster')actions.light();
+  else if(id==='luster'&&!model.state.properties.luster.light)actions.light();
   // Maleabilidade e ductilidade ativam o atuador correspondente na cena; a carga é aplicada pelo gesto do usuário.
   schedule();return true;
  }

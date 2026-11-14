@@ -24,7 +24,8 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  const units=U.element('div',null,'silm-assembly-units');units.setAttribute('role','group');units.setAttribute('aria-label','Unidades da estrutura de '+name);
  area.append(stage);
  const feedback=U.element('p','','sr-only silm-assembly-feedback');feedback.id='silm-assembly-feedback';feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
- root.append(title,meta,area,feedback);host.append(root);
+ const surfaceNote=U.element('p','','silm-surface-cross-scale-note');surfaceNote.hidden=true;
+ root.append(title,meta,area,surfaceNote,feedback);host.append(root);
  const say=(text,{announce=true}={})=>{feedback.textContent=text;if(announce)SimCore.notifications.announce(text);};
  /* ---------- comandos rápidos: os mesmos estados de Ver → Camadas → Estrutura ---------- */
  // Ações estruturais ficam centralizadas em Ver → Observar; aqui permanece apenas o seletor de projeção.
@@ -396,6 +397,9 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  }
  function render(){
   const S=model.state,s=S.structure;if(!s||s.mode!=='crystalline')return;const r=s.crystallography.representation,baseUnits=s.units,pr=S.properties,active=pr?.active||null;const alignNow=(mode3d?'3d':rep2.projection())+'|'+(pr?.startedAt||'');if(alignNow!==alignKey){alignKey=alignNow;align=camAngles(rep2.projection());}
+  const surface=SILM.surfacePhysics?.current(S),hasSurface=!!(surface&&(surface.strokes.length||surface.plasticSteps));
+  surfaceNote.hidden=!hasSurface;
+  if(hasSurface)surfaceNote.textContent=(localFocus?'Centro metálico':'Rede cristalina')+' · '+surface.strokes.length+' tratamento(s) superficiais e '+surface.plasticSteps+' passo(s) plásticos registrados. O acabamento pertence à superfície da amostra, não a átomos isolados.';
   const list=r.view==='lattice'?baseUnits.map(u=>({...u,referenceSite:u.site,site:navigator.cursor.displaySite(u.site)})):baseUnits;
   const focusSite=localFocus?navigator.cursor.site:null;
   const focusShell=focusSite?g.neighbors(focusSite):null;
