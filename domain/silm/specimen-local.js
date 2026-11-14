@@ -102,6 +102,7 @@ window.SILM=window.SILM||{};
    const a=xx-i,b=yy-j;
    const ids=[node(i,j),node(i+1,j),node(i,j+1),node(i+1,j+1)];
    const w=[(1-a)*(1-b),a*(1-b),(1-a)*b,a*b],factor=clamp(Number(load)||0,0,1);
+   if(!factor)return {dx:0,dy:0};
    let dx=0,dy=0;
    ids.forEach((n,k)=>{dx+=u[2*n]*w[k];dy+=u[2*n+1]*w[k];});
    return {dx:dx*factor,dy:dy*factor};
