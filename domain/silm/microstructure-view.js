@@ -348,9 +348,9 @@ SILM.microstructure=(()=>{
    specimenFeedback.textContent=title+' · '+regime+(load?' · carga relativa '+relative+'%':'');
    mechanicalStatus.textContent=title+' · '+regime+
     ' · contato em '+Math.round(contactPosition*100)+'% · largura '+Math.round(contactWidth*100)+'%'+
-    ' · '+step+'/'+max+' passo(s) plásticos didáticos'+
+    ' · passo ilustrativo '+step+'/'+max+
     (load?' · carga relativa '+relative+'%':'')+
-    ' · modelo elástico plano normalizado, sem MPa ou medida por grão';
+    ' · não representa deformação medida por grão; elasticidade plana normalizada, sem MPa';
   }
   const mechanicalPulseStep=()=>{
    const mode=getMode(),st=model?.state;
@@ -361,8 +361,8 @@ SILM.microstructure=(()=>{
   mechanicalPulse.addEventListener('click',mechanicalPulseStep);
   mechanicalReset.addEventListener('click',()=>{
    if(!getMode())return;
-   deformCtl?.setLoad(0);
-   model?.resetMechanicalSpecimen?.();refreshMechanical();
+   model?.resetMechanicalSpecimen?.();
+   deformCtl?.reset?.();refreshMechanical();
   });
   for(const [grip,upper] of [[topGrip,true],[bottomGrip,false]]){
    let dragged=null;
