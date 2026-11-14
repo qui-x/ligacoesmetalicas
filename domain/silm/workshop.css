@@ -1164,3 +1164,17 @@
  #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom-tools{gap:0}
  #si-stage[data-workshop-scale="2"] .silm-workshop-micro-zoom{flex-basis:32px;min-width:32px}
 }
+
+/* Superfície óptica local sobre grãos; preserva geometria e câmera. */
+.silm-micro-surface-field{pointer-events:none;mix-blend-mode:screen}
+.silm-micro-surface-tools[hidden]{display:none!important}
+#si-stage[data-workshop-scale="2"] .silm-micro-surface-tools{order:5;display:flex;flex:1 1 100%;gap:6px;align-items:center;flex-wrap:wrap;min-width:0;width:100%;padding:5px 0 0;border-top:1px solid var(--border);box-sizing:border-box}
+.silm-micro-surface-select{flex:1 1 130px;min-width:120px;min-height:44px;color:var(--text);background:var(--panel2,var(--surface));border:1px solid var(--border);border-radius:7px;font:inherit;font-size:.82rem}
+.silm-micro-surface-tools .silm-workshop-micro-control{min-height:44px;font-size:.77rem}
+.silm-micro-surface-angle{display:flex;align-items:center;gap:5px;flex:1 1 150px;min-width:115px;font-size:.74rem;color:var(--text);font-weight:600}
+.silm-micro-surface-angle input{min-width:60px;width:100%;accent-color:var(--accent)}
+.silm-micro-surface-reading{flex:1 1 100%;min-width:0;max-width:100%;font-size:.74rem;line-height:1.4;color:var(--muted);overflow-wrap:anywhere}
+.silm-workshop-micro-viewer[data-surface-optical="active"] .silm-workshop-micro-map{touch-action:none}
+@media(max-width:560px){#si-stage[data-workshop-scale="2"] .silm-micro-surface-tools{order:4;gap:4px}.silm-micro-surface-select{flex:1 1 100%}.silm-micro-surface-angle{flex:1 1 calc(50% - 4px);flex-wrap:wrap}.silm-micro-surface-angle span{flex-basis:100%}.silm-micro-surface-angle input{flex-basis:100%;min-height:36px}}
+@media(forced-colors:active){.silm-micro-surface-field{display:none}}
+@media(prefers-reduced-motion:reduce){.silm-micro-surface-field{transition:none}}
