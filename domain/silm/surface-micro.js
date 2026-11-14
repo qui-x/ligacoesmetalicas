@@ -130,9 +130,10 @@ window.SILM=window.SILM||{};
    const st=model.state,visual=SILM.specimenVisualLight;
    if(!visual){shading.setAttribute('visibility','hidden');return;}
    const surface=physics.current(st),size=getSize();
-   const marks=Array.isArray(st.metadata?.mechanicalImprints)?st.metadata.mechanicalImprints:[];
+   const marks=st.module?.active==='explorar'&&Array.isArray(st.metadata?.mechanicalImprints)?st.metadata.mechanicalImprints:[];
    const count=visual.projectAll({
-    marks,activeContact:lightField?.contact,mode:lightField?.mode,
+    marks,activeContact:st.module?.active==='explorar'?lightField?.contact:null,
+    mode:st.module?.active==='explorar'?lightField?.mode:null,
     load:lightField?.load||0,field:lightField?.field,
     amplitude:lightField?.amplitude||0,
     incidenceDeg:drive?.angle??35,illuminated:surface.light
