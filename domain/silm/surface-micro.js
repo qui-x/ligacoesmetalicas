@@ -78,7 +78,9 @@ window.SILM=window.SILM||{};
    section.dataset.surfaceCoobservation=on&&!focusing?'active':'inactive';
    section.dataset.surfaceTool=focusing?tool.value:'observe';
    tool.disabled=!focusing;
-   apply.disabled=!focusing||tool.value==='observe'||!getSelectedPoint?.();
+   const selected=getSelectedPoint?.();
+   apply.disabled=!focusing||tool.value==='observe'||!selected||
+    !Number.isFinite(selected.x)||!Number.isFinite(selected.y);
    reset.disabled=!focusing||!surface.strokes.length;
    section.dataset.surfaceStrokes=String(surface.strokes.length);
    section.dataset.surfacePlasticSteps=String(surface.plasticSteps);
