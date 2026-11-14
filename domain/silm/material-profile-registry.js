@@ -23,7 +23,9 @@ window.SILM=window.SILM||{};
   if(record.optical){
    const p=record.optical;
    if(p.evidence!=='TABULATED_NK'||!Array.isArray(p.points)||p.points.length<2||
-      !p.source?.doi||!p.conditions)
+      !p.source||!(p.source.doi||
+       (typeof p.source.url==='string'&&p.source.url.startsWith('https://')&&p.source.table&&
+        p.source.title&&p.source.authors&&Number.isInteger(p.source.year)))||!p.conditions)
     throw new TypeError('Perfil óptico sem evidência, série ou fonte');
    const valid=SILM.referenceConditions?.validate(p.conditions);
    if(!valid?.ok)throw new TypeError('Condições ópticas inválidas: '+(valid?.reasonCode||'VALIDATOR_UNAVAILABLE'));

@@ -100,7 +100,23 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   item.append(label,meter,value);spectralBars.append(item);return {nm,meter,value};
  });
  const opticalSource=U.element('p','','silm-optical-source');
- opticalSection.append(opticalHeading,opticalNote,spectralBars,opticalSource);
+ const opticalLink=document.createElement('a');
+ opticalLink.className='silm-optical-source-link';
+ opticalLink.target='_blank';opticalLink.rel='noopener noreferrer';
+ opticalLink.hidden=true;opticalLink.textContent='Consultar fonte científica original';
+ opticalSection.append(opticalHeading,opticalNote,spectralBars,opticalSource,opticalLink);
+ // Valor térmico institucional, em 295 K, somente para consulta junto da experiência.
+ // Não alimenta o solver nem é atribuído à CNTP adotada pelo SILM.
+ const thermalSection=U.element('section',null,'silm-research-reference silm-thermal-nist-reference');
+ thermalSection.hidden=true;thermalSection.setAttribute('aria-label','Condutividade térmica de referência NIST a 295 K');
+ const thermalTitle=U.element('strong','Condutividade térmica · referência NIST');
+ const thermalValue=U.element('p','','silm-thermal-nist-value');
+ const thermalNote=U.element('p','','silm-research-note');
+ const thermalSource=document.createElement('a');
+ thermalSource.href='https://www.nist.gov/ncnr/neutron-instruments/sample-environment/sample-mounting/reference-tables';
+ thermalSource.target='_blank';thermalSource.rel='noopener noreferrer';
+ thermalSource.textContent='Ver tabela do NIST · 295 K';
+ thermalSection.append(thermalTitle,thermalValue,thermalNote,thermalSource);
  // Evidencia de pesquisa incorporada no mesmo painel "Explorar > Ductilidade".
  // Selecionar amostra altera APENAS a tabela documental; nao altera o motor.
  const researchSection=U.element('section',null,'silm-research-reference');researchSection.hidden=true;
@@ -148,7 +164,7 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  researchPicker.addEventListener('change',updateResearchRows);
  researchSection.append(researchTitle,researchNote,researchPickerLabel,researchPurity,researchScroll,researchSource);
  const multistageEvidence=SILM.createMultistageResearchPanel?.({prefix});
- box.append(head,row,status,readings,opticalSection,researchSection,...(multistageEvidence?[multistageEvidence.root]:[]),list);container.append(box);
+ box.append(head,row,status,readings,opticalSection,researchSection,thermalSection,...(multistageEvidence?[multistageEvidence.root]:[]),list);container.append(box);
  function updateOptical(state,driveState){
   const service=SILM.materialEngine;
   const angle=driveState?.angle??35,finish=driveState?.finish??'polished';
@@ -160,32 +176,50 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   opticalSection.dataset.finish=finish;
   opticalSection.dataset.reference=validated?
    (cap.conditionMatch?.ok?'cntp-verified':'source-conditions-only'):'unavailable';
+  opticalLink.hidden=!validated||typeof cap?.source?.url!=='string';
+  if(!opticalLink.hidden)opticalLink.href=cap.source.url;
   if(!validated){
-   opticalNote.textContent='A bancada na cena permite comparar reflexão polida e espalhamento fosco apenas qualitativamente. Não há perfil óptico quantitativo homologado para este metal.';
+   opticalNote.textContent='A bancada na cena permite comparar reflexão polida e espalhamento fosco qualitativamente. Não há perfil óptico quantitativo de referência disponível para este metal.';
    opticalSource.textContent='Não atribuímos ao metal a refletância nem a cor de outro elemento. Mova lanterna e observador na cena.';
    return;
   }
+  const sourceConditions=cap.conditions?.description||'Condições experimentais não informadas numericamente.';
+  const sampleDetails=cap.source?.sample?'Amostra: '+cap.source.sample+'. ':'';
   if(finish==='matte'){
-   opticalNote.textContent='Acabamento fosco: o espalhamento na bancada é ilustrativo. Os valores n,k da fonte permitem modelar uma interface ideal lisa, não prever a luz vista na superfície fosca.';
-   opticalSource.textContent='Referência de '+cap.symbol+': '+cap.source.authors+' ('+cap.source.year+'), temperatura ambiente; CNTP não verificada.';
+   opticalNote.textContent='Acabamento fosco: espalhamento apenas ilustrativo. Os valores experimentais n,k são de uma amostra específica; o modelo de Fresnel é para interface ideal lisa, não para superfície fosca.';
+   opticalSource.textContent='Fonte: '+cap.source.authors+' ('+cap.source.year+'). '+sampleDetails+sourceConditions+' Não CNTP verificada.';
    return;
   }
-  const angleDeg=Number.isFinite(angle)?angle:0,values=channels.map(row=>service.optical(numeric,row.nm,angleDeg));
-  if(values.some(v=>!v.ok)){
+  const angleDeg=Number.isFinite(angle)?angle:0;
+  const values=channels.map(row=>service.optical(numeric,row.nm,angleDeg));
+  const nValid=values.filter(v=>v.ok).length;
+  if(!nValid){
    spectralBars.hidden=true;
-   opticalNote.textContent='A amostra não permite calcular esta condição sem extrapolar os dados.';
-   opticalSource.textContent='Revise o intervalo espectral ou o perfil de referência.';
+   opticalNote.textContent='Não é possível calcular a refletância deste ângulo e intervalo espectral sem extrapolar a fonte.';
+   opticalSource.textContent=sampleDetails+sourceConditions+' Sem extrapolação.';
    return;
   }
   for(let i=0;i<channels.length;i++){
-   const v=values[i],channel=channels[i];channel.meter.value=v.reflectance;
-   channel.value.textContent=(100*v.reflectance).toLocaleString('pt-BR',{maximumFractionDigits:1})+' %';
+   const v=values[i],channel=channels[i];
+   channel.meter.hidden=!v.ok;
+   if(v.ok){
+    channel.meter.value=v.reflectance;
+    channel.value.textContent=(100*v.reflectance).toLocaleString('pt-BR',{maximumFractionDigits:1})+' %';
+   }else{
+    channel.value.textContent=v.reasonCode==='SPECTRAL_OUT_OF_RANGE'?
+     'Sem medição nesta faixa':'Indisponível';
+   }
   }
   const atReference=!!cap.conditionMatch?.ok;
-  opticalNote.textContent=cap.symbol+' · interface lisa ideal ar–metal · luz não polarizada · incidência '+angleDeg+'°. As porcentagens são propriedades ópticas da fonte, NÃO intensidade vista pelo observador nem aparência de uma peça real.';
-  opticalSource.textContent=(atReference?'Condição CNTP verificada. ':
-   'ATENÇÃO: fonte à temperatura ambiente; CNTP (0 °C, 1 atm) não verificada — não interpretar estas porcentagens como previsão em CNTP. ')+
-   'Constantes n,k: '+cap.source.authors+' ('+cap.source.year+'). Sem considerar óxido, rugosidade ou filme.';
+  const range=cap.source?.spectralRangeNm;
+  const rangeNote=nValid<values.length&&Array.isArray(range)?
+   ' Série disponível somente entre '+range[0]+' e '+range[1]+' nm; demais canais não são extrapolados.':'';
+  opticalNote.textContent=cap.symbol+' · cálculo de Fresnel para interface lisa ideal ar–metal · luz não polarizada · incidência '+angleDeg+'°. '+
+   'Os valores exibidos NÃO são medição direta de brilho, cor percebida ou aparência de uma peça real.'+rangeNote;
+  opticalSource.textContent=(atReference?'Temperatura e pressão da referência coincidem, sem validar superfície e pureza. ':
+   'ATENÇÃO: medição não homologada na CNTP (0 °C, 1 atm). ')+
+   sampleDetails+sourceConditions+' Fonte: '+cap.source.authors+' ('+cap.source.year+
+   '). Não considerar óxido, rugosidade ou a temperatura de deposição como temperatura da medição.';
  }
 
  const button=(id,label,run,opts={})=>{const b=SILM.actionButton(label,run,scope,{id:prefix+'-'+id,...opts});return b;};
@@ -200,6 +234,16 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   readings.hidden=!joule||compact;
   opticalSection.hidden=active!=='luster'||compact;
   if(!opticalSection.hidden)updateOptical(state,info().drive);
+  const thermalReference=(!compact&&active==='thermal')?
+   SILM.researchThermalNIST?.get?.(state.metal?.atomicNumber):null;
+  thermalSection.hidden=!thermalReference;
+  if(thermalReference){
+   thermalTitle.textContent='Condutividade térmica · '+thermalReference.name;
+   thermalValue.textContent=Number(thermalReference.conductivity).toLocaleString('pt-BR')+
+    ' W/(m·K) · tabela de referência a 295 K';
+   thermalNote.textContent='Dado compilado na tabela técnica do NIST para 295 K. Pureza, processamento e pressão da amostra não são identificados individualmente. NÃO é condutividade homologada na CNTP do SILM (273,15 K, 101325 Pa) e NÃO calibra a animação de calor.';
+   thermalSection.dataset.evidence='compiled-source-conditions-only';
+  }
   researchSection.hidden=active!=='ductility'||compact||state.metal?.atomicNumber!==26||!scientificEvidence;
   if(!researchSection.hidden)updateResearchRows();
   if(multistageEvidence)multistageEvidence.update({atomicNumber:compact?null:state.metal?.atomicNumber,active});

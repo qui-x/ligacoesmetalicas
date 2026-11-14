@@ -4,13 +4,13 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const ctx=vm.createContext({console,structuredClone});
 ctx.window=ctx;
-for(const path of ['data/bundle','data-api','crystal','properties','reference-conditions','material-profile-registry','data/material-profile-demo-cu','material-engine']){
+for(const path of ['data/bundle','data-api','crystal','properties','reference-conditions','material-profile-registry','data/material-profile-demo-cu','data/material-profile-tc-experimental-1988','material-engine']){
  vm.runInContext(readFileSync(new URL('../domain/silm/'+path+'.js',import.meta.url),'utf8'),ctx,{filename:path+'.js'});
 }
 const S=ctx.SILM,ENGINE=S.materialEngine;
 const close=(actual,expected,tolerance=1e-3)=>assert.ok(Math.abs(actual-expected)<=tolerance,actual+' != '+expected);
 
-test('o motor geral atende 79 metais (14 com escopo estrutural), sem copiar o perfil de Cu',()=>{
+test('o motor geral atende 79 metais sem copiar perfis ópticos Cu/Tc para outros metais',()=>{
  const metals=S.data.elements.filter(e=>e.silmEligibility.status==='available');
  assert.equal(metals.length,79);
  for(const el of metals){
@@ -19,10 +19,9 @@ test('o motor geral atende 79 metais (14 com escopo estrutural), sem copiar o pe
    assert.equal(cap.atomicNumber,el.atomicNumber);
    assert.equal(cap.property,property);
    assert.ok(['qualitative','reference-data',undefined].includes(cap.mode));
-   if(el.atomicNumber!==29&&property==='luster'){
-    // Alguns dos 65 metais são investigáveis na Oficina, mas não habilitados
-    // para esta experiência específica (fase, estrutura etc.). Não forçar
-    // disponibilidade nem dados do Cu sobre um metal inelegível.
+   if(![29,43].includes(el.atomicNumber)&&property==='luster'){
+    // Outros metais não herdam n,k de Cu nem de Tc; estrutura disponível
+    // não equivale a perfil óptico experimental habilitado.
     assert.notEqual(cap.mode,'reference-data',el.symbol);
     const result=ENGINE.optical(el.atomicNumber,550);
     assert.equal(result.ok,false,el.symbol);
@@ -35,7 +34,7 @@ test('o motor geral atende 79 metais (14 com escopo estrutural), sem copiar o pe
  assert.equal(ENGINE.capability(29,'not-a-property').reasonCode,'PROPERTY_UNKNOWN');
 });
 
-test('um perfil óptico demonstrativo valida somente o cobre',()=>{
+test('perfil experimental Cu conserva sua fonte e condições',()=>{
  const cap=ENGINE.capability(29,'luster');
  assert.equal(cap.ok,true);
  assert.equal(cap.mode,'reference-data');
@@ -44,11 +43,45 @@ test('um perfil óptico demonstrativo valida somente o cobre',()=>{
  assert.equal(cap.requestedReference,'CNTP_BR_0C_1ATM');
  assert.equal(cap.conditionMatch.ok,false);
  assert.equal(cap.conditionMatch.reasonCode,'CONDITIONS_UNVERIFIED');
- assert.equal(S.materialProfiles.list().length,1);
+ assert.equal(S.materialProfiles.list().length,2);
  const q=ENGINE.optical(29,550,0);
  assert.equal(q.ok,true);assert.equal(q.source.doi,cap.source.doi);
  assert.equal(q.assumptions.includes('sem filme de óxido'),true);
  assert.ok(q.reflectance>0&&q.reflectance<1);
+});
+
+
+
+test('Tc óptico de 1988: 11 pares n,k em 500–600 nm, não CNTP e sem extrapolação',()=>{
+ const cap=ENGINE.capability(43,'luster');
+ assert.equal(cap.ok,true);
+ assert.equal(cap.mode,'reference-data');
+ assert.equal(cap.dataKind,'TABULATED_NK');
+ assert.equal(cap.source.table,'Table I, p. 1843');
+ assert.equal(cap.source.year,1988);
+ assert.equal(cap.source.doi,undefined,'não inventar DOI para artigo JETP');
+ assert.equal(cap.source.sample,'99Tc(0001), 120 nm');
+ assert.equal(cap.conditionMatch.ok,false);
+ assert.equal(cap.conditionMatch.reasonCode,'CONDITIONS_UNVERIFIED');
+ const at550=ENGINE.optical(43,550,0);
+ assert.equal(at550.ok,true);
+ assert.equal(at550.wavelengthNm,550);
+ assert.equal(at550.n,3.36);
+ assert.equal(at550.k,4.21);
+ close(at550.reflectance,0.6341234343395847,1e-12);
+ assert.equal(at550.conditions.temperatureK,null);
+ assert.equal(at550.conditions.pressurePa,null);
+ assert.equal(ENGINE.optical(43,500,0).ok,true);
+ assert.equal(ENGINE.optical(43,600,0).ok,true);
+ for(const nm of [450,650]){
+  const o=ENGINE.optical(43,nm,0);
+  assert.equal(o.ok,false);
+  assert.equal(o.reasonCode,'SPECTRAL_OUT_OF_RANGE');
+ }
+ const strict=ENGINE.opticalForReference(43,550,0);
+ assert.equal(strict.ok,false);
+ assert.equal(strict.reasonCode,'CONDITIONS_UNVERIFIED');
+ assert.equal(Object.hasOwn(strict,'reflectance'),false);
 });
 
 test('Fresnel oblíquo coincide com refletância normal no limite θ=0',()=>{
@@ -119,7 +152,7 @@ test('o registro recusa dados rotulados CNTP com T e P inconsistentes',()=>{
  assert.throws(()=>P.register({atomicNumber:47,element:'Ag',properties:{
   electrical:{evidence:'TABULATED',value:1,unit:'S/m',source:{title:'Teste'},conditions:wrong}
  }}),/CONDITIONS_STANDARD_MISMATCH/);
- assert.equal(P.list().length,1);
+ assert.equal(P.list().length,2);
  assert.equal(S.referenceConditions.compare(valid).ok,true);
 });
 
@@ -127,7 +160,7 @@ test('motor geral recebe propriedades CNTP futuras sem copiar o perfil do cobre'
  // Instância isolada: valor fictício de contrato, nunca exposto à Oficina.
  const isolated=vm.createContext({console,structuredClone});isolated.window=isolated;
  for(const path of ['data/bundle','data-api','crystal','properties','reference-conditions',
-                    'material-profile-registry','data/material-profile-demo-cu','material-engine'])
+                    'material-profile-registry','data/material-profile-demo-cu','data/material-profile-tc-experimental-1988','material-engine'])
   vm.runInContext(readFileSync(new URL('../domain/silm/'+path+'.js',import.meta.url),'utf8'),isolated);
  const T=isolated.SILM;
  T.materialProfiles.register({atomicNumber:47,element:'Ag',
