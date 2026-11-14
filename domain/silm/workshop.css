@@ -1191,3 +1191,11 @@
   flex:1 1 105px;max-width:160px;min-width:90px;font-size:.73rem
  }
 }
+
+/* Contorno didático do corpo de prova: acompanha grãos e permanece após plasticidade. */
+.silm-micro-specimen-outline{fill:none;stroke:var(--accent,var(--text));stroke-width:2.2;
+ stroke-dasharray:7 4;opacity:0;vector-effect:non-scaling-stroke;pointer-events:none}
+.silm-workshop-micro-viewer[data-mechanical-study="malleability"] .silm-micro-specimen-outline,
+.silm-workshop-micro-viewer[data-mechanical-study="ductility"] .silm-micro-specimen-outline,
+.silm-workshop-micro-viewer[data-mechanical-permanent="active"] .silm-micro-specimen-outline{opacity:.8}
+@media(forced-colors:active){.silm-micro-specimen-outline{stroke:CanvasText;stroke-dasharray:5 4}}
