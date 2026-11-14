@@ -171,6 +171,8 @@ window.SILM=window.SILM||{};
   const api={
    subscribe(f){listeners.add(f);return ()=>listeners.delete(f);},
    sync,
+   reset(){load=0;strain=0;velocity=0;work=0;pulse=null;limitReached=false;
+    memo=null;const c=ctx();snap(c);last=0;notify();},
    setLoad(v){const x=Math.max(0,Math.min(1,Number(v)||0));if(x===load&&!pulse)return;pulse=null;load=x;memo=null;const c=ctx();if(reducedMotion()&&x>YIELD&&c.id&&c.count<LIMIT)commit(c,c.count+1);wake();notify();},
    /* Pulso (botão e teclado): registra um deslizamento agora e anima carga → deslizamento → retorno elástico. */
    pulse(){memo=null;const c=ctx();if(!c.id||c.count>=LIMIT)return false;if(!commit(c,c.count+1))return false;if(!reducedMotion()){pulse={t:0};wake();}else snap(c);notify();return true;},
