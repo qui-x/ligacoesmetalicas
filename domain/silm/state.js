@@ -293,7 +293,7 @@ SILM.createScientificState=()=>{
  }
  function resetSurface(){
   if(!state.structure)return false;
-  return persistSurface(SILM.surfacePhysics.base(),'reset');
+  return persistSurface({...SILM.surfacePhysics.current(state),strokes:[]},'reset');
  }
  /* ---------- Propriedades (0.7.x) ---------- */
  const P=SILM.properties;
