@@ -13,6 +13,36 @@ window.SILM=window.SILM||{};
   const overlay=document.createElementNS(NS,'g');
   overlay.setAttribute('class','silm-micro-surface-field');
   overlay.setAttribute('pointer-events','none');
+  // Um único conjunto de gradientes SVG é suficiente para toda a amostra.
+  // Os pontos de claro/escuro mostram a localização das intervenções:
+  // não são topografia 3D medida nem sombras por traçado de raios.
+  const shading=document.createElementNS(NS,'g');
+  shading.setAttribute('class','silm-micro-deformation-shading');
+  shading.setAttribute('pointer-events','none');
+  const defs=document.createElementNS(NS,'defs');
+  const prefix='silm-deform-light-'+Math.random().toString(36).slice(2);
+  const svgEl=(tag,attrs)=>{
+   const el=document.createElementNS(NS,tag);
+   for(const [key,value]of Object.entries(attrs))el.setAttribute(key,String(value));
+   return el;
+  };
+  const gradient=(id,color)=>{
+   const g=svgEl('radialGradient',{id});
+   for(const [offset,alpha]of [[0,1],[.35,.72],[.74,.22],[1,0]])
+    g.append(svgEl('stop',{offset,'stop-color':color,'stop-opacity':alpha}));
+   defs.append(g);
+  };
+  gradient(prefix+'-shadow','#000');
+  gradient(prefix+'-highlight','#fff');
+  shading.append(defs);
+  const spots=[];
+  for(let i=0;i<17;i++){
+   const shadow=svgEl('ellipse',{class:'silm-micro-contact-shadow',
+    fill:'url(#'+prefix+'-shadow)',opacity:0,'pointer-events':'none'});
+   const highlight=svgEl('ellipse',{class:'silm-micro-contact-highlight',
+    fill:'url(#'+prefix+'-highlight)',opacity:0,'pointer-events':'none'});
+   shading.append(shadow,highlight);spots.push({shadow,highlight});
+  }
   const controls=n('div','silm-micro-surface-tools');
   controls.hidden=true;controls.setAttribute('role','group');
   controls.setAttribute('aria-label','Preparar e iluminar a mesma superfície metálica');
@@ -41,7 +71,7 @@ window.SILM=window.SILM||{};
   reading.setAttribute('role','status');reading.setAttribute('aria-live','polite');
   controls.append(tool,apply,light,source.wrap,observer.wrap,reset,reading);
   toolbar.append(controls);
-  let tiles=[],tileBoxes=[],paint=null,localWarp=null;
+  let tiles=[],tileBoxes=[],paint=null,localWarp=null,lightField=null;
   const focus=st=>st.module?.active==='explorar'&&st.properties?.active==='luster';
   const eligibleForCoobservation=st=>st.module?.active==='explorar'&&
    ['electrical','thermal','malleability','ductility'].includes(st.properties?.active);
@@ -70,7 +100,7 @@ window.SILM=window.SILM||{};
     overlay.append(tile);tiles.push(tile);
     tileBoxes.push({x:x*width/cols,y:y*height/rows,w:width/cols+.35,h:height/rows+.35});
    }
-   mechanicalField.append(overlay);
+   mechanicalField.append(overlay,shading);
    setWarp(localWarp);
    refresh();
   }
@@ -90,6 +120,38 @@ window.SILM=window.SILM||{};
     const m01=(c.x-a.x)/p.h,m11=(c.y-a.y)/p.h;
     const tx=a.x-m00*p.x-m01*p.y,ty=a.y-m10*p.x-m11*p.y;
     tile.setAttribute('transform','matrix('+[m00,m10,m01,m11,tx,ty].join(' ')+')');
+   }
+  }
+  function setDeformationLight(value){
+   lightField=value&&typeof value==='object'?value:null;
+   renderDeformationLight();
+  }
+  function renderDeformationLight(){
+   const st=model.state,visual=SILM.specimenVisualLight;
+   if(!visual){shading.setAttribute('visibility','hidden');return;}
+   const surface=physics.current(st),size=getSize();
+   const marks=st.module?.active==='explorar'&&Array.isArray(st.metadata?.mechanicalImprints)?st.metadata.mechanicalImprints:[];
+   const count=visual.projectAll({
+    marks,activeContact:st.module?.active==='explorar'?lightField?.contact:null,
+    mode:st.module?.active==='explorar'?lightField?.mode:null,
+    load:lightField?.load||0,field:lightField?.field,
+    amplitude:lightField?.amplitude||0,
+    incidenceDeg:drive?.angle??35,illuminated:surface.light
+   });
+   shading.setAttribute('visibility',count.length?'visible':'hidden');
+   section.dataset.mechanicalShadows=count.length?'active':'inactive';
+   section.dataset.mechanicalShadowZones=String(count.length);
+   for(let i=0;i<spots.length;i++){
+    const pair=spots[i],spot=count[i];
+    for(const [el,name] of [[pair.shadow,'shadow'],[pair.highlight,'highlight']]){
+     const data=spot?.[name];
+     if(!data){el.setAttribute('opacity','0');continue;}
+     el.setAttribute('cx',String(data.x*size.width));
+     el.setAttribute('cy',String(data.y*size.height));
+     el.setAttribute('rx',String(data.rx*size.width));
+     el.setAttribute('ry',String(data.ry*size.height));
+     el.setAttribute('opacity',String(data.opacity));
+    }
    }
   }
   function refresh(){
@@ -116,13 +178,15 @@ window.SILM=window.SILM||{};
     const opacity=!on?0:surface.light?.12+.62*q.specularRelative:.035+.13*q.specularRelative;
     tiles[i].setAttribute('opacity',String(clamp(opacity,0,.78)));
    }
+   renderDeformationLight();
    const suffix=R===null?'resposta óptica qualitativa':'Fresnel 550 nm de referência, sem CNTP confirmada';
    reading.textContent=surface.strokes.length+' traçado(s) · '+surface.plasticSteps+
     ' passo(s) plásticos · '+suffix+
     (on&&!focusing?' · Observação óptica mantida durante '+({
       malleability:'compressão',ductility:'tração',thermal:'aquecimento',electrical:'condução elétrica'
      }[st.properties.active]||'outra propriedade')+'.':'')+
-    ' Aquecimento/eletricidade não implicam oxidação ou corrente local calculada.';
+    ' Aquecimento/eletricidade não implicam oxidação ou corrente local calculada.'+
+    (st.metadata?.mechanicalImprints?.length?' Sombreamento das intervenções é didático, sem relevo 3D medido.':'');
   }
   light.addEventListener('click',()=>{
    const st=model.state,surface=physics.current(st);
@@ -173,7 +237,7 @@ window.SILM=window.SILM||{};
     else if(attached)off();
    });
   }
-  return Object.freeze({rebuild,refresh,setWarp,controls});
+  return Object.freeze({rebuild,refresh,setWarp,setDeformationLight,controls});
  }
  SILM.surfaceMicro=Object.freeze({attach});
 })();
