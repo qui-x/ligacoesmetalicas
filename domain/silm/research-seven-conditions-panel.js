@@ -47,7 +47,7 @@ SILM.createSevenConditionPanel=({prefix='silm-seven'}={})=>{
   root.dataset.evidence=record.grade;
   root.dataset.sourceConditions='reported-not-normalized';
   root.dataset.engineRelease='false';
-  title.textContent='Dados experimentais/compilados · '+record.symbol+' · '+D.labels[active];
+  title.textContent='Dados da pesquisa por condição · '+record.symbol+' · '+D.labels[active];
   status.textContent=label[record.grade]||'Referência condicionada';
   qty.replaceChildren();
   const dt=document.createElement('dt'),dd=document.createElement('dd');
