@@ -1,0 +1,199 @@
+{
+  "schema": "silm.research.mechanical.stage76.v1",
+  "stage": 76,
+  "date": "2026-11-14",
+  "scope": "Eu Lu; crosschecks with stage65, stage66, stage75 and stage73 on main",
+  "referenceConditions": {
+    "temperatureK": 273.15,
+    "pressurePa": 101325
+  },
+  "newObservationCount": 3,
+  "newMeasuredTensileElongationCount": 0,
+  "calibrationReleasedCount": 0,
+  "newObservations": [
+    {
+      "id": "stage76-eu-hv10-asprepared-1959",
+      "symbol": "Eu",
+      "property": "diamond_pyramid_hardness",
+      "value": 17,
+      "unit": "DPH_10kg",
+      "sampleCondition": "as_prepared",
+      "phase": "bcc",
+      "annealTemperatureC": null,
+      "mechanicalInterpretation": "indentation_hardness_not_plastic_limit",
+      "referenceOnly": true,
+      "engineRelease": false,
+      "CNTPValidated": false,
+      "testTemperatureK": null,
+      "testPressurePa": null,
+      "source": {
+        "url": "https://digital.library.unt.edu/ark:/67531/metadc1248886/m2/1/high_res_d/metadc1248886.pdf",
+        "document": "Simmons (1959), AECU-4423",
+        "location": "página impressa 9, Tabela I (Daane / Ames)",
+        "visualSourceChecked": true,
+        "originalDaaneStudyChecked": false
+      }
+    },
+    {
+      "id": "stage76-lu-hv10-asprepared-1959",
+      "symbol": "Lu",
+      "property": "diamond_pyramid_hardness",
+      "value": 118,
+      "unit": "DPH_10kg",
+      "sampleCondition": "as_prepared_distilled_arc_melted",
+      "phase": "hcp",
+      "annealTemperatureC": null,
+      "mechanicalInterpretation": "indentation_hardness_not_plastic_limit",
+      "referenceOnly": true,
+      "engineRelease": false,
+      "CNTPValidated": false,
+      "testTemperatureK": null,
+      "testPressurePa": null,
+      "source": {
+        "url": "https://digital.library.unt.edu/ark:/67531/metadc1248886/m2/1/high_res_d/metadc1248886.pdf",
+        "document": "Simmons (1959), AECU-4423",
+        "location": "página impressa 9, Tabela I (Daane / Ames)",
+        "visualSourceChecked": true,
+        "originalDaaneStudyChecked": false
+      }
+    },
+    {
+      "id": "stage76-lu-hv10-annealed-1959",
+      "symbol": "Lu",
+      "property": "diamond_pyramid_hardness",
+      "value": 77,
+      "unit": "DPH_10kg",
+      "sampleCondition": "annealed_vacuum",
+      "phase": "hcp",
+      "annealTemperatureC": 900,
+      "annealTemperatureQualifier": "approximately; from paper narrative; duration unknown",
+      "mechanicalInterpretation": "indentation_hardness_not_plastic_limit",
+      "referenceOnly": true,
+      "engineRelease": false,
+      "CNTPValidated": false,
+      "testTemperatureK": null,
+      "testPressurePa": null,
+      "source": {
+        "url": "https://digital.library.unt.edu/ark:/67531/metadc1248886/m2/1/high_res_d/metadc1248886.pdf",
+        "document": "Simmons (1959), AECU-4423",
+        "location": "página impressa 9, Tabela I (Daane / Ames)",
+        "visualSourceChecked": true,
+        "originalDaaneStudyChecked": false
+      }
+    }
+  ],
+  "proceduralEvidence": [
+    {
+      "id": "stage76-eu-cold-work-ames",
+      "symbol": "Eu",
+      "source": {
+        "url": "https://www.ameslab.gov/sites/default/files/inline-files/Handl_Proced%3DEuropium%20%281%29.pdf",
+        "location": "página 1, seções IV-VI",
+        "visualSourceChecked": true
+      },
+      "capabilities": [
+        "extrusion",
+        "swaging",
+        "cold_rolling"
+      ],
+      "conditions": {
+        "surfaceProtectedFromAir": true,
+        "quantitativeDuctilityMeasured": false
+      },
+      "referenceOnly": true,
+      "engineRelease": false,
+      "CNTPValidated": false,
+      "notes": "Procedural recommendation: Eu is soft and can be cold worked. The sheet does not report tensile strain to break or stress-strain curve."
+    },
+    {
+      "id": "stage76-lu-existing-compression-stage64",
+      "symbol": "Lu",
+      "source": {
+        "url": "https://ufn.ru/ufn63/ufn63_1/ufn631f.pdf",
+        "location": "Soviet Physics Uspekhi 6(1), p. 136, Table XIII; registered in research stage 64",
+        "visualSourceCheckedInThisStage": false
+      },
+      "existingProfileId": "v64-lu-savitskii1963-cast-compression-roomtemp",
+      "existingCompressionPlasticityPct": 12,
+      "doNotCreateDuplicate": true,
+      "referenceOnly": true,
+      "engineRelease": false,
+      "CNTPValidated": false,
+      "notes": "Already in stage65 matrix. Compression plasticity is NOT tensile elongation to rupture."
+    }
+  ],
+  "crosschecks": [
+    {
+      "symbol": "Eu",
+      "property": "young_modulus",
+      "value": 18.2,
+      "unit": "GPa",
+      "status": "ALREADY_PRESENT_STAGE66",
+      "url": "https://fap.if.usp.br/~jhsevero/Fisica_Experimental_C_Semestral_2022/crc.pdf",
+      "location": "CRC Handbook 84th ed, p. 4-119, Table 11",
+      "notNew": true,
+      "temperatureDescription": "room temperature, numeric temperature unspecified"
+    },
+    {
+      "symbol": "Lu",
+      "property": "young_modulus",
+      "value": 68.6,
+      "unit": "GPa",
+      "status": "ALREADY_PRESENT_STAGE66",
+      "url": "https://fap.if.usp.br/~jhsevero/Fisica_Experimental_C_Semestral_2022/crc.pdf",
+      "location": "CRC Handbook 84th ed, p. 4-119, Table 11",
+      "notNew": true,
+      "temperatureDescription": "room temperature, numeric temperature unspecified"
+    },
+    {
+      "symbol": "Eu",
+      "property": "tensile_elongation_pct",
+      "value": null,
+      "status": "NOT_IN_CRC_TABLE11",
+      "url": "https://fap.if.usp.br/~jhsevero/Fisica_Experimental_C_Semestral_2022/crc.pdf",
+      "notNew": true
+    },
+    {
+      "symbol": "Lu",
+      "property": "tensile_elongation_pct",
+      "value": null,
+      "status": "NOT_IN_CRC_TABLE11",
+      "url": "https://fap.if.usp.br/~jhsevero/Fisica_Experimental_C_Semestral_2022/crc.pdf",
+      "notNew": true
+    },
+    {
+      "symbol": "Lu",
+      "property": "approximate_supplier_break_elongation_pct",
+      "value": 15,
+      "status": "EXISTING_STAGE38_SUPPLIER_CANDIDATE_NOT_APPROVED",
+      "url": "https://www.goodfellow.com/uk/material/rare-earth-metals/lutetium",
+      "notNew": true,
+      "engineRelease": false
+    }
+  ],
+  "interpretationGates": {
+    "hardnessIsNotYieldStrength": true,
+    "hardnessIsNotTensileDuctility": true,
+    "compressionPlasticityIsNotTensileElongation": true,
+    "roomTemperatureIsNotExact27315K": true,
+    "neverApproveFromAveragedSupplier": true,
+    "sourceVisualReviewOfSimmonsPage9": true,
+    "sourceVisualReviewOfAmesPage1": true,
+    "sourceVisualReviewOfCrcTable11": false
+  },
+  "proposedMicrostructureContract": {
+    "allowed": [
+      "didactic qualitative display of cold-work and recrystallization",
+      "show reference hardness with sample and temperature caveat",
+      "oxidation-sensitive appearance of Eu only as separate surface condition"
+    ],
+    "forbidden": [
+      "convert Lu hardness 118->77 into calibrated plastic strain",
+      "derive Eu ductility from cold-work guidance",
+      "reuse Lu compression 12% as fracture elongation",
+      "show supplier Lu ~15% as validated tensile point",
+      "combine hardness and optical reflectance without a surface model"
+    ],
+    "integrationState": "RESEARCH_ONLY_NO_ENGINE_CHANGES"
+  }
+}
