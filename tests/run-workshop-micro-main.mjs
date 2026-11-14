@@ -113,6 +113,8 @@ async function test(viewport){
  // conserva essas escolhas ao mudar de escala.
  assert.equal(await viewer.getAttribute('data-mechanical-solver'),'elastic-local-2d',
   'Solver FEM elástico local não foi ligado à microestrutura.');
+ const contactDetails=mech.locator('.silm-micro-contact-details');
+ await contactDetails.locator('summary').click();
  const position=mech.locator('.silm-micro-contact-position');
  const contactWidth=mech.locator('.silm-micro-contact-width');
  const pressBounds=await viewer.locator('.silm-micro-press-plate').first().boundingBox();
@@ -126,6 +128,7 @@ async function test(viewport){
  assert.ok(newPressBounds.width>pressBounds.width*1.3,
   'A largura de contato não modificou a placa de compressão.');
  assert.equal(await viewer.getAttribute('data-mechanical-contact-width'),'60');
+ await contactDetails.locator('summary').click();
 
  const grip=viewer.locator('.silm-micro-mechanical-top');
  const mechanicalDir=join('reports','micro-deformation',browserName);
