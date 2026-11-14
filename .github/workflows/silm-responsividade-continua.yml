@@ -77,6 +77,9 @@ jobs:
           node --check tests/run-multistage-evidence.mjs
           node --check domain/silm/data/research-evidence-stage65.js
           node --check tests/run-stage65-mechanical-evidence.mjs
+          node --check domain/silm/data/research-optical-candidates-stage65.js
+          node --check domain/silm/research-optical-candidates-panel.js
+          node --check tests/run-optical-candidates-stage65.mjs
           node --check domain/silm/data/material-profile-tc-experimental-1988.js
           node --check tests/run-tc-optical-conditional.mjs
           node --check domain/silm/data/research-thermal-nist-295k.js
@@ -145,6 +148,9 @@ jobs:
       - name: Verificar Bi Pu Lu Co e transcricoes Th em Explorar (Etapa 65)
         run: node tests/run-stage65-mechanical-evidence.mjs
 
+      - name: Validar 59 candidatos R550 no controle Brilho sem parametrizar motor
+        run: node tests/run-optical-candidates-stage65.mjs
+
       - name: Verificar n k condicionais de Tc e canais de Cu no Brilho Metalico
         run: node tests/run-tc-optical-conditional.mjs
 
@@ -212,6 +218,15 @@ jobs:
         with:
           name: silm-tc-optical-${{ matrix.browser }}
           path: reports/tc-optical-conditional/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Arquivar fontes ópticas de pesquisa da Etapa 65
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-optical-candidates-${{ matrix.browser }}
+          path: reports/optical-candidates-stage65/${{ matrix.browser }}/
           if-no-files-found: warn
           retention-days: 14
 
