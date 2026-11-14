@@ -70,10 +70,15 @@ test('11 triagens antigas substituídas por fontes rastreadas SEM liberar motore
 });
 test('recomendação térmica e ajuste elétrico não viram medida individual',()=>{
  for(const row of data.records.filter(x=>['recommended-evaluated','recommended-impure',
- 'provisional-evaluated','fit-derived','historical-impure','historical-specimen'].includes(x.grade))){
+ 'provisional-evaluated','fit-derived'].includes(x.grade))){
   assert.equal(row.observationIsMeasured,false,'compilação/cálculo não é ponto medido individualmente no catálogo');
   assert.equal(row.calibrationApproved,false);
   assert.ok(row.sample.length>=20);
+ }
+ for(const grade of ['historical-impure','historical-specimen']){
+  const r=data.records.find(x=>x.grade===grade);
+  assert.ok(r?.observationIsMeasured,'medição histórica deve permanecer classificada como medida');
+  assert.equal(r.engineRelease,false,'medida específica não habilita motor universal');
  }
  for(const row of data.records.filter(x=>x.grade==='processing-only')){
   assert.equal(row.observationIsMeasured,false);
