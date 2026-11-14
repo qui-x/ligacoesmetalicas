@@ -44,8 +44,8 @@ test('sem carga não há deformação elástica e com carga parcial escala linea
 test('falha com valores inválidos, mas região extrema permanece dentro da malha',()=>{
  const e=fem();
  assert.throws(()=>e.solve({mode:'cut'}));
- assert.throws(()=>e.solve({poisson:.7}),RangeError);
- assert.throws(()=>e.solve({position:NaN}),TypeError);
+ assert.throws(()=>e.solve({poisson:.7}),{name:'RangeError'});
+ assert.throws(()=>e.solve({position:NaN}),{name:'TypeError'});
  const q=e.solve({position:.01,width:.08});
  assert.ok(q.contactNodes>=1&&Number.isFinite(q.sample(.2,.5).dx));
 });
