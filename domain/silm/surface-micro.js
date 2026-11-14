@@ -185,7 +185,8 @@ window.SILM=window.SILM||{};
     (on&&!focusing?' · Observação óptica mantida durante '+({
       malleability:'compressão',ductility:'tração',thermal:'aquecimento',electrical:'condução elétrica'
      }[st.properties.active]||'outra propriedade')+'.':'')+
-    ' Aquecimento/eletricidade não implicam oxidação ou corrente local calculada.';
+    ' Aquecimento/eletricidade não implicam oxidação ou corrente local calculada.'+
+    (st.metadata?.mechanicalImprints?.length?' Sombreamento das intervenções é didático, sem relevo 3D medido.':'');
   }
   light.addEventListener('click',()=>{
    const st=model.state,surface=physics.current(st);
