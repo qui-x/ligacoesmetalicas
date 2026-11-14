@@ -1174,7 +1174,9 @@
 .silm-micro-surface-angle{display:flex;align-items:center;gap:5px;flex:1 1 150px;min-width:115px;font-size:.74rem;color:var(--text);font-weight:600}
 .silm-micro-surface-angle input{min-width:60px;width:100%;accent-color:var(--accent)}
 .silm-micro-surface-reading{flex:1 1 100%;min-width:0;max-width:100%;font-size:.74rem;line-height:1.4;color:var(--muted);overflow-wrap:anywhere}
-.silm-workshop-micro-viewer[data-surface-optical="active"] .silm-workshop-micro-map{touch-action:none}
+.silm-workshop-micro-viewer[data-surface-tool="brush"] .silm-workshop-micro-map,
+.silm-workshop-micro-viewer[data-surface-tool="sand"] .silm-workshop-micro-map,
+.silm-workshop-micro-viewer[data-surface-tool="polish"] .silm-workshop-micro-map{touch-action:none}
 @media(max-width:560px){#si-stage[data-workshop-scale="2"] .silm-micro-surface-tools{order:4;gap:4px}.silm-micro-surface-select{flex:1 1 100%}.silm-micro-surface-angle{flex:1 1 calc(50% - 4px);flex-wrap:wrap}.silm-micro-surface-angle span{flex-basis:100%}.silm-micro-surface-angle input{flex-basis:100%;min-height:36px}}
 @media(forced-colors:active){.silm-micro-surface-field{display:none}}
 @media(prefers-reduced-motion:reduce){.silm-micro-surface-field{transition:none}}
@@ -1182,3 +1184,20 @@
 /* Registro de preparação da mesma amostra em Rede e Centro. */
 .silm-surface-cross-scale-note[hidden]{display:none!important}
 .silm-surface-cross-scale-note{font-size:.75rem;line-height:1.38;color:var(--muted);padding:4px 10px;margin:0 6px 4px;overflow-wrap:anywhere}
+
+/* Luz e superfície acompanham a mesma amostra sob força/calor/campo. */
+.silm-micro-surface-tools .silm-micro-surface-apply{min-width:44px;min-height:44px}
+.silm-micro-surface-tools button:disabled,.silm-micro-surface-tools select:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:560px){
+ #si-stage[data-workshop-scale="2"] .silm-micro-surface-tools .silm-micro-surface-apply{
+  flex:1 1 105px;max-width:160px;min-width:90px;font-size:.73rem
+ }
+}
+
+/* Contorno didático do corpo de prova: acompanha grãos e permanece após plasticidade. */
+.silm-micro-specimen-outline{fill:none;stroke:var(--accent,var(--text));stroke-width:2.2;
+ stroke-dasharray:7 4;opacity:0;vector-effect:non-scaling-stroke;pointer-events:none}
+.silm-workshop-micro-viewer[data-mechanical-study="malleability"] .silm-micro-specimen-outline,
+.silm-workshop-micro-viewer[data-mechanical-study="ductility"] .silm-micro-specimen-outline,
+.silm-workshop-micro-viewer[data-mechanical-permanent="active"] .silm-micro-specimen-outline{opacity:.8}
+@media(forced-colors:active){.silm-micro-specimen-outline{stroke:CanvasText;stroke-dasharray:5 4}}

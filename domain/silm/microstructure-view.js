@@ -86,6 +86,7 @@ SILM.microstructure=(()=>{
     status.textContent='Grão '+grain.id+(area===null?' · sem calibração':' · área segmentada '+fmt(area)+' µm²')+' · dados importados não homologados';
    }else status.textContent='Grão '+(i+1)+' selecionado · modelo esquemático';
    svg.setAttribute('data-selected-grain',String(i+1));
+   surfaceMicro?.refresh();
   };
   function drawGrains(){
    paths=[];cells=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField);
@@ -111,6 +112,10 @@ SILM.microstructure=(()=>{
    const bevel=svgNode('path',{d,'class':'silm-micro-highlight','pointer-events':'none'});
    g.append(p,bevel,hatch);mechanicalField.append(g);paths[i]=p;cells[i]=g;
    });
+   const specimen=svgNode('rect',{x:W*.04,y:H*.04,width:W*.92,height:H*.92,
+    rx:Math.min(W,H)*.025,ry:Math.min(W,H)*.025,
+    'class':'silm-micro-specimen-outline',fill:'none','pointer-events':'none'});
+   mechanicalField.append(specimen);
    surfaceMicro?.rebuild();
    if(chosen>=polygons.length)chosen=polygons.length-1;
    if(chosen>=0)choose(chosen);else status.textContent=sourceData?'Selecione um grão segmentado · dados importados não homologados':'Selecione um grão · modelo esquemático';
@@ -208,8 +213,16 @@ SILM.microstructure=(()=>{
    mechanicalTools.hidden=!active;
    topGrip.hidden=bottomGrip.hidden=!active;
    section.dataset.mechanicalStudy=mode||'inactive';
+   const surface=SILM.surfacePhysics?.current(st);
+   const comp=Math.min(4,surface?.compressionSteps||0),tens=Math.min(4,surface?.tensionSteps||0);
+   const residual=comp+tens>0;
+   section.dataset.mechanicalPermanent=residual?'active':'inactive';
    if(!active){
-    mechanicalField.removeAttribute('transform');
+    // Retirar a força não apaga a deformação plástica já registrada.
+    if(residual){
+     const x=1+.045*comp-.035*tens,y=1-.045*comp+.055*tens;
+     mechanicalField.setAttribute('transform','translate('+CX+' '+CY+') scale('+x+' '+y+') translate('+(-CX)+' '+(-CY)+')');
+    }else mechanicalField.removeAttribute('transform');
     delete section.dataset.mechanicalStep;
     delete section.dataset.mechanicalLoad;
     return;
@@ -220,9 +233,9 @@ SILM.microstructure=(()=>{
    const load=clamp(Number(state.load)||0,0,1),p=step/max;
    // Envelope geométrico abstrato, sem módulo elástico, tensão ou
    // porcentagem de deformação atribuídos à amostra/material.
-   const x=mode==='malleability'?1+.16*p+.04*load:1-.12*p-.025*load;
-   const y=mode==='malleability'?1-.16*p-.04*load:1+.22*p+.05*load;
-   if(step||load){
+   const x=1+.045*comp-.035*tens+(mode==='malleability'?.04:-.025)*load;
+   const y=1-.045*comp+.055*tens+(mode==='malleability'?-.04:.05)*load;
+   if(step||load||residual){
     mechanicalField.setAttribute('transform','translate('+CX+' '+CY+') scale('+x+' '+y+') translate('+(-CX)+' '+(-CY)+')');
    }else mechanicalField.removeAttribute('transform');
    section.dataset.mechanicalStep=String(step);
@@ -237,7 +250,7 @@ SILM.microstructure=(()=>{
    if(mechanicalPulse.textContent.trim()!==pulseLabel)mechanicalPulse.textContent=pulseLabel;
    mechanicalPulse.setAttribute('aria-label',mode==='malleability'?'Aplicar compressão':'Aplicar tração');
    mechanicalPulse.disabled=step>=max;
-   mechanicalReset.disabled=!step&&!load;
+   mechanicalReset.disabled=!step&&!load&&!residual;
    mechanicalStatus.textContent=(mode==='malleability'?'Compressão':'Tração')+
     ' · passo ilustrativo '+step+'/'+max+(load?' · força relativa '+Math.round(load*100)+' %':'')+
     ' · não representa deformação medida por grão';
@@ -252,7 +265,7 @@ SILM.microstructure=(()=>{
   mechanicalReset.addEventListener('click',()=>{
    if(!getMode())return;
    deformCtl?.setLoad(0);
-   model?.restoreProperty();refreshMechanical();
+   model?.resetMechanicalSpecimen?.();refreshMechanical();
   });
   for(const [grip,upper] of [[topGrip,true],[bottomGrip,false]]){
    let dragged=null;
@@ -304,7 +317,13 @@ SILM.microstructure=(()=>{
    });
   }
   refreshMechanical();
-  surfaceMicro=SILM.surfaceMicro?.attach({section,svg,mechanicalField,toolbar,model,element,getSize:()=>({width:W,height:H})})||null;
+  surfaceMicro=SILM.surfaceMicro?.attach({section,svg,mechanicalField,toolbar,model,element,
+   getSize:()=>({width:W,height:H}),
+   getSelectedPoint:()=>{
+    const poly=polygons[chosen];if(!poly?.length)return null;
+    return{x:clamp(poly.reduce((sum,p)=>sum+p[0],0)/(poly.length*W),0,1),
+     y:clamp(poly.reduce((sum,p)=>sum+p[1],0)/(poly.length*H),0,1)};
+   }})||null;
   section.silmMicroSurfaceRefresh=()=>surfaceMicro?.refresh();
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
   svg.addEventListener('pointerdown',e=>{

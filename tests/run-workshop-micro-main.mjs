@@ -194,6 +194,53 @@ async function test(viewport){
  assert.equal(await viewer.getAttribute('data-surface-strokes'),'1',
   'Reativar o brilho perdeu acabamento persistente.');
 
+ // A escova também funciona sem arrastar o mouse: seleciona-se o grão
+ // e usa-se o botão acessível, que atualiza a mesma amostra.
+ await viewer.locator('.silm-micro-grain').nth(25).focus();
+ await viewer.locator('.silm-micro-grain').nth(25).press('Enter');
+ await opticalTools.getByRole('combobox',{name:'Ferramenta superficial'}).selectOption('brush');
+ await opticalTools.getByRole('button',{name:'Aplicar ferramenta ao grão selecionado'}).click();
+ const finished=await page.evaluate(()=>SILMIntegration.snapshot());
+ assert.equal(finished.metadata.surface.strokes.length,2,
+  'Ferramenta por teclado não registrou a região: '+JSON.stringify({active:finished.properties.active,strokes:finished.metadata.surface.strokes.length}));
+ await opticalTools.getByRole('combobox',{name:'Ferramenta superficial'}).selectOption('observe');
+ await openProperty('malleability');
+ assert.equal(await viewer.getAttribute('data-surface-coobservation'),'active',
+  'A iluminação não permaneceu acessível durante a compressão.');
+ assert.equal(await opticalTools.getByRole('combobox',{name:'Ferramenta superficial'}).isDisabled(),true,
+  'A ferramenta abrasiva não deve competir com a prensa.');
+ await mech.locator('.silm-micro-mechanical-pulse').click();
+ await page.waitForFunction(()=>SILMIntegration.snapshot().metadata.surface?.compressionSteps===1);
+ assert.equal(await viewer.getAttribute('data-mechanical-permanent'),'active',
+  'A compressão plástica não produziu geometria residual na amostra.');
+ await openProperty('ductility');
+ assert.equal(await viewer.getAttribute('data-mechanical-permanent'),'active',
+  'Trocar de compressão para tração apagou a deformação plástica.');
+ await mech.locator('.silm-micro-mechanical-pulse').click();
+ await page.waitForFunction(()=>SILMIntegration.snapshot().metadata.surface?.tensionSteps===1);
+ await page.getByRole('button',{name:'Ver',exact:true}).click();
+ await page.locator('[data-action="property-luster"]').click();
+ await page.locator('#si-dock-right [data-close-dock="right"]').click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.surfaceOptical==='active');
+ assert.equal(await viewer.getAttribute('data-mechanical-permanent'),'active',
+  'A deformação residual desapareceu ao investigar o brilho da superfície.');
+ assert.ok((await viewer.locator('.silm-micro-mechanical-field').getAttribute('transform'))?.includes('scale('),
+  'Grãos e superfície não acompanharam a deformação da mesma amostra.');
+ assert.equal(await page.evaluate(()=>SILMIntegration.snapshot().metadata.surface.strokes.length),2,
+  'Força aplicada não deve apagar a preparação óptica.');
+ // Reposição virtual explícita é diferente de soltar a força.
+ await openProperty('malleability');
+ await mech.getByRole('button',{name:'Restaurar deformação'}).click();
+ await page.waitForFunction(()=>SILMIntegration.snapshot().metadata.surface?.plasticSteps===0);
+ assert.equal(await viewer.getAttribute('data-mechanical-permanent'),'inactive');
+ assert.equal(await viewer.locator('.silm-micro-mechanical-field').getAttribute('transform'),null,
+  'Restaurar a amostra não removeu a deformação residual.');
+ await page.getByRole('button',{name:'Ver',exact:true}).click();
+ await page.locator('[data-action="property-luster"]').click();
+ await page.locator('#si-dock-right [data-close-dock="right"]').click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.surfaceOptical==='active');
+
+
 
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  await viewer.getByRole('button',{name:'Ampliar microestrutura'}).click();

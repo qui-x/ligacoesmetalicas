@@ -277,6 +277,8 @@ SILM.createScientificState=()=>{
   if(!state.investigation||state.module.active!=='explorar'||!SILM.surfacePhysics?.validState(next))return false;
   const previous=snapshot();
   state.metadata.surface=next;
+  // A iluminação pertence à amostra, e não apenas à ferramenta em foco.
+  if(action==='light'&&state.properties.active==='luster')state.properties.luster.light=next.light;
   state.investigation.updatedAt=now();
   publish('surface:'+action,previous,{action});
   return true;
@@ -294,6 +296,20 @@ SILM.createScientificState=()=>{
  function resetSurface(){
   if(!state.structure)return false;
   return persistSurface({...SILM.surfacePhysics.current(state),strokes:[]},'reset');
+ }
+ /* A restauração virtual é diferente de simplesmente retirar a força:
+    descarregar mantém a deformação plástica da amostra. */
+ function resetMechanicalSpecimen(){
+  const id=state.properties.active;
+  if(!state.investigation||state.module.active!=='explorar'||
+     !['malleability','ductility'].includes(id))return false;
+  const previous=snapshot(),surface={...SILM.surfacePhysics.current(state),
+    plasticSteps:0,compressionSteps:0,tensionSteps:0};
+  state.metadata.surface=surface;
+  state.properties={...state.properties,[id]:JSON.parse(JSON.stringify(P.defaults[id]))};
+  state.investigation.updatedAt=now();
+  publish('specimen:restored',previous,{property:id});
+  return true;
  }
  /* ---------- Propriedades (0.7.x) ---------- */
  const P=SILM.properties;
@@ -326,10 +342,16 @@ SILM.createScientificState=()=>{
    // Acumular eventos didáticos da mesma amostra. Não atribuir unidades
    // de deformação/tempo ao número de passos ou ciclos.
    const surface={...SILM.surfacePhysics.current(state)};
-   if(id==='malleability'&&next.malleability.compression>pr.malleability.compression)
-    surface.plasticSteps=Math.min(10000,surface.plasticSteps+next.malleability.compression-pr.malleability.compression);
-   if(id==='ductility'&&next.ductility.elongation>pr.ductility.elongation)
-    surface.plasticSteps=Math.min(10000,surface.plasticSteps+next.ductility.elongation-pr.ductility.elongation);
+   if(id==='malleability'&&next.malleability.compression>pr.malleability.compression){
+    const amount=next.malleability.compression-pr.malleability.compression;
+    surface.plasticSteps=Math.min(10000,surface.plasticSteps+amount);
+    surface.compressionSteps=Math.min(10000,(surface.compressionSteps||0)+amount);
+   }
+   if(id==='ductility'&&next.ductility.elongation>pr.ductility.elongation){
+    const amount=next.ductility.elongation-pr.ductility.elongation;
+    surface.plasticSteps=Math.min(10000,surface.plasticSteps+amount);
+    surface.tensionSteps=Math.min(10000,(surface.tensionSteps||0)+amount);
+   }
    if(id==='thermal'&&next.thermal.heating&&!pr.thermal.heating)
     surface.heatEvents=Math.min(10000,surface.heatEvents+1);
    if(id==='electrical'&&next.electrical.field&&!pr.electrical.field)
@@ -410,7 +432,7 @@ SILM.createScientificState=()=>{
  return Object.freeze({get state(){return snapshot();},snapshot,connect,begin,setWorkshopContext,setModule,resetInvestigation,close,setStatus,restore,
   checkpoint:()=>({state:snapshot(),history:JSON.parse(JSON.stringify(history))}),
   rollback(value){replace(JSON.parse(JSON.stringify(value.state)));history=JSON.parse(JSON.stringify(value.history));emit?.('investigation:updated',{current:snapshot(),change:'storage:rollback'});},
-  beginAssembly,addUnit,moveUnit,undo,clearStructure,setAssistance,setAssemblyStatus,organize,restoreFree,setCrystalRepresentation,activateElectrons,setElectronRepresentation,startProperty,setPropertyParams,restoreProperty,endProperty,propertyAvailability,applySurfaceTreatment,setSurfaceLight,resetSurface,addMeasurement,removeMeasurement,clearMeasurements,measurementAvailability,addCalculation,removeCalculation,clearCalculations,calculationAvailability,
+  beginAssembly,addUnit,moveUnit,undo,clearStructure,setAssistance,setAssemblyStatus,organize,restoreFree,setCrystalRepresentation,activateElectrons,setElectronRepresentation,startProperty,setPropertyParams,restoreProperty,endProperty,propertyAvailability,applySurfaceTreatment,setSurfaceLight,resetSurface,resetMechanicalSpecimen,addMeasurement,removeMeasurement,clearMeasurements,measurementAvailability,addCalculation,removeCalculation,clearCalculations,calculationAvailability,
   get canUndo(){return !!state.structure&&free()&&history.length>0;},get historySize(){return history.length;},
   get lastAction(){const last=history[history.length-1];return state.structure&&last?{type:last.type,unitId:last.unitId}:null;},
   load(){const missing={};const saved=storage?.get('scientific.state',missing);if(saved===missing)return {ok:true,empty:true};const result=restore(saved);if(!result.ok){history=[];replace(SILM.emptyScientificState());persist();return result;}return result;}
