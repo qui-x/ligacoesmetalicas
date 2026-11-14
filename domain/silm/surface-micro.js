@@ -93,9 +93,11 @@ window.SILM=window.SILM||{};
    ['electrical','thermal','malleability','ductility'].includes(st.properties?.active);
   // A iluminação preparada permanece observável enquanto a mesma amostra
   // recebe calor, campo ou força. Ferramentas abrasivas ficam em Brilho.
-  // Luz e observação ficam disponíveis mesmo se o ensaio começar diretamente
-  // por compressão ou tração, sem obrigar uma visita anterior ao Brilho.
-  const visible=(st,surface)=>focus(st)||eligibleForCoobservation(st);
+  // A sombra da região de carga permanece visível sob luz ambiente.
+  // Os controles ópticos completos só aparecem na co-observação já preparada,
+  // evitando competir com a prensa na faixa inferior.
+  const visible=(st,surface)=>focus(st)||(eligibleForCoobservation(st)&&
+   (surface.light||surface.strokes.length>0));
   const active=()=>focus(model.state);
   function coord(e){
    const matrix=mechanicalField.getScreenCTM()?.inverse(),size=getSize();
