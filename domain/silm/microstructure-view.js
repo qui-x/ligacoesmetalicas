@@ -212,9 +212,23 @@ SILM.microstructure=(()=>{
      input.setAttribute('aria-label','Largura do contato da prensa ou garra, em porcentagem');
      widthLabel.input=input;return input;
     })());
+   const forceLabel=node('label','silm-micro-contact-control silm-micro-force-control');
+   const forceInput=node('input','silm-micro-force-input');
+   forceInput.type='range';forceInput.min='0';forceInput.max='100';forceInput.step='5';
+   forceInput.value='0';forceInput.setAttribute('aria-label','Carga relativa aplicada ao corpo de prova');
+   forceLabel.append(node('span','','Carga aplicada'),forceInput);
+   const releaseForce=node('button','silm-workshop-micro-control silm-micro-force-release','Retirar força');
+   releaseForce.type='button';releaseForce.setAttribute('aria-label','Retirar carga mantendo deformação plástica');
+   releaseForce.addEventListener('click',()=>{
+    deformCtl?.setLoad(0);forceInput.value='0';refreshMechanical();
+   });
+   forceInput.addEventListener('input',()=>{
+    deformCtl?.setLoad(clamp(Number(forceInput.value)/100,0,1));
+    refreshMechanical();
+   });
    const contactDetails=node('details','silm-micro-contact-details');
    const contactSummary=node('summary','','Aplicação da carga');
-   contactDetails.append(contactSummary,contactLabel,widthLabel);
+   contactDetails.append(contactSummary,forceLabel,releaseForce,contactLabel,widthLabel);
    mechanicalTools.append(mechanicalPulse,mechanicalReset,mechanicalLoadMeter,
     contactDetails,mechanicalStatus);
   toolbar.append(mechanicalTools);
@@ -287,6 +301,8 @@ SILM.microstructure=(()=>{
   };
   function refreshMechanical(){
    const mode=getMode(),st=model?.state,active=!!mode;
+   // Não transportar carga transitória ao sair do ensaio mecânico.
+   if(!active&&mechanicsMode)deformCtl?.setLoad(0);
    mechanicsMode=mode;
    mechanicalTools.hidden=!active;topGrip.hidden=bottomGrip.hidden=!active;
    section.dataset.mechanicalStudy=mode||'inactive';
@@ -351,6 +367,8 @@ SILM.microstructure=(()=>{
    const relative=Math.round(load*100);
    section.dataset.mechanicalStep=String(step);section.dataset.mechanicalLoad=String(relative);
    mechanicalLoadMeter.value=relative;
+   if(document.activeElement!==forceInput)forceInput.value=String(relative);
+   releaseForce.disabled=load<1e-4&&Math.abs(Number(motion.strain)||0)<1e-4;
    topGrip.textContent=mode==='malleability'?'↓':'↑';
    bottomGrip.textContent=mode==='malleability'?'↑':'↓';
    for(const grip of [topGrip,bottomGrip])grip.setAttribute('aria-label',
