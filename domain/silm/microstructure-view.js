@@ -212,8 +212,11 @@ SILM.microstructure=(()=>{
      input.setAttribute('aria-label','Largura do contato da prensa ou garra, em porcentagem');
      widthLabel.input=input;return input;
     })());
+   const contactDetails=node('details','silm-micro-contact-details');
+   const contactSummary=node('summary','','Aplicação da carga');
+   contactDetails.append(contactSummary,contactLabel,widthLabel);
    mechanicalTools.append(mechanicalPulse,mechanicalReset,mechanicalLoadMeter,
-    contactLabel,widthLabel,mechanicalStatus);
+    contactDetails,mechanicalStatus);
   toolbar.append(mechanicalTools);
 
   // Alças operáveis no próprio mapa (não em diálogo ou mini-palco).
