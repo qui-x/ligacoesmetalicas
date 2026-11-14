@@ -106,6 +106,9 @@ test('painel integrado à UI nativa e disponível no cache offline',()=>{
  assert.match(view,/SILM\.createSevenConditionPanel/);
  assert.match(view,/sevenEvidence\.update/);
  assert.match(view,/sevenEvidence\.root/);
+ const ownPanel=load('domain/silm/research-seven-conditions-panel.js');
+ assert.match(ownPanel,/silm-seven-condition-metrics/);
+ assert.doesNotMatch(ownPanel,/className='silm-research-metrics'/,'não duplicar seletor do painel mecânico legado');
  const panel=load(p);
  assert.match(panel,/sourceConditions='reported-not-normalized'/);
  assert.match(panel,/engineRelease='false'/);
