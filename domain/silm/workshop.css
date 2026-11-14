@@ -1253,3 +1253,28 @@
  .silm-micro-contact-control input[type="range"]{flex:1 1 100%;min-width:0}
 }
 @media(forced-colors:active){.silm-micro-contact-control input[type="range"]{accent-color:Highlight}}
+
+/* Ajustes de aplicação recolhíveis, sem sobrepor a região dos grãos. */
+#si-stage[data-workshop-scale="2"] .silm-micro-contact-details{
+ flex:0 1 152px;min-width:116px;max-width:180px;
+ border:1px solid var(--border);border-radius:7px;
+ background:var(--surface);color:var(--text);font-size:.74rem;
+}
+#si-stage[data-workshop-scale="2"] .silm-micro-contact-details summary{
+ cursor:pointer;min-height:44px;box-sizing:border-box;
+ display:flex;align-items:center;padding:5px 8px;overflow-wrap:anywhere;
+}
+#si-stage[data-workshop-scale="2"] .silm-micro-contact-details[open]{
+ order:8;flex:1 1 100%;width:100%;max-width:none;min-width:0;padding-bottom:6px
+}
+#si-stage[data-workshop-scale="2"] .silm-micro-contact-details[open] .silm-micro-contact-control{
+ margin:3px 6px;min-height:40px
+}
+@media(max-width:560px){
+ #si-stage[data-workshop-scale="2"] .silm-micro-contact-details{
+  grid-column:auto;min-width:0;max-width:none;width:100%
+ }
+ #si-stage[data-workshop-scale="2"] .silm-micro-contact-details[open]{
+  grid-column:1/-1;order:initial
+ }
+}
