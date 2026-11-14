@@ -105,6 +105,18 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  opticalLink.target='_blank';opticalLink.rel='noopener noreferrer';
  opticalLink.hidden=true;opticalLink.textContent='Consultar fonte científica original';
  opticalSection.append(opticalHeading,opticalNote,spectralBars,opticalSource,opticalLink);
+ // Valor térmico institucional, em 295 K, somente para consulta junto da experiência.
+ // Não alimenta o solver nem é atribuído à CNTP adotada pelo SILM.
+ const thermalSection=U.element('section',null,'silm-research-reference silm-thermal-nist-reference');
+ thermalSection.hidden=true;thermalSection.setAttribute('aria-label','Condutividade térmica de referência NIST a 295 K');
+ const thermalTitle=U.element('strong','Condutividade térmica · referência NIST');
+ const thermalValue=U.element('p','','silm-thermal-nist-value');
+ const thermalNote=U.element('p','','silm-research-note');
+ const thermalSource=document.createElement('a');
+ thermalSource.href='https://www.nist.gov/ncnr/neutron-instruments/sample-environment/sample-mounting/reference-tables';
+ thermalSource.target='_blank';thermalSource.rel='noopener noreferrer';
+ thermalSource.textContent='Ver tabela do NIST · 295 K';
+ thermalSection.append(thermalTitle,thermalValue,thermalNote,thermalSource);
  // Evidencia de pesquisa incorporada no mesmo painel "Explorar > Ductilidade".
  // Selecionar amostra altera APENAS a tabela documental; nao altera o motor.
  const researchSection=U.element('section',null,'silm-research-reference');researchSection.hidden=true;
@@ -152,7 +164,7 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  researchPicker.addEventListener('change',updateResearchRows);
  researchSection.append(researchTitle,researchNote,researchPickerLabel,researchPurity,researchScroll,researchSource);
  const multistageEvidence=SILM.createMultistageResearchPanel?.({prefix});
- box.append(head,row,status,readings,opticalSection,researchSection,...(multistageEvidence?[multistageEvidence.root]:[]),list);container.append(box);
+ box.append(head,row,status,readings,opticalSection,thermalSection,researchSection,...(multistageEvidence?[multistageEvidence.root]:[]),list);container.append(box);
  function updateOptical(state,driveState){
   const service=SILM.materialEngine;
   const angle=driveState?.angle??35,finish=driveState?.finish??'polished';
@@ -222,6 +234,16 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   readings.hidden=!joule||compact;
   opticalSection.hidden=active!=='luster'||compact;
   if(!opticalSection.hidden)updateOptical(state,info().drive);
+  const thermalReference=(!compact&&active==='thermal')?
+   SILM.researchThermalNIST?.get?.(state.metal?.atomicNumber):null;
+  thermalSection.hidden=!thermalReference;
+  if(thermalReference){
+   thermalTitle.textContent='Condutividade térmica · '+thermalReference.name;
+   thermalValue.textContent=Number(thermalReference.conductivity).toLocaleString('pt-BR')+
+    ' W/(m·K) · tabela de referência a 295 K';
+   thermalNote.textContent='Dado compilado na tabela técnica do NIST para 295 K. Pureza, processamento e pressão da amostra não são identificados individualmente. NÃO é condutividade homologada na CNTP do SILM (273,15 K, 101325 Pa) e NÃO calibra a animação de calor.';
+   thermalSection.dataset.evidence='compiled-source-conditions-only';
+  }
   researchSection.hidden=active!=='ductility'||compact||state.metal?.atomicNumber!==26||!scientificEvidence;
   if(!researchSection.hidden)updateResearchRows();
   if(multistageEvidence)multistageEvidence.update({atomicNumber:compact?null:state.metal?.atomicNumber,active});
