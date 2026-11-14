@@ -77,6 +77,8 @@ jobs:
           node --check tests/run-multistage-evidence.mjs
           node --check domain/silm/data/material-profile-tc-experimental-1988.js
           node --check tests/run-tc-optical-conditional.mjs
+          node --check domain/silm/data/research-thermal-nist-295k.js
+          node --check tests/run-thermal-nist-295k.mjs
           node --check tests/run-four-scales-responsive.mjs
           node --check tests/run-cross-regressions.mjs
           node --check tests/run-controls-responsive-matrix.mjs
@@ -135,6 +137,9 @@ jobs:
       - name: Verificar n k condicionais de Tc e canais de Cu no Brilho Metalico
         run: node tests/run-tc-optical-conditional.mjs
 
+      - name: Verificar dados termicos NIST a 295 K sem extrapolar CNTP
+        run: node tests/run-thermal-nist-295k.mjs
+
       - name: Validar ocupação visual e navegação das quatro escalas
         run: node tests/run-four-scales-responsive.mjs
 
@@ -156,6 +161,15 @@ jobs:
           else
             echo "Auditoria de $BROWSER_NAME interrompida antes de produzir relatório." >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Arquivar condutividade termica NIST · 295 K
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-thermal-nist-${{ matrix.browser }}
+          path: reports/thermal-nist-295k/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Arquivar canais opticos Tc e Cu · fonte primaria
         if: always()
