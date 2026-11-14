@@ -1,0 +1,30 @@
+name: SILM — Contrato constitutivo Etapa 77
+on:
+  pull_request:
+    paths:
+      - 'domain/silm/deformation-constitutive.js'
+      - 'domain/silm/deformation.js'
+      - 'domain/silm/microstructure-view.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/stage77-constitutive-contract.test.cjs'
+      - '.github/workflows/silm-stage77-constitutive.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  constitutive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Testes determinísticos de propriedades e de integração
+        run: node --test tests/stage77-constitutive-contract.test.cjs tests/silm-surface-physics.test.cjs
+      - name: Verificação sintática de arquivos alterados
+        run: |
+          node --check domain/silm/deformation-constitutive.js
+          node --check domain/silm/deformation.js
+          node --check domain/silm/microstructure-view.js
