@@ -56,7 +56,7 @@ test('51 pares n,k produzem exatamente R550 do inventário anterior',()=>{
  const cu=r.bySymbol.Cu[0];
  assert.equal(cu.sourceDataset,'Johnson');
  assert.ok(Math.abs(cu.R-0.6235101484078714)<1e-12);
- assert.equal(r.bySymbol.Sc[0].temperatureK,null,'registro v17 declarou condição em texto');
+ assert.equal(r.bySymbol.Sc[0].temperatureK,4.2,'preservar temperatura criogênica da fonte');
  assert.match(r.bySymbol.Sc[0].sourceCondition,/4\.2 K/);
 });
 test('6 leituras gráficas, 1 interpolada, 1 secundária sem n,k: não reconstituir dados',()=>{
