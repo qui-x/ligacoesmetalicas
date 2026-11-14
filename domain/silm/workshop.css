@@ -1182,3 +1182,12 @@
 /* Registro de preparação da mesma amostra em Rede e Centro. */
 .silm-surface-cross-scale-note[hidden]{display:none!important}
 .silm-surface-cross-scale-note{font-size:.75rem;line-height:1.38;color:var(--muted);padding:4px 10px;margin:0 6px 4px;overflow-wrap:anywhere}
+
+/* Luz e superfície acompanham a mesma amostra sob força/calor/campo. */
+.silm-micro-surface-tools .silm-micro-surface-apply{min-width:44px;min-height:44px}
+.silm-micro-surface-tools button:disabled,.silm-micro-surface-tools select:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:560px){
+ #si-stage[data-workshop-scale="2"] .silm-micro-surface-tools .silm-micro-surface-apply{
+  flex:1 1 105px;max-width:160px;min-width:90px;font-size:.73rem
+ }
+}
