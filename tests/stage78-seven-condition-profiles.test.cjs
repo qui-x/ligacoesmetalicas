@@ -30,7 +30,7 @@ test('CNTP deixa de ser porta de consulta; amostra e temperatura continuam repor
   assert.equal(row.calibrationApproved,false);
   assert.equal(row.canDisplayReference,true);
   assert.ok(row.temperatureText.length>4&&row.sample.length>8);
-  assert.ok(['triagem-sem-homologação','transcrição-pendente','processamento-não-maleabilidade','referência-condicionada'].includes(row.evidencePolicy));
+  assert.ok(['triagem-sem-homologação','transcrição-pendente','processamento-não-maleabilidade','referência-condicionada','recomendação-avaliada-fonte-institucional','recomendação-impurezas-documentadas','recomendação-provisória','cálculo-derivado-de-ajuste','medição-amostra-com-óxido','medição-amostra-histórica'].includes(row.evidencePolicy));
  }
 });
 test('casos especiais Co / Tc / Er / Zr não são confundidos',()=>{
@@ -45,13 +45,35 @@ test('casos especiais Co / Tc / Er / Zr não são confundidos',()=>{
  assert.equal(get('Th','ductility').grade,'secondary-pending');
  assert.equal(get('Th','malleability').grade,'secondary-pending');
 });
-test('triagens não ganham fonte inventada nem homologação física',()=>{
- const lows=data.records.filter(x=>x.grade==='screening-untraced');
- assert.ok(lows.length>=7);
- for(const row of lows){
-  assert.equal(row.sourceTracked,false);
-  assert.equal(row.sourceURL,null);
-  assert.equal(row.observationIsMeasured,false);
+test('11 triagens antigas substituídas por fontes rastreadas SEM liberar motores',()=>{
+ const original=['Co:thermal','Hf:electrical','Hf:thermal','Ta:electrical',
+ 'Ta:thermal','Tc:electrical','Tc:thermal','Th:electrical','Th:thermal',
+ 'Zr:electrical','Zr:thermal'];
+ for(const key of original){
+  const [symbol,property]=key.split(':'),row=get(symbol,property);
+  assert.ok(row.sourceURL?.startsWith('https://'),key+' sem fonte');
+  assert.notEqual(row.grade,'screening-untraced',key+' continua em triagem');
+  assert.equal(row.sourceTracked,true);assert.equal(row.engineRelease,false);
+ }
+ assert.equal(data.records.filter(r=>r.grade==='screening-untraced').length,0);
+ const thermals=symbols.filter(s=>s!=='Er').map(s=>get(s,'thermal'));
+ assert.deepEqual(thermals.map(r=>r.value),[100,23,57.5,50.7,54,22.7]);
+ assert.ok(thermals.every(r=>r.temperatureK===300));
+ assert.equal(get('Hf','thermal').grade,'recommended-impure');
+ assert.equal(get('Th','thermal').grade,'provisional-evaluated');
+ assert.equal(get('Ta','electrical').value,1.4e-7);
+ assert.equal(get('Tc','electrical').grade,'fit-derived');
+ assert.equal(get('Tc','electrical').temperatureK,298.15);
+ assert.ok(Math.abs(get('Tc','electrical').value-1.78e-7)<1e-10);
+ assert.equal(get('Th','electrical').grade,'historical-impure');
+ assert.equal(get('Zr','electrical').value,4.8e-7);
+});
+test('recomendação térmica e ajuste elétrico não viram medida individual',()=>{
+ for(const row of data.records.filter(x=>['recommended-evaluated','recommended-impure',
+ 'provisional-evaluated','fit-derived','historical-impure','historical-specimen'].includes(x.grade))){
+  assert.equal(row.observationIsMeasured,false,'compilação/cálculo não é ponto medido individualmente no catálogo');
+  assert.equal(row.calibrationApproved,false);
+  assert.ok(row.sample.length>=20);
  }
  for(const row of data.records.filter(x=>x.grade==='processing-only')){
   assert.equal(row.observationIsMeasured,false);
