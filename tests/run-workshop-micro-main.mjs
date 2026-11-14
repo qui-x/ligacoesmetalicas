@@ -107,6 +107,14 @@ async function test(viewport){
  };
  await openProperty('malleability');
  const mech=viewer.locator('.silm-micro-mechanical-tools');
+ await page.waitForFunction(()=>{
+  const view=document.querySelector('.silm-workshop-micro-viewport');
+  const tools=document.querySelector('.silm-micro-mechanical-tools');
+  if(!view||!tools)return false;
+  const a=view.getBoundingClientRect(),b=tools.getBoundingClientRect();
+  return b.top>=a.bottom-1;
+ },undefined,{timeout:10000});
+
  await mech.waitFor({state:'visible'});
 
  // O contato da prensa tem posição e largura próprias. A mesma amostra
