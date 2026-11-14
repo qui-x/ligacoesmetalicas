@@ -51,3 +51,8 @@
 .silm-optical-source-link{display:inline-block;margin:.35rem 0 .15rem;font-size:.8rem;text-decoration:underline;overflow-wrap:anywhere}
 .silm-optical-source-link[hidden]{display:none!important}
 .silm-optical-band meter[hidden]{display:none!important}
+
+.silm-thermal-nist-reference .silm-thermal-nist-value{
+ font-weight:700;font-variant-numeric:tabular-nums;margin:.55rem 0;font-size:1rem
+}
+.silm-thermal-nist-reference[hidden]{display:none!important}
