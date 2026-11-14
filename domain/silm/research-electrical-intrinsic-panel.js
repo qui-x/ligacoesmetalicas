@@ -12,6 +12,7 @@ SILM.createPGMIntrinsicPanel=({prefix='silm-pgm'}={})=>{
  const caution=document.createElement('p');caution.className='silm-research-note';
  caution.textContent='ρᵢ é a resistividade INTRÍNSECA avaliada, sem a parcela residual ρ₀ de defeitos e impurezas. Uma peça real possui ρtotal≈ρᵢ+ρ₀ nas condições de aplicação da regra de Matthiessen. Não converter este valor em condutividade macroscópica de um objeto do SILM. Temperatura e fase declaradas; pressão/amostra simulada não homologadas em CNTP.';
  const label=document.createElement('label');label.className='silm-research-label';
+ label.textContent='Temperatura tabulada da avaliação';
  const select=document.createElement('select');select.id=prefix+'-intrinsic-temperature';
  select.setAttribute('aria-label','Temperatura da curva avaliada, em kelvins');
  label.htmlFor=select.id;label.append(select);
