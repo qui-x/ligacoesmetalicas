@@ -34,7 +34,7 @@ window.SILM=window.SILM||{};
   const lighting=illuminated?1:.68;
   return Object.freeze({
    shadow:{x:clamp(cx+offset,0,1),y:cy,rx:clamp(w*.83,.10,.65),
-    ry:contact?.15:.19,opacity:clamp((.36+.23*intensity)*lighting,0,.53)},
+    ry:contact?.15:.19,opacity:clamp((.36+.23*intensity)*lighting,0,.42)},
    highlight:{x:clamp(cx-offset*.78,0,1),y:clamp(cy-.016,0,1),
     rx:clamp(w*.47,.045,.42),ry:contact?.09:.12,
     opacity:clamp((.28+.22*intensity)*lighting,0,.48)},
