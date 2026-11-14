@@ -74,3 +74,21 @@
 @media (max-width:480px){
  .silm-electrical-evidence .silm-electrical-metrics{gap:.3rem .5rem;font-size:.77rem}
 }
+
+
+/* Curvas científicas intrínsecas publicadas: no controle Elétrica do SILM. */
+.silm-pgm-intrinsic[hidden]{display:none!important}
+.silm-pgm-intrinsic{max-width:100%;min-width:0;overflow-wrap:anywhere}
+.silm-pgm-intrinsic-result{font-weight:650;font-variant-numeric:tabular-nums;font-size:.9rem;margin:.65rem 0}
+.silm-pgm-intrinsic-chart{width:100%;max-width:460px;display:block;height:auto;aspect-ratio:330/160;margin:.3rem auto;color:inherit}
+.silm-pgm-intrinsic-chart .silm-pgm-axis{stroke:currentColor;opacity:.55;stroke-width:1}
+.silm-pgm-intrinsic-chart .silm-pgm-polyline{stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.silm-pgm-intrinsic-chart .silm-pgm-marker{fill:currentColor;opacity:.65}
+.silm-pgm-intrinsic-chart .silm-pgm-marker-selected{fill:currentColor;stroke:var(--surface,#fff);stroke-width:1.5}
+.silm-pgm-intrinsic-chart .silm-pgm-axis-label{font-size:11px;fill:currentColor}
+.silm-pgm-intrinsic-table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.77rem}
+.silm-pgm-intrinsic-table th,.silm-pgm-intrinsic-table td{text-align:center;border-bottom:1px solid rgba(127,127,127,.24);padding:.32rem .4rem;white-space:nowrap}
+.silm-pgm-intrinsic-table th{white-space:normal;min-width:4.5rem}
+.silm-pgm-intrinsic-table .silm-pgm-active-row{outline:2px solid currentColor;outline-offset:-2px;font-weight:700}
+.silm-pgm-intrinsic a{overflow-wrap:anywhere}
+@media(max-width:480px){.silm-pgm-intrinsic{padding:.55rem}.silm-pgm-intrinsic-table{font-size:.73rem}}
