@@ -217,17 +217,20 @@ SILM.microstructure=(()=>{
    const step=mode==='malleability'?st.properties.malleability.compression:st.properties.ductility.elongation;
    const max=SILM.properties.limits[mode==='malleability'?'compression':'elongation'];
    const state=deformCtl?.reading?.()||{load:0,regime:'rest'};
-   const load=clamp(Number(state.load)||0,0,1),p=step/max;
+   const load=clamp(Number(state.load)||0,0,1);
    // Envelope geométrico abstrato, sem módulo elástico, tensão ou
    // porcentagem de deformação atribuídos à amostra/material.
-   const x=mode==='malleability'?1+.16*p+.04*load:1-.12*p-.025*load;
-   const y=mode==='malleability'?1-.16*p-.04*load:1+.22*p+.05*load;
+   // Geometria didática com deformação plástica aproximadamente isocórica
+   // em 3D (a profundidade não está desenhada). NÃO é deformação medida.
+   const envelope=SILM.mechanicalConstitutive?.visualEnvelope({mode,step,maxSteps:max,load});
+   const x=envelope?.scaleX??1,y=envelope?.scaleY??1;
    if(step||load){
     mechanicalField.setAttribute('transform','translate('+CX+' '+CY+') scale('+x+' '+y+') translate('+(-CX)+' '+(-CY)+')');
    }else mechanicalField.removeAttribute('transform');
    section.dataset.mechanicalStep=String(step);
    section.dataset.mechanicalLoad=String(Math.round(load*100));
    section.dataset.mechanicalRegime=state.regime||'rest';
+   section.dataset.mechanicalCalibration=state.constitutive?.calibrationReleased?'calibrated':'qualitative';
    topGrip.textContent=mode==='malleability'?'↓':'↑';
    bottomGrip.textContent=mode==='malleability'?'↑':'↓';
    for(const grip of [topGrip,bottomGrip])grip.setAttribute('aria-label',mode==='malleability'?
@@ -241,6 +244,9 @@ SILM.microstructure=(()=>{
    mechanicalStatus.textContent=(mode==='malleability'?'Compressão':'Tração')+
     ' · passo ilustrativo '+step+'/'+max+(load?' · força relativa '+Math.round(load*100)+' %':'')+
     ' · não representa deformação medida por grão';
+   mechanicalStatus.title=state.constitutive?.calibrationReleased?
+    'Existe um perfil de material aprovado; os passos desta microestrutura continuam ilustrativos.':
+    'Sem curva tensão–deformação homologada nesta condição; força e passos são relativos.';
   }
   const mechanicalPulseStep=()=>{
    const mode=getMode(),st=model?.state;
