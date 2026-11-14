@@ -1,5 +1,7 @@
 name: SILM — Sete metais por condição da fonte (Etapa 78)
 on:
+  push:
+    branches: [feat/silm-seven-metals-source-conditions-20261114]
   pull_request:
     paths:
       - 'domain/silm/data/research-seven-condition-profiles.js'
