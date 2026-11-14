@@ -113,6 +113,7 @@ SILM.validateScientificState=(value,data=SILM.data)=>{
  if(value.observations.some(x=>typeof x!=='string'||x.length>12000))return fail('OBSERVATIONS_INVALID');
  if(!value.conditions||value.conditions.temperature!==null||value.conditions.pressure!==null||!value.representation||value.representation.dimension!==null||!Array.isArray(value.representation.layers)||value.representation.layers.length)return fail('CONDITIONS_INVALID');
  if(!value.metadata||typeof value.metadata!=='object'||Array.isArray(value.metadata))return fail('METADATA_INVALID');
+  if(value.metadata.surface!==undefined&&!SILM.surfacePhysics?.validState(value.metadata.surface))return fail('SURFACE_STATE_INVALID');
  if(value.investigation===null){if(value.metal!==null||value.structure!==null||value.electrons!==null)return fail('ORPHAN_METAL');}
  else{
   const i=value.investigation,m=value.metal;
@@ -271,6 +272,29 @@ SILM.createScientificState=()=>{
   if(JSON.stringify(next)===JSON.stringify(el.representation))return true;
   const previous=snapshot();el.representation=next;publish('electrons:representation',previous,{patch});return true;
  }
+ /* ---------- Superfície: preparo persistente, propriedades com foco único ---------- */
+ function persistSurface(next,action){
+  if(!state.investigation||state.module.active!=='explorar'||!SILM.surfacePhysics?.validState(next))return false;
+  const previous=snapshot();
+  state.metadata.surface=next;
+  state.investigation.updatedAt=now();
+  publish('surface:'+action,previous,{action});
+  return true;
+ }
+ function applySurfaceTreatment(stroke){
+  if(state.properties.active!=='luster'||!state.structure||!SILM.surfacePhysics?.validStroke(stroke))return false;
+  const next=SILM.surfacePhysics.applyStroke(SILM.surfacePhysics.current(state),stroke);
+  return next?persistSurface(next,'treated'):false;
+ }
+ function setSurfaceLight(value){
+  if(typeof value!=='boolean'||!state.structure)return false;
+  const next={...SILM.surfacePhysics.current(state),light:value};
+  return persistSurface(next,'light');
+ }
+ function resetSurface(){
+  if(!state.structure)return false;
+  return persistSurface(SILM.surfacePhysics.base(),'reset');
+ }
  /* ---------- Propriedades (0.7.x) ---------- */
  const P=SILM.properties;
  // Encerra a experiência se o contexto deixou de valer (ex.: voltou ao modo livre, ficou sem elétrons).
@@ -296,7 +320,20 @@ SILM.createScientificState=()=>{
   const pr=state.properties,id=pr.active;if(!id||!patch||typeof patch!=='object')return false;
   const next={...pr,[id]:{...pr[id],...patch}};if(Object.keys(next[id]).length!==Object.keys(P.defaults[id]).length)return false;
   if(!SILM.validateProperties(next,{...state,properties:next}).ok)return false;if(JSON.stringify(next[id])===JSON.stringify(pr[id]))return true;
-  const previous=snapshot();state.properties=next;publish('properties:changed',previous,{property:id,patch});return true;
+  const previous=snapshot();state.properties=next;
+   // Acumular eventos didáticos da mesma amostra. Não atribuir unidades
+   // de deformação/tempo ao número de passos ou ciclos.
+   const surface={...SILM.surfacePhysics.current(state)};
+   if(id==='malleability'&&next.malleability.compression>pr.malleability.compression)
+    surface.plasticSteps=Math.min(10000,surface.plasticSteps+next.malleability.compression-pr.malleability.compression);
+   if(id==='ductility'&&next.ductility.elongation>pr.ductility.elongation)
+    surface.plasticSteps=Math.min(10000,surface.plasticSteps+next.ductility.elongation-pr.ductility.elongation);
+   if(id==='thermal'&&next.thermal.heating&&!pr.thermal.heating)
+    surface.heatEvents=Math.min(10000,surface.heatEvents+1);
+   if(id==='electrical'&&next.electrical.field&&!pr.electrical.field)
+    surface.electricEvents=Math.min(10000,surface.electricEvents+1);
+   if(SILM.surfacePhysics.validState(surface))state.metadata.surface=surface;
+   publish('properties:changed',previous,{property:id,patch});return true;
  }
  /* Restaurar: volta ao estado-base da experiência; não reseta a investigação nem troca o metal. */
  function restoreProperty(){const pr=state.properties;if(!pr.active)return false;const previous=snapshot();state.properties={...pr,[pr.active]:JSON.parse(JSON.stringify(P.defaults[pr.active]))};publish('properties:restored',previous,{property:pr.active});return true;}
@@ -370,7 +407,7 @@ SILM.createScientificState=()=>{
  return Object.freeze({get state(){return snapshot();},snapshot,connect,begin,setWorkshopContext,setModule,resetInvestigation,close,setStatus,restore,
   checkpoint:()=>({state:snapshot(),history:JSON.parse(JSON.stringify(history))}),
   rollback(value){replace(JSON.parse(JSON.stringify(value.state)));history=JSON.parse(JSON.stringify(value.history));emit?.('investigation:updated',{current:snapshot(),change:'storage:rollback'});},
-  beginAssembly,addUnit,moveUnit,undo,clearStructure,setAssistance,setAssemblyStatus,organize,restoreFree,setCrystalRepresentation,activateElectrons,setElectronRepresentation,startProperty,setPropertyParams,restoreProperty,endProperty,propertyAvailability,addMeasurement,removeMeasurement,clearMeasurements,measurementAvailability,addCalculation,removeCalculation,clearCalculations,calculationAvailability,
+  beginAssembly,addUnit,moveUnit,undo,clearStructure,setAssistance,setAssemblyStatus,organize,restoreFree,setCrystalRepresentation,activateElectrons,setElectronRepresentation,startProperty,setPropertyParams,restoreProperty,endProperty,propertyAvailability,applySurfaceTreatment,setSurfaceLight,resetSurface,addMeasurement,removeMeasurement,clearMeasurements,measurementAvailability,addCalculation,removeCalculation,clearCalculations,calculationAvailability,
   get canUndo(){return !!state.structure&&free()&&history.length>0;},get historySize(){return history.length;},
   get lastAction(){const last=history[history.length-1];return state.structure&&last?{type:last.type,unitId:last.unitId}:null;},
   load(){const missing={};const saved=storage?.get('scientific.state',missing);if(saved===missing)return {ok:true,empty:true};const result=restore(saved);if(!result.ok){history=[];replace(SILM.emptyScientificState());persist();return result;}return result;}
