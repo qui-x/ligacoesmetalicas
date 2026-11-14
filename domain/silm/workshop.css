@@ -1278,3 +1278,25 @@
   grid-column:1/-1;order:initial
  }
 }
+
+
+/* Atuação mecânica: espaço vertical REAL para cena + faixa de controles.
+   Nunca permitir que as garras da cena interceptem botões da faixa. */
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer:has(.silm-micro-mechanical-tools:not([hidden])){
+ height:auto;max-height:none;min-height:0;
+ grid-template-rows:minmax(300px,56dvh) auto auto;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewport{z-index:1}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar{
+ position:relative;z-index:5;
+}
+@media(max-width:620px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer:has(.silm-micro-mechanical-tools:not([hidden])){
+  grid-template-rows:minmax(260px,46dvh) auto auto;
+ }
+}
+@media(max-height:510px) and (orientation:landscape){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer:has(.silm-micro-mechanical-tools:not([hidden])){
+  grid-template-rows:minmax(240px,58dvh) auto auto;
+ }
+}
