@@ -167,7 +167,7 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  const electricalEvidence=SILM.createElectricalEvidencePanel?.({prefix});
  const intrinsicEvidence=SILM.createPGMIntrinsicPanel?.({prefix});
  const multistageEvidence=SILM.createMultistageResearchPanel?.({prefix});
- box.append(head,row,status,readings,opticalSection,...(opticalCandidate?[opticalCandidate.root]:[]),researchSection,thermalSection,...(electricalEvidence?[electricalEvidence.root]:[]),...(intrinsicEvidence?[intrinsicEvidence.root]:[]),...(multistageEvidence?[multistageEvidence.root]:[]),list);container.append(box);
+ box.append(head,row,status,readings,opticalSection,researchSection,...(opticalCandidate?[opticalCandidate.root]:[]),thermalSection,...(electricalEvidence?[electricalEvidence.root]:[]),...(intrinsicEvidence?[intrinsicEvidence.root]:[]),...(multistageEvidence?[multistageEvidence.root]:[]),list);container.append(box);
  function updateOptical(state,driveState){
   const service=SILM.materialEngine;
   const angle=driveState?.angle??35,finish=driveState?.finish??'polished';
