@@ -1,0 +1,31 @@
+name: SILM — Referências das terras-raras (Etapa 68)
+on:
+  pull_request:
+    paths:
+      - 'domain/silm/data/rare-earth-reference-67.js'
+      - 'integracao/metallic-experience.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/rare-earth-reference-68.test.mjs'
+      - '.github/workflows/silm-rare-earth-reference-68.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-rare-earth-reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar os scripts
+        run: |
+          node --check domain/silm/data/rare-earth-reference-67.js
+          node --check integracao/metallic-experience.js
+          node --check sw.js
+      - name: Conferir as 17 terras-raras e integração com Dados
+        run: node --test tests/rare-earth-reference-68.test.mjs
+      - name: Regressão do cache offline
+        run: node .github/scripts/test_pwa_updates.js
