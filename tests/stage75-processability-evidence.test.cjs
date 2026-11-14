@@ -1,0 +1,7 @@
+'use strict';
+const test=require('node:test'), assert=require('node:assert/strict'), path=require('node:path');
+const data=require(path.resolve(__dirname,'../docs/science/silm-etapa75-processabilidade-terras-raras.json'));
+test('nine unique reference-only profiles',()=>{assert.equal(data.records.length,9); assert.equal(new Set(data.records.map(x=>x.id)).size,9); for(const r of data.records){assert.equal(r.engineRelease,false);assert.equal(r.CNTPValidated,false);assert.equal(r.pressurePa,null);assert.equal(r.sourcePdfImageChecked,false);assert.ok(r.source.startsWith('https://'));}});
+test('Pm is interpolation, not measurement',()=>{const a=data.records.filter(x=>x.symbol==='Pm');assert.equal(a.length,2);assert.deepEqual(a.map(x=>x.estimatedElongationPct).sort((a,b)=>a-b),[.2,7]);for(const x of a){assert.equal(x.status,'INTERPOLATION_FROM_ND_SM_NOT_MEASURED');assert.equal(x.temperatureK,300.15);}});
+test('Eu extrusion geometry is not tensile failure',()=>{const e=data.records.find(x=>x.symbol==='Eu'); assert.equal(e.pressurePsiNominal,16000);assert.equal(e.extrusionAreaRatioDerived,64);assert.equal(e.extrusionAreaReductionPctDerived,98.4375);assert.equal(Object.hasOwn(e,'elongationToFracture'),false);});
+test('Y rolling evidence always reports cracking',()=>{const y=data.records.filter(x=>x.symbol==='Y');assert.equal(y.length,6);for(const x of y)assert.match(x.crackingObservation,/crack/);});
