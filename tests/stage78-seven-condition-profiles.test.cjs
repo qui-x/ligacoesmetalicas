@@ -66,6 +66,7 @@ test('dados ópticos são de interface ideal e não brilho real',()=>{
   assert.equal(r.unit,'fração');
   assert.ok(r.value>=0&&r.value<=1);
   assert.ok(r.sourceURL?.startsWith('https://'));
+  assert.equal(r.observationIsMeasured,false,'R550 derivada não é refletância medida na peça');
  }
 });
 test('painel integrado à UI nativa e disponível no cache offline',()=>{
