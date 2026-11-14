@@ -313,7 +313,9 @@ SILM.createScientificState=()=>{
   const previous=snapshot(),date=now();let electrons=false;
   if(id==='electrical'){if(!state.electrons){const e=SILM.data.get(state.metal.atomicNumber),M=SILM.electronModel;state.electrons={modelVersion:M.modelVersion,type:M.types[0],status:'active',metalAtomicNumber:state.metal.atomicNumber,source:{model:M.sourceModel,valenceSourceId:e.valenceModel.sourceId,configurationSourceId:e.electronConfiguration.sourceId},representation:{...M.defaults},createdAt:date};electrons=true;}
    else if(!state.electrons.representation.visible){state.electrons.representation.visible=true;electrons=true;}}
-  const switched=state.properties.active;state.properties={...P.fresh(),active:id,startedAt:date};state.investigation.updatedAt=date;
+  const switched=state.properties.active;state.properties={...P.fresh(),active:id,startedAt:date};
+   if(id==='luster')state.properties.luster.light=!!SILM.surfacePhysics.current(state).light;
+   state.investigation.updatedAt=date;
   publish('properties:started',previous,{property:id,switchedFrom:switched,electrons});return {ok:true,switchedFrom:switched,electrons};
  }
  function setPropertyParams(patch){
@@ -332,6 +334,7 @@ SILM.createScientificState=()=>{
     surface.heatEvents=Math.min(10000,surface.heatEvents+1);
    if(id==='electrical'&&next.electrical.field&&!pr.electrical.field)
     surface.electricEvents=Math.min(10000,surface.electricEvents+1);
+   if(id==='luster')surface.light=next.luster.light;
    if(SILM.surfacePhysics.validState(surface))state.metadata.surface=surface;
    publish('properties:changed',previous,{property:id,patch});return true;
  }
