@@ -1201,3 +1201,102 @@
 .silm-workshop-micro-viewer[data-mechanical-study="ductility"] .silm-micro-specimen-outline,
 .silm-workshop-micro-viewer[data-mechanical-permanent="active"] .silm-micro-specimen-outline{opacity:.8}
 @media(forced-colors:active){.silm-micro-specimen-outline{stroke:CanvasText;stroke-dasharray:5 4}}
+
+
+/* Ensaios mecânicos no corpo de prova: placas não são centros metálicos. */
+.silm-micro-apparatus{pointer-events:none}
+.silm-micro-press-plate{fill:var(--accent);stroke:var(--text);stroke-opacity:.35;stroke-width:1;
+ opacity:.82;vector-effect:non-scaling-stroke}
+.silm-micro-mechanical-load-meter{
+ flex:0 1 110px;width:90px;max-width:110px;min-width:60px;height:14px;
+ accent-color:var(--accent)
+}
+.silm-micro-specimen-feedback[hidden]{display:none!important}
+.silm-micro-specimen-feedback{
+ position:absolute;z-index:3;top:8px;left:8px;
+ pointer-events:none;max-width:min(55%,270px);padding:5px 7px;
+ border:1px solid var(--border);border-radius:5px;
+ background:var(--surface);color:var(--text);
+ font-size:.71rem;line-height:1.3;overflow-wrap:anywhere;
+ box-shadow:0 1px 4px rgb(0 0 0/.09)
+}
+@media(max-width:560px){
+ .silm-micro-specimen-feedback{
+  max-width:52%;font-size:.66rem;top:5px;left:5px;padding:3px 5px
+ }
+ .silm-micro-mechanical-load-meter{width:100%;max-width:none;min-width:0}
+}
+@media(forced-colors:active){
+ .silm-micro-press-plate{fill:CanvasText;stroke:CanvasText;opacity:1}
+ .silm-micro-specimen-feedback{background:Canvas;color:CanvasText;border-color:CanvasText;box-shadow:none}
+}
+
+
+/* Posição e largura do contato da prensa/garra na MESMA cena. */
+#si-stage[data-workshop-scale="2"] .silm-micro-contact-control{
+ display:flex;align-items:center;gap:6px;min-width:150px;flex:1 1 155px;
+ color:var(--text);font-size:.73rem;line-height:1.35;
+}
+.silm-micro-contact-control span{flex:0 1 100px;min-width:65px}
+.silm-micro-contact-control input[type="range"]{
+ flex:1 1 95px;min-width:60px;width:100%;accent-color:var(--accent);min-height:35px
+}
+.silm-micro-press-plate{transition:none}
+.silm-workshop-micro-viewer[data-mechanical-solver="elastic-local-2d"] .silm-micro-specimen-outline{
+ stroke-dasharray:5 3;
+}
+@media(max-width:560px){
+ #si-stage[data-workshop-scale="2"] .silm-micro-contact-control{
+  grid-column:span 1;flex-wrap:wrap;min-width:0;gap:1px
+ }
+ .silm-micro-contact-control span{flex:1 1 100%;min-width:0}
+ .silm-micro-contact-control input[type="range"]{flex:1 1 100%;min-width:0}
+}
+@media(forced-colors:active){.silm-micro-contact-control input[type="range"]{accent-color:Highlight}}
+
+/* Ajustes de aplicação recolhíveis, sem sobrepor a região dos grãos. */
+#si-stage[data-workshop-scale="2"] .silm-micro-contact-details{
+ flex:0 1 152px;min-width:116px;max-width:180px;
+ border:1px solid var(--border);border-radius:7px;
+ background:var(--surface);color:var(--text);font-size:.74rem;
+}
+#si-stage[data-workshop-scale="2"] .silm-micro-contact-details summary{
+ cursor:pointer;min-height:44px;box-sizing:border-box;
+ display:flex;align-items:center;padding:5px 8px;overflow-wrap:anywhere;
+}
+#si-stage[data-workshop-scale="2"] .silm-micro-contact-details[open]{
+ order:8;flex:1 1 100%;width:100%;max-width:none;min-width:0;padding-bottom:6px
+}
+#si-stage[data-workshop-scale="2"] .silm-micro-contact-details[open] .silm-micro-contact-control{
+ margin:3px 6px;min-height:40px
+}
+@media(max-width:560px){
+ #si-stage[data-workshop-scale="2"] .silm-micro-contact-details{
+  grid-column:auto;min-width:0;max-width:none;width:100%
+ }
+ #si-stage[data-workshop-scale="2"] .silm-micro-contact-details[open]{
+  grid-column:1/-1;order:initial
+ }
+}
+
+
+/* Atuação mecânica: espaço vertical REAL para cena + faixa de controles.
+   Nunca permitir que as garras da cena interceptem botões da faixa. */
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer:has(.silm-micro-mechanical-tools:not([hidden])){
+ height:auto;max-height:none;min-height:0;
+ grid-template-rows:minmax(300px,56dvh) auto auto;
+}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewport{z-index:1}
+#si-stage[data-workshop-scale="2"] .silm-workshop-micro-toolbar{
+ position:relative;z-index:5;
+}
+@media(max-width:620px){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer:has(.silm-micro-mechanical-tools:not([hidden])){
+  grid-template-rows:minmax(260px,46dvh) auto auto;
+ }
+}
+@media(max-height:510px) and (orientation:landscape){
+ #si-stage[data-workshop-scale="2"] .silm-workshop-micro-viewer:has(.silm-micro-mechanical-tools:not([hidden])){
+  grid-template-rows:minmax(240px,58dvh) auto auto;
+ }
+}

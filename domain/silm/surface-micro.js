@@ -41,7 +41,7 @@ window.SILM=window.SILM||{};
   reading.setAttribute('role','status');reading.setAttribute('aria-live','polite');
   controls.append(tool,apply,light,source.wrap,observer.wrap,reset,reading);
   toolbar.append(controls);
-  let tiles=[],paint=null;
+  let tiles=[],tileBoxes=[],paint=null,localWarp=null;
   const focus=st=>st.module?.active==='explorar'&&st.properties?.active==='luster';
   const eligibleForCoobservation=st=>st.module?.active==='explorar'&&
    ['electrical','thermal','malleability','ductility'].includes(st.properties?.active);
@@ -59,7 +59,7 @@ window.SILM=window.SILM||{};
   const draft=()=>paint?{tool:paint.tool,x0:paint.first.x,y0:paint.first.y,x1:paint.last.x,y1:paint.last.y,radius:.053}:null;
   function rebuild(){
    const {width,height}=getSize();
-   overlay.replaceChildren();tiles=[];
+   overlay.replaceChildren();tiles=[];tileBoxes=[];
    const cols=24,rows=15;
    for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
     const tile=document.createElementNS(NS,'rect');
@@ -68,9 +68,29 @@ window.SILM=window.SILM||{};
     tile.setAttribute('fill','#fff');tile.setAttribute('opacity','0');
     tile.setAttribute('pointer-events','none');
     overlay.append(tile);tiles.push(tile);
+    tileBoxes.push({x:x*width/cols,y:y*height/rows,w:width/cols+.35,h:height/rows+.35});
    }
    mechanicalField.append(overlay);
+   setWarp(localWarp);
    refresh();
+  }
+  // As marcas de acabamento seguem o mesmo campo de deslocamento local
+  // dos grãos. Cada tile recebe uma aproximação afim do campo FEM; é apenas
+  // a apresentação visual, não recalibração dos índices ópticos do metal.
+  function setWarp(map){
+   localWarp=typeof map==='function'?map:null;
+   for(let i=0;i<tiles.length;i++){
+    const tile=tiles[i],p=tileBoxes[i];
+    if(!localWarp){tile.removeAttribute('transform');continue;}
+    const a=localWarp(p.x,p.y),b=localWarp(p.x+p.w,p.y),c=localWarp(p.x,p.y+p.h);
+    if(![a?.x,a?.y,b?.x,b?.y,c?.x,c?.y].every(Number.isFinite)){
+     tile.removeAttribute('transform');continue;
+    }
+    const m00=(b.x-a.x)/p.w,m10=(b.y-a.y)/p.w;
+    const m01=(c.x-a.x)/p.h,m11=(c.y-a.y)/p.h;
+    const tx=a.x-m00*p.x-m01*p.y,ty=a.y-m10*p.x-m11*p.y;
+    tile.setAttribute('transform','matrix('+[m00,m10,m01,m11,tx,ty].join(' ')+')');
+   }
   }
   function refresh(){
    const st=model.state,surface=physics.current(st),focusing=focus(st),on=visible(st,surface),angle=drive?.angle??35,eye=drive?.observerAngle??35;
@@ -153,7 +173,7 @@ window.SILM=window.SILM||{};
     else if(attached)off();
    });
   }
-  return Object.freeze({rebuild,refresh,controls});
+  return Object.freeze({rebuild,refresh,setWarp,controls});
  }
  SILM.surfaceMicro=Object.freeze({attach});
 })();

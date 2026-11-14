@@ -96,6 +96,34 @@ window.SILM=window.SILM||{};
  const steps=n=>Array.from({length:LIMIT},(_,i)=>i<n?1:0);
  /* Forma estática (resultado guardado): n deslizamentos completos, sem carga. */
  function staticTransform(g,id,count,camera=null){const sys=system(g);if(!sys)return null;return transform(sys,{progress:steps(count),sign:id==='ductility'?1:-1,strain:0,orient:1,camera});}
+ /*
+  * Resposta GEOMÉTRICA do mesmo corpo de prova nas várias escalas.
+  * As constantes visuais são adimensionais: NÃO fornecem tensão, módulo
+  * de Young, limite de escoamento ou ensaios reais de cada metal.
+  * A deformação elástica transitória vem do controlador da rede, e a
+  * deformação plástica residual, da investigação. Transversal: LATERAL.
+  */
+ function specimenResponse(surface={},reading={}){
+  const count=v=>Number.isInteger(v)?Math.max(0,Math.min(LIMIT,v)):0;
+  const compression=count(surface?.compressionSteps),tension=count(surface?.tensionSteps);
+  const residualAxial=-.045*compression+.055*tension;
+  const residualLateral=.045*compression-.035*tension;
+  const elastic=Number.isFinite(reading?.strain)?
+   Math.max(-EPS_YIELD,Math.min(EPS_YIELD,reading.strain)):0;
+  const force=Number.isFinite(reading?.load)?
+   Math.max(0,Math.min(1,reading.load)):0;
+  const sx=Math.max(.5,1+residualLateral-LATERAL*elastic);
+  const sy=Math.max(.5,1+residualAxial+elastic);
+  const hasResidual=compression+tension>0;
+  const regime=['rest','returning','elastic','plastic'].includes(reading?.regime)?
+   reading.regime:'rest';
+  return Object.freeze({
+   scaleX:sx,scaleY:sy,
+   elasticAxial:elastic,plasticAxial:residualAxial,plasticLateral:residualLateral,
+   compressionSteps:compression,tensionSteps:tension,
+   hasResidual,force,regime,hasTransient:force>0||Math.abs(elastic)>1e-4
+  });
+ }
  const fmt=v=>v.toFixed(2).replace('.',',');
  /* Controlador contínuo, um por modelo: carga (0–1), deformação elástica amortecida, deslizamentos animados e
     orientação. A carga vem do arraste na cena, do controle "Força aplicada" ou do botão (pulso). */
@@ -143,6 +171,8 @@ window.SILM=window.SILM||{};
   const api={
    subscribe(f){listeners.add(f);return ()=>listeners.delete(f);},
    sync,
+   reset(){load=0;strain=0;velocity=0;work=0;pulse=null;limitReached=false;
+    memo=null;const c=ctx();snap(c);last=0;notify();},
    setLoad(v){const x=Math.max(0,Math.min(1,Number(v)||0));if(x===load&&!pulse)return;pulse=null;load=x;memo=null;const c=ctx();if(reducedMotion()&&x>YIELD&&c.id&&c.count<LIMIT)commit(c,c.count+1);wake();notify();},
    /* Pulso (botão e teclado): registra um deslizamento agora e anima carga → deslizamento → retorno elástico. */
    pulse(){memo=null;const c=ctx();if(!c.id||c.count>=LIMIT)return false;if(!commit(c,c.count+1))return false;if(!reducedMotion()){pulse={t:0};wake();}else snap(c);notify();return true;},
@@ -155,5 +185,5 @@ window.SILM=window.SILM||{};
  }
  /* Texto científico curto do sistema de deslizamento, com b calculado da geometria do banco. */
  function describe(sys){if(!sys)return '';return 'Plano '+sys.planeLabel+' da família '+sys.family+', direção '+sys.directionLabel+'; b = '+fmt(sys.b)+' Å (calculado pelo SILM a partir do parâmetro de rede).';}
- SILM.deformation=Object.freeze({SYSTEMS,LIMIT,YIELD,EPS_YIELD,SOURCE,system,transform,staticTransform,controller,describe,steps,cameraBasis,specimen,inSlab,block,trace});
+ SILM.deformation=Object.freeze({SYSTEMS,LIMIT,YIELD,EPS_YIELD,SOURCE,system,transform,staticTransform,specimenResponse,controller,describe,steps,cameraBasis,specimen,inSlab,block,trace});
 })();

@@ -55,7 +55,11 @@ SILM.microstructure=(()=>{
   const plane=svgNode('g',{'class':'silm-micro-plane'});svg.append(plane);
   // A transformação didática é uma camada REVERSÍVEL sobre os mesmos caminhos.
   const mechanicalField=svgNode('g',{'class':'silm-micro-mechanical-field'});plane.append(mechanicalField);
-  let paths=[],cells=[];let surfaceMicro=null;
+  const apparatusField=svgNode('g',{'class':'silm-micro-apparatus','pointer-events':'none'});
+  const topPlate=svgNode('rect',{'class':'silm-micro-press-plate','pointer-events':'none'});
+  const bottomPlate=svgNode('rect',{'class':'silm-micro-press-plate','pointer-events':'none'});
+  apparatusField.append(topPlate,bottomPlate);plane.append(apparatusField);
+  let paths=[],cells=[],specimenOutline=null;let surfaceMicro=null;
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
   let sourceData=null; // Mapa importado = análise de polígonos fornecidos, não homologação.
   const status=node('span','silm-workshop-micro-status','Selecione um grão · modelo esquemático');
@@ -89,7 +93,7 @@ SILM.microstructure=(()=>{
    surfaceMicro?.refresh();
   };
   function drawGrains(){
-   paths=[];cells=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField);
+   paths=[];cells=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField,apparatusField);
    polygons.forEach((poly,i)=>{
    if(poly.length<3)return;
    const d='M'+poly.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')+' Z';
@@ -112,10 +116,9 @@ SILM.microstructure=(()=>{
    const bevel=svgNode('path',{d,'class':'silm-micro-highlight','pointer-events':'none'});
    g.append(p,bevel,hatch);mechanicalField.append(g);paths[i]=p;cells[i]=g;
    });
-   const specimen=svgNode('rect',{x:W*.04,y:H*.04,width:W*.92,height:H*.92,
-    rx:Math.min(W,H)*.025,ry:Math.min(W,H)*.025,
-    'class':'silm-micro-specimen-outline',fill:'none','pointer-events':'none'});
-   mechanicalField.append(specimen);
+   specimenOutline=svgNode('path',{'class':'silm-micro-specimen-outline',
+    fill:'none','pointer-events':'none'});
+   mechanicalField.append(specimenOutline);
    surfaceMicro?.rebuild();
    if(chosen>=polygons.length)chosen=polygons.length-1;
    if(chosen>=0)choose(chosen);else status.textContent=sourceData?'Selecione um grão segmentado · dados importados não homologados':'Selecione um grão · modelo esquemático';
@@ -188,9 +191,32 @@ SILM.microstructure=(()=>{
   const mechanicalReset=node('button','silm-workshop-micro-control silm-micro-mechanical-reset','Restaurar');
   mechanicalReset.type='button';
   mechanicalReset.setAttribute('aria-label','Restaurar deformação');
+  const mechanicalLoadMeter=node('meter','silm-micro-mechanical-load-meter');
+  mechanicalLoadMeter.min=0;mechanicalLoadMeter.max=100;mechanicalLoadMeter.value=0;
+  mechanicalLoadMeter.setAttribute('aria-label','Carga mecânica relativa no corpo de prova');
   const mechanicalStatus=node('output','silm-micro-mechanical-reading','');
   mechanicalStatus.setAttribute('role','status');mechanicalStatus.setAttribute('aria-live','polite');
-  mechanicalTools.append(mechanicalPulse,mechanicalReset,mechanicalStatus);
+  const contactLabel=node('label','silm-micro-contact-control');
+   contactLabel.append(node('span','','Posição do contato'),
+    (()=>{
+     const input=node('input','silm-micro-contact-position');
+     input.type='range';input.min='10';input.max='90';input.step='5';input.value='50';
+     input.setAttribute('aria-label','Posição da prensa ou garra na amostra, em porcentagem');
+     contactLabel.input=input;return input;
+    })());
+   const widthLabel=node('label','silm-micro-contact-control');
+   widthLabel.append(node('span','','Largura da área de contato'),
+    (()=>{
+     const input=node('input','silm-micro-contact-width');
+     input.type='range';input.min='10';input.max='80';input.step='5';input.value='30';
+     input.setAttribute('aria-label','Largura do contato da prensa ou garra, em porcentagem');
+     widthLabel.input=input;return input;
+    })());
+   const contactDetails=node('details','silm-micro-contact-details');
+   const contactSummary=node('summary','','Aplicação da carga');
+   contactDetails.append(contactSummary,contactLabel,widthLabel);
+   mechanicalTools.append(mechanicalPulse,mechanicalReset,mechanicalLoadMeter,
+    contactDetails,mechanicalStatus);
   toolbar.append(mechanicalTools);
 
   // Alças operáveis no próprio mapa (não em diálogo ou mini-palco).
@@ -202,7 +228,53 @@ SILM.microstructure=(()=>{
    grip.type='button';grip.hidden=true;grip.title='Arraste para aplicar força; Enter ou Espaço aplica um passo';
    grip.style.touchAction='none';
   }
+  const specimenFeedback=node('output','silm-micro-specimen-feedback','');
+  specimenFeedback.setAttribute('aria-live','off');specimenFeedback.hidden=true;
   let mechanicsMode=null;
+   const savedContact=model?.state?.metadata?.mechanicalContact;
+   let contactPosition=Number.isFinite(savedContact?.position)?clamp(savedContact.position,.1,.9):.5;
+   let contactWidth=Number.isFinite(savedContact?.width)?clamp(savedContact.width,.1,.8):.3;
+   contactLabel.input.value=String(Math.round(contactPosition*100));
+   widthLabel.input.value=String(Math.round(contactWidth*100));
+   const updateContact=()=>{
+    contactPosition=clamp(Number(contactLabel.input.value)/100,.1,.9);
+    contactWidth=clamp(Number(widthLabel.input.value)/100,.1,.8);
+    refreshMechanical();
+   };
+   contactLabel.input.addEventListener('input',updateContact);
+   widthLabel.input.addEventListener('input',updateContact);
+   const saveContact=()=>model?.setMechanicalContact?.(contactPosition,contactWidth);
+   contactLabel.input.addEventListener('change',saveContact);
+   widthLabel.input.addEventListener('change',saveContact);
+   function warpGrains(field,amplitude){
+    const map=field&&amplitude>1e-4?(x,y)=>{
+     const p=field.sample(x/W,y/H,amplitude);
+     return{x:x+p.dx*W,y:y+p.dy*H};
+    }:null;
+    const coordinate=(x,y)=>{const p=map?map(x,y):{x,y};return p.x.toFixed(1)+' '+p.y.toFixed(1);};
+    for(let i=0;i<polygons.length;i++){
+     const poly=polygons[i],cell=cells[i];if(!cell?.isConnected||poly?.length<3)continue;
+     let d;
+     if(map){
+      const points=[];
+      for(let j=0;j<poly.length;j++){
+       const a=poly[j],b=poly[(j+1)%poly.length];
+       for(let k=0;k<3;k++){
+        const t=k/3;points.push(coordinate(a[0]*(1-t)+b[0]*t,a[1]*(1-t)+b[1]*t));
+       }
+      }
+      d='M'+points.join(' L')+' Z';
+     }else d='M'+poly.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')+' Z';
+     for(const p of cell.querySelectorAll('path'))p.setAttribute('d',d);
+    }
+    const border=[];
+    for(let i=0;i<=20;i++)border.push([W*i/20,0]);
+    for(let i=1;i<=12;i++)border.push([W,H*i/12]);
+    for(let i=19;i>=0;i--)border.push([W*i/20,H]);
+    for(let i=11;i>=1;i--)border.push([0,H*i/12]);
+    if(specimenOutline)specimenOutline.setAttribute('d','M'+border.map(p=>coordinate(p[0],p[1])).join(' L')+' Z');
+    surfaceMicro?.setWarp(map);
+   }
   const getMode=()=>{
    const st=model?.state,mode=st?.properties?.active;
    return st?.module?.active==='explorar'&&['malleability','ductility'].includes(mode)?mode:null;
@@ -210,50 +282,78 @@ SILM.microstructure=(()=>{
   function refreshMechanical(){
    const mode=getMode(),st=model?.state,active=!!mode;
    mechanicsMode=mode;
-   mechanicalTools.hidden=!active;
-   topGrip.hidden=bottomGrip.hidden=!active;
+   mechanicalTools.hidden=!active;topGrip.hidden=bottomGrip.hidden=!active;
    section.dataset.mechanicalStudy=mode||'inactive';
    const surface=SILM.surfacePhysics?.current(st);
-   const comp=Math.min(4,surface?.compressionSteps||0),tens=Math.min(4,surface?.tensionSteps||0);
-   const residual=comp+tens>0;
-   section.dataset.mechanicalPermanent=residual?'active':'inactive';
+   const motion=active?(deformCtl?.reading?.()||{load:0,strain:0,regime:'rest'}):{};
+   // A alteração plástica residual continua no estado geral da investigação.
+   // O modelo de elementos finitos resolve APENAS a parcela elástica local.
+   const residual=SILM.deformation?.specimenResponse?.(surface,{});
+   if(!residual)return;
+   const load=active?clamp(Number(motion.load)||0,0,1):0;
+   const maxStrain=SILM.deformation?.EPS_YIELD||.06;
+   const amplitude=active?clamp(Math.abs(Number(motion.strain)||0)/maxStrain,0,1):0;
+   const field=active?SILM.specimenLocal?.field({
+    mode:mode==='malleability'?'compression':'tension',
+    position:contactPosition,width:contactWidth}):null;
+   section.dataset.mechanicalPermanent=residual.hasResidual?'active':'inactive';
+   section.dataset.mechanicalRegime=active?(motion.regime||'rest'):residual.hasResidual?'residual':'rest';
+   section.dataset.mechanicalElastic=String(Math.round((motion.strain||0)*1000));
+   section.dataset.mechanicalContact=String(Math.round(contactPosition*100));
+   section.dataset.mechanicalContactWidth=String(Math.round(contactWidth*100));
+   section.dataset.mechanicalSolver=field?.converged?'elastic-local-2d':field?'unconverged':'inactive';
+   specimenFeedback.hidden=!(active||residual.hasResidual);
+   apparatusField.setAttribute('visibility',active?'visible':'hidden');
+   topGrip.style.left=bottomGrip.style.left=String(Math.round(contactPosition*100))+'%';
+   // Deformação plástica é global e persistente nesta etapa; a parcela
+   // elástica transitória é variável no espaço (FEM).
+   if(residual.hasResidual)mechanicalField.setAttribute('transform','translate('+CX+' '+CY+
+    ') scale('+residual.scaleX+' '+residual.scaleY+') translate('+(-CX)+' '+(-CY)+')');
+   else mechanicalField.removeAttribute('transform');
+   warpGrains(field,amplitude);
+   if(active){
+    const h=Math.max(4,H*.016),w=Math.max(W*.09,W*contactWidth),px=clamp(W*contactPosition-w/2,0,W-w);
+    const displacement=field?field.sample(contactPosition,0,amplitude).dy*H:0;
+    const plates=[
+     [topPlate,px,Math.max(-H*.08,H*.015+displacement),w],
+     [bottomPlate,0,H-h*1.4,W]
+    ];
+    for(const [plate,x,y,width] of plates){
+     plate.setAttribute('x',String(x));plate.setAttribute('y',String(y));
+     plate.setAttribute('width',String(width));plate.setAttribute('height',String(h));
+     plate.setAttribute('rx',String(h*.2));
+    }
+   }
    if(!active){
-    // Retirar a força não apaga a deformação plástica já registrada.
-    if(residual){
-     const x=1+.045*comp-.035*tens,y=1-.045*comp+.055*tens;
-     mechanicalField.setAttribute('transform','translate('+CX+' '+CY+') scale('+x+' '+y+') translate('+(-CX)+' '+(-CY)+')');
-    }else mechanicalField.removeAttribute('transform');
-    delete section.dataset.mechanicalStep;
-    delete section.dataset.mechanicalLoad;
+    delete section.dataset.mechanicalStep;delete section.dataset.mechanicalLoad;
+    specimenFeedback.textContent=residual.hasResidual?'Deformação plástica residual, sem carga':'';
     return;
    }
    const step=mode==='malleability'?st.properties.malleability.compression:st.properties.ductility.elongation;
    const max=SILM.properties.limits[mode==='malleability'?'compression':'elongation'];
-   const state=deformCtl?.reading?.()||{load:0,regime:'rest'};
-   const load=clamp(Number(state.load)||0,0,1),p=step/max;
-   // Envelope geométrico abstrato, sem módulo elástico, tensão ou
-   // porcentagem de deformação atribuídos à amostra/material.
-   const x=1+.045*comp-.035*tens+(mode==='malleability'?.04:-.025)*load;
-   const y=1-.045*comp+.055*tens+(mode==='malleability'?-.04:.05)*load;
-   if(step||load||residual){
-    mechanicalField.setAttribute('transform','translate('+CX+' '+CY+') scale('+x+' '+y+') translate('+(-CX)+' '+(-CY)+')');
-   }else mechanicalField.removeAttribute('transform');
-   section.dataset.mechanicalStep=String(step);
-   section.dataset.mechanicalLoad=String(Math.round(load*100));
-   section.dataset.mechanicalRegime=state.regime||'rest';
+   const relative=Math.round(load*100);
+   section.dataset.mechanicalStep=String(step);section.dataset.mechanicalLoad=String(relative);
+   mechanicalLoadMeter.value=relative;
    topGrip.textContent=mode==='malleability'?'↓':'↑';
    bottomGrip.textContent=mode==='malleability'?'↑':'↓';
-   for(const grip of [topGrip,bottomGrip])grip.setAttribute('aria-label',mode==='malleability'?
-    'Comprimir o campo de grãos':'Tracionar o campo de grãos');
+   for(const grip of [topGrip,bottomGrip])grip.setAttribute('aria-label',
+    mode==='malleability'?'Aplicar compressão localizada na amostra':'Aplicar tração localizada na amostra');
    const pulseLabel=mode==='malleability'?'Comprimir':'Tracionar';
-   // Evitar reconstruir o ícone em toda atualização do controlador.
    if(mechanicalPulse.textContent.trim()!==pulseLabel)mechanicalPulse.textContent=pulseLabel;
    mechanicalPulse.setAttribute('aria-label',mode==='malleability'?'Aplicar compressão':'Aplicar tração');
    mechanicalPulse.disabled=step>=max;
-   mechanicalReset.disabled=!step&&!load&&!residual;
-   mechanicalStatus.textContent=(mode==='malleability'?'Compressão':'Tração')+
-    ' · passo ilustrativo '+step+'/'+max+(load?' · força relativa '+Math.round(load*100)+' %':'')+
-    ' · não representa deformação medida por grão';
+   mechanicalReset.disabled=!step&&!load&&!residual.hasResidual;
+   const regime=motion.regime==='plastic'?'regime plástico didático':
+    motion.regime==='elastic'?'deformação elástica':
+    motion.regime==='returning'?'retorno elástico':
+    residual.hasResidual?'deformação residual':'sem carga';
+   const title=mode==='malleability'?'Compressão':'Tração';
+   specimenFeedback.textContent=title+' · '+regime+(load?' · carga relativa '+relative+'%':'');
+   mechanicalStatus.textContent=title+' · '+regime+
+    ' · contato em '+Math.round(contactPosition*100)+'% · largura '+Math.round(contactWidth*100)+'%'+
+    ' · passo ilustrativo '+step+'/'+max+
+    (load?' · carga relativa '+relative+'%':'')+
+    ' · não representa deformação medida por grão; elasticidade plana normalizada, sem MPa';
   }
   const mechanicalPulseStep=()=>{
    const mode=getMode(),st=model?.state;
@@ -264,8 +364,8 @@ SILM.microstructure=(()=>{
   mechanicalPulse.addEventListener('click',mechanicalPulseStep);
   mechanicalReset.addEventListener('click',()=>{
    if(!getMode())return;
-   deformCtl?.setLoad(0);
-   model?.resetMechanicalSpecimen?.();refreshMechanical();
+   model?.resetMechanicalSpecimen?.();
+   deformCtl?.reset?.();refreshMechanical();
   });
   for(const [grip,upper] of [[topGrip,true],[bottomGrip,false]]){
    let dragged=null;
@@ -276,24 +376,32 @@ SILM.microstructure=(()=>{
    grip.addEventListener('pointerdown',event=>{
     if(event.button!==0||!getMode()||!deformCtl)return;
     event.preventDefault();event.stopPropagation();
-    dragged={id:event.pointerId,y:event.clientY,moved:false};
+    dragged={id:event.pointerId,x:event.clientX,y:event.clientY,origin:contactPosition,axis:null,moved:false};
     try{grip.setPointerCapture(event.pointerId);}catch{}
    });
    grip.addEventListener('pointermove',event=>{
     if(!dragged||event.pointerId!==dragged.id)return;
     event.preventDefault();event.stopPropagation();
-    const diff=(event.clientY-dragged.y)*direction();
-    if(Math.abs(event.clientY-dragged.y)>3)dragged.moved=true;
-    if(dragged.moved){
-     deformCtl.setLoad(clamp(diff/Math.max(44,viewport.clientHeight*.25),0,1));
-     refreshMechanical();
+    const dx=event.clientX-dragged.x,dy=event.clientY-dragged.y;
+    if(!dragged.axis&&Math.hypot(dx,dy)>5)dragged.axis=Math.abs(dx)>Math.abs(dy)*1.3?'position':'load';
+    if(!dragged.axis)return;
+    dragged.moved=true;
+    if(dragged.axis==='position'){
+     const ratio=clamp(dragged.origin+dx/Math.max(120,viewport.clientWidth),.1,.9);
+     contactPosition=Math.round(ratio*20)/20;
+     contactLabel.input.value=String(Math.round(contactPosition*100));
+     deformCtl.setLoad(0);
+    }else{
+     deformCtl.setLoad(clamp(dy*direction()/Math.max(44,viewport.clientHeight*.25),0,1));
     }
+    refreshMechanical();
    });
    const release=event=>{
     if(!dragged||event.pointerId!==dragged.id)return;
     event.preventDefault();event.stopPropagation();
-    const tap=!dragged.moved;dragged=null;
+    const tap=!dragged.moved,relocated=dragged.axis==='position';dragged=null;
     deformCtl?.setLoad(0);
+    if(relocated)saveContact();
     if(tap&&event.type==='pointerup')mechanicalPulseStep();
     refreshMechanical();
    };
@@ -348,7 +456,7 @@ SILM.microstructure=(()=>{
    if(suppressClick)queueMicrotask(()=>{suppressClick=false;});
   };
   svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);
-  viewport.append(svg,topGrip,bottomGrip);
+  viewport.append(svg,topGrip,bottomGrip,specimenFeedback);
   const note=node('p','silm-workshop-micro-caveat',
    'Grãos e tons ilustrativos; sem composição, fração de fase ou tamanho medidos.');
   // Mudanças de formação são explícitas. Redimensionar, ampliar ou mudar
