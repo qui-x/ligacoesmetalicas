@@ -241,6 +241,11 @@ async function test(viewport){
   'A ferramenta abrasiva não deve competir com a prensa.');
  await mech.locator('.silm-micro-mechanical-pulse').click();
  await page.waitForFunction(()=>SILMIntegration.snapshot().metadata.surface?.compressionSteps===1);
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalShadows==='active');
+ assert.deepEqual(await page.evaluate(()=>SILMIntegration.snapshot().metadata.mechanicalImprints.map(m=>m.mode)),
+  ['compression'],'A marca visual de compressão não foi registrada na amostra.');
+ assert.notEqual(await viewer.locator('.silm-micro-contact-shadow').first().getAttribute('opacity'),'0',
+  'Não surgiu sombreamento localizado após a compressão.');
  assert.equal(await viewer.getAttribute('data-mechanical-permanent'),'active',
   'A compressão plástica não produziu geometria residual na amostra.');
  await openProperty('ductility');
@@ -248,6 +253,8 @@ async function test(viewport){
   'Trocar de compressão para tração apagou a deformação plástica.');
  await mech.locator('.silm-micro-mechanical-pulse').click();
  await page.waitForFunction(()=>SILMIntegration.snapshot().metadata.surface?.tensionSteps===1);
+ assert.deepEqual(await page.evaluate(()=>SILMIntegration.snapshot().metadata.mechanicalImprints.map(m=>m.mode)),
+  ['compression','tension'],'O registro da tração apagou a posição da compressão.');
  await page.getByRole('button',{name:'Ver',exact:true}).click();
  await page.locator('[data-action="property-luster"]').click();
  await page.locator('#si-dock-right [data-close-dock="right"]').click();
@@ -258,10 +265,25 @@ async function test(viewport){
   'Grãos e superfície não acompanharam a deformação da mesma amostra.');
  assert.equal(await page.evaluate(()=>SILMIntegration.snapshot().metadata.surface.strokes.length),2,
   'Força aplicada não deve apagar a preparação óptica.');
+ assert.equal(await viewer.getAttribute('data-mechanical-shadow-zones'),'2',
+  'O brilho não recuperou os dois locais de intervenção mecânica.');
+ const shadowFirst=viewer.locator('.silm-micro-contact-shadow').first();
+ const shadowBefore=Number(await shadowFirst.getAttribute('cx'));
+ await opticalTools.locator('input[aria-label="Fonte em graus"]').evaluate(input=>{
+  input.value='75';input.dispatchEvent(new Event('input',{bubbles:true}));
+ });
+ await page.waitForFunction(old=>{
+  const current=document.querySelector('.silm-micro-contact-shadow')?.getAttribute('cx');
+  return current!==null&&Math.abs(Number(current)-old)>.01;
+ },shadowBefore);
+ assert.equal(await viewer.getAttribute('data-mechanical-shadows'),'active',
+  'Mover a luz apagou indevidamente o sombreamento persistente.');
  // Reposição virtual explícita é diferente de soltar a força.
  await openProperty('malleability');
  await mech.getByRole('button',{name:'Restaurar deformação'}).click();
  await page.waitForFunction(()=>SILMIntegration.snapshot().metadata.surface?.plasticSteps===0);
+ assert.deepEqual(await page.evaluate(()=>SILMIntegration.snapshot().metadata.mechanicalImprints),[],
+  'Restaurar a amostra não removeu marcas de intervenção plástica.');
  assert.equal(await viewer.getAttribute('data-mechanical-permanent'),'inactive');
  assert.equal(await viewer.locator('.silm-micro-mechanical-field').getAttribute('transform'),null,
   'Restaurar a amostra não removeu a deformação residual.');
