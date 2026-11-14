@@ -321,8 +321,8 @@ SILM.microstructure=(()=>{
    getSize:()=>({width:W,height:H}),
    getSelectedPoint:()=>{
     const poly=polygons[chosen];if(!poly?.length)return null;
-    return{x:clamp(poly.reduce((sum,p)=>sum+p[0],0)/(poly.length*W)),
-     y:clamp(poly.reduce((sum,p)=>sum+p[1],0)/(poly.length*H))};
+    return{x:clamp(poly.reduce((sum,p)=>sum+p[0],0)/(poly.length*W),0,1),
+     y:clamp(poly.reduce((sum,p)=>sum+p[1],0)/(poly.length*H),0,1)};
    }})||null;
   section.silmMicroSurfaceRefresh=()=>surfaceMicro?.refresh();
   svg.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom+(e.deltaY<0?.25:-.25));},{passive:false});
