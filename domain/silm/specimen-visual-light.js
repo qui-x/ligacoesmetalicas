@@ -30,7 +30,7 @@ window.SILM=window.SILM||{};
    field.sample(p,dy,clamp(amplitude,0,1)):null;
   const cx=clamp(p+(Number.isFinite(f?.dx)?f.dx:0),0,1);
   const cy=clamp(dy+(Number.isFinite(f?.dy)?f.dy:0),0,1);
-  const intensity=active?clamp(Number(load)||0,0,1):.34;
+  const intensity=active?clamp(Number(load)||0,0,1):clamp(.27+.14*((mark.count||1)-1),.27,.9);
   const lighting=illuminated?1:.25;
   return Object.freeze({
    shadow:{x:clamp(cx+offset,0,1),y:cy,rx:clamp(w*.83,.10,.65),
@@ -44,7 +44,13 @@ window.SILM=window.SILM||{};
  function projectAll({marks=[],activeContact=null,mode=null,load=0,field=null,
                      amplitude=0,incidenceDeg=35,illuminated=true}={}){
   const list=(Array.isArray(marks)?marks:[]).filter(validMark).slice(-maxMarks);
-  const entries=list.map(mark=>project(mark,{incidenceDeg,illuminated,active:false}));
+  const unique=new Map();
+  for(const mark of list){
+   const key=[mark.mode,mark.position,mark.width].join('|');
+   const previous=unique.get(key);
+   unique.set(key,{...mark,count:(previous?.count||0)+1});
+  }
+  const entries=[...unique.values()].map(mark=>project(mark,{incidenceDeg,illuminated,active:false}));
   if(load>1e-4&&activeContact&&['compression','tension'].includes(mode)){
    const live=project({...activeContact,mode},{incidenceDeg,illuminated,active:true,load,field,amplitude});
    if(live)entries.push(live);
