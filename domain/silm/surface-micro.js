@@ -76,6 +76,7 @@ window.SILM=window.SILM||{};
    const st=model.state,surface=physics.current(st),focusing=focus(st),on=visible(st,surface),angle=drive?.angle??35,eye=drive?.observerAngle??35;
    controls.hidden=!on;section.dataset.surfaceOptical=on?'active':'inactive';
    section.dataset.surfaceCoobservation=on&&!focusing?'active':'inactive';
+   section.dataset.surfaceTool=focusing?tool.value:'observe';
    tool.disabled=!focusing;
    apply.disabled=!focusing||tool.value==='observe'||!getSelectedPoint?.();
    reset.disabled=!focusing||!surface.strokes.length;
