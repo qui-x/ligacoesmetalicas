@@ -75,6 +75,8 @@ jobs:
           node --check tests/run-fe-nist-evidence.mjs
           node --check domain/silm/research-evidence-panel.js
           node --check tests/run-multistage-evidence.mjs
+          node --check domain/silm/data/research-evidence-stage65.js
+          node --check tests/run-stage65-mechanical-evidence.mjs
           node --check domain/silm/data/material-profile-tc-experimental-1988.js
           node --check tests/run-tc-optical-conditional.mjs
           node --check domain/silm/data/research-thermal-nist-295k.js
@@ -139,6 +141,9 @@ jobs:
 
       - name: Verificar referencias multi-etapa na Ductilidade e Compressao
         run: node tests/run-multistage-evidence.mjs
+
+      - name: Verificar Bi Pu Lu Co e transcricoes Th em Explorar (Etapa 65)
+        run: node tests/run-stage65-mechanical-evidence.mjs
 
       - name: Verificar n k condicionais de Tc e canais de Cu no Brilho Metalico
         run: node tests/run-tc-optical-conditional.mjs
@@ -207,6 +212,15 @@ jobs:
         with:
           name: silm-tc-optical-${{ matrix.browser }}
           path: reports/tc-optical-conditional/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Guardar capturas mecanicas de pesquisa etapa 65
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-stage65-evidence-${{ matrix.browser }}
+          path: reports/stage65-mechanics/${{ matrix.browser }}/
           if-no-files-found: warn
           retention-days: 14
 
