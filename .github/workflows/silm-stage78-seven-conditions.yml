@@ -1,0 +1,77 @@
+name: SILM — Sete metais por condição da fonte (Etapa 78)
+on:
+  push:
+    branches: [feat/silm-seven-metals-stage79-main-contact-integration-20261114]
+  pull_request:
+    paths:
+      - 'domain/silm/data/research-seven-condition-profiles.js'
+      - 'domain/silm/research-seven-conditions-panel.js'
+      - 'domain/silm/property-view.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/stage78-seven-condition-profiles.test.cjs'
+      - 'tests/run-seven-conditions-stage78.mjs'
+      - '.github/workflows/silm-stage78-seven-conditions.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dados:
+    name: Auditoria científica dos 35 registros
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          node --check domain/silm/data/research-seven-condition-profiles.js
+          node --check domain/silm/research-seven-conditions-panel.js
+          node --check domain/silm/property-view.js
+          node --check tests/run-seven-conditions-stage78.mjs
+          node --test tests/stage78-seven-condition-profiles.test.cjs
+  interface:
+    name: Explorar 7x5 / ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Instalar Playwright
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-playwright/node_modules/playwright" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright" install --with-deps "$BROWSER_NAME"
+      - name: Iniciar servidor da aplicação publicada
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-http.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/silm-http.pid"
+          for n in $(seq 1 30); do
+            if curl -fsS "$BASE_URL/index.html" > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-http.log"
+          exit 1
+      - name: Montar controles nativos e testar 35 combinações em mobile e desktop
+        run: node tests/run-seven-conditions-stage78.mjs
+      - name: Guardar capturas da verificação
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-seven-conditions-${{ matrix.browser }}
+          path: reports/seven-conditions/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
