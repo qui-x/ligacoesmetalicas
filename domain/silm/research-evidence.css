@@ -116,3 +116,10 @@
 .silm-optical-candidate select{max-width:100%;width:100%;margin:.45rem 0}
 .silm-optical-candidate a{overflow-wrap:anywhere}
 @media(max-width:480px){.silm-optical-candidate-metrics{gap:.35rem .45rem;font-size:.76rem}}
+
+/* Auditoria do dataset óptico original: status de confiança explícito,
+   acessível no mesmo painel de Brilho, sem pintar a cena com R550. */
+.silm-optical-yaml-status{font-size:.8rem;line-height:1.45;
+ border-inline-start:3px solid currentColor;padding-inline-start:.6rem;overflow-wrap:anywhere}
+.silm-optical-yaml-doi{display:block;max-width:100%;font-size:.78rem;overflow-wrap:anywhere}
+.silm-optical-yaml-doi[hidden]{display:none!important}
