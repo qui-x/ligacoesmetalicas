@@ -123,3 +123,17 @@
  border-inline-start:3px solid currentColor;padding-inline-start:.6rem;overflow-wrap:anywhere}
 .silm-optical-yaml-doi{display:block;max-width:100%;font-size:.78rem;overflow-wrap:anywhere}
 .silm-optical-yaml-doi[hidden]{display:none!important}
+
+/* Etapa 79: grade de métricas própria do painel 7×5; não duplicar o
+ * seletor .silm-research-metrics dos ensaios mecânicos legados. */
+.silm-seven-condition-reference .silm-seven-condition-metrics{
+ display:grid;grid-template-columns:minmax(0,1fr) auto;
+ gap:.32rem .75rem;max-width:100%;font-size:.83rem;margin:.5rem 0;
+}
+.silm-seven-condition-reference .silm-seven-condition-metrics dt{min-width:0}
+.silm-seven-condition-reference .silm-seven-condition-metrics dd{
+ min-width:0;margin:0;text-align:end;font-variant-numeric:tabular-nums;
+}
+@media(max-width:480px){
+ .silm-seven-condition-reference .silm-seven-condition-metrics{column-gap:.4rem}
+}
