@@ -236,8 +236,111 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
  for(const [key,label]of [['temperature','Temperatura de referência'],['pressure','Pressão de referência'],['phase','Fase de referência']]){const d=condition?.[key];if(d)row(dl,label,d.display||String(d.value)+' '+(d.unit||''));}
  host.append(dl);
  const heading=el('h3','Propriedades do metal');host.append(heading);
- for(const id of Properties.ids){const ref=Properties.data(e,id),p=el('p');p.textContent=Properties.catalog[id].title+': '+(ref?(ref.display??ref.value)+' '+ref.unit+' · '+(ref.kind==='CALCULATED'?'Calculado pelo SILM':'Dado tabelado'):(['electrical','thermal'].includes(id)?'Sem valor numérico homologado; experiência qualitativa conforme elegibilidade.':'Experiência qualitativa; não representa uma medida numérica da amostra.'));host.append(p);}
+ // Etapas 78–79: a aba Dados deve consultar a MESMA fonte de pesquisa que
+ // Explorar, sem fazer um dado de referência passar por calibração do motor.
+ // Não exigir CNTP: registrar a condição exata da amostra/fonte, quando houver.
+ const research=S.sevenConditionResearch;
+ const fmt=value=>Number(value).toLocaleString('pt-BR',{maximumSignificantDigits:6});
+ const evidenceLabel=Object.freeze({
+  'compilation-evaluated':'compilação avaliada',
+  'recommended-evaluated':'referência institucional avaliada',
+  'recommended-impure':'referência avaliada com impurezas',
+  'provisional-evaluated':'referência provisória',
+  'compiled-conditional':'compilação com condições incompletas',
+  'primary-report':'relatório experimental',
+  'primary-transcription':'transcrição de artigo primário',
+  'primary-conditional':'ensaio da amostra indicada',
+  'primary-applied':'deformação imposta no ensaio',
+  'primary-bound':'limite inferior, não valor pontual',
+  'primary-approximate':'valor aproximado',
+  'historical-compilation':'compilação histórica',
+  'historical-impure':'amostra histórica contaminada',
+  'historical-specimen':'amostra histórica identificada',
+  'processing-only':'processo de laminação; não limite intrínseco',
+  'secondary-pending':'transcrição secundária não conferida',
+  'fit-derived':'resultado calculado de ajuste experimental',
+  'optical-derived':'refletância de interface ideal, não brilho da peça'
+ });
+ const caseValue=(r)=>{
+  if(r.grade==='primary-bound')return 'superior a '+fmt(r.value)+' '+r.unit+' (limite inferior)';
+  return fmt(r.value)+' '+r.unit;
+ };
+ const sourceCases=[];
+ for(const id of Properties.ids){
+  const ref=Properties.data(e,id),r=research?.get?.(e.atomicNumber,id)||null;
+  const p=el('p');p.className='silm-metal-data-property';p.dataset.property=id;
+  if(ref){
+   p.textContent=Properties.catalog[id].title+': '+(ref.display??ref.value)+' '+ref.unit+
+    ' · '+(ref.kind==='CALCULATED'?'Calculado pelo SILM':'Dado tabelado');
+   host.append(p);
+  }
+  if(r){
+   const observed=el('p');
+   observed.className='silm-metal-data-observation';
+   observed.dataset.property=id;observed.dataset.sourceGrade=r.grade;
+   observed.dataset.engineRelease='false';
+   const title=el('strong',Properties.catalog[id].title);observed.append(title);
+   const primary=el('span');
+   // Resistividade e condutividade são inversas apenas para a mesma amostra
+   // e condição. A condutividade é DERIVADA, não medida de forma independente.
+   const rho=id==='electrical'?(r.unit==='µΩ·cm'?r.value*1e-8:
+     r.unit==='Ω·m'?r.value:null):null;
+   if(rho!==null&&Number.isFinite(rho)&&rho>0){
+    primary.textContent='Condutividade derivada: '+fmt(1/rho)+' S/m (σ = 1/ρ)';
+    observed.append(primary);
+    observed.append(el('small','Resistividade da fonte: '+caseValue(r)+
+      ' · cálculo matemático, não medição independente.'));
+   }else{
+    primary.textContent=r.quantity+': '+caseValue(r);
+    observed.append(primary);
+   }
+   const temporal=Number.isFinite(r.temperatureK)?fmt(r.temperatureK)+' K':'temperatura numérica não informada';
+   const note=el('small','Condição: '+temporal+' · '+(evidenceLabel[r.grade]||'referência condicional')+
+    '. Dado da fonte, sem calibração do motor.');
+   observed.append(note);
+   host.append(observed);
+   sourceCases.push({id,r});
+  }else if(!ref){
+   p.textContent=Properties.catalog[id].title+': '+
+    (['electrical','thermal'].includes(id)?
+     'Sem valor numérico homologado; experiência qualitativa conforme elegibilidade.':
+     'Experiência qualitativa; não representa uma medida numérica da amostra.');
+   host.append(p);
+  }
+ }
  const sources=el('details');sources.append(el('summary','Fontes e condições'));
- for(const id of Data.sourceIds(e)){const s=Data.source(id);if(!s)continue;const p=el('p',s.institution+' — '+s.title+(s.year?' ('+s.year+')':''));if(s.url){const a=el('a','Consultar fonte');a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';p.append(document.createTextNode(' · '),a);}sources.append(p);}
+ // Informações da ficha estrutural já existentes, preservadas.
+ for(const id of Data.sourceIds(e)){
+  const s=Data.source(id);if(!s)continue;
+  const p=el('p',s.institution+' — '+s.title+(s.year?' ('+s.year+')':''));
+  if(s.url){const a=el('a','Consultar fonte');a.href=s.url;a.target='_blank';
+   a.rel='noopener noreferrer';p.append(document.createTextNode(' · '),a);}
+  sources.append(p);
+ }
+ // Diferenciar fonte e amostra para cada uma das 5 propriedades; elas não
+ // descrevem necessariamente a mesma pureza, fase ou temperatura.
+ if(sourceCases.length){
+  sources.append(el('h4','Referências específicas das cinco propriedades'));
+  sources.append(el('p','Cada valor se aplica à amostra e às condições relatadas. '+
+   'Não combinar automaticamente como se fossem um mesmo ensaio.'));
+  for(const {id,r} of sourceCases){
+   const p=el('p');
+   p.className='silm-metal-data-source';
+   p.dataset.property=id;
+   const title=el('strong',Properties.catalog[id].title+' — '+r.quantity);
+   p.append(title);
+   p.append(el('span',' · '+caseValue(r)+' · '+
+    (Number.isFinite(r.temperatureK)?fmt(r.temperatureK)+' K':'T numérica não informada')+
+    ' · '+(evidenceLabel[r.grade]||r.grade)));
+   p.append(el('small','Amostra/limitação: '+r.sample+
+    '. Condição da fonte: '+r.temperatureText+
+    '. Pressão: '+(Number.isFinite(r.pressurePa)?fmt(r.pressurePa)+' Pa':'não informada')+'.'));
+   if(r.sourceURL){
+    const a=el('a','Abrir fonte desta propriedade');a.href=r.sourceURL;
+    a.target='_blank';a.rel='noopener noreferrer';p.append(a);
+   }
+   sources.append(p);
+  }
+ }
  if(condition?.notes)sources.append(el('p',condition.notes));host.append(sources);
 };
