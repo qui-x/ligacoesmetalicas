@@ -277,6 +277,8 @@ SILM.createScientificState=()=>{
   if(!state.investigation||state.module.active!=='explorar'||!SILM.surfacePhysics?.validState(next))return false;
   const previous=snapshot();
   state.metadata.surface=next;
+  // A iluminação pertence à amostra, e não apenas à ferramenta em foco.
+  if(action==='light'&&state.properties.active==='luster')state.properties.luster.light=next.light;
   state.investigation.updatedAt=now();
   publish('surface:'+action,previous,{action});
   return true;
