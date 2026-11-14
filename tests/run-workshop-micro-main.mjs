@@ -142,13 +142,27 @@ async function test(viewport){
  const mechanicalDir=join('reports','micro-deformation',browserName);
  mkdirSync(mechanicalDir,{recursive:true});
  assert.ok((await grip.boundingBox())?.height>=44,'Alça da prensa não alcança 44 px.');
+ await contactDetails.locator('summary').click();
+ const force=mech.locator('.silm-micro-force-input');
+ await force.evaluate(input=>{input.value='50';input.dispatchEvent(new Event('input',{bubbles:true}));});
+ await page.waitForFunction(()=>Number(document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalLoad)>=50);
+ assert.notEqual(await viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
+  nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|')),initialGrainShapes,
+  'A aplicação contínua de carga não deformou a peça.');
+ await mech.getByRole('button',{name:'Retirar carga mantendo deformação plástica'}).click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalLoad==='0');
+ await contactDetails.locator('summary').click();
  const pulse=mech.locator('.silm-micro-mechanical-pulse');
  assert.equal(await pulse.getAttribute('aria-label'),'Aplicar compressão',
   'Botão de compressão não recebeu o nome acessível: '+await pulse.evaluate(n=>n.outerHTML));
  await pulse.click();
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='1');
- assert.match(await viewer.locator('.silm-micro-mechanical-field').getAttribute('transform'),/scale\(/,
-  'Compressão não modifica a representação no mesmo mapa.');
+ assert.equal(await viewer.getAttribute('data-mechanical-residual-field'),'localized',
+  'Deformação plástica deve conservar o ponto da prensa.');
+ const deformedGrains=await viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
+  nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|'));
+ assert.notEqual(deformedGrains,initialGrainShapes,
+  'Compressão não deformou localmente a microestrutura.');
  await viewer.screenshot({path:join(mechanicalDir,'compressao-'+viewport.width+'.png'),animations:'disabled'});
  assert.equal(await viewer.locator('.silm-micro-cell.is-selected').count(),activeGrain,
   'Comprimir apagou o grão selecionado.');
@@ -261,8 +275,11 @@ async function test(viewport){
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.surfaceOptical==='active');
  assert.equal(await viewer.getAttribute('data-mechanical-permanent'),'active',
   'A deformação residual desapareceu ao investigar o brilho da superfície.');
- assert.ok((await viewer.locator('.silm-micro-mechanical-field').getAttribute('transform'))?.includes('scale('),
-  'Grãos e superfície não acompanharam a deformação da mesma amostra.');
+ assert.equal(await viewer.getAttribute('data-mechanical-residual-field'),'localized',
+  'Perdeu-se o campo plástico localizado ao voltar para o brilho.');
+ assert.notEqual(await viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
+  nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|')),initialGrainShapes,
+  'O brilho apagou a deformação local da peça.');
  assert.equal(await page.evaluate(()=>SILMIntegration.snapshot().metadata.surface.strokes.length),2,
   'Força aplicada não deve apagar a preparação óptica.');
  assert.equal(await viewer.getAttribute('data-mechanical-shadow-zones'),'2',
