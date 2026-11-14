@@ -80,6 +80,12 @@ jobs:
           node --check domain/silm/data/research-optical-candidates-stage65.js
           node --check domain/silm/research-optical-candidates-panel.js
           node --check tests/run-optical-candidates-stage65.mjs
+          node --check domain/silm/data/optical-source-audit-registry.js
+          node --check domain/silm/data/optical-source-audit-part1.js
+          node --check domain/silm/data/optical-source-audit-part2.js
+          node --check domain/silm/data/optical-source-audit-part3.js
+          node --check domain/silm/data/optical-source-audit-part4.js
+          node --check tests/run-optical-original-yaml-audit-30.mjs
           node --check domain/silm/data/material-profile-tc-experimental-1988.js
           node --check tests/run-tc-optical-conditional.mjs
           node --check domain/silm/data/research-thermal-nist-295k.js
@@ -151,6 +157,9 @@ jobs:
       - name: Validar 59 candidatos R550 no controle Brilho sem parametrizar motor
         run: node tests/run-optical-candidates-stage65.mjs
 
+      - name: Validar 30 datasets YAML e metadados de origem do Brilho
+        run: node tests/run-optical-original-yaml-audit-30.mjs
+
       - name: Verificar n k condicionais de Tc e canais de Cu no Brilho Metalico
         run: node tests/run-tc-optical-conditional.mjs
 
@@ -218,6 +227,15 @@ jobs:
         with:
           name: silm-tc-optical-${{ matrix.browser }}
           path: reports/tc-optical-conditional/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Arquivar capturas da auditoria dos 30 YAML ópticos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-optical-source-yaml-${{ matrix.browser }}
+          path: reports/optical-yaml-audit-30/${{ matrix.browser }}/
           if-no-files-found: warn
           retention-days: 14
 

@@ -31,7 +31,9 @@ SILM.createOpticalCandidatePanel=({prefix='silm-optical-candidate'}={})=>{
  const source=document.createElement('a');
  source.target='_blank';source.rel='noopener noreferrer';source.textContent='Consultar arquivo de origem';
  const conclusion=document.createElement('p');conclusion.className='silm-research-note';
- section.append(heading,notice,selectLabel,result,details,sample,provenance,source,conclusion);
+ const auditStatus=document.createElement('p');auditStatus.className='silm-optical-yaml-status silm-research-note';
+ const auditLink=document.createElement('a');auditLink.target='_blank';auditLink.rel='noopener noreferrer';auditLink.className='silm-optical-yaml-doi';
+ section.append(heading,notice,selectLabel,result,details,sample,provenance,source,auditStatus,auditLink,conclusion);
  const study=SILM.opticalResearchCandidates;
  const fmt=(x,d=2)=>Number(x).toLocaleString('pt-BR',{maximumFractionDigits:d});
  let symbol=null,profiles=[];
@@ -67,6 +69,37 @@ SILM.createOpticalCandidatePanel=({prefix='silm-optical-candidate'}={})=>{
    rows.push(['Outra direção tabulada',fmt(r.secondaryDirectionR*100,2)+' %']);
   rows.push(['Temperatura de medição',
    Number.isFinite(r.temperatureK)?fmt(r.temperatureK,2)+' K':r.sourceCondition||'não confirmada']);
+
+  // Conferência documental no dataset YAML, independente da comprovação
+  // do estudo experimental e das condições CNTP.
+  const audit=SILM.opticalSourceYAMLAudit?.getForSymbol?.(r.symbol);
+  const verified=audit?.dataset===r.sourceDataset&&
+   Math.abs(audit.R550-r.R)<1e-9;
+  if(verified){
+   const label=audit.sourceType==='fitted-optical-model'?
+    'MODELO ajustado Lorentz–Drude; não equivale a medição direta nesta ficha.':
+    audit.sourceType==='electron-loss-derived'?
+    'Constantes obtidas da análise de perdas de energia (REELS); não é refletância medida separadamente.':
+    'n,k tabulados no arquivo YAML da fonte.';
+   auditStatus.textContent='ARQUIVO YAML CONFERIDO: 550 nm dentro do intervalo tabulado, '+
+    'n,k interpolados e R de Fresnel conferidos. '+label+' '+
+    (audit.comments?'Condições descritas no arquivo: '+audit.comments+'. ':'Condições quantitativas da amostra não informadas no YAML. ')+
+    'Artigo científico completo ainda NÃO auditado; NÃO homologado na CNTP.';
+   auditLink.hidden=!audit.doi;
+   if(audit.doi){
+    auditLink.href='https://doi.org/'+audit.doi;
+    auditLink.textContent='Estudo citado no YAML · DOI '+audit.doi;
+   }else{
+    auditLink.removeAttribute('href');
+    auditLink.textContent='';
+   }
+  }else{
+   auditStatus.textContent='Arquivo de dados original ainda NÃO confrontado nesta etapa. '+
+    'Fórmula de Fresnel conferida na matriz, mas origem, fase e amostra exigem auditoria.';
+   auditLink.hidden=true;
+   auditLink.removeAttribute('href');
+  }
+  section.dataset.sourceAudit=verified?'yaml-550nm-verified-paper-pending':'source-unreviewed';
   printRows(rows);
   sample.textContent='Metal: '+r.symbol+'. Amostra/estado: '+r.sample+
    '. Dataset: '+r.sourceDataset+'. '+(r.warning||'Amostra, fase e acabamento exigem conferência específica.');
