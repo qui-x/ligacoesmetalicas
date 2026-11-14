@@ -311,6 +311,11 @@ SILM.microstructure=(()=>{
     ') scale('+residual.scaleX+' '+residual.scaleY+') translate('+(-CX)+' '+(-CY)+')');
    else mechanicalField.removeAttribute('transform');
    warpGrains(field,amplitude);
+   surfaceMicro?.setDeformationLight?.({
+    mode:active?(mode==='malleability'?'compression':'tension'):null,
+    contact:{position:contactPosition,width:contactWidth},
+    field,amplitude,load
+   });
    if(active){
     const h=Math.max(4,H*.016),w=Math.max(W*.09,W*contactWidth),px=clamp(W*contactPosition-w/2,0,W-w);
     const displacement=field?field.sample(contactPosition,0,amplitude).dy*H:0;
