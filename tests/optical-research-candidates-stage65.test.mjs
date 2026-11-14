@@ -92,7 +92,7 @@ test('integração no painel do Brilho original, sem liberar ótica espectral ou
  assert.match(view,/opticalCandidate\.update/);
  assert.match(code,/REFERÊNCIA CANDIDATA, NÃO HOMOLOGADA/);
  assert.match(code,/NÃO controlam a iluminação, a cor da cena ou a simulação/);
- assert.match(code,/sourceOriginalChecked/)==undefined;
+ assert.doesNotMatch(code,/sourceOriginalChecked\s*=\s*true/);
  assert.match(code,/Faixa de leitura \(NÃO incerteza experimental\)/);
  assert.match(code,/não reconferida registro por registro/);
  assert.ok(!read('domain/silm/material-engine.js').includes('opticalResearchCandidates'));
