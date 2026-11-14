@@ -23,7 +23,7 @@ test('CNTP deixa de ser porta de consulta; amostra e temperatura continuam repor
  assert.equal(get('Co','electrical').temperatureK,273.15);
  assert.equal(get('Er','luster').temperatureK,4.2);
  assert.equal(get('Hf','electrical').temperatureK,295);
- assert.equal(get('Th','electrical').temperatureK,273);
+ assert.equal(get('Th','electrical').temperatureK,293);
  for(const row of data.records){
   assert.equal(row.pressurePa,null);
   assert.equal(row.engineRelease,false);
