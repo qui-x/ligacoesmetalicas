@@ -34,7 +34,23 @@ window.SILM=window.SILM||{};
   };
   gradient(prefix+'-shadow','#000');
   gradient(prefix+'-highlight','#fff');
-  shading.append(defs);
+  const blur=svgEl('filter',{id:prefix+'-soft',x:'-8%',y:'-8%',width:'116%',height:'116%'});
+  blur.append(svgEl('feGaussianBlur',{stdDeviation:3.6}));
+  defs.append(blur);
+  const reliefLayer=svgEl('g',{'class':'silm-micro-local-relief',
+   filter:'url(#'+prefix+'-soft)','pointer-events':'none'});
+  shading.append(defs,reliefLayer);
+  const reliefCells=[];
+  // Malha cromática leve: a fonte ilumina a alteração local de relevo.
+  // Não cria um segundo palco, novo grão ou altura física medida.
+  for(let y=0;y<15;y++)for(let x=0;x<24;x++){
+   const shadow=svgEl('rect',{class:'silm-micro-relief-shadow',fill:'#080b0e',
+    opacity:0,'pointer-events':'none'});
+   const highlight=svgEl('rect',{class:'silm-micro-relief-highlight',fill:'#fff',
+    opacity:0,'pointer-events':'none'});
+   reliefLayer.append(shadow,highlight);
+   reliefCells.push({shadow,highlight,p:null});
+  }
   const spots=[];
   for(let i=0;i<17;i++){
    const shadow=svgEl('ellipse',{class:'silm-micro-contact-shadow',
@@ -77,8 +93,9 @@ window.SILM=window.SILM||{};
    ['electrical','thermal','malleability','ductility'].includes(st.properties?.active);
   // A iluminação preparada permanece observável enquanto a mesma amostra
   // recebe calor, campo ou força. Ferramentas abrasivas ficam em Brilho.
-  const visible=(st,surface)=>focus(st)||(eligibleForCoobservation(st)&&
-   (surface.light||surface.strokes.length>0));
+  // Luz e observação ficam disponíveis mesmo se o ensaio começar diretamente
+  // por compressão ou tração, sem obrigar uma visita anterior ao Brilho.
+  const visible=(st,surface)=>focus(st)||eligibleForCoobservation(st);
   const active=()=>focus(model.state);
   function coord(e){
    const matrix=mechanicalField.getScreenCTM()?.inverse(),size=getSize();
@@ -100,6 +117,15 @@ window.SILM=window.SILM||{};
     overlay.append(tile);tiles.push(tile);
     tileBoxes.push({x:x*width/cols,y:y*height/rows,w:width/cols+.35,h:height/rows+.35});
    }
+   for(let i=0;i<reliefCells.length;i++){
+    const cell=reliefCells[i],x=i%24,y=Math.floor(i/24);
+    const p={x:x*width/24,y:y*height/15,w:width/24+.5,h:height/15+.5};
+    cell.p=p;
+    for(const rect of [cell.shadow,cell.highlight]){
+     rect.setAttribute('x',String(p.x));rect.setAttribute('y',String(p.y));
+     rect.setAttribute('width',String(p.w));rect.setAttribute('height',String(p.h));
+    }
+   }
    mechanicalField.append(overlay,shading);
    setWarp(localWarp);
    refresh();
@@ -109,50 +135,81 @@ window.SILM=window.SILM||{};
   // a apresentação visual, não recalibração dos índices ópticos do metal.
   function setWarp(map){
    localWarp=typeof map==='function'?map:null;
-   for(let i=0;i<tiles.length;i++){
-    const tile=tiles[i],p=tileBoxes[i];
-    if(!localWarp){tile.removeAttribute('transform');continue;}
-    const a=localWarp(p.x,p.y),b=localWarp(p.x+p.w,p.y),c=localWarp(p.x,p.y+p.h);
-    if(![a?.x,a?.y,b?.x,b?.y,c?.x,c?.y].every(Number.isFinite)){
-     tile.removeAttribute('transform');continue;
+   // O acabamento e o gradiente de relevo seguem a MESMA transformação
+   // usada pelos grãos. Isto evita luz 'flutuando' fora da amostra.
+   const setAffine=(tile,p)=>{
+    if(!p)return;
+    if(!localWarp){tile.removeAttribute('transform');return;}
+    const a=localWarp(p.x,p.y),b=localWarp(p.x+p.w,p.y),d=localWarp(p.x,p.y+p.h);
+    if(![a?.x,a?.y,b?.x,b?.y,d?.x,d?.y].every(Number.isFinite)){
+     tile.removeAttribute('transform');return;
     }
     const m00=(b.x-a.x)/p.w,m10=(b.y-a.y)/p.w;
-    const m01=(c.x-a.x)/p.h,m11=(c.y-a.y)/p.h;
+    const m01=(d.x-a.x)/p.h,m11=(d.y-a.y)/p.h;
     const tx=a.x-m00*p.x-m01*p.y,ty=a.y-m10*p.x-m11*p.y;
     tile.setAttribute('transform','matrix('+[m00,m10,m01,m11,tx,ty].join(' ')+')');
-   }
+   };
+   tiles.forEach((tile,i)=>setAffine(tile,tileBoxes[i]));
+   reliefCells.forEach(({shadow,highlight,p})=>{
+    setAffine(shadow,p);setAffine(highlight,p);
+   });
   }
   function setDeformationLight(value){
    lightField=value&&typeof value==='object'?value:null;
    renderDeformationLight();
   }
   function renderDeformationLight(){
-   const st=model.state,visual=SILM.specimenVisualLight;
+   const st=model.state,visual=SILM.specimenVisualLight,relief=SILM.specimenRelief;
    if(!visual){shading.setAttribute('visibility','hidden');return;}
    const surface=physics.current(st),size=getSize();
-   const marks=st.module?.active==='explorar'&&Array.isArray(st.metadata?.mechanicalImprints)?st.metadata.mechanicalImprints:[];
+   const marks=st.module?.active==='explorar'&&Array.isArray(st.metadata?.mechanicalImprints)?
+    st.metadata.mechanicalImprints:[];
+   const activeContact=st.module?.active==='explorar'&&lightField?.mode&&
+    lightField.load>1e-4?{
+     ...lightField.contact,mode:lightField.mode,load:lightField.load
+    }:null;
    const count=visual.projectAll({
-    marks,activeContact:st.module?.active==='explorar'?lightField?.contact:null,
-    mode:st.module?.active==='explorar'?lightField?.mode:null,
-    load:lightField?.load||0,field:lightField?.field,
+    marks,activeContact:activeContact,
+    mode:activeContact?.mode||null,
+    load:activeContact?.load||0,field:lightField?.field,
     amplitude:lightField?.amplitude||0,
     incidenceDeg:drive?.angle??35,illuminated:surface.light
    });
-   shading.setAttribute('visibility',count.length?'visible':'hidden');
-   section.dataset.mechanicalShadows=count.length?'active':'inactive';
+   const showing=!!count.length;
+   shading.setAttribute('visibility',showing?'visible':'hidden');
+   section.dataset.mechanicalShadows=showing?'active':'inactive';
    section.dataset.mechanicalShadowZones=String(count.length);
+   if(!showing){
+    section.dataset.mechanicalShadowContrast='0';
+    return;
+   }
    for(let i=0;i<spots.length;i++){
     const pair=spots[i],spot=count[i];
     for(const [el,name] of [[pair.shadow,'shadow'],[pair.highlight,'highlight']]){
      const data=spot?.[name];
      if(!data){el.setAttribute('opacity','0');continue;}
-     el.setAttribute('cx',String(data.x*size.width));
-     el.setAttribute('cy',String(data.y*size.height));
+     const originX=data.x*size.width,originY=data.y*size.height;
+     const warped=localWarp?localWarp(originX,originY):{x:originX,y:originY};
+     el.setAttribute('cx',String(warped.x));
+     el.setAttribute('cy',String(warped.y));
      el.setAttribute('rx',String(data.rx*size.width));
      el.setAttribute('ry',String(data.ry*size.height));
      el.setAttribute('opacity',String(data.opacity));
     }
    }
+   let contrast=0;
+   for(let i=0;i<reliefCells.length;i++){
+    const cell=reliefCells[i],u=((i%24)+.5)/24,v=(Math.floor(i/24)+.5)/15;
+    const roughness=physics.sample(surface,u,v).roughness;
+    const q=relief?.shadeAt({
+     marks,active:activeContact,u,v,
+     incidenceDeg:drive?.angle??35,illuminated:surface.light,roughness
+    })||{dark:0,light:0};
+    cell.shadow.setAttribute('opacity',String(q.dark));
+    cell.highlight.setAttribute('opacity',String(q.light));
+    contrast=Math.max(contrast,q.dark,q.light);
+   }
+   section.dataset.mechanicalShadowContrast=contrast.toFixed(3);
   }
   function refresh(){
    const st=model.state,surface=physics.current(st),focusing=focus(st),on=visible(st,surface),angle=drive?.angle??35,eye=drive?.observerAngle??35;
