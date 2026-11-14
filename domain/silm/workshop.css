@@ -1300,3 +1300,22 @@
   grid-template-rows:minmax(240px,58dvh) auto auto;
  }
 }
+
+
+/* Luz incidente sobre zonas de intervenção mecânica.
+   Gradientes SVG leves por contato, sem framework CSS adicional. */
+.silm-micro-deformation-shading{pointer-events:none}
+.silm-micro-contact-shadow{pointer-events:none;mix-blend-mode:multiply}
+.silm-micro-contact-highlight{pointer-events:none;mix-blend-mode:screen}
+.silm-micro-apparatus .silm-micro-press-plate{
+ filter:drop-shadow(1px 2px 2px rgb(0 0 0/.28));
+}
+:root.si-highcontrast .silm-micro-contact-shadow,
+:root.si-highcontrast .silm-micro-contact-highlight{display:none}
+@media(forced-colors:active){
+ .silm-micro-contact-shadow,.silm-micro-contact-highlight{display:none}
+ .silm-micro-apparatus .silm-micro-press-plate{filter:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .silm-micro-contact-shadow,.silm-micro-contact-highlight{transition:none}
+}
