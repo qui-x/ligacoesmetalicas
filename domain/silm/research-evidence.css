@@ -102,3 +102,17 @@
 .silm-stage65-context ul,.silm-stage65-pending ul{padding-inline-start:1.1rem;margin:.35rem 0}
 .silm-stage65-context li,.silm-stage65-pending li{margin:.35rem 0}
 .silm-stage65-context a,.silm-stage65-pending a{overflow-wrap:anywhere}
+
+/* Pesquisa óptica em Brilho: R550 condicional, sem aplicar intensidade
+   à geometria visual nem confundir fontes com medida de CNTP. */
+.silm-optical-candidate[hidden]{display:none!important}
+.silm-optical-candidate{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.silm-optical-candidate-warning{font-size:.81rem;line-height:1.45;font-weight:600;border-inline-start:3px solid currentColor;padding-inline-start:.65rem;margin:.5rem 0}
+.silm-optical-candidate-result{font-size:1.08rem;font-weight:700;margin:.65rem 0;font-variant-numeric:tabular-nums}
+.silm-optical-candidate-metrics{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.35rem .65rem;max-width:100%;font-size:.82rem}
+.silm-optical-candidate-metrics dd{text-align:right;margin:0;font-weight:600;font-variant-numeric:tabular-nums;min-width:0}
+.silm-optical-candidate-metrics dt{min-width:0}
+.silm-optical-candidate select[hidden],.silm-optical-candidate label[hidden]{display:none!important}
+.silm-optical-candidate select{max-width:100%;width:100%;margin:.45rem 0}
+.silm-optical-candidate a{overflow-wrap:anywhere}
+@media(max-width:480px){.silm-optical-candidate-metrics{gap:.35rem .45rem;font-size:.76rem}}
