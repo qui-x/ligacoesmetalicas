@@ -465,7 +465,7 @@
   // Investigar objeto já iniciou uma investigação. Preparo oferece a ação
   // distinta de começar uma montagem livre, sem botão de início redundante.
   {const startButton=$('silm-start'),
-    label=state.metadata?.workshop?.referenceId?'Nova montagem livre':'Iniciar investigação';
+    label=state.metadata?.workshop?.referenceId?'Nova montagem livre':'Iniciar montagem livre';
    // Atualizar só o texto: o iconizador preserva o SVG nativo do botão.
    const textNode=[...startButton.childNodes].find(node=>node.nodeType===Node.TEXT_NODE);
    if(textNode){if(textNode.nodeValue!==label)textNode.nodeValue=label;}
