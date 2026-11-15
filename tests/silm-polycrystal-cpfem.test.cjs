@@ -332,3 +332,82 @@ test('84E: modos de descarga diferenciam retorno da garra de alivio de forca',()
  assert.ok(Math.abs(f.energyAudit.unloadingExternalWork)>0);
  assert.equal(m.run({unloadMode:'not-supported'}).status,'INVALID_LOADING');
 });
+
+test('84F: equilibrio elastico livre de forca nao inventa plasticidade residual',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const r=m.run({mode:'tension',load:.10,increments:3,unload:true,
+  unloadMode:'force',unloadIncrements:3});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ assert.equal(r.mechanicalState,'ZERO_TOP_FORCE');
+ assert.ok(Object.isFrozen(r.residualSummary));
+ assert.equal(r.residualSummary.status,'ZERO_TOP_FORCE_EQUILIBRIUM_ESTIMATE');
+ assert.equal(r.residualSummary.measured,false);
+ assert.ok(r.residualSummary.meanEquivalentPlasticStrain<1e-12);
+ assert.ok(Math.abs(r.residualSummary.meanPlasticAxialStrain)<1e-12);
+ assert.ok(Math.abs(r.residualSummary.meanAxialStress)<.001);
+ assert.ok(r.grains.every(g=>g.integrationPoints===0?g.mechanics===null:
+  g.mechanics.residualAtZeroTopForce&&g.mechanics.meanEquivalentPlasticStrain<1e-12));
+ const pt=r.sampleMechanics(.5,.3);
+ assert.equal(pt.residualAtZeroTopForce,true);
+ assert.ok(pt.equivalentPlasticStrain<1e-12);
+ assert.ok(pt.vonMisesStress<.01);
+ assert.equal(pt.calibrated,false);
+ assert.ok(Object.isFrozen(pt.stress));
+ assert.equal(r.samplePlastic(.5,.3),0);
+ assert.ok(Math.hypot(r.sample(.5,.3).dx,r.sample(.5,.3).dy)<.0003);
+});
+test('84F: tensor plastico + tensor elastico = deformacao total em 3D',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const r=m.run({mode:'tension',load:.82,increments:5,unload:true,
+  unloadMode:'force',unloadIncrements:5});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ assert.equal(r.mechanicalState,'ZERO_TOP_FORCE');
+ assert.equal(r.residualSummary.units,'relative');
+ assert.ok(r.residualSummary.meanEquivalentPlasticStrain>0);
+ assert.ok(r.residualSummary.meanVonMisesStress>=0);
+ assert.ok(r.grains.some(g=>g.mechanics?.meanEquivalentPlasticStrain>1e-7));
+ assert.ok(r.grains.filter(g=>g.integrationPoints>0).every(g=>
+  g.mechanics.meanVonMisesStress>=0&&g.mechanics.maxVonMisesStress>=g.mechanics.meanVonMisesStress&&
+  g.mechanics.maxEquivalentPlasticStrain+1e-12>=g.mechanics.meanEquivalentPlasticStrain&&
+  g.mechanics.residualAtZeroTopForce));
+ assert.ok(Number.isFinite(r.residualSummary.axialStrainChangeFromPeak));
+ assert.ok(Math.abs(
+  r.residualSummary.meanTotalAxialStrain-
+  r.residualSummary.meanPlasticAxialStrain-
+  r.residualSummary.meanElasticAxialStrain)<1e-10);
+ for(const [u,v] of [[.17,.2],[.5,.5],[.81,.65]]){
+  const p=r.sampleMechanics(u,v);
+  assert.equal(p.residualAtZeroTopForce,true);
+  assert.ok(p.equivalentPlasticStrain>=0&&p.vonMisesStress>=0);
+  assert.deepEqual(p.stress,r.sampleStress(u,v));
+  for(let i=0;i<3;i++)for(let j=0;j<3;j++){
+   assert.ok(Math.abs(p.totalStrain[i][j]-
+    p.elasticStrain[i][j]-p.plasticStrain[i][j])<1e-12);
+   assert.ok(Math.abs(p.stress[i][j]-p.stress[j][i])<1e-12);
+  }
+ }
+ const peak=r.samplePeakDisplacement(.5,.5);
+ const change=r.sampleDisplacementChangeFromPeak(.5,.5);
+ const final=r.sample(.5,.5);
+ assert.ok(Math.abs(change.dx-(peak.dx-final.dx))<1e-12);
+ assert.ok(Math.abs(change.dy-(peak.dy-final.dy))<1e-12);
+});
+test('84F: garra presa e ensaio sob carga nao recebem rotulo de tensao residual',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const loaded=m.run({mode:'compression',load:.6,increments:4});
+ const grip=m.run({mode:'compression',load:.6,increments:4,unload:true,
+  unloadMode:'displacement',unloadIncrements:4});
+ assert.equal(loaded.status,'CONVERGED',JSON.stringify(loaded));
+ assert.equal(grip.status,'CONVERGED',JSON.stringify(grip));
+ assert.equal(loaded.mechanicalState,'LOADED');
+ assert.equal(grip.mechanicalState,'GRIP_AT_ZERO');
+ assert.equal(loaded.residualSummary,null);
+ assert.equal(grip.residualSummary,null);
+ assert.equal(loaded.samplePeakDisplacement(.5,.5),null);
+ assert.equal(loaded.sampleDisplacementChangeFromPeak(.5,.5),null);
+ assert.ok(grip.samplePeakDisplacement(.5,.5));
+ assert.ok(grip.sampleDisplacementChangeFromPeak(.5,.5));
+ assert.ok(loaded.grains.every(g=>g.mechanics===null||!g.mechanics.residualAtZeroTopForce));
+ assert.ok(grip.grains.every(g=>g.mechanics===null||!g.mechanics.residualAtZeroTopForce));
+ assert.equal(grip.sampleMechanics(.4,.4).residualAtZeroTopForce,false);
+});
