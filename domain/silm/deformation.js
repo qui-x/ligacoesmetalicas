@@ -132,6 +132,14 @@ window.SILM=window.SILM||{};
   if(controllers.has(model))return controllers.get(model);
   const listeners=new Set(),DT=1/120,W=2*Math.PI*2.2,ZETA=.22,SLIDE=.45,TURN=.6,WORK=.6,S=SILM;
   let load=0,strain=0,velocity=0,work=0,progress=steps(0),orient=0,frame=0,last=0,pulse=null,limitReached=false,key='',lastSys=null,lastSign=-1,memo=null;
+  // Modelo constitutivo uniaxial ADIMENSIONAL paralelo aos passos visuais
+  // de deslizamento. Os passos não representam 1:1 a deformação calculada.
+  let constitutive=S.elastoplastic?.fresh?.()||null;
+  const updateConstitutive=c=>{
+   if(!constitutive||!S.elastoplastic)return;
+   const stress=c.id?c.sign*load:0;
+   constitutive=S.elastoplastic.stressStep(constitutive,stress);
+  };
   /* model.state devolve uma cópia completa do estado: uma leitura por tarefa (quadro, evento), reaproveitada até o fim dela. */
   function ctx(){
    if(memo)return memo;const st=model.state,p=st.properties,id=p?.active==='malleability'||p?.active==='ductility'?p.active:null;let g=null;
@@ -157,6 +165,7 @@ window.SILM=window.SILM||{};
    // Elástico: oscilador amortecido em direção à deformação proporcional à carga (limitada ao escoamento).
    const target=c.id&&orient>.999?c.sign*EPS_YIELD*Math.min(load,YIELD)/YIELD:0;
    velocity+=(-W*W*(strain-target)-2*ZETA*W*velocity)*dt;strain+=velocity*dt;
+   updateConstitutive(c);
   }
   function tick(now){
    frame=0;memo=null;const c=ctx(),elapsed=last?Math.min(.1,(now-last)/1000):DT;last=now;
@@ -167,18 +176,25 @@ window.SILM=window.SILM||{};
   }
   function wake(){if(!frame&&typeof requestAnimationFrame==='function')frame=requestAnimationFrame(tick);}
   /* Estado novo (troca de metal, de investigação ou recarga): posições finais sem animação. */
-  function sync(){const c=ctx();if(c.key!==key){key=c.key;load=0;pulse=null;work=0;snap(c);strain=0;velocity=0;}if(!settled(c))wake();}
+  function sync(){const c=ctx();if(c.key!==key){key=c.key;load=0;pulse=null;work=0;snap(c);strain=0;velocity=0;constitutive=S.elastoplastic?.fresh?.()||null;}if(!settled(c))wake();}
   const api={
    subscribe(f){listeners.add(f);return ()=>listeners.delete(f);},
    sync,
    reset(){load=0;strain=0;velocity=0;work=0;pulse=null;limitReached=false;
+    constitutive=S.elastoplastic?.fresh?.()||null;
     memo=null;const c=ctx();snap(c);last=0;notify();},
-   setLoad(v){const x=Math.max(0,Math.min(1,Number(v)||0));if(x===load&&!pulse)return;pulse=null;load=x;memo=null;const c=ctx();if(reducedMotion()&&x>YIELD&&c.id&&c.count<LIMIT)commit(c,c.count+1);wake();notify();},
+   setLoad(v){const x=Math.max(0,Math.min(1,Number(v)||0));if(x===load&&!pulse)return;
+    pulse=null;load=x;memo=null;const c=ctx();updateConstitutive(c);
+    if(reducedMotion()&&x>YIELD&&c.id&&c.count<LIMIT)commit(c,c.count+1);
+    wake();notify();},
    /* Pulso (botão e teclado): registra um deslizamento agora e anima carga → deslizamento → retorno elástico. */
    pulse(){memo=null;const c=ctx();if(!c.id||c.count>=LIMIT)return false;if(!commit(c,c.count+1))return false;if(!reducedMotion()){pulse={t:0};wake();}else snap(c);notify();return true;},
    // Ao encerrar ou restaurar, o retorno também é animado: o último sistema vale até a forma voltar à de referência.
    transform(camera=null){const c=ctx(),s=c.sys||lastSys;if(!s||(!c.id&&orient<1e-4&&progress.every(v=>v<1e-4)))return null;return transform(s,{progress,sign:c.id?c.sign:lastSign,strain,orient,camera});},
-   reading(){const c=ctx();return {active:c.id,load,strain,regime:!c.id?null:load>YIELD||pulse?'plastic':load>0?'elastic':Math.abs(strain)>.002?'returning':'rest',count:c.count,limit:LIMIT,limitReached,sliding:moving(c),orient,system:c.sys};},
+   reading(){const c=ctx();return {active:c.id,load,strain,
+    constitutive:constitutive?{...constitutive}:null,
+    regime:!c.id?null:load>YIELD||pulse?'plastic':load>0?'elastic':Math.abs(strain)>.002?'returning':'rest',
+    count:c.count,limit:LIMIT,limitReached,sliding:moving(c),orient,system:c.sys};},
    get load(){return load;}
   };
   controllers.set(model,api);return api;
