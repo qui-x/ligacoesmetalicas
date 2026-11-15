@@ -168,7 +168,8 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
  const intrinsicEvidence=SILM.createPGMIntrinsicPanel?.({prefix});
  const multistageEvidence=SILM.createMultistageResearchPanel?.({prefix});
  const sevenEvidence=SILM.createSevenConditionPanel?.({prefix});
- box.append(head,row,status,readings,opticalSection,researchSection,...(opticalCandidate?[opticalCandidate.root]:[]),thermalSection,...(electricalEvidence?[electricalEvidence.root]:[]),...(intrinsicEvidence?[intrinsicEvidence.root]:[]),...(multistageEvidence?[multistageEvidence.root]:[]),...(sevenEvidence?[sevenEvidence.root]:[]),list);container.append(box);
+ const unifiedEvidence=SILM.createUnifiedElementEvidencePanel?.({mode:'explore'});
+ box.append(head,row,status,readings,opticalSection,researchSection,...(opticalCandidate?[opticalCandidate.root]:[]),thermalSection,...(electricalEvidence?[electricalEvidence.root]:[]),...(intrinsicEvidence?[intrinsicEvidence.root]:[]),...(multistageEvidence?[multistageEvidence.root]:[]),...(sevenEvidence?[sevenEvidence.root]:[]),...(unifiedEvidence?[unifiedEvidence.root]:[]),list);container.append(box);
  function updateOptical(state,driveState){
   const service=SILM.materialEngine;
   const angle=driveState?.angle??35,finish=driveState?.finish??'polished';
@@ -253,6 +254,7 @@ SILM.createPropertyControls=(container,{scope,info,actions,prefix='silm-prop',co
   if(!researchSection.hidden)updateResearchRows();
   if(multistageEvidence)multistageEvidence.update({atomicNumber:compact?null:state.metal?.atomicNumber,active});
   if(sevenEvidence)sevenEvidence.update({atomicNumber:compact?null:state.metal?.atomicNumber,active});
+  if(unifiedEvidence)unifiedEvidence.update({atomicNumber:compact?null:state.metal?.atomicNumber,active});
   if(electricalEvidence)electricalEvidence.update({atomicNumber:compact?null:state.metal?.atomicNumber,active});
   if(intrinsicEvidence)intrinsicEvidence.update({atomicNumber:compact?null:state.metal?.atomicNumber,active});
   box.dataset.active=active||'';list.hidden=!!active||compact;row.hidden=!active;
