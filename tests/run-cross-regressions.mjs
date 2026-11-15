@@ -332,11 +332,11 @@ try{
  const response=await page.goto(base+'/index.html#/ambiente',{waitUntil:'load',timeout:45000});
  assert.ok(response?.ok(),'SILM não carregou');
  await page.waitForFunction(()=>window.SILM?.workshop?.valid()&&!document.querySelector('#silm-workshop-context')?.hidden);
- await page.locator('#silm-workshop-context').getByRole('button',{name:'Tabela Periódica'}).click();
- await page.locator('#silm-periodic-dialog [data-z="29"]').click();
- await page.locator('#silm-periodic-dialog [id$="-explore"]').click();
- await page.locator('.silm-workshop-card[data-reference-id="atlas-cu"]')
-   .getByRole('button',{name:'Investigar componente'}).click();
+ await page.locator('[data-open-dock="montagem"]').click();
+ await page.locator('#silm-open-periodic').click();
+ await page.locator('#silm-object-entry [data-z="29"]').click();
+ await page.locator('#silm-objects-dialog [data-reference-id="atlas-cu"]')
+   .getByRole('button',{name:'Iniciar montagem'}).click();
  await page.waitForFunction(()=>window.SILMIntegration?.snapshot?.()?.metal?.atomicNumber===29);
  // A Visão geral gerencia investigações com uma estrutura existente. O
  // Objeto isolado ainda não gera cartão: preparar Cu com o motor real antes
