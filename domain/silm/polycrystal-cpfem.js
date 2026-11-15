@@ -348,7 +348,30 @@ SILM.polycrystalCPFEM=(()=>{
     calibrated:false,units:'relative'
    }),run,calibrated:false,canFeedJ2:false,requiresMenuReview:true});
  }
+ // Patch de deformacao afim: valida somente geometria CST e interpolacao.
+ // Nao substitui ensaio de convergencia de malha nem verifica equilibrio
+ // elastoplastico ou condicoes experimentais de contorno.
+ function verifyAffinePatch({exx=.001,eyy=-.0005,gammaXY=.0004}={}){
+  if(![exx,eyy,gammaXY].every(finite)||
+   [exx,eyy,gammaXY].some(v=>Math.abs(v)>.02))
+   throw new RangeError('Patch requer componentes finitas de pequenas deformacoes');
+  const u=new Float64Array(ND);
+  for(let y=0;y<=NY;y++)for(let x=0;x<=NX;x++){
+   const id=node(x,y),xx=x/NX,yy=y/NY;
+   u[2*id]=exx*xx+gammaXY*yy*.5;
+   u[2*id+1]=eyy*yy+gammaXY*xx*.5;
+  }
+  let area=0,maxError=0;
+  for(const tri of triangles){
+   area+=tri.area;
+   const observed=strainOf(tri,u),expected=[exx,eyy,gammaXY];
+   for(let j=0;j<3;j++)maxError=Math.max(maxError,Math.abs(observed[j]-expected[j]));
+  }
+  return Object.freeze({status:maxError<1e-10&&Math.abs(area-1)<1e-10?'AFFINE_PATCH_PASS':'AFFINE_PATCH_FAIL',
+   maxStrainError:maxError,integratedArea:area,areaError:Math.abs(area-1),
+   triangles:NE,engineeringShear:true,calibrated:false,meshConvergenceVerified:false});
+ }
  return Object.freeze({schema:'silm.polycrystal-cpfem.small-strain.v1',
-  create,calibrated:false,requiresMenuReview:true,canFeedJ2:false,
+  create,verifyAffinePatch,calibrated:false,requiresMenuReview:true,canFeedJ2:false,
   NX,NY,triangles:NE});
 })();
