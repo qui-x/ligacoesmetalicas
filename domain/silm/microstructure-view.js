@@ -309,7 +309,7 @@ SILM.microstructure=(()=>{
     'Sem orientação cristalográfica não há fator de Schmid por grão.');
    slipInfo.setAttribute('role','status');slipInfo.setAttribute('aria-live','off');
    slipInfo.setAttribute('aria-label','Leitura geométrica de deslizamento sem ativação física prevista');
-   const slipStress=node('output','silm-micro-slip-stress silm-micro-constitutive-reading',
+   const slipStress=node('output','silm-micro-slip-stress',
     'Projeção de tensão local indisponível sem J2 e orientação explícita.');
    slipStress.setAttribute('aria-label',
     'Projeção de tensão local J2 normalizada; não é tensão experimental nem causa deslizamento');
