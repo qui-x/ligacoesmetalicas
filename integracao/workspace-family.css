@@ -643,3 +643,6 @@ body.si-structure-expanded #silm-scene-actionbar{
 }
 /* A apresentação expandida usa a mecânica própria de tela cheia. */
 body.si-structure-expanded #si-workspace{display:flex!important}
+
+/* Expandir a estrutura continua ocupando toda a área, sem espaçamento da doca. */
+body.si-structure-expanded #si-workspace:not(.si-workspace-fullscreen) #workspace-focus{padding:0!important}
