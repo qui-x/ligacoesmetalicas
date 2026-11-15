@@ -2017,7 +2017,7 @@ var BaseDemoSI;
             panel.hidden = panel.dataset.rightPanel !== workspaceState.rightTab;
         const lh = node("si-left-title");
         if (lh)
-            lh.textContent = { resumo: "Montagem", preparo: "Preparo", objetos: "Recipientes", modulo: "Módulo", missao: "Missão" }[workspaceState.leftTab];
+            lh.textContent = { resumo: "Montagem", preparo: "Preparo", objetos: "Unidades", modulo: "Módulo", missao: "Roteiro" }[workspaceState.leftTab];
         const detail = viewerLevel === "detail" && workspaceState.rightTab === "ver";
         const rh = node("si-right-title");
         if (rh)
@@ -2258,7 +2258,7 @@ var BaseDemoSI;
         document.querySelectorAll("[data-scene-view]").forEach(b => b.addEventListener("click", () => changeWorkspace({ type: "view", view: b.dataset.sceneView })));
         document.querySelectorAll("[data-open-dock]").forEach(b => b.addEventListener("click", () => {
             const which = b.dataset.openDock;
-            openWorkspace(which === "montagem" ? "left" : "right", which === "montagem" ? "preparo" : which, b);
+            openWorkspace(which === "montagem" ? "left" : "right", which === "montagem" ? workspaceState.leftTab : which, b);
         }));
         document.querySelectorAll("[data-close-dock]").forEach(b => b.addEventListener("click", () => closeWorkspace(b.dataset.closeDock)));
         document.querySelectorAll("[data-left-tab],[data-open-left-category]").forEach(b => b.addEventListener("click", () => {
