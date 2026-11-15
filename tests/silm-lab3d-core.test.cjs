@@ -32,3 +32,10 @@ test('motor J2 não convergido nunca produz deslocamento inventado',()=>{
  assert.equal(v.dx,.2);assert.equal(v.dy,-.1);
  assert.equal(m.calibrated,false);
 });
+test('seleciona o instrumento apontado com raio 3D, não um objeto atrás da câmera',()=>{
+ const targets=[{id:'press',center:[0,1.5,-1.2],radius:.3},{id:'rear',center:[0,1.5,2],radius:.3}];
+ const hit=m.pickTarget([0,1.5,1],0,0,targets);
+ assert.equal(hit.id,'press');
+ assert.equal(m.pickTarget([0,1.5,1],Math.PI,0,targets).id,'rear');
+ assert.equal(m.pickTarget([0,1.5,1],Math.PI/2,0,targets),null);
+});

@@ -107,7 +107,7 @@
    this.button(bottom,'Tração / compressão','mode',()=>{this.loadMode=this.loadMode==='compression'?'tension':'compression';this.setLoad(this.load)});
    this.button(bottom,'− Carga','less',()=>this.setLoad(this.load-.2));
    this.button(bottom,'+ Carga','more',()=>this.setLoad(this.load+.2));
-   this.heatButton=this.button(bottom,'Calor','heat',()=>{this.heat=!this.heat;this.heatButton.setAttribute('aria-pressed',String(this.heat));});
+   this.heatButton=this.button(bottom,'Calor','heat',()=>{this.heat=!this.heat;this.heatButton.setAttribute('aria-pressed',String(this.heat));if(reduced())this.temperature=C.initialHeat().map((_,i)=>this.heat?Math.max(0,1-i/17):0);});
    this.currentButton=this.button(bottom,'Corrente','current',()=>{this.current=!this.current;this.currentButton.setAttribute('aria-pressed',String(this.current));});
    this.lampButton=this.button(bottom,'Luz','lamp',()=>{this.lamp=!this.lamp;this.lampButton.setAttribute('aria-pressed',String(this.lamp));});
    this.button(bottom,'Microscópio','micro',()=>this.enterScale(2));
@@ -143,9 +143,11 @@
    };
    this.onPointerDown=e=>{if(e.button===0){this.dragging=true;this.canvas.focus({preventScroll:true});}};
    this.onPointerUp=()=>{this.dragging=false};
-   this.onClick=()=>{if(this.canvas.requestPointerLock&&matchMedia('(pointer:fine)').matches&&document.pointerLockElement!==this.canvas){
-    try{const r=this.canvas.requestPointerLock();r?.catch?.(()=>{});}catch{}
-   }};
+   this.onClick=()=>{if(this.touchMoved){this.touchMoved=false;return}
+    if(this.canvas.requestPointerLock&&matchMedia('(pointer:fine)').matches&&document.pointerLockElement!==this.canvas){
+     try{const r=this.canvas.requestPointerLock();r?.catch?.(()=>{});}catch{}
+    }else this.interact();
+   };
    this.onWheel=e=>{if(this.inspect){e.preventDefault();this.eye[2]=clamp(this.eye[2]+Math.sign(e.deltaY)*.18,.15,1.85);}};
    this.onRoute=()=>{if(!location.hash.startsWith('#/ambiente'))this.close()};
    document.addEventListener('keydown',this.onKey,true);document.addEventListener('keyup',this.onUp,true);
@@ -154,9 +156,10 @@
    this.canvas.addEventListener('click',this.onClick);this.canvas.addEventListener('wheel',this.onWheel,{passive:false});
    window.addEventListener('hashchange',this.onRoute);
    this.touch=null;
-   this.onTouchStart=e=>{if(e.touches.length===1)this.touch={x:e.touches[0].clientX,y:e.touches[0].clientY}};
+   this.onTouchStart=e=>{this.touchMoved=false;if(e.touches.length===1)this.touch={x:e.touches[0].clientX,y:e.touches[0].clientY}};
    this.onTouchMove=e=>{if(!this.touch||e.touches.length!==1)return;
     const x=e.touches[0].clientX,y=e.touches[0].clientY;
+    if(Math.hypot(x-this.touch.x,y-this.touch.y)>2)this.touchMoved=true;
     this.yaw+=(x-this.touch.x)*.005;this.pitch=clamp(this.pitch-(y-this.touch.y)*.005,-1.1,1);
     this.touch={x,y};
    };
@@ -189,8 +192,20 @@
    }catch(e){this.status.textContent='Amostra original preservada: '+(e?.message||'sem resposta do modelo J2');}
   }
   interact(){
-   if(!this.inspect){this.setInspect(true);return}
-   this.status.textContent='Bancada selecionada. Use Calor, Corrente, Carga ou o Microscópio.';
+   const items=[
+    {id:'microscope',center:[1.07,1.36,-1.3],radius:.4},
+    {id:'heater',center:[-1.15,1.19,-1.39],radius:.42},
+    {id:'lamp',center:[-1.63,1.35,-1.31],radius:.35},
+    {id:'power',center:[1.65,1.08,-1.5],radius:.38},
+    {id:'press',center:[0,1.25,-1.35],radius:.63}
+   ];
+   const hit=C.pickTarget(this.eye,this.yaw,this.pitch,items);
+   if(!hit){this.status.textContent='Mire um instrumento da bancada com o retículo e pressione E ou clique. Aproximar também está disponível.';return}
+   if(hit.id==='microscope'){this.enterScale(2);return}
+   if(hit.id==='heater'){this.heatButton.click();this.status.textContent='Fonte térmica '+(this.heat?'ligada':'desligada')+' · propagação relativa.';return}
+   if(hit.id==='lamp'){this.lampButton.click();this.status.textContent='Iluminação '+(this.lamp?'ligada':'desligada')+' · superfície esquemática.';return}
+   if(hit.id==='power'){this.currentButton.click();this.status.textContent='Fonte elétrica '+(this.current?'ligada':'desligada')+' · marcadores visuais.';return}
+   this.setLoad(this.load+.2);
   }
   enterScale(n){
    const step=$('#silm-workshop-context .silm-workshop-scale[data-scale="'+n+'"]');
@@ -261,7 +276,7 @@
    if(!reduced()){
     this.thermalTimer+=dt;
     while(this.thermalTimer>=1/24){this.temperature=C.heatStep(this.temperature,{source:this.heat});this.thermalTimer-=1/24;}
-   }else if(this.heat&&this.temperature[0]===0){this.temperature=C.heatStep(this.temperature,{source:true});}
+   }
    try{this.renderer.render(this.items(time),this.eye,this.yaw,this.pitch)}
    catch(e){this.status.textContent='Renderização 3D interrompida: '+e.message;this.close(false);return;}
    this.frame=requestAnimationFrame(t=>this.tick(t));

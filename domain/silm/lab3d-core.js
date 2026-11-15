@@ -32,6 +32,24 @@ SILM.lab3dCore=(()=>{
   return read&&Number.isFinite(read.dx)&&Number.isFinite(read.dy)?
    {dx:read.dx,dy:read.dy}:null;
  }
- return Object.freeze({schema:'silm.lab3d.visual-core.v1',initialHeat,heatStep,canWalk,sampleField,
+ function pickTarget(eye,yaw,pitch,targets,maxDistance=4.25){
+  if(!Array.isArray(eye)||eye.length!==3||!eye.every(Number.isFinite)||
+     ![yaw,pitch,maxDistance].every(Number.isFinite)||maxDistance<=0||
+     !Array.isArray(targets))throw new RangeError('Raio de seleção inválido');
+  const f=[Math.sin(yaw)*Math.cos(pitch),Math.sin(pitch),-Math.cos(yaw)*Math.cos(pitch)];
+  let best=null;
+  for(const item of targets){
+   if(!item||typeof item.id!=='string'||!Array.isArray(item.center)||
+      item.center.length!==3||!item.center.every(Number.isFinite)||
+      !Number.isFinite(item.radius)||item.radius<=0)continue;
+   const d=item.center.map((x,i)=>x-eye[i]),along=d.reduce((a,x,i)=>a+x*f[i],0);
+   if(along<=0||along>maxDistance)continue;
+   const off2=Math.max(0,d.reduce((a,x)=>a+x*x,0)-along*along);
+   if(off2>item.radius*item.radius)continue;
+   if(!best||along<best.distance)best={id:item.id,distance:along};
+  }
+  return best;
+ }
+ return Object.freeze({schema:'silm.lab3d.visual-core.v1',initialHeat,heatStep,canWalk,sampleField,pickTarget,
   calibrated:false,thermalUnits:'normalized',collisionOnly:true});
 })();

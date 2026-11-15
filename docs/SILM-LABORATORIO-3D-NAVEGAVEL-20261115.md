@@ -5,7 +5,7 @@ Com uma investigação iniciada e o ambiente aberto, a ação **Sala 3D**
 surge na barra da cena, sem substituir Montagem/Ver/Dados ou salvar outro
 ScientificState. O espaço usa **WebGL2 nativo** (sem CDN, funciona offline).
 WASD/mouse e controles de toque deslocam a câmera com colisões simples
-contra paredes e bancada. E aproxima a inspeção; Fechar restaura foco.
+contra paredes e bancada. E e clique selecionam os instrumentos visados por raio 3D; Inspecionar aproxima a bancada; Fechar restaura foco.
 A bancada contém prensa, amostra, microscópio, fonte, aquecedor e luz.
 
 A carga em tração/compressão lê **SILM.specimenJ2.active** da main, 
