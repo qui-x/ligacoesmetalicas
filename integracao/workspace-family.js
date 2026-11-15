@@ -108,8 +108,10 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   const editableStructure=canObserve;
   // Centro é uma vista local: a célula não aparece nela, e a primeira
   // vizinhança já é mostrada. Não oferecer botões sem efeito perceptível.
-  const localCenter=document.getElementById('si-stage')?.dataset.workshopScale==='4';
-  if(!localCenter){
+  const stageScale=Number(document.getElementById('si-stage')?.dataset.workshopScale||0);
+  const showCenterControls=stageScale===0||stageScale===3;
+  const showCrystalControls=stageScale===3;
+  if(showCenterControls){
   const structureActions=actionGroup(root,'Centros metálicos');
   actionButton(structureActions,{id:'centers',label:observer.centers?'Ocultar identificação':'Identificar centros',path:actionIcons.centers,pressed:observer.centers,disabled:!editableStructure,reason:!structure?'Monte uma estrutura primeiro':activityLocked?'Recurso restrito nesta atividade':'',hint:'Destaca todos os centros. Na montagem livre, identifica cada unidade; na célula cristalina, mostra o papel de cada sítio.',onClick:()=>{
    observer.centers=!observer.centers;B.storage.write(observerKey,{centers:observer.centers});
@@ -123,7 +125,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   actionButton(interactionActions,{id:'electrons',label:electronsActive?'Ocultar mar de elétrons':'Mostrar mar de elétrons',path:actionIcons.electrons,pressed:electronsActive,disabled:!canExplore||(!structure||structure.units.length<minimum),reason:!structure?'Monte uma estrutura primeiro':structure.units.length<minimum?'São necessárias '+minimum+' unidades':!canExplore?'Disponível no módulo Explorar':'',hint:'Mostra o modelo coletivo dos elétrons de valência e seu movimento ao redor dos centros. Não representa ligações localizadas entre pares.',onClick:()=>{
    quickActions?.toggleElectrons?.();refreshScene();renderViewers();
   }});
-  if(!localCenter){
+  if(showCrystalControls){
   const crystalActions=actionGroup(root,'Célula e rede cristalina');
   actionButton(crystalActions,{id:'view-toggle',label:crystal?(rep.view==='cell'?'Mostrar rede':'Mostrar célula'):'Célula / rede',path:actionIcons.view,pressed:!!crystal&&rep.view==='lattice',disabled:!crystal||!canObserve,reason:!crystal?'Organize a montagem para habilitar a célula e a rede':activityLocked?'Recurso restrito nesta atividade':'',onClick:()=>{
    if(!crystal||!canObserve)return;
