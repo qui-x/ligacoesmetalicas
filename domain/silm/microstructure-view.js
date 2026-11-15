@@ -381,7 +381,8 @@ SILM.microstructure=(()=>{
    });
    if(active){
     const h=Math.max(4,H*.016),w=Math.max(W*.09,W*contactWidth),px=clamp(W*contactPosition-w/2,0,W-w);
-    const displacement=field?field.sample(contactPosition,0,amplitude).dy*H:0;
+    const displacement=j2Ready&&active?j2.sample(contactPosition,0).dy*H:
+     field?field.sample(contactPosition,0,amplitude).dy*H:0;
     const plates=[
      [topPlate,px,Math.max(-H*.08,H*.015+displacement),w],
      [bottomPlate,0,H-h*1.4,W]
