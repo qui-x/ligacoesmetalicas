@@ -186,14 +186,14 @@ def run(browser_name: str, root: str) -> None:
             }""")
             assert archive and archive["propertyHistory"]["events"], (browser_name, width, "sem histórico arquivado")
             page.goto(root.rstrip("/") + "/#/ambiente")
-            measure_button = page.locator('[data-silm-module-shortcut="medir"]')
+            assert page.locator('[data-silm-module-shortcut]').count() == 0
+            page.locator('[data-open-dock="montagem"]').click()
+            page.locator('[data-left-tab="modulo"]').click()
+            measure_button = page.locator('#silm-module-activate-medir')
+            page.locator('.silm-module-card[data-module="medir"] summary').click()
             expect(measure_button).to_be_enabled()
-            page.evaluate("""() => {
-                const selector = document.getElementById('silm-module');
-                if (!selector || selector.disabled) throw new Error('Seletor científico indisponível');
-                selector.value = 'medir';
-                selector.dispatchEvent(new Event('change', {bubbles: true}));
-            }""")
+            measure_button.click()
+            page.wait_for_function("SILMIntegration.snapshot()?.module?.active === 'medir'")
             page.goto(root.rstrip("/") + "/#/relatorios")
             expect(report.locator(".silm-report-doc")).to_have_attribute("data-scientific-module", "medir")
             expect(report.locator('[data-report-section="medicoes"]')).to_contain_text("Nenhuma medição registrada")
@@ -203,14 +203,14 @@ def run(browser_name: str, root: str) -> None:
             report.locator("#report-observations").fill("A régua do modelo não foi usada.")
             report.locator("#route-report-notebook").click()
             page.goto(root.rstrip("/") + "/#/ambiente")
-            calculate_button = page.locator('[data-silm-module-shortcut="calcular"]')
+            assert page.locator('[data-silm-module-shortcut]').count() == 0
+            page.locator('[data-open-dock="montagem"]').click()
+            page.locator('[data-left-tab="modulo"]').click()
+            calculate_button = page.locator('#silm-module-activate-calcular')
+            page.locator('.silm-module-card[data-module="calcular"] summary').click()
             expect(calculate_button).to_be_enabled()
-            page.evaluate("""() => {
-                const selector = document.getElementById('silm-module');
-                if (!selector || selector.disabled) throw new Error('Seletor científico indisponível');
-                selector.value = 'calcular';
-                selector.dispatchEvent(new Event('change', {bubbles: true}));
-            }""")
+            calculate_button.click()
+            page.wait_for_function("SILMIntegration.snapshot()?.module?.active === 'calcular'")
             page.goto(root.rstrip("/") + "/#/relatorios")
             expect(report.locator(".silm-report-doc")).to_have_attribute("data-scientific-module", "calcular")
             expect(report.locator('[data-report-section="calculos"]')).to_contain_text("Nenhum cálculo registrado")
