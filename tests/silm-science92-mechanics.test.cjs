@@ -12,7 +12,7 @@ const S=ctx.SILM,M=S.scientificMechanicalBatch,C=S.scientific400;
 test('In 70% historico; Cr >20 e >40% com limites inferiores e amostras diferentes',()=>{
  assert.equal(M.rows.length,3);
  assert.equal(M.getFor(49,'ductility').length,1);assert.equal(M.getFor(49,'ductility')[0].values[0].value,70);
- const c=M.getFor(24,'ductility');assert.equal(c.length,2);assert.deepEqual(c.map(x=>x.values[0].value).sort((a,b)=>a-b),[20,40]);
+ const c=M.getFor(24,'ductility');assert.equal(c.length,2);assert.deepEqual(Array.from(c.map(x=>x.values[0].value).sort((a,b)=>a-b)),[20,40]);
  assert.ok(c.every(x=>x.values[0].meaning==='lower-bound-not-point'));
  assert.ok(c.every(x=>x.qualifier.includes('>')&&x.sourceURL.startsWith('https://')));
  assert.ok(M.rows.every(r=>r.referenceOnly&&!r.engineRelease&&!r.calibrationApproved));
