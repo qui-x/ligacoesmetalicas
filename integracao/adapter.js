@@ -333,14 +333,15 @@
   disposeEntryTable();host.replaceChildren();host.hidden=false;
   const area=document.createElement('section');area.className='silm-object-entry';area.id='silm-object-entry';
   const head=document.createElement('div');head.className='silm-object-entry-head';
-  const title=document.createElement('h2');title.textContent='Objetos do cotidiano';
+  const title=document.createElement('h2');title.textContent='Escolha um metal';
   const actions=document.createElement('div');actions.className='silm-object-entry-actions';
-  // Mantém acesso ao diálogo histórico da tabela para apresentação e compatibilidade.
-  const full=document.createElement('button');full.type='button';full.className='button outline';full.textContent='Ampliar tabela';full.title='Abrir a Tabela Periódica em janela ampliada';
-  full.setAttribute('aria-label','Tabela Periódica');full.addEventListener('click',()=> $('silm-open-periodic')?.click());
-  actions.append(full);
+  // A tabela já está no palco. Não oferecer um segundo botão que a abre
+  // por cima do próprio palco.
   if(active){const back=document.createElement('button');back.type='button';back.className='button outline';
-   back.textContent='Voltar ao objeto';back.addEventListener('click',()=>{showObjectEntry=false;schedule();});actions.prepend(back);}
+   back.textContent='Voltar à investigação';back.addEventListener('click',()=>{
+    showObjectEntry=false;schedule();
+    requestAnimationFrame(()=>$('silm-open-periodic')?.focus({preventScroll:true}));
+   });actions.append(back);}
   head.append(title,actions);area.append(head);
   const tableHost=document.createElement('div');tableHost.className='silm-object-entry-table';area.append(tableHost);
   host.append(area);entryTableScope=SimCore.createScope();
@@ -355,6 +356,23 @@
   // Mover o mesmo formulário preserva eventos, rótulos e estado de busca.
   const search=tableHost.querySelector('.periodic-search');
   if(search)head.insertBefore(search,actions);
+ }
+ function openStagePeriodic(){
+  if(routeUI?.session.open()){
+   say('Encerre a atividade orientada para escolher outro objeto.','info');
+   return false;
+  }
+  if(B.currentRoute(location.hash)!=='ambiente')location.hash='#/ambiente';
+  showFocus();showObjectEntry=true;legacyDiscovery=false;
+  // A Tabela ocupa a área que exibe os objetos; nenhuma estrutura
+  // cristalina nem registro científico é alterado ao apenas consultá-la.
+  // Recolher a doca libera a largura integral para os 18 grupos.
+  const left=$('si-dock-left');
+  if(left&&!left.hidden)left.querySelector('[data-close-dock="left"]')?.click();
+  schedule();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>
+   $('silm-object-entry')?.querySelector('.periodic-heading h1')?.focus({preventScroll:true})));
+  return true;
  }
  function activeWorkshopScale(saved){
   if(saved?.scale>=1&&saved.scale<=4&&(saved.scale!==1||workshopSelectionId||S.workshop.list(element().atomicNumber).length))return saved.scale;
@@ -395,6 +413,12 @@
    $('si-stage').classList.remove('silm-workshop-context-only');return;
   }
   const active=element(),candidate=S.data.get(Number(selected||$('silm-metal')?.value));
+  if(showObjectEntry){
+   updateWorkshopViewport(false);
+   const key='entry:table:'+(active?.atomicNumber||'initial');
+   if(host.dataset.key!==key){host.dataset.key=key;renderObjectEntry(host,{active});}
+   return;
+  }
   if(active&&candidate&&candidate.atomicNumber!==active.atomicNumber){
    disposeEntryTable();
    const saved=model.state.metadata.workshop;
@@ -419,11 +443,6 @@
   workshopSelectionId=saved&&S.workshop.get(saved.referenceId)?.atomicNumber===active.atomicNumber?saved.referenceId:null;
   workshopScale=activeWorkshopScale(saved);
   updateWorkshopViewport(true);
-  if(showObjectEntry&&workshopScale===1){
-   const key='entry:active:'+active.atomicNumber;
-   if(host.dataset.key!==key){host.dataset.key=key;renderObjectEntry(host,{active});}
-   return;
-  }
   disposeEntryTable();
   if(workshopSelectionId&&S.workshop.get(workshopSelectionId)?.atomicNumber!==active.atomicNumber)workshopSelectionId=null;
   const item=S.workshop.get(workshopSelectionId);
@@ -434,7 +453,7 @@
   S.workshop.renderReference(host,{element:active,item:chosen,items:S.workshop.list(active.atomicNumber),scale:workshopScale,model,
    onChoose:next=>{model.setWorkshopContext(next.id,1);schedule();},
    onScale:setWorkshopScale,
-   onOpenPeriodic:()=>{if(workshopScale===1){showObjectEntry=true;schedule();}else $('silm-open-periodic')?.click();},
+   onOpenPeriodic:openStagePeriodic,
    onBrowseObjects:()=>openObjectCatalog(active)});
  }
  function text(id,value){if($(id))$(id).textContent=value;}
@@ -479,7 +498,9 @@
   $('scene-count').dataset.compactCount=units(n);
   // O editor só aparece em Preparo por escolha explícita, nunca como aba.
   const freeAssembly=$('silm-free-assembly');
-  freeAssembly.hidden=!e||state.module.active!=='explorar'||(routeUI.session.open()&&!routeUI.canBuild());
+  freeAssembly.hidden=!e||state.module.active!=='explorar'||
+   !!(crystalMode&&state.metadata?.workshop?.referenceId)||
+   (routeUI.session.open()&&!routeUI.canBuild());
   if(freeAssembly.hidden)freeAssembly.open=false;
   else if(freeMode&&freeAssembly.dataset.autoOpened!==state.investigation?.id){
    freeAssembly.open=true;freeAssembly.dataset.autoOpened=state.investigation.id;
@@ -668,6 +689,7 @@
     event.preventDefault();event.stopImmediatePropagation();setStageExpanded(false);
    }
   },true);
+  $('silm-open-periodic').addEventListener('click',openStagePeriodic);
   $('silm-start').addEventListener('click',start);$('silm-add').addEventListener('click',run.add);$('silm-organize').addEventListener('click',run.organize);
   $('silm-free').addEventListener('click',()=>(!routeUI.session.open()||routeUI.canBuild())&&report(model.restoreFree()));
   $('scene-undo').addEventListener('click',run.undo);$('scene-clear').addEventListener('click',clear);

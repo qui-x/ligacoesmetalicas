@@ -34,7 +34,7 @@ try{
  await page.locator('#silm-object-entry .periodic-element[data-z="29"]').click();
  await page.locator('#silm-objects-dialog').waitFor({state:'visible'});
  await page.locator('#silm-objects-dialog [data-reference-id="atlas-cu"]')
-  .getByRole('button',{name:'Investigar objeto'}).click();
+  .getByRole('button',{name:'Iniciar montagem'}).click();
  await page.waitForFunction(()=>SILMIntegration.snapshot()?.metal?.atomicNumber===29);
  await scale(2);
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-map')?.dataset.mapReady==='true');
