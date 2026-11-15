@@ -59,8 +59,13 @@ try{
    const find=s=>results.records.find(x=>x.symbol===s);
    for(const x of results.records){
     assert.ok(x.entries>=1,x.symbol+' não tem ficha');
-    assert.ok(x.newCount>=1,x.symbol+' não recebeu Etapa81');
-    assert.ok(x.sourceCount>=1,x.symbol+' não mostra fonte');
+    if(x.symbol==='Co'){
+     assert.equal(x.newCount,0,'Co deve usar Etapas 78–80 sem fichas novas da 81');
+     assert.ok(x.entries>=1,'Co perdeu registros já integrados');
+    }else{
+     assert.ok(x.newCount>=1,x.symbol+' não recebeu Etapa81');
+     assert.ok(x.sourceCount>=1,x.symbol+' não mostra fonte');
+    }
     assert.equal(x.noEngine,true,x.symbol+' indevidamente calibrado');
     assert.equal(x.hasUnofficialLink,false);
    }
