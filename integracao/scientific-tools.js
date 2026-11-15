@@ -2,7 +2,7 @@
 /* Interface sobre os serviços científicos existentes. Não contém fórmulas próprias. */
 SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,onModule,activity=()=>null})=>{
  const S=SILM,MS=S.measurement,CA=S.calculation,U=S.units;
- let context='',tool=null,picks=[],review=null,formula=null,choice={},user={},unit='Å';
+ let context='',tool=null,picks=[],review=null,formula=null,choice={},user={},unit='Å',historyKey='';
  const node=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
  const button=(text,fn)=>{const b=node('button',text);b.type='button';b.className='button outline';b.addEventListener('click',fn);return b;};
  const select=(id,items,value,fn)=>{const s=node('select');s.id=id;for(const [v,t]of items){const o=node('option',t);o.value=v;s.append(o);}s.value=value;s.addEventListener('change',()=>fn(s.value));return s;};
@@ -172,7 +172,7 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
  function render(){
   const state=model.state,key=state.investigation?.id+':'+state.structure?.mode+':'+state.module.active;
   if(key!==context){context=key;reset();}
-  host.replaceChildren();moduleHost.replaceChildren();history.replaceChildren();
+  host.replaceChildren();moduleHost.replaceChildren();
   if(state.module.active==='medir'){
    directChoices('medir',Object.entries(MS.types).filter(([id])=>allowed(id))
     .map(([id,t])=>({id,label:t.label})),tool,activateMeasure,
@@ -233,7 +233,17 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
     }
    }
   }
-  history.append(node('h3','Medições e cálculos'));
+  // Uma mudança na câmera/propriedade não deve fechar os registros consultados
+  // nem remover o foco do histórico. Reconstruir somente quando o conteúdo mudar.
+  const nextHistoryKey=JSON.stringify([state.investigation?.id,state.structure?.updatedAt,state.structure?.mode,unit,state.measurements,state.calculations]);
+  if(nextHistoryKey!==historyKey){
+   const previousDetails=[...history.querySelectorAll('details')];
+   const wasOpen=previousDetails.map(d=>d.open);
+   const focused=document.activeElement;
+   const focusIndex=previousDetails.indexOf(focused?.closest?.('details'));
+   const focusSummary=focused?.tagName==='SUMMARY';
+   history.replaceChildren();
+   history.append(node('h3','Medições e cálculos'));
   for(const m of state.measurements){
    const row=node('details');row.append(node('summary',MS.types[m.type].label+(m.parameter?' '+m.parameter:'')+': '+value(m)+' · Medida do modelo'));
    row.append(node('p','Resolução: '+U.format(m.resolution,m.unit)+' · Fonte: '+m.source.latticeSourceId));
@@ -247,6 +257,14 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
    row.append(node('p','Modelo: '+c.provenance.model+' · Fontes: '+c.provenance.references.join(', ')));history.append(row);
   }
   if(!state.measurements.length&&!state.calculations.length)history.append(node('p','Nenhum registro nesta investigação.'));
+   const currentDetails=[...history.querySelectorAll('details')];
+   currentDetails.forEach((d,i)=>{if(wasOpen[i])d.open=true;});
+   if(focusIndex>=0){
+    const target=focusSummary?currentDetails[focusIndex]?.querySelector('summary'):currentDetails[focusIndex]?.querySelector('button');
+    if(target?.getClientRects().length)target.focus({preventScroll:true});
+   }
+   historyKey=nextHistoryKey;
+  }
  }
  const calcMarks=()=>{
   if(model.state.module.active!=='calcular'||!available()||!formula)return null;
