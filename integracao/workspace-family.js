@@ -367,7 +367,11 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    const button=card.querySelector('button');button.disabled=locked||active;button.setAttribute('aria-pressed',String(active));button.textContent=active?'Módulo '+names[current]+' em uso':'Ativar módulo '+names[card.dataset.module];
   }
   $('silm-module-context').textContent=locked?'Módulo definido pelo roteiro.':'';
-  {const n=model.state.structure?.units.length||0;$('silm-unit-count').textContent=n+(n===1?' unidade':' unidades')+' na montagem';}
+  {const structure=model.state.structure,n=structure?.units.length||0;
+   $('silm-unit-count').textContent=structure?.mode==='crystalline'
+    ?n+(n===1?' centro metálico':' centros metálicos')
+    :n+(n===1?' unidade':' unidades')+' na montagem';
+  }
   {const m=model.state.measurements.length,c=model.state.calculations.length;$('silm-record-count').textContent=m+(m===1?' medição':' medições')+' · '+c+(c===1?' cálculo':' cálculos');}
   const active=B.activeViewer();if(active&&document.querySelector('[data-open-dock="ver"]').getAttribute('aria-expanded')==='true'&&!$('si-viewer-detail').hidden)$('si-right-title').textContent=active.title;
   if(dataPage&&document.querySelector('[data-open-dock="dados"]').getAttribute('aria-expanded')==='true')$('si-right-title').textContent={tabela:'Dados do metal',registros:'Medições e cálculos',arquivo:'Arquivos da investigação'}[dataPage];
