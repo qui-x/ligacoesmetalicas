@@ -164,6 +164,7 @@ window.SILM=window.SILM||{};
    const st=model.state,visual=SILM.specimenVisualLight,relief=SILM.specimenRelief;
    if(!visual){shading.setAttribute('visibility','hidden');return;}
    const surface=physics.current(st),size=getSize();
+   const plasticField=lightField?.plasticField;
    const marks=st.module?.active==='explorar'&&Array.isArray(st.metadata?.mechanicalImprints)?
     st.metadata.mechanicalImprints:[];
    const activeContact=st.module?.active==='explorar'&&lightField?.mode&&
@@ -205,7 +206,8 @@ window.SILM=window.SILM||{};
     const roughness=physics.sample(surface,u,v).roughness;
     const q=relief?.shadeAt({
      marks,active:activeContact,u,v,
-     incidenceDeg:drive?.angle??35,illuminated:surface.light,roughness
+     incidenceDeg:drive?.angle??35,illuminated:surface.light,roughness,
+     plasticEquivalent:plasticField?.converged?plasticField.samplePlastic(u,v):0
     })||{dark:0,light:0};
     cell.shadow.setAttribute('opacity',String(q.dark));
     cell.highlight.setAttribute('opacity',String(q.light));

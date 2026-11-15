@@ -59,7 +59,7 @@ window.SILM=window.SILM||{};
   return{height:clamp(height,-.24,.24),gx:clamp(gx,-2,2),gy:clamp(gy,-2,2)};
  }
  function shadeAt({marks=[],active=null,u=.5,v=.5,incidenceDeg=35,
-                   illuminated=true,roughness=.43}={}){
+                   illuminated=true,roughness=.43,plasticEquivalent=0}={}){
   if(![u,v].every(Number.isFinite))return null;
   const q=heightAndGradient(marks,active,clamp(u,0,1),clamp(v,0,1));
   if(Math.abs(q.height)+Math.abs(q.gx)+Math.abs(q.gy)<1e-8)
@@ -73,10 +73,13 @@ window.SILM=window.SILM||{};
   const ridge=Math.max(0,q.height)*.48;
   const shade=clamp(directional-indentation+ridge,-1,1);
   const lamp=illuminated?1:.68;
+  // O campo J2 pondera o relevo didático, sem atribuir altura ou Ra reais.
+  const intensity=Number.isFinite(plasticEquivalent)?
+   1+.4*clamp(plasticEquivalent/.055,0,1):1;
   const smooth=1-.32*clamp(Number.isFinite(roughness)?roughness:.43,0,1);
   return{
-   dark:clamp(Math.max(0,-shade)*.94*lamp,0,.62),
-   light:clamp(Math.max(0,shade)*1.18*lamp*smooth,0,.60),
+   dark:clamp(Math.max(0,-shade)*.94*lamp*intensity,0,.62),
+   light:clamp(Math.max(0,shade)*1.18*lamp*smooth*intensity,0,.60),
    relief:Math.abs(q.height),illustrative:true
   };
  }

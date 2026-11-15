@@ -119,8 +119,9 @@ async function test(viewport){
 
  // O contato da prensa tem posição e largura próprias. A mesma amostra
  // conserva essas escolhas ao mudar de escala.
- assert.equal(await viewer.getAttribute('data-mechanical-solver'),'elastic-local-2d',
-  'Solver FEM elástico local não foi ligado à microestrutura.');
+ assert.equal(await viewer.getAttribute('data-mechanical-solver'),'incremental-j2-plane-strain',
+  'O solver J2 incremental não está dirigindo a microestrutura.');
+ assert.equal(await viewer.getAttribute('data-mechanical-j2'),'plane-strain-converged');
  const contactDetails=mech.locator('.silm-micro-contact-details');
  await contactDetails.locator('summary').click();
  const position=mech.locator('.silm-micro-contact-position');
@@ -159,6 +160,8 @@ async function test(viewport){
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='1');
  assert.equal(await viewer.getAttribute('data-mechanical-residual-field'),'localized',
   'Deformação plástica deve conservar o ponto da prensa.');
+ assert.ok(Number(await viewer.getAttribute('data-mechanical-j2-alpha'))>.005,
+  'A prensa não gerou deformação plástica equivalente na malha J2.');
  const deformedGrains=await viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
   nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|'));
  assert.notEqual(deformedGrains,initialGrainShapes,

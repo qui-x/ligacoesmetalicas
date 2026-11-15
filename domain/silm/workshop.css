@@ -1353,3 +1353,12 @@
 @media(forced-colors:active){
  .silm-micro-constitutive-reading{color:CanvasText;background:Canvas;border-color:CanvasText}
 }
+
+
+/* J2 incremental em deformação plana: permanece no mesmo SVG. */
+.silm-workshop-micro-viewer[data-mechanical-solver="incremental-j2-plane-strain"]
+ .silm-micro-specimen-outline{stroke-dasharray:none;stroke-width:2.5}
+@media(forced-colors:active){
+ .silm-workshop-micro-viewer[data-mechanical-solver="incremental-j2-plane-strain"]
+  .silm-micro-specimen-outline{stroke:CanvasText;stroke-dasharray:5 3}
+}
