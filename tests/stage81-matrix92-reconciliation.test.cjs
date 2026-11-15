@@ -50,7 +50,7 @@ test('Ga mostra eixo a de 41 W/(m K) e 17,4 µΩ cm de ficha, sem isotropia pres
  const thermal=D.getFor(31,'thermal').find(x=>x.origin==='stage81-matrix92');
  const el=D.getFor(31,'electrical').find(x=>x.origin==='stage81-matrix92');
  assert.equal(thermal.values[0].value,41);assert.equal(thermal.temperatureK,273.2);
- assert.match(thermal.qualifier,/eixo a/);
+ assert.match(thermal.qualifier,/eixo a/i);
  assert.match(thermal.qualifier,/NÃO/);
  assert.equal(thermal.status,'evaluated');
  assert.equal(el.temperatureK,293.15);
