@@ -23,8 +23,8 @@ window.SILM=window.SILM||{};
  const S=window.SILM,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  const MATERIAL=Object.freeze({E:10,nu:.3,yieldStress:.5,hardening:12,
   calibrated:false,units:'relative'});
- const NX=8,NY=6,MAX_CACHE=20,MAX_STEPS=16;
- const cache=new Map(),privateState=new WeakMap();
+ const NX=8,NY=6,MAX_CACHE=28,MAX_STEPS=16;
+ const historyCache=new Map(),activeCache=new Map(),privateState=new WeakMap();
  const lambda=MATERIAL.E*MATERIAL.nu/((1+MATERIAL.nu)*(1-2*MATERIAL.nu));
  const G=MATERIAL.E/(2*(1+MATERIAL.nu));
  const elasticD=[
@@ -210,7 +210,7 @@ window.SILM=window.SILM||{};
  const neutral=()=>empty();
  const names=m=>Array.isArray(m)?m.filter(x=>S.specimenVisualLight?.validMark(x)).slice(-MAX_STEPS):[];
  const sig=m=>m.map(x=>[x.mode,x.position,x.width].join(':')).join(';');
- const store=(key,value)=>{
+ const store=(cache,key,value)=>{
   if(cache.has(key))cache.delete(key);
   cache.set(key,value);
   while(cache.size>MAX_CACHE)cache.delete(cache.keys().next().value);
@@ -242,9 +242,9 @@ window.SILM=window.SILM||{};
  }
  function history(marks=[]){
   const safe=names(marks),key='h:'+sig(safe);
-  if(cache.has(key))return cache.get(key);
+  if(historyCache.has(key))return historyCache.get(key);
   if(!safe.length){
-   return store('h:',fieldFor(neutral(),{converged:true,cycles:0,
+   return store(historyCache,'h:',fieldFor(neutral(),{converged:true,cycles:0,
     maxAlpha:0,meanAlpha:0,iterations:0,residual:0}));
   }
   const prefix=history(safe.slice(0,-1)),old=privateState.get(prefix),m=safe[safe.length-1];
@@ -256,7 +256,7 @@ window.SILM=window.SILM||{};
    });
    if(!last.converged){allConverged=false;break;}
   }
-  if(!allConverged)return store(key,fieldFor(old,{
+  if(!allConverged)return store(historyCache,key,fieldFor(old,{
    converged:false,cycles:safe.length-1,residual:last.residual,
    maxAlpha:prefix.maxAlpha,meanAlpha:prefix.meanAlpha,failedAt:safe.length
   }));
@@ -264,24 +264,24 @@ window.SILM=window.SILM||{};
   const field=fieldFor(last.record,{converged:true,cycles:safe.length,
    maxAlpha:last.maxAlpha,meanAlpha:last.meanAlpha,
    residual:last.residual,iterations:last.iterations});
-  return store(key,field);
+  return store(historyCache,key,field);
  }
  function active(marks=[],{mode='compression',position=.5,width=.3,load=0}={}){
   const prefix=history(marks);
   if(!prefix.converged||!(load>0))return prefix;
   const q=Math.round(clamp(load,0,1)*20)/20;
   const key='a:'+sig(names(marks))+'|'+mode+':'+position+':'+width+':'+q;
-  if(cache.has(key))return cache.get(key);
+  if(activeCache.has(key))return activeCache.get(key);
   const previous=privateState.get(prefix);
   let last={record:previous,converged:true},ok=true;
   for(let i=1;i<=Math.ceil(q/.25);i++){
    last=equilibrate(last.record,{mode,position,width,load:q*i/Math.ceil(q/.25)});
    if(!last.converged){ok=false;break;}
   }
-  if(!ok)return store(key,fieldFor(previous,{converged:false,
+  if(!ok)return store(activeCache,key,fieldFor(previous,{converged:false,
    cycles:prefix.cycles,maxAlpha:prefix.maxAlpha,meanAlpha:prefix.meanAlpha,
    residual:last.residual,fallback:true}));
-  return store(key,fieldFor(last.record,{converged:true,cycles:prefix.cycles,
+  return store(activeCache,key,fieldFor(last.record,{converged:true,cycles:prefix.cycles,
    maxAlpha:last.maxAlpha,meanAlpha:last.meanAlpha,residual:last.residual,
    iterations:last.iterations,load:q}));
  }
