@@ -93,7 +93,7 @@ SILM.scienceEvidenceIndex=(()=>{
     {code:'UTS',value:p.tensileStrengthMPa,label:'Resistência máxima à tração',unit:'MPa',meaning:'experimental-sample'},
     {code:'reductionArea',value:p.reductionOfAreaPercent,label:'Redução de área',unit:'%',meaning:'experimental-sample'}],
    status:'experimental-conditional',sourceURL:source?.url,sourceName:source?.title,
-   sample:(sp?.name||p.sample)+' · taxa '+p.strainRatePerSecond+' s⁻¹',
+   sample:p.sample+' · '+(sp?.name||'Ferro')+' · taxa '+p.strainRatePerSecond+' s⁻¹',
    temperatureK:null,temperatureText:source?.temperatureLabel,
    qualifier:'Média da amostra BAM, não ductilidade universal do ferro.'});
  }
