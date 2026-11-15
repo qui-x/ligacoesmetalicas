@@ -289,37 +289,121 @@ SILM.polycrystalCPFEM=(()=>{
     {converged:false,reason:'EQUILIBRIUM_NOT_CONVERGED',
      iterations:iter,residual:err};
   }
-  function report(record,solved){
-   const sums=polygons.map(()=>({count:0,total:0,max:0,plastic:0}));
+  // Tensor simetrico 3D com 6 componentes [xx,yy,zz,xy,yz,xz].
+  // Os cisalhamentos sao TENSORIAIS (nao gamma de engenharia).
+  const tensor=v=>Object.freeze([
+   Object.freeze([v[0],v[3],v[5]]),
+   Object.freeze([v[3],v[1],v[4]]),
+   Object.freeze([v[5],v[4],v[2]])
+  ]);
+  const devSquared=v=>{
+   const p=(v[0]+v[1]+v[2])/3;
+   return (v[0]-p)**2+(v[1]-p)**2+(v[2]-p)**2+
+    2*(v[3]**2+v[4]**2+v[5]**2);
+  };
+  const equivalentPlastic=v=>Math.sqrt(Math.max(0,2*devSquared(v)/3));
+  const vonMises=v=>Math.sqrt(Math.max(0,3*devSquared(v)/2));
+  function report(record,solved,{peakRecord=null,residualAtZeroForce=false,
+   mechanicalState='LOADED'}={}){
+   const residual=Boolean(residualAtZeroForce&&peakRecord);
+   // Area ponderada em vez de contagem bruta: preserva a unidade da media.
+   const sums=polygons.map(()=>({count:0,area:0,total:0,max:0,plastic:0,
+    totalYY:0,plasticYY:0,elasticYY:0,stressYY:0,eqp:0,maxEqp:0,
+    vm:0,maxVm:0,peakYY:0}));
+   let domainArea=0,domainTotalYY=0,domainPlasticYY=0,domainElasticYY=0,
+    domainStressYY=0,domainEqp=0,domainVm=0,domainPeakYY=0,domainMaxVm=0;
    for(let i=0;i<NE;i++){
-    const id=grainOfTriangle[i],acc=record.points[i].accumulatedSlip,
-     g=sums[id];g.count++;g.total+=acc;g.max=Math.max(g.max,acc);
-     if(acc>1e-8)g.plastic++;
+    const st=record.points[i],peak=peakRecord?.points[i],area=triangles[i].area,
+     g=sums[grainOfTriangle[i]],acc=st.accumulatedSlip,
+     eqp=equivalentPlastic(st.plasticStrain),vm=vonMises(st.stress),
+     elasticYY=st.totalStrain[1]-st.plasticStrain[1];
+    g.count++;g.area+=area;g.total+=acc*area;g.max=Math.max(g.max,acc);
+    if(acc>1e-8)g.plastic++;
+    g.totalYY+=st.totalStrain[1]*area;
+    g.plasticYY+=st.plasticStrain[1]*area;
+    g.elasticYY+=elasticYY*area;g.stressYY+=st.stress[1]*area;
+    g.eqp+=eqp*area;g.maxEqp=Math.max(g.maxEqp,eqp);
+    g.vm+=vm*area;g.maxVm=Math.max(g.maxVm,vm);
+    if(peak)g.peakYY+=peak.totalStrain[1]*area;
+    domainArea+=area;domainTotalYY+=st.totalStrain[1]*area;
+    domainPlasticYY+=st.plasticStrain[1]*area;domainElasticYY+=elasticYY*area;
+    domainStressYY+=st.stress[1]*area;
+    domainEqp+=eqp*area;domainVm+=vm*area;
+    domainMaxVm=Math.max(domainMaxVm,vm);
+    if(peak)domainPeakYY+=peak.totalStrain[1]*area;
    }
-   const grains=Object.freeze(sums.map((g,i)=>Object.freeze({
-    grainId:i+1,orientationMatrix:Object.freeze(orientations[i].map(row=>Object.freeze([...row]))),
-    integrationPoints:g.count,meanAccumulatedSlip:g.count?g.total/g.count:null,
-    maxAccumulatedSlip:g.count?g.max:null,
-    plasticIntegrationPoints:g.plastic,
-    status:g.count?'SYNTHETIC_MODEL':'NOT_SAMPLED_BY_FEM',
-    calibrated:false
-   })));
-   const sample=(u,v)=>{
+   const grains=Object.freeze(sums.map((g,i)=>{
+    const sampled=g.count>0;
+    const mechanics=sampled?Object.freeze({
+     meanTotalAxialStrain:g.totalYY/g.area,
+     meanPlasticAxialStrain:g.plasticYY/g.area,
+     meanElasticAxialStrain:g.elasticYY/g.area,
+     meanEquivalentPlasticStrain:g.eqp/g.area,
+     maxEquivalentPlasticStrain:g.maxEqp,
+     meanAxialStress:g.stressYY/g.area,
+     meanVonMisesStress:g.vm/g.area,
+     maxVonMisesStress:g.maxVm,
+     peakAxialStrain:peakRecord?g.peakYY/g.area:null,
+     axialStrainChangeFromPeak:peakRecord?(g.peakYY-g.totalYY)/g.area:null,
+     residualAtZeroTopForce:residual,
+     calibrated:false,units:'relative'
+    }):null;
+    return Object.freeze({
+     grainId:i+1,orientationMatrix:Object.freeze(orientations[i].map(row=>Object.freeze([...row]))),
+     integrationPoints:g.count,integrationArea:g.area,
+     meanAccumulatedSlip:sampled?g.total/g.area:null,
+     maxAccumulatedSlip:sampled?g.max:null,plasticIntegrationPoints:g.plastic,
+     mechanics,status:sampled?'SYNTHETIC_MODEL':'NOT_SAMPLED_BY_FEM',calibrated:false
+    });
+   }));
+   const sampleFrom=(state,u,v)=>{
     const xx=clip(Number(u)||0,0,1)*NX,yy=clip(Number(v)||0,0,1)*NY,
      i=Math.min(NX-1,Math.floor(xx)),j=Math.min(NY-1,Math.floor(yy)),
      a=xx-i,b=yy-j,ids=[node(i,j),node(i+1,j),node(i,j+1),node(i+1,j+1)],
      weights=[(1-a)*(1-b),a*(1-b),(1-a)*b,a*b];
     let dx=0,dy=0;ids.forEach((id,k)=>{
-     dx+=weights[k]*record.u[2*id];dy+=weights[k]*record.u[2*id+1];
+     dx+=weights[k]*state.u[2*id];dy+=weights[k]*state.u[2*id+1];
     });
     return Object.freeze({dx,dy});
    };
+   const sample=(u,v)=>sampleFrom(record,u,v);
    const samplePlastic=(u,v)=>record.points[indexOf(u,v)].accumulatedSlip;
-   const sampleStress=(u,v)=>{
-    const s=record.points[indexOf(u,v)].stress;
-    return Object.freeze([Object.freeze([s[0],s[3],s[5]]),
-     Object.freeze([s[3],s[1],s[4]]),Object.freeze([s[5],s[4],s[2]])]);
+   const sampleStress=(u,v)=>tensor(record.points[indexOf(u,v)].stress);
+   const sampleMechanics=(u,v)=>{
+    const st=record.points[indexOf(u,v)],
+     elastic=st.totalStrain.map((x,i)=>x-st.plasticStrain[i]);
+    return Object.freeze({
+     totalStrain:tensor(st.totalStrain),
+     plasticStrain:tensor(st.plasticStrain),
+     elasticStrain:tensor(elastic),
+     stress:tensor(st.stress),
+     equivalentPlasticStrain:equivalentPlastic(st.plasticStrain),
+     vonMisesStress:vonMises(st.stress),accumulatedSlip:st.accumulatedSlip,
+     residualAtZeroTopForce:residual,calibrated:false,units:'relative'
+    });
    };
+   const samplePeakDisplacement=peakRecord?
+    (u,v)=>sampleFrom(peakRecord,u,v):()=>null;
+   const sampleDisplacementChangeFromPeak=peakRecord?(u,v)=>{
+    const before=sampleFrom(peakRecord,u,v),after=sample(u,v);
+    return Object.freeze({dx:before.dx-after.dx,dy:before.dy-after.dy});
+   }:()=>null;
+   // "Recuperacao" no sentido de deslocamento pico->final. Pode haver
+   // deslizamento durante a descarga, portanto nao chamamos puramente elastica.
+   const residualSummary=residual?Object.freeze({
+    status:'ZERO_TOP_FORCE_EQUILIBRIUM_ESTIMATE',
+    boundaryCondition:'traction-free-top',
+    meanTotalAxialStrain:domainTotalYY/domainArea,
+    meanPlasticAxialStrain:domainPlasticYY/domainArea,
+    meanElasticAxialStrain:domainElasticYY/domainArea,
+    meanEquivalentPlasticStrain:domainEqp/domainArea,
+    meanAxialStress:domainStressYY/domainArea,
+    meanVonMisesStress:domainVm/domainArea,
+    maxVonMisesStress:domainMaxVm,
+    peakAxialStrain:domainPeakYY/domainArea,
+    axialStrainChangeFromPeak:(domainPeakYY-domainTotalYY)/domainArea,
+    calibrated:false,measured:false,units:'relative'
+   }):null;
    return Object.freeze({
     schema:'silm.polycrystal-cpfem.small-strain.v1',
     status:'CONVERGED',converged:true,
@@ -332,7 +416,9 @@ SILM.polycrystalCPFEM=(()=>{
     maxAbsLocalStrain:solved.maxAbsLocalStrain,
     energy:solved.energy,reactions:solved.reactions,
     energyBalanceStatus:'NOT_EVALUATED_EXTERNAL_WORK',
-    sample,samplePlastic,sampleStress,
+    residualSummary,mechanicalState,
+    sample,samplePlastic,sampleStress,sampleMechanics,
+    samplePeakDisplacement,sampleDisplacementChangeFromPeak,
     calibrated:false,units:'relative',canFeedJ2:false,canFeedMetalProperties:false,
     canClaimMeasuredGrainResponse:false,finiteDeformation:false,
     limitation:'Policristal hipotetico em pequenas deformacoes, FEM plano, parametros relativos. Sem EBSD medido, fronteiras intergranulares especiais, deformacao finita, estriccao ou ruptura.'
@@ -378,6 +464,7 @@ SILM.polycrystalCPFEM=(()=>{
     prior=r.record;last=r;stepsCompleted++;
    }
    const loaded=history[history.length-1];
+   const peakRecord=prior; // estado de pico ANTES de qualquer descarga
    const externalWorkLoading=externalWork;
    let peakContactForceNorm=null;
    let boundaryFinal=unload?'contact-fixed-at-zero':'contact-displacement-prescribed';
@@ -465,7 +552,10 @@ SILM.polycrystalCPFEM=(()=>{
       'Descarga gradual controlada ate deslocamento zero, com garra mantida. Nao representa liberacao do contato, forca zero, dinamica nem ensaio medido.':
       'Quadratura trapezoidal por incrementos discretos; incerteza numerica depende da discretizacao.'
    });
-   return Object.freeze({...report(prior,last),energyAudit,
+   return Object.freeze({...report(prior,last,{
+     peakRecord:unload?peakRecord:null,residualAtZeroForce:forceUnloaded,
+     mechanicalState:forceUnloaded?'ZERO_TOP_FORCE':heldAtZero?'GRIP_AT_ZERO':'LOADED'
+    }),energyAudit,
     energyBalanceStatus:'TRAPEZOIDAL_WORK_AUDIT',
     workHistory:Object.freeze(history),stepsCompleted,unloaded:unload,
     loadCase:Object.freeze({mode,position,width,load,increments,unload,
