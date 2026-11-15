@@ -135,6 +135,31 @@ async function test(viewport){
  assert.match(await selectedReadout.textContent(),/posição do grão 26.*Campo contínuo da amostra/);
  assert.ok(Number.isFinite(Number(await map.getAttribute('data-selected-grain-plastic'))),
   'A seleção não recebeu a leitura regional do campo J2.');
+
+ const slip=contactDetails.locator('.silm-micro-slip-details');
+ await slip.locator('summary').click();
+ assert.equal(await viewer.getAttribute('data-slip-j2-coupled'),'false');
+ assert.equal(await viewer.getAttribute('data-slip-orientation'),'none');
+ assert.equal(await viewer.getAttribute('data-slip-model'),'ORIENTATION_UNAVAILABLE');
+ assert.match(await slip.locator('.silm-micro-slip-result').textContent(),/orientação individual não informada/);
+ const demo=slip.locator('.silm-micro-slip-demo');
+ await demo.check();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.slipModel==='GEOMETRY_ONLY');
+ assert.equal(await viewer.getAttribute('data-slip-orientation'),'demonstration');
+ const max0=Number(await viewer.getAttribute('data-slip-max'));
+ const angle=slip.locator('.silm-micro-slip-angle');
+ await angle.evaluate(el=>{
+  el.value='25';el.dispatchEvent(new Event('input',{bubbles:true}));
+ });
+ await page.waitForFunction(()=>document.querySelector('.silm-micro-slip-angle-value')?.textContent==='25°');
+ const max25=Number(await viewer.getAttribute('data-slip-max'));
+ assert.ok(Math.abs(max25-max0)>.03,'Giro hipotético não alterou o fator de Schmid');
+ assert.ok(max25>0&&max25<=.5000001,'Fator de Schmid fora do limite geométrico');
+ assert.match(await slip.textContent(),/NÃO é orientação medida do grão/);
+ await demo.uncheck();
+ assert.equal(await viewer.getAttribute('data-slip-model'),'ORIENTATION_UNAVAILABLE');
+ assert.equal(await viewer.getAttribute('data-slip-max'),null);
+ await slip.locator('summary').click();
  const position=mech.locator('.silm-micro-contact-position');
  const contactWidth=mech.locator('.silm-micro-contact-width');
  const pressBounds=await viewer.locator('.silm-micro-press-plate').first().boundingBox();
