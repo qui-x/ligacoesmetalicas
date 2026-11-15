@@ -36,7 +36,7 @@ try{
       hasPending:records.some(e=>e.dataset.status==='pending'),
       engine:records.every(e=>e.dataset.engineRelease==='false'),
       properties:props.map(e=>e.dataset.property),
-      hasScientificValue:host.textContent.includes('referência da amostra'),
+      hasScientificValue:host.textContent.includes('referência condicionada à amostra e à fonte'),
       dataText:host.textContent.slice(0,1800),
       noUnexpectedPlaceholder:metal.symbol!=='Cu'?true:!!extra
      });
