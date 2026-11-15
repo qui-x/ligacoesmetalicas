@@ -337,7 +337,9 @@ SILM.polycrystalCPFEM=(()=>{
      reason:r.reason,diagnostic:r.diagnostic||null,stepsCompleted,requestedSteps:increments+1,calibrated:false});
     prior=r.record;last=r;stepsCompleted++;
    }
-   return Object.freeze({...report(prior,last),stepsCompleted,unloaded:unload});
+   return Object.freeze({...report(prior,last),stepsCompleted,unloaded:unload,
+    loadCase:Object.freeze({mode,position,width,load,increments,unload,
+     kind:'prescribed-displacement',units:'relative'})});
   }
   return Object.freeze({schema:'silm.polycrystal-cpfem.small-strain.v1',
    structure:slip.types[structure],sourceKind:'synthetic-voronoi',
