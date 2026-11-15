@@ -14,8 +14,18 @@ const evidence=[],errors=[];
 let page;
 const snapshot=()=>page.evaluate(()=>window.SILMIntegration.snapshot());
 const chooseModule=async name=>{
- await page.locator('[data-silm-module-shortcut="'+name+'"]').click();
+ // O módulo pertence somente à Montagem; Ver mantém as ferramentas diretas.
+ if(await page.locator('[data-open-dock="ver"]').getAttribute('aria-expanded')==='true')
+  await page.locator('[data-close-dock="right"]').click();
+ await page.locator('[data-open-dock="montagem"]').click();
+ await page.locator('[data-left-tab="modulo"]').click();
+ const card=page.locator('.silm-module-card[data-module="'+name+'"]');
+ if(!await card.evaluate(el=>el.open))await card.locator('summary').click();
+ const btn=page.locator('#silm-module-activate-'+name);
+ if(!await btn.isDisabled())await btn.click();
  await page.waitForFunction(m=>window.SILMIntegration.snapshot().module.active===m,name);
+ await page.locator('[data-close-dock="left"]').click();
+ await page.locator('[data-open-dock="ver"]').click();
 };
 try{
  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
@@ -89,10 +99,14 @@ try{
  await chooseModule('explorar');
  assert.equal(await page.locator('#silm-direct-actionbar [data-action="electrons"]').count(),1,
   'Explorar perdeu as ações após retornar de Calcular');
- const extras=page.locator('#silm-explore-extras details');
- assert.equal(await extras.count(),2,'Preferências e comparação conceitual não estão acessíveis');
- assert.equal(await extras.first().getAttribute('open'),null,
-  'Preferências devem começar recolhidas');
+ assert.equal(await page.locator('#silm-explore-extras').count(),0,
+  'Painel antigo de comparação conceitual foi reintroduzido.');
+ const more=page.locator('#silm-ver-more');
+ assert.equal(await more.count(),1,'Ajustes secundários de exibição ausentes');
+ assert.equal(await more.evaluate(el=>el.open),false,'Ajustes devem iniciar recolhidos');
+ await more.locator(':scope > summary').click();
+ assert.equal(await page.locator('#si-viewer-catalog').isVisible(),true,
+  'Ajustes de exibição devem ser acessíveis sob demanda.');
  for(const [label,width,height] of [['mobile-320',320,568],['mobile-390',390,844],['desktop',1366,768]]){
   await page.setViewportSize({width,height});
   const geo=await page.locator('#silm-direct-actionbar').evaluate(node=>{
