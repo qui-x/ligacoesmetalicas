@@ -100,3 +100,19 @@ Cada registro `grains[i].mechanics` contém médias **ponderadas pela área dos 
 A prévia técnica opt-in mostra os valores por grão selecionado e o resumo do estado final, com precisão adaptada a valores pequenos. Não cria menu novo, não altera `ScientificState`, não transfere valores para propriedades dos elementos e não muda o solucionador J2.
 
 **Portão da etapa 84F:** ensaios elásticos/plásticos, tensor elástico + plástico = total, invariantes não negativas, consistência dos campos por grão e ausência de classificação residual fora da condição de força zero. A validação dos testes é independente da futura homologação de acesso em Montagem/Ver/Dados.
+
+## Etapa 84G — mapas relativos de deformação e tensão por grão (15/11/2026)
+
+O contrato SILM.polycrystalCPFEM.describeGrainMap(result,{kind}) calcula exclusivamente mapas de grãos Voronoi **sintéticos** com solução FEM convergente:
+
+- plastic-strain: deformação plástica equivalente média por grão, escala de 0 até o máximo amostrado. Pode ser exibida após carregamento ou descarga.
+- residual-von-mises: tensão equivalente residual de von Mises, de 0 até o máximo amostrado. Exige ZERO_TOP_FORCE e residualSummary válido.
+- residual-axial: tensão axial residual σyy com sinal, escala SIMÉTRICA [-máximo absoluto, zero, +máximo absoluto]. Azul indica compressão, neutro indica zero, laranja indica tração. Exige ZERO_TOP_FORCE.
+
+Somente grãos com pontos de integração contam na escala; os não amostrados preservam valor e normalização null, status NOT_SAMPLED_BY_FEM e contorno tracejado cinza. Zero válido nunca é mascarado. Cada entrada contém valor relativo, normalização, número de pontos e área de integração. A normalização é feita **por execução atual**: cores de dois ensaios não podem ser comparadas como grandeza absoluta.
+
+A sobreposição SVG silm-micro-cpfem-overlay usa preenchimento translúcido e borda relativa e **não modifica** o preenchimento --silm-grain-fill, gradiente, geometria, seleção, foco nem os controles de luz/sombra. O mapa só fica visível depois que a prévia CPFEM foi calculada, Mostrar campo está ativo e uma grandeza é escolhida. Mudança de contato, carga, origem, formação ou condição de contorno invalida o mapa; desligar Mostrar campo remove todas as sobreposições. Em alto contraste ou forced-colors, a sobreposição cromática é ocultada e permanece a leitura textual.
+
+A legenda expõe a grandeza, os extremos relativos, o zero na escala com sinal, a cobertura dos grãos e a limitação para comparação entre ensaios. Não são dados EBSD, mapa de composição química, medição de deformação ou tensão em MPa. A interpretação permanece relativa ao modelo hipotético não calibrado.
+
+A nova interface é um controle na prévia removível: **não cria doca, não altera Montagem/Ver/Dados, não substitui J2 e não faz merge na main**. A validação quantitativa de refinamento de malha é o marco seguinte.
