@@ -12,6 +12,9 @@ async function test(viewport){
  page.on('pageerror',e=>errors.push(e.message));
  const res=await page.goto(base+'/index.html#/ambiente',{waitUntil:'load',timeout:45000});
  assert.ok(res?.ok(),'SILM não carregou');
+ const boot=await page.evaluate(()=>({initialized:!!window.SILMIntegration,document:document.readyState,
+  stage:!!document.querySelector('#silm-workshop-context'),scientific:!!window.SILM?.microstructure?.create}));
+ if(!boot.initialized)throw new Error('A Oficina não inicializou: '+JSON.stringify(boot)+' · '+errors.join(' | '));
  await page.waitForFunction(()=>window.SILMIntegration&&window.SILM?.microstructure?.create&&!document.querySelector('#silm-workshop-context')?.hidden,undefined,{timeout:45000});
  await page.waitForFunction(()=>window.SILMActionIcons?.audit&&document.querySelector('#scene-undo > svg.silm-action-icon'),undefined,{timeout:15000});
  const iconAudit=await page.evaluate(()=>SILMActionIcons.audit());
