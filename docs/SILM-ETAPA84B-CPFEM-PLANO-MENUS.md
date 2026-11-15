@@ -56,8 +56,18 @@ Plasticidade cristalográfica global e J2 continuam modelos distintos. A calibra
 - O relatório numérico `energy` distingue **energia elástica armazenada** (contração tridimensional tensorial de `sigma : epsilon_e`, incluindo `sigma_zz`), **energia de encruamento isotrópico** (H vezes deslizamento acumulado ao quadrado sobre 2) e **dissipação plástica acumulada** (soma de CRSS por sistema multiplicada pelo deslizamento absoluto). Todas são integrais dos triângulos, em **unidades relativas** do modelo.
 - As reações `topY`, `bottomY`, `contactX`, `netFx`, `netFy` e `freeResidual` permitem auditar equilíbrio global e o tratamento dos graus de liberdade prescritos. Elas não são forças em newtons.
 - O teste `verifyAffinePatch` confere a interpolação de deformação afim constante e a conversão de cisalhamento de engenharia na malha CST. **Não** comprova convergência de malha ou validade física por material.
-- O campo `energyBalanceStatus: NOT_EVALUATED_EXTERNAL_WORK` deixa explícito que o trabalho externo histórico ainda não foi integrado. Portanto, a soma de energias **não** deve ser descrita como balanço experimental fechado.
+- A saída `energyBalanceStatus: TRAPEZOIDAL_WORK_AUDIT` indica trabalho estimado com quadratura trapezoidal do deslocamento prescrito. Isso **não equivale a balanço experimental** nem certifica independência de malha ou precisão física.
 - As condições de carga ficam identificadas em `loadCase`: modo, posição, largura, amplitude de deslocamento prescrito e número de incrementos. Uma mudança de deslocamento, descarregamento ou contato **invalida** a prévia existente, evitando resultados com configurações antigas.
 - Os resultados são apenas da prévia técnica, disponibilizada em opt-in no ramo; não alimentam automaticamente Dados, Ver, Montagem, propriedades dos metais nem o solucionador J2.
 
 **Ainda pendente antes de qualquer merge:** análise da sensibilidade a diferentes refinamentos de malha, trabalho externo incremental e comparação quantitativa de soluções com referências independentes, além da homologação de UX dos três menus.
+
+## Etapa 84D — descarga incremental controlada
+
+A opção `unload: true` passou a aplicar `unloadIncrements` incrementos de retração desde o deslocamento máximo até zero. O conjunto de graus de liberdade da garra permanece prescrito **inclusive no último incremento de deslocamento zero**, sem liberação abrupta do contato. O resultado não deve ser chamado de ensaio de força zero.
+
+O histórico `workHistory` contém `phase: loading` ou `phase: unloading`, comando relativo, trabalho incremental e acumulado obtido por quadratura trapezoidal das reações, energia interna e resíduo. `energyAudit.unloadingExternalWork` apresenta o trabalho durante o retorno, `externalWorkTotal` apresenta o total do ciclo, `contactHeldAtZero: true` e `contactReleased: false` identificam a condição mecânica final.
+
+**Limites:** aproximação quase estática de pequenas deformações, parâmetros hipotéticos e sem convergência de malha certificada. Não resolve contato unilateral, força zero, atrito, retirada real da garra, grandes deformações, dinâmica, estricção nem ruptura. Os trabalhos são relativos e não foram medidos.
+
+A apresentação da prévia opt-in informa a condição da garra e o trabalho de descarga, sem modificar os menus Montagem, Ver e Dados e sem integrar nada à `main`.
