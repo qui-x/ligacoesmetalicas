@@ -55,7 +55,19 @@ SILM.polycrystalPreview=(()=>{
   const show=n('input','silm-micro-cpfem-show');show.type='checkbox';show.disabled=true;
   show.setAttribute('aria-label','Sobrepor deslocamentos do policristal hipotético à microestrutura');
   showLabel.append(show,n('span','','Mostrar campo na microestrutura'));
-  row.append(loadLabel,unloadLabel,unloadModeLabel,run,showLabel);
+  const mapLabel=n('label','silm-micro-cpfem-map-label','Mapa dos grãos');
+  const mapMode=n('select','silm-micro-cpfem-map-mode');
+  mapMode.setAttribute('aria-label','Selecionar mapa relativo por grão do ensaio CPFEM');
+  for(const [kind,desc]of [
+   ['none','Sem mapa de grandeza'],
+   ['plastic-strain','Deformação plástica equivalente'],
+   ['residual-von-mises','Tensão equivalente residual'],
+   ['residual-axial','Tensão axial residual (com sinal)']
+  ]){
+   const option=n('option','',desc);option.value=kind;mapMode.append(option);
+  }
+  mapMode.value='none';mapMode.disabled=true;mapLabel.append(mapMode);
+  row.append(loadLabel,unloadLabel,unloadModeLabel,run,showLabel,mapLabel);
   const status=n('output','silm-micro-cpfem-status',
    'Nenhum ensaio calculado. Esta prévia não representa o metal da investigação.');
   status.setAttribute('role','status');status.setAttribute('aria-live','polite');
@@ -70,7 +82,17 @@ SILM.polycrystalPreview=(()=>{
   const audit=n('output','silm-micro-cpfem-energy',
    'Não calculado. Diagnóstico relativo, não medida de calor, força ou energia real.');
   auditDetails.append(audit);
-  details.append(row,status,grainReading,residualReading,auditDetails);
+  const mapLegend=n('div','silm-micro-cpfem-map-legend');
+  mapLegend.hidden=true;
+  mapLegend.setAttribute('role','status');
+  mapLegend.setAttribute('aria-label','Legenda de escala relativa do mapa CPFEM sintético');
+  const mapLegendTitle=n('output','silm-micro-cpfem-map-title');
+  const mapTrack=n('div','silm-micro-cpfem-map-track');
+  mapTrack.setAttribute('aria-hidden','true');
+  const mapLimits=n('output','silm-micro-cpfem-map-limits');
+  const mapNote=n('p','silm-micro-cpfem-map-note');
+  mapLegend.append(mapLegendTitle,mapTrack,mapLimits,mapNote);
+  details.append(row,status,grainReading,residualReading,mapLegend,auditDetails);
   container.append(details);
   let result=null,selected=-1,mode=null,configuration=null,destroyed=false,working=false;
   const currentField=()=>{
@@ -82,6 +104,32 @@ SILM.polycrystalPreview=(()=>{
     Number(load.value)===configuration.load&&unload.checked===configuration.unload&&
     unloadMode.value===configuration.unloadMode?result:null;
   };
+  function currentMap(){
+   const field=currentField();
+   if(!field||mapMode.value==='none')return null;
+   return SILM.polycrystalCPFEM.describeGrainMap(field,{kind:mapMode.value});
+  }
+  function renderLegend(){
+   const map=currentMap();
+   mapLegend.hidden=!map;
+   if(!map)return;
+   if(map.status==='UNAVAILABLE_RESIDUAL_BOUNDARY'){
+    mapLegendTitle.textContent='Mapa indisponível · '+map.label;
+    mapTrack.hidden=true;mapLimits.textContent='Sem escala aplicável.';
+    mapNote.textContent=map.explanation+' Não há dados para colorir grãos.';
+    return;
+   }
+   mapTrack.hidden=false;mapTrack.dataset.kind=map.kind;
+   mapLegendTitle.textContent=map.label+' · '+map.sampledGrains+'/'+map.totalGrains+
+    ' grãos sintéticos com integração FEM';
+   mapLimits.textContent=map.signed?
+    'Compressão '+fmtSmall(map.min)+' · zero · tração '+fmtSmall(map.max):
+    'Mínimo '+fmtSmall(map.min)+' · máximo '+fmtSmall(map.max);
+   mapNote.textContent='Escala relativa ao ensaio atual, não comparável diretamente entre ensaios. '+
+    'Grãos não amostrados exibem contorno tracejado cinza. '+
+    'Cores originais preservadas sob camada translúcida. '+map.explanation;
+  }
+  mapMode.addEventListener('change',()=>{renderLegend();onChange();});
   function renderGrain(){
    if(!result){grainReading.textContent='Selecione um grão para ler a resposta após o cálculo.';return;}
    if(selected<0||selected>=result.grains.length){
@@ -110,6 +158,7 @@ SILM.polycrystalPreview=(()=>{
    status.textContent=message;
    audit.textContent='Resultado invalidado: recalcule para a configuração atual.';
    residualReading.textContent='Análise residual invalidada: recalcule o ensaio.';
+   mapMode.disabled=true;mapMode.value='none';renderLegend();
    renderGrain();onChange();
   }
   function invalidateIfSolved(message){
@@ -124,6 +173,7 @@ SILM.polycrystalPreview=(()=>{
     return;
    }
    working=true;run.disabled=true;show.checked=false;show.disabled=true;result=null;configuration=null;
+   mapMode.disabled=true;mapMode.value='none';renderLegend();
    status.textContent='Calculando equilíbrio mecânico do policristal hipotético…';
    audit.textContent='Aguardando solução convergente para calcular os indicadores.';
    residualReading.textContent='Calculando tensões e deformações por grão...';
@@ -178,7 +228,7 @@ SILM.polycrystalPreview=(()=>{
        configuration=Object.freeze({synthetic,structure,mode:study,
         position:contact.position,width:contact.width,load:requestedLoad,
          unload:requestedUnload,unloadMode:requestedUnloadMode});
-       show.disabled=false;
+       show.disabled=false;mapMode.disabled=true;renderLegend();
       status.textContent='Policristal hipotético · contato '+Math.round(contact.position*100)+
        '% · largura '+Math.round(contact.width*100)+'% · '+
        response.sampledGrains+'/'+response.grainCount+
@@ -195,15 +245,19 @@ SILM.polycrystalPreview=(()=>{
       '. Nenhum campo aplicado.';
      residualReading.textContent='Sem leitura residual válida.';
     }finally{
-     working=false;run.disabled=false;renderGrain();onChange();
+     working=false;run.disabled=false;renderGrain();renderLegend();onChange();
     }
    });
   });
-  show.addEventListener('change',()=>onChange());
+  show.addEventListener('change',()=>{
+   mapMode.disabled=!show.checked||!result?.converged;
+   if(!show.checked)mapMode.value='none';
+   renderLegend();onChange();
+  });
   return Object.freeze({
    status:'STAGING_PREVIEW',element:details,
    selected(index){selected=Number.isInteger(index)?index:-1;renderGrain();},
-   invalidate,field:currentField,
+   invalidate,field:currentField,map:currentMap,
    result:()=>result,
    destroy(){destroyed=true;details.remove();result=null;configuration=null;show.checked=false;}
   });
