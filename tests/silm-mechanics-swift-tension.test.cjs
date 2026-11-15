@@ -36,7 +36,7 @@ test('calibração algébrica recupera K e n do conjunto sintético sem declarar
  const K=520,n=.25,offset=.008;
  const samples=[.025,.045,.08,.12,.15].map(ep=>({epsilonPlastic:ep,sigmaTrue:K*(offset+ep)**n}));
  const conditions={temperature:{value:300,unit:'K'},source:'ensaio original'};
- const f=s.fit({samples,epsilon0:offset,conditions,sourceId:'fonte-test-1',origin:'computed',stressUnit:'MPa'});
+ const f=s.fit({samples,epsilon0:offset,conditions,sourceId:'fonte-test-1',origin:'computational',stressUnit:'MPa'});
  assert.equal(f.ok,true);approx(f.K,K,1e-8);approx(f.n,n,1e-10);
  assert.ok(f.r2>.999999);
  assert.equal(f.status,'FIT_ONLY_UNVALIDATED');
