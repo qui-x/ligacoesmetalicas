@@ -1,0 +1,38 @@
+/* Camada 3D opt-in dentro do palco, sem modificar docas nem estado científico. */
+#si-stage{position:relative}
+.silm-lab3d-entry{white-space:nowrap;min-height:36px}
+.silm-lab3d{position:absolute;inset:0;z-index:30;overflow:hidden;background:#101b2a;
+ color:#f4f7fc;isolation:isolate;border-radius:10px;display:flex;flex-direction:column}
+.silm-lab3d[hidden]{display:none}
+.silm-lab3d canvas{display:block;width:100%;height:100%;min-height:0;flex:1;touch-action:none;outline-offset:-4px}
+.silm-lab3d canvas:focus-visible{outline:3px solid #79d8ff}
+.silm-lab3d-hud{position:absolute;top:8px;left:10px;right:10px;z-index:2;display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+ background:rgba(11,22,36,.88);border:1px solid rgba(189,219,255,.28);border-radius:8px;padding:7px 10px;max-width:calc(100% - 20px)}
+.silm-lab3d-title{font-size:.89rem;font-weight:700;margin:0;margin-right:auto}
+.silm-lab3d button,.silm-lab3d select{font:inherit;font-size:.82rem;min-height:36px;border:1px solid #90b7ce;
+ background:#193247;color:#fff;border-radius:6px;padding:5px 10px;cursor:pointer}
+.silm-lab3d button:hover,.silm-lab3d button:focus-visible{background:#315574;outline-offset:2px}
+.silm-lab3d button[aria-pressed=true]{background:#195a67;border-color:#88e5de}
+.silm-lab3d-bottom{position:absolute;bottom:7px;left:10px;right:10px;z-index:2;
+ background:rgba(11,22,36,.9);border:1px solid rgba(189,219,255,.3);border-radius:8px;padding:8px;
+ display:flex;flex-wrap:wrap;justify-content:center;gap:6px;align-items:center}
+.silm-lab3d-label{font-size:.77rem;max-width:30ch}
+.silm-lab3d-status{font-size:.76rem;display:block;flex:1 1 100%;text-align:center;line-height:1.35}
+.silm-lab3d-crosshair{position:absolute;top:50%;left:50%;width:10px;height:10px;transform:translate(-50%,-50%);
+ border:1px solid rgba(255,255,255,.8);border-radius:50%;pointer-events:none}
+.silm-lab3d-controls{position:absolute;bottom:94px;left:10px;display:none;gap:5px;z-index:2}
+.silm-lab3d-controls button{width:44px;height:44px;font-size:1.1rem;padding:0;background:#162c40e8}
+.silm-lab3d-reduced .silm-lab3d-crosshair{display:none}
+@media(max-width:690px),(pointer:coarse){
+ .silm-lab3d-hud{padding:5px 6px;gap:4px}
+ .silm-lab3d-hud button{min-height:34px}
+ .silm-lab3d-bottom{gap:4px;padding:5px}
+ .silm-lab3d-bottom button{min-height:38px;font-size:.77rem;padding:4px 6px}
+ .silm-lab3d-controls{display:grid;grid-template-columns:repeat(3,44px)}
+ .silm-lab3d-controls [data-move=forward]{grid-column:2}
+ .silm-lab3d-controls [data-move=left]{grid-row:2;grid-column:1}
+ .silm-lab3d-controls [data-move=backward]{grid-row:2;grid-column:2}
+ .silm-lab3d-controls [data-move=right]{grid-row:2;grid-column:3}
+}
+@media(prefers-reduced-motion:reduce){.silm-lab3d *{scroll-behavior:auto}}
+@media(forced-colors:active){.silm-lab3d-hud,.silm-lab3d-bottom{border:1px solid CanvasText;background:Canvas;color:CanvasText}}
