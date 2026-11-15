@@ -614,3 +614,32 @@ body.si-structure-expanded #silm-scene-actionbar{
 .silm-unit-inventory button:disabled{opacity:.65;cursor:not-allowed}
 .silm-unit-inventory button:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
 .silm-unit-inventory small{font-size:.78rem;color:var(--muted);overflow-wrap:anywhere}
+
+/* Layout com docas no fluxo (nov/2026). Evita cobrir estruturas e ferramentas.
+   As vistas científicas mantêm coordenadas; seu ResizeObserver adapta pixels. */
+@media (min-width:901px){
+ #si-workspace:not(.si-workspace-fullscreen){
+  --silm-left-track:0px;--silm-right-track:0px;
+  display:grid;grid-template-columns:var(--silm-left-track) minmax(0,1fr) var(--silm-right-track);
+  grid-template-rows:auto minmax(0,1fr) auto;column-gap:0;min-width:0;min-height:0;
+ }
+ #si-workspace:not(.si-workspace-fullscreen)[data-left-open="true"]{--silm-left-track:var(--si-dock-left)}
+ #si-workspace:not(.si-workspace-fullscreen)[data-right-open="true"]{--silm-right-track:var(--si-dock-right)}
+ #si-workspace:not(.si-workspace-fullscreen)>.si-workspace-toolbar{grid-column:1/-1;grid-row:1;min-width:0}
+ #si-workspace:not(.si-workspace-fullscreen)>#si-stage{grid-column:2;grid-row:2;min-width:0;min-height:0}
+ #si-workspace:not(.si-workspace-fullscreen)>#silm-scene-actionbar{grid-column:2;grid-row:3;min-width:0;max-width:100%}
+ #si-workspace:not(.si-workspace-fullscreen)>#si-dock-left,
+ #si-workspace:not(.si-workspace-fullscreen)>#si-dock-right{
+  position:relative;inset:auto;top:auto;bottom:auto;left:auto;right:auto;
+  box-sizing:border-box;width:auto;max-width:100%;height:auto;min-height:0;
+  grid-row:2/span 2;margin:7px 8px;border-radius:12px;
+  box-shadow:0 5px 20px rgb(0 0 0 / .12)
+ }
+ #si-workspace:not(.si-workspace-fullscreen)>#si-dock-left{grid-column:1}
+ #si-workspace:not(.si-workspace-fullscreen)>#si-dock-right{grid-column:3}
+ #si-workspace:not(.si-workspace-fullscreen) #workspace-focus{padding:8px 10px!important;min-width:0}
+ #si-workspace:not(.si-workspace-fullscreen) #workspace-overview{min-width:0}
+ #si-workspace:not(.si-workspace-fullscreen) .si-dock-scroll{min-width:0;min-height:0}
+}
+/* A apresentação expandida usa a mecânica própria de tela cheia. */
+body.si-structure-expanded #si-workspace{display:flex!important}
