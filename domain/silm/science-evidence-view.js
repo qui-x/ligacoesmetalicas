@@ -4,7 +4,7 @@ window.SILM=window.SILM||{};
  * A interface conserva os painéis especializados e não altera motors físicos.
  */
 SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
- const S=SILM,db=S.scienceEvidenceIndex,batch=S.batch80Research,iaea=S.scientific400,optical=S.scientificOpticalBatch,mechanical=S.scientificMechanicalBatch,compression=S.scientificCompressionBatch,mechanics93=S.scientificMechanicalStage93,
+ const S=SILM,db=S.scienceEvidenceIndex,batch=S.batch80Research,iaea=S.scientific400,optical=S.scientificOpticalBatch,mechanical=S.scientificMechanicalBatch,compression=S.scientificCompressionBatch,mechanics93=S.scientificMechanicalStage93,compression94=S.scientificMechanicalStage94,
   props=S.properties,labels=Object.freeze({
    'experimental-conditional':'Ensaio com condições específicas',
    evaluated:'Referência avaliada',compiled:'Compilação ou ficha técnica',
@@ -57,10 +57,11 @@ SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
    const mechanicalRecords=mechanical?.getFor(z,property)||[];
    const compressionRecords=compression?.getFor(z,property)||[];
    const stage93Records=mechanics93?.getFor(z,property)||[];
+   const stage94Records=compression94?.getFor(z,property)||[];
    const mainRecords=core.length?core:(opticalRecords.length?opticalRecords:(iaeaRecords.length?iaeaRecords:(batch?.getFor(z,property)||[])));
    // Estudos mecanicos novos são amostras independentes; somar sem substituir a fonte principal.
    const ids=new Set(mainRecords.map(r=>r.id));
-   const all=[...mainRecords,...mechanicalRecords.filter(r=>!ids.has(r.id)),...compressionRecords.filter(r=>!ids.has(r.id)),...stage93Records.filter(r=>!ids.has(r.id))];
+   const all=[...mainRecords,...mechanicalRecords.filter(r=>!ids.has(r.id)),...compressionRecords.filter(r=>!ids.has(r.id)),...stage93Records.filter(r=>!ids.has(r.id)),...stage94Records.filter(r=>!ids.has(r.id))];
 
    if(!all.length)continue;
    const published=all.filter(r=>r.status!=='pending'),unverified=all.filter(r=>r.status==='pending');
