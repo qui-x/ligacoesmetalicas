@@ -165,13 +165,15 @@ SILM.polycrystalCPFEM=(()=>{
    const force=new Float64Array(ND),states=new Array(NE),out=new Array(NE),
     rows=stiffness?newRows():null;
    let total=0,plastic=0,maxSlip=0;
+   let activeIndex=-1,activeStage='start';
    try{
     for(let i=0;i<NE;i++){
+     activeIndex=i;activeStage='return-map';
      const t=triangles[i],model=models[grainOfTriangle[i]],
       strain=strainOf(t,u),e=bToCrystal(strain),z=model.step(prior.points[i],e,{
        tolerance:2e-9,maxSweeps:180
       });
-     if(!z.converged)return null;
+     if(!z.converged)return {failure:'LOCAL_NONCONVERGED',element:i,strain:e};
      states[i]=z.state;out[i]=z;
      plastic+=z.activeSystems>0?1:0;
      total+=z.accumulatedSlip*t.area;maxSlip=Math.max(maxSlip,z.accumulatedSlip);
@@ -181,6 +183,7 @@ SILM.polycrystalCPFEM=(()=>{
       force[t.dofs[a]]+=value*t.area;
      }
      if(stiffness){
+      activeStage='tangent';
       const D=Array.from({length:3},()=>[0,0,0]),h=1e-6;
       for(let j=0;j<3;j++){
        const ep=e.slice(),em=e.slice();
@@ -189,7 +192,7 @@ SILM.polycrystalCPFEM=(()=>{
        ep[jj]+=h*scale;em[jj]-=h*scale;
        const a=model.step(prior.points[i],ep,{tolerance:1e-8,maxSweeps:150});
        const b=model.step(prior.points[i],em,{tolerance:1e-8,maxSweeps:150});
-       if(!a.converged||!b.converged)return null;
+       if(!a.converged||!b.converged)return {failure:'TANGENT_NONCONVERGED',element:i,strain:e};
        const ap=vectorStress(a),bp=vectorStress(b);
        for(let k=0;k<3;k++)D[k][j]=(ap[k]-bp[k])/(2*h);
       }
@@ -200,7 +203,7 @@ SILM.polycrystalCPFEM=(()=>{
       addStiffness(rows,t,D);
      }
     }
-   }catch{return null;}
+   }catch(error){return {failure:'LOCAL_ERROR',element:activeIndex,stage:activeStage,message:error?.message||String(error)};}
    return{force,rows,states,out,plasticTriangles:plastic,
     meanSlip:total,maxSlip};
   }
@@ -211,7 +214,7 @@ SILM.polycrystalCPFEM=(()=>{
    let last=null,iter=0,done=false,err=Infinity;
    for(;iter<16;iter++){
     const a=assemble(u,previous,{stiffness:true});
-    if(!a)return{converged:false,reason:'CONSTITUTIVE_INTEGRATION',iterations:iter};
+    if(!a||a.failure)return{converged:false,reason:a?.failure||'CONSTITUTIVE_INTEGRATION',diagnostic:a||null,iterations:iter};
     last=a;err=norm(a.force,mask);
     if(err<8e-5){done=true;break;}
     const d=pcg(a.rows,mask,a.force);
@@ -221,7 +224,7 @@ SILM.polycrystalCPFEM=(()=>{
      const candidate=u.slice();
      for(let j=0;j<ND;j++)if(!mask[j])candidate[j]+=scale*d.x[j];
      const next=assemble(candidate,previous);
-     if(next&&norm(next.force,mask)<err*(1-1e-5*scale)){
+     if(next&&!next.failure&&norm(next.force,mask)<err*(1-1e-5*scale)){
       u=candidate;last=next;accepted=true;break;
      }
      scale*=.5;
@@ -229,7 +232,7 @@ SILM.polycrystalCPFEM=(()=>{
     if(!accepted)return{converged:false,reason:'LINE_SEARCH',iterations:iter,residual:err};
    }
    last=assemble(u,previous);
-   if(!last)return{converged:false,reason:'CONSTITUTIVE_INTEGRATION',iterations:iter};
+   if(!last||last.failure)return{converged:false,reason:last?.failure||'CONSTITUTIVE_INTEGRATION',diagnostic:last||null,iterations:iter};
    err=norm(last.force,mask);
    if(err<8e-5)done=true;
    return done?{converged:true,record:{u,points:last.states},
@@ -294,13 +297,13 @@ SILM.polycrystalCPFEM=(()=>{
    for(let i=1;i<=increments;i++){
     const r=equilibrate(prior,{mode,position,width,load:load*i/increments});
     if(!r.converged)return Object.freeze({status:'NONCONVERGED',converged:false,
-     reason:r.reason,stepsCompleted,requestedSteps:increments,calibrated:false});
+     reason:r.reason,diagnostic:r.diagnostic||null,stepsCompleted,requestedSteps:increments,calibrated:false});
     prior=r.record;last=r;stepsCompleted++;
    }
    if(unload){
     const r=equilibrate(prior,{mode,position,width,load:0,release:true});
     if(!r.converged)return Object.freeze({status:'NONCONVERGED',converged:false,
-     reason:r.reason,stepsCompleted,requestedSteps:increments+1,calibrated:false});
+     reason:r.reason,diagnostic:r.diagnostic||null,stepsCompleted,requestedSteps:increments+1,calibrated:false});
     prior=r.record;last=r;stepsCompleted++;
    }
    return Object.freeze({...report(prior,last),stepsCompleted,unloaded:unload});
