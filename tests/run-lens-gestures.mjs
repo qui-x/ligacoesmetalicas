@@ -23,7 +23,7 @@ try{
  await page.locator('#silm-object-entry .periodic-element[data-z="29"]').click();
  await page.locator('#silm-objects-dialog').waitFor({state:'visible'});
  await page.locator('#silm-objects-dialog [data-reference-id="atlas-cu"]')
-  .getByRole('button',{name:'Investigar objeto'}).click();
+  .getByRole('button',{name:'Iniciar montagem'}).click();
  await page.waitForFunction(()=>SILMIntegration.snapshot()?.metadata?.workshop?.referenceId==='atlas-cu');
  await page.waitForFunction(()=>SILM.lensController.inspect().attached&&SILM.lensController.inspect().scale===1);
  const read=()=>page.evaluate(()=>SILM.lensController.inspect());
