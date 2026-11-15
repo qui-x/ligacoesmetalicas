@@ -90,11 +90,11 @@ SILM.polycrystalCPFEM=(()=>{
    row.set(index,(row.get(index)||0)+v*triangle.area);
   }
  };
- const fixed=(mode,position,width,load,release)=>{
+ const fixed=(mode,position,width,load,release,holdContact=false)=>{
   const mask=new Uint8Array(ND),values=new Float64Array(ND);
   for(let i=0;i<=NX;i++)mask[2*node(i,NY)+1]=1;
   mask[2*node(Math.floor(NX/2),NY)]=1;
-  if(!release&&load>0){
+  if(!release&&(load>0||holdContact)){
    const contact=[];
    for(let i=0;i<=NX;i++)if(Math.abs(i/NX-position)<=width/2+1e-9)contact.push(i);
    if(!contact.length)contact.push(clip(Math.round(position*NX),0,NX));
@@ -228,8 +228,8 @@ SILM.polycrystalCPFEM=(()=>{
      hardeningStored:energyHardening,plasticDissipated:energyDissipated,
      total:energyElastic+energyHardening+energyDissipated})};
   }
-  function equilibrate(previous,{mode,position,width,load,release=false}){
-   const {mask,values}=fixed(mode,position,width,load,release);
+  function equilibrate(previous,{mode,position,width,load,release=false,holdContact=false}){
+   const {mask,values}=fixed(mode,position,width,load,release,holdContact);
    let u=previous.u.slice();
    for(let i=0;i<ND;i++)if(mask[i])u[i]=values[i];
    let last=null,iter=0,done=false,err=Infinity;
@@ -323,19 +323,21 @@ SILM.polycrystalCPFEM=(()=>{
    });
   }
   function run({mode='tension',position=.5,width=.3,load=0.7,
-   increments=4,unload=false}={}){
+   increments=4,unload=false,unloadIncrements=5}={}){
    if(!['tension','compression'].includes(mode)||![position,width,load].every(finite)||
     position<.1||position>.9||width<.1||width>.8||load<0||load>1||
-    !Number.isInteger(increments)||increments<1||increments>MAX_STEPS)
+    !Number.isInteger(increments)||increments<1||increments>MAX_STEPS||
+    !Number.isInteger(unloadIncrements)||unloadIncrements<1||unloadIncrements>MAX_STEPS)
     return Object.freeze({status:'INVALID_LOADING',converged:false});
    let prior=initial(),last=null,stepsCompleted=0,externalWork=0;
    const history=[];
-   // Integracao trapezoidal do trabalho no contato com deslocamento prescrito.
-   // Ao remover bruscamente Dirichlet na descarga nao conhecemos o trabalho.
-   const accumulateWork=(before,after,command,stepNumber)=>{
-    const prescribed=fixed(mode,position,width,command,false).mask;
+   // Trabalho externo: quadratura trapezoidal das reacoes no contato com
+   // deslocamento imposto. A garra permanece prescrita na descarga ate
+   // deslocamento ZERO; nao ha liberacao instantanea de Dirichlet.
+   const accumulateWork=(before,after,command,stepNumber,phase)=>{
+    const mask=fixed(mode,position,width,command,false,true).mask;
     let increment=0;
-    for(let i=0;i<ND;i++)if(prescribed[i]){
+    for(let i=0;i<ND;i++)if(mask[i]){
      const du=after.record.u[i]-before.u[i];
      increment+=.5*(before.force[i]+after.record.force[i])*du;
     }
@@ -343,44 +345,61 @@ SILM.polycrystalCPFEM=(()=>{
     const stored=after.energy.total;
     const imbalance=externalWork-stored;
     const relative=Math.abs(imbalance)/Math.max(Math.abs(externalWork),Math.abs(stored),1e-10);
-    history.push(Object.freeze({step:stepNumber,relativeCommand:command,
+    history.push(Object.freeze({step:stepNumber,phase,relativeCommand:command,
      externalWorkIncrement:increment,externalWorkCumulative:externalWork,
      internalEnergyCumulative:stored,workEnergyResidual:imbalance,
      relativeResidual:relative,freeResidual:after.residual,
      integration:'trapezoidal-prescribed-displacement',units:'relative'}));
    };
    for(let i=1;i<=increments;i++){
-    const r=equilibrate(prior,{mode,position,width,load:load*i/increments});
+    const command=load*i/increments;
+    const r=equilibrate(prior,{mode,position,width,load:command});
     if(!r.converged)return Object.freeze({status:'NONCONVERGED',converged:false,
-     reason:r.reason,diagnostic:r.diagnostic||null,stepsCompleted,requestedSteps:increments,calibrated:false});
-    accumulateWork(prior,r,load*i/increments,i);
-    prior=r.record;last=r;stepsCompleted++;
-   }
-   if(unload){
-    const r=equilibrate(prior,{mode,position,width,load:0,release:true});
-    if(!r.converged)return Object.freeze({status:'NONCONVERGED',converged:false,
-     reason:r.reason,diagnostic:r.diagnostic||null,stepsCompleted,requestedSteps:increments+1,calibrated:false});
-    // O contato e liberado sem rampa de deslocamento controlado. Nenhum
-    // resultado de balanco energetico da descarga pode ser reivindicado.
+     phase:'loading',reason:r.reason,diagnostic:r.diagnostic||null,
+     stepsCompleted,requestedSteps:increments+(unload?unloadIncrements:0),calibrated:false});
+    accumulateWork(prior,r,command,i,'loading');
     prior=r.record;last=r;stepsCompleted++;
    }
    const loaded=history[history.length-1];
+   const externalWorkLoading=externalWork;
+   if(unload){
+    // Retrair gradualmente a garra, preservando o mesmo conjunto de DOFs.
+    // A amostra ao final esta com deslocamento aplicado zero, nao livre de
+    // tracao no topo; um ensaio de forca zero requer outro controle.
+    for(let j=1;j<=unloadIncrements;j++){
+     const command=load*(1-j/unloadIncrements);
+     const r=equilibrate(prior,{mode,position,width,load:command,holdContact:true});
+     if(!r.converged)return Object.freeze({status:'NONCONVERGED',converged:false,
+      phase:'unloading',reason:r.reason,diagnostic:r.diagnostic||null,
+      stepsCompleted,requestedSteps:increments+unloadIncrements,calibrated:false});
+     accumulateWork(prior,r,command,increments+j,'unloading');
+     prior=r.record;last=r;stepsCompleted++;
+    }
+   }
+   const final=history[history.length-1];
    const energyAudit=Object.freeze({
-    status:unload?'UNLOADING_PATH_NOT_RESOLVED':'TRAPEZOIDAL_ESTIMATE',
-    externalWorkLoading:externalWork,
+    status:unload?'CONTROLLED_UNLOADING_ESTIMATE':'TRAPEZOIDAL_ESTIMATE',
+    externalWorkLoading,externalWorkTotal:externalWork,
     storedPlusDissipatedLoading:loaded?.internalEnergyCumulative||0,
     loadingWorkEnergyResidual:loaded?.workEnergyResidual||0,
     loadingRelativeResidual:loaded?.relativeResidual||0,
-    unloadingExternalWork:null,
+    unloadingExternalWork:unload?externalWork-externalWorkLoading:null,
+    storedPlusDissipatedFinal:final?.internalEnergyCumulative||0,
+    finalWorkEnergyResidual:final?.workEnergyResidual||0,
+    finalRelativeResidual:final?.relativeResidual||0,
+    unloadingIncrements:unload?unloadIncrements:0,
+    contactHeldAtZero:unload,contactReleased:false,
     validAsExperimentalBalance:false,calibrated:false,units:'relative',
     method:'trapezoidal-reactions-at-prescribed-nodes',
     limitation:unload?
-     'O contato e liberado sem curva de descarga controlada; trabalho de descarga desconhecido.':
-     'Quadratura trapezoidal por passos discretos; o erro depende dos incrementos.'
+     'Descarga gradual controlada ate deslocamento zero, com garra mantida. Nao representa liberacao do contato, forca zero, dinamica nem ensaio medido.':
+     'Quadratura trapezoidal por incrementos discretos; incerteza numerica depende da discretizacao.'
    });
    return Object.freeze({...report(prior,last),energyAudit,
+    energyBalanceStatus:'TRAPEZOIDAL_WORK_AUDIT',
     workHistory:Object.freeze(history),stepsCompleted,unloaded:unload,
     loadCase:Object.freeze({mode,position,width,load,increments,unload,
+     unloadIncrements:unload?unloadIncrements:0,contactHeldAtZero:unload,
      kind:'prescribed-displacement',units:'relative'})});
   }
   return Object.freeze({schema:'silm.polycrystal-cpfem.small-strain.v1',
