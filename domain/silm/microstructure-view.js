@@ -62,6 +62,7 @@ SILM.microstructure=(()=>{
   let paths=[],cells=[],specimenOutline=null;let surfaceMicro=null;
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
   let currentJ2=null,selectedMechanicalReading=null,updateSlip=()=>{};
+  let cpfemPreview=null; // Previa tecnica removivel, sem alterar os menus.
   const grainCenter=poly=>{
    let a=0,cx=0,cy=0;
    for(let i=0;i<poly.length;i++){
@@ -134,6 +135,7 @@ SILM.microstructure=(()=>{
    surfaceMicro?.refresh();
    updateSelectedMechanicalReading();
    updateSlip();
+   cpfemPreview?.selected(i);
   };
   function drawGrains(){
    paths=[];cells=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField,apparatusField);
@@ -340,6 +342,15 @@ SILM.microstructure=(()=>{
    const slipRefElement=SILM.data?.get?.(element?.atomicNumber)||element;
    const slipEligibility=SILM.crystal?.eligibility?.(slipRefElement);
    const slipStructure=slipEligibility?.status==='available'?slipEligibility.structureType:null;
+   // Previa de ramo: a posicao definitiva da acao aguarda revisao dos menus.
+   const cpfemFlag=new URLSearchParams(window.location.search).get('cpfem-preview')==='1';
+   if(cpfemFlag&&SILM.polycrystalPreview){
+    cpfemPreview=SILM.polycrystalPreview.mount({container:slipDetails,
+     getSynthetic:()=>sourceData?null:generated,
+     getStructure:()=>slipStructure,
+     getMode:()=>getMode()==='ductility'?'tension':getMode()==='malleability'?'compression':null,
+     onChange:()=>refreshMechanical()});
+   }
    section.dataset.slipJ2Coupled='false';
    updateSlip=()=>{
     if(!slipEngine)return;
@@ -477,7 +488,8 @@ SILM.microstructure=(()=>{
    contactLabel.input.addEventListener('change',saveContact);
    widthLabel.input.addEventListener('change',saveContact);
    function warpGrains(field,amplitude,marks=[],j2=null){
-    const nonlinear=!!j2?.converged&&(marks.length>0||Number(j2.load)>0);
+    const nonlinear=!!j2?.converged&&(
+     j2.status==='CONVERGED'||marks.length>0||Number(j2.load)>0);
     const elasticOn=!nonlinear&&!!field&&amplitude>1e-4;
     const relief=SILM.specimenRelief,permanentOn=!nonlinear&&!!relief&&marks.length>0;
     const map=nonlinear?(x,y)=>{
@@ -581,18 +593,21 @@ SILM.microstructure=(()=>{
    section.dataset.mechanicalJ2=j2Ready?'plane-strain-converged':
     j2?'fallback-elastic':'unavailable';
    section.dataset.mechanicalJ2Alpha=j2Ready?j2.maxAlpha.toFixed(4):'0';
-   section.dataset.mechanicalSolver=j2Ready?'incremental-j2-plane-strain':
+   const cpfemField=cpfemPreview?.field()||null;
+   section.dataset.mechanicalSolver=cpfemField?'cpfem-polycrystal-preview':
+    j2Ready?'incremental-j2-plane-strain':
     field?.converged?'elastic-local-2d':field?'unconverged':'inactive';
+   section.dataset.cpfemPresentation=cpfemField?'synthetic-readout-opt-in':'j2-default';
    const local=marks.length>0&&(j2Ready||!!SILM.specimenRelief);
    if(residual.hasResidual&&!local)
     mechanicalField.setAttribute('transform','translate('+CX+' '+CY+
      ') scale('+residual.scaleX+' '+residual.scaleY+') translate('+(-CX)+' '+(-CY)+')');
    else mechanicalField.removeAttribute('transform');
-   warpGrains(field,amplitude,marks,j2Ready?j2:null);
+   warpGrains(field,amplitude,marks,cpfemField||(j2Ready?j2:null));
    surfaceMicro?.setDeformationLight?.({
     mode:active?(mode==='malleability'?'compression':'tension'):null,
     contact:{position:contactPosition,width:contactWidth},
-    field,amplitude,load,plasticField:j2Ready?j2:null
+    field,amplitude,load,plasticField:cpfemField||(j2Ready?j2:null)
    });
    if(active){
     const h=Math.max(4,H*.016),w=Math.max(W*.09,W*contactWidth),px=clamp(W*contactPosition-w/2,0,W-w);
@@ -756,6 +771,7 @@ SILM.microstructure=(()=>{
   // Mudanças de formação são explícitas. Redimensionar, ampliar ou mudar
   // o tema nunca regeneram os grãos, alteram a semente ou as propriedades.
   function applySchematic(options){
+   cpfemPreview?.invalidate('Nova formacao esquematica: recalcular o ensaio CPFEM.');
    generated=synthetic.generate(options);
    seed=generated.seed;profile=generated.profile;
    W=generated.width;H=generated.height;CX=W/2;CY=H/2;
@@ -923,6 +939,7 @@ SILM.microstructure=(()=>{
     const json=JSON.parse(await file.text());
     const checked=SILM.microstructureData?.validate(json,element?.atomicNumber);
     if(!checked?.ok)throw new Error(checked?.error||'Módulo de validação indisponível.');
+    cpfemPreview?.invalidate('Mapa importado: CPFEM sintetico desabilitado, sem orientacao plasticamente homologada.');
     sourceData=checked.data;
     formationsButton.disabled=true;
     W=sourceData.image.widthPx;H=sourceData.image.heightPx;CX=W/2;CY=H/2;
