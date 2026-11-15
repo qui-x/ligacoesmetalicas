@@ -59,7 +59,7 @@ SILM.microstructure=(()=>{
   const topPlate=svgNode('rect',{'class':'silm-micro-press-plate','pointer-events':'none'});
   const bottomPlate=svgNode('rect',{'class':'silm-micro-press-plate','pointer-events':'none'});
   apparatusField.append(topPlate,bottomPlate);plane.append(apparatusField);
-  let paths=[],cells=[],specimenOutline=null;let surfaceMicro=null;
+  let paths=[],cells=[],cpfemOverlayPaths=[],specimenOutline=null;let surfaceMicro=null;
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
   let currentJ2=null,selectedMechanicalReading=null,updateSlip=()=>{};
   let cpfemPreview=null; // Previa tecnica removivel, sem alterar os menus.
@@ -138,7 +138,7 @@ SILM.microstructure=(()=>{
    cpfemPreview?.selected(i);
   };
   function drawGrains(){
-   paths=[];cells=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField,apparatusField);
+   paths=[];cells=[];cpfemOverlayPaths=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField,apparatusField);
    polygons.forEach((poly,i)=>{
    if(poly.length<3)return;
    const d='M'+poly.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')+' Z';
@@ -159,7 +159,12 @@ SILM.microstructure=(()=>{
    });
    const hatch=svgNode('path',{d,'class':'silm-micro-hatching',fill:'url(#'+uid+'-pattern-'+(i%4)+')','pointer-events':'none'});
    const bevel=svgNode('path',{d,'class':'silm-micro-highlight','pointer-events':'none'});
-   g.append(p,bevel,hatch);mechanicalField.append(g);paths[i]=p;cells[i]=g;
+   // Camada reversivel: NUNCA alterar --silm-grain-fill ou os atributos do material.
+   const heat=svgNode('path',{d,'class':'silm-micro-cpfem-overlay',
+    'pointer-events':'none','aria-hidden':'true'});
+   heat.style.display='none';
+   g.append(p,heat,bevel,hatch);mechanicalField.append(g);
+   paths[i]=p;cells[i]=g;cpfemOverlayPaths[i]=heat;
    });
    specimenOutline=svgNode('path',{'class':'silm-micro-specimen-outline',
     fill:'none','pointer-events':'none'});
@@ -489,6 +494,50 @@ SILM.microstructure=(()=>{
    const saveContact=()=>model?.setMechanicalContact?.(contactPosition,contactWidth);
    contactLabel.input.addEventListener('change',saveContact);
    widthLabel.input.addEventListener('change',saveContact);
+   const cpfemMapColor=(kind,v)=>{
+    const x=Math.min(1,Math.max(0,Math.abs(v)));
+    if(kind==='plastic-strain')
+     return 'hsl('+(44-20*x).toFixed(0)+' 94% '+(80-35*x).toFixed(0)+'%)';
+    if(kind==='residual-von-mises')
+     return 'hsl('+(199+17*x).toFixed(0)+' 87% '+(80-33*x).toFixed(0)+'%)';
+    // Divergente com zero neutro. Azul: compressao, laranja: tracao.
+    if(v<0)return 'hsl(217 85% '+(82-36*x).toFixed(0)+'%)';
+    if(v>0)return 'hsl(13 87% '+(82-36*x).toFixed(0)+'%)';
+    return 'hsl(0 0% 78%)';
+   };
+   function paintCpfemGrainMap(map){
+    const on=!sourceData&&map?.status==='DIAGNOSTIC_ONLY'&&
+     Array.isArray(map.entries)&&map.entries.length===polygons.length;
+    section.dataset.cpfemGrainMap=on?map.kind:'none';
+    for(let i=0;i<cpfemOverlayPaths.length;i++){
+     const path=cpfemOverlayPaths[i];if(!path)continue;
+     const item=on?map.entries[i]:null;
+     if(!item||item.grainId!==i+1){
+      path.style.display='none';
+      delete path.dataset.mapValue;delete path.dataset.mapSampled;
+      delete path.dataset.mapNormalized;continue;
+     }
+     path.style.display='';
+     path.dataset.mapSampled=item.status;
+     if(item.value===null){
+      path.setAttribute('fill','none');path.setAttribute('stroke','var(--muted)');
+      path.setAttribute('stroke-dasharray','5 5');
+      path.setAttribute('stroke-opacity','0.65');
+      path.setAttribute('stroke-width','2');
+      delete path.dataset.mapValue;delete path.dataset.mapNormalized;
+      continue;
+     }
+     const z=Math.min(1,Math.abs(item.normalized));
+     const color=cpfemMapColor(map.kind,item.normalized);
+     path.setAttribute('fill',color);path.setAttribute('stroke',color);
+     path.setAttribute('fill-opacity',(0.10+0.28*z).toFixed(3));
+     path.setAttribute('stroke-opacity',(0.35+0.5*z).toFixed(3));
+     path.setAttribute('stroke-width',(1.8+1.5*z).toFixed(2));
+     path.removeAttribute('stroke-dasharray');
+     path.dataset.mapValue=String(item.value);
+     path.dataset.mapNormalized=String(item.normalized);
+    }
+   }
    function warpGrains(field,amplitude,marks=[],j2=null){
     const nonlinear=!!j2?.converged&&(
      j2.status==='CONVERGED'||marks.length>0||Number(j2.load)>0);
@@ -606,6 +655,7 @@ SILM.microstructure=(()=>{
      ') scale('+residual.scaleX+' '+residual.scaleY+') translate('+(-CX)+' '+(-CY)+')');
    else mechanicalField.removeAttribute('transform');
    warpGrains(field,amplitude,marks,cpfemField||(j2Ready?j2:null));
+   paintCpfemGrainMap(cpfemPreview?.map()||null);
    surfaceMicro?.setDeformationLight?.({
     mode:active?(mode==='malleability'?'compression':'tension'):null,
     contact:{position:contactPosition,width:contactWidth},
