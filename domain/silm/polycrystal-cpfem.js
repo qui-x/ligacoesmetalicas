@@ -96,7 +96,9 @@ SILM.polycrystalCPFEM=(()=>{
    if(!contact.length)contact.push(clip(Math.round(position*NX),0,NX));
    for(const i of contact){
     const k=2*node(i,0),sign=mode==='tension'?-1:1;
-    mask[k+1]=1;values[k+1]=sign*.022*load;
+    // Limite de deslocamento reduzido: contato localizado concentra 
+    // deformacao; preservar o dominio de pequenas deformacoes (< 5%).
+    mask[k+1]=1;values[k+1]=sign*.012*load;
     if(mode==='tension'){mask[k]=1;values[k]=0;}
    }
   }
