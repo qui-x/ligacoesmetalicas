@@ -102,7 +102,7 @@ jobs:
         run: node tests/run-direct-ver-tools.mjs
       - name: Homologar câmera do centro e foco dos grãos
         run: node tests/run-center-camera-focus.mjs
-      - name: Auditoria profunda: mouse, toque, teclado e nove resoluções
+      - name: "Auditoria profunda: mouse, toque, teclado e nove resoluções"
         run: node tests/run-controls-responsive-matrix.mjs
       - name: Guardar evidências visuais
         if: always()
