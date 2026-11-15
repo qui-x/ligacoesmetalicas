@@ -166,3 +166,32 @@
  display:inline-block;font-size:.8rem;max-width:100%;margin-top:.25rem;
  overflow-wrap:anywhere;
 }
+
+/* Etapa 80 — evidências por elemento, sem modificar a visualização dos motores. */
+.silm-unified-evidence{
+ min-width:0;margin-block:.9rem;padding-block:.6rem;
+ border-top:1px solid var(--border-color,rgba(127,127,127,.25));
+ overflow-wrap:anywhere;
+}
+.silm-unified-evidence h4{font-size:.94rem;margin:.25rem 0 .4rem}
+.silm-unified-evidence h5{font-size:.85rem;margin:.65rem 0 .3rem}
+.silm-unified-evidence-note{font-size:.78rem;line-height:1.5;opacity:.85}
+.silm-unified-evidence-record{
+ min-width:0;margin:.4rem 0;padding:.55rem .65rem;
+ border:1px solid var(--border-color,rgba(127,127,127,.18));border-radius:.35rem;
+ background:var(--card-bg,transparent);
+}
+.silm-unified-evidence-record>strong{display:block;font-size:.81rem;margin-bottom:.35rem}
+.silm-unified-evidence-values{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.25rem .55rem;font-size:.79rem;margin:0}
+.silm-unified-evidence-values dt{min-width:0}
+.silm-unified-evidence-values dd{margin:0;text-align:end;font-variant-numeric:tabular-nums}
+.silm-unified-evidence-conditions,.silm-unified-evidence-caution{font-size:.76rem;line-height:1.4;margin:.35rem 0 0}
+.silm-unified-evidence-caution{opacity:.82}
+.silm-unified-evidence-record a{display:inline-block;margin-top:.35rem;font-size:.79rem}
+.silm-unified-evidence-more{margin:.35rem 0}
+.silm-unified-evidence-more summary{font-size:.79rem;cursor:pointer}
+.silm-unified-evidence [data-status="pending"]{border-style:dashed}
+@media(max-width:480px){
+ .silm-unified-evidence-record{padding:.4rem .5rem}
+ .silm-unified-evidence-values{column-gap:.32rem}
+}

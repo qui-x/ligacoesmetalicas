@@ -1,0 +1,81 @@
+name: 'SILM — Etapa 80: dados científicos por elemento'
+on:
+  push:
+    branches: [feat/silm-stage80-unified-element-evidence-20261115]
+  pull_request:
+    paths:
+      - 'domain/silm/science-evidence-index.js'
+      - 'domain/silm/science-evidence-view.js'
+      - 'integracao/metallic-experience.js'
+      - 'domain/silm/property-view.js'
+      - 'domain/silm/research-evidence.css'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/stage80-unified-evidence.test.cjs'
+      - 'tests/run-stage80-unified-evidence.mjs'
+      - '.github/workflows/silm-stage80-unified-element-evidence.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  science:
+    name: Integridade e proveniência (315 fichas)
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar sintaxe dos módulos alterados
+        run: |
+          node --check domain/silm/science-evidence-index.js
+          node --check domain/silm/science-evidence-view.js
+          node --check integracao/metallic-experience.js
+          node --check domain/silm/property-view.js
+          node --check sw.js
+      - name: Validação científica e compatibilidade com Etapas 78–79
+        run: node --test tests/stage80-unified-evidence.test.cjs tests/silm-metal-data-seven.test.cjs tests/stage78-seven-condition-profiles.test.cjs
+  browsers:
+    name: Dados e Explorar / ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Instalar Playwright e navegador
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-playwright/node_modules/playwright" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright" install --with-deps "$BROWSER_NAME"
+      - name: Servir a aplicação real
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-http.log" 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS "$BASE_URL/index.html" > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-http.log"
+          exit 1
+      - name: Testar fichas no painel Dados e mesmo índice em Explorar
+        run: node tests/run-stage80-unified-evidence.mjs
+      - name: Guardar capturas Fe e Co
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-evidence-stage80-${{ matrix.browser }}
+          path: reports/stage80/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14

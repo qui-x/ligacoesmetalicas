@@ -301,6 +301,15 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
    host.append(observed);
    sourceCases.push({id,r});
   }else if(!ref){
+   const known=S.scienceEvidenceIndex?.getFor?.(e.atomicNumber,id,{excludeSeven:true,includePending:false})||[];
+   if(known.length){
+    const first=known[0],metric=first.values[0];
+    const sampleT=Number.isFinite(first.temperatureK)?fmt(first.temperatureK)+' K':'T não numericamente informada';
+    p.textContent=Properties.catalog[id].title+': '+metric.label+' '+fmt(metric.value)+' '+metric.unit+
+     ' · '+sampleT+' · referência da amostra; ver estudos abaixo.';
+    host.append(p);
+    continue;
+   }
    p.textContent=Properties.catalog[id].title+': '+
     (['electrical','thermal'].includes(id)?
      'Sem valor numérico homologado; experiência qualitativa conforme elegibilidade.':
@@ -343,4 +352,6 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
   }
  }
  if(condition?.notes)sources.append(el('p',condition.notes));host.append(sources);
+ const unified=S.createUnifiedElementEvidencePanel?.({mode:'data'});
+ if(unified){unified.update({atomicNumber:e.atomicNumber});if(!unified.root.hidden)host.append(unified.root);}
 };
