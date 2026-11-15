@@ -62,7 +62,30 @@ try{
  assert.equal(await viewer.getAttribute('data-cpfem-presentation'),'synthetic-readout-opt-in');
  assert.equal(await viewer.getAttribute('data-mechanical-solver'),'cpfem-polycrystal-preview');
  assert.equal(await viewer.getAttribute('data-slip-j2-coupled'),'false');
+ const mapSelect=preview.locator('.silm-micro-cpfem-map-mode');
+ assert.equal(await mapSelect.isEnabled(),true);
+ const materialFill=await viewer.locator('.silm-micro-grain').first()
+  .evaluate(p=>p.style.getPropertyValue('--silm-grain-fill'));
+ await mapSelect.selectOption('plastic-strain');
+ assert.equal(await viewer.getAttribute('data-cpfem-grain-map'),'plastic-strain');
+ const overlays=viewer.locator('.silm-micro-cpfem-overlay');
+ assert.equal(await overlays.count(),await viewer.locator('.silm-micro-grain').count());
+ const painted=await overlays.evaluateAll(nodes=>nodes.filter(n=>
+  n.style.display!=='none'&&n.dataset.mapSampled==='SAMPLED_SYNTHETIC').length);
+ assert.ok(painted>0,'Mapa plastico nao coloriu regioes FEM amostradas');
+ assert.match(await preview.locator('.silm-micro-cpfem-map-legend').textContent(),
+  /Deformação plástica equivalente.*Mínimo.*máximo.*Escala relativa ao ensaio atual/);
+ const afterFill=await viewer.locator('.silm-micro-grain').first()
+  .evaluate(p=>p.style.getPropertyValue('--silm-grain-fill'));
+ assert.equal(afterFill,materialFill,'Mapa CPFEM substituiu a cor original do material');
+ await mapSelect.selectOption('residual-von-mises');
+ assert.equal(await viewer.getAttribute('data-cpfem-grain-map'),'none',
+  'Mapa de tensao residual nao deve estar disponivel antes da forca zero');
+ assert.match(await preview.locator('.silm-micro-cpfem-map-legend').textContent(),
+  /Mapa indisponível.*topo precisa atingir equilibrio numerico/i);
  await show.uncheck();
+ assert.equal(await mapSelect.isDisabled(),true);
+ assert.equal(await viewer.getAttribute('data-cpfem-grain-map'),'none');
  assert.equal(await viewer.getAttribute('data-cpfem-presentation'),'j2-default');
  assert.equal(await viewer.getAttribute('data-mechanical-solver'),'incremental-j2-plane-strain');
  assert.equal(JSON.stringify(await page.evaluate(()=>SILMIntegration.snapshot())),before,
@@ -126,7 +149,20 @@ try{
  assert.equal(await show.isEnabled(),true);
  await show.check();
  assert.equal(await viewer.getAttribute('data-mechanical-solver'),'cpfem-polycrystal-preview');
+ assert.equal(await mapSelect.isEnabled(),true);
+ await mapSelect.selectOption('residual-axial');
+ assert.equal(await viewer.getAttribute('data-cpfem-grain-map'),'residual-axial');
+ assert.match(await preview.locator('.silm-micro-cpfem-map-legend').textContent(),
+  /Tensão axial residual σyy.*Compressão.*zero.*tração/);
+ const axialOverlay=await overlays.evaluateAll(nodes=>nodes.filter(n=>
+  n.style.display!=='none'&&n.dataset.mapSampled==='SAMPLED_SYNTHETIC').length);
+ assert.ok(axialOverlay>0,'Mapa de tensão residual não contém grãos amostrados');
+ await mapSelect.selectOption('residual-von-mises');
+ assert.equal(await viewer.getAttribute('data-cpfem-grain-map'),'residual-von-mises');
+ assert.match(await preview.locator('.silm-micro-cpfem-map-limits').textContent(),
+  /Mínimo.*máximo/);
  await show.uncheck();
+ assert.equal(await viewer.getAttribute('data-cpfem-grain-map'),'none');
  assert.equal(await viewer.getAttribute('data-cpfem-presentation'),'j2-default');
  assert.equal(JSON.stringify(await page.evaluate(()=>SILMIntegration.snapshot())),before,
   'Descarga por forca nao pode alterar o estado cientifico da investigacao.');
