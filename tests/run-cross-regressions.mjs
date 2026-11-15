@@ -284,98 +284,44 @@ async function checkMobileNotices(label,width,scale,accessible=false){
  reports.push({label,scale,mode:accessible?'notices-a11y':'notices',...geometry});
 }
 
+// Paridade aprovada: Montagem escolhe módulos; Ver apenas opera as ferramentas.
 async function checkModuleShortcuts(label,width){
- const launch=page.locator('[data-open-dock="ver"]');
- if(await launch.getAttribute('aria-expanded')!=='true')await launch.click();
- await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===false);
- assert.equal(await page.locator('.si-workspace-toolbar #silm-module-shortcuts').count(),0,
-  label+': controle de módulos ainda está na barra superior');
- assert.equal(await page.locator('#si-dock-right [data-right-panel="ver"] #silm-module-shortcuts').count(),1,
-  label+': módulo científico não está em Ver');
- const close=async()=>{
-  await page.locator('[data-close-dock="right"]').click();
-  await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===true);
- };
+ assert.equal(await page.locator('#silm-module-shortcuts,[data-silm-module-shortcut]').count(),0,
+  label+': seletor antigo continua em Ver');
+ assert.equal(await page.locator('[data-left-panel="modulo"] .silm-module-card').count(),3,
+  label+': os módulos não estão em Montagem');
+ if(!['celular-390','desktop'].includes(label))return;
  const before=JSON.parse(await scientific());
- const buttons=await page.locator('#silm-module-shortcuts [data-silm-module-shortcut]')
-  .evaluateAll(nodes=>nodes.map(n=>{
-   const b=n.getBoundingClientRect();
-   return {id:n.dataset.silmModuleShortcut,pressed:n.getAttribute('aria-pressed'),
-    disabled:n.disabled,width:b.width,height:b.height,left:b.left,right:b.right};
-  }));
- assert.equal(buttons.length,3,label+': atalhos de módulo ausentes');
- assert.deepEqual(buttons.map(b=>b.id),['explorar','medir','calcular'],label+': ordem dos módulos');
- const glyphs=await page.locator('#si-dock-right #silm-module-shortcuts svg').evaluateAll(nodes=>
-  nodes.map(n=>{const box=n.getBoundingClientRect(),host=n.closest('button').getBoundingClientRect();
-   return {width:box.width,height:box.height,inside:box.left>=host.left-1&&
-    box.right<=host.right+1&&box.top>=host.top-1&&box.bottom<=host.bottom+1};
-  }));
- assert.equal(glyphs.length,3,label+': faltam ícones vetoriais dos módulos');
- assert.ok(glyphs.every(g=>g.width>=15&&g.height>=15&&g.width<=25&&g.height<=25&&g.inside),
-  label+': ícones de Ver deformados '+JSON.stringify(glyphs));
- assert.ok(await page.locator('#si-dock-right .silm-module-shortcut-label').first().isVisible(),
-  label+': rótulos dos módulos não estão visíveis');
- if(label==='celular-390'||label==='desktop')
-  await page.screenshot({path:join(evidenceDir,label+'-modulos-no-ver.jpg'),
-   type:'jpeg',quality:70,animations:'disabled'});
-
- assert.deepEqual(buttons.filter(b=>b.pressed==='true').map(b=>b.id),[before.module],
-  label+': indicador do módulo ativo incorreto');
- assert.ok(buttons.every(b=>b.width>=43.5&&b.height>=43.5&&b.left>=-2&&b.right<=width+2),
-  label+': módulos invisíveis ou comprimidos '+JSON.stringify(buttons));
- const visualWidth=await page.evaluate(()=>document.documentElement.scrollWidth);
- assert.ok(visualWidth<=width+6,label+': atalhos provocaram rolagem global '+visualWidth);
- if(!['celular-390','desktop'].includes(label)){await close();return;}
+ const launch=page.locator('[data-open-dock="montagem"]');
+ if(await launch.getAttribute('aria-expanded')!=='true')await launch.click();
+ await page.locator('[data-left-tab="modulo"]').click();
  for(const target of ['medir','calcular','explorar']){
-  const button=page.locator('[data-silm-module-shortcut="'+target+'"]');
+  const card=page.locator('.silm-module-card[data-module="'+target+'"]');
+  if(!await card.evaluate(el=>el.open))await card.locator('summary').click();
+  const button=page.locator('#silm-module-activate-'+target);
+  assert.equal(await button.isDisabled(),false,label+': módulo bloqueado: '+target);
   await button.click();
   await page.waitForFunction(mode=>window.SILMIntegration?.snapshot?.()?.module?.active===mode,target);
-  await page.waitForFunction(mode=>document.querySelector('#silm-module-shortcuts')?.dataset.activeModule===mode,target);
-  // O menu Ver agora não utiliza famílias de catálogo como navegação.
-  // O botão direto correspondente é o contrato verificável de cada módulo.
-  assert.equal(await page.locator('#si-dock-right #si-viewer-catalog').isVisible(),false,
-   label+': menus intermediários ainda estão visíveis em Ver');
-  const direct=page.locator('#si-dock-right #silm-direct-actionbar');
-  const tool=target==='explorar'?'[data-action="electrons"]':
-   target==='medir'?'[data-silm-direct-tool="medir:distance"]':
-   '[data-silm-direct-tool^="calcular:"]';
-  assert.ok(await direct.locator(tool).count()>=1,
-   label+': não há botões diretos para '+target);
-  const visible=await direct.locator('button').evaluateAll(nodes=>nodes.map(n=>({
-   shown:n.getClientRects().length>0,disabled:n.disabled,
-   height:n.getBoundingClientRect().height,width:n.getBoundingClientRect().width
-  })));
-  assert.ok(visible.some(x=>x.shown&&x.height>=43.5&&x.width>=43.5),
-   label+': ferramentas diretas invisíveis ou muito pequenas '+JSON.stringify(visible));
+  await page.waitForFunction(mode=>document.querySelector('#si-workspace')?.dataset.silmModule===mode,target);
   const current=JSON.parse(await scientific());
-  assert.equal(current.module,target,label+': atalho não alterou o módulo');
+  assert.equal(current.module,target,label+': módulo não alterado pela Montagem');
   assert.equal(await page.locator('#silm-module').inputValue(),target,
-   label+': seletor original não sincronizado');
-  assert.deepEqual(await page.locator('#silm-module-shortcuts [aria-pressed="true"]')
-   .evaluateAll(nodes=>nodes.map(n=>n.dataset.silmModuleShortcut)),[target],
-   label+': mais de um módulo marcado como ativo');
-  assert.equal(await page.locator('[data-silm-module-shortcut="'+target+'"]').isDisabled(),false,
-   label+': módulo livre ficou bloqueado');
+   label+': seletor científico sem sincronização');
   for(const key of ['metal','investigationId','structure','properties','electrons','measurements','calculations'])
    assert.deepEqual(current[key],before[key],label+': mudar módulo alterou '+key);
-  // A disponibilidade agora é verificada pelos botões científicos diretos
-  // acima. A API legada de famílias não faz parte da navegação pública.
-  if(target!=='explorar'){
-   assert.equal(await page.locator('#scene-undo').isDisabled(),true,
-    label+': editar estrutura deve continuar proibido em '+target);
-  }
+  if(target!=='explorar')assert.equal(await page.locator('#scene-undo').isDisabled(),true,
+   label+': edição estrutural disponível em '+target);
  }
- // Teclado: a seleção visual segue o padrão do SIAB.
- const explorar=page.locator('[data-silm-module-shortcut="explorar"]');
- await explorar.focus();
- await explorar.press('ArrowRight');
- await page.waitForFunction(()=>SILMIntegration.snapshot()?.module?.active==='medir');
- await page.locator('[data-silm-module-shortcut="medir"]').press('End');
- await page.waitForFunction(()=>SILMIntegration.snapshot()?.module?.active==='calcular');
- await page.locator('[data-silm-module-shortcut="calcular"]').press('Home');
- await page.waitForFunction(()=>SILMIntegration.snapshot()?.module?.active==='explorar');
- assert.equal(await scientific(),JSON.stringify(before),label+': teclado alterou registros científicos');
- await close();
+ await page.locator('[data-close-dock="left"]').click();
+ await page.locator('[data-open-dock="ver"]').click();
+ assert.ok(await page.locator('#si-dock-right #silm-direct-actionbar [data-action="electrons"]').count()>0,
+  label+': ferramentas de Explorar não aparecem em Ver');
+ assert.equal(await page.locator('#si-dock-right [data-silm-module-shortcut]').count(),0,
+  label+': escolha de módulo duplicada em Ver');
+ await page.screenshot({path:join(evidenceDir,label+'-modulos-na-montagem.jpg'),
+  type:'jpeg',quality:70,animations:'disabled'});
+ await page.locator('[data-close-dock="right"]').click();
+ assert.equal(await scientific(),JSON.stringify(before),label+': navegar módulos alterou a ciência');
 }
 
 try{
