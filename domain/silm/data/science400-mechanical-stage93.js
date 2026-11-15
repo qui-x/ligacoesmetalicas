@@ -78,7 +78,8 @@ SILM.scientificMechanicalStage93=(()=>{
   qualifier:'FAIXA de 5–15% da deformação na fratura/perda de carga: NÃO substituir pelo mínimo nem usar média. Condições diferem do relato de 70% (1958).',
   additionalValues:[{code:'elong-range-maximum',value:15,unit:'%',label:'Extremo superior da faixa de fratura',meaning:'range-maximum-NOT-typical'}]});
  const byKey=new Map();
- for(const r of rows){const k=r.atomicNumber+'|'+r.property;const existing=byKey.get(k)||[];existing.push(r);byKey.set(k,Object.freeze(existing))}
+ for(const r of rows){const k=r.atomicNumber+'|'+r.property;const existing=byKey.get(k)||[];byKey.set(k,[...existing,r]);}
+ for(const [k,records] of byKey.entries())byKey.set(k,Object.freeze(records));
  return Object.freeze({schema:'silm.stage93.conditional-mechanics.v1',rows:Object.freeze(rows),
   getFor:(z,p)=>byKey.get(Number(z)+'|'+p)||[],
   newNumericSlots:Object.freeze(['Ga-ductility','Nb-malleability','Ti-malleability','Pb-malleability','Sn-malleability']),
