@@ -220,7 +220,6 @@ window.SILM=window.SILM||{};
   const info=Object.freeze({...metadata,
    kind:'incremental-j2-plane-strain-normalized',
    calibrated:false,nx:NX,ny:NY});
-  privateState.set(info,record);
   const sample=(u,v)=>{
    const xx=clamp(Number(u)||0,0,1)*NX,yy=clamp(Number(v)||0,0,1)*NY;
    const ix=Math.min(NX-1,Math.floor(xx)),iy=Math.min(NY-1,Math.floor(yy)),
@@ -237,7 +236,9 @@ window.SILM=window.SILM||{};
     tri=(yy-iy)<=(xx-ix)?0:1;
    return record.history[2*(iy*NX+ix)+tri].alpha;
   };
-  return Object.freeze({...info,sample,samplePlastic});
+  const exposed=Object.freeze({...info,sample,samplePlastic});
+  privateState.set(exposed,record);
+  return exposed;
  }
  function history(marks=[]){
   const safe=names(marks),key='h:'+sig(safe);
