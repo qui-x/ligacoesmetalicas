@@ -1343,7 +1343,7 @@
 
 
 /* Leitura secundária de mecânica constitutiva: não ocupar o palco central. */
-.silm-micro-constitutive-reading{
+.silm-micro-constitutive-reading,.silm-micro-slip-stress{
  display:block;flex:1 1 100%;min-width:0;
  padding:6px 8px;margin:3px 6px;
  color:var(--muted);background:var(--panel2,var(--surface));
@@ -1351,7 +1351,7 @@
  font-size:.72rem;line-height:1.45;overflow-wrap:anywhere;
 }
 @media(forced-colors:active){
- .silm-micro-constitutive-reading{color:CanvasText;background:Canvas;border-color:CanvasText}
+ .silm-micro-constitutive-reading,.silm-micro-slip-stress{color:CanvasText;background:Canvas;border-color:CanvasText}
 }
 
 
