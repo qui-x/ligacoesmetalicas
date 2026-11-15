@@ -271,3 +271,64 @@ test('controle rejeita numero invalido de incrementos de descarga',()=>{
  assert.equal(m.run({unload:true,unloadIncrements:13}).status,'INVALID_LOADING');
  assert.equal(m.run({unload:true,unloadIncrements:1.5}).status,'INVALID_LOADING');
 });
+
+test('84E: retirada de forca elastica gera equilibrio no topo livre e retorno praticamente nulo',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const r=m.run({mode:'tension',load:.10,increments:3,
+  unload:true,unloadMode:'force',unloadIncrements:3});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ assert.equal(r.stepsCompleted,6);
+ assert.equal(r.energyAudit.status,'ZERO_FORCE_EQUILIBRIUM_ESTIMATE');
+ assert.equal(r.energyAudit.boundaryConditionFinal,'traction-free-top');
+ assert.equal(r.energyAudit.contactReleased,true);
+ assert.equal(r.energyAudit.contactHeldAtZero,false);
+ assert.equal(r.loadCase.unloadMode,'force');
+ assert.equal(r.energyAudit.appliedContactForceNormFinal,0);
+ assert.ok(r.energyAudit.peakContactForceNorm>0);
+ assert.ok(r.energyAudit.topFreeResidual<8e-5);
+ assert.equal(r.workHistory.filter(h=>h.phase==='force-unloading').length,3);
+ assert.ok(r.workHistory.at(-1).relativeCommand===0);
+ assert.ok(r.energyAudit.unloadingExternalWork<0,'A descarga elastica deve restituir trabalho');
+ assert.ok(Math.abs(r.energyAudit.externalWorkTotal)<1e-5);
+ assert.ok(Math.abs(r.energy.total)<1e-5);
+ const p=r.sample(.5,.3);
+ assert.ok(Math.hypot(p.dx,p.dy)<.0003);
+ assert.equal(r.energyAudit.validAsExperimentalBalance,false);
+});
+test('84E: equilibrio de forca nula preserva deformacao plastica acumulada',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const r=m.run({mode:'tension',load:.80,increments:5,
+  unload:true,unloadMode:'force',unloadIncrements:5});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ assert.ok(r.maxAccumulatedSlip>0,'O historico plastico precisa ser mantido');
+ assert.ok(r.energy.plasticDissipated>0);
+ assert.ok(r.energy.hardeningStored>0);
+ assert.equal(r.energyAudit.appliedContactForceNormFinal,0);
+ assert.ok(r.energyAudit.topFreeResidual<8e-5);
+ assert.equal(r.energyAudit.contactReleased,true);
+ assert.equal(r.energyAudit.unloadingIncrements,5);
+ assert.equal(r.workHistory.length,10);
+ assert.equal(r.workHistory.at(-1).phase,'force-unloading');
+ assert.ok(r.workHistory.slice(5).every(x=>x.integration==='trapezoidal-prescribed-nodal-force'));
+ assert.ok(Math.abs(r.reactions.netFy)<2e-4);
+ const displaced=r.sample(.5,.3);
+ assert.ok(Number.isFinite(displaced.dy)&&Number.isFinite(displaced.dx));
+ assert.equal(r.calibrated,false);
+ assert.equal(r.finiteDeformation,false);
+});
+test('84E: modos de descarga diferenciam retorno da garra de alivio de forca',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const options={mode:'tension',load:.35,increments:4,unload:true,unloadIncrements:4};
+ const d=m.run({...options,unloadMode:'displacement'});
+ const f=m.run({...options,unloadMode:'force'});
+ assert.equal(d.status,'CONVERGED',JSON.stringify(d));
+ assert.equal(f.status,'CONVERGED',JSON.stringify(f));
+ assert.equal(d.loadCase.contactHeldAtZero,true);
+ assert.equal(d.loadCase.contactReleased,false);
+ assert.equal(f.loadCase.contactHeldAtZero,false);
+ assert.equal(f.loadCase.contactReleased,true);
+ assert.equal(f.loadCase.boundaryConditionFinal,'traction-free-top');
+ assert.ok(f.energyAudit.topFreeResidual<8e-5);
+ assert.ok(Math.abs(f.energyAudit.unloadingExternalWork)>0);
+ assert.equal(m.run({unloadMode:'not-supported'}).status,'INVALID_LOADING');
+});
