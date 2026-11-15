@@ -23,7 +23,7 @@ window.SILM=window.SILM||{};
  const S=window.SILM,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  const MATERIAL=Object.freeze({E:10,nu:.3,yieldStress:.5,hardening:12,
   calibrated:false,units:'relative'});
- const NX=10,NY=8,MAX_CACHE=20,MAX_STEPS=16;
+ const NX=8,NY=6,MAX_CACHE=20,MAX_STEPS=16;
  const cache=new Map(),privateState=new WeakMap();
  const lambda=MATERIAL.E*MATERIAL.nu/((1+MATERIAL.nu)*(1-2*MATERIAL.nu));
  const G=MATERIAL.E/(2*(1+MATERIAL.nu));
