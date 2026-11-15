@@ -1871,7 +1871,7 @@ var BaseDemoSI;
         return { view: "focus", left: "collapsed", right: "collapsed", leftTab: "preparo", rightTab: "ver", presentation: "standard" };
     }
     BaseDemoSI.initialWorkspace = initialWorkspace;
-    /** A dimensão compacta (<1280 px) opera uma doca por vez; <=900 px usa sheet. */
+    /** As docas são mutuamente exclusivas em qualquer largura; <=900 px usa sheet. */
     function reduceWorkspace(s, a, compact) {
         switch (a.type) {
             case "reset": return initialWorkspace();
@@ -1879,9 +1879,9 @@ var BaseDemoSI;
             case "open": {
                 const tab = a.tab;
                 if (a.side === "left")
-                    return { ...s, left: "open", right: compact ? "collapsed" : s.right, presentation: "standard",
+                    return { ...s, left: "open", right: "collapsed", presentation: "standard",
                         leftTab: tab === "resumo" || tab === "objetos" || tab === "modulo" || tab === "missao" ? tab : "preparo" };
-                return { ...s, right: "open", left: compact ? "collapsed" : s.left,
+                return { ...s, right: "open", left: "collapsed",
                     rightTab: tab === "dados" ? "dados" : "ver", presentation: "standard" };
             }
             case "close": return { ...s, [a.side]: "collapsed", presentation: "standard" };
