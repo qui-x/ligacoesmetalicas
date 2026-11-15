@@ -1,0 +1,23 @@
+name: SILM — ponte mecânica/cena 3D
+on:
+  pull_request:
+    paths:
+      - 'domain/silm/mechanics-scene-bridge.js'
+      - 'tests/silm-mechanics-scene-bridge.test.cjs'
+      - '.github/workflows/silm-mechanics-scene-bridge-preview.yml'
+  workflow_dispatch:
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar sintaxe dos módulos
+        run: |
+          node --check domain/silm/mechanics-scene-bridge.js
+          node --check tests/silm-mechanics-scene-bridge.test.cjs
+      - name: Testes determinísticos
+        run: node --test tests/silm-mechanics-scene-bridge.test.cjs

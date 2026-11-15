@@ -11,7 +11,7 @@ const field={converged:true,sample:(u,v)=>({dx:.02*u,dy:-.04*v}),
  samplePlastic:()=>.025,sampleStress:()=>[[1,0,0],[0,-1,0],[0,0,0]]};
 test('recusa campo não convergido e origem não suportada',()=>{
  assert.equal(api.create({converged:false,sample:field.sample}).ok,false);
- assert.throws(()=>api.create(field,{source:'another'}),RangeError);
+ assert.throws(()=>api.create(field,{source:'another'}),{name:'RangeError'});
 });
 test('mapeia coordenadas e não inventa deformação fora do plano',()=>{
  const bridge=api.create(field,{source:'j2',amplification:2});
@@ -20,7 +20,7 @@ test('mapeia coordenadas e não inventa deformação fora do plano',()=>{
  assert.ok(Math.abs(p.y-(.5-.08))<1e-12);
  assert.equal(p.z,.25);assert.equal(p.read.displacement.dz,null);
  assert.equal(p.read.calibrated,false);
- assert.throws(()=>bridge.point(1.1,0),RangeError);
+ assert.throws(()=>bridge.point(1.1,0),{name:'RangeError'});
 });
 test('grade determinística e índices válidos',()=>{
  const g=api.create(field).sampleGrid(4,3);
@@ -35,7 +35,7 @@ test('camadas ópticas e térmicas não alegam previsões experimentais',()=>{
  assert.equal(v.heatOverlay,.8);assert.equal(v.chargeOverlay,.6);
  assert.equal(v.validAsMaterialPrediction,false);
  assert.ok(v.roughnessRelative>=0&&v.roughnessRelative<=1);
- assert.throws(()=>bridge.appearance(0,0,{temperature:2}),RangeError);
+ assert.throws(()=>bridge.appearance(0,0,{temperature:2}),{name:'RangeError'});
 });
 test('interface compatível com amostras CPFEM e ausência de plástico',()=>{
  const c={converged:true,sample:(u,v)=>({dx:u*.01,dy:v*.01}),sampleMechanics:()=>({stressTensor:[[1,0,0],[0,1,0],[0,0,1]]})};
