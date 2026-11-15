@@ -109,6 +109,7 @@ SILM.stage81Reconciliation=(()=>{
   blockedFromStructuralUse:blocked.has(symbol),
   numericalEngineCalibrationAllowed:false,
   stage81Status:blocked.has(symbol)?'blocked-structural':
+   !notIndexedStage80.has(symbol)?'already-indexed-stage80':
    bySymbol[symbol].some(x=>x.status!=='candidate')?'new-sourced-reference':
    bySymbol[symbol].length?'estimates-only':
    noIndividualSources.has(symbol)?'untraced-legacy-values-only':'no-admissible-quantitative-data'
