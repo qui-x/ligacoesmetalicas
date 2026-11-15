@@ -305,8 +305,12 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
    if(known.length){
     const first=known[0],metric=first.values[0];
     const sampleT=Number.isFinite(first.temperatureK)?fmt(first.temperatureK)+' K':'T não numericamente informada';
+    const evidenceType=first.evidenceIsModelEstimate?
+     'ESTIMATIVA por analogia; não medido nem homologado':first.status==='candidate'?
+     'CANDIDATO de pesquisa; condições específicas ou incompletas':
+     'referência condicionada à amostra e à fonte';
     p.textContent=Properties.catalog[id].title+': '+metric.label+' '+fmt(metric.value)+' '+metric.unit+
-     ' · '+sampleT+' · referência da amostra; ver estudos abaixo.';
+     ' · '+sampleT+' · '+evidenceType+'; ver estudos abaixo.';
     host.append(p);
     continue;
    }
