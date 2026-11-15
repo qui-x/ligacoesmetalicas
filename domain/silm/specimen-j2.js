@@ -178,7 +178,7 @@ window.SILM=window.SILM||{};
   const {mask,values}=constraints({mode,position,width,load,release});
   let u=previous.u.slice();
   for(let i=0;i<nd;i++)if(mask[i])u[i]=values[i];
-  const maxNewton=18,tol=1.5e-5;
+  const maxNewton=18,tol=8e-5; // Norma residual relativa ao E=10 normalizado.
   let iterations=0,solved=false,a=null;
   for(;iterations<maxNewton;iterations++){
    a=assemble(u,previous,{stiffness:true});
