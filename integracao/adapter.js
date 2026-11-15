@@ -482,8 +482,13 @@
   const state=model.state,e=element(),s=state.structure,n=s?.units.length||0;
   // Investigar objeto já iniciou uma investigação. Preparo oferece a ação
   // distinta de começar uma montagem livre, sem botão de início redundante.
-  $('silm-start').textContent=state.metadata?.workshop?.referenceId
-   ?'Nova montagem livre':'Iniciar investigação';
+  {const startButton=$('silm-start'),
+    label=state.metadata?.workshop?.referenceId?'Nova montagem livre':'Iniciar investigação';
+   // Atualizar só o texto: o iconizador preserva o SVG nativo do botão.
+   const textNode=[...startButton.childNodes].find(node=>node.nodeType===Node.TEXT_NODE);
+   if(textNode){if(textNode.nodeValue!==label)textNode.nodeValue=label;}
+   else startButton.append(document.createTextNode(label));
+  }
   const tag=$('si-module-tag');if(tag){const c=routeUI.session.context();tag.textContent=(c?(c.type==='mission'?'Missão':'Roteiro'):'Módulo')+' · '+({explorar:'Explorar',medir:'Medir',calcular:'Calcular'})[state.module.active];}
   const expandButton=$('si-expand-structure'),expandable=!!(e&&s?.mode==='crystalline'&&n>0);
   expandButton.disabled=!expandable;
