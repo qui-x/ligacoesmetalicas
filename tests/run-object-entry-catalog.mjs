@@ -33,8 +33,10 @@ try{
  await page.locator('[data-left-tab="preparo"]').click();
  await page.locator('#silm-open-periodic').click();
  await page.waitForFunction(()=>document.querySelector('#silm-object-entry .periodic-element[data-z="79"]'));
- assert.equal(await page.locator('#silm-periodic-dialog').isVisible(),false,
-  'O botão da Montagem abriu uma Tabela modal redundante.');
+ assert.equal(await page.locator('#silm-periodic-dialog').count(),0,
+  'A Tabela modal redundante ainda existe no DOM.');
+ assert.equal(await page.locator('#silm-object-entry .periodic-actions').count(),0,
+  'A Tabela de escolha mantém botões desnecessários no rodapé.');
  assert.equal(await page.locator('#si-dock-left').isVisible(),false,
   'Montagem não foi recolhida para liberar a área da Tabela.');
 
@@ -185,6 +187,10 @@ try{
  await gdDialog.waitFor({state:'visible'});
  assert.equal(await gdDialog.locator('.silm-workshop-card').count(),1,
   'Gadolínio deve apresentar uma aplicação no catálogo');
+ assert.equal(await gdDialog.locator('.silm-workshop-manual-link').count(),0,
+  'Modal das imagens deve apresentar seleção e não links repetidos ao Manual.');
+ assert.equal(await gdDialog.locator('.silm-workshop-card').getByRole('button',{name:'Iniciar montagem'}).count(),1,
+  'Falta a ação inequívoca de iniciar montagem para a imagem escolhida.');
  await page.waitForFunction(()=>document.querySelector('#silm-objects-dialog .silm-workshop-card img')?.naturalWidth>0);
  const singleDesktop=await gdDialog.evaluate(dialog=>{
   const card=dialog.querySelector('.silm-workshop-card');
