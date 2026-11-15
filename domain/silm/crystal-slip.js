@@ -28,19 +28,17 @@ SILM.crystalSlip=(()=>{
   }
   return [...map.values()];
  };
- const perms=v=>new Set([
-  [v[0],v[1],v[2]].join(','),
-  [v[0],v[2],v[1]].join(','),
-  [v[1],v[0],v[2]].join(','),
-  [v[1],v[2],v[0]].join(','),
-  [v[2],v[0],v[1]].join(','),
-  [v[2],v[1],v[0]].join(',')
- ]).values().map(x=>x.split(',').map(Number)).toArray();
  const types=Object.freeze({CCC:'BCC',CFC:'FCC',HC:'HCP',BCC:'BCC',FCC:'FCC',HCP:'HCP'});
  const cubicNormals=family=>{
-  if(family==='FCC')return unique([-1,1].flatMap(x=>[-1,1].flatMap(y=>[-1,1].map(z=>[x,y,z]))));
-  return unique(perms([1,1,0]).flatMap(v=>[-1,1].flatMap(a=>[-1,1].map(b=>
-   v.map((n,i)=>n===0?0:(i===v.findIndex(k=>k!==0)?a:b)))));
+  if(family==='FCC')
+   return unique([-1,1].flatMap(x=>[-1,1].flatMap(y=>[-1,1].map(z=>[x,y,z]))));
+  const all=[];
+  for(let zero=0;zero<3;zero++)for(const a of [-1,1])for(const b of [-1,1]){
+   const v=[0,0,0];let j=0;
+   for(let i=0;i<3;i++)if(i!==zero)v[i]=j++===0?a:b;
+   all.push(v);
+  }
+  return unique(all);
  };
  const cubicDirs=family=>{
   if(family==='FCC')return cubicNormals('BCC');
