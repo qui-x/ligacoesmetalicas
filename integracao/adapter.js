@@ -468,9 +468,15 @@
    const c=routeUI.session.context();if(c)rows.unshift([c.type==='mission'?'Missão':'Roteiro',routeUI.session.route().title]);
    const key=JSON.stringify(rows);if(list.dataset.key!==key){list.dataset.key=key;list.replaceChildren(...rows.flatMap(([k,v])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;return [dt,dd];}));}}
   text('scene-count',units(n));text('silm-metal-information',selected?S.data.get(Number(selected)).name:'');
-  $('scene-undo').disabled=state.module.active!=='explorar'||!model.canUndo;$('scene-clear').disabled=state.module.active!=='explorar'||!n;
-  $('si-compact-clear').disabled=state.module.active!=='explorar'||!n;$('scene-count').dataset.compactCount=units(n);
   const freeMode=s?.mode==='free',crystalMode=s?.mode==='crystalline';
+  $('scene-undo').disabled=state.module.active!=='explorar'||!model.canUndo;
+  // Limpar a rede pronta apagaria a referência gerada pelo objeto; a ação
+  // pertence exclusivamente ao editor manual, não à investigação.
+  $('scene-clear').hidden=!freeMode;
+  $('scene-clear').disabled=state.module.active!=='explorar'||!n||!freeMode;
+  $('si-compact-clear').hidden=!freeMode;
+  $('si-compact-clear').disabled=state.module.active!=='explorar'||!n||!freeMode;
+  $('scene-count').dataset.compactCount=units(n);
   // O editor só aparece em Preparo por escolha explícita, nunca como aba.
   const freeAssembly=$('silm-free-assembly');
   freeAssembly.hidden=!e||state.module.active!=='explorar'||(routeUI.session.open()&&!routeUI.canBuild());
