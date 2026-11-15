@@ -37,7 +37,7 @@ SILM.scienceEvidenceIndex=(()=>{
   return 'ductility';
  };
  function add({id,atomicNumber,symbol,property,origin,values,status,sourceURL,sourceName,
-  sample,temperatureK,temperatureText,pressurePa,qualifier,phase,test,sourceStatus}){
+  sample,temperatureK,temperatureText,pressurePa,qualifier,phase,test,sourceStatus,evidenceIsModelEstimate=false}){
   if(!known.has(property)||!Number.isInteger(atomicNumber)||atomicNumber<1||atomicNumber>118)return;
   const available=(values||[]).filter(x=>finite(x.value)&&text(x.unit)&&text(x.label));
   if(!available.length)return;
@@ -52,7 +52,7 @@ SILM.scienceEvidenceIndex=(()=>{
    temperatureK:temperature(temperatureK),
    temperatureText:text(temperatureText)||'Temperatura de ensaio não numericamente informada',
    pressurePa:finite(pressurePa)?pressurePa:null,
-   qualifier:text(qualifier),phase:text(phase),test:text(test),sourceStatus:text(sourceStatus),
+   qualifier:text(qualifier),phase:text(phase),test:text(test),sourceStatus:text(sourceStatus),evidenceIsModelEstimate:!!evidenceIsModelEstimate,
    engineRelease:false,calibrationApproved:false,referenceOnly:true
   }));
  }
@@ -133,6 +133,14 @@ SILM.scienceEvidenceIndex=(()=>{
    qualifier:[p.warning,'R(550 nm) não mede o brilho percebido nem representa peça oxidada/rugosa. Fonte original individual pendente quando indicada.'].filter(Boolean).join(' '),
    sourceStatus:p.sourceStatus,phase:''});
  }
+ for(const p of S.stage81Reconciliation?.records||[]){
+  add({id:p.id,atomicNumber:p.atomicNumber,symbol:p.symbol,property:p.property,
+   origin:'stage81-matrix92',values:p.values,status:p.status,sourceURL:p.sourceURL,
+   sourceName:p.sourceName,sample:p.sample,temperatureK:p.temperatureK,
+   temperatureText:p.temperatureText,pressurePa:p.pressurePa,
+   qualifier:p.qualifier,phase:p.phase,test:p.test,sourceStatus:p.sourceStatus,
+   evidenceIsModelEstimate:p.evidenceIsModelEstimate});
+ }
  for(const p of S.sevenConditionResearch?.records||[]){
   const status=p.grade==='secondary-pending'?'pending':
    p.grade==='optical-derived'||p.grade==='primary-bound'||p.grade==='processing-only'||
@@ -174,7 +182,7 @@ SILM.scienceEvidenceIndex=(()=>{
  })])));
  const index=Object.freeze({
   schema:'silm.science.evidence-index.v1',keys,rows:Object.freeze(rows),
-  getFor,summary,elementCount:byZ.size,sourceCatalogCount:9,
+  getFor,summary,elementCount:byZ.size,sourceCatalogCount:10,
   evidenceIsNotMotorCalibration:true
  });
  return index;
