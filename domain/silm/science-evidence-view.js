@@ -4,7 +4,7 @@ window.SILM=window.SILM||{};
  * A interface conserva os painéis especializados e não altera motors físicos.
  */
 SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
- const S=SILM,db=S.scienceEvidenceIndex,
+ const S=SILM,db=S.scienceEvidenceIndex,batch=S.batch80Research,
   props=S.properties,labels=Object.freeze({
    'experimental-conditional':'Ensaio com condições específicas',
    evaluated:'Referência avaliada',compiled:'Compilação ou ficha técnica',
@@ -49,7 +49,10 @@ SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
   if(!valid){root.hidden=true;return;}
   let total=0,display=0,pending=0;
   for(const property of selected){
-   const all=db.getFor(z,property,{excludeSeven:true});
+   // O catalogo principal tem precedencia: o lote80 somente preenche ausencias,
+   // nunca sobrescreve nem duplica um estudo ja indexado.
+   const core=db.getFor(z,property,{excludeSeven:true});
+   const all=core.length?core:(batch?.getFor(z,property)||[]);
    if(!all.length)continue;
    const published=all.filter(r=>r.status!=='pending'),unverified=all.filter(r=>r.status==='pending');
    total+=all.length;display+=published.length;pending+=unverified.length;
@@ -58,9 +61,10 @@ SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
    const label=props.catalog[property]?.title||property;
    group.append(node('h5',label+' · '+published.length+' referências'+
     (unverified.length?' · '+unverified.length+' pendentes':'')));
-   const top=published.slice(0,mode==='explore'?1:2);
+   // Sem fonte primaria, tornar a pendencia visivel e explicitamente identificada.
+   const top=published.length?published.slice(0,mode==='explore'?1:2):unverified.slice(0,1);
    for(const r of top)group.append(article(r));
-   const rest=[...published.slice(top.length),...unverified];
+   const rest=published.length?[...published.slice(top.length),...unverified]:unverified.slice(1);
    if(rest.length){
     const more=document.createElement('details');more.className='silm-unified-evidence-more';
     more.append(node('summary','Outros estudos e condições ('+rest.length+')'));
@@ -75,6 +79,7 @@ SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
    'Evidências científicas reunidas desta propriedade':'Outras referências científicas do elemento';
   description.textContent=display+' fichas consultáveis'+(pending?' · '+pending+' registros com fonte original pendente':'')+
    '. Estudos podem se referir a amostras e temperaturas diferentes. '+
+   'O lote de 80 metais complementa somente campos sem referência no catálogo principal; registros sem fonte individual são triagens, não dados homologados. '+
    'Valores de ensaios, compilações e estimativas não homologam automaticamente os motores do SILM.';
  }
  return Object.freeze({root,update});
