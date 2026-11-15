@@ -473,7 +473,7 @@ SILM.polycrystalCPFEM=(()=>{
      unloadIncrements:unload?unloadIncrements:0,
      contactHeldAtZero:heldAtZero,contactReleased:forceUnloaded,
      boundaryConditionFinal:boundaryFinal,
-     kind:'displacement-loading-with-selected-unloading',units:'relative'})});
+     kind:'prescribed-displacement',units:'relative'})});
   }
   return Object.freeze({schema:'silm.polycrystal-cpfem.small-strain.v1',
    structure:slip.types[structure],sourceKind:'synthetic-voronoi',
