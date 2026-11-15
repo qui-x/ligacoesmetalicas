@@ -23,6 +23,15 @@ with sync_playwright() as pw:
         assert response and response.ok, f"{name}: falha ao carregar"
         page.wait_for_function("window.SILMIntegration && document.querySelector('#silm-add')")
         montagem = page.locator('[data-open-dock="montagem"]')
+        assert page.locator("#silm-module-shortcuts, [data-silm-module-shortcut], .silm-module-navigation").count() == 0, (
+            name, "Ver ainda contém seleção duplicada de módulos"
+        )
+        assert page.locator('[data-left-panel="modulo"] #silm-module-cards').count() == 1, (
+            name, "Módulos não estão exclusivamente na Montagem"
+        )
+        assert page.locator('[data-right-panel="ver"] #silm-module').count() == 0, (
+            name, "Controle de escolha de módulo indevidamente presente em Ver"
+        )
         if name == "desktop":
             # A doca deve reservar seu espaço entre 901px e 1920px, sem
             # ocultar a estrutura, a Visão geral ou a barra científica.
@@ -105,9 +114,15 @@ with sync_playwright() as pw:
         )
         page.locator("#silm-module-activate-medir").click()
         page.wait_for_function("SILMIntegration.snapshot().module.active === 'medir'")
+        assert page.locator("#si-workspace").get_attribute("data-silm-module") == "medir", (
+            name, "Alteração do módulo não sincronizou a apresentação"
+        )
         cards.nth(0).locator("summary").click()
         page.locator("#silm-module-activate-explorar").click()
         page.wait_for_function("SILMIntegration.snapshot().module.active === 'explorar'")
+        assert page.locator("#si-workspace").get_attribute("data-silm-module") == "explorar", (
+            name, "Ver não retornou às ferramentas de Explorar"
+        )
         page.locator('[data-left-tab="objetos"]').click()
         page.locator("#silm-add").click()
         page.wait_for_function("window.SILMIntegration.snapshot().structure.units.length === 1")

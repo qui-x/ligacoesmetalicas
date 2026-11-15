@@ -558,8 +558,8 @@
   // Tour da oficina (Etapa 10): coachmark como no SIAB, só na oficina livre; cada passo aponta um controle real e visível.
   const TOUR=[
    {title:'Prepare a oficina',text:'Abra Montagem → Preparo para escolher o metal e usar Iniciar investigação. A Tabela periódica mostra os metais disponíveis.',left:'preparo',target:()=>$('si-dock-left'),mobile:'[data-open-dock="montagem"]'},
-   {title:'Escolha um módulo',text:'Abra Ver e escolha Explorar, Medir ou Calcular. O segundo nível mostra as ferramentas permitidas pelo módulo, como no SIAB.',right:'ver',target:()=>$('silm-module-shortcuts'),mobile:'[data-open-dock="ver"]'},
-   {title:'Monte a estrutura',text:'Em Explorar, use Adicionar unidade e Organizar estrutura para dispor as unidades na estrutura de referência. Desfazer recupera o estado anterior.',left:'preparo',target:()=>$('silm-group-structure')?.closest('section,.silm-dock-group')||$('silm-add'),mobile:'[data-open-dock="montagem"]'},
+   {title:'Escolha um módulo',text:'Em Montagem → Módulo, escolha Explorar, Medir ou Calcular. Ver apresenta as ferramentas do módulo ativo.',left:'modulo',target:()=>$('silm-module-cards'),mobile:'[data-open-dock="montagem"]'},
+   {title:'Monte a estrutura',text:'Em Montagem → Unidades, adicione e organize os centros metálicos. Desfazer restaura a etapa anterior.',left:'objetos',target:()=>$('silm-group-structure')?.closest('section,.silm-dock-group')||$('silm-add'),mobile:'[data-open-dock="montagem"]'},
    {title:'Observe',text:'A cena mostra a montagem. Girar, aproximar ou trocar a vista não altera medições nem cálculos.',target:()=>$('si-stage'),mobile:'#si-stage'},
    {title:'Investigue e consulte os dados',text:'Em Ver, observe, meça e analise conforme o módulo. Em Dados, consulte os valores, as fontes e o relatório.',right:'ver',target:()=>$('si-dock-right'),mobile:'[data-open-dock="ver"]'}];
   const tourDialog=$('silm-tour'),ring=tourDialog.querySelector('.si-coach-ring'),card=tourDialog.querySelector('.si-coach-card');let step=0,opener=null;

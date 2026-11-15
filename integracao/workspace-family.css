@@ -712,3 +712,24 @@ body.si-structure-expanded #si-workspace:not(.si-workspace-fullscreen) #workspac
 @media(forced-colors:active){
  #silm-ver-more>summary:focus-visible{outline:3px solid Highlight}
 }
+
+/* Distribuição de responsabilidades: Montagem escolhe o módulo; Ver só opera
+   seus recursos. Regras necessárias mantidas após remover a antiga barra dupla. */
+#si-workspace .si-workspace-toolbar #si-module-tag{
+ position:absolute!important;width:1px!important;height:1px!important;
+ padding:0!important;margin:-1px!important;border:0!important;
+ clip-path:inset(50%);overflow:hidden;white-space:nowrap
+}
+#si-workspace:is([data-silm-module="medir"],[data-silm-module="calcular"]) #scene-undo,
+#si-workspace:is([data-silm-module="medir"],[data-silm-module="calcular"]) #silm-quick-explore{
+ display:none!important
+}
+@media(max-width:900px){
+ #si-workspace .si-workspace-toolbar{padding-inline:7px;gap:5px}
+ #si-workspace .si-workspace-toolbar .si-view-tabs{display:flex;flex:1 1 0;min-width:0;width:auto;gap:4px}
+ #si-workspace .si-workspace-toolbar .si-view-tabs button{min-width:0;padding:7px 4px}
+}
+@media(max-width:650px){
+ #si-workspace .si-workspace-toolbar #si-expand-structure{display:none!important}
+}
+#si-workspace #si-dock-right .si-viewer-family-tabs:has(> :only-child){display:none}

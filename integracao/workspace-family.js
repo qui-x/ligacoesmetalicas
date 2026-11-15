@@ -37,6 +37,21 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   {id:'calculos',title:'Cálculos cristalográficos',capability:'analyze',family:'calcular',description:'Escolha uma fórmula e a origem de cada valor. Consulte os resultados e a proveniência em Dados.'}
  ];
  let ready=false,dataPage=null;
+ // A escolha do módulo existe apenas em Montagem. Ver apresenta ferramentas do
+ // módulo ativo sem uma segunda navegação. Conservar as famílias científicas.
+ let viewerModule=null;
+ const lastViewerFamily=new Map();
+ const firstFamily={explorar:'observar',medir:'medir',calcular:'calcular'};
+ function syncModulePresentation(current){
+  const workspace=$('si-workspace');if(workspace)workspace.dataset.silmModule=current;
+  if(viewerModule===current)return;
+  if(viewerModule){const previous=B.currentViewerFamily?.();if(previous)lastViewerFamily.set(viewerModule,previous);}
+  viewerModule=current;
+  const allowed=B.availableViewerFamilies?.()||[];
+  const desired=lastViewerFamily.get(current)||firstFamily[current];
+  const selected=allowed.includes(desired)?desired:allowed.includes(firstFamily[current])?firstFamily[current]:allowed[0];
+  if(selected&&B.currentViewerFamily?.()!==selected)B.chooseViewerFamily?.(selected);
+ }
  const names={explorar:'Explorar',medir:'Medir',calcular:'Calcular'};
  // Mantém o renderizador da Base SI disponível para ações rápidas e seleção de ferramentas.
  // Preserva o foco da navegação por teclado quando o conteúdo do painel é reconstruído.
@@ -343,9 +358,10 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  }
  function update(){
   if(!ready)return;
+  const current=model.state.module.active,locked=!!activity()?.lockedModule();
+  syncModulePresentation(current);
   renderViewers();
   applyLayerPresentation();
-  const current=model.state.module.active,locked=!!activity()?.lockedModule();
   for(const card of $('silm-module-cards').children){
    const active=card.dataset.module===current;card.classList.toggle('is-active',active);card.querySelector('.silm-module-badge').hidden=!active;
    const button=card.querySelector('button');button.disabled=locked||active;button.setAttribute('aria-pressed',String(active));button.textContent=active?'Módulo '+names[current]+' em uso':'Ativar módulo '+names[card.dataset.module];
@@ -359,6 +375,13 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  // Como no SIAB, os painéis abertos por Ver e Dados se chamam "Investigar" e "Dados da investigação". A Base reescreve o
  // título a cada desenho da doca; o observador troca só esses rótulos genéricos e deixa os títulos de detalhe como estão.
  function titleInvestigar(){const title=$('si-right-title');if(!title)return;const fix=()=>{const label={Ver:'Investigar',Dados:'Dados da investigação'}[title.textContent];if(label)title.textContent=label;};new MutationObserver(fix).observe(title,{childList:true,characterData:true,subtree:true});fix();}
- function init(){modules();setupViewers();setupData();titleInvestigar();ready=true;update();}
+ function init(){
+  modules();
+  // Como no SIAB, reter a última família de visualização em cada módulo.
+  window.addEventListener('si-viewer-family-selected',()=>{
+   const current=B.currentViewerFamily?.();if(viewerModule&&current)lastViewerFamily.set(viewerModule,current);
+  });
+  setupViewers();setupData();titleInvestigar();ready=true;update();
+ }
  return {init,update,observer};
 };
