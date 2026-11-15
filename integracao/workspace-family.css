@@ -603,3 +603,140 @@ body.si-structure-expanded #silm-scene-actionbar{
   border:2px solid Highlight;outline:2px solid Highlight;outline-offset:-4px;
  }
 }
+
+/* Layout com docas no fluxo (nov/2026). Evita cobrir estruturas e ferramentas.
+   As vistas científicas mantêm coordenadas; seu ResizeObserver adapta pixels. */
+@media (min-width:901px){
+ #si-workspace:not(.si-workspace-fullscreen){
+  --silm-left-track:0px;--silm-right-track:0px;
+  display:grid;grid-template-columns:var(--silm-left-track) minmax(0,1fr) var(--silm-right-track);
+  grid-template-rows:auto minmax(0,1fr) auto;column-gap:0;min-width:0;min-height:0;
+ }
+ #si-workspace:not(.si-workspace-fullscreen)[data-left-open="true"]{--silm-left-track:var(--si-dock-left)}
+ #si-workspace:not(.si-workspace-fullscreen)[data-right-open="true"]{--silm-right-track:var(--si-dock-right)}
+ #si-workspace:not(.si-workspace-fullscreen)>.si-workspace-toolbar{grid-column:1/-1;grid-row:1;min-width:0}
+ #si-workspace:not(.si-workspace-fullscreen)>#si-stage{grid-column:2;grid-row:2;min-width:0;min-height:0}
+ #si-workspace:not(.si-workspace-fullscreen)>#silm-scene-actionbar{grid-column:2;grid-row:3;min-width:0;max-width:100%}
+ #si-workspace:not(.si-workspace-fullscreen)>#si-dock-left,
+ #si-workspace:not(.si-workspace-fullscreen)>#si-dock-right{
+  position:relative;inset:auto;top:auto;bottom:auto;left:auto;right:auto;
+  box-sizing:border-box;width:auto;max-width:100%;height:auto;min-height:0;
+  grid-row:2/span 2;margin:7px 8px;border-radius:12px;
+  box-shadow:0 5px 20px rgb(0 0 0 / .12)
+ }
+ #si-workspace:not(.si-workspace-fullscreen)>#si-dock-left{grid-column:1}
+ #si-workspace:not(.si-workspace-fullscreen)>#si-dock-right{grid-column:3}
+ #si-workspace:not(.si-workspace-fullscreen) #workspace-focus{padding:8px 10px!important;min-width:0}
+ #si-workspace:not(.si-workspace-fullscreen) #workspace-overview{min-width:0}
+ #si-workspace:not(.si-workspace-fullscreen) .si-dock-scroll{min-width:0;min-height:0}
+}
+/* A apresentação expandida usa a mecânica própria de tela cheia. */
+body.si-structure-expanded #si-workspace{display:flex!important}
+
+/* Expandir a estrutura continua ocupando toda a área, sem espaçamento da doca. */
+body.si-structure-expanded #si-workspace:not(.si-workspace-fullscreen) #workspace-focus{padding:0!important}
+
+/* Paridade de hierarquia SIAB (15/11/2026): conteúdo primeiro, explicação sob demanda.
+   Módulos continuam em Montagem; Ver possui comandos diretos e segundo nível
+   recolhível; Dados é um catálogo curto com resultados científicos separados. */
+#silm-module-context:empty{display:none}
+#silm-module-cards .silm-module-body p.silm-module-note{
+ margin:4px 0 12px;font-size:.82rem;line-height:1.4;color:var(--muted)
+}
+#silm-ver-more{
+ margin:12px 0 0;border-top:1px solid var(--border);padding-top:6px;min-width:0
+}
+#silm-ver-more>summary{
+ display:flex;align-items:center;min-height:44px;padding:8px 4px;
+ font-size:.83rem;font-weight:700;color:var(--text);cursor:pointer
+}
+#silm-ver-more>summary::after{
+ content:'+';margin-left:auto;color:var(--muted);font-size:1.05rem
+}
+#silm-ver-more[open]>summary::after{content:'−'}
+#silm-ver-more>summary:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+#silm-ver-more .si-viewer-controls{padding-top:6px}
+#silm-data-catalog .silm-data-menu{gap:6px}
+#silm-data-catalog .silm-data-menu>button{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:8px;padding:10px 12px;min-height:46px;border-radius:9px
+}
+#silm-data-catalog .silm-data-menu>button strong{font-size:.84rem}
+#silm-data-catalog .silm-data-menu #silm-record-count{
+ font-size:.75rem;line-height:1.3;text-align:right;color:var(--muted)
+}
+#silm-data-catalog .silm-data-documents{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;
+ margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--border)
+}
+#silm-data-catalog .silm-data-documents .button{
+ display:flex;justify-content:center;align-items:center;
+ min-height:44px;min-width:0;margin:0;padding:7px 6px
+}
+@media(forced-colors:active){
+ #silm-ver-more>summary:focus-visible{outline:3px solid Highlight}
+}
+
+/* Distribuição de responsabilidades: Montagem escolhe o módulo; Ver só opera
+   seus recursos. Regras necessárias mantidas após remover a antiga barra dupla. */
+#si-workspace .si-workspace-toolbar #si-module-tag{
+ position:absolute!important;width:1px!important;height:1px!important;
+ padding:0!important;margin:-1px!important;border:0!important;
+ clip-path:inset(50%);overflow:hidden;white-space:nowrap
+}
+#si-workspace:is([data-silm-module="medir"],[data-silm-module="calcular"]) #scene-undo,
+#si-workspace:is([data-silm-module="medir"],[data-silm-module="calcular"]) #silm-quick-explore{
+ display:none!important
+}
+@media(max-width:900px){
+ #si-workspace .si-workspace-toolbar{padding-inline:7px;gap:5px}
+ #si-workspace .si-workspace-toolbar .si-view-tabs{display:flex;flex:1 1 0;min-width:0;width:auto;gap:4px}
+ #si-workspace .si-workspace-toolbar .si-view-tabs button{min-width:0;padding:7px 4px}
+}
+@media(max-width:650px){
+ #si-workspace .si-workspace-toolbar #si-expand-structure{display:none!important}
+}
+#si-workspace #si-dock-right .si-viewer-family-tabs:has(> :only-child){display:none}
+
+/* Preparo concentra opções secundárias, sem aba Unidades nem lista duplicada.
+   [hidden] prevalece inclusive quando a doca está aberta em bottom sheet. */
+#si-dock-left #silm-module-choice[hidden],
+#si-dock-left #silm-free-assembly[hidden],
+#si-dock-left #silm-free-tools[hidden],
+#si-dock-left #silm-free-mode-options[hidden]{display:none!important}
+#si-dock-left .silm-preparo-secondary,
+#si-dock-left .silm-preparo-free{
+ margin:10px 0 0;padding:4px 0 0;
+ border-top:1px solid var(--border)
+}
+#si-dock-left .silm-preparo-secondary>summary,
+#si-dock-left .silm-preparo-free>summary{
+ display:flex;align-items:center;min-height:44px;cursor:pointer;
+ font-size:.86rem;font-weight:650;color:var(--text);padding:6px 2px
+}
+#si-dock-left .silm-preparo-secondary>summary:focus-visible,
+#si-dock-left .silm-preparo-free>summary:focus-visible{
+ outline:3px solid var(--ring);outline-offset:2px
+}
+#si-dock-left .silm-preparo-secondary>.button{
+ box-sizing:border-box;display:flex;width:100%;min-height:44px;
+ align-items:center;justify-content:center;margin:5px 0 9px
+}
+#si-dock-left .silm-preparo-free #silm-free-tools{
+ margin:4px 0;padding:0 0 8px
+}
+#si-dock-left .silm-preparo-free #silm-free-tools h4{
+ margin:3px 0 8px;font-size:.84rem
+}
+#si-dock-left .silm-preparo-free .silm-dock-actions{
+ display:grid;grid-template-columns:minmax(0,1fr);gap:6px
+}
+#si-dock-left .silm-preparo-free .silm-dock-actions>.button,
+#si-dock-left #silm-free{
+ box-sizing:border-box;width:100%;min-height:44px;
+ text-align:left;justify-content:flex-start;margin:0
+}
+#si-dock-left #silm-free-mode-options{padding:6px 0 10px}
+#si-dock-left [data-left-panel="resumo"] .silm-summary-list{
+ margin-top:6px
+}

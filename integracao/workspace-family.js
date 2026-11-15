@@ -5,7 +5,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  const node=(tag,text,className)=>{const el=document.createElement(tag);if(text)el.textContent=text;if(className)el.className=className;return el;};
  const emptyScene=()=>({schemaVersion:1,entities:[],selectedId:null});
  const layerKey='silm-viewer-layer-state-v1';
- const layerDefaults={centers:true,property:true,labels:true,legend:true};
+ const layerDefaults={property:true,labels:true,legend:true};
  const observerKey='silm-observer-presentation-v1';
  const storedObserver=B.storage.read(observerKey);
  const observer={centers:storedObserver?.centers===true};
@@ -25,18 +25,31 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  window.addEventListener('keyup',onModifierRelease);
  window.addEventListener('blur',()=>{if(ctrlSelectionPending){ctrlSelectionPending=false;applyPendingSelection?.();}});
  const storedLayers=B.storage.read(layerKey);
- const layerState={...layerDefaults,...(storedLayers&&typeof storedLayers==='object'?storedLayers:{})};
+ const layerState=Object.fromEntries(Object.keys(layerDefaults).map(key=>[key,storedLayers?.[key]!==false]));
+ // O painel Ver oferece fenômenos reais e instrumentos diretos.
+ // "Comparações" apenas textuais, seletores científicos paralelos e outro
+ // interruptor para identificar centros não são visualizações independentes.
  const definitions=[
-  {id:'camadas-estrutura',title:'Destaque estrutural',capability:'tools',family:'camadas',description:'Controle de destaque dos centros metálicos.',render:output=>renderLayerStructure(output)},
-  {id:'camadas-indicacoes',title:'Indicações',capability:'tools',family:'camadas',description:'Respostas visuais, rótulos e legendas.',render:output=>renderLayerIndications(output)},
-  {id:'comparar-livre-cristalina',title:'Montagem livre × cristalina',capability:'tools',family:'comparar',description:'Compare a preparação livre com a organização cristalográfica.',render:output=>renderComparison('free-crystal',output)},
-  {id:'comparar-celula-rede',title:'Célula × rede',capability:'tools',family:'comparar',description:'Compare a célula unitária com a rede extensa.',render:output=>renderComparison('cell-lattice',output)},
-  {id:'comparar-eletrons',title:'Elétrons ocultos × visíveis',capability:'tools',family:'comparar',description:'Compare a mesma estrutura com o modelo eletrônico oculto e visível.',render:output=>renderComparison('electrons',output)},
-  {id:'comparar-propriedade',title:'Antes × depois da propriedade',capability:'tools',family:'comparar',description:'Consulte o estado-base e a resposta da experiência atual.',render:output=>renderComparison('property',output)},
-  {id:'instrumentos',title:'Instrumentos de medição',capability:'measure',family:'medir',description:'Escolha um instrumento e selecione pontos na estrutura. Os registros ficam em Dados.'},
-  {id:'calculos',title:'Cálculos cristalográficos',capability:'analyze',family:'calcular',description:'Escolha uma fórmula e a origem de cada valor. Consulte os resultados e a proveniência em Dados.'}
+  {id:'camadas-indicacoes',title:'Indicações da cena',capability:'tools',family:'camadas',
+   description:'Rótulos, legendas e indicação de respostas visuais.',
+   render:output=>renderLayerIndications(output)}
  ];
  let ready=false,dataPage=null;
+ // A escolha do módulo existe apenas em Montagem. Ver apresenta ferramentas do
+ // módulo ativo sem uma segunda navegação. Conservar as famílias científicas.
+ let viewerModule=null;
+ const lastViewerFamily=new Map();
+ const firstFamily={explorar:'observar',medir:'medir',calcular:'calcular'};
+ function syncModulePresentation(current){
+  const workspace=$('si-workspace');if(workspace)workspace.dataset.silmModule=current;
+  if(viewerModule===current)return;
+  if(viewerModule){const previous=B.currentViewerFamily?.();if(previous)lastViewerFamily.set(viewerModule,previous);}
+  viewerModule=current;
+  const allowed=B.availableViewerFamilies?.()||[];
+  const desired=lastViewerFamily.get(current)||firstFamily[current];
+  const selected=allowed.includes(desired)?desired:allowed.includes(firstFamily[current])?firstFamily[current]:allowed[0];
+  if(selected&&B.currentViewerFamily?.()!==selected)B.chooseViewerFamily?.(selected);
+ }
  const names={explorar:'Explorar',medir:'Medir',calcular:'Calcular'};
  // Mantém o renderizador da Base SI disponível para ações rápidas e seleção de ferramentas.
  // Preserva o foco da navegação por teclado quando o conteúdo do painel é reconstruído.
@@ -44,27 +57,12 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   const focused=document.activeElement;
   const action=focused?.closest('#silm-direct-actionbar .silm-observer-action')?.dataset.action||null;
   B.renderViewers(emptyScene());
-  const bar=$('silm-direct-actionbar'),selection=$('silm-direct-selection'),extras=$('silm-explore-extras');
+  const bar=$('silm-direct-actionbar'),selection=$('silm-direct-selection');
   if(model.state.module.active==='explorar'&&bar){
    bar.replaceChildren();selection?.replaceChildren();
    renderObserverContext(bar);
-   if(extras){
-    const preserve={display:extras.querySelector('[data-silm-extra="display"]')?.open||false,
-     comparison:extras.querySelector('[data-silm-extra="comparison"]')?.open||false};
-    extras.replaceChildren();
-    const display=node('details');display.dataset.silmExtra='display';
-    display.open=preserve.display;
-    display.append(node('summary','Exibição e rótulos'));
-    renderLayerStructure(display);renderLayerIndications(display);
-    const comparison=node('details');comparison.dataset.silmExtra='comparison';
-    comparison.open=preserve.comparison;
-    comparison.append(node('summary','Comparações conceituais (sem cena A/B independente)'));
-    for(const kind of ['free-crystal','cell-lattice','electrons','property'])renderComparison(kind,comparison);
-    extras.append(display,comparison);
-   }
   }else{
    selection?.replaceChildren();
-   extras?.replaceChildren();
   }
   if(action)bar?.querySelector('.silm-observer-action[data-action="'+action+'"]')?.focus({preventScroll:true});
  }
@@ -161,7 +159,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   };
   const propertyButtons=new Map();
   const propertyTools=node('div',null,'silm-observer-selection-tools');
-  const propertyHelp=node('p','Ative Elétrica + Térmica para observar a transformação da energia elétrica em calor. Ctrl (ou ⌘) combina outras propriedades compatíveis.','silm-observer-selection-status');
+  const propertyHelp=node('p','Ctrl + clique: combinar propriedades.','silm-observer-selection-status');
   propertyHelp.setAttribute('role','status');propertyHelp.setAttribute('aria-live','polite');
   const touchModeButton=node('button','Selecionar várias','silm-observer-select-mode');
   touchModeButton.type='button';touchModeButton.setAttribute('aria-pressed','false');
@@ -188,7 +186,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
     const pending=names.join(' + ');
     propertyHelp.textContent='Seleção: '+pending+(multiSelectMode?' · toque em Aplicar seleção':' · solte Ctrl para aplicar');
    }else{
-    propertyHelp.textContent=multiSelectMode?'Selecione duas propriedades compatíveis e toque em Aplicar seleção.':touchCapable?'Elétrica + Térmica revela o aquecimento por Joule; Selecionar várias combina outras propriedades.':'Elétrica + Térmica = efeito Joule. Também é possível selecionar juntas com Ctrl + clique.';
+    propertyHelp.textContent=multiSelectMode?'Selecione duas propriedades compatíveis e toque em Aplicar seleção.':touchCapable?'Elétrica + Térmica: efeito Joule. Use Selecionar várias.':'Elétrica + Térmica: efeito Joule. Ctrl + clique combina.';
    }
    touchModeButton.setAttribute('aria-pressed',String(multiSelectMode));
    touchModeButton.textContent=multiSelectMode?'Seleção múltipla ativa':'Selecionar várias';
@@ -271,19 +269,12 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  function persistLayerState(){B.storage.write(layerKey,{...layerState});}
  function applyLayerPresentation(){
   const scene=document.querySelector('#silm-integration-scene .silm-assembly');if(!scene)return;
-  scene.dataset.layerCenters=layerState.centers?'normal':'dim';scene.dataset.layerLabels=layerState.labels?'on':'off';
+  scene.dataset.layerCenters='normal';scene.dataset.layerLabels=layerState.labels?'on':'off';
   scene.dataset.layerProperty=layerState.property?'on':'off';scene.dataset.layerLegend=layerState.legend?'on':'off';
   for(const notes of document.querySelectorAll('#silm-structure-notes .silm-scene-notes'))notes.hidden=!layerState.legend;
   for(const overlay of scene.querySelectorAll('.silm-property-overlay'))overlay.hidden=!layerState.property;
  }
  function layerChanged(key,value){layerState[key]=!!value;persistLayerState();applyLayerPresentation();renderViewers();}
- function renderLayerStructure(output){
-  const group=node('section',null,'silm-layer-group');
-  group.append(node('h3','Destaque estrutural'));
-  toggleRow(group,{title:'Destacar centros metálicos',description:'Reduzir o destaque não remove as unidades.',checked:layerState.centers,onChange:v=>layerChanged('centers',v)});
-  group.append(node('p','A geometria e as vizinhanças permanecem disponíveis na cena e nas ferramentas diretas de Ver.','silm-layer-note'));
-  output.append(group);
- }
  function renderLayerIndications(output){
   const group=node('section',null,'silm-layer-group');group.append(node('h3','Indicações da cena'));
   toggleRow(group,{title:'Indicações da propriedade',description:'Ocultar a sobreposição não desliga fontes nem encerra a experiência.',checked:layerState.property,onChange:v=>layerChanged('property',v)});
@@ -291,33 +282,9 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   toggleRow(group,{title:'Legendas e orientação',description:'Recolhe as notas auxiliares de leitura da cena.',checked:layerState.legend,onChange:v=>layerChanged('legend',v)});
   group.append(node('p','Visibilidade altera somente a apresentação; não altera o estado científico.','silm-layer-note'));output.append(group);
  }
- function compareCard(parent,kicker,title,description,status){
-  const card=node('article',null,'silm-compare-card');card.append(node('span',kicker,'silm-compare-kicker'),node('h3',title),node('p',description));if(status)card.append(node('small',status,'silm-compare-status'));parent.append(card);
- }
- function renderComparison(kind,output){
-  const state=model.state,s=state.structure,props=state.properties,grid=node('div',null,'silm-compare-grid');
-  if(kind==='free-crystal'){
-   const free=s?.mode==='crystalline'?s.crystallography.freeUnits:s?.mode==='free'?s.units:null,organized=s?.mode==='crystalline'?s.units:null;
-   compareCard(grid,'A','Montagem livre',free?free.length+' unidades preservadas na disposição anterior.':'A montagem livre ainda não foi registrada nesta investigação.',free?'Registro disponível':'Sem registro');
-   compareCard(grid,'B','Estrutura cristalina',organized?organized.length+' unidades na estrutura organizada.':'Organize a montagem para obter a estrutura cristalina de referência.',organized?'Registro disponível':'Aguardando organização');
-  }else if(kind==='cell-lattice'){
-   const rep=s?.mode==='crystalline'?s.crystallography.representation:null;
-   compareCard(grid,'A','Célula unitária','Unidade de referência cristalográfica. Use Célula/Rede na barra da cena para alternar o enquadramento.',rep?'Geometria disponível':'Requer estrutura cristalina');
-   compareCard(grid,'B','Rede extensa','Repetição periódica da mesma estrutura. Use Célula/Rede na barra da cena para alternar o enquadramento.',rep?'Geometria disponível':'Requer estrutura cristalina');
-  }else if(kind==='electrons'){
-   const visible=!!state.electrons?.representation.visible;
-   compareCard(grid,'A','Elétrons ocultos','A camada eletrônica não aparece na cena.',state.electrons?(visible?'Variante A':'Estado atual'):'Modelo não ativado');
-   compareCard(grid,'B','Elétrons visíveis','Marcadores qualitativos de elétrons de valência deslocalizados.',state.electrons?(visible?'Estado atual':'Variante B'):'Ative o modelo em Camadas → Modelos');
-  }else{
-   const active=props?.active,entry=active?SILM.properties.catalog[active]:null,narrative=entry?SILM.properties.narrative(active,props[active],{reduced:false,electronsVisible:!!state.electrons?.representation.visible}):null;
-   compareCard(grid,'A','Estado-base','Condição de referência anterior à experiência.',active?'Base conceitual':'Sem experiência ativa');
-   compareCard(grid,'B','Resposta atual',entry?entry.title+' · '+(narrative?.observation||'Resposta qualitativa em andamento.'):'Nenhuma propriedade está em estudo.',entry?'Estado atual':'Sem experiência ativa');
-  }
-  output.append(grid,node('p','Quadro informativo, somente leitura. As cenas A/B lado a lado ainda não estão conectadas; não cria outra amostra nem produz medições.','silm-compare-note'));
- }
  function setupViewers(){
   for(const definition of definitions)B.registerViewer({...definition,render(_snapshot,_records,output){
-   if(definition.id!=='observacao-contextual')output.append(node('p',definition.description,'silm-tool-description'));
+   // O catálogo segue a hierarquia do SIAB: ferramenta e conteúdo, sem texto introdutório redundante.
    if(typeof definition.render==='function'){definition.render(output);return;}
    for(const panel of document.querySelectorAll('[data-silm-viewer]'))panel.hidden=!panel.dataset.silmViewer.split(' ').includes(definition.id);
   }});
@@ -325,18 +292,18 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  }
  function modules(){
   const descriptions={
-   explorar:['Monte e observe','Escolha um metal, adicione unidades e organize a estrutura. Explore elétrons e propriedades qualitativas.'],
-   medir:['Meça o modelo','Use distância, ângulo, parâmetro de rede e coordenação numa estrutura cristalina válida.'],
-   calcular:['Relacione os dados','Calcule contagem de átomos, volume, raio, empacotamento e densidade, identificando a origem dos valores.']
+   explorar:'Montar e observar fenômenos.',
+   medir:'Marcar pontos e registrar medidas.',
+   calcular:'Aplicar fórmulas aos dados da estrutura.'
   };
   const host=$('silm-module-cards');
   for(const [index,id]of Object.keys(descriptions).entries()){
    const card=node('details',null,'silm-module-card');card.dataset.module=id;
    const summary=node('summary');summary.append(node('span',String(index+1),'silm-module-number'),node('strong',names[id]));
    const badge=node('span','Ativo','silm-module-badge');badge.hidden=true;summary.append(badge);
-   const body=node('div',null,'silm-module-body');body.append(node('h4',descriptions[id][0]),node('p',descriptions[id][1]));
+   const body=node('div',null,'silm-module-body');body.append(node('p',descriptions[id],'silm-module-note'));
    const activate=node('button','Ativar módulo '+names[id],'button outline');activate.type='button';activate.id='silm-module-activate-'+id;
-   activate.addEventListener('click',()=>{const choice=$('silm-module');if(choice.disabled)return;choice.value=id;choice.dispatchEvent(new Event('change',{bubbles:true}));queueMicrotask(()=>$('silm-module')?.focus({preventScroll:true}));});
+   activate.addEventListener('click',()=>{const choice=$('silm-module');if(choice.disabled)return;choice.value=id;choice.dispatchEvent(new Event('change',{bubbles:true}));queueMicrotask(()=>card.querySelector('summary')?.focus({preventScroll:true}));});
    body.append(activate);card.append(summary,body);host.append(card);
    card.addEventListener('toggle',()=>{if(card.open)for(const other of host.children)if(other!==card)other.open=false;});
   }
@@ -358,15 +325,15 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  }
  function update(){
   if(!ready)return;
+  const current=model.state.module.active,locked=!!activity()?.lockedModule();
+  syncModulePresentation(current);
   renderViewers();
   applyLayerPresentation();
-  const current=model.state.module.active,locked=!!activity()?.lockedModule();
   for(const card of $('silm-module-cards').children){
    const active=card.dataset.module===current;card.classList.toggle('is-active',active);card.querySelector('.silm-module-badge').hidden=!active;
    const button=card.querySelector('button');button.disabled=locked||active;button.setAttribute('aria-pressed',String(active));button.textContent=active?'Módulo '+names[current]+' em uso':'Ativar módulo '+names[card.dataset.module];
   }
-  $('silm-module-context').textContent=locked?'O módulo é definido pela atividade em andamento.':'A troca de módulo preserva a investigação e seus registros.';
-  {const n=model.state.structure?.units.length||0;$('silm-unit-count').textContent=n+(n===1?' unidade':' unidades')+' na montagem';}
+  $('silm-module-context').textContent=locked?'Módulo definido pelo roteiro.':'';
   {const m=model.state.measurements.length,c=model.state.calculations.length;$('silm-record-count').textContent=m+(m===1?' medição':' medições')+' · '+c+(c===1?' cálculo':' cálculos');}
   const active=B.activeViewer();if(active&&document.querySelector('[data-open-dock="ver"]').getAttribute('aria-expanded')==='true'&&!$('si-viewer-detail').hidden)$('si-right-title').textContent=active.title;
   if(dataPage&&document.querySelector('[data-open-dock="dados"]').getAttribute('aria-expanded')==='true')$('si-right-title').textContent={tabela:'Dados do metal',registros:'Medições e cálculos',arquivo:'Arquivos da investigação'}[dataPage];
@@ -374,6 +341,13 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  // Como no SIAB, os painéis abertos por Ver e Dados se chamam "Investigar" e "Dados da investigação". A Base reescreve o
  // título a cada desenho da doca; o observador troca só esses rótulos genéricos e deixa os títulos de detalhe como estão.
  function titleInvestigar(){const title=$('si-right-title');if(!title)return;const fix=()=>{const label={Ver:'Investigar',Dados:'Dados da investigação'}[title.textContent];if(label)title.textContent=label;};new MutationObserver(fix).observe(title,{childList:true,characterData:true,subtree:true});fix();}
- function init(){modules();setupViewers();setupData();titleInvestigar();ready=true;update();}
+ function init(){
+  modules();
+  // Como no SIAB, reter a última família de visualização em cada módulo.
+  window.addEventListener('si-viewer-family-selected',()=>{
+   const current=B.currentViewerFamily?.();if(viewerModule&&current)lastViewerFamily.set(viewerModule,current);
+  });
+  setupViewers();setupData();titleInvestigar();ready=true;update();
+ }
  return {init,update,observer};
 };

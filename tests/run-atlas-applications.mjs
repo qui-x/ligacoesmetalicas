@@ -31,6 +31,38 @@ async function check(v){
    await page.waitForFunction(sym=>{const i=document.querySelector('[data-reference-id="atlas-'+sym+'"] img');return i?.complete&&i.naturalWidth===960;},item.symbol,{timeout:15000});
    await card.getByRole('button',{name:'Investigar componente'}).click();
    await page.waitForFunction(z=>window.SILMIntegration?.snapshot?.()?.metal?.atomicNumber===z,item.z,{timeout:30000});
+   // Selecionar objeto prepara a rede científica sem exigir Adicionar unidade.
+   const context=await page.evaluate(()=>{
+    const state=SILMIntegration.snapshot(),metal=SILM.data.get(state.metal.atomicNumber);
+    return {mode:state.structure?.mode,count:state.structure?.units?.length||0,
+     eligibility:SILM.crystal.eligibility(metal).status,
+     workshop:state.metadata?.workshop,scale:document.querySelector('#si-stage')?.dataset.workshopScale};
+   });
+   if(context.eligibility==='available'){
+    assert.equal(context.mode,'crystalline',item.symbol+' não preparou a estrutura ao escolher objeto');
+    assert.ok(context.count>0,item.symbol+' não preparou centros cristalinos');
+   }
+   assert.equal(context.workshop?.referenceId,'atlas-'+item.symbol,'Objeto não associado à investigação');
+   assert.equal(context.scale,'1','A seleção do objeto pulou indevidamente a escala macroscópica');
+   await page.locator('[data-open-dock="montagem"]').click();
+   assert.match(await page.locator('#silm-start').innerText(),/Nova montagem livre/,
+    'Preparo continua oferecendo iniciar investigação já iniciada');
+   await page.locator('#silm-start > svg.silm-action-icon').waitFor({state:'attached'});
+   assert.equal(await page.locator('[data-left-tab="objetos"]').count(),0,
+    'Aba Unidades não foi removida');
+   assert.equal(await page.locator('#silm-unit-inventory').count(),0,
+    'Inventário duplicado permaneceu em Montagem');
+   if(context.mode==='crystalline'){
+    assert.equal(await page.locator('#silm-add').isVisible(),false,
+     'Adicionar unidade continua visível na investigação de objeto');
+    assert.equal(await page.locator('#silm-organize').isVisible(),false,
+     'Organizar estrutura continua visível na investigação de objeto');
+    assert.equal(await page.locator('#silm-free-assembly').isVisible(),true,
+     'Montagem livre opcional não está em Preparo');
+    assert.equal(await page.locator('#silm-free-assembly').evaluate(el=>el.open),false,
+     'Montagem livre deve permanecer recolhida para um objeto pronto');
+   }
+   await page.locator('[data-close-dock="left"]').click();
    const figure=page.locator('.silm-workshop-reference .silm-workshop-atlas-photo img');
    await figure.waitFor({state:'visible',timeout:20000});
    await figure.scrollIntoViewIfNeeded();
