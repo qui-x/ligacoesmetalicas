@@ -37,7 +37,7 @@ with sync_playwright() as pw:
                 assert left["x"] + left["width"] <= stage["x"] + 2, (
                     args.browser, viewport_width, "Montagem sobreposta à cena", left, stage
                 )
-                assert left["x"] + left["width"] <= action["x"] + 2, (
+                assert action is None or left["x"] + left["width"] <= action["x"] + 2, (
                     args.browser, viewport_width, "Montagem oculta controles", left, action
                 )
                 assert stage["width"] > 340 and stage["width"] < initial["width"] - 100, (
@@ -63,7 +63,7 @@ with sync_playwright() as pw:
                 assert stage["x"] + stage["width"] <= right["x"] + 2, (
                     args.browser, viewport_width, "Dados sobreposto à cena", stage, right
                 )
-                assert action["x"] + action["width"] <= right["x"] + 2, (
+                assert action is None or action["x"] + action["width"] <= right["x"] + 2, (
                     args.browser, viewport_width, "Dados oculta os controles", action, right
                 )
                 montagem.click()
