@@ -61,7 +61,7 @@ SILM.microstructure=(()=>{
   apparatusField.append(topPlate,bottomPlate);plane.append(apparatusField);
   let paths=[],cells=[],specimenOutline=null;let surfaceMicro=null;
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
-  let currentJ2=null,selectedMechanicalReading=null;
+  let currentJ2=null,selectedMechanicalReading=null,updateSlip=()=>{};
   const grainCenter=poly=>{
    let a=0,cx=0,cy=0;
    for(let i=0;i<poly.length;i++){
@@ -82,7 +82,9 @@ SILM.microstructure=(()=>{
     delete svg.dataset.selectedGrainPlastic;return;
    }
    if(sourceData){
-    selectedMechanicalReading.textContent='Mapa importado não homologado: a orientação e a plasticidade de cada grão não são medidas pelo SILM.';
+    selectedMechanicalReading.textContent=sourceData.orientation?
+     'Mapa importado: orientação cristalográfica declarada pela fonte, não homologada; plasticidade individual do grão não medida.':
+     'Mapa importado não homologado: a orientação e a plasticidade de cada grão não são medidas pelo SILM.';
     delete svg.dataset.selectedGrainPlastic;return;
    }
    if(!currentJ2?.converged){
@@ -131,6 +133,7 @@ SILM.microstructure=(()=>{
    svg.setAttribute('data-selected-grain',String(i+1));
    surfaceMicro?.refresh();
    updateSelectedMechanicalReading();
+   updateSlip();
   };
   function drawGrains(){
    paths=[];cells=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField,apparatusField);
@@ -300,8 +303,78 @@ SILM.microstructure=(()=>{
     '. Não combinar amostras, fases ou temperaturas distintas.'));
    const contactDetails=node('details','silm-micro-contact-details');
    const contactSummary=node('summary','','Aplicação da carga');
+   const slipDetails=node('details','silm-micro-slip-details');
+   slipDetails.append(node('summary','','Deslizamento cristalográfico · Schmid'));
+   const slipInfo=node('output','silm-micro-slip-result',
+    'Sem orientação cristalográfica não há fator de Schmid por grão.');
+   slipInfo.setAttribute('role','status');slipInfo.setAttribute('aria-live','off');
+   slipInfo.setAttribute('aria-label','Leitura geométrica de deslizamento sem ativação física prevista');
+   const demoLabel=node('label','silm-micro-slip-demo-label');
+   const demoToggle=node('input','silm-micro-slip-demo');
+   demoToggle.type='checkbox';
+   demoToggle.setAttribute('aria-label','Usar orientação cristalográfica hipotética para demonstração');
+   demoLabel.append(demoToggle,node('span','','Exemplo hipotético, não pertence ao grão'));
+   const angleLabel=node('label','silm-micro-slip-angle-label');
+   const angleInput=node('input','silm-micro-slip-angle');
+   angleInput.type='range';angleInput.min='0';angleInput.max='90';
+   angleInput.step='5';angleInput.value='0';angleInput.disabled=true;
+   angleInput.setAttribute('aria-label','Rotacionar cristal hipotético em graus');
+   const angleValue=node('output','silm-micro-slip-angle-value','0°');
+   angleLabel.append(node('span','','Giro didático em torno de z'),angleInput,angleValue);
+   slipDetails.append(demoLabel,angleLabel,slipInfo,
+    node('p','silm-micro-slip-limits',
+     'm = |(eixo·normal)(eixo·direção)|, 0 a 0,5. Não fornece tensão de escoamento nem altera a FEM J2. CCC pode violar a lei de Schmid; HC depende das CRSS específicas de cada família.'));
+   const slipSource=node('a','','Referência: MTEX — sistemas de deslizamento');
+   slipSource.href='https://mtex-toolbox.github.io/SlipSystems.html';
+   slipSource.target='_blank';slipSource.rel='noopener noreferrer';
+   slipDetails.append(slipSource);
+   const slipEngine=SILM.crystalSlip;
+   const slipRefElement=SILM.data?.get?.(element?.atomicNumber)||element;
+   const slipEligibility=SILM.crystal?.eligibility?.(slipRefElement);
+   const slipStructure=slipEligibility?.status==='available'?slipEligibility.structureType:null;
+   section.dataset.slipJ2Coupled='false';
+   updateSlip=()=>{
+    if(!slipEngine)return;
+    const imported=sourceData?.orientation,grain=sourceData?.grains?.[chosen];
+    const hasImported=!!(grain?.orientationMatrix&&imported);
+    const structure=hasImported?imported.phaseStructure:slipStructure;
+    const matrix=hasImported?grain.orientationMatrix:
+     demoToggle.checked?slipEngine.rotationZ(Number(angleInput.value)):null;
+    const provenance=hasImported?'imported-unverified':demoToggle.checked?'demonstration':'none';
+    const result=slipEngine.analyze({
+     structure,orientationMatrix:matrix,provenance,loadAxis:[0,1,0]
+    });
+    section.dataset.slipOrientation=provenance;
+    section.dataset.slipModel=result.status;
+    section.dataset.slipPhase=structure||'unsupported';
+    angleInput.disabled=!demoToggle.checked||hasImported;
+    demoToggle.disabled=hasImported;
+    if(result.status!=='GEOMETRY_ONLY'){
+     delete section.dataset.slipMax;
+     slipInfo.textContent=structure?
+      'Estrutura '+structure+' · orientação individual não informada. Ative um exemplo hipotético para investigar apenas a geometria.':
+      'Sistema de deslizamento não calculado para esta estrutura. Nenhuma fase foi presumida.';
+     return;
+    }
+    section.dataset.slipMax=result.highestSchmid.toFixed(4);
+    const fmt=n=>n.toFixed(4).replace('.',',');
+    const fam=result.families.map(x=>x.family+': '+x.count+
+     ' sistemas, |m| máximo '+fmt(x.maxSchmid)).join(' · ');
+    const origin=hasImported?
+     'Matriz declarada no arquivo, NÃO homologada; grão '+grain.id+', fase '+structure+
+      ', eixo vertical da amostra.':
+     'Rotação hipotética '+angleInput.value+'°, NÃO é orientação medida do grão.';
+    slipInfo.textContent=origin+' · '+fam+
+     ' · '+result.caveat+' Nenhuma ativação de sistemas ou plasticidade por grão prevista.';
+   };
+   demoToggle.addEventListener('change',updateSlip);
+   angleInput.addEventListener('input',()=>{
+    angleValue.textContent=angleInput.value+'°';
+    updateSlip();
+   });
    contactDetails.append(contactSummary,forceLabel,releaseForce,
-    constitutiveReadout,selectedMechanicalReading,audit,contactLabel,widthLabel);
+    constitutiveReadout,selectedMechanicalReading,audit,slipDetails,
+    contactLabel,widthLabel);
    mechanicalTools.append(mechanicalPulse,mechanicalReset,mechanicalLoadMeter,
     contactDetails,mechanicalStatus);
   toolbar.append(mechanicalTools);
@@ -434,6 +507,7 @@ SILM.microstructure=(()=>{
    const j2Ready=!!j2?.converged;
    currentJ2=j2Ready?j2:null;
    updateSelectedMechanicalReading();
+   updateSlip();
    section.dataset.mechanicalJ2=j2Ready?'plane-strain-converged':
     j2?'fallback-elastic':'unavailable';
    section.dataset.mechanicalJ2Alpha=j2Ready?j2.maxAlpha.toFixed(4):'0';
