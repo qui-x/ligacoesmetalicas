@@ -25,11 +25,10 @@ try{
  await page.locator('#silm-object-entry [data-z="29"]').click();
  await page.locator('#silm-objects-dialog').waitFor({state:'visible'});
  const discoveryCard=page.locator('.silm-workshop-card[data-reference-id="atlas-cu"]');
- const discoveryLink=discoveryCard.locator('.silm-workshop-manual-link');
  assert.equal(await discoveryCard.locator('details').count(),0,
-  'Cartão de descoberta ainda coloca fontes dentro do palco');
- assert.match(await discoveryLink.getAttribute('href'),/topico=aplicacoes-metalicas&referencia=atlas-cu/,
-  'Manual não preserva a referência do componente');
+  'Cartão de objetos ainda coloca fontes dentro do palco');
+ assert.equal(await discoveryCard.locator('.silm-workshop-manual-link').count(),0,
+  'Catálogo de imagens não deve duplicar o Manual: fontes permanecem na investigação.');
  const conciseCard=await discoveryCard.locator('.silm-workshop-card-body').innerText();
  assert.ok(conciseCard.length<125,'Cartão introdutório ficou com texto excessivo');
  await discoveryCard.getByRole('button',{name:'Iniciar montagem'}).click();
