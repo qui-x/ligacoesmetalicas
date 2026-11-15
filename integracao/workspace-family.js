@@ -26,15 +26,13 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  window.addEventListener('blur',()=>{if(ctrlSelectionPending){ctrlSelectionPending=false;applyPendingSelection?.();}});
  const storedLayers=B.storage.read(layerKey);
  const layerState={...layerDefaults,...(storedLayers&&typeof storedLayers==='object'?storedLayers:{})};
+ // O painel Ver oferece fenômenos reais e instrumentos diretos.
+ // "Comparações" apenas textuais, seletores científicos paralelos e outro
+ // interruptor para identificar centros não são visualizações independentes.
  const definitions=[
-  {id:'camadas-estrutura',title:'Destaque estrutural',capability:'tools',family:'camadas',description:'Controle de destaque dos centros metálicos.',render:output=>renderLayerStructure(output)},
-  {id:'camadas-indicacoes',title:'Indicações',capability:'tools',family:'camadas',description:'Respostas visuais, rótulos e legendas.',render:output=>renderLayerIndications(output)},
-  {id:'comparar-livre-cristalina',title:'Montagem livre × cristalina',capability:'tools',family:'comparar',description:'Compare a preparação livre com a organização cristalográfica.',render:output=>renderComparison('free-crystal',output)},
-  {id:'comparar-celula-rede',title:'Célula × rede',capability:'tools',family:'comparar',description:'Compare a célula unitária com a rede extensa.',render:output=>renderComparison('cell-lattice',output)},
-  {id:'comparar-eletrons',title:'Elétrons ocultos × visíveis',capability:'tools',family:'comparar',description:'Compare a mesma estrutura com o modelo eletrônico oculto e visível.',render:output=>renderComparison('electrons',output)},
-  {id:'comparar-propriedade',title:'Antes × depois da propriedade',capability:'tools',family:'comparar',description:'Consulte o estado-base e a resposta da experiência atual.',render:output=>renderComparison('property',output)},
-  {id:'instrumentos',title:'Instrumentos de medição',capability:'measure',family:'medir',description:'Escolha um instrumento e selecione pontos na estrutura. Os registros ficam em Dados.'},
-  {id:'calculos',title:'Cálculos cristalográficos',capability:'analyze',family:'calcular',description:'Escolha uma fórmula e a origem de cada valor. Consulte os resultados e a proveniência em Dados.'}
+  {id:'camadas-indicacoes',title:'Indicações da cena',capability:'tools',family:'camadas',
+   description:'Rótulos, legendas e indicação de respostas visuais.',
+   render:output=>renderLayerIndications(output)}
  ];
  let ready=false,dataPage=null;
  // A escolha do módulo existe apenas em Montagem. Ver apresenta ferramentas do
@@ -336,7 +334,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    const badge=node('span','Ativo','silm-module-badge');badge.hidden=true;summary.append(badge);
    const body=node('div',null,'silm-module-body');body.append(node('p',descriptions[id],'silm-module-note'));
    const activate=node('button','Ativar módulo '+names[id],'button outline');activate.type='button';activate.id='silm-module-activate-'+id;
-   activate.addEventListener('click',()=>{const choice=$('silm-module');if(choice.disabled)return;choice.value=id;choice.dispatchEvent(new Event('change',{bubbles:true}));queueMicrotask(()=>$('silm-module')?.focus({preventScroll:true}));});
+   activate.addEventListener('click',()=>{const choice=$('silm-module');if(choice.disabled)return;choice.value=id;choice.dispatchEvent(new Event('change',{bubbles:true}));queueMicrotask(()=>card.querySelector('summary')?.focus({preventScroll:true}));});
    body.append(activate);card.append(summary,body);host.append(card);
    card.addEventListener('toggle',()=>{if(card.open)for(const other of host.children)if(other!==card)other.open=false;});
   }
@@ -367,11 +365,6 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    const button=card.querySelector('button');button.disabled=locked||active;button.setAttribute('aria-pressed',String(active));button.textContent=active?'Módulo '+names[current]+' em uso':'Ativar módulo '+names[card.dataset.module];
   }
   $('silm-module-context').textContent=locked?'Módulo definido pelo roteiro.':'';
-  {const structure=model.state.structure,n=structure?.units.length||0;
-   $('silm-unit-count').textContent=structure?.mode==='crystalline'
-    ?n+(n===1?' centro metálico':' centros metálicos')
-    :n+(n===1?' unidade':' unidades')+' na montagem';
-  }
   {const m=model.state.measurements.length,c=model.state.calculations.length;$('silm-record-count').textContent=m+(m===1?' medição':' medições')+' · '+c+(c===1?' cálculo':' cálculos');}
   const active=B.activeViewer();if(active&&document.querySelector('[data-open-dock="ver"]').getAttribute('aria-expanded')==='true'&&!$('si-viewer-detail').hidden)$('si-right-title').textContent=active.title;
   if(dataPage&&document.querySelector('[data-open-dock="dados"]').getAttribute('aria-expanded')==='true')$('si-right-title').textContent={tabela:'Dados do metal',registros:'Medições e cálculos',arquivo:'Arquivos da investigação'}[dataPage];
