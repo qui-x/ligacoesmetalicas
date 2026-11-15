@@ -83,19 +83,55 @@ with sync_playwright() as pw:
             page.set_viewport_size({"width": width, "height": height})
         montagem.click()
         page.locator('[data-left-tab="preparo"]').click()
+        assert page.locator('[data-left-panel="preparo"] #silm-add').count() == 0, (
+            name, "Adicionar unidade continua incorretamente em Preparo"
+        )
+        assert page.locator('[data-left-panel="objetos"] #silm-add').count() == 1, (
+            name, "A construção não está na aba Unidades"
+        )
         page.locator("#silm-start").click()
         page.wait_for_function("window.SILMIntegration.snapshot().metal !== null")
+        page.locator('[data-left-tab="modulo"]').click()
+        cards = page.locator("#silm-module-cards details")
+        assert cards.count() == 3, f"{name}: módulos da Montagem ausentes"
+        cards.nth(0).locator("summary").click()
+        cards.nth(1).locator("summary").click()
+        assert not cards.nth(0).evaluate("(el) => el.open"), (
+            name, "Módulos deveriam abrir apenas um cartão, como no SIAB"
+        )
+        page.locator('[data-left-tab="objetos"]').click()
         page.locator("#silm-add").click()
         page.wait_for_function("window.SILMIntegration.snapshot().structure.units.length === 1")
-        page.locator('[data-left-tab="objetos"]').click()
         page.locator("#silm-unit-inventory .silm-unit-inventory button").first.wait_for()
         assert page.locator("#silm-unit-inventory .silm-unit-inventory button").count() == 1, f"{name}: inventário inicial"
         assert "1 unidade" in page.locator("#silm-unit-count").inner_text(), f"{name}: contagem inicial"
         if name == "desktop":
             assert page.locator("#silm-unit-inventory button").first.get_attribute("aria-label").startswith("Localizar unidade"), "inventário sem navegação"
         page.locator('[data-close-dock="left"]').click()
+        page.locator('[data-open-dock="ver"]').click()
+        advanced = page.locator("#silm-ver-more")
+        assert advanced.count() == 1 and not advanced.evaluate("(el) => el.open"), (
+            name, "Ferramentas avançadas devem iniciar recolhidas"
+        )
+        assert page.locator("#silm-explore-extras").count() == 0, (
+            name, "Controles visuais duplicados no Ver"
+        )
+        assert page.locator("#silm-direct-actionbar .silm-observer-action").count() > 0, (
+            name, "Comandos científicos de Explorar não aparecem"
+        )
+        advanced.locator("summary").click()
+        assert page.locator("#si-viewer-catalog").is_visible(), (
+            name, "Catálogo SIAB não abre"
+        )
+        page.locator('[data-close-dock="right"]').click()
         dados = page.locator('[data-open-dock="dados"]')
         dados.click()
+        assert page.locator('[data-silm-data-open="tabela"] strong').inner_text() == "Metal e propriedades", (
+            name, "Dados mantém texto antigo"
+        )
+        assert page.locator('#silm-data-catalog .silm-data-documents a').count() == 2, (
+            name, "Relatório e Caderno devem ser acessos diretos"
+        )
         page.locator('[data-silm-data-open="tabela"]').click()
         panel = page.locator('#silm-data')
         assert "Propriedades do metal" in panel.inner_text(), f"{name}: dados das propriedades ausentes"
