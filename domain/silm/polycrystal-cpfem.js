@@ -228,24 +228,33 @@ SILM.polycrystalCPFEM=(()=>{
      hardeningStored:energyHardening,plasticDissipated:energyDissipated,
      total:energyElastic+energyHardening+energyDissipated})};
   }
-  function equilibrate(previous,{mode,position,width,load,release=false,holdContact=false}){
+  function equilibrate(previous,{mode,position,width,load,release=false,holdContact=false,external=null}){
    const {mask,values}=fixed(mode,position,width,load,release,holdContact);
    let u=previous.u.slice();
    for(let i=0;i<ND;i++)if(mask[i])u[i]=values[i];
+   if(external&&(!(external instanceof Float64Array)||external.length!==ND||
+    external.some(v=>!finite(v))))
+    return{converged:false,reason:'INVALID_EXTERNAL_FORCE'};
+   const residualOf=force=>{
+    if(!external)return force;
+    const r=force.slice();
+    for(let k=0;k<ND;k++)r[k]-=external[k];
+    return r;
+   };
    let last=null,iter=0,done=false,err=Infinity;
    for(;iter<16;iter++){
     const a=assemble(u,previous,{stiffness:true});
     if(!a||a.failure)return{converged:false,reason:a?.failure||'CONSTITUTIVE_INTEGRATION',diagnostic:a||null,iterations:iter};
-    last=a;err=norm(a.force,mask);
+    last=a;err=norm(residualOf(a.force),mask);
     if(err<8e-5){done=true;break;}
-    const d=pcg(a.rows,mask,a.force);
+    const d=pcg(a.rows,mask,residualOf(a.force));
     if(!d.converged)return{converged:false,reason:'LINEAR_SOLVE',iterations:iter,residual:err};
     let accepted=false,scale=1;
     for(let line=0;line<10;line++){
      const candidate=u.slice();
      for(let j=0;j<ND;j++)if(!mask[j])candidate[j]+=scale*d.x[j];
      const next=assemble(candidate,previous);
-     if(next&&!next.failure&&norm(next.force,mask)<err*(1-1e-5*scale)){
+     if(next&&!next.failure&&norm(residualOf(next.force),mask)<err*(1-1e-5*scale)){
       u=candidate;last=next;accepted=true;break;
      }
      scale*=.5;
@@ -254,7 +263,7 @@ SILM.polycrystalCPFEM=(()=>{
    }
    last=assemble(u,previous);
    if(!last||last.failure)return{converged:false,reason:last?.failure||'CONSTITUTIVE_INTEGRATION',diagnostic:last||null,iterations:iter};
-   err=norm(last.force,mask);
+   err=norm(residualOf(last.force),mask);
    if(err<8e-5)done=true;
    let netFx=0,netFy=0,topY=0,bottomY=0,contactReactionX=0;
    for(let i=0;i<ND/2;i++){
@@ -264,8 +273,15 @@ SILM.polycrystalCPFEM=(()=>{
     if(mask[2*i+1]&&row===0)topY+=y;
     if(mask[2*i+1]&&row===NY)bottomY+=y;
    }
+   let appliedContactForce=0,topFreeResidual=0;
+   if(external)for(let k=0;k<ND;k++){
+    appliedContactForce+=external[k]*external[k];
+    if(Math.floor(k/2/(NX+1))===0&&!mask[k])
+     topFreeResidual+=Math.pow(last.force[k]-external[k],2);
+   }
    const reactions=Object.freeze({topY,bottomY,contactX:contactReactionX,
-    netFx,netFy,freeResidual:err,units:'relative'});
+    netFx,netFy,freeResidual:err,appliedContactForceNorm:Math.sqrt(appliedContactForce),
+    topFreeResidual:Math.sqrt(topFreeResidual),units:'relative'});
    return done?{converged:true,record:{u,force:last.force,points:last.states},
     iterations:iter+1,residual:err,plasticTriangles:last.plasticTriangles,
     meanSlip:last.meanSlip,maxSlip:last.maxSlip,maxAbsLocalStrain:last.maxAbsLocalStrain,
@@ -323,11 +339,12 @@ SILM.polycrystalCPFEM=(()=>{
    });
   }
   function run({mode='tension',position=.5,width=.3,load=0.7,
-   increments=4,unload=false,unloadIncrements=5}={}){
+   increments=4,unload=false,unloadIncrements=5,unloadMode='displacement'}={}){
    if(!['tension','compression'].includes(mode)||![position,width,load].every(finite)||
     position<.1||position>.9||width<.1||width>.8||load<0||load>1||
     !Number.isInteger(increments)||increments<1||increments>MAX_STEPS||
-    !Number.isInteger(unloadIncrements)||unloadIncrements<1||unloadIncrements>MAX_STEPS)
+    !Number.isInteger(unloadIncrements)||unloadIncrements<1||unloadIncrements>MAX_STEPS||
+    !['displacement','force'].includes(unloadMode))
     return Object.freeze({status:'INVALID_LOADING',converged:false});
    let prior=initial(),last=null,stepsCompleted=0,externalWork=0;
    const history=[];
