@@ -435,8 +435,8 @@
   const previousFocus=document.activeElement?.closest('#silm-unit-inventory [data-silm-unit-id]')?.dataset.silmUnitId;
   const previousScroll=host.scrollTop;
   host.replaceChildren();host.dataset.key=key;
-  if(!list.length){const p=document.createElement('p');p.textContent='Nenhuma unidade inserida. Abra Preparo e use Adicionar unidade para iniciar a montagem.';host.append(p);return;}
-  const intro=document.createElement('p');intro.className='silm-inventory-guide';intro.textContent=canLocate?'Selecione uma unidade para localizá-la no palco.':'Para localizar uma unidade, abra a visualização da estrutura na Oficina.';host.append(intro);
+  if(!list.length){const p=document.createElement('p');p.textContent=state.investigation?'Use Adicionar unidade para começar.':'Inicie uma investigação em Preparo.';host.append(p);return;}
+  if(!canLocate){const intro=document.createElement('p');intro.className='silm-inventory-guide';intro.textContent='Abra a escala da estrutura para localizar unidades.';host.append(intro);}
   const ul=document.createElement('ol');ul.className='silm-unit-inventory';
   for(let i=0;i<list.length;i++){
    const unit=list[i],li=document.createElement('li'),button=document.createElement('button');
@@ -444,8 +444,7 @@
    button.disabled=!canLocate;
    button.setAttribute('aria-label','Localizar unidade '+(i+1)+' na estrutura');
    if(unit.id===chosen){button.setAttribute('aria-current','true');li.classList.add('is-selected');}
-   const label=document.createElement('small');label.textContent=mode==='crystalline'?'Centro metálico na estrutura cristalina':'Centro metálico na montagem livre';
-   li.append(button,label);ul.append(li);
+   li.append(button);ul.append(li);
    button.addEventListener('click',()=>{
     if($('silm-integration-scene').hidden){say('Abra a visualização da estrutura para localizar a unidade.');return;}
     const focus=()=>view?.focusUnit?.(unit.id);
