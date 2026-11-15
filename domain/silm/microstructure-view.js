@@ -348,6 +348,7 @@ SILM.microstructure=(()=>{
     cpfemPreview=SILM.polycrystalPreview.mount({container:slipDetails,
      getSynthetic:()=>sourceData?null:generated,
      getStructure:()=>slipStructure,
+     getContact:()=>({position:contactPosition,width:contactWidth}),
      getMode:()=>getMode()==='ductility'?'tension':getMode()==='malleability'?'compression':null,
      onChange:()=>refreshMechanical()});
    }
@@ -480,7 +481,8 @@ SILM.microstructure=(()=>{
    const updateContact=()=>{
     contactPosition=clamp(Number(contactLabel.input.value)/100,.1,.9);
     contactWidth=clamp(Number(widthLabel.input.value)/100,.1,.8);
-    refreshMechanical();
+    if(cpfemPreview)cpfemPreview.invalidate('Contato alterado: recalcule a prévia CPFEM com a posição e a largura atuais.');
+    else refreshMechanical();
    };
    contactLabel.input.addEventListener('input',updateContact);
    widthLabel.input.addEventListener('input',updateContact);
