@@ -443,7 +443,7 @@
  function renderUnitInventory(state){
   const panel=document.querySelector('[data-left-panel="objetos"]');if(!panel)return;
   let host=$('silm-unit-inventory');
-  if(!host){host=document.createElement('div');host.id='silm-unit-inventory';panel.append(host);}
+  if(!host){host=document.createElement('div');host.id='silm-unit-inventory';const advanced=$('silm-free-mode-options');if(advanced)panel.insertBefore(host,advanced);else panel.append(host);}
   const structure=state.structure,list=structure?.units||[],mode=structure?.mode||'none';
   const chosen=mode==='crystalline'?structure.crystallography?.representation?.selectedUnitId:(view?.selected||null);
   const canLocate=!!view?.focusUnit&&!$('silm-integration-scene').hidden;
@@ -506,7 +506,9 @@
   $('si-compact-clear').disabled=state.module.active!=='explorar'||!n;$('scene-count').dataset.compactCount=units(n);
   const freeMode=s?.mode==='free',crystalMode=s?.mode==='crystalline';
   $('silm-free-tools').hidden=!freeMode;
-  $('silm-free-mode-options').hidden=!crystalMode;
+  const editOptions=$('silm-free-mode-options');
+  editOptions.hidden=!crystalMode||state.module.active!=='explorar'||(routeUI.session.open()&&!routeUI.canBuild());
+  if(editOptions.hidden)editOptions.open=false;
   const structureStatus=$('silm-structure-status');
   structureStatus.textContent=crystalMode?(S.crystal.label(s.crystallography.structureType,e)+' · modelo de referência preparado'):freeMode?'Montagem livre':'Selecione um metal em Preparo.';
   $('silm-add').disabled=state.module.active!=='explorar'||!e||!freeMode;
