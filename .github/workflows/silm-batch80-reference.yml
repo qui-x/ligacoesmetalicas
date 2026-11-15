@@ -6,6 +6,7 @@ on:
       - 'domain/silm/data/science400-coverage.js'
       - 'domain/silm/data/science400-optical-stage92.js'
       - 'domain/silm/data/science400-mechanical-stage92.js'
+      - 'domain/silm/data/science400-compression-stage92.js'
       - 'domain/silm/science-evidence-view.js'
       - 'index.html'
       - 'sw.js'
@@ -35,6 +36,7 @@ jobs:
           node --check domain/silm/data/science400-coverage.js
           node --check domain/silm/data/science400-optical-stage92.js
           node --check domain/silm/data/science400-mechanical-stage92.js
+          node --check domain/silm/data/science400-compression-stage92.js
           node --check domain/silm/science-evidence-view.js
       - name: Testes de cobertura, precedencia, nao calibracao e cache offline
-        run: node --test tests/batch80-documentary-fallback.test.cjs tests/silm-science400-coverage.test.cjs tests/silm-science92-optics.test.cjs tests/silm-science92-mechanics.test.cjs tests/stage80-unified-evidence.test.cjs
+        run: node --test tests/batch80-documentary-fallback.test.cjs tests/silm-science400-coverage.test.cjs tests/silm-science92-optics.test.cjs tests/silm-science92-mechanics.test.cjs tests/silm-science92-compression.test.cjs tests/stage80-unified-evidence.test.cjs
