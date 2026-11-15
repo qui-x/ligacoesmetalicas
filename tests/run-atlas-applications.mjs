@@ -48,14 +48,19 @@ async function check(v){
    assert.match(await page.locator('#silm-start').innerText(),/Nova montagem livre/,
     'Preparo continua oferecendo iniciar investigação já iniciada');
    await page.locator('#silm-start > svg.silm-action-icon').waitFor({state:'attached'});
-   await page.locator('[data-left-tab="objetos"]').click();
+   assert.equal(await page.locator('[data-left-tab="objetos"]').count(),0,
+    'Aba Unidades não foi removida');
+   assert.equal(await page.locator('#silm-unit-inventory').count(),0,
+    'Inventário duplicado permaneceu em Montagem');
    if(context.mode==='crystalline'){
     assert.equal(await page.locator('#silm-add').isVisible(),false,
-     'Adicionar unidade continua exposto na investigação do objeto');
+     'Adicionar unidade continua visível na investigação de objeto');
     assert.equal(await page.locator('#silm-organize').isVisible(),false,
-     'Organizar estrutura continua exposto na investigação do objeto');
-    assert.equal(await page.locator('#silm-free-mode-options').isVisible(),true,
-     'A edição avançada da montagem livre desapareceu');
+     'Organizar estrutura continua visível na investigação de objeto');
+    assert.equal(await page.locator('#silm-free-assembly').isVisible(),true,
+     'Montagem livre opcional não está em Preparo');
+    assert.equal(await page.locator('#silm-free-assembly').evaluate(el=>el.open),false,
+     'Montagem livre deve permanecer recolhida para um objeto pronto');
    }
    await page.locator('[data-close-dock="left"]').click();
    const figure=page.locator('.silm-workshop-reference .silm-workshop-atlas-photo img');
