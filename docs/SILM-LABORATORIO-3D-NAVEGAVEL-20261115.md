@@ -3,7 +3,7 @@
 ## Fluxo integrado
 Com uma investigação iniciada e o ambiente aberto, a ação **Sala 3D**
 surge na barra da cena, sem substituir Montagem/Ver/Dados ou salvar outro
-ScientificState. O espaço usa **WebGL2 nativo** (sem CDN, funciona offline).
+ScientificState. O espaço usa **WebGL2 nativo** com fallback WebGL1 (sem CDN, funciona offline).
 WASD/mouse e controles de toque deslocam a câmera com colisões simples
 contra paredes e bancada. E e clique selecionam os instrumentos visados por raio 3D; Inspecionar aproxima a bancada; Fechar restaura foco.
 A bancada contém prensa, amostra, microscópio, fonte, aquecedor e luz.
@@ -24,7 +24,7 @@ utilizam os comandos reais das escalas 2/3 da investigação em andamento.
   não é simulação de corpos rígidos nem a física da metalurgia.
 - A ponte mecânica `mechanics-scene-bridge` será associada após
   homologação de ambas as branches.
-- WebGL2 indisponível -> sala não abre, e a interface anterior permanece.
+- WebGL2 ausente -> tenta WebGL1; sem ambos -> sala não abre e a interface anterior permanece.
 
 ## Testes e critérios
 `node --test tests/silm-lab3d-core.test.cjs`.

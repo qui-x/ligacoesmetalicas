@@ -30,7 +30,8 @@ try{
  const closeDock=page.locator('[data-close-dock="left"]');
  if(await closeDock.isVisible())await closeDock.click();
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
- const available=await page.evaluate(()=>!!document.createElement('canvas').getContext('webgl2'));
+ const backend=await page.evaluate(()=>{const c=document.createElement('canvas');return c.getContext('webgl2')?'webgl2':c.getContext('webgl')?'webgl1':'none'});
+ const available=backend!=='none';
  await entry.click();
  if(available){
   const canvas=page.locator('.silm-lab3d canvas');
@@ -55,5 +56,5 @@ try{
  const after=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  assert.equal(after,before,'A sala alterou o estado científico.');
  assert.deepEqual(pageErrors,[],'Erros JavaScript durante o fluxo: '+pageErrors.join(' | '));
- console.log(JSON.stringify({browser:name,webgl2:available,status:available?'LAB3D_SMOKE_OK':'SAFE_FALLBACK_OK'}));
+ console.log(JSON.stringify({browser:name,backend,status:available?'LAB3D_SMOKE_OK':'SAFE_FALLBACK_OK'}));
 }finally{await context.close();await browser.close();}

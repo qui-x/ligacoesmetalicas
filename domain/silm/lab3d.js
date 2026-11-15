@@ -53,8 +53,9 @@
   return s;
  }
  function makeRenderer(canvas){
-  const gl=canvas.getContext('webgl2',{antialias:true,alpha:false,depth:true,preserveDrawingBuffer:false});
-  if(!gl)throw new Error('WebGL2 indisponível neste navegador.');
+  const options={antialias:true,alpha:false,depth:true,preserveDrawingBuffer:false};
+  const gl=canvas.getContext('webgl2',options)||canvas.getContext('webgl',options);
+  if(!gl)throw new Error('WebGL indisponível neste navegador.');
   const vs=shader(gl,gl.VERTEX_SHADER,
    'attribute vec3 p;attribute vec3 n;uniform mat4 m,vp;varying vec3 N,W;void main(){vec4 world=m*vec4(p,1.);W=world.xyz;N=normalize(mat3(m)*n);gl_Position=vp*world;}');
   const fs=shader(gl,gl.FRAGMENT_SHADER,
