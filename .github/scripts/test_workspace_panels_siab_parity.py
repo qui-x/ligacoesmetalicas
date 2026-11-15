@@ -96,9 +96,17 @@ with sync_playwright() as pw:
         assert cards.count() == 3, f"{name}: módulos da Montagem ausentes"
         cards.nth(0).locator("summary").click()
         cards.nth(1).locator("summary").click()
+        page.wait_for_function(
+            "() => !document.querySelector('#silm-module-cards details:nth-child(1)').open "
+            "&& document.querySelector('#silm-module-cards details:nth-child(2)').open"
+        )
         assert not cards.nth(0).evaluate("(el) => el.open"), (
             name, "Módulos deveriam abrir apenas um cartão, como no SIAB"
         )
+        page.locator("#silm-module-activate-medir").click()
+        page.wait_for_function("SILMIntegration.snapshot().module.active === 'medir'")
+        page.locator("#silm-module-activate-explorar").click()
+        page.wait_for_function("SILMIntegration.snapshot().module.active === 'explorar'")
         page.locator('[data-left-tab="objetos"]').click()
         page.locator("#silm-add").click()
         page.wait_for_function("window.SILMIntegration.snapshot().structure.units.length === 1")
