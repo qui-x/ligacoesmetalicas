@@ -480,6 +480,10 @@
  function render(){
   const focused=document.activeElement,restoreControl=focused?.closest('#silm-tools,#silm-module-choice,#silm-history')?focused.id:null;
   const state=model.state,e=element(),s=state.structure,n=s?.units.length||0;
+  // Investigar objeto já iniciou uma investigação. Preparo oferece a ação
+  // distinta de começar uma montagem livre, sem botão de início redundante.
+  $('silm-start').textContent=state.metadata?.workshop?.referenceId
+   ?'Nova montagem livre':'Iniciar investigação';
   const tag=$('si-module-tag');if(tag){const c=routeUI.session.context();tag.textContent=(c?(c.type==='mission'?'Missão':'Roteiro'):'Módulo')+' · '+({explorar:'Explorar',medir:'Medir',calcular:'Calcular'})[state.module.active];}
   const expandButton=$('si-expand-structure'),expandable=!!(e&&s?.mode==='crystalline'&&n>0);
   expandButton.disabled=!expandable;
