@@ -1,4 +1,4 @@
-name: SILM — Etapa 80: dados científicos por elemento
+name: 'SILM — Etapa 80: dados científicos por elemento'
 on:
   push:
     branches: [feat/silm-stage80-unified-element-evidence-20261115]
