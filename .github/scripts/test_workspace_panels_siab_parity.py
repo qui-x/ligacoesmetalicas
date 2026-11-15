@@ -143,7 +143,7 @@ with sync_playwright() as pw:
         assert page.locator("#silm-direct-actionbar .silm-observer-action").count() > 0, (
             name, "Comandos científicos de Explorar não aparecem"
         )
-        advanced.locator("summary").click()
+        advanced.locator(":scope > summary").click()
         assert page.locator("#si-viewer-catalog").is_visible(), (
             name, "Catálogo SIAB não abre"
         )
