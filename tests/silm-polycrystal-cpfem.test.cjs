@@ -196,3 +196,30 @@ test('descarregamento com liberacao brusca de contato nao fecha trabalho sem ram
  assert.equal(r.stepsCompleted,6);
  assert.match(r.energyAudit.limitation,/trabalho de descarga desconhecido/);
 });
+
+test('a mesma malha CST resolve patch afim nas tres resolucoes independentes',()=>{
+ const {S}=setup(),engine=S.polycrystalCPFEM;
+ for(const [meshNX,meshNY] of engine.meshPresets){
+  const r=engine.verifyAffinePatch({meshNX,meshNY,exx:.0008,eyy:-.0004,gammaXY:.0009});
+  assert.equal(r.status,'AFFINE_PATCH_PASS',meshNX+'x'+meshNY);
+  assert.equal(r.triangles,2*meshNX*meshNY);
+  assert.ok(r.maxStrainError<1e-12);
+  assert.equal(r.meshConvergenceVerified,false);
+ }
+ assert.throws(()=>engine.verifyAffinePatch({meshNX:4,meshNY:4}),/Malha CPFEM indisponivel/);
+});
+test('malhas refinadas produzem deslocamentos e reacoes em ensaio elastico comparavel',()=>{
+ const {S,synthetic}=setup(),engine=S.polycrystalCPFEM;
+ const cmp=engine.compareMeshSensitivity({structure:'CFC',synthetic,
+  mode:'compression',position:.5,width:.5,load:.04});
+ assert.equal(cmp.status,'DIAGNOSTIC_ONLY',JSON.stringify(cmp));
+ assert.equal(cmp.grids.length,3);
+ assert.equal(cmp.comparisons.length,2);
+ assert.deepEqual(Array.from(cmp.grids.map(x=>x.triangles)),[48,192,432]);
+ assert.ok(cmp.grids.every(x=>x.status==='CONVERGED'&&
+  Number.isFinite(x.contactReactionY)&&Number.isFinite(x.energyTotal)));
+ assert.ok(cmp.comparisons.every(x=>Number.isFinite(x.relativeReactionDifference)&&
+  x.relativeReactionDifference>=0&&Number.isFinite(x.absoluteDisplacementDifference)));
+ assert.equal(cmp.meshConvergenceVerified,false);
+ assert.equal(cmp.calibrated,false);
+});
