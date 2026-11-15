@@ -13,9 +13,9 @@ SILM.polycrystalPreview=(()=>{
   return el;
  };
  const fmt=x=>Number(x||0).toFixed(4).replace('.',',');
- function mount({container,getSynthetic,getStructure,getMode,onChange}={}){
+ function mount({container,getSynthetic,getStructure,getMode,getContact,onChange}={}){
   if(!container||typeof getSynthetic!=='function'||typeof getStructure!=='function'||
-   typeof getMode!=='function'||typeof onChange!=='function')
+   typeof getMode!=='function'||typeof getContact!=='function'||typeof onChange!=='function')
    throw new TypeError('Adaptador CPFEM requer contexto, sem assumir controle do menu');
   const details=n('details','silm-micro-cpfem-preview');
   details.append(n('summary','','Prévia técnica do policristal · ramo de desenvolvimento'));
@@ -26,12 +26,13 @@ SILM.polycrystalPreview=(()=>{
   const load=n('input','silm-micro-cpfem-load');load.type='range';load.min='10';load.max='100';
   load.step='5';load.value='70';load.setAttribute('aria-label','Deslocamento prescrito relativo do ensaio de policristal hipotético');
   const value=n('output','silm-micro-cpfem-load-value','70%');
-  load.addEventListener('input',()=>{value.textContent=load.value+'%';});
+  load.addEventListener('input',()=>{value.textContent=load.value+'%';invalidateIfSolved('Alteração da carga: recalcule o ensaio CPFEM.');});
   loadLabel.append(load,value);
   const unloadLabel=n('label','silm-micro-cpfem-unload-label');
   const unload=n('input','silm-micro-cpfem-unload');unload.type='checkbox';
   unload.setAttribute('aria-label','Executar descarregamento após a aplicação da carga');
   unloadLabel.append(unload,n('span','','Descarregar após o ensaio'));
+  unload.addEventListener('change',()=>invalidateIfSolved('Alteração do descarregamento: recalcule o ensaio CPFEM.'));
   const run=n('button','silm-workshop-micro-control silm-micro-cpfem-run','Calcular prévia CPFEM');
   run.type='button';run.setAttribute('aria-label','Calcular equilíbrio dos grãos sintéticos na prévia CPFEM');
   const showLabel=n('label','silm-micro-cpfem-show-label');
@@ -47,9 +48,15 @@ SILM.polycrystalPreview=(()=>{
   grainReading.setAttribute('aria-label','Leitura relativa do grão sintético no modelo CPFEM');
   details.append(row,status,grainReading);
   container.append(details);
-  let result=null,selected=-1,mode=null,destroyed=false,working=false;
-  const currentField=()=>!destroyed&&show.checked&&result?.converged&&
-   getSynthetic()&&getMode()===mode?result:null;
+  let result=null,selected=-1,mode=null,configuration=null,destroyed=false,working=false;
+  const currentField=()=>{
+   if(destroyed||!show.checked||!result?.converged||!configuration)return null;
+   const contact=getContact();
+   return getSynthetic()===configuration.synthetic&&
+    getStructure()===configuration.structure&&getMode()===configuration.mode&&
+    contact?.position===configuration.position&&contact?.width===configuration.width&&
+    Number(load.value)===configuration.load&&unload.checked===configuration.unload?result:null;
+  };
   function renderGrain(){
    if(!result){grainReading.textContent='Selecione um grão para ler a resposta após o cálculo.';return;}
    if(selected<0||selected>=result.grains.length){
@@ -65,17 +72,21 @@ SILM.polycrystalPreview=(()=>{
     'Grão sintético '+g.grainId+' sem ponto de integração nesta malha: nenhum resultado plástico atribuído.';
   }
   function invalidate(message='Prévia inválida após mudança da formação ou origem dos grãos.'){
-   result=null;mode=null;show.checked=false;show.disabled=true;
+   result=null;mode=null;configuration=null;show.checked=false;show.disabled=true;
    status.textContent=message;renderGrain();onChange();
+  }
+  function invalidateIfSolved(message){
+   if(result||show.checked)invalidate(message);
   }
   run.addEventListener('click',()=>{
    if(working)return;
-   const synthetic=getSynthetic(),structure=getStructure(),study=getMode();
-   if(!synthetic||!structure||!['compression','tension'].includes(study)){
+   const synthetic=getSynthetic(),structure=getStructure(),study=getMode(),contact=getContact();
+   if(!synthetic||!structure||!['compression','tension'].includes(study)||
+    !contact||![contact.position,contact.width].every(Number.isFinite)){
     invalidate('Prévia indisponível: exige formação sintética, estrutura suportada e ensaio mecânico ativo.');
     return;
    }
-   working=true;run.disabled=true;show.checked=false;show.disabled=true;result=null;
+   working=true;run.disabled=true;show.checked=false;show.disabled=true;result=null;configuration=null;
    status.textContent='Calculando equilíbrio mecânico do policristal hipotético…';
    onChange();
    // Uma etapa visual para exibir a atividade antes do processamento síncrono.
@@ -83,13 +94,17 @@ SILM.polycrystalPreview=(()=>{
     if(destroyed)return;
     try{
      const model=SILM.polycrystalCPFEM.create({structure,synthetic});
-     const response=model.run({mode:study,load:Number(load.value)/100,
-      unload:unload.checked,increments:5});
+     const requestedLoad=Number(load.value),requestedUnload=unload.checked;
+     const response=model.run({mode:study,position:contact.position,width:contact.width,
+      load:requestedLoad/100,unload:requestedUnload,increments:5});
      if(!response.converged){
       status.textContent='CPFEM não convergiu ('+(response.reason||response.status)+
        '); campo não aplicado. Reduza a carga ou revise o domínio do modelo.';
      }else{
-      result=response;mode=study;show.disabled=false;
+      result=response;mode=study;
+       configuration=Object.freeze({synthetic,structure,mode:study,
+        position:contact.position,width:contact.width,load:requestedLoad,unload:requestedUnload});
+       show.disabled=false;
       status.textContent='Policristal hipotético · '+response.sampledGrains+'/'+response.grainCount+
        ' grãos com pontos de integração · '+response.plasticTriangles+
        ' elementos plastificados no último incremento · deslizamento máximo '+
@@ -111,7 +126,7 @@ SILM.polycrystalPreview=(()=>{
    selected(index){selected=Number.isInteger(index)?index:-1;renderGrain();},
    invalidate,field:currentField,
    result:()=>result,
-   destroy(){destroyed=true;details.remove();result=null;show.checked=false;}
+   destroy(){destroyed=true;details.remove();result=null;configuration=null;show.checked=false;}
   });
  }
  return Object.freeze({schema:'silm.polycrystal-preview.staging.v1',mount,
