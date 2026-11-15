@@ -9,12 +9,14 @@
   const observed=new WeakSet();
   let frame=0;
   const ro=typeof ResizeObserver==='function'?new ResizeObserver(()=>queue()):null;
-  const nodes=()=>[
+  // Os limites superiores independem da presença de controles opcionais.
+  // A doca inferior nunca pode ser confundida com a barra de navegação.
+  const upperNodes=()=>[
    document.querySelector('#si-workspace .si-workspace-toolbar'),
-   document.querySelector('#silm-module-shortcuts'),
-   document.querySelector('#si-stage .silm-workshop-scales'),
-   document.querySelector('#si-workspace .si-launchers')
+   document.querySelector('#si-stage .silm-workshop-scales')
   ].filter(Boolean);
+  const nodes=()=>[...upperNodes(),
+   document.querySelector('#si-workspace .si-launchers')].filter(Boolean);
   function clear(){
    rail.dataset.silmPositioned='false';
    rail.style.removeProperty('--silm-notice-top');
@@ -27,7 +29,7 @@
    for(const node of nodes())if(ro&&!observed.has(node)){
     observed.add(node);ro.observe(node);
    }
-   const topNodes=nodes().slice(0,3).filter(n=>n.getClientRects().length);
+   const topNodes=upperNodes().filter(n=>n.getClientRects().length);
    const navBottom=Math.max(0,...topNodes.map(n=>n.getBoundingClientRect().bottom));
    const dock=document.querySelector('#si-workspace .si-launchers');
    const dockTop=dock?.getClientRects().length?dock.getBoundingClientRect().top:innerHeight-58;

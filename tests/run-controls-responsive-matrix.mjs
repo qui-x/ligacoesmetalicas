@@ -145,6 +145,23 @@ try{
  await page.locator('[data-open-dock="ver"]').click();
  await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===false);
  const direct=page.locator('#silm-direct-actionbar');
+ // Um único local ativa o módulo: Montagem → Módulo. Ver exibe as
+ // ferramentas correspondentes e não oferece um segundo seletor.
+ async function chooseModule(target){
+  const ver=page.locator('[data-open-dock="ver"]');
+  if(await ver.getAttribute('aria-expanded')==='true')
+   await page.locator('[data-close-dock="right"]').click();
+  await page.locator('[data-open-dock="montagem"]').click();
+  await page.locator('[data-left-tab="modulo"]').click();
+  const card=page.locator('.silm-module-card[data-module="'+target+'"]');
+  if(!await card.evaluate(el=>el.open))await card.locator('summary').click();
+  const button=page.locator('#silm-module-activate-'+target);
+  assert.equal(await button.isDisabled(),false,'Módulo indisponível em Montagem: '+target);
+  await button.click();
+  await page.waitForFunction(value=>window.SILMIntegration?.snapshot?.()?.module?.active===value,target);
+  await page.locator('[data-close-dock="left"]').click();
+  await page.locator('[data-open-dock="ver"]').click();
+ }
  assert.equal(await direct.locator('[data-action="unit-cell"]').count(),0,
   'Centro oferece ação sem efeito: ocultar célula');
  assert.equal(await direct.locator('[data-action="view-toggle"]').count(),0,
@@ -159,7 +176,7 @@ try{
  assert.equal(await direct.locator('[data-action="property-thermal"]').count(),1);
  assert.match(await page.locator('.silm-observer-selection-status').first().textContent(),
   /Elétrica \+ Térmica/,'A combinação Joule não está explicada na navegação');
- await page.locator('[data-silm-module-shortcut="medir"]').click();
+ await chooseModule('medir');
  assert.ok(await direct.locator('[data-silm-direct-tool="medir:distance"]').count()===1,
   'Medir deixou de oferecer instrumento direto');
  const guide=page.locator('#silm-tools .silm-module-guide');
@@ -167,7 +184,7 @@ try{
  await direct.locator('[data-silm-direct-tool="medir:angle"]').click();
  await page.waitForFunction(()=>document.querySelector('#silm-tools .silm-module-guide')?.textContent.includes('B será o vértice'));
  assert.match(await guide.textContent(),/Próximo ponto A de 3/,'Medir não indica o ponto da cena');
- await page.locator('[data-silm-module-shortcut="calcular"]').click();
+ await chooseModule('calcular');
  assert.ok(await direct.locator('[data-silm-direct-tool^="calcular:"]').count()>=1,
   'Calcular deixou de oferecer fórmulas');
  assert.equal(await guide.getAttribute('data-module'),'calcular','Calcular perdeu a relação geométrica');
@@ -175,11 +192,11 @@ try{
  await page.waitForFunction(()=>document.querySelector('.silm-crystal')?.dataset.calc==='fractions',undefined,{timeout:10000});
  assert.equal(await page.locator('.silm-crystal').getAttribute('data-calc'),'fractions',
   'Contagem geométrica não realçou as frações dos sítios');
- await page.locator('[data-silm-module-shortcut="medir"]').click();
+ await chooseModule('medir');
  await page.waitForFunction(()=>document.querySelector('#silm-tools .silm-module-guide')?.textContent.includes('Selecione o instrumento acima'));
  assert.equal(await direct.locator('[data-silm-direct-tool="medir:angle"]').getAttribute('aria-pressed'),'false',
   'Trocar de módulo deixou instrumento antigo ativo');
- await page.locator('[data-silm-module-shortcut="explorar"]').click();
+ await chooseModule('explorar');
  // O painel Ver no mobile usa uma folha modal. Fechar a folha antes da
  // travessia evita clicar através do backdrop (bloqueio correto do produto).
  await page.locator('[data-open-dock="ver"]').click();

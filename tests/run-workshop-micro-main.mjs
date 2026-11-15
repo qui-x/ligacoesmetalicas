@@ -85,10 +85,21 @@ async function test(viewport){
  assert.equal(await viewer.getAttribute('data-measurement-status'),'unavailable','Medidas experimentais não devem estar disponíveis para esquema gerado.');
  assert.doesNotMatch(await viewer.locator('.silm-workshop-micro-status').textContent(),/\d+[,.]?\d*\s*%/,'O grão não deve exibir porcentagem de composição ou fração sem dados experimentais.');
  assert.match(await viewer.locator('.silm-workshop-micro-caveat').textContent(),/sem composição, fração de fase ou tamanho medidos/,'Aviso científico ausente para mapa esquemático.');
- // Propriedades mecânicas agora atuam diretamente na escala de grãos,
- // ANTES de organizar a rede, sem substituir polígonos ou criar minipalco.
- assert.equal(await page.evaluate(()=>SILMIntegration.snapshot().structure?.mode),'free',
-  'A microestrutura deveria permitir deformação antes da rede cristalina.');
+ // Investigar um objeto prepara a referência cristalina automaticamente.
+ // Isso não força a navegação: a escala de grãos continua independente
+ // da cena da rede, e a deformação microestrutural deve operar nela.
+ const prepared=await page.evaluate(()=>{
+  const x=SILMIntegration.snapshot();
+  return {mode:x.structure?.mode,count:x.structure?.units?.length||0,
+   referenceId:x.metadata?.workshop?.referenceId,
+   scale:document.querySelector('#si-stage')?.dataset.workshopScale};
+ });
+ assert.equal(prepared.mode,'crystalline',
+  'Escolher o objeto deveria preparar a rede de referência sem Adicionar unidade.');
+ assert.ok(prepared.count>0,'A estrutura do objeto não recebeu centros cristalinos.');
+ assert.ok(prepared.referenceId,'O objeto escolhido perdeu sua referência do catálogo.');
+ assert.equal(prepared.scale,'2',
+  'Preparar a rede não deve tirar o estudante da escala de microestrutura.');
  const initialGrainShapes=await viewer.locator('.silm-micro-grain').evaluateAll(nodes=>
   nodes.slice(0,10).map(n=>n.getAttribute('d')).join('|'));
  const initialSeed=await viewer.getAttribute('data-synthetic-seed');

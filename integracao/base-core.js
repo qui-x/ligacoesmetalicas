@@ -1871,7 +1871,7 @@ var BaseDemoSI;
         return { view: "focus", left: "collapsed", right: "collapsed", leftTab: "preparo", rightTab: "ver", presentation: "standard" };
     }
     BaseDemoSI.initialWorkspace = initialWorkspace;
-    /** A dimensão compacta (<1280 px) opera uma doca por vez; <=900 px usa sheet. */
+    /** As docas são mutuamente exclusivas em qualquer largura; <=900 px usa sheet. */
     function reduceWorkspace(s, a, compact) {
         switch (a.type) {
             case "reset": return initialWorkspace();
@@ -1879,9 +1879,9 @@ var BaseDemoSI;
             case "open": {
                 const tab = a.tab;
                 if (a.side === "left")
-                    return { ...s, left: "open", right: compact ? "collapsed" : s.right, presentation: "standard",
-                        leftTab: tab === "resumo" || tab === "objetos" || tab === "modulo" || tab === "missao" ? tab : "preparo" };
-                return { ...s, right: "open", left: compact ? "collapsed" : s.left,
+                    return { ...s, left: "open", right: "collapsed", presentation: "standard",
+                        leftTab: tab === "resumo" || tab === "modulo" || tab === "missao" ? tab : "preparo" };
+                return { ...s, right: "open", left: "collapsed",
                     rightTab: tab === "dados" ? "dados" : "ver", presentation: "standard" };
             }
             case "close": return { ...s, [a.side]: "collapsed", presentation: "standard" };
@@ -1916,7 +1916,9 @@ var BaseDemoSI;
             return "preparo";
         if (value === "ajustes")
             return "modulo";
-        return value === "resumo" || value === "preparo" || value === "objetos" || value === "modulo" || value === "missao" ? value : null;
+        if (value === "objetos")
+            return "preparo";
+        return value === "resumo" || value === "preparo" || value === "modulo" || value === "missao" ? value : null;
     }
     BaseDemoSI.normalizeLeftCategory = normalizeLeftCategory;
     function parseWorkspacePreference(raw) {
@@ -2017,7 +2019,7 @@ var BaseDemoSI;
             panel.hidden = panel.dataset.rightPanel !== workspaceState.rightTab;
         const lh = node("si-left-title");
         if (lh)
-            lh.textContent = { resumo: "Montagem", preparo: "Preparo", objetos: "Recipientes", modulo: "Módulo", missao: "Missão" }[workspaceState.leftTab];
+            lh.textContent = { resumo: "Resumo", preparo: "Preparo", modulo: "Módulo", missao: "Roteiro" }[workspaceState.leftTab];
         const detail = viewerLevel === "detail" && workspaceState.rightTab === "ver";
         const rh = node("si-right-title");
         if (rh)
@@ -2258,7 +2260,7 @@ var BaseDemoSI;
         document.querySelectorAll("[data-scene-view]").forEach(b => b.addEventListener("click", () => changeWorkspace({ type: "view", view: b.dataset.sceneView })));
         document.querySelectorAll("[data-open-dock]").forEach(b => b.addEventListener("click", () => {
             const which = b.dataset.openDock;
-            openWorkspace(which === "montagem" ? "left" : "right", which === "montagem" ? "preparo" : which, b);
+            openWorkspace(which === "montagem" ? "left" : "right", which === "montagem" ? workspaceState.leftTab : which, b);
         }));
         document.querySelectorAll("[data-close-dock]").forEach(b => b.addEventListener("click", () => closeWorkspace(b.dataset.closeDock)));
         document.querySelectorAll("[data-left-tab],[data-open-left-category]").forEach(b => b.addEventListener("click", () => {

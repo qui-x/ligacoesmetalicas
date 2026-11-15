@@ -370,30 +370,37 @@ try{
   SILM.lensController.inspect().scale===4);
  assert.equal(await page.locator('.silm-lens-circle:visible').count(),1);
 
- // Parte 8: a lente acompanha a Oficina unificada e nunca cria outro motor.
- // As mudanças de módulo usam o seletor científico original do SILM.
+ // A lente acompanha as mudanças científicas sem uma doca de módulos
+ // repetida em Ver. O único acesso é Montagem → Módulo.
  await page.setViewportSize({width:1366,height:768});
- assert.equal(await page.locator('.si-workspace-toolbar #silm-module-shortcuts').count(),0,
-  'A área principal ainda contém o seletor de módulos');
+ assert.equal(await page.locator('#silm-module-shortcuts, [data-silm-module-shortcut]').count(),0,
+  'O seletor antigo duplicado de módulos voltou ao aplicativo');
  await page.locator('[data-open-dock="ver"]').click();
  await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===false);
- assert.equal(await page.locator('#si-dock-right [data-right-panel="ver"] #silm-module-shortcuts').count(),1,
-  'Os três módulos devem estar no topo do menu Ver');
+ assert.equal(await page.locator('#si-dock-right #silm-module').count(),0,
+  'Ver não deve conter o seletor de módulos');
  const stableBeforeModules=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
- const shortcuts=page.locator('#silm-module-shortcuts [data-silm-module-shortcut]');
- assert.equal(await shortcuts.count(),3,'Travessia integrada perdeu os três módulos');
  for(const module of ['medir','calcular','explorar']){
-  const button=page.locator('[data-silm-module-shortcut="'+module+'"]');
+  await page.locator('[data-close-dock="right"]').click();
+  await page.locator('[data-open-dock="montagem"]').click();
+  await page.locator('[data-left-tab="modulo"]').click();
+  const card=page.locator('.silm-module-card[data-module="'+module+'"]');
+  if(!await card.evaluate(el=>el.open))await card.locator('summary').click();
+  const button=page.locator('#silm-module-activate-'+module);
+  assert.equal(await button.isDisabled(),false,'Módulo indisponível na Montagem: '+module);
   await button.click();
   await page.waitForFunction(n=>SILMIntegration.snapshot()?.module?.active===n,module);
   await page.waitForFunction(()=>SILM.lensController.inspect().attached&&SILM.lensController.inspect().scale===4);
   assert.equal(await page.locator('#silm-module').inputValue(),module,
-   'Atalho de módulo não usa o seletor científico original');
-  assert.deepEqual(await shortcuts.evaluateAll(nodes=>nodes.filter(n=>
-   n.getAttribute('aria-pressed')==='true').map(n=>n.dataset.silmModuleShortcut)),[module],
-   'Estado visual do módulo ativo inconsistente com o motor');
+   'Montagem não sincronizou o seletor científico original');
+  assert.equal(await card.getAttribute('class').then(x=>x.includes('is-active')),true,
+   'Cartão ativo não reflete o estado do modelo');
   assert.equal(await page.locator('.silm-lens-layer').count(),1,
    'Troca de módulo duplicou o DOM da lente');
+  await page.locator('[data-close-dock="left"]').click();
+  await page.locator('[data-open-dock="ver"]').click();
+  assert.equal(await page.locator('#silm-module-shortcuts').count(),0,
+   'A escolha de módulo não pode reaparecer em Ver');
  }
  // A troca de módulo atualiza legitimamente o carimbo updatedAt do ensaio.
  // Isso não é mutação física: comparar o snapshot COMPLETO salvo esse carimbo.
