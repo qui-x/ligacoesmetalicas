@@ -202,18 +202,29 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
     host.append(moduleGuide(tool?MS.types[tool].label:'Instrumentos de medição',
      tool?measureDirections[tool]:'Escolha uma ferramenta. Em seguida, toque ou use Enter nos centros da cena; o modelo fornece os valores em escala física.',
      {progress,actions:operations}));
-    field(host,'Instrumento',select('silm-instrument',[['','Escolha um instrumento'],...Object.entries(MS.types).filter(([k])=>allowed(k)).map(([k,t])=>[k,t.label])],tool||'',v=>{tool=null;activateMeasure(v||null);}));
+    // A escolha do instrumento já existe na faixa direta do Ver.
+    // Conservar o seletor original apenas como espelho de compatibilidade.
+    const mirroredInstrument=select('silm-instrument',[['','Escolha um instrumento'],...Object.entries(MS.types).filter(([k])=>allowed(k)).map(([k,t])=>[k,t.label])],tool||'',v=>{tool=null;activateMeasure(v||null);});
+    mirroredInstrument.hidden=true;mirroredInstrument.setAttribute('aria-hidden','true');host.append(mirroredInstrument);
     field(host,'Unidade de comprimento',select('silm-measure-unit',Object.keys(U.length).map(k=>[k,k]),unit,v=>{unit=v;change();}));
    }else{
     const formulas=CA.applicable(type()).filter(f=>allowed(f.quantity));if(!formulas.some(f=>f.id===formula))formula=formulas[0]?.id;
-    field(host,'Fórmula',select('silm-formula',formulas.map(f=>[f.id,f.name]),formula,activateFormula));
+    // A fórmula foi selecionada na própria faixa de Ver. Não duplicar
+    // a seleção em um segundo controle visual abaixo do guia.
+    const mirroredFormula=select('silm-formula',formulas.map(f=>[f.id,f.name]),formula,activateFormula);
+    mirroredFormula.hidden=true;mirroredFormula.setAttribute('aria-hidden','true');host.append(mirroredFormula);
     const f=S.formulas[formula];if(f){
      host.append(moduleGuide(f.name,
       'Relação geométrica: '+f.expression+'. Inspecione na cena os centros, as arestas ou os contatos destacados. Os valores registrados mantêm sua origem científica.',
       {progress:f.requiredInputs.length?
        f.requiredInputs.length+' entrada(s) · dado tabelado, medida do modelo, cálculo anterior ou valor informado':
        'Contagem geométrica direta · sem entradas adicionais'}));
-     host.append(node('p',f.expression),node('p',f.notes));{const d=f.describe?.(S.crystal.geometry(element()));if(d){const n=node('p',d);n.id='silm-formula-detail';host.append(n);}}
+     // A relação já aparece no guia. Premissas e limitações continuam
+     // consultáveis sem empilhar parágrafos antes dos campos da fórmula.
+     const details=node('details');details.className='silm-calc-conditions';
+     details.append(node('summary','Premissas e limitações'),node('p',f.notes));
+     {const d=f.describe?.(S.crystal.geometry(element()));if(d){const n=node('p',d);n.id='silm-formula-detail';details.append(n);}}
+     host.append(details);
      for(const spec of f.requiredInputs){
       const opts=options(spec);
       // Uma medida realmente realizada nesta investigação prevalece como sugestão,
@@ -224,7 +235,7 @@ SILM.createIntegrationTools=({model,host,moduleHost=host,history,onChange,say,on
       // Entrada que o SILM calcula (V, r…) mas que ainda não foi calculada: indicar a fórmula que vem antes.
       const before=spec.origins.includes('CALCULATED')&&spec.key!=='n'&&!opts.some(o=>o.origin!=='USER')?CA.applicable(type()).find(x=>x.quantity===spec.quantity&&x.id!==f.id&&allowed(x.quantity)):null;
       if(before){const hint=node('p');hint.className='silm-calc-dependency';hint.id='silm-dependency-'+spec.key;hint.textContent='Ainda não há '+spec.name+' calculado nesta investigação. Calcule antes “'+before.name+'” ou informe o valor.';
-       const go=button('Ir para “'+before.name+'”',()=>{formula=before.id;choice={};user={};change();say('Fórmula escolhida: '+before.name+'.');document.getElementById('silm-formula')?.focus();});go.id='silm-dependency-go-'+spec.key;host.append(hint,go);}
+       const go=button('Ir para “'+before.name+'”',()=>{formula=before.id;choice={};user={};change();say('Fórmula escolhida: '+before.name+'.');document.querySelector('[data-silm-direct-tool="calcular:'+before.id+'"]')?.focus({preventScroll:true});});go.id='silm-dependency-go-'+spec.key;host.append(hint,go);}
       if(choice[spec.key]==='user'){
        const input=node('input');input.id='silm-input-'+spec.key;input.type='text';input.inputMode='decimal';input.value=user[spec.key]||'';input.addEventListener('input',()=>{user[spec.key]=input.value;});field(host,'Valor de '+spec.symbol+' em '+spec.unit,input);
       }
