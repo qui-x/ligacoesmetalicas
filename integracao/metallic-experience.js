@@ -208,16 +208,9 @@ SILM.createMetallicExperience=({model,say,schedule,reduced,selectMetal,prepareMe
  const scene={quickActions,jouleReading,
   canStudy:id=>editable()&&allows(id)&&model.propertyAvailability(id).ok,
   advanceHeat:actions.advance,toggleHeat:()=>actions.heat(),toggleLight:()=>actions.light(),controls:(host,viewScope)=>S.createPropertyControls(host,{scope:viewScope,info,actions,prefix:'silm-scene-property',compact:true})};
- const dialog=document.getElementById('silm-periodic-dialog'),body=document.getElementById('silm-periodic-body'),trigger=document.getElementById('silm-open-periodic');let tableScope;
- trigger.addEventListener('click',()=>{
-  tableScope?.destroy();tableScope=SimCore.createScope();body.replaceChildren();
-  const periodicTable=S.createPeriodicTable(body,{scope:tableScope,state:{selection:Number(document.getElementById('silm-metal').value)||29,query:''},onSelect:e=>prepareMetal(e.atomicNumber),onInvestigate:async e=>{dialog.close();await selectMetal(e.atomicNumber);},onExplore:e=>{prepareMetal(e.atomicNumber);dialog.close();},onSources:e=>{const text=Data.sourceIds(e).map(id=>{const s=Data.source(id);return s?s.institution+' — '+s.title:id;}).join('\n');document.getElementById('silm-periodic-sources').textContent=text;}});
-  document.getElementById('silm-periodic-sources').textContent='';dialog.showModal();
-  // No WebKit, a medida do conteúdo modal estabiliza após sua abertura.
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{if(dialog.open)periodicTable.resize();}));
- });
- document.getElementById('silm-close-periodic').addEventListener('click',()=>dialog.close());
- dialog.addEventListener('close',()=>{tableScope?.destroy();trigger.focus({preventScroll:true});});
+ // A Tabela Periódica da Oficina é controlada exclusivamente pelo adaptador
+ // (renderObjectEntry/openStagePeriodic). Remover o antigo registro de eventos
+ // evita recriar um segundo diálogo e preserva o motor de propriedades.
  return {scene,quickActions,info,update(){controls.update();for(const id of P.ids){const b=document.getElementById('silm-panel-property-start-'+id);b.parentElement.hidden=!allows(id);}document.getElementById('silm-properties').hidden=!model.state.metal;document.getElementById('silm-property-caption').textContent=currentCoupling()?'Modelo didático em unidades relativas; parâmetros iguais entre metais, sem comparação quantitativa.':model.state.properties.active?P.catalog[model.state.properties.active].limitation:'As experiências qualitativas são distintas dos dados tabelados do metal.';}};
 };
 SILM.renderIntegrationMetalData=(host,e,state)=>{
