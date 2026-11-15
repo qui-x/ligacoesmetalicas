@@ -210,12 +210,40 @@
               <nav class="si-dock-tabs" role="group" aria-label="Categorias da montagem">
                 <button type="button" data-left-tab="resumo" aria-pressed="false">Resumo</button>
                 <button type="button" data-left-tab="preparo" aria-pressed="true">Preparo</button>
-                <button type="button" data-left-tab="objetos" aria-pressed="false">Unidades</button>
+                
                 <button type="button" data-left-tab="modulo" aria-pressed="false">Módulo</button>
                 <button type="button" data-left-tab="missao" aria-pressed="false" hidden>Roteiro</button>
               </nav>
               <div class="si-dock-scroll" id="si-left-scroll" tabindex="-1">
-                <div data-left-panel="resumo"><h3>Investigação atual</h3><p id="silm-summary" hidden></p><dl id="silm-summary-list" class="silm-summary-list"></dl></div><div data-left-panel="preparo"><section class="silm-dock-group" aria-labelledby="silm-group-metal"><h3 id="silm-group-metal">Metal da investigação</h3><label for="silm-metal">Escolha um metal</label><select id="silm-metal"></select><div class="silm-dock-actions"><button id="silm-open-periodic" type="button" class="button outline">Tabela periódica</button><button id="silm-start" class="button primary" type="button">Iniciar investigação</button><a id="silm-open-presets" class="button outline" href="#/montagens">Montagens prontas</a></div><p id="silm-metal-information" hidden></p></section></div><div data-left-panel="objetos"><p id="silm-structure-status" class="silm-structure-status" role="status"></p><p id="silm-unit-count" class="silm-unit-count"></p><section id="silm-free-tools" class="silm-dock-group" aria-labelledby="silm-group-structure" hidden><h3 id="silm-group-structure">Montagem livre</h3><div class="silm-dock-actions"><button id="silm-add" class="button outline" type="button">Adicionar unidade</button><button id="silm-organize" class="button outline" type="button" aria-describedby="silm-organize-reason">Organizar em rede</button><p id="silm-organize-reason" class="silm-organize-reason" hidden></p></div></section><details id="silm-free-mode-options" class="silm-free-mode-options" hidden><summary>Editar montagem livre</summary><div class="silm-free-mode-actions"><button id="silm-free" class="button outline" type="button">Voltar à montagem livre</button></div></details></div><div data-left-panel="modulo"><h3 class="sr-only">Módulos científicos</h3><div id="silm-module-choice"></div><p id="silm-module-context"></p><div id="silm-module-cards"></div></div><div data-left-panel="missao" hidden>
+                <div data-left-panel="resumo"><h3>Investigação atual</h3><p id="silm-summary" hidden></p><dl id="silm-summary-list" class="silm-summary-list"></dl></div>
+                <div data-left-panel="preparo">
+                  <section class="silm-dock-group" aria-labelledby="silm-group-metal">
+                    <h3 id="silm-group-metal">Metal da investigação</h3>
+                    <label for="silm-metal">Escolha um metal</label><select id="silm-metal"></select>
+                    <div class="silm-dock-actions">
+                      <button id="silm-open-periodic" type="button" class="button outline">Tabela periódica</button>
+                      <button id="silm-start" class="button primary" type="button">Iniciar investigação</button>
+                    </div>
+                    <details class="silm-preparo-secondary"><summary>Outras opções</summary>
+                      <a id="silm-open-presets" class="button outline" href="#/montagens">Montagens prontas</a>
+                    </details>
+                    <details id="silm-free-assembly" class="silm-preparo-free" hidden>
+                      <summary>Montagem livre</summary>
+                      <section id="silm-free-tools" aria-labelledby="silm-group-structure" hidden>
+                        <h4 id="silm-group-structure">Construir estrutura</h4>
+                        <div class="silm-dock-actions">
+                          <button id="silm-add" class="button outline" type="button">Adicionar centro metálico</button>
+                          <button id="silm-organize" class="button outline" type="button" aria-describedby="silm-organize-reason">Organizar em rede</button>
+                        </div>
+                        <p id="silm-organize-reason" class="silm-organize-reason" hidden></p>
+                      </section>
+                      <div id="silm-free-mode-options" hidden>
+                        <button id="silm-free" class="button outline" type="button">Editar disposição livre</button>
+                      </div>
+                    </details>
+                    <p id="silm-metal-information" hidden></p>
+                  </section>
+                </div><div data-left-panel="modulo"><h3 class="sr-only">Módulos científicos</h3><div id="silm-module-choice" hidden></div><p id="silm-module-context"></p><div id="silm-module-cards"></div></div><div data-left-panel="missao" hidden>
                   <div id="silm-route-guidance"></div>
                   <p id="si-dock-activity-status" role="status">Nenhuma atividade orientada em andamento.</p>
                   </div>
@@ -233,7 +261,7 @@
                       
                     </div>
                   </section>
-                  <details id="silm-ver-more" class="silm-ver-more"><summary>Mais visualizações</summary><div id="si-viewer-catalog" class="si-viewer-controls" role="group" aria-label="Visualizações científicas">
+                  <details id="silm-ver-more" class="silm-ver-more"><summary>Ajustes de exibição</summary><div id="si-viewer-catalog" class="si-viewer-controls" role="group" aria-label="Visualizações científicas">
                     <div id="si-viewer-families" class="si-viewer-family-tabs" role="tablist" aria-label="Famílias do painel Ver"></div>
                     <div id="si-viewer-family-panel" class="si-viewer-family-panel" role="tabpanel" aria-label="Ferramentas da família escolhida">
                       <p id="si-viewer-family-description" class="si-viewer-caption"></p>
@@ -259,7 +287,7 @@
                     </nav>
                     <nav class="silm-data-documents" aria-label="Relatórios e registros"><a id="silm-report-link" class="button outline" href="#/relatorios">Relatório</a><a class="button outline" href="#/caderno">Caderno</a></nav>
                   </div>
-                  <section class="silm-data-detail" data-silm-data-panel="tabela" hidden><h3>Dados científicos e fontes</h3><div id="silm-data"></div></section>
+                  <section class="silm-data-detail" data-silm-data-panel="tabela" hidden><div id="silm-data"></div></section>
                   <section class="silm-data-detail" data-silm-data-panel="registros" hidden><div id="silm-history"></div></section>
                   <section class="silm-data-detail" data-silm-data-panel="arquivo" hidden><h3>Arquivos da investigação</h3><button id="silm-export-legacy" class="button outline" type="button" hidden>Exportar investigação antiga (JSON)</button><button id="silm-export" class="button outline" type="button">Exportar investigação</button><label for="silm-import">Abrir investigação SILM (JSON)</label><input type="file" id="silm-import" accept="application/json,.json"><p id="silm-storage-status" role="status"></p></section>
                 </div>
