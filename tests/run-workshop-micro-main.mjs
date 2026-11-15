@@ -460,7 +460,12 @@ async function test(viewport){
   image:{widthPx:100,heightPx:80,micrometersPerPixel:.5,
    calibrationReference:'Calibração fictícia para verificação matemática'},
   segmentation:{method:'Contorno manual fictício'},
-  grains:[{id:'g1',vertices:[[10,10],[30,10],[30,20],[10,20]]}]
+  orientation:{convention:'crystal-to-specimen-matrix',phaseStructure:'BCC',
+   method:'EBSD (fixture)',sourceURL:'https://example.org/fixture',
+   frame:{x:'RD',y:'TD',z:'ND',imageX:'RD',imageY:'TD'},
+   status:'declared-unverified'},
+  grains:[{id:'g1',vertices:[[10,10],[30,10],[30,20],[10,20]],
+   orientationMatrix:[[1,0,0],[0,1,0],[0,0,1]]}]
  };
  await viewer.getByRole('button',{name:'Abrir dados segmentados'}).click();
  const importDialog=viewer.locator('.silm-micro-data-dialog');
@@ -521,6 +526,14 @@ async function test(viewport){
  assert.equal(await viewer.locator('.silm-micro-grain').count(),1,'O mapa importado não alterou a segmentação.');
  await importDialog.getByRole('button',{name:'Fechar importação de dados'}).click();
  await viewer.locator('.silm-micro-grain').first().click();
+ assert.equal(await viewer.getAttribute('data-slip-orientation'),'imported-unverified',
+  'A matriz de orientação declarada não foi associada ao grão importado.');
+ assert.equal(await viewer.getAttribute('data-slip-model'),'GEOMETRY_ONLY');
+ assert.equal(await viewer.getAttribute('data-slip-j2-coupled'),'false');
+ assert.ok(Math.abs(Number(await viewer.getAttribute('data-slip-max'))-1/Math.sqrt(6))<.0002,
+  'A orientação identidade CCC deveria reproduzir m=1/√6 para eixo y.');
+ assert.match(await viewer.locator('.silm-micro-slip-result').textContent(),/NÃO homologada/,
+  'Matriz importada não pode ser identificada como orientação experimental homologada.');
  assert.match(await viewer.locator('.silm-workshop-micro-status').textContent(),/área segmentada 50 µm².*não homologados/,'Área calibrada de teste ou aviso de procedência não aparece.');
  assert.doesNotMatch(await viewer.locator('.silm-workshop-micro-status').textContent(),/%/,'Mapas importados não autorizam porcentagens de composição.');
  assert.equal(await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot())),before,'Importar mapa modificou o estado científico.');
