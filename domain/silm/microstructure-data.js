@@ -54,6 +54,26 @@
    return fail('Informe como os contornos de grão foram segmentados.');
   if(!Array.isArray(raw.grains)||raw.grains.length===0||raw.grains.length>MAX_GRAINS)
    return fail('O mapa deve conter de 1 a 160 grãos identificados.');
+  // Orientações opcionais são DADOS DECLARADOS pelo arquivo, nunca
+  // homologação automática EBSD. Uma matriz é crystal -> specimen e
+  // precisa referenciar os eixos da imagem e a fase cristalográfica.
+  const o=raw.orientation;let orientation=null,hasMatrices=0;
+  if(o!==undefined){
+   if(!o||o.convention!=='crystal-to-specimen-matrix'||
+      !['BCC','FCC','HCP'].includes(o.phaseStructure)||
+      !txt(o.method,80)||!link(o.sourceURL)||
+      !o.frame||!['x','y','z','imageX','imageY'].every(k=>txt(o.frame[k],50))||
+      o.frame.imageX!==o.frame.x||o.frame.imageY!==o.frame.y)
+    return fail('Orientação exige fase CCC/CFC/HC, matriz cristal→amostra, fonte HTTPS, método e eixos da imagem compatíveis.');
+   if(o.status!==undefined&&o.status!=='declared-unverified')
+    return fail('Não aceitar homologação de orientação autodeclarada.');
+   orientation=Object.freeze({
+    convention:o.convention,phaseStructure:o.phaseStructure,
+    method:o.method,sourceURL:o.sourceURL,
+    frame:Object.freeze(Object.fromEntries(['x','y','z','imageX','imageY'].map(k=>[k,o.frame[k]]))),
+    status:'declared-unverified',calibrationApproved:false
+   });
+  }
   const used=new Set(),grains=[];
   for(const grain of raw.grains){
    if(!grain||!txt(grain.id,50)||!/^[a-z0-9][a-z0-9._-]*$/i.test(grain.id)||used.has(grain.id))
@@ -73,15 +93,28 @@
     return fail('Área degenerada ou inválida no grão '+grain.id+'.');
    // Cada área é de uma região SEGMENTADA informada. Não é tamanho médio ASTM.
    const areaMicrometers2=calibrated?area*calibration*calibration:null;
+   if(grain.orientationMatrix!==undefined&&grain.orientationMatrix!==null){
+    if(!orientation)return fail('Matriz por grão exige metadados de orientação.');
+    if(!root.SILM?.crystalSlip?.isMatrix?.(grain.orientationMatrix))
+     return fail('Matriz de orientação inválida no grão '+grain.id+
+      ': use rotação ortonormal com determinante +1.');
+    hasMatrices++;
+   }
+   const matrix=grain.orientationMatrix===undefined||grain.orientationMatrix===null?
+    null:Object.freeze(grain.orientationMatrix.map(row=>Object.freeze([...row])));
    grains.push(Object.freeze({
     id:grain.id,label:txt(grain.label,100)?grain.label:null,
+    orientationMatrix:matrix,orientationStatus:matrix?'declared-unverified':null,
     vertices:Object.freeze(vertices.map(p=>Object.freeze(p))),
     areaPixels2:num(area),
     areaMicrometers2:areaMicrometers2===null?null:num(areaMicrometers2),
     equivalentCircleDiameterMicrometers:areaMicrometers2===null?null:num(eqCircleDiameter(areaMicrometers2))
    }));
   }
+  if(orientation&&!hasMatrices)
+   return fail('Metadados de orientação sem nenhum grão indexado.');
   const data=Object.freeze({
+   orientation,
    schema:raw.schema,id:raw.id,title:raw.title,material:raw.material,
    materialAtomicNumber:raw.materialAtomicNumber,sourceKind:raw.sourceKind,
    source:Object.freeze({citation:source.citation,url:source.url,acquisitionMethod:source.acquisitionMethod}),
