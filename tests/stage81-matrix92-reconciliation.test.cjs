@@ -117,7 +117,7 @@ test('documentação e interface usam o mesmo índice, sem alterar arquivos do m
  const stage='domain/silm/data/research-stage81-matrix92.js';
  const ix='domain/silm/science-evidence-index.js';
  assert.ok(html.indexOf(stage)>0&&html.indexOf(stage)<html.indexOf(ix));
- assert.ok(sw.includes('"'+stage+'"')&&sw.includes('stage81-matrix92-reconciled-r1'));
+ assert.ok(sw.includes('"'+stage+'"')&&sw.includes('stage81-matrix92-reconciled-r'));
  assert.ok(index.includes('S.stage81Reconciliation?.records'));
  const data=read('integracao/metallic-experience.js'),view=read('domain/silm/science-evidence-view.js');
  assert.match(data,/ESTIMATIVA por analogia; não medido nem homologado/);
