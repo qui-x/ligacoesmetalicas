@@ -87,3 +87,33 @@ test('script carrega antes da importação e está no offline',()=>{
  assert.ok(html.indexOf(file)<html.indexOf('domain/silm/microstructure-view.js'));
  assert.ok(sw.includes('"'+file+'"'));
 });
+
+test('tensor uniaxial do J2 reproduz Schmid m vezes tensao relativa',()=>{
+ const e=engine(),s=e.analyzeStress({structure:'CFC',
+  orientationMatrix:e.identity(),
+  stressTensor:[[0,0,0],[0,2,0],[0,0,0]],provenance:'demonstration'});
+ assert.equal(s.status,'PROJECTED_J2_STRESS');
+ near(s.maxAbsShear,2/Math.sqrt(6));
+ assert.equal(s.units,'relative');
+ assert.equal(s.calibratesJ2,false);
+ assert.equal(s.predictsSlipActivation,false);
+});
+test('pressao hidrostatica gera cisalhamento resolvido nulo e inversao troca sinal',()=>{
+ const e=engine(),R=e.rotationZ(25);
+ const p=e.analyzeStress({structure:'CFC',orientationMatrix:R,
+  stressTensor:[[3,0,0],[0,3,0],[0,0,3]]});
+ near(p.maxAbsShear,0,1e-9);
+ const up=e.analyzeStress({structure:'CFC',orientationMatrix:R,
+  stressTensor:[[0,0,0],[0,1,0],[0,0,0]]});
+ const down=e.analyzeStress({structure:'CFC',orientationMatrix:R,
+  stressTensor:[[0,0,0],[0,-1,0],[0,0,0]]});
+ near(up.maxAbsShear,down.maxAbsShear,1e-9);
+ const u=up.families[0].signedShear,d=down.families[0].signedShear;
+ near(Math.abs(u),Math.abs(d),1e-9);
+});
+test('tensao sem orientacao, nao simetrica ou nao finita nao cria leitura',()=>{
+ const e=engine(),I=e.identity();
+ assert.equal(e.analyzeStress({structure:'CFC',stressTensor:[[0,0,0],[0,1,0],[0,0,0]]}).status,'ORIENTATION_UNAVAILABLE');
+ assert.equal(e.analyzeStress({structure:'CFC',orientationMatrix:I,stressTensor:[[0,1,0],[0,1,0],[0,0,0]]}).status,'STRESS_UNAVAILABLE');
+ assert.equal(e.analyzeStress({structure:'CFC',orientationMatrix:I,stressTensor:[[0,0,0],[0,Infinity,0],[0,0,0]]}).status,'STRESS_UNAVAILABLE');
+});

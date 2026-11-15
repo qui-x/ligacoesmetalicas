@@ -309,6 +309,10 @@ SILM.microstructure=(()=>{
     'Sem orientação cristalográfica não há fator de Schmid por grão.');
    slipInfo.setAttribute('role','status');slipInfo.setAttribute('aria-live','off');
    slipInfo.setAttribute('aria-label','Leitura geométrica de deslizamento sem ativação física prevista');
+   const slipStress=node('output','silm-micro-slip-stress',
+    'Projeção de tensão local indisponível sem J2 e orientação explícita.');
+   slipStress.setAttribute('aria-label',
+    'Projeção de tensão local J2 normalizada; não é tensão experimental nem causa deslizamento');
    const demoLabel=node('label','silm-micro-slip-demo-label');
    const demoToggle=node('input','silm-micro-slip-demo');
    demoToggle.type='checkbox';
@@ -321,7 +325,7 @@ SILM.microstructure=(()=>{
    angleInput.setAttribute('aria-label','Rotacionar cristal hipotético em graus');
    const angleValue=node('output','silm-micro-slip-angle-value','0°');
    angleLabel.append(node('span','','Giro didático em torno de z'),angleInput,angleValue);
-   slipDetails.append(demoLabel,angleLabel,slipInfo,
+   slipDetails.append(demoLabel,angleLabel,slipInfo,slipStress,
     node('p','silm-micro-slip-limits',
      'm = |(eixo·normal)(eixo·direção)|, 0 a 0,5. Não fornece tensão de escoamento nem altera a FEM J2. CCC pode violar a lei de Schmid; HC depende das CRSS específicas de cada família.'));
    const slipSource=node('a','','Referência: MTEX — sistemas de deslizamento');
@@ -351,6 +355,9 @@ SILM.microstructure=(()=>{
     demoToggle.disabled=hasImported;
     if(result.status!=='GEOMETRY_ONLY'){
      delete section.dataset.slipMax;
+     delete section.dataset.slipStressMax;
+     section.dataset.slipJ2Projection='unavailable';
+     slipStress.textContent='Sem orientação explícita não há projeção de tensão nos sistemas de deslizamento.';
      slipInfo.textContent=structure?
       'Estrutura '+structure+' · orientação individual não informada. Ative um exemplo hipotético para investigar apenas a geometria.':
       'Sistema de deslizamento não calculado para esta estrutura. Nenhuma fase foi presumida.';
@@ -366,6 +373,32 @@ SILM.microstructure=(()=>{
      'Rotação hipotética '+angleInput.value+'°, NÃO é orientação medida do grão.';
     slipInfo.textContent=origin+' · '+fam+
      ' · '+result.caveat+' Nenhuma ativação de sistemas ou plasticidade por grão prevista.';
+    // O J2 descreve um continuo normalizado, nao tensoes medidas nos graos.
+    // Mapas importados nao sao a mesma amostra do ensaio didatico do J2:
+    // jamais projetar ali tensoes artificiais sobre orientacoes declaradas.
+    const poly=polygons[chosen],probe=poly?.length>=3?
+     grainCenter(poly):{x:W*.5,y:H*.5};
+    const stress=!sourceData&&currentJ2?.converged&&
+     typeof currentJ2.sampleStress==='function'?
+     currentJ2.sampleStress(clamp(probe.x/W,0,1),clamp(probe.y/H,0,1)):null;
+    const projection=stress?slipEngine.analyzeStress({
+     structure,orientationMatrix:matrix,stressTensor:stress,provenance
+    }):null;
+    if(projection?.status==='PROJECTED_J2_STRESS'){
+     section.dataset.slipJ2Projection='read-only';
+     section.dataset.slipStressMax=projection.maxAbsShear.toFixed(4);
+     slipStress.textContent='Tensor de tensão J2 local (modelo relativo): |τ| máximo '+
+      fmt(projection.maxAbsShear)+' · '+
+      (poly?.length>=3?'posição do grão selecionado':'centro da amostra')+
+      '. Projeção apenas de leitura; sem MPa, CRSS ou previsão de deslizamento. '+
+      'Não modifica o solver nem as sombras.';
+    }else{
+     section.dataset.slipJ2Projection='unavailable';
+     delete section.dataset.slipStressMax;
+     slipStress.textContent=sourceData?
+      'Mapa importado: nenhuma tensão J2 desta amostra foi medida ou homologada; projeção local desabilitada.':
+      'Tensor de tensão J2 local indisponível; apenas o fator geométrico de Schmid é mostrado.';
+    }
    };
    demoToggle.addEventListener('change',updateSlip);
    angleInput.addEventListener('input',()=>{
