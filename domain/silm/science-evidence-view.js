@@ -4,7 +4,7 @@ window.SILM=window.SILM||{};
  * A interface conserva os painéis especializados e não altera motors físicos.
  */
 SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
- const S=SILM,db=S.scienceEvidenceIndex,batch=S.batch80Research,iaea=S.scientific400,
+ const S=SILM,db=S.scienceEvidenceIndex,batch=S.batch80Research,iaea=S.scientific400,optical=S.scientificOpticalBatch,
   props=S.properties,labels=Object.freeze({
    'experimental-conditional':'Ensaio com condições específicas',
    evaluated:'Referência avaliada',compiled:'Compilação ou ficha técnica',
@@ -53,7 +53,9 @@ SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
    // nunca sobrescreve nem duplica um estudo ja indexado.
    const core=db.getFor(z,property,{excludeSeven:true});
    const iaeaRecords=iaea?.getIAEA(z,property)||[];
-   const all=core.length?core:(iaeaRecords.length?iaeaRecords:(batch?.getFor(z,property)||[]));
+   const opticalRecords=optical?.getFor(z,property)||[];
+   const all=core.length?core:(opticalRecords.length?opticalRecords:(iaeaRecords.length?iaeaRecords:(batch?.getFor(z,property)||[])));
+
    if(!all.length)continue;
    const published=all.filter(r=>r.status!=='pending'),unverified=all.filter(r=>r.status==='pending');
    total+=all.length;display+=published.length;pending+=unverified.length;
