@@ -5,7 +5,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  const node=(tag,text,className)=>{const el=document.createElement(tag);if(text)el.textContent=text;if(className)el.className=className;return el;};
  const emptyScene=()=>({schemaVersion:1,entities:[],selectedId:null});
  const layerKey='silm-viewer-layer-state-v1';
- const layerDefaults={centers:true,property:true,labels:true,legend:true};
+ const layerDefaults={property:true,labels:true,legend:true};
  const observerKey='silm-observer-presentation-v1';
  const storedObserver=B.storage.read(observerKey);
  const observer={centers:storedObserver?.centers===true};
@@ -25,7 +25,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  window.addEventListener('keyup',onModifierRelease);
  window.addEventListener('blur',()=>{if(ctrlSelectionPending){ctrlSelectionPending=false;applyPendingSelection?.();}});
  const storedLayers=B.storage.read(layerKey);
- const layerState={...layerDefaults,...(storedLayers&&typeof storedLayers==='object'?storedLayers:{})};
+ const layerState=Object.fromEntries(Object.keys(layerDefaults).map(key=>[key,storedLayers?.[key]!==false]));
  // O painel Ver oferece fenômenos reais e instrumentos diretos.
  // "Comparações" apenas textuais, seletores científicos paralelos e outro
  // interruptor para identificar centros não são visualizações independentes.
@@ -269,49 +269,18 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  function persistLayerState(){B.storage.write(layerKey,{...layerState});}
  function applyLayerPresentation(){
   const scene=document.querySelector('#silm-integration-scene .silm-assembly');if(!scene)return;
-  scene.dataset.layerCenters=layerState.centers?'normal':'dim';scene.dataset.layerLabels=layerState.labels?'on':'off';
+  scene.dataset.layerCenters='normal';scene.dataset.layerLabels=layerState.labels?'on':'off';
   scene.dataset.layerProperty=layerState.property?'on':'off';scene.dataset.layerLegend=layerState.legend?'on':'off';
   for(const notes of document.querySelectorAll('#silm-structure-notes .silm-scene-notes'))notes.hidden=!layerState.legend;
   for(const overlay of scene.querySelectorAll('.silm-property-overlay'))overlay.hidden=!layerState.property;
  }
  function layerChanged(key,value){layerState[key]=!!value;persistLayerState();applyLayerPresentation();renderViewers();}
- function renderLayerStructure(output){
-  const group=node('section',null,'silm-layer-group');
-  group.append(node('h3','Destaque estrutural'));
-  toggleRow(group,{title:'Destacar centros metálicos',description:'Reduzir o destaque não remove as unidades.',checked:layerState.centers,onChange:v=>layerChanged('centers',v)});
-  group.append(node('p','A geometria e as vizinhanças permanecem disponíveis na cena e nas ferramentas diretas de Ver.','silm-layer-note'));
-  output.append(group);
- }
  function renderLayerIndications(output){
   const group=node('section',null,'silm-layer-group');group.append(node('h3','Indicações da cena'));
   toggleRow(group,{title:'Indicações da propriedade',description:'Ocultar a sobreposição não desliga fontes nem encerra a experiência.',checked:layerState.property,onChange:v=>layerChanged('property',v)});
   toggleRow(group,{title:'Rótulos',description:'Mostra ou oculta símbolos e identificadores auxiliares.',checked:layerState.labels,onChange:v=>layerChanged('labels',v)});
   toggleRow(group,{title:'Legendas e orientação',description:'Recolhe as notas auxiliares de leitura da cena.',checked:layerState.legend,onChange:v=>layerChanged('legend',v)});
   group.append(node('p','Visibilidade altera somente a apresentação; não altera o estado científico.','silm-layer-note'));output.append(group);
- }
- function compareCard(parent,kicker,title,description,status){
-  const card=node('article',null,'silm-compare-card');card.append(node('span',kicker,'silm-compare-kicker'),node('h3',title),node('p',description));if(status)card.append(node('small',status,'silm-compare-status'));parent.append(card);
- }
- function renderComparison(kind,output){
-  const state=model.state,s=state.structure,props=state.properties,grid=node('div',null,'silm-compare-grid');
-  if(kind==='free-crystal'){
-   const free=s?.mode==='crystalline'?s.crystallography.freeUnits:s?.mode==='free'?s.units:null,organized=s?.mode==='crystalline'?s.units:null;
-   compareCard(grid,'A','Montagem livre',free?free.length+' unidades preservadas na disposição anterior.':'A montagem livre ainda não foi registrada nesta investigação.',free?'Registro disponível':'Sem registro');
-   compareCard(grid,'B','Estrutura cristalina',organized?organized.length+' unidades na estrutura organizada.':'Organize a montagem para obter a estrutura cristalina de referência.',organized?'Registro disponível':'Aguardando organização');
-  }else if(kind==='cell-lattice'){
-   const rep=s?.mode==='crystalline'?s.crystallography.representation:null;
-   compareCard(grid,'A','Célula unitária','Unidade de referência cristalográfica. Use Célula/Rede na barra da cena para alternar o enquadramento.',rep?'Geometria disponível':'Requer estrutura cristalina');
-   compareCard(grid,'B','Rede extensa','Repetição periódica da mesma estrutura. Use Célula/Rede na barra da cena para alternar o enquadramento.',rep?'Geometria disponível':'Requer estrutura cristalina');
-  }else if(kind==='electrons'){
-   const visible=!!state.electrons?.representation.visible;
-   compareCard(grid,'A','Elétrons ocultos','A camada eletrônica não aparece na cena.',state.electrons?(visible?'Variante A':'Estado atual'):'Modelo não ativado');
-   compareCard(grid,'B','Elétrons visíveis','Marcadores qualitativos de elétrons de valência deslocalizados.',state.electrons?(visible?'Estado atual':'Variante B'):'Ative o modelo em Camadas → Modelos');
-  }else{
-   const active=props?.active,entry=active?SILM.properties.catalog[active]:null,narrative=entry?SILM.properties.narrative(active,props[active],{reduced:false,electronsVisible:!!state.electrons?.representation.visible}):null;
-   compareCard(grid,'A','Estado-base','Condição de referência anterior à experiência.',active?'Base conceitual':'Sem experiência ativa');
-   compareCard(grid,'B','Resposta atual',entry?entry.title+' · '+(narrative?.observation||'Resposta qualitativa em andamento.'):'Nenhuma propriedade está em estudo.',entry?'Estado atual':'Sem experiência ativa');
-  }
-  output.append(grid,node('p','Comparação conceitual, sem segunda cena nem nova medição.','silm-compare-note'));
  }
  function setupViewers(){
   for(const definition of definitions)B.registerViewer({...definition,render(_snapshot,_records,output){
