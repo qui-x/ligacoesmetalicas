@@ -102,8 +102,11 @@ def run(browser_name: str, root: str) -> None:
                 "Prevejo que o cobre e o neodímio terão limitações diferentes; "
                 "o ímã Nd-Fe-B não é o metal puro."
             )
-            page.locator("#route-hypothesis").fill(prediction)
+            # Selecionar o metal ANTES de escrever evita perder a hipótese
+            # se a ficha for re-renderizada após mudança da seleção.
             page.locator("#route-metal").select_option("29")
+            page.locator("#route-hypothesis").fill(prediction)
+            expect(page.locator("#route-hypothesis")).to_have_value(prediction)
             page.locator("#route-mount").click()
             expect(page).to_have_url(re.compile(r".*#/ambiente.*"), timeout=10000)
             # A ação vem do motor real e alimenta o histórico; nenhuma
