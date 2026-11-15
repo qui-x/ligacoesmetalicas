@@ -59,15 +59,15 @@ SILM.workshop=(()=>{
   if(!IMAGE_LABELS[kind])return LATTICE;
   return '<figure class="silm-workshop-photo"><img src="assets/workshop/'+kind+'.webp" width="960" height="640" loading="lazy" decoding="async" alt="'+escapeAttr(IMAGE_LABELS[kind])+'"><figcaption>Ilustração realista gerada por IA · referência genérica</figcaption></figure>';
  };
- function itemCard(item,onAction,label='Investigar componente'){
+ function itemCard(item,onAction,label='Investigar componente',{showManual=true,primary=false}={}){
   const article=node('article','silm-workshop-card');article.dataset.referenceId=item.id;
   const art=node('div','silm-workshop-art');art.innerHTML=visual(item,1);
   const body=node('div','silm-workshop-card-body');
   body.append(node('h3','',item.title),node('p','silm-workshop-component-label',item.component));
   // Metadados e ressalvas são consultados no Manual, por referência.
   // O cartão mantém a figura, o componente e a ação de investigar.
-  body.append(manualLink('aplicacoes-metalicas',item,'Consultar no Manual composição e fontes de '+item.title));
-  const b=node('button','button outline',label);b.type='button';b.addEventListener('click',()=>onAction(item));body.append(b);article.append(art,body);return article;
+  if(showManual)body.append(manualLink('aplicacoes-metalicas',item,'Consultar no Manual composição e fontes de '+item.title));
+  const b=node('button',primary?'button primary':'button outline',label);b.type='button';b.addEventListener('click',()=>onAction(item));body.append(b);article.append(art,body);return article;
  }
  function renderObjectCatalog(host,{element,onInvestigate=()=>{},onStartStructure=()=>{}}={}){
   host.replaceChildren();
@@ -79,7 +79,7 @@ SILM.workshop=(()=>{
    node('p','silm-object-catalog-note',refs.length+' objeto'+(refs.length===1?'':'s')+' disponível'+(refs.length===1?'':'is')+' para investigação. As imagens são ilustrativas; a composição real depende do produto.'));
   if(refs.length){
    const grid=node('div','silm-workshop-grid silm-object-catalog-grid');
-   for(const item of refs)grid.append(itemCard(item,onInvestigate,'Iniciar montagem'));
+   for(const item of refs)grid.append(itemCard(item,onInvestigate,'Iniciar montagem',{showManual:false,primary:true}));
    section.append(grid);
   }else{
    // A referência científica pode permitir estrutura sem imagem de objeto.
