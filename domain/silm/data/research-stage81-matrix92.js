@@ -14,6 +14,7 @@ SILM.stage81Reconciliation=(()=>{
  const notIndexedStage80=new Set('Ac Np Pa Po Ra Ga Pm Hg Fr Cm Bk Cf Es Fm Md No Lr Rf Db Sg Bh Hs Mt Ds Rg Cn Nh Fl Mc Lv'.split(' '));
  const noIndividualSources=new Set('Ac Np Pa Po Ra'.split(' '));
  const V={nist:'https://srd.nist.gov/JPCRD/jpcrdS1Vol3.pdf',
+  nist1972:'https://srd.nist.gov/jpcrdreprint/1.3253100.pdf',
   ga:'https://www.espimetals.com/index.php/component/content/article/356-online-catalog/gallium-ga/365-gallium-ga?Itemid=135',
   pm:'https://www.osti.gov/servlets/purl/4136914',
   pmGupta:'https://vector.umd.edu/images/links/Extractive_Metallurgy_of_Rare_Earths_Gupta.pdf',
@@ -83,18 +84,35 @@ SILM.stage81Reconciliation=(()=>{
     v('sigma-derived',1/(21.8e-8),'Condutividade apenas calculada','S/m','derived-not-another-measurement')],
    {pressurePa:100000,phase:'urânio metálico de referência (fase não individualizada na tabela 2.4)',
     sourceVerifiedLevel:'IAEA-table2.4-pdf-visually-checked'}),
-  base('fr-k-analog','Fr',87,'thermal','candidate',300,V.nist,
-   'Ho, Powell e Liley 1974 · extrapolação por grupo IA',
+
+  // Seis casos antes sem fontes individuais na matriz Etapa72: ESTIMATIVAS
+  // rastreadas na edição abreviada de 1972, não medições novas.
+  ...[
+   ['Ac',89,12,300,'p. 418: actínio; extrapolação de material hipotético, ±50%'],
+   ['Np',93,6.3,300,'p. 369: neptúnio policristalino; referência provisória marcada como estimada, ±20%'],
+   ['Pa',91,47,300,'p. 418: protactínio; estimativa extremamente incerta, ±50%'],
+   ['Po',84,20,300,'p. 418: polônio; estimativa extremamente incerta, ±50%'],
+   ['Ra',88,18.6,293.2,'p. 384: rádio sólido; valor provisório, incerteza até ±50%'],
+   ['Rf',104,23,300,'p. 418: antigo elemento 104 (Rf); previsão histórica anterior à caracterização do metal, ±50%']
+  ].map(([symbol,z,k,T,condition])=>base('historical-thermal-'+symbol.toLowerCase(),symbol,z,
+   'thermal','candidate',T,V.nist1972,
+   'Ho, Powell e Liley 1972 · estimativa de condutividade térmica',
+   'Sem amostra/macroscopia individual experimentalmente estabelecida',
+   'Valor de '+condition+'. NBS registra ESTIMATIVA/PROVISÓRIO, NÃO é medição direta. 1972 é uma referência histórica, não previsão moderna DFT. Não calibrar motores.',
+   [v('k-nbs-historical-estimate',k,'Condutividade térmica estimada/provisória','W/(m·K)','historical-estimate-not-measured')],
+   {modelEstimate:true,sourceVerifiedLevel:'original-1972-pdf-page-visually-verified'})),
+  base('fr-k-analog','Fr',87,'thermal','candidate',300,V.nist1972,
+   'Ho, Powell e Liley 1972 · tabela p. 418, extrapolação por grupo IA',
    'SEM amostra: metal francium não medido na fonte', 
-   '14,5 W/(m·K) é EXTRAPOLAÇÃO EMPÍRICA histórica do grupo dos alcalinos; NÃO medição ou previsão ab initio, nem propriedade calibrada de frâncio macroscópico.',
-   [v('k-analog',14.5,'Condutividade térmica estimada por extrapolação','W/(m·K)','empirical-group-prediction')],
+   '15 W/(m·K) (0,15 W/(cm·K)) é ESTIMATIVA de 1972, provavelmente ±50%, NÃO medição nem previsão ab initio. A matriz Etapa72 trazia 14,5 W/(m·K), valor divergente; prevalece o valor visualmente conferido da tabela original.',
+   [v('k-analog',15,'Condutividade térmica estimada por extrapolação','W/(m·K)','empirical-group-prediction')],
    {modelEstimate:true,sourceVerifiedLevel:'legacy-matrix-stated-empirical-extrapolation'}),
   ...['Cm','Bk','Cf','Es','Fm','Md','No','Lr'].map((symbol,i)=>
    base('actinide-k-analogy-'+symbol.toLowerCase(),symbol,[96,97,98,99,100,101,102,103][i],
-    'thermal','candidate',300,V.nist,
-    'Ho, Powell e Liley 1974 · estimativa por analogia de série',
+    'thermal','candidate',300,V.nist1972,
+    'Ho, Powell e Liley 1972 · p. 418, estimativa de série',
     'SEM amostra experimental individual identificada',
-    '10 W/(m·K) é ESTIMATIVA HISTÓRICA DE ANALOGIA de família, compartilhada por vários actinídeos; não foi medida separadamente para '+symbol+'. Não usar como calibração nem como parâmetro próprio do metal.',
+    '10 W/(m·K) (0,1 W/(cm·K)) é ESTIMATIVA HISTÓRICA altamente incerta (±50%) da tabela de 1972, repetida para vários actinídeos; não foi medida separadamente para '+symbol+'. Não usar como calibração nem como parâmetro próprio do metal.',
     [v('k-group-analogy',10,'Estimativa térmica por analogia de família','W/(m·K)','empirical-group-prediction')],
     {modelEstimate:true,sourceVerifiedLevel:'legacy-matrix-stated-family-analogy'}))
  ].map(Object.freeze);
@@ -104,7 +122,7 @@ SILM.stage81Reconciliation=(()=>{
  const stage72Audit=Object.freeze(universe.map(symbol=>Object.freeze({
   symbol,stage72Eligibility:blocked.has(symbol)?'blocked':'available',
   indexedAtStage80:!notIndexedStage80.has(symbol),
-  missingIndividualScientificSource:noIndividualSources.has(symbol),
+  legacyValuesWithoutIndividualSource:noIndividualSources.has(symbol),
   hasStage81QualifiedOrEstimatedReference:bySymbol[symbol].length>0,
   blockedFromStructuralUse:blocked.has(symbol),
   numericalEngineCalibrationAllowed:false,
