@@ -226,9 +226,13 @@ SILM.microstructure=(()=>{
     deformCtl?.setLoad(clamp(Number(forceInput.value)/100,0,1));
     refreshMechanical();
    });
+   const constitutiveReadout=node('output','silm-micro-constitutive-reading','');
+   constitutiveReadout.setAttribute('aria-label','Resposta elastoplástica relativa da amostra');
+   constitutiveReadout.title='Modelo uniaxial normalizado, sem parâmetros medidos do metal.';
    const contactDetails=node('details','silm-micro-contact-details');
    const contactSummary=node('summary','','Aplicação da carga');
-   contactDetails.append(contactSummary,forceLabel,releaseForce,contactLabel,widthLabel);
+   contactDetails.append(contactSummary,forceLabel,releaseForce,
+    constitutiveReadout,contactLabel,widthLabel);
    mechanicalTools.append(mechanicalPulse,mechanicalReset,mechanicalLoadMeter,
     contactDetails,mechanicalStatus);
   toolbar.append(mechanicalTools);
@@ -308,6 +312,21 @@ SILM.microstructure=(()=>{
    section.dataset.mechanicalStudy=mode||'inactive';
    const surface=SILM.surfacePhysics?.current(st);
    const motion=active?(deformCtl?.reading?.()||{load:0,strain:0,regime:'rest'}):{};
+   const mechanics=motion.constitutive;
+   section.dataset.mechanicalConstitutive=mechanics?'normalized-uniaxial':'unavailable';
+   if(mechanics){
+    section.dataset.mechanicalPlasticNormalized=mechanics.accumulatedPlastic.toFixed(4);
+    const fmt=v=>Number(v||0).toFixed(3).replace('.',',');
+    constitutiveReadout.textContent=
+     'Modelo relativo · σ '+fmt(mechanics.stress)+
+     ' · ε elástica '+fmt(mechanics.elasticStrain)+
+     ' · ε plástica '+fmt(mechanics.plasticStrain)+
+     ' · limiar '+fmt(mechanics.yieldThreshold)+
+     ' · sem MPa ou parâmetros experimentais do metal';
+   }else{
+    delete section.dataset.mechanicalPlasticNormalized;
+    constitutiveReadout.textContent='Modelo uniaxial ainda não disponível';
+   }
    // A alteração plástica residual continua no estado geral da investigação.
    // O modelo de elementos finitos resolve APENAS a parcela elástica local.
    const residual=SILM.deformation?.specimenResponse?.(surface,{});
@@ -317,7 +336,10 @@ SILM.microstructure=(()=>{
    // Aplicar carga deve deformar a amostra imediatamente, mesmo antes
    // do próximo passo temporal do controlador da rede.
    const strainFactor=active?Math.abs(Number(motion.strain)||0)/maxStrain:0;
-   const amplitude=active?clamp(Math.max(strainFactor,.88*load),0,1):0;
+   // A parcela elástica da lei constitutiva normalizada participa da
+   // apresentação, sem converter tensão relativa em deformação medida.
+   const epElastic=active&&mechanics?Math.abs(mechanics.elasticStrain)/.1:0;
+   const amplitude=active?clamp(Math.max(.72*strainFactor,.88*load,epElastic),0,1):0;
    const field=active?SILM.specimenLocal?.field({
     mode:mode==='malleability'?'compression':'tension',
     position:contactPosition,width:contactWidth}):null;
@@ -383,7 +405,9 @@ SILM.microstructure=(()=>{
     motion.regime==='returning'?'retorno elástico':
     residual.hasResidual?'deformação residual':'sem carga';
    const title=mode==='malleability'?'Compressão':'Tração';
-   specimenFeedback.textContent=title+' · '+regime+(load?' · carga relativa '+relative+'%':'');
+   specimenFeedback.textContent=title+' · '+regime+(load?' · carga relativa '+relative+'%':'')+
+    (mechanics?.accumulatedPlastic>1e-4?
+     ' · plasticidade normalizada '+mechanics.accumulatedPlastic.toFixed(3).replace('.',','):'');
    mechanicalStatus.textContent=title+' · '+regime+
     ' · contato em '+Math.round(contactPosition*100)+'% · largura '+Math.round(contactWidth*100)+'%'+
     ' · passo ilustrativo '+step+'/'+max+
