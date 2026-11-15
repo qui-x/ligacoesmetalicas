@@ -34,6 +34,7 @@ with sync_playwright() as pw:
         assert "1 unidade" in page.locator("#silm-unit-count").inner_text(), f"{name}: contagem inicial"
         if name == "desktop":
             assert page.locator("#silm-unit-inventory button").first.get_attribute("aria-label").startswith("Localizar unidade"), "inventário sem navegação"
+        page.locator('[data-close-dock="left"]').click()
         dados = page.locator('[data-open-dock="dados"]')
         dados.click()
         page.locator('[data-silm-data-open="tabela"]').click()
@@ -54,6 +55,7 @@ with sync_playwright() as pw:
         page.locator("#silm-data-back").click()
         assert not page.locator("#silm-data-catalog").is_hidden(), f"{name}: retorno ao catálogo falhou"
         if name == "mobile":
+            page.locator('[data-close-dock="right"]').click()
             page.locator('[data-open-dock="montagem"]').click()
             page.locator('[data-left-tab="objetos"]').click()
             assert page.locator("#si-dock-left").is_visible(), "bottom sheet de Montagem invisível"
