@@ -22,11 +22,11 @@ SILM.polycrystalPreview=(()=>{
   details.append(n('p','silm-micro-cpfem-limit',
    'Acesso temporário para revisão de Montagem, Ver e Dados. Grãos sintéticos e orientações hipotéticas; FEM 2D em pequenas deformações, sem parâmetros experimentais do metal.'));
   const row=n('div','silm-micro-cpfem-actions');
-  const loadLabel=n('label','','Carga relativa da prévia (0–100%)');
+  const loadLabel=n('label','','Deslocamento relativo prescrito (10–100%)');
   const load=n('input','silm-micro-cpfem-load');load.type='range';load.min='10';load.max='100';
   load.step='5';load.value='70';load.setAttribute('aria-label','Deslocamento prescrito relativo do ensaio de policristal hipotético');
   const value=n('output','silm-micro-cpfem-load-value','70%');
-  load.addEventListener('input',()=>{value.textContent=load.value+'%';invalidateIfSolved('Alteração da carga: recalcule o ensaio CPFEM.');});
+  load.addEventListener('input',()=>{value.textContent=load.value+'%';invalidateIfSolved('Deslocamento alterado: recalcule o ensaio CPFEM.');});
   loadLabel.append(load,value);
   const unloadLabel=n('label','silm-micro-cpfem-unload-label');
   const unload=n('input','silm-micro-cpfem-unload');unload.type='checkbox';
@@ -105,7 +105,9 @@ SILM.polycrystalPreview=(()=>{
        configuration=Object.freeze({synthetic,structure,mode:study,
         position:contact.position,width:contact.width,load:requestedLoad,unload:requestedUnload});
        show.disabled=false;
-      status.textContent='Policristal hipotético · '+response.sampledGrains+'/'+response.grainCount+
+      status.textContent='Policristal hipotético · contato '+Math.round(contact.position*100)+
+       '% · largura '+Math.round(contact.width*100)+'% · '+
+       response.sampledGrains+'/'+response.grainCount+
        ' grãos com pontos de integração · '+response.plasticTriangles+
        ' elementos plastificados no último incremento · deslizamento máximo '+
        fmt(response.maxAccumulatedSlip)+' · resíduo FEM '+fmt(response.residual)+
