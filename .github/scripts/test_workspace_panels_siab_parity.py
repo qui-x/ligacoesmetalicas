@@ -105,6 +105,7 @@ with sync_playwright() as pw:
         )
         page.locator("#silm-module-activate-medir").click()
         page.wait_for_function("SILMIntegration.snapshot().module.active === 'medir'")
+        cards.nth(0).locator("summary").click()
         page.locator("#silm-module-activate-explorar").click()
         page.wait_for_function("SILMIntegration.snapshot().module.active === 'explorar'")
         page.locator('[data-left-tab="objetos"]').click()
