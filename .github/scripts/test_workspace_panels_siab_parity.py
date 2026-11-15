@@ -23,7 +23,66 @@ with sync_playwright() as pw:
         assert response and response.ok, f"{name}: falha ao carregar"
         page.wait_for_function("window.SILMIntegration && document.querySelector('#silm-add')")
         montagem = page.locator('[data-open-dock="montagem"]')
+        if name == "desktop":
+            # A doca deve reservar seu espaço entre 901px e 1920px, sem
+            # ocultar a estrutura, a Visão geral ou a barra científica.
+            for viewport_width in (901, 1024, 1280, 1440, 1920):
+                page.set_viewport_size({"width": viewport_width, "height": 900})
+                initial = page.locator("#si-stage").bounding_box()
+                before = page.evaluate("JSON.stringify(SILMIntegration.snapshot())")
+                montagem.click()
+                left = page.locator("#si-dock-left").bounding_box()
+                stage = page.locator("#si-stage").bounding_box()
+                action = page.locator("#silm-scene-actionbar").bounding_box()
+                assert left["x"] + left["width"] <= stage["x"] + 2, (
+                    args.browser, viewport_width, "Montagem sobreposta à cena", left, stage
+                )
+                assert left["x"] + left["width"] <= action["x"] + 2, (
+                    args.browser, viewport_width, "Montagem oculta controles", left, action
+                )
+                assert stage["width"] > 340 and stage["width"] < initial["width"] - 100, (
+                    args.browser, viewport_width, "cena não redimensionou", stage, initial
+                )
+                page.locator('[data-left-tab="objetos"]').click()
+                page.locator('[data-close-dock="left"]').click()
+                assert page.locator("#si-stage").bounding_box()["width"] > stage["width"] + 100, (
+                    args.browser, viewport_width, "cena não recuperou a largura"
+                )
+                montagem.click()
+                assert page.locator('[data-left-tab="objetos"]').get_attribute("aria-pressed") == "true", (
+                    args.browser, viewport_width, "categoria da Montagem não foi preservada"
+                )
+                assert page.locator("#si-left-title").inner_text() == "Unidades", (
+                    args.browser, viewport_width, "título de Montagem incorreto"
+                )
+                page.locator('[data-close-dock="left"]').click()
+                page.locator('[data-open-dock="dados"]').click()
+                right = page.locator("#si-dock-right").bounding_box()
+                stage = page.locator("#si-stage").bounding_box()
+                action = page.locator("#silm-scene-actionbar").bounding_box()
+                assert stage["x"] + stage["width"] <= right["x"] + 2, (
+                    args.browser, viewport_width, "Dados sobreposto à cena", stage, right
+                )
+                assert action["x"] + action["width"] <= right["x"] + 2, (
+                    args.browser, viewport_width, "Dados oculta os controles", action, right
+                )
+                montagem.click()
+                assert page.locator("#si-dock-right").is_hidden(), (
+                    args.browser, viewport_width, "as duas docas ficaram abertas"
+                )
+                assert page.locator("#si-dock-left").is_visible(), (
+                    args.browser, viewport_width, "Montagem não abriu após Dados"
+                )
+                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 5"), (
+                    args.browser, viewport_width, "rolagem horizontal global"
+                )
+                assert page.evaluate("JSON.stringify(SILMIntegration.snapshot())") == before, (
+                    args.browser, viewport_width, "abrir e fechar docas alterou a ciência"
+                )
+                page.locator('[data-close-dock="left"]').click()
+            page.set_viewport_size({"width": width, "height": height})
         montagem.click()
+        page.locator('[data-left-tab="preparo"]').click()
         page.locator("#silm-start").click()
         page.wait_for_function("window.SILMIntegration.snapshot().metal !== null")
         page.locator("#silm-add").click()
