@@ -8,7 +8,8 @@ const sources=[
  'domain/silm/data/research-electrical-icepoint.js','domain/silm/data/research-electrical-intrinsic-pgm.js',
  'domain/silm/data/research-thermal-nist-295k.js',
  'domain/silm/data/research-optical-candidates-stage65.js',
- 'domain/silm/data/research-seven-condition-profiles.js','domain/silm/science-evidence-index.js'
+ 'domain/silm/data/research-seven-condition-profiles.js',
+ 'domain/silm/data/research-stage81-matrix92.js','domain/silm/science-evidence-index.js'
 ];
 class Element{
  constructor(tag){this.tagName=tag;this._text='';this.children=[];this.dataset={};this.hidden=false;this.className='';this.href='';}
