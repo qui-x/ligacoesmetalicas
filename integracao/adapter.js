@@ -156,15 +156,15 @@
  /* "Organizar estrutura" indisponível: diga para qual metal, qual estrutura está registrada e o que continua possível. */
  function organizeReason(e,eligibility){const label=eligibility.registeredLabel?' ('+eligibility.registeredLabel+')':'';
   return 'Organizar indisponível para '+e.name.toLowerCase()+': '+eligibility.message.replace(/\.$/,'')+label+'. A montagem livre continua disponível.';}
- function openLeft(tab){const open=document.querySelector('[data-open-dock="montagem"]');if(open&&open.getAttribute('aria-expanded')!=='true')open.click();requestAnimationFrame(()=>document.querySelector('[data-left-tab="'+tab+'"]:not([hidden])')?.click());}
+ function openLeft(tab){const open=document.querySelector('[data-open-dock="montagem"]');if(open&&open.getAttribute('aria-expanded')!=='true')open.click();const visibleTab=tab==='objetos'?'preparo':tab;requestAnimationFrame(()=>document.querySelector('[data-left-tab="'+visibleTab+'"]:not([hidden])')?.click());}
  function renderScene(){
   const state=model.state,e=element(),key=e?state.investigation.id+':'+e.atomicNumber+':'+state.module.active+':'+(state.structure?.mode||'empty')+':'+(state.structure?.mode==='crystalline'?(workshopScale===4?representation.centerViewMode:representation.viewMode):'2d')+':'+(workshopScale===4?'centro':'rede'):'none';
   if(viewKey!==key){placeExpansionButton(false);scope?.destroy();scope=null;view=null;viewKey=key;$('silm-integration-scene').replaceChildren();
    if(!e){
     // Fallback para a Oficina anterior caso o módulo de aplicações não carregue.
-    if(!S.workshop)emptyState({title:'Oficina vazia',text:['Abra ','Montagem → Preparo',' para escolher um metal. Depois adicione unidades e organize a estrutura.'],actions:[['Abrir Montagem',()=>openLeft('preparo'),'primary'],['Começar com o cobre',async()=>{$('silm-metal').value='29';selected='29';await start();}],['Montagens prontas',()=>{location.hash='#/montagens';}],['Tabela periódica',()=>$('silm-open-periodic').click()]]});
+    if(!S.workshop)emptyState({title:'Oficina vazia',text:['Abra ','Montagem → Preparo',' ou escolha um objeto na Tabela Periódica para começar.'],actions:[['Abrir Montagem',()=>openLeft('preparo'),'primary'],['Começar com o cobre',async()=>{$('silm-metal').value='29';selected='29';await start();}],['Montagens prontas',()=>{location.hash='#/montagens';}],['Tabela periódica',()=>$('silm-open-periodic').click()]]});
    }
-   else if(!state.structure)emptyState({title:'Estrutura de '+e.name+' vazia',text:state.module.active==='explorar'?['Para construir uma montagem livre, abra ','Montagem → Unidades',' e adicione os centros metálicos.']:['A estrutura ainda não foi preparada. Em ','Montagem → Módulo',', selecione Explorar.'],actions:state.module.active==='explorar'&&(!routeUI.session.open()||routeUI.canBuild())?[['Abrir Montagem',()=>openLeft('objetos'),'primary']]:[['Abrir Módulo',()=>openLeft('modulo'),'primary']]});
+   else if(!state.structure)emptyState({title:'Estrutura de '+e.name+' vazia',text:state.module.active==='explorar'?['A montagem livre é opcional. Em ','Montagem → Preparo',', abra Montagem livre para construir manualmente.']:['A estrutura ainda não foi preparada. Em ','Montagem → Módulo',', selecione Explorar.'],actions:state.module.active==='explorar'&&(!routeUI.session.open()||routeUI.canBuild())?[['Abrir Preparo',()=>openLeft('preparo'),'primary']]:[['Abrir Módulo',()=>openLeft('modulo'),'primary']]});
    else if(state.structure){
     scope=SimCore.createScope();const common={scope,model,element:e,actions:run,reducedMotion:reduced,representation:rep,observer:workspaceFamily.observer,moduleTitle:{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active],measure:tools.measure,calc:tools.calc,properties:experience.scene};
     if(state.structure.mode==='crystalline')view=S.createCrystalView($('silm-integration-scene'),{...common,geometry:S.crystal.geometry(e),localFocus:workshopScale===4&&!routeUI?.session.open()});
@@ -438,45 +438,8 @@
    onBrowseObjects:()=>openObjectCatalog(active)});
  }
  function text(id,value){if($(id))$(id).textContent=value;}
- // Paridade com a lista de recipientes do SIAB: a aba Unidades precisa
- // refletir as unidades reais da cena e oferecer navegação acessível.
- function renderUnitInventory(state){
-  const panel=document.querySelector('[data-left-panel="objetos"]');if(!panel)return;
-  let host=$('silm-unit-inventory');
-  if(!host){host=document.createElement('div');host.id='silm-unit-inventory';const advanced=$('silm-free-mode-options');if(advanced)panel.insertBefore(host,advanced);else panel.append(host);}
-  const structure=state.structure,list=structure?.units||[],mode=structure?.mode||'none';
-  const chosen=mode==='crystalline'?structure.crystallography?.representation?.selectedUnitId:(view?.selected||null);
-  const canLocate=!!view?.focusUnit&&!$('silm-integration-scene').hidden;
-  // Não mostrar uma grade de botões desativados quando o usuário
-  // ainda está observando o objeto ou seus grãos (escalas 1 e 2).
-  host.hidden=mode==='crystalline'&&!canLocate;
-  const key=JSON.stringify([state.investigation?.id,mode,list.map(u=>u.id),chosen,canLocate]);
-  if(host.dataset.key===key)return;
-  const previousFocus=document.activeElement?.closest('#silm-unit-inventory [data-silm-unit-id]')?.dataset.silmUnitId;
-  const previousScroll=host.scrollTop;
-  host.replaceChildren();host.dataset.key=key;
-  if(!list.length){const p=document.createElement('p');p.textContent=state.investigation?'Use Adicionar unidade para começar.':'Inicie uma investigação em Preparo.';host.append(p);return;}
-  if(!canLocate){const intro=document.createElement('p');intro.className='silm-inventory-guide';intro.textContent='Abra a escala da estrutura para localizar unidades.';host.append(intro);}
-  const ul=document.createElement('ol');ul.className='silm-unit-inventory';
-  for(let i=0;i<list.length;i++){
-   const unit=list[i],li=document.createElement('li'),button=document.createElement('button');
-   button.type='button';button.dataset.silmUnitId=unit.id;button.textContent='Unidade '+(i+1);
-   button.disabled=!canLocate;
-   button.setAttribute('aria-label','Localizar unidade '+(i+1)+' na estrutura');
-   if(unit.id===chosen){button.setAttribute('aria-current','true');li.classList.add('is-selected');}
-   li.append(button);ul.append(li);
-   button.addEventListener('click',()=>{
-    if($('silm-integration-scene').hidden){say('Abra a visualização da estrutura para localizar a unidade.');return;}
-    const focus=()=>view?.focusUnit?.(unit.id);
-    if(window.matchMedia('(max-width: 900px)').matches){
-     document.querySelector('[data-close-dock="left"]')?.click();
-     requestAnimationFrame(()=>requestAnimationFrame(focus));
-    }else focus();
-   });
-  }
-  host.append(ul);host.scrollTop=previousScroll;
-  if(previousFocus)host.querySelectorAll('[data-silm-unit-id]').forEach(b=>{if(b.dataset.silmUnitId===previousFocus&&!b.disabled)b.focus({preventScroll:true});});
- }
+ // A seleção e o foco dos centros pertencem à cena, não a uma lista duplicada na doca.
+
  function render(){
   const focused=document.activeElement,restoreControl=focused?.closest('#silm-tools,#silm-module-choice,#silm-history')?focused.id:null;
   const state=model.state,e=element(),s=state.structure,n=s?.units.length||0;
@@ -495,25 +458,31 @@
   expandButton.title=$('si-stage').classList.contains('si-scene-expanded')?'Recolher estrutura (Escape)':expandable?'Expandir a estrutura cristalina configurada':'Organize uma estrutura cristalina para habilitar a visualização expandida.';
   if(!expandable&&$('si-stage').classList.contains('si-scene-expanded'))setStageExpanded(false);
   if(representation.investigationId!==(state.investigation?.id??null))representation=S.representation.defaults(state.investigation?.id??null);
-  tools.render();experience.update();updateWorkshopContext();renderScene();renderUnitInventory(state);if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
+  tools.render();experience.update();updateWorkshopContext();renderScene();if(focusAfterRender){$(focusAfterRender)?.focus({preventScroll:true});focusAfterRender=null;}
   text('silm-summary',e?e.name+' · '+units(n)+' · '+(s?.mode==='crystalline'?'estrutura cristalina':'montagem livre'):'Nenhuma investigação iniciada.');
   // Resumo em pares rótulo/valor, como o resumo da bancada do SIAB (só leitura do estado; nada é recalculado aqui).
-  const list=$('silm-summary-list');if(list){const exp=routeUI?.experiment?.();const rows=e?[...(exp&&!routeUI.session.open()?[['Roteiro',exp.title]]:[]),['Metal',e.name+' ('+e.symbol+')'],['Estrutura',s?.mode==='crystalline'?S.crystal.label(s.crystallography?.structureType,e):'Montagem livre'],['Unidades',String(n)],['Módulo',{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active]],['Medições',String(state.measurements?.length||0)],['Cálculos',String(state.calculations?.length||0)]]:[];
+  const list=$('silm-summary-list');if(list){const ref=state.metadata?.workshop?.referenceId,object=ref?S.workshop?.get(ref):null;
+   const rows=e?[['Metal',e.name+' ('+e.symbol+')'],...(object?[['Objeto',object.title]]:[]),
+    ['Estrutura',s?.mode==='crystalline'?S.crystal.label(s.crystallography?.structureType,e):s?.mode==='free'?'Montagem livre':'Não preparada'],
+    ['Módulo',{explorar:'Explorar',medir:'Medir',calcular:'Calcular'}[state.module.active]]]:[];
    const c=routeUI.session.context();if(c)rows.unshift([c.type==='mission'?'Missão':'Roteiro',routeUI.session.route().title]);
    const key=JSON.stringify(rows);if(list.dataset.key!==key){list.dataset.key=key;list.replaceChildren(...rows.flatMap(([k,v])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;return [dt,dd];}));}}
   text('scene-count',units(n));text('silm-metal-information',selected?S.data.get(Number(selected)).name:'');
   $('scene-undo').disabled=state.module.active!=='explorar'||!model.canUndo;$('scene-clear').disabled=state.module.active!=='explorar'||!n;
   $('si-compact-clear').disabled=state.module.active!=='explorar'||!n;$('scene-count').dataset.compactCount=units(n);
   const freeMode=s?.mode==='free',crystalMode=s?.mode==='crystalline';
+  // O editor só aparece em Preparo por escolha explícita, nunca como aba.
+  const freeAssembly=$('silm-free-assembly');
+  freeAssembly.hidden=!e||state.module.active!=='explorar'||(routeUI.session.open()&&!routeUI.canBuild());
+  if(freeAssembly.hidden)freeAssembly.open=false;
+  else if(freeMode&&freeAssembly.dataset.autoOpened!==state.investigation?.id){
+   freeAssembly.open=true;freeAssembly.dataset.autoOpened=state.investigation.id;
+  }else if(crystalMode&&freeAssembly.dataset.lastMode==='free')freeAssembly.open=false;
+  freeAssembly.dataset.lastMode=s?.mode||'none';
   $('silm-free-tools').hidden=!freeMode;
-  const editOptions=$('silm-free-mode-options');
-  editOptions.hidden=!crystalMode||state.module.active!=='explorar'||(routeUI.session.open()&&!routeUI.canBuild());
-  if(editOptions.hidden)editOptions.open=false;
-  const structureStatus=$('silm-structure-status');
-  structureStatus.textContent=crystalMode?(S.crystal.label(s.crystallography.structureType,e)+' · modelo de referência preparado'):freeMode?'Montagem livre':'Selecione um metal em Preparo.';
+  $('silm-free-mode-options').hidden=!crystalMode;
   $('silm-add').disabled=state.module.active!=='explorar'||!e||!freeMode;
   $('silm-organize').disabled=state.module.active!=='explorar'||!n||!freeMode||S.crystal.eligibility(e).status!=='available';{const el=e?S.crystal.eligibility(e):null,why=$('silm-organize-reason');if(why){why.textContent=el&&el.status!=='available'?organizeReason(e,el):'';why.hidden=!why.textContent;}}
-  $('silm-free').hidden=!crystalMode;
   $('silm-free').disabled=state.module.active!=='explorar'||(routeUI.session.open()&&!routeUI.canBuild());$('silm-export').disabled=!e;
   $('silm-electrons').disabled=n<2;
   const visible=!!state.electrons?.representation.visible;
@@ -597,7 +566,6 @@
   const TOUR=[
    {title:'Prepare a oficina',text:'Abra Montagem → Preparo para escolher o metal e usar Iniciar investigação. A Tabela periódica mostra os metais disponíveis.',left:'preparo',target:()=>$('si-dock-left'),mobile:'[data-open-dock="montagem"]'},
    {title:'Escolha um módulo',text:'Em Montagem → Módulo, escolha Explorar, Medir ou Calcular. Ver apresenta as ferramentas do módulo ativo.',left:'modulo',target:()=>$('silm-module-cards'),mobile:'[data-open-dock="montagem"]'},
-   {title:'Observe a estrutura',text:'O objeto escolhido já prepara a estrutura de referência. Em Montagem → Unidades, consulte os centros; na montagem livre, você pode adicionar e reorganizar.',left:'objetos',target:()=>$('silm-group-structure')?.closest('section,.silm-dock-group')||$('silm-add'),mobile:'[data-open-dock="montagem"]'},
    {title:'Observe',text:'A cena mostra a montagem. Girar, aproximar ou trocar a vista não altera medições nem cálculos.',target:()=>$('si-stage'),mobile:'#si-stage'},
    {title:'Investigue e consulte os dados',text:'Em Ver, observe, meça e analise conforme o módulo. Em Dados, consulte os valores, as fontes e o relatório.',right:'ver',target:()=>$('si-dock-right'),mobile:'[data-open-dock="ver"]'}];
   const tourDialog=$('silm-tour'),ring=tourDialog.querySelector('.si-coach-ring'),card=tourDialog.querySelector('.si-coach-card');let step=0,opener=null;
@@ -631,7 +599,7 @@
   window.addEventListener('resize',placeTour);document.addEventListener('scroll',placeTour,true);
   // Ajuda "?" das docas: o tópico do Manual que corresponde ao que o painel mostra agora (como as ajudas do SIAB).
   const VIEWER_TOPICS=[['Estrutura','vista'],['Elétrons','eletrons-deslocalizados'],['Propriedades','propriedades-metalicas'],['Instrumentos','medir'],['Medir','medir'],['Cálculos','calcular'],['Calcular','calcular']];
-  const dockTopic=side=>{if(side==='left'){const tab=document.querySelector('[data-left-tab][aria-pressed="true"]')?.dataset.leftTab;return {resumo:'interface',preparo:'selecionar-metal',objetos:'montagem',missao:'atividades',modulo:{explorar:'explorar',medir:'medir',calcular:'calcular'}[model.state.module.active]||'interface'}[tab]||'montagem';}
+  const dockTopic=side=>{if(side==='left'){const tab=document.querySelector('[data-left-tab][aria-pressed="true"]')?.dataset.leftTab;return {resumo:'interface',preparo:'selecionar-metal',missao:'atividades',modulo:{explorar:'explorar',medir:'medir',calcular:'calcular'}[model.state.module.active]||'interface'}[tab]||'montagem';}
    if(document.querySelector('[data-open-dock="ver"]')?.getAttribute('aria-expanded')==='true'&&shown($('si-dock-viewer-back'))){const title=$('si-right-title').textContent;return VIEWER_TOPICS.find(([k])=>title.includes(k))?.[1]||'vista';}
    return 'interface';};
   const helpDialog=$('silm-help-dialog');
