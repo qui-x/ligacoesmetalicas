@@ -84,3 +84,19 @@ O motor resolve `f_internal - f_external = 0` nos graus de liberdade livres por 
 **Restrições importantes:** a mudança de Dirichlet para Neumann no início do ensaio emprega cargas nodais equivalentes das reações, não simulação de contato unilateral, deslizamento/atrito de garras, rigidez de máquina ou dinâmica de separação. Força nula significa vetor externo controlado nulo **dentro da tolerância de equilíbrio numérico**, não força medida zero. O cálculo mantém parâmetros hipotéticos e pequenas deformações. Não chamar resultados de valores experimentais nem substituir automaticamente o J2.
 
 A apresentação continua opt-in no ramo. A seleção de modo não altera Montagem, Ver ou Dados. Os novos testes verificam retorno elástico, preservação de deslizamento plástico, histórico energético, resíduo de tração no topo e separação dos dois modos.
+
+## Etapa 84F — campos de deformação e tensão residual por grão (15/11/2026)
+
+O CPFEM mantém `samplePlastic(u,v)` como **deslizamento cristalográfico acumulado**. A leitura científica ampliada é exposta separadamente em `sampleMechanics(u,v)`, para impedir que deslizamento acumulado, deformação plástica equivalente e deformação total sejam tratados como sinônimos.
+
+`sampleMechanics` disponibiliza os tensores simétricos tridimensionais `totalStrain`, `plasticStrain`, `elasticStrain` e `stress`, além da deformação plástica equivalente `sqrt(2/3 dev(ep):dev(ep))`, tensão equivalente de von Mises `sqrt(3/2 dev(sigma):dev(sigma))`, deslizamento acumulado e condição física do contorno. Cisalhamentos nos tensores são componentes **tensoriais**, não deformações de cisalhamento de engenharia. Em cada ponto vale `eps_total = eps_elastic + eps_plastic`, inclusive para `sigma_zz` em deformação plana.
+
+Cada registro `grains[i].mechanics` contém médias **ponderadas pela área dos triângulos**: deformação axial total, elástica e plástica, deformação plástica equivalente, tensão axial e tensão equivalente de von Mises; contém também máximos das invariantes e diferença axial entre pico e configuração final. Grãos sem pontos de integração continuam com `mechanics: null`, sem inventar resposta. Preserva-se `meanAccumulatedSlip` com ponderação por área.
+
+**Critério de estado residual:** `mechanicalState: ZERO_TOP_FORCE` e `residualSummary` são permitidos somente após `unload: true, unloadMode: 'force'`, quando o vetor de força externa no topo chega a zero e as condições de equilíbrio numérico são verificadas. O ensaio sob carga (`LOADED`) e o retorno da garra presa (`GRIP_AT_ZERO`) mantêm `residualSummary: null`; suas tensões não recebem rótulo de tensão residual. A leitura `residualSummary` apresenta médias volumétricas 2D ponderadas pela área e diferença de deformação axial pico–final.
+
+**Importante:** a diferença entre deformação total no pico e no fim **não é necessariamente uma recuperação apenas elástica**. A cristaloplasticidade pode continuar ativada na descarga, portanto as leituras usam `axialStrainChangeFromPeak` e não `elasticRecovery`. Tensões residuais modeladas não são tensões medidas em MPa; não há EBSD, textura experimental, contorno de grão caracterizado, contato real nem validação de independência de malha.
+
+A prévia técnica opt-in mostra os valores por grão selecionado e o resumo do estado final, com precisão adaptada a valores pequenos. Não cria menu novo, não altera `ScientificState`, não transfere valores para propriedades dos elementos e não muda o solucionador J2.
+
+**Portão da etapa 84F:** ensaios elásticos/plásticos, tensor elástico + plástico = total, invariantes não negativas, consistência dos campos por grão e ausência de classificação residual fora da condição de força zero. A validação dos testes é independente da futura homologação de acesso em Montagem/Ver/Dados.
