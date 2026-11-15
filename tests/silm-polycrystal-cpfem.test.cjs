@@ -128,3 +128,20 @@ test('energia nula em carga nula e ausencia de propriedades calorimetricas',()=>
  assert.equal(r.energyBalanceStatus,'NOT_EVALUATED_EXTERNAL_WORK');
  assert.equal(r.units,'relative');
 });
+
+test('contato deslocado altera campo e preserva metadados do carregamento',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const a=m.run({mode:'compression',position:.2,width:.2,load:.10,increments:2});
+ const b=m.run({mode:'compression',position:.8,width:.2,load:.10,increments:2});
+ assert.equal(a.status,'CONVERGED',JSON.stringify(a));
+ assert.equal(b.status,'CONVERGED',JSON.stringify(b));
+ assert.equal(a.loadCase.position,.2);
+ assert.equal(b.loadCase.position,.8);
+ assert.equal(a.loadCase.width,.2);
+ assert.equal(a.loadCase.kind,'prescribed-displacement');
+ assert.equal(a.loadCase.units,'relative');
+ assert.equal(a.loadCase.unload,false);
+ assert.equal(a.calibrated,false);
+ assert.ok(Math.abs(a.sample(.2,0).dy-b.sample(.2,0).dy)>1e-5,
+  'Contato deslocado precisa alterar o campo de deslocamento');
+});
