@@ -14,10 +14,14 @@ try{
  const capabilities=await page.evaluate(()=>SILM.mechanicsActionContract.statusFor('mechanics.crystal.preview'));
  assert.equal(capabilities.status,'AWAITING_MENU_REVIEW');
  assert.equal(capabilities.enabled,false);
- await page.locator('#silm-workshop-context').getByRole('button',{name:'Tabela Periódica'}).click();
- await page.locator('#silm-periodic-dialog [data-z="26"]').click();
- await page.locator('#silm-periodic-dialog [id$="-explore"]').click();
- await page.locator('.silm-workshop-card').filter({hasText:'Parafuso de aço'}).getByRole('button',{name:'Investigar componente'}).click();
+ // A main atual organiza a Tabela no palco e os objetos em catálogo/modal.
+ // Reutilizar a mesma navegação validada em run-workshop-micro-main.mjs.
+ await page.locator('[data-open-dock="montagem"]').click();
+ await page.locator('#silm-open-periodic').click();
+ await page.locator('#silm-object-entry .periodic-element[data-z="26"]').click();
+ await page.locator('#silm-objects-dialog').waitFor({state:'visible'});
+ await page.locator('#silm-objects-dialog .silm-workshop-card')
+  .filter({hasText:'Parafuso de aço'}).getByRole('button',{name:'Iniciar montagem'}).click();
  await page.waitForFunction(()=>SILMIntegration.snapshot()?.metal?.atomicNumber===26);
  await page.locator('.silm-workshop-scale').nth(1).click();
  const viewer=page.locator('.silm-workshop-micro-viewer');
