@@ -733,3 +733,25 @@ body.si-structure-expanded #si-workspace:not(.si-workspace-fullscreen) #workspac
  #si-workspace .si-workspace-toolbar #si-expand-structure{display:none!important}
 }
 #si-workspace #si-dock-right .si-viewer-family-tabs:has(> :only-child){display:none}
+
+/* Montagem contextual: objetos apresentam a rede pronta; ações de adicionar
+   unidades ficam restritas à edição intencional da montagem livre. */
+#silm-structure-status{margin:0 0 5px;font-size:.87rem;font-weight:700;line-height:1.4;color:var(--text)}
+#silm-structure-status:empty{display:none}
+#si-dock-left #silm-free-tools[hidden],
+#si-dock-left #silm-free-mode-options[hidden],
+#silm-unit-inventory[hidden]{display:none!important}
+#silm-free-mode-options{
+ margin:12px 0 0;padding:0;border-top:1px solid var(--border)
+}
+#silm-free-mode-options>summary{
+ min-height:44px;display:flex;align-items:center;cursor:pointer;
+ font-size:.82rem;font-weight:650;color:var(--muted)
+}
+#silm-free-mode-options>summary:focus-visible{
+ outline:3px solid var(--ring);outline-offset:2px
+}
+#silm-free-mode-options .silm-free-mode-actions{padding:4px 0 8px}
+#silm-free-mode-options .silm-free-mode-actions .button{
+ box-sizing:border-box;width:100%;min-height:44px;white-space:normal
+}
