@@ -168,6 +168,26 @@ async function test(viewport){
   'Comprimir apagou o grão selecionado.');
  await grip.focus();await grip.press('Enter');
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='2');
+
+ // Nova lei constitutiva: a amostra deve ter componente plástica
+ // normalizada depois de ultrapassar o escoamento e conservá-la ao
+ // descarregar. Não é medida em MPa nem dado de laboratório do Fe.
+ await contactDetails.locator('summary').click();
+ const constitutive=mech.locator('.silm-micro-constitutive-reading');
+ assert.match(await constitutive.textContent(),/Modelo relativo.*sem MPa/);
+ assert.equal(await viewer.getAttribute('data-mechanical-constitutive'),'normalized-uniaxial');
+ await mech.locator('.silm-micro-force-input').evaluate(el=>{
+  el.value='90';el.dispatchEvent(new Event('input',{bubbles:true}));
+ });
+ await page.waitForFunction(()=>Number(document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalPlasticNormalized)>0.01);
+ const accumulatedBefore=Number(await viewer.getAttribute('data-mechanical-plastic-normalized'));
+ await mech.getByRole('button',{name:'Retirar carga mantendo deformação plástica'}).click();
+ await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalLoad==='0');
+ const accumulatedAfter=Number(await viewer.getAttribute('data-mechanical-plastic-normalized'));
+ assert.ok(accumulatedAfter>=accumulatedBefore-1e-4,
+  'A retirada da carga apagou indevidamente o encruamento normalizado.');
+ await contactDetails.locator('summary').click();
+
  await mech.getByRole('button',{name:'Restaurar deformação'}).click();
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='0');
  assert.equal(await viewer.locator('.silm-micro-mechanical-field').getAttribute('transform'),null,
