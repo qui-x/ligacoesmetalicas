@@ -1,0 +1,67 @@
+name: SILM — Paridade dos painéis Dados e Montagem
+
+on:
+  pull_request:
+    paths:
+      - 'integracao/adapter.js'
+      - 'integracao/scientific-tools.js'
+      - 'integracao/workspace-family.css'
+      - '.github/scripts/test_workspace_panels_siab_parity.py'
+      - '.github/workflows/silm-workspace-panels-parity.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'integracao/adapter.js'
+      - 'integracao/scientific-tools.js'
+      - 'integracao/workspace-family.css'
+      - '.github/scripts/test_workspace_panels_siab_parity.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  panels:
+    name: Dados + Montagem / ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar Playwright
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps ${{ matrix.browser }}
+      - name: Iniciar servidor local
+        run: |
+          python -m http.server 8765 --bind 127.0.0.1 >/tmp/silm-workspace.log 2>&1 &
+          python - <<'PY'
+          import time, urllib.request
+          for _ in range(60):
+              try:
+                  urllib.request.urlopen('http://127.0.0.1:8765/', timeout=1)
+                  break
+              except OSError:
+                  time.sleep(.3)
+          else:
+              raise SystemExit('Servidor não iniciou')
+          PY
+      - name: Testar atualização e navegação das docas
+        run: python .github/scripts/test_workspace_panels_siab_parity.py --browser ${{ matrix.browser }}
+      - name: Preservar capturas por navegador
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-workspace-panels-${{ matrix.browser }}
+          path: artifacts/workspace-panels/*.png
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Diagnóstico em falha
+        if: failure()
+        run: tail -n 100 /tmp/silm-workspace.log || true
