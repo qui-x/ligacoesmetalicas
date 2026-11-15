@@ -99,6 +99,25 @@ try{
   /Descarga incremental controlada: trabalho de retorno .*Garra mantida em deslocamento zero/);
  assert.equal(JSON.stringify(await page.evaluate(()=>SILMIntegration.snapshot())),before,
   'Descarga controlada não deve modificar o estado científico da investigação.');
+ // 84E: a reducao de forca tem outro contorno mecanico e invalida a previa 84D.
+ const mode=preview.locator('.silm-micro-cpfem-unload-mode');
+ await mode.selectOption('force');
+ assert.equal(await show.isDisabled(),true,'Trocar de contorno deve invalidar a previa.');
+ assert.match(await preview.locator('.silm-micro-cpfem-status').textContent(),/Modo de descarga alterado/);
+ await preview.getByRole('button',{name:'Calcular equilíbrio dos grãos sintéticos na prévia CPFEM'}).click();
+ await page.waitForFunction(()=>/Policristal hipotético|não convergiu|Prévia indisponível/.test(
+  document.querySelector('.silm-micro-cpfem-status')?.textContent||''),undefined,{timeout:90000});
+ assert.match(await preview.locator('.silm-micro-cpfem-status').textContent(),
+  /redução gradual de forças até zero/);
+ assert.match(await details.locator('.silm-micro-cpfem-energy').textContent(),
+  /Descarga quase-estática de forças nodais: trabalho de retorno .*topo livre de tração prescrita/);
+ assert.equal(await show.isEnabled(),true);
+ await show.check();
+ assert.equal(await viewer.getAttribute('data-mechanical-solver'),'cpfem-polycrystal-preview');
+ await show.uncheck();
+ assert.equal(await viewer.getAttribute('data-cpfem-presentation'),'j2-default');
+ assert.equal(JSON.stringify(await page.evaluate(()=>SILMIntegration.snapshot())),before,
+  'Descarga por forca nao pode alterar o estado cientifico da investigacao.');
  assert.deepEqual(errors,[],'Erros JS no ensaio CPFEM opt-in: '+errors.join('; '));
  console.log('CPFEM opt-in: '+browserName+' OK, sem menu novo e sem alterar J2.');
 }finally{await browser.close();}
