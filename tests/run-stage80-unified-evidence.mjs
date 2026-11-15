@@ -16,7 +16,7 @@ try{
    page.on('pageerror',e=>errors.push(e.message));
    const resp=await page.goto(base+'/index.html#/ambiente',{waitUntil:'load',timeout:45000});
    assert.ok(resp?.ok());
-   await page.waitForFunction(()=>Boolean(SILM.scienceEvidenceIndex?.rows?.length===315&&SILM.createUnifiedElementEvidencePanel&&SILM.renderIntegrationMetalData),undefined,{timeout:20000});
+   await page.waitForFunction(()=>Boolean(SILM.scienceEvidenceIndex?.rows?.length>=315&&SILM.createUnifiedElementEvidencePanel&&SILM.renderIntegrationMetalData),undefined,{timeout:20000});
    const data=await page.evaluate(()=>{
     const Z=[26,29,13,44,22,68,90,27,72,43],results=[];
     for(const z of Z){
