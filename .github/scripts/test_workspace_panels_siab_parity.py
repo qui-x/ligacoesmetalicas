@@ -123,6 +123,10 @@ with sync_playwright() as pw:
 
         # Ferramentas de construção só aparecem na Montagem livre em Preparo.
         page.locator('[data-left-tab="preparo"]').click()
+        # A montagem livre é uma seção secundária recolhível; o usuário
+        # pode voltar ao módulo e expandi-la novamente.
+        if not page.locator("#silm-free-assembly").evaluate("(el) => el.open"):
+            page.locator("#silm-free-assembly > summary").click()
         assert page.locator("#silm-add").is_visible()
         page.locator('[data-close-dock="left"]').click()
         page.locator('[data-open-dock="ver"]').click()
