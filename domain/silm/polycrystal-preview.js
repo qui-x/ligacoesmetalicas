@@ -95,6 +95,7 @@ SILM.polycrystalPreview=(()=>{
    }
    working=true;run.disabled=true;show.checked=false;show.disabled=true;result=null;configuration=null;
    status.textContent='Calculando equilíbrio mecânico do policristal hipotético…';
+   audit.textContent='Aguardando solução convergente para calcular os indicadores.';
    onChange();
    // Uma etapa visual para exibir a atividade antes do processamento síncrono.
    requestAnimationFrame(()=>{
@@ -107,6 +108,7 @@ SILM.polycrystalPreview=(()=>{
      if(!response.converged){
       status.textContent='CPFEM não convergiu ('+(response.reason||response.status)+
        '); campo não aplicado. Reduza a carga ou revise o domínio do modelo.';
+       audit.textContent='Sem auditoria energética: solução não convergente.';
      }else{
       result=response;mode=study;
        const e=response.energy,a=response.energyAudit;
