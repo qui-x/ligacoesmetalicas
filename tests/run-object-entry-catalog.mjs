@@ -27,6 +27,17 @@ try{
   'A escala Objeto não começa com a Tabela Periódica de 118 elementos');
  assert.equal(await page.locator('#silm-object-entry .silm-workshop-card').count(),0,
   'Objetos foram exibidos antes de escolher um metal');
+ // A Tabela do menu Montagem reaproveita o mesmo palco, sem abrir modal
+ // para uma segunda tabela nem modificar o estado científico.
+ await page.locator('[data-open-dock="montagem"]').click();
+ await page.locator('[data-left-tab="preparo"]').click();
+ await page.locator('#silm-open-periodic').click();
+ await page.waitForFunction(()=>document.querySelector('#silm-object-entry .periodic-element[data-z="79"]'));
+ assert.equal(await page.locator('#silm-periodic-dialog').isVisible(),false,
+  'O botão da Montagem abriu uma Tabela modal redundante.');
+ assert.equal(await page.locator('#si-dock-left').isVisible(),false,
+  'Montagem não foi recolhida para liberar a área da Tabela.');
+
  const initially=await snap();
  const pickMetal=async z=>{
   // Mesmo componente periódico em todas as telas; o click faz
@@ -239,7 +250,7 @@ try{
  assert.equal(await snap(),initially,'Cancelar catálogo alterou estado científico');
  await pickMetal(29,11);
  await modal.waitFor({state:'visible'});
- await modal.locator('[data-reference-id="atlas-cu"]').getByRole('button',{name:'Investigar objeto'}).click();
+ await modal.locator('[data-reference-id="atlas-cu"]').getByRole('button',{name:'Iniciar montagem'}).click();
  await page.waitForFunction(()=>SILMIntegration.snapshot()?.metal?.atomicNumber===29);
  await page.waitForFunction(()=>SILMIntegration.snapshot()?.metadata?.workshop?.referenceId==='atlas-cu');
  assert.equal(await page.locator('#si-stage').getAttribute('data-workshop-scale'),'1');
@@ -251,7 +262,7 @@ try{
  });
  await page.locator('.silm-workshop-browse-objects').click();
  await modal.waitFor({state:'visible'});
- await modal.locator('[data-reference-id="cobre-latao"]').getByRole('button',{name:'Investigar objeto'}).click();
+ await modal.locator('[data-reference-id="cobre-latao"]').getByRole('button',{name:'Iniciar montagem'}).click();
  await page.waitForFunction(()=>SILMIntegration.snapshot()?.metadata?.workshop?.referenceId==='cobre-latao');
  const scientificAfter=await page.evaluate(()=>{
   const st=SILMIntegration.snapshot();return JSON.stringify({
@@ -270,12 +281,12 @@ try{
  assert.ok(await modal.locator('[data-reference-id="atlas-fe"]').count()===1,
   'Ferro não oferece o objeto do atlas');
  assert.equal(await snap(),prior,'Inspecionar objetos de outro metal mudou a investigação');
- await modal.locator('[data-reference-id="atlas-fe"]').getByRole('button',{name:'Investigar objeto'}).click();
+ await modal.locator('[data-reference-id="atlas-fe"]').getByRole('button',{name:'Iniciar montagem'}).click();
  await page.locator('#si-modal-confirm').waitFor({state:'visible'});
  await page.locator('#si-modal-cancel').click();
  await modal.waitFor({state:'visible'});
  assert.equal(await snap(),prior,'Cancelar troca de metal alterou a investigação');
- await modal.locator('[data-reference-id="atlas-fe"]').getByRole('button',{name:'Investigar objeto'}).click();
+ await modal.locator('[data-reference-id="atlas-fe"]').getByRole('button',{name:'Iniciar montagem'}).click();
  await page.locator('#si-modal-confirm').click();
  await page.waitForFunction(()=>SILMIntegration.snapshot()?.metal?.atomicNumber===26);
  await page.waitForFunction(()=>SILMIntegration.snapshot()?.metadata?.workshop?.referenceId==='atlas-fe');
