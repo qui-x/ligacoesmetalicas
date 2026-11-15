@@ -85,3 +85,46 @@ test('o modulo carrega antes da microestrutura e participa do cache offline',()=
  assert.ok(html.indexOf('domain/silm/crystal-plasticity.js')<html.indexOf(p));
  assert.ok(html.indexOf(p)<html.indexOf('domain/silm/microstructure-view.js'));
 });
+
+test('energia do modelo elastico e positiva e reacoes preservam equilibrio global',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const r=m.run({mode:'tension',load:.10,increments:2});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ assert.ok(Object.isFrozen(r.energy)&&Object.isFrozen(r.reactions));
+ assert.ok(r.energy.elasticStored>0);
+ assert.equal(r.energy.hardeningStored,0);
+ assert.equal(r.energy.plasticDissipated,0);
+ assert.ok(Math.abs(r.energy.total-r.energy.elasticStored)<1e-12);
+ assert.ok(Math.abs(r.reactions.netFx)<1e-9,'Forca global x sem equilibrio');
+ assert.ok(Math.abs(r.reactions.netFy)<1e-9,'Forca global y sem equilibrio');
+ assert.ok(r.reactions.topY<0,'Carga superior de tracao orientada incorretamente');
+ assert.ok(r.reactions.bottomY>0,'Reacao inferior de tracao incorreta');
+ assert.ok(Math.abs(r.reactions.topY+r.reactions.bottomY)<2e-4);
+ assert.ok(r.maxAbsLocalStrain>0&&r.maxAbsLocalStrain<.05);
+ assert.equal(r.energyBalanceStatus,'NOT_EVALUATED_EXTERNAL_WORK');
+});
+test('dissipacao cristaloplastica e encruamento permanecem nao negativos',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const loading=m.run({mode:'tension',load:.83,increments:5});
+ assert.equal(loading.status,'CONVERGED',JSON.stringify(loading));
+ const unloading=m.run({mode:'tension',load:.83,increments:5,unload:true});
+ assert.equal(unloading.status,'CONVERGED',JSON.stringify(unloading));
+ assert.ok(loading.energy.elasticStored>=0&&loading.energy.hardeningStored>0);
+ assert.ok(loading.energy.plasticDissipated>0);
+ assert.ok(loading.energy.total>=loading.energy.elasticStored);
+ assert.ok(unloading.energy.plasticDissipated+1e-10>=loading.energy.plasticDissipated);
+ assert.ok(unloading.energy.hardeningStored+1e-10>=loading.energy.hardeningStored);
+ assert.ok(unloading.maxAbsLocalStrain<.05);
+ assert.ok(Math.abs(unloading.reactions.netFy)<1e-9);
+ assert.equal(unloading.reactions.units,'relative');
+});
+test('energia nula em carga nula e ausencia de propriedades calorimetricas',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const r=m.run({mode:'compression',load:0,increments:1});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ assert.ok(Math.abs(r.energy.total)<1e-12);
+ assert.ok(Math.abs(r.reactions.netFy)<1e-12);
+ assert.ok(r.maxAbsLocalStrain<1e-12);
+ assert.equal(r.energyBalanceStatus,'NOT_EVALUATED_EXTERNAL_WORK');
+ assert.equal(r.units,'relative');
+});
