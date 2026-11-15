@@ -15,6 +15,53 @@ window.SILM=window.SILM||{};
 SILM.polycrystalCPFEM=(()=>{
  const cp=SILM.crystalPlasticity,slip=SILM.crystalSlip;
  const DEFAULT_NX=12,DEFAULT_NY=8;
+
+ // Campos para leitura visual sem substituir os valores cientificos.
+ // Escalas relativas e calculadas exclusivamente dos graos amostrados.
+ function describeGrainMap(result,{kind='plastic-strain'}={}){
+  const definitions=Object.freeze({
+   'plastic-strain':Object.freeze({property:'meanEquivalentPlasticStrain',
+    label:'Deformação plástica equivalente',signed:false,residualOnly:false}),
+   'residual-von-mises':Object.freeze({property:'meanVonMisesStress',
+    label:'Tensão equivalente residual (von Mises)',signed:false,residualOnly:true}),
+   'residual-axial':Object.freeze({property:'meanAxialStress',
+    label:'Tensão axial residual σyy',signed:true,residualOnly:true})
+  });
+  const spec=definitions[kind];
+  if(!spec)throw new RangeError('Grandeza CPFEM sem mapa homologado');
+  if(!result?.converged||result.sourceKind!=='synthetic-voronoi'||
+   !Array.isArray(result.grains)||result.calibrated!==false)
+   throw new TypeError('Mapa somente para solucao CPFEM sintetica convergente');
+  if(spec.residualOnly&&(!result.residualSummary||
+   result.mechanicalState!=='ZERO_TOP_FORCE'))
+   return Object.freeze({status:'UNAVAILABLE_RESIDUAL_BOUNDARY',kind,
+    label:spec.label,entries:Object.freeze([]),units:'relative',calibrated:false,
+    explanation:'O topo precisa atingir equilibrio numerico com forca externa zero.'});
+  const data=result.grains.map(grain=>{
+   const value=grain.mechanics?.[spec.property];
+   const usable=Number.isFinite(value)&&grain.integrationPoints>0;
+   return Object.freeze({grainId:grain.grainId,
+    value:usable?value:null,integrationPoints:grain.integrationPoints,
+    integrationArea:grain.integrationArea||0,
+    status:usable?'SAMPLED_SYNTHETIC':'NOT_SAMPLED_BY_FEM'});
+  });
+  const valid=data.filter(v=>v.value!==null);
+  // Zero e origem fisica das magnitudes; tensao axial usa escala centrada.
+  const maxAbs=Math.max(0,...valid.map(v=>Math.abs(v.value)));
+  const max=spec.signed?maxAbs:Math.max(0,...valid.map(v=>v.value));
+  const min=spec.signed?-maxAbs:0;
+  const entries=Object.freeze(data.map(v=>Object.freeze({...v,
+   normalized:v.value===null?null:maxAbs===0?0:
+    spec.signed?v.value/maxAbs:v.value/Math.max(max,1e-30)
+  })));
+  return Object.freeze({status:valid.length?'DIAGNOSTIC_ONLY':'NO_SAMPLED_GRAINS',
+   kind,label:spec.label,signed:spec.signed,min,max,
+   sampledGrains:valid.length,totalGrains:data.length,entries,
+   domain:'per-run-sampled-grains',units:'relative',calibrated:false,
+   sourceKind:'synthetic-voronoi',measured:false,
+   explanation:'Escala relativa ao ensaio atual; comparacao de cor entre ensaios nao e quantitativa.'});
+ }
+
  const MAX_GRAINS=256,MAX_STEPS=12;
  const clip=(x,a,b)=>Math.max(a,Math.min(b,x));
  const finite=Number.isFinite;
@@ -644,7 +691,7 @@ SILM.polycrystalCPFEM=(()=>{
    limitation:'Geometria sintética e atribuição de grãos por centro do triângulo mudam com o refinamento. Comparações não provam convergência nem identificam valores experimentais.'});
  }
  return Object.freeze({schema:'silm.polycrystal-cpfem.small-strain.v1',
-  create,verifyAffinePatch,compareMeshSensitivity,
+  create,verifyAffinePatch,compareMeshSensitivity,describeGrainMap,
   meshPresets:allowedGrids,calibrated:false,requiresMenuReview:true,canFeedJ2:false,
   NX:DEFAULT_NX,NY:DEFAULT_NY,triangles:2*DEFAULT_NX*DEFAULT_NY});
 })();
