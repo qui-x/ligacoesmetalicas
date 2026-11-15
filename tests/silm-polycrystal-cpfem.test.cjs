@@ -101,7 +101,7 @@ test('energia do modelo elastico e positiva e reacoes preservam equilibrio globa
  assert.ok(r.reactions.bottomY>0,'Reacao inferior de tracao incorreta');
  assert.ok(Math.abs(r.reactions.topY+r.reactions.bottomY)<2e-4);
  assert.ok(r.maxAbsLocalStrain>0&&r.maxAbsLocalStrain<.05);
- assert.equal(r.energyBalanceStatus,'NOT_EVALUATED_EXTERNAL_WORK');
+ assert.equal(r.energyBalanceStatus,'TRAPEZOIDAL_WORK_AUDIT');
 });
 test('dissipacao cristaloplastica e encruamento permanecem nao negativos',()=>{
  const {S,synthetic}=setup(),m=make(S,synthetic);
@@ -125,7 +125,7 @@ test('energia nula em carga nula e ausencia de propriedades calorimetricas',()=>
  assert.ok(Math.abs(r.energy.total)<1e-12);
  assert.ok(Math.abs(r.reactions.netFy)<1e-12);
  assert.ok(r.maxAbsLocalStrain<1e-12);
- assert.equal(r.energyBalanceStatus,'NOT_EVALUATED_EXTERNAL_WORK');
+ assert.equal(r.energyBalanceStatus,'TRAPEZOIDAL_WORK_AUDIT');
  assert.equal(r.units,'relative');
 });
 
@@ -186,15 +186,23 @@ test('trabalho na plastificacao tem historico mas nao e chamado de balanco medid
  assert.equal(r.energyAudit.calibrated,false);
  assert.equal(r.energyAudit.status,'TRAPEZOIDAL_ESTIMATE');
 });
-test('descarregamento com liberacao brusca de contato nao fecha trabalho sem rampa',()=>{
+test('descarregamento controlado tem 5 incrementos sem liberacao abrupta',()=>{
  const {S,synthetic}=setup(),m=make(S,synthetic);
  const r=m.run({mode:'tension',load:.8,increments:5,unload:true});
  assert.equal(r.status,'CONVERGED',JSON.stringify(r));
- assert.equal(r.energyAudit.status,'UNLOADING_PATH_NOT_RESOLVED');
- assert.equal(r.energyAudit.unloadingExternalWork,null);
- assert.equal(r.workHistory.length,5);
- assert.equal(r.stepsCompleted,6);
- assert.match(r.energyAudit.limitation,/trabalho de descarga desconhecido/);
+ assert.equal(r.energyAudit.status,'CONTROLLED_UNLOADING_ESTIMATE');
+ assert.ok(Number.isFinite(r.energyAudit.unloadingExternalWork));
+ assert.equal(r.workHistory.length,10);
+ assert.equal(r.stepsCompleted,10);
+ assert.deepEqual(Array.from(r.workHistory.slice(0,5).map(x=>x.phase)),
+  Array(5).fill('loading'));
+ assert.deepEqual(Array.from(r.workHistory.slice(5).map(x=>x.phase)),
+  Array(5).fill('unloading'));
+ assert.ok(Math.abs(r.workHistory.at(-1).relativeCommand)<1e-14);
+ assert.equal(r.energyAudit.contactHeldAtZero,true);
+ assert.equal(r.energyAudit.contactReleased,false);
+ assert.equal(r.loadCase.unloadIncrements,5);
+ assert.match(r.energyAudit.limitation,/garra mantida/);
 });
 
 test('a mesma malha CST resolve patch afim nas tres resolucoes independentes',()=>{
@@ -222,4 +230,44 @@ test('malhas refinadas produzem deslocamentos e reacoes em ensaio elastico compa
   x.relativeReactionDifference>=0&&Number.isFinite(x.absoluteDisplacementDifference)));
  assert.equal(cmp.meshConvergenceVerified,false);
  assert.equal(cmp.calibrated,false);
+});
+
+test('ciclo elastico controlado realiza trabalho negativo na descarga e retorna energia',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const r=m.run({mode:'tension',load:.10,increments:3,unload:true,unloadIncrements:3});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ assert.equal(r.workHistory.length,6);
+ assert.equal(r.stepsCompleted,6);
+ assert.equal(r.energyAudit.unloadingIncrements,3);
+ assert.equal(r.loadCase.contactHeldAtZero,true);
+ assert.equal(r.energyAudit.status,'CONTROLLED_UNLOADING_ESTIMATE');
+ assert.ok(r.energyAudit.externalWorkLoading>0);
+ assert.ok(r.energyAudit.unloadingExternalWork<0,'Descarga elastica deve devolver trabalho');
+ assert.ok(Math.abs(r.energyAudit.externalWorkTotal)<1e-5,
+  'Trabalho liquido elastico deveria ser aproximadamente nulo');
+ assert.ok(Math.abs(r.energy.total)<1e-5,'Energia final elastica nao e nula');
+ assert.equal(r.energyAudit.validAsExperimentalBalance,false);
+ assert.ok(r.workHistory.slice(3).every((x,i)=>x.phase==='unloading'&&
+  Math.abs(x.relativeCommand-.10*(1-(i+1)/3))<1e-12));
+});
+test('ciclo plastico em passos controlados retém dissipacao e historico energetico',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const r=m.run({mode:'tension',load:.80,increments:5,unload:true,unloadIncrements:5});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ assert.equal(r.energyAudit.contactReleased,false);
+ assert.equal(r.workHistory.length,10);
+ assert.ok(r.energy.plasticDissipated>0);
+ assert.ok(r.energy.hardeningStored>0);
+ assert.ok(r.maxAccumulatedSlip>0);
+ assert.ok(Number.isFinite(r.energyAudit.finalWorkEnergyResidual));
+ assert.ok(r.energyAudit.externalWorkTotal<=r.energyAudit.externalWorkLoading+1e-9);
+ const dissipations=r.workHistory.map(h=>h.internalEnergyCumulative);
+ assert.ok(dissipations.every(Number.isFinite));
+ assert.ok(r.workHistory.every(h=>h.units==='relative'));
+});
+test('controle rejeita numero invalido de incrementos de descarga',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ assert.equal(m.run({unload:true,unloadIncrements:0}).status,'INVALID_LOADING');
+ assert.equal(m.run({unload:true,unloadIncrements:13}).status,'INVALID_LOADING');
+ assert.equal(m.run({unload:true,unloadIncrements:1.5}).status,'INVALID_LOADING');
 });
