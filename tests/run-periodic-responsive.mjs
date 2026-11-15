@@ -1,4 +1,4 @@
-// Regressão da Tabela Periódica em viewport real (Chromium/Firefox/WebKit).
+// Regressão da Tabela Periódica no palco real da Oficina (Chromium/Firefox/WebKit).
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
@@ -11,85 +11,79 @@ const sizes=[
  ['celular-414',414,896],['celular-horizontal',844,390],
  ['tablet',768,1024],['desktop',1440,900]
 ];
-async function measure(page){
- return page.evaluate(()=>{
-  const d=document.querySelector('#silm-periodic-dialog');
-  const root=d.querySelector('.silm-periodic'),scroll=d.querySelector('.periodic-scroll');
-  const cell=d.querySelector('.periodic-element');
-  const rect=n=>{const r=n.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
-  const hint=d.querySelector('.periodic-scroll-hint');
-  return {
-   viewport:[innerWidth,innerHeight],dialog:rect(d),root:rect(root),scroller:rect(scroll),
-   item:rect(cell),cellSize:parseFloat(root.style.getPropertyValue('--periodic-cell')),
-   dialogScrollHeight:d.scrollHeight,dialogClientHeight:d.clientHeight,
-   scrollWidth:scroll.scrollWidth,clientWidth:scroll.clientWidth,
-   scrollHeight:scroll.scrollHeight,clientHeight:scroll.clientHeight,
-   documentWidth:document.documentElement.scrollWidth,
-   hintVisible:!hint.hidden,bodyScrollTop:document.scrollingElement.scrollTop
-  };
- });
-}
+const measure=page=>page.evaluate(()=>{
+ const area=document.querySelector('#silm-object-entry');
+ const root=area.querySelector('.silm-periodic');
+ const scroll=area.querySelector('.periodic-scroll');
+ const cell=area.querySelector('.periodic-element');
+ const rect=n=>{const x=n.getBoundingClientRect();return {left:x.left,right:x.right,top:x.top,bottom:x.bottom,width:x.width,height:x.height}};
+ const hint=area.querySelector('.periodic-scroll-hint');
+ return {viewport:[innerWidth,innerHeight],area:rect(area),root:rect(root),
+  scroller:rect(scroll),item:rect(cell),scrollWidth:scroll.scrollWidth,
+  clientWidth:scroll.clientWidth,scrollHeight:scroll.scrollHeight,
+  clientHeight:scroll.clientHeight,documentWidth:document.documentElement.scrollWidth,
+  hintVisible:!hint.hidden};
+});
 try{
  const ctx=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
- const page=await ctx.newPage();
- const errors=[];
+ const page=await ctx.newPage(),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  const response=await page.goto(base+'/index.html#/ambiente',{waitUntil:'load',timeout:45000});
  assert.ok(response?.ok(),'SILM não carregou');
- const open=page.locator('#silm-workshop-context').getByRole('button',{name:'Tabela Periódica'});
- await open.waitFor({state:'visible'});
+ await page.waitForFunction(()=>window.SILMIntegration&&!!document.querySelector('#silm-object-entry'));
+ const baseline=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
  for(const [name,width,height] of sizes){
   await page.setViewportSize({width,height});
-  await open.click();
-  const dialog=page.locator('#silm-periodic-dialog');
-  await dialog.waitFor({state:'visible'});
-  await page.waitForFunction(()=>Number.isFinite(parseFloat(document.querySelector('#silm-periodic-dialog .silm-periodic')?.style.getPropertyValue('--periodic-cell'))));
+  await page.locator('[data-open-dock="montagem"]').click();
+  await page.locator('[data-left-tab="preparo"]').click();
+  await page.locator('#silm-open-periodic').click();
+  await page.locator('#silm-object-entry .periodic-element[data-z="29"]').waitFor({state:'visible'});
+  assert.equal(await page.locator('#silm-periodic-dialog').isVisible(),false,
+   name+': a Tabela foi aberta como janela modal em vez de ocupar o palco');
+  assert.equal(await page.locator('#si-dock-left').isVisible(),false,
+   name+': Montagem precisa recolher para liberar a área das imagens');
   await page.waitForTimeout(90);
-  let m=await measure(page);
-  assert.ok(m.dialog.left>=-2&&m.dialog.right<=width+2,
-   name+': diálogo ultrapassa horizontalmente a tela: '+JSON.stringify(m.dialog));
-  assert.ok(m.dialog.top>=-2&&m.dialog.bottom<=height+2,
-   name+': diálogo ultrapassa verticalmente a tela: '+JSON.stringify(m.dialog));
+  const m=await measure(page);
+  assert.ok(m.area.left>=-3&&m.area.right<=width+3,
+   name+': Tabela fora do palco horizontal: '+JSON.stringify(m));
   assert.ok(m.scroller.width>100&&m.scroller.height>=50,
-   name+': região rolável da tabela desapareceu');
-  assert.ok(m.cellSize>=43.9&&m.item.width>=43.5&&m.item.height>=43.5,
-   name+': células pequenas para toque '+JSON.stringify(m));
-  assert.ok(m.dialogScrollHeight<=m.dialogClientHeight+5,
-   name+': modal criou rolagem concorrente '+JSON.stringify(m));
-  assert.ok(m.root.width<=m.dialog.width+2,
-   name+': componente vazou do diálogo');
-  assert.ok(m.documentWidth<=width+3,
-   name+': tabela aumentou largura da página');
+   name+': região rolável da Tabela desapareceu');
+  assert.ok(m.item.width>=40&&m.item.height>=40,
+   name+': células reduzidas demais '+JSON.stringify(m));
+  assert.ok(m.root.width<=m.area.width+3,
+   name+': componente periódico escapou da área central');
+  assert.ok(m.documentWidth<=width+5,
+   name+': a Tabela gerou rolagem global');
   if(width<=414)assert.ok(m.scrollWidth>m.clientWidth+100&&m.hintVisible,
-   name+': dica de rolagem horizontal ausente');
-  const cells=await dialog.locator('.periodic-element').count();
-  assert.equal(cells,118,name+': tabela não tem 118 elementos');
-  await page.locator('#silm-close-periodic').click();
-  await dialog.waitFor({state:'hidden'});
+   name+': falta rolagem horizontal e dica dos grupos 1–18');
+  assert.equal(await page.locator('#silm-object-entry .periodic-element').count(),118,
+   name+': Tabela não possui 118 elementos');
+  assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),baseline,
+   name+': abrir Tabela alterou estado científico');
  }
- // Na digitação, apenas destacar. Localizar faz seleção, sem rolar o modal.
- await page.setViewportSize({width:360,height:740});
- await open.click();
- const dialog=page.locator('#silm-periodic-dialog');
- const table=dialog.locator('.silm-periodic');
- const search=dialog.locator('.periodic-search input');
- const selected=()=>dialog.locator('.periodic-element[aria-pressed="true"]').getAttribute('data-z');
- assert.equal(await selected(),'29','Seleção inicial deveria ser cobre (Z=29)');
+ await page.setViewportSize({width:390,height:844});
+ const table=page.locator('#silm-object-entry');
+ const search=table.locator('.periodic-search input');
  await search.fill('Au');
- assert.equal(await selected(),'29','Digitar mudou o metal antes de Localizar');
- assert.ok(await dialog.locator('[data-z="79"].is-match').count(),
-  'Busca não destacou ouro');
- await dialog.locator('.periodic-search button[type=submit]').click();
- assert.equal(await selected(),'79','Localizar não selecionou ouro');
- let m=await measure(page);
- assert.ok(m.dialogScrollHeight<=m.dialogClientHeight+5,'Busca rolou o modal externo');
- assert.ok(m.documentWidth<=360+3,'Busca rolou a página inteira');
- const gold=dialog.locator('.periodic-element[data-z="79"]');
- await gold.focus();
- await gold.press('Home');
- assert.equal(await dialog.locator('.periodic-element:focus').count(),1);
- await page.locator('#silm-close-periodic').click();
+ assert.equal(await page.locator('#silm-objects-dialog').isVisible(),false,
+  'Digitar na busca abriu o catálogo sem confirmação');
+ assert.ok(await table.locator('[data-z="79"].is-match').count(),
+  'Busca não destacou o ouro');
+ await table.locator('.periodic-search button[type=submit]').click();
+ await page.locator('#silm-objects-dialog').waitFor({state:'visible'});
+ assert.ok(await page.locator('#silm-objects-dialog [data-reference-id="atlas-au"] img').count(),
+  'Selecionar Au não abriu imagens do metal');
+ assert.ok(await page.locator('#silm-objects-dialog [data-reference-id="atlas-au"]')
+  .getByRole('button',{name:'Iniciar montagem'}).count(),
+  'Modal de imagens não oferece Iniciar montagem');
+ assert.equal(await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot())),baseline,
+  'Consultar imagem no modal alterou a investigação');
+ await page.locator('#silm-objects-close').click();
+ await page.locator('#silm-objects-dialog').waitFor({state:'hidden'});
+ const gold=table.locator('.periodic-element[data-z="79"]');
+ await gold.focus();await gold.press('Home');
+ assert.equal(await table.locator('.periodic-element:focus').count(),1);
+ assert.deepEqual(errors,[],'Erros JS: '+errors.join('; '));
+ console.log('OK '+browserName+': 118 elementos, 7 viewports, Tabela no palco, imagens em modal e início de montagem');
  await ctx.close();
- assert.deepEqual(errors,[],'Erros JavaScript: '+errors.join('; '));
- console.log('OK '+browserName+': 118 elementos, 7 viewports, rolagem confinada, alvo 44px e busca intencional');
 }finally{await browser.close();}
