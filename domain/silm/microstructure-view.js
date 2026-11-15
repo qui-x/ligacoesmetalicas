@@ -59,9 +59,10 @@ SILM.microstructure=(()=>{
   const topPlate=svgNode('rect',{'class':'silm-micro-press-plate','pointer-events':'none'});
   const bottomPlate=svgNode('rect',{'class':'silm-micro-press-plate','pointer-events':'none'});
   apparatusField.append(topPlate,bottomPlate);plane.append(apparatusField);
-  let paths=[],cells=[],specimenOutline=null;let surfaceMicro=null;
+  let paths=[],cells=[],cpfemOverlayPaths=[],specimenOutline=null;let surfaceMicro=null;
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
   let currentJ2=null,selectedMechanicalReading=null,updateSlip=()=>{};
+  let cpfemPreview=null; // Previa tecnica removivel, sem alterar os menus.
   const grainCenter=poly=>{
    let a=0,cx=0,cy=0;
    for(let i=0;i<poly.length;i++){
@@ -134,9 +135,10 @@ SILM.microstructure=(()=>{
    surfaceMicro?.refresh();
    updateSelectedMechanicalReading();
    updateSlip();
+   cpfemPreview?.selected(i);
   };
   function drawGrains(){
-   paths=[];cells=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField,apparatusField);
+   paths=[];cells=[];cpfemOverlayPaths=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField,apparatusField);
    polygons.forEach((poly,i)=>{
    if(poly.length<3)return;
    const d='M'+poly.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')+' Z';
@@ -157,7 +159,12 @@ SILM.microstructure=(()=>{
    });
    const hatch=svgNode('path',{d,'class':'silm-micro-hatching',fill:'url(#'+uid+'-pattern-'+(i%4)+')','pointer-events':'none'});
    const bevel=svgNode('path',{d,'class':'silm-micro-highlight','pointer-events':'none'});
-   g.append(p,bevel,hatch);mechanicalField.append(g);paths[i]=p;cells[i]=g;
+   // Camada reversivel: NUNCA alterar --silm-grain-fill ou os atributos do material.
+   const heat=svgNode('path',{d,'class':'silm-micro-cpfem-overlay',
+    'pointer-events':'none','aria-hidden':'true'});
+   heat.style.display='none';
+   g.append(p,heat,bevel,hatch);mechanicalField.append(g);
+   paths[i]=p;cells[i]=g;cpfemOverlayPaths[i]=heat;
    });
    specimenOutline=svgNode('path',{'class':'silm-micro-specimen-outline',
     fill:'none','pointer-events':'none'});
@@ -340,6 +347,16 @@ SILM.microstructure=(()=>{
    const slipRefElement=SILM.data?.get?.(element?.atomicNumber)||element;
    const slipEligibility=SILM.crystal?.eligibility?.(slipRefElement);
    const slipStructure=slipEligibility?.status==='available'?slipEligibility.structureType:null;
+   // Previa de ramo: a posicao definitiva da acao aguarda revisao dos menus.
+   const cpfemFlag=new URLSearchParams(window.location.search).get('cpfem-preview')==='1';
+   if(cpfemFlag&&SILM.polycrystalPreview){
+    cpfemPreview=SILM.polycrystalPreview.mount({container:slipDetails,
+     getSynthetic:()=>sourceData?null:generated,
+     getStructure:()=>slipStructure,
+     getContact:()=>({position:contactPosition,width:contactWidth}),
+     getMode:()=>getMode()==='ductility'?'tension':getMode()==='malleability'?'compression':null,
+     onChange:()=>refreshMechanical()});
+   }
    section.dataset.slipJ2Coupled='false';
    updateSlip=()=>{
     if(!slipEngine)return;
@@ -469,15 +486,61 @@ SILM.microstructure=(()=>{
    const updateContact=()=>{
     contactPosition=clamp(Number(contactLabel.input.value)/100,.1,.9);
     contactWidth=clamp(Number(widthLabel.input.value)/100,.1,.8);
-    refreshMechanical();
+    if(cpfemPreview)cpfemPreview.invalidate('Contato alterado: recalcule a prévia CPFEM com a posição e a largura atuais.');
+    else refreshMechanical();
    };
    contactLabel.input.addEventListener('input',updateContact);
    widthLabel.input.addEventListener('input',updateContact);
    const saveContact=()=>model?.setMechanicalContact?.(contactPosition,contactWidth);
    contactLabel.input.addEventListener('change',saveContact);
    widthLabel.input.addEventListener('change',saveContact);
+   const cpfemMapColor=(kind,v)=>{
+    const x=Math.min(1,Math.max(0,Math.abs(v)));
+    if(kind==='plastic-strain')
+     return 'hsl('+(44-20*x).toFixed(0)+' 94% '+(80-35*x).toFixed(0)+'%)';
+    if(kind==='residual-von-mises')
+     return 'hsl('+(199+17*x).toFixed(0)+' 87% '+(80-33*x).toFixed(0)+'%)';
+    // Divergente com zero neutro. Azul: compressao, laranja: tracao.
+    if(v<0)return 'hsl(217 85% '+(82-36*x).toFixed(0)+'%)';
+    if(v>0)return 'hsl(13 87% '+(82-36*x).toFixed(0)+'%)';
+    return 'hsl(0 0% 78%)';
+   };
+   function paintCpfemGrainMap(map){
+    const on=!sourceData&&map?.status==='DIAGNOSTIC_ONLY'&&
+     Array.isArray(map.entries)&&map.entries.length===polygons.length;
+    section.dataset.cpfemGrainMap=on?map.kind:'none';
+    for(let i=0;i<cpfemOverlayPaths.length;i++){
+     const path=cpfemOverlayPaths[i];if(!path)continue;
+     const item=on?map.entries[i]:null;
+     if(!item||item.grainId!==i+1){
+      path.style.display='none';
+      delete path.dataset.mapValue;delete path.dataset.mapSampled;
+      delete path.dataset.mapNormalized;continue;
+     }
+     path.style.display='';
+     path.dataset.mapSampled=item.status;
+     if(item.value===null){
+      path.setAttribute('fill','none');path.setAttribute('stroke','var(--muted)');
+      path.setAttribute('stroke-dasharray','5 5');
+      path.setAttribute('stroke-opacity','0.65');
+      path.setAttribute('stroke-width','2');
+      delete path.dataset.mapValue;delete path.dataset.mapNormalized;
+      continue;
+     }
+     const z=Math.min(1,Math.abs(item.normalized));
+     const color=cpfemMapColor(map.kind,item.normalized);
+     path.setAttribute('fill',color);path.setAttribute('stroke',color);
+     path.setAttribute('fill-opacity',(0.10+0.28*z).toFixed(3));
+     path.setAttribute('stroke-opacity',(0.35+0.5*z).toFixed(3));
+     path.setAttribute('stroke-width',(1.8+1.5*z).toFixed(2));
+     path.removeAttribute('stroke-dasharray');
+     path.dataset.mapValue=String(item.value);
+     path.dataset.mapNormalized=String(item.normalized);
+    }
+   }
    function warpGrains(field,amplitude,marks=[],j2=null){
-    const nonlinear=!!j2?.converged&&(marks.length>0||Number(j2.load)>0);
+    const nonlinear=!!j2?.converged&&(
+     j2.status==='CONVERGED'||marks.length>0||Number(j2.load)>0);
     const elasticOn=!nonlinear&&!!field&&amplitude>1e-4;
     const relief=SILM.specimenRelief,permanentOn=!nonlinear&&!!relief&&marks.length>0;
     const map=nonlinear?(x,y)=>{
@@ -581,18 +644,22 @@ SILM.microstructure=(()=>{
    section.dataset.mechanicalJ2=j2Ready?'plane-strain-converged':
     j2?'fallback-elastic':'unavailable';
    section.dataset.mechanicalJ2Alpha=j2Ready?j2.maxAlpha.toFixed(4):'0';
-   section.dataset.mechanicalSolver=j2Ready?'incremental-j2-plane-strain':
+   const cpfemField=cpfemPreview?.field()||null;
+   section.dataset.mechanicalSolver=cpfemField?'cpfem-polycrystal-preview':
+    j2Ready?'incremental-j2-plane-strain':
     field?.converged?'elastic-local-2d':field?'unconverged':'inactive';
+   section.dataset.cpfemPresentation=cpfemField?'synthetic-readout-opt-in':'j2-default';
    const local=marks.length>0&&(j2Ready||!!SILM.specimenRelief);
    if(residual.hasResidual&&!local)
     mechanicalField.setAttribute('transform','translate('+CX+' '+CY+
      ') scale('+residual.scaleX+' '+residual.scaleY+') translate('+(-CX)+' '+(-CY)+')');
    else mechanicalField.removeAttribute('transform');
-   warpGrains(field,amplitude,marks,j2Ready?j2:null);
+   warpGrains(field,amplitude,marks,cpfemField||(j2Ready?j2:null));
+   paintCpfemGrainMap(cpfemPreview?.map()||null);
    surfaceMicro?.setDeformationLight?.({
     mode:active?(mode==='malleability'?'compression':'tension'):null,
     contact:{position:contactPosition,width:contactWidth},
-    field,amplitude,load,plasticField:j2Ready?j2:null
+    field,amplitude,load,plasticField:cpfemField||(j2Ready?j2:null)
    });
    if(active){
     const h=Math.max(4,H*.016),w=Math.max(W*.09,W*contactWidth),px=clamp(W*contactPosition-w/2,0,W-w);
@@ -756,6 +823,7 @@ SILM.microstructure=(()=>{
   // Mudanças de formação são explícitas. Redimensionar, ampliar ou mudar
   // o tema nunca regeneram os grãos, alteram a semente ou as propriedades.
   function applySchematic(options){
+   cpfemPreview?.invalidate('Nova formacao esquematica: recalcular o ensaio CPFEM.');
    generated=synthetic.generate(options);
    seed=generated.seed;profile=generated.profile;
    W=generated.width;H=generated.height;CX=W/2;CY=H/2;
@@ -923,6 +991,7 @@ SILM.microstructure=(()=>{
     const json=JSON.parse(await file.text());
     const checked=SILM.microstructureData?.validate(json,element?.atomicNumber);
     if(!checked?.ok)throw new Error(checked?.error||'Módulo de validação indisponível.');
+    cpfemPreview?.invalidate('Mapa importado: CPFEM sintetico desabilitado, sem orientacao plasticamente homologada.');
     sourceData=checked.data;
     formationsButton.disabled=true;
     W=sourceData.image.widthPx;H=sourceData.image.heightPx;CX=W/2;CY=H/2;
