@@ -29,7 +29,7 @@ test('11 registros em sete metais e cinco novos campos condicionados',()=>{
 test('Ga tres amostras; solidificacao nao e temperatura de ensaio; nunca media universal',()=>{
  const rs=M.getFor(31,'ductility');
  assert.equal(rs.length,3);
- assert.deepEqual(rs.map(r=>r.values[0].value),[55,80,110]);
+ assert.deepEqual(Array.from(rs.map(r=>r.values[0].value)),[55,80,110]);
  assert.ok(rs.every(r=>r.temperatureK===null&&r.temperatureText.includes('SOLIDIFICAÇÃO')));
  assert.equal(rs.find(r=>r.values[0].value===110).values[0].meaning,'maximum-reported-not-typical');
 });
