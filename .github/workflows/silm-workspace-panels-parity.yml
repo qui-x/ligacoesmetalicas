@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'integracao/base-core.js'
+      - 'integracao/dock-focus.js'
       - 'integracao/adapter.js'
       - 'integracao/scientific-tools.js'
       - 'integracao/workspace-family.css'
@@ -13,6 +14,7 @@ on:
     branches: [main]
     paths:
       - 'integracao/base-core.js'
+      - 'integracao/dock-focus.js'
       - 'integracao/adapter.js'
       - 'integracao/scientific-tools.js'
       - 'integracao/workspace-family.css'
