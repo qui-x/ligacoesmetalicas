@@ -4,7 +4,7 @@ window.SILM=window.SILM||{};
  * A interface conserva os painéis especializados e não altera motors físicos.
  */
 SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
- const S=SILM,db=S.scienceEvidenceIndex,batch=S.batch80Research,
+ const S=SILM,db=S.scienceEvidenceIndex,batch=S.batch80Research,iaea=S.scientific400,
   props=S.properties,labels=Object.freeze({
    'experimental-conditional':'Ensaio com condições específicas',
    evaluated:'Referência avaliada',compiled:'Compilação ou ficha técnica',
@@ -52,7 +52,8 @@ SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
    // O catalogo principal tem precedencia: o lote80 somente preenche ausencias,
    // nunca sobrescreve nem duplica um estudo ja indexado.
    const core=db.getFor(z,property,{excludeSeven:true});
-   const all=core.length?core:(batch?.getFor(z,property)||[]);
+   const iaeaRecords=iaea?.getIAEA(z,property)||[];
+   const all=core.length?core:(iaeaRecords.length?iaeaRecords:(batch?.getFor(z,property)||[]));
    if(!all.length)continue;
    const published=all.filter(r=>r.status!=='pending'),unverified=all.filter(r=>r.status==='pending');
    total+=all.length;display+=published.length;pending+=unverified.length;
@@ -77,7 +78,9 @@ SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
   if(!total)return;
   title.textContent=mode==='explore'?
    'Evidências científicas reunidas desta propriedade':'Outras referências científicas do elemento';
-  description.textContent=display+' fichas consultáveis'+(pending?' · '+pending+' registros com fonte original pendente':'')+
+  const audit=iaea?.summaryFor(z)||[];
+  const documented=audit.filter(x=>x.hasNumeric).length;
+  description.textContent=(audit.length?documented+'/5 categorias com referências numéricas locais · ':'')+display+' fichas consultáveis'+(pending?' · '+pending+' registros com fonte original pendente':'')+
    '. Estudos podem se referir a amostras e temperaturas diferentes. '+
    'O lote de 80 metais complementa somente campos sem referência no catálogo principal; registros sem fonte individual são triagens, não dados homologados. '+
    'Valores de ensaios, compilações e estimativas não homologam automaticamente os motores do SILM.';
