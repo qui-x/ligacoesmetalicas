@@ -30,7 +30,8 @@ SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
     (v.meaning==='lower-bound-not-point'?' (limite inferior, valor > indicado)':'')));
   }
   item.append(details);
-  item.append(node('p',(labels[r.status]||'Evidência condicionada')+' · '+
+  item.append(node('p',(r.evidenceIsModelEstimate?'ESTIMATIVA HISTÓRICA / NÃO medida / precisão baixa':
+   (labels[r.status]||'Evidência condicionada'))+' · '+
    (Number.isFinite(r.temperatureK)?fmt(r.temperatureK)+' K':r.temperatureText)+
    ' · amostra: '+r.sample,'silm-unified-evidence-conditions'));
   if(r.qualifier)item.append(node('p',r.qualifier,'silm-unified-evidence-caution'));
