@@ -19,14 +19,14 @@ async function test(viewport){
  assert.equal(await page.locator('#scene-undo').getAttribute('aria-label'),'Desfazer','Desfazer perdeu o nome acessível.');
  assert.equal(await page.locator('#scene-undo > svg.silm-action-icon').getAttribute('aria-hidden'),'true','SVG de ação deve ser decorativo.');
 
- await page.locator('#silm-workshop-context').getByRole('button',{name:'Tabela Periódica'}).click();
- await page.locator('#silm-periodic-dialog').waitFor({state:'visible'});
- await page.waitForFunction(()=>!!document.querySelector('#silm-close-periodic > svg.silm-action-icon'),undefined,{timeout:15000});
- assert.equal(await page.locator('#silm-close-periodic').getAttribute('aria-label'),'Fechar tabela','Fechar tabela perdeu nome acessível.');
-
- await page.locator('#silm-periodic-dialog [data-z="26"]').click();
- await page.locator('#silm-periodic-dialog [id$="-explore"]').click();
- await page.locator('.silm-workshop-card').filter({hasText:'Parafuso de aço'}).getByRole('button',{name:'Investigar componente'}).click();
+ await page.locator('[data-open-dock="montagem"]').click();
+ await page.locator('#silm-open-periodic').click();
+ await page.locator('#silm-object-entry .periodic-element[data-z="26"]').click();
+ await page.locator('#silm-objects-dialog').waitFor({state:'visible'});
+ assert.equal(await page.locator('#silm-periodic-dialog').isVisible(),false,
+  'Tabela Periódica abriu diálogo duplicado ao invés do palco.');
+ await page.locator('#silm-objects-dialog .silm-workshop-card').filter({hasText:'Parafuso de aço'})
+  .getByRole('button',{name:'Iniciar montagem'}).click();
  await page.waitForFunction(()=>window.SILMIntegration?.snapshot?.()?.metal?.atomicNumber===26,undefined,{timeout:30000});
  await page.locator('.silm-workshop-scale').nth(1).click();
  const viewer=page.locator('.silm-workshop-micro-viewer');
