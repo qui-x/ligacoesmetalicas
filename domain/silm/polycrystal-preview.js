@@ -13,6 +13,7 @@ SILM.polycrystalPreview=(()=>{
   return el;
  };
  const fmt=x=>Number(x||0).toFixed(4).replace('.',',');
+ const fmtSmall=x=>Number(x).toExponential(3).replace('.',',');
  function mount({container,getSynthetic,getStructure,getMode,getContact,onChange}={}){
   if(!container||typeof getSynthetic!=='function'||typeof getStructure!=='function'||
    typeof getMode!=='function'||typeof getContact!=='function'||typeof onChange!=='function')
@@ -61,12 +62,15 @@ SILM.polycrystalPreview=(()=>{
   const grainReading=n('output','silm-micro-cpfem-grain',
    'Selecione um grão para ler a resposta após o cálculo.');
   grainReading.setAttribute('aria-label','Leitura relativa do grão sintético no modelo CPFEM');
+  const residualReading=n('output','silm-micro-cpfem-residual',
+   'Leituras residuais ficam disponíveis após alívio das forças do topo até zero.');
+  residualReading.setAttribute('aria-label','Diagnóstico residual por grão no ensaio sintético');
   const auditDetails=n('details','silm-micro-cpfem-audit');
   auditDetails.append(n('summary','','Diagnóstico numérico · trabalho e energia'));
   const audit=n('output','silm-micro-cpfem-energy',
    'Não calculado. Diagnóstico relativo, não medida de calor, força ou energia real.');
   auditDetails.append(audit);
-  details.append(row,status,grainReading,auditDetails);
+  details.append(row,status,grainReading,residualReading,auditDetails);
   container.append(details);
   let result=null,selected=-1,mode=null,configuration=null,destroyed=false,working=false;
   const currentField=()=>{
@@ -84,18 +88,28 @@ SILM.polycrystalPreview=(()=>{
     grainReading.textContent='Selecione um grão do mapa para consultar os pontos de integração.';return;
    }
    const g=result.grains[selected];
+   const m=g.mechanics;
    grainReading.textContent=g.integrationPoints?
     'Grão sintético '+g.grainId+' · '+g.integrationPoints+' ponto(s) de integração · '+
     'deslizamento médio '+fmt(g.meanAccumulatedSlip)+
     ' · máximo '+fmt(g.maxAccumulatedSlip)+
     ' · regiões plastificadas '+g.plasticIntegrationPoints+'/'+g.integrationPoints+
-    '. Não é medição nem plasticidade EBSD.':
+    ' · deformação plástica equivalente '+fmtSmall(m.meanEquivalentPlasticStrain)+
+    ' · εyy plástica '+fmtSmall(m.meanPlasticAxialStrain)+
+    ' · tensão equivalente '+fmtSmall(m.meanVonMisesStress)+
+    (m.residualAtZeroTopForce?
+     ' · tensão axial residual '+fmtSmall(m.meanAxialStress)+
+     ' · variação axial pico–final '+fmtSmall(m.axialStrainChangeFromPeak)+
+     ' (pode haver plasticidade na descarga)':
+     ' · tensão sob condição controlada, NÃO classificada como residual')+
+    '. Valores relativos hipotéticos; não são medições nem EBSD.':
     'Grão sintético '+g.grainId+' sem ponto de integração nesta malha: nenhum resultado plástico atribuído.';
   }
   function invalidate(message='Prévia inválida após mudança da formação ou origem dos grãos.'){
    result=null;mode=null;configuration=null;show.checked=false;show.disabled=true;
    status.textContent=message;
    audit.textContent='Resultado invalidado: recalcule para a configuração atual.';
+   residualReading.textContent='Análise residual invalidada: recalcule o ensaio.';
    renderGrain();onChange();
   }
   function invalidateIfSolved(message){
@@ -112,6 +126,7 @@ SILM.polycrystalPreview=(()=>{
    working=true;run.disabled=true;show.checked=false;show.disabled=true;result=null;configuration=null;
    status.textContent='Calculando equilíbrio mecânico do policristal hipotético…';
    audit.textContent='Aguardando solução convergente para calcular os indicadores.';
+   residualReading.textContent='Calculando tensões e deformações por grão...';
    onChange();
    // Uma etapa visual para exibir a atividade antes do processamento síncrono.
    requestAnimationFrame(()=>{
@@ -127,8 +142,21 @@ SILM.polycrystalPreview=(()=>{
       status.textContent='CPFEM não convergiu ('+(response.reason||response.status)+
        '); campo não aplicado. Reduza a carga ou revise o domínio do modelo.';
        audit.textContent='Sem auditoria energética: solução não convergente.';
+       residualReading.textContent='Sem leitura residual: cálculo não convergente.';
      }else{
       result=response;mode=study;
+       const residual=response.residualSummary;
+       residualReading.textContent=residual?
+        'Equilíbrio aproximado do topo sem força externa · deformação plástica equivalente média '+
+        fmtSmall(residual.meanEquivalentPlasticStrain)+
+        ' · εyy total residual '+fmtSmall(residual.meanTotalAxialStrain)+
+        ' · εyy plástica '+fmtSmall(residual.meanPlasticAxialStrain)+
+        ' · εyy elástica '+fmtSmall(residual.meanElasticAxialStrain)+
+        ' · tensão axial residual média '+fmtSmall(residual.meanAxialStress)+
+        ' · tensão equivalente média '+fmtSmall(residual.meanVonMisesStress)+
+        ' · variação εyy pico–final '+fmtSmall(residual.axialStrainChangeFromPeak)+
+        '. Modelo sintético; pode ocorrer deslizamento durante a descarga.':
+        'Sem classificação de tensão residual: o topo permanece sob carga ou com posição da garra prescrita.';
        const e=response.energy,a=response.energyAudit;
        audit.textContent='Energia elástica '+fmt(e.elasticStored)+
         ' · encruamento '+fmt(e.hardeningStored)+
@@ -165,6 +193,7 @@ SILM.polycrystalPreview=(()=>{
     }catch(error){
      status.textContent='Prévia indisponível: '+(error?.message||String(error))+
       '. Nenhum campo aplicado.';
+     residualReading.textContent='Sem leitura residual válida.';
     }finally{
      working=false;run.disabled=false;renderGrain();onChange();
     }
