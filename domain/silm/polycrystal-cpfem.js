@@ -161,7 +161,7 @@ SILM.polycrystalCPFEM=(()=>{
     i=Math.min(NX-1,Math.floor(xx)),j=Math.min(NY-1,Math.floor(yy));
    return 2*(j*NX+i)+((yy-j)<=(xx-i)?0:1);
   };
-  const initial=()=>({u:new Float64Array(ND),
+  const initial=()=>({u:new Float64Array(ND),force:new Float64Array(ND),
    points:triangles.map((t,i)=>models[grainOfTriangle[i]].initial())});
   function assemble(u,prior,{stiffness=false}={}){
    const force=new Float64Array(ND),states=new Array(NE),out=new Array(NE),
@@ -262,7 +262,7 @@ SILM.polycrystalCPFEM=(()=>{
    }
    const reactions=Object.freeze({topY,bottomY,contactX:contactReactionX,
     netFx,netFy,freeResidual:err,units:'relative'});
-   return done?{converged:true,record:{u,points:last.states},
+   return done?{converged:true,record:{u,force:last.force,points:last.states},
     iterations:iter+1,residual:err,plasticTriangles:last.plasticTriangles,
     meanSlip:last.meanSlip,maxSlip:last.maxSlip,maxAbsLocalStrain:last.maxAbsLocalStrain,
     energy:last.energy,reactions}:
@@ -324,20 +324,58 @@ SILM.polycrystalCPFEM=(()=>{
     position<.1||position>.9||width<.1||width>.8||load<0||load>1||
     !Number.isInteger(increments)||increments<1||increments>MAX_STEPS)
     return Object.freeze({status:'INVALID_LOADING',converged:false});
-   let prior=initial(),last=null,stepsCompleted=0;
+   let prior=initial(),last=null,stepsCompleted=0,externalWork=0;
+   const history=[];
+   // Integracao trapezoidal do trabalho no contato com deslocamento prescrito.
+   // Ao remover bruscamente Dirichlet na descarga nao conhecemos o trabalho.
+   const accumulateWork=(before,after,command,stepNumber)=>{
+    const prescribed=fixed(mode,position,width,command,false).mask;
+    let increment=0;
+    for(let i=0;i<ND;i++)if(prescribed[i]){
+     const du=after.record.u[i]-before.u[i];
+     increment+=.5*(before.force[i]+after.record.force[i])*du;
+    }
+    externalWork+=increment;
+    const stored=after.energy.total;
+    const imbalance=externalWork-stored;
+    const relative=Math.abs(imbalance)/Math.max(Math.abs(externalWork),Math.abs(stored),1e-10);
+    history.push(Object.freeze({step:stepNumber,relativeCommand:command,
+     externalWorkIncrement:increment,externalWorkCumulative:externalWork,
+     internalEnergyCumulative:stored,workEnergyResidual:imbalance,
+     relativeResidual:relative,freeResidual:after.residual,
+     integration:'trapezoidal-prescribed-displacement',units:'relative'}));
+   };
    for(let i=1;i<=increments;i++){
     const r=equilibrate(prior,{mode,position,width,load:load*i/increments});
     if(!r.converged)return Object.freeze({status:'NONCONVERGED',converged:false,
      reason:r.reason,diagnostic:r.diagnostic||null,stepsCompleted,requestedSteps:increments,calibrated:false});
+    accumulateWork(prior,r,load*i/increments,i);
     prior=r.record;last=r;stepsCompleted++;
    }
    if(unload){
     const r=equilibrate(prior,{mode,position,width,load:0,release:true});
     if(!r.converged)return Object.freeze({status:'NONCONVERGED',converged:false,
      reason:r.reason,diagnostic:r.diagnostic||null,stepsCompleted,requestedSteps:increments+1,calibrated:false});
+    // O contato e liberado sem rampa de deslocamento controlado. Nenhum
+    // resultado de balanco energetico da descarga pode ser reivindicado.
     prior=r.record;last=r;stepsCompleted++;
    }
-   return Object.freeze({...report(prior,last),stepsCompleted,unloaded:unload,
+   const loaded=history[history.length-1];
+   const energyAudit=Object.freeze({
+    status:unload?'UNLOADING_PATH_NOT_RESOLVED':'TRAPEZOIDAL_ESTIMATE',
+    externalWorkLoading:externalWork,
+    storedPlusDissipatedLoading:loaded?.internalEnergyCumulative||0,
+    loadingWorkEnergyResidual:loaded?.workEnergyResidual||0,
+    loadingRelativeResidual:loaded?.relativeResidual||0,
+    unloadingExternalWork:null,
+    validAsExperimentalBalance:false,calibrated:false,units:'relative',
+    method:'trapezoidal-reactions-at-prescribed-nodes',
+    limitation:unload?
+     'O contato e liberado sem curva de descarga controlada; trabalho de descarga desconhecido.':
+     'Quadratura trapezoidal por passos discretos; o erro depende dos incrementos.'
+   });
+   return Object.freeze({...report(prior,last),energyAudit,
+    workHistory:Object.freeze(history),stepsCompleted,unloaded:unload,
     loadCase:Object.freeze({mode,position,width,load,increments,unload,
      kind:'prescribed-displacement',units:'relative'})});
   }
