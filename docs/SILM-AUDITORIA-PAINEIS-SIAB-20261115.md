@@ -46,3 +46,19 @@ Referência: SIAB (repositório `qui-x/acidobase`, ramo `acidosebases1.0.0`).
 - Exercitar fluxos de Medir e Calcular com registros efetivos e ida/volta do relatório, sem regressões de foco.
 - Testar roteiro bloqueado e a elegibilidade de materiais sem estrutura disponível.
 - Manter o PR em rascunho até os workflows da versão final passarem.
+
+## Revisão específica: seleção de objeto versus montagem livre
+
+**Regra de interface:** a escolha de um objeto com referência estrutural habilitada prepara o modelo cristalográfico de forma automática, sem obrigar o estudante a adicionar unidades ou clicar em Organizar. Permanece na escala macroscópica inicial; Rede/Centro são abertos pela navegação de escalas. O modelo é a **referência do elemento**, não a metalografia experimental do objeto ou de sua liga.
+
+**Regra científica:** a preparação aproveita `ensureWorkshopCrystal()`, que usa o motor `beginAssembly/addUnit/organize` e respeita `SILM.crystal.eligibility`, sem criar uma geometria alternativa. Metais sem geometria validada preservam o contexto do objeto e sinalizam a indisponibilidade, sem inventar centros/valores. A mudança de objeto acompanha a seleção existente de `workshop.referenceId`.
+
+**Doca Montagem:**
+- `Preparo`: selecionar metal e iniciar uma investigação livre/direta; a seleção do objeto na Oficina já inicia a investigação, sem repetição.
+- `Unidades`: mostrar tipo de estrutura, quantidade de centros e, apenas na escala apropriada, permitir localizar um centro existente. Lista oculta quando a cena cristalina ainda não está visível.
+- `Adicionar unidade` e `Organizar em rede`: somente na edição de montagem **livre**, não na investigação normal de objeto.
+- `Editar montagem livre`: ação intencional recolhida, com possibilidade de regressar ao editor sem remover o motor de montagem.
+- `Módulo`: escolha de Explorar/Medir/Calcular; não duplicar em Ver.
+- `Resumo`: informação somente leitura; `Roteiro`: instruções da atividade orientada.
+
+**Validação:** testes de atlas comprovam referência preparada ao escolher objeto, permanência na escala Objeto e ausência de botões de adicionar/organizar no modo cristalino. Repetir a matriz de paridade dos painéis e regressões de microestrutura, responsividade e roteiros antes de merge.
