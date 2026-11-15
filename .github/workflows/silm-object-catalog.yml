@@ -1,4 +1,4 @@
-name: SILM — Objetos: tabela e catálogo modal
+name: "SILM — Objetos: tabela e catálogo modal"
 on:
   push:
     branches: [feat/silm-parte9-entrada-objetos-tabela-catalogo-20261110]
