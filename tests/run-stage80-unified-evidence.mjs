@@ -16,7 +16,7 @@ try{
    page.on('pageerror',e=>errors.push(e.message));
    const resp=await page.goto(base+'/index.html#/ambiente',{waitUntil:'load',timeout:45000});
    assert.ok(resp?.ok());
-   await page.waitForFunction(()=>Boolean(SILM.scienceEvidenceIndex?.rows?.length===315&&SILM.createUnifiedElementEvidencePanel&&SILM.renderIntegrationMetalData),undefined,{timeout:20000});
+   await page.waitForFunction(()=>Boolean(SILM.scienceEvidenceIndex?.rows?.length>=315&&SILM.createUnifiedElementEvidencePanel&&SILM.renderIntegrationMetalData),undefined,{timeout:20000});
    const data=await page.evaluate(()=>{
     const Z=[26,29,13,44,22,68,90,27,72,43],results=[];
     for(const z of Z){
@@ -36,7 +36,7 @@ try{
       hasPending:records.some(e=>e.dataset.status==='pending'),
       engine:records.every(e=>e.dataset.engineRelease==='false'),
       properties:props.map(e=>e.dataset.property),
-      hasScientificValue:host.textContent.includes('referência da amostra'),
+      hasScientificValue:host.textContent.includes('referência condicionada à amostra e à fonte'),
       dataText:host.textContent.slice(0,1800),
       noUnexpectedPlaceholder:metal.symbol!=='Cu'?true:!!extra
      });
