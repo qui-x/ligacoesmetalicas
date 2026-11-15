@@ -46,7 +46,12 @@ SILM.polycrystalPreview=(()=>{
   const grainReading=n('output','silm-micro-cpfem-grain',
    'Selecione um grão para ler a resposta após o cálculo.');
   grainReading.setAttribute('aria-label','Leitura relativa do grão sintético no modelo CPFEM');
-  details.append(row,status,grainReading);
+  const auditDetails=n('details','silm-micro-cpfem-audit');
+  auditDetails.append(n('summary','','Diagnóstico numérico · trabalho e energia'));
+  const audit=n('output','silm-micro-cpfem-energy',
+   'Não calculado. Diagnóstico relativo, não medida de calor, força ou energia real.');
+  auditDetails.append(audit);
+  details.append(row,status,grainReading,auditDetails);
   container.append(details);
   let result=null,selected=-1,mode=null,configuration=null,destroyed=false,working=false;
   const currentField=()=>{
@@ -73,7 +78,9 @@ SILM.polycrystalPreview=(()=>{
   }
   function invalidate(message='Prévia inválida após mudança da formação ou origem dos grãos.'){
    result=null;mode=null;configuration=null;show.checked=false;show.disabled=true;
-   status.textContent=message;renderGrain();onChange();
+   status.textContent=message;
+   audit.textContent='Resultado invalidado: recalcule para a configuração atual.';
+   renderGrain();onChange();
   }
   function invalidateIfSolved(message){
    if(result||show.checked)invalidate(message);
@@ -102,6 +109,16 @@ SILM.polycrystalPreview=(()=>{
        '); campo não aplicado. Reduza a carga ou revise o domínio do modelo.';
      }else{
       result=response;mode=study;
+       const e=response.energy,a=response.energyAudit;
+       audit.textContent='Energia elástica '+fmt(e.elasticStored)+
+        ' · encruamento '+fmt(e.hardeningStored)+
+        ' · dissipação plástica '+fmt(e.plasticDissipated)+
+        ' · trabalho externo do carregamento '+fmt(a.externalWorkLoading)+
+        ' · diferença de quadratura '+fmt(a.loadingWorkEnergyResidual)+
+        ' (unidades relativas). '+
+        (response.unloaded?'Descarga sem trajetória de trabalho resolvida.':
+         'Quadratura trapezoidal aproximada, não validada experimentalmente.')+
+        ' O comando não representa força em N nem tensão em MPa.';
        configuration=Object.freeze({synthetic,structure,mode:study,
         position:contact.position,width:contact.width,load:requestedLoad,unload:requestedUnload});
        show.disabled=false;
