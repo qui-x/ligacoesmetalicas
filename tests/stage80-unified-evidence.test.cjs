@@ -24,11 +24,11 @@ const context=vm.createContext(box);
 for(const source of sources)vm.runInContext(read(source),context,{filename:source});
 vm.runInContext(read('domain/silm/science-evidence-view.js'),context);
 const S=context.SILM,D=S.scienceEvidenceIndex;
-test('nove catálogos de pesquisa unidos sem perder estudos e sem criar propriedades universais',()=>{
+test('dez catálogos de pesquisa unidos sem perder estudos e sem criar propriedades universais',()=>{
  assert.equal(D.schema,'silm.science.evidence-index.v1');
  assert.equal(D.sourceCatalogCount,10);
- assert.equal(D.elementCount,73);
- assert.equal(D.rows.length,332);
+ assert.equal(D.elementCount,79);
+ assert.equal(D.rows.length,338);
  assert.equal(D.rows.filter(x=>x.origin!=='stage81-matrix92').length,315,'Etapa80 preserva 315 fichas originais');
  assert.equal(new Set(D.rows.map(x=>x.id)).size,D.rows.length);
  assert.deepEqual(Array.from(D.keys),['electrical','thermal','malleability','ductility','luster']);
