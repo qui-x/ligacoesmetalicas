@@ -603,3 +603,14 @@ body.si-structure-expanded #silm-scene-actionbar{
   border:2px solid Highlight;outline:2px solid Highlight;outline-offset:-4px;
  }
 }
+
+/* Paridade SIAB × SILM: inventário navegável e responsivo na aba Unidades. */
+#silm-unit-inventory{min-width:0;margin-block:12px}
+#silm-unit-inventory .silm-inventory-guide{font-size:.84rem;color:var(--muted);margin:0 0 10px}
+.silm-unit-inventory{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-height:min(48dvh,360px);overflow-y:auto;overscroll-behavior:contain}
+.silm-unit-inventory li{display:grid;gap:3px;min-width:0;padding:8px;border:1px solid var(--border);border-radius:10px;background:var(--panel)}
+.silm-unit-inventory li.is-selected{border-color:var(--accent)}
+.silm-unit-inventory button{width:100%;min-height:44px;text-align:left;padding:8px 10px;font:inherit;font-weight:650;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer}
+.silm-unit-inventory button:disabled{opacity:.65;cursor:not-allowed}
+.silm-unit-inventory button:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.silm-unit-inventory small{font-size:.78rem;color:var(--muted);overflow-wrap:anywhere}
