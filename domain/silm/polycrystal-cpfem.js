@@ -379,23 +379,67 @@ SILM.polycrystalCPFEM=(()=>{
    }
    const loaded=history[history.length-1];
    const externalWorkLoading=externalWork;
+   let peakContactForceNorm=null;
+   let boundaryFinal=unload?'contact-fixed-at-zero':'contact-displacement-prescribed';
    if(unload){
-    // Retrair gradualmente a garra, preservando o mesmo conjunto de DOFs.
-    // A amostra ao final esta com deslocamento aplicado zero, nao livre de
-    // tracao no topo; um ensaio de forca zero requer outro controle.
-    for(let j=1;j<=unloadIncrements;j++){
-     const command=load*(1-j/unloadIncrements);
-     const r=equilibrate(prior,{mode,position,width,load:command,holdContact:true});
-     if(!r.converged)return Object.freeze({status:'NONCONVERGED',converged:false,
-      phase:'unloading',reason:r.reason,diagnostic:r.diagnostic||null,
-      stepsCompleted,requestedSteps:increments+unloadIncrements,calibrated:false});
-     accumulateWork(prior,r,command,increments+j,'unloading');
-     prior=r.record;last=r;stepsCompleted++;
+    if(unloadMode==='displacement'){
+     // 84D: recuar a garra, mantendo os mesmos graus de liberdade prescritos.
+     for(let j=1;j<=unloadIncrements;j++){
+      const command=load*(1-j/unloadIncrements);
+      const r=equilibrate(prior,{mode,position,width,load:command,holdContact:true});
+      if(!r.converged)return Object.freeze({status:'NONCONVERGED',converged:false,
+       phase:'unloading',unloadMode,reason:r.reason,diagnostic:r.diagnostic||null,
+       stepsCompleted,requestedSteps:increments+unloadIncrements,calibrated:false});
+      accumulateWork(prior,r,command,increments+j,'unloading');
+      prior=r.record;last=r;stepsCompleted++;
+     }
+    }else{
+     // 84E: liberar os DOFs da garra e substitui-los pelas respectivas
+     // forcas nodais EXATAMENTE da solucao de carregamento anterior.
+     // A cada incremento reduz-se esse vetor ate zero (controle Neumann).
+     // Não e modelo unilateral de contato ou força medida em newtons.
+     const atPeak=fixed(mode,position,width,load,false,true).mask;
+     const supports=fixed(mode,position,width,0,true).mask;
+     const peakLoads=new Float64Array(ND);
+     for(let k=0;k<ND;k++)if(atPeak[k]&&!supports[k])
+      peakLoads[k]=prior.force[k];
+     peakContactForceNorm=Math.hypot(...peakLoads);
+     let lastLoads=peakLoads;
+     for(let j=1;j<=unloadIncrements;j++){
+      const fraction=Math.max(0,1-j/unloadIncrements);
+      const nextLoads=peakLoads.map(force=>fraction*force);
+      const r=equilibrate(prior,{mode,position,width,load:0,
+       release:true,external:nextLoads});
+      if(!r.converged)return Object.freeze({status:'NONCONVERGED',converged:false,
+       phase:'force-unloading',unloadMode,reason:r.reason,diagnostic:r.diagnostic||null,
+       stepsCompleted,requestedSteps:increments+unloadIncrements,calibrated:false});
+      let increment=0;
+      for(let k=0;k<ND;k++){
+       const du=r.record.u[k]-prior.u[k];
+       increment+=.5*(lastLoads[k]+nextLoads[k])*du;
+      }
+      externalWork+=increment;
+      const stored=r.energy.total,imbalance=externalWork-stored;
+      const relative=Math.abs(imbalance)/
+       Math.max(Math.abs(externalWork),Math.abs(stored),1e-10);
+      history.push(Object.freeze({step:increments+j,phase:'force-unloading',
+       relativeCommand:fraction,externalWorkIncrement:increment,
+       externalWorkCumulative:externalWork,internalEnergyCumulative:stored,
+       workEnergyResidual:imbalance,relativeResidual:relative,
+       freeResidual:r.residual,
+       appliedContactForceNorm:r.reactions.appliedContactForceNorm,
+       integration:'trapezoidal-prescribed-nodal-force',units:'relative'}));
+      prior=r.record;last=r;lastLoads=nextLoads;stepsCompleted++;
+     }
+     boundaryFinal='traction-free-top';
     }
    }
    const final=history[history.length-1];
+   const forceUnloaded=unload&&unloadMode==='force';
+   const heldAtZero=unload&&unloadMode==='displacement';
    const energyAudit=Object.freeze({
-    status:unload?'CONTROLLED_UNLOADING_ESTIMATE':'TRAPEZOIDAL_ESTIMATE',
+    status:forceUnloaded?'ZERO_FORCE_EQUILIBRIUM_ESTIMATE':
+     unload?'CONTROLLED_UNLOADING_ESTIMATE':'TRAPEZOIDAL_ESTIMATE',
     externalWorkLoading,externalWorkTotal:externalWork,
     storedPlusDissipatedLoading:loaded?.internalEnergyCumulative||0,
     loadingWorkEnergyResidual:loaded?.workEnergyResidual||0,
@@ -405,19 +449,31 @@ SILM.polycrystalCPFEM=(()=>{
     finalWorkEnergyResidual:final?.workEnergyResidual||0,
     finalRelativeResidual:final?.relativeResidual||0,
     unloadingIncrements:unload?unloadIncrements:0,
-    contactHeldAtZero:unload,contactReleased:false,
+    unloadingMode:unload?unloadMode:null,
+    contactHeldAtZero:heldAtZero,contactReleased:forceUnloaded,
+    appliedContactForceNormFinal:forceUnloaded?
+     last.reactions.appliedContactForceNorm:null,
+    topFreeResidual:forceUnloaded?last.reactions.topFreeResidual:null,
+    peakContactForceNorm,
+    boundaryConditionFinal:boundaryFinal,
     validAsExperimentalBalance:false,calibrated:false,units:'relative',
-    method:'trapezoidal-reactions-at-prescribed-nodes',
-    limitation:unload?
-     'Descarga gradual controlada ate deslocamento zero, com garra mantida. Nao representa liberacao do contato, forca zero, dinamica nem ensaio medido.':
-     'Quadratura trapezoidal por incrementos discretos; incerteza numerica depende da discretizacao.'
+    method:forceUnloaded?'trapezoidal-nodal-force-and-reaction':
+     'trapezoidal-reactions-at-prescribed-nodes',
+    limitation:forceUnloaded?
+     'Descarga gradual por vetor de forcas nodais ate zero; garra cinematicamente liberada. Equilibrio estatico sem tracao externa, nao contato unilateral, friccao nem medicao real.':
+     unload?
+      'Descarga gradual controlada ate deslocamento zero, com garra mantida. Nao representa liberacao do contato, forca zero, dinamica nem ensaio medido.':
+      'Quadratura trapezoidal por incrementos discretos; incerteza numerica depende da discretizacao.'
    });
    return Object.freeze({...report(prior,last),energyAudit,
     energyBalanceStatus:'TRAPEZOIDAL_WORK_AUDIT',
     workHistory:Object.freeze(history),stepsCompleted,unloaded:unload,
     loadCase:Object.freeze({mode,position,width,load,increments,unload,
-     unloadIncrements:unload?unloadIncrements:0,contactHeldAtZero:unload,
-     kind:'prescribed-displacement',units:'relative'})});
+     unloadMode:unload?unloadMode:null,
+     unloadIncrements:unload?unloadIncrements:0,
+     contactHeldAtZero:heldAtZero,contactReleased:forceUnloaded,
+     boundaryConditionFinal:boundaryFinal,
+     kind:'displacement-loading-with-selected-unloading',units:'relative'})});
   }
   return Object.freeze({schema:'silm.polycrystal-cpfem.small-strain.v1',
    structure:slip.types[structure],sourceKind:'synthetic-voronoi',
