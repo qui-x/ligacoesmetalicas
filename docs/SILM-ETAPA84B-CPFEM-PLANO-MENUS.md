@@ -71,3 +71,16 @@ O histórico `workHistory` contém `phase: loading` ou `phase: unloading`, coman
 **Limites:** aproximação quase estática de pequenas deformações, parâmetros hipotéticos e sem convergência de malha certificada. Não resolve contato unilateral, força zero, atrito, retirada real da garra, grandes deformações, dinâmica, estricção nem ruptura. Os trabalhos são relativos e não foram medidos.
 
 A apresentação da prévia opt-in informa a condição da garra e o trabalho de descarga, sem modificar os menus Montagem, Ver e Dados e sem integrar nada à `main`.
+
+## Etapa 84E — equilíbrio sem forças externas sobre o topo
+
+A descarga foi separada em dois percursos mecanicamente distintos em `polycrystal-cpfem.js`:
+
+1. `unloadMode: 'displacement'`: recuo incremental da garra com deslocamento prescrito até zero. A garra permanece cinematicamente conectada; a reação final não é necessariamente nula.
+2. `unloadMode: 'force'`: no estado final de carregamento, as reações dos DOFs da garra são convertidas em forças nodais equivalentes; a restrição cinemática do topo é liberada e o vetor das forças é reduzido em `unloadIncrements` etapas até zero, com equilíbrio global em cada uma. Os apoios inferiores permanecem definidos. Isso aproxima o **equilíbrio estático do topo sem força prescrita**, e não o contato com uma ferramenta real.
+
+O motor resolve `f_internal - f_external = 0` nos graus de liberdade livres por Newton, matriz tangente numérica e PCG. O trabalho de descarga por força é integrado com a quadratura trapezoidal de forças nodais vezes incrementos de deslocamento. O histórico distingue `phase: 'force-unloading'`; `energyAudit` registra `appliedContactForceNormFinal`, `topFreeResidual`, `contactReleased`, `boundaryConditionFinal: 'traction-free-top'` e trabalho de retorno. Quando o modo é por recuo, registra `contactHeldAtZero: true`.
+
+**Restrições importantes:** a mudança de Dirichlet para Neumann no início do ensaio emprega cargas nodais equivalentes das reações, não simulação de contato unilateral, deslizamento/atrito de garras, rigidez de máquina ou dinâmica de separação. Força nula significa vetor externo controlado nulo **dentro da tolerância de equilíbrio numérico**, não força medida zero. O cálculo mantém parâmetros hipotéticos e pequenas deformações. Não chamar resultados de valores experimentais nem substituir automaticamente o J2.
+
+A apresentação continua opt-in no ramo. A seleção de modo não altera Montagem, Ver ou Dados. Os novos testes verificam retorno elástico, preservação de deslizamento plástico, histórico energético, resíduo de tração no topo e separação dos dois modos.
