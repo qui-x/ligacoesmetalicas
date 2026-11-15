@@ -411,3 +411,75 @@ test('84F: garra presa e ensaio sob carga nao recebem rotulo de tensao residual'
  assert.ok(grip.grains.every(g=>g.mechanics===null||!g.mechanics.residualAtZeroTopForce));
  assert.equal(grip.sampleMechanics(.4,.4).residualAtZeroTopForce,false);
 });
+
+test('84G: escala de deformacao plastica relativa usa apenas grãos amostrados',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const r=m.run({mode:'tension',load:.8,increments:5});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ const scale=S.polycrystalCPFEM.describeGrainMap(r,{kind:'plastic-strain'});
+ assert.equal(scale.status,'DIAGNOSTIC_ONLY');
+ assert.equal(scale.kind,'plastic-strain');
+ assert.equal(scale.units,'relative');
+ assert.equal(scale.sourceKind,'synthetic-voronoi');
+ assert.equal(scale.calibrated,false);
+ assert.equal(scale.measured,false);
+ assert.equal(scale.min,0);
+ assert.ok(scale.max>0);
+ assert.equal(scale.entries.length,r.grainCount);
+ assert.equal(scale.sampledGrains,r.sampledGrains);
+ assert.ok(Object.isFrozen(scale)&&Object.isFrozen(scale.entries));
+ for(const entry of scale.entries){
+  const grain=r.grains[entry.grainId-1];
+  if(grain.integrationPoints===0){
+   assert.equal(entry.value,null);
+   assert.equal(entry.normalized,null);
+   assert.equal(entry.status,'NOT_SAMPLED_BY_FEM');
+  }else{
+   assert.equal(entry.value,grain.mechanics.meanEquivalentPlasticStrain);
+   assert.ok(entry.normalized>=0&&entry.normalized<=1+1e-12);
+  }
+ }
+ const again=S.polycrystalCPFEM.describeGrainMap(r,{kind:'plastic-strain'});
+ assert.deepEqual(JSON.parse(JSON.stringify(scale)),JSON.parse(JSON.stringify(again)));
+});
+test('84G: tensao residual exige alivio de forca, nao recuo da garra',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic),engine=S.polycrystalCPFEM;
+ const loaded=m.run({mode:'tension',load:.5,increments:4});
+ const held=m.run({mode:'tension',load:.5,increments:4,unload:true,
+  unloadMode:'displacement',unloadIncrements:4});
+ for(const r of [loaded,held]){
+  assert.equal(engine.describeGrainMap(r,{kind:'residual-von-mises'}).status,
+   'UNAVAILABLE_RESIDUAL_BOUNDARY');
+  assert.equal(engine.describeGrainMap(r,{kind:'residual-axial'}).entries.length,0);
+  assert.equal(engine.describeGrainMap(r,{kind:'plastic-strain'}).status,'DIAGNOSTIC_ONLY');
+ }
+ assert.throws(()=>engine.describeGrainMap(loaded,{kind:'force'}),/Grandeza CPFEM/);
+ assert.throws(()=>engine.describeGrainMap({converged:false},{kind:'plastic-strain'}),
+  /somente para solucao CPFEM/);
+});
+test('84G: escala de tensao residual axial simetrica com sinal preservado',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic),engine=S.polycrystalCPFEM;
+ const r=m.run({mode:'tension',load:.8,increments:5,unload:true,
+  unloadMode:'force',unloadIncrements:5});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ for(const kind of ['residual-von-mises','residual-axial']){
+  const scale=engine.describeGrainMap(r,{kind});
+  assert.equal(scale.status,'DIAGNOSTIC_ONLY');
+  assert.equal(scale.sampledGrains,r.sampledGrains);
+  assert.equal(scale.entries.length,r.grainCount);
+  assert.ok(scale.entries.filter(x=>x.value!==null).every(x=>
+   Number.isFinite(x.value)&&Number.isFinite(x.normalized)&&
+   Math.abs(x.normalized)<=1+1e-12));
+  assert.equal(scale.units,'relative');
+  if(kind==='residual-von-mises'){
+   assert.equal(scale.signed,false);
+   assert.equal(scale.min,0);
+   assert.ok(scale.entries.filter(x=>x.value!==null).every(x=>x.value>=0));
+  }else{
+   assert.equal(scale.signed,true);
+   assert.equal(scale.min,-scale.max);
+   assert.ok(scale.entries.filter(x=>x.value!==null).every(x=>
+    Math.sign(x.normalized)===Math.sign(x.value)));
+  }
+ }
+});
