@@ -44,27 +44,12 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   const focused=document.activeElement;
   const action=focused?.closest('#silm-direct-actionbar .silm-observer-action')?.dataset.action||null;
   B.renderViewers(emptyScene());
-  const bar=$('silm-direct-actionbar'),selection=$('silm-direct-selection'),extras=$('silm-explore-extras');
+  const bar=$('silm-direct-actionbar'),selection=$('silm-direct-selection');
   if(model.state.module.active==='explorar'&&bar){
    bar.replaceChildren();selection?.replaceChildren();
    renderObserverContext(bar);
-   if(extras){
-    const preserve={display:extras.querySelector('[data-silm-extra="display"]')?.open||false,
-     comparison:extras.querySelector('[data-silm-extra="comparison"]')?.open||false};
-    extras.replaceChildren();
-    const display=node('details');display.dataset.silmExtra='display';
-    display.open=preserve.display;
-    display.append(node('summary','Exibição e rótulos'));
-    renderLayerStructure(display);renderLayerIndications(display);
-    const comparison=node('details');comparison.dataset.silmExtra='comparison';
-    comparison.open=preserve.comparison;
-    comparison.append(node('summary','Comparações conceituais (sem cena A/B independente)'));
-    for(const kind of ['free-crystal','cell-lattice','electrons','property'])renderComparison(kind,comparison);
-    extras.append(display,comparison);
-   }
   }else{
    selection?.replaceChildren();
-   extras?.replaceChildren();
   }
   if(action)bar?.querySelector('.silm-observer-action[data-action="'+action+'"]')?.focus({preventScroll:true});
  }
@@ -161,7 +146,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   };
   const propertyButtons=new Map();
   const propertyTools=node('div',null,'silm-observer-selection-tools');
-  const propertyHelp=node('p','Ative Elétrica + Térmica para observar a transformação da energia elétrica em calor. Ctrl (ou ⌘) combina outras propriedades compatíveis.','silm-observer-selection-status');
+  const propertyHelp=node('p','Ctrl + clique: combinar propriedades.','silm-observer-selection-status');
   propertyHelp.setAttribute('role','status');propertyHelp.setAttribute('aria-live','polite');
   const touchModeButton=node('button','Selecionar várias','silm-observer-select-mode');
   touchModeButton.type='button';touchModeButton.setAttribute('aria-pressed','false');
@@ -188,7 +173,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
     const pending=names.join(' + ');
     propertyHelp.textContent='Seleção: '+pending+(multiSelectMode?' · toque em Aplicar seleção':' · solte Ctrl para aplicar');
    }else{
-    propertyHelp.textContent=multiSelectMode?'Selecione duas propriedades compatíveis e toque em Aplicar seleção.':touchCapable?'Elétrica + Térmica revela o aquecimento por Joule; Selecionar várias combina outras propriedades.':'Elétrica + Térmica = efeito Joule. Também é possível selecionar juntas com Ctrl + clique.';
+    propertyHelp.textContent=multiSelectMode?'Selecione duas propriedades compatíveis e toque em Aplicar seleção.':touchCapable?'Elétrica + Térmica: efeito Joule. Use Selecionar várias.':'Elétrica + Térmica: efeito Joule. Ctrl + clique combina.';
    }
    touchModeButton.setAttribute('aria-pressed',String(multiSelectMode));
    touchModeButton.textContent=multiSelectMode?'Seleção múltipla ativa':'Selecionar várias';
@@ -313,11 +298,11 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    compareCard(grid,'A','Estado-base','Condição de referência anterior à experiência.',active?'Base conceitual':'Sem experiência ativa');
    compareCard(grid,'B','Resposta atual',entry?entry.title+' · '+(narrative?.observation||'Resposta qualitativa em andamento.'):'Nenhuma propriedade está em estudo.',entry?'Estado atual':'Sem experiência ativa');
   }
-  output.append(grid,node('p','Quadro informativo, somente leitura. As cenas A/B lado a lado ainda não estão conectadas; não cria outra amostra nem produz medições.','silm-compare-note'));
+  output.append(grid,node('p','Comparação conceitual, sem segunda cena nem nova medição.','silm-compare-note'));
  }
  function setupViewers(){
   for(const definition of definitions)B.registerViewer({...definition,render(_snapshot,_records,output){
-   if(definition.id!=='observacao-contextual')output.append(node('p',definition.description,'silm-tool-description'));
+   // O catálogo segue a hierarquia do SIAB: ferramenta e conteúdo, sem texto introdutório redundante.
    if(typeof definition.render==='function'){definition.render(output);return;}
    for(const panel of document.querySelectorAll('[data-silm-viewer]'))panel.hidden=!panel.dataset.silmViewer.split(' ').includes(definition.id);
   }});
@@ -325,16 +310,16 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
  }
  function modules(){
   const descriptions={
-   explorar:['Monte e observe','Escolha um metal, adicione unidades e organize a estrutura. Explore elétrons e propriedades qualitativas.'],
-   medir:['Meça o modelo','Use distância, ângulo, parâmetro de rede e coordenação numa estrutura cristalina válida.'],
-   calcular:['Relacione os dados','Calcule contagem de átomos, volume, raio, empacotamento e densidade, identificando a origem dos valores.']
+   explorar:'Montar e observar fenômenos.',
+   medir:'Marcar pontos e registrar medidas.',
+   calcular:'Aplicar fórmulas aos dados da estrutura.'
   };
   const host=$('silm-module-cards');
   for(const [index,id]of Object.keys(descriptions).entries()){
    const card=node('details',null,'silm-module-card');card.dataset.module=id;
    const summary=node('summary');summary.append(node('span',String(index+1),'silm-module-number'),node('strong',names[id]));
    const badge=node('span','Ativo','silm-module-badge');badge.hidden=true;summary.append(badge);
-   const body=node('div',null,'silm-module-body');body.append(node('h4',descriptions[id][0]),node('p',descriptions[id][1]));
+   const body=node('div',null,'silm-module-body');body.append(node('p',descriptions[id],'silm-module-note'));
    const activate=node('button','Ativar módulo '+names[id],'button outline');activate.type='button';activate.id='silm-module-activate-'+id;
    activate.addEventListener('click',()=>{const choice=$('silm-module');if(choice.disabled)return;choice.value=id;choice.dispatchEvent(new Event('change',{bubbles:true}));queueMicrotask(()=>$('silm-module')?.focus({preventScroll:true}));});
    body.append(activate);card.append(summary,body);host.append(card);
@@ -365,7 +350,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    const active=card.dataset.module===current;card.classList.toggle('is-active',active);card.querySelector('.silm-module-badge').hidden=!active;
    const button=card.querySelector('button');button.disabled=locked||active;button.setAttribute('aria-pressed',String(active));button.textContent=active?'Módulo '+names[current]+' em uso':'Ativar módulo '+names[card.dataset.module];
   }
-  $('silm-module-context').textContent=locked?'O módulo é definido pela atividade em andamento.':'A troca de módulo preserva a investigação e seus registros.';
+  $('silm-module-context').textContent=locked?'Módulo definido pelo roteiro.':'';
   {const n=model.state.structure?.units.length||0;$('silm-unit-count').textContent=n+(n===1?' unidade':' unidades')+' na montagem';}
   {const m=model.state.measurements.length,c=model.state.calculations.length;$('silm-record-count').textContent=m+(m===1?' medição':' medições')+' · '+c+(c===1?' cálculo':' cálculos');}
   const active=B.activeViewer();if(active&&document.querySelector('[data-open-dock="ver"]').getAttribute('aria-expanded')==='true'&&!$('si-viewer-detail').hidden)$('si-right-title').textContent=active.title;
