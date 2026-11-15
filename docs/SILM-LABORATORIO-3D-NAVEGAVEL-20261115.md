@@ -22,12 +22,12 @@ utilizam os comandos reais das escalas 2/3 da investigação em andamento.
   acoplado cientificamente à temperatura e ao campo do painel Ver.
 - As geometrias instrumentais não são réplicas reais; movimento na sala
   não é simulação de corpos rígidos nem a física da metalurgia.
-- A ponte mecânica \`mechanics-scene-bridge\` será associada após
+- A ponte mecânica `mechanics-scene-bridge` será associada após
   homologação de ambas as branches.
 - WebGL2 indisponível -> sala não abre, e a interface anterior permanece.
 
 ## Testes e critérios
-\`node --test tests/silm-lab3d-core.test.cjs\`.
+`node --test tests/silm-lab3d-core.test.cjs`.
 Validar na PR: abertura sem metal, escolha de metal, retorno de foco,
 tabulação/escape, ponte objeto→grãos→rede, comportamento touch,
 Chromium/Firefox/WebKit, DPR, redução de movimento, CI e PWA offline.

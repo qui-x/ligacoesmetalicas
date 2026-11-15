@@ -1,0 +1,25 @@
+name: SILM — sala 3D navegável
+on:
+  pull_request:
+    paths:
+      - 'domain/silm/lab3d-core.js'
+      - 'domain/silm/lab3d.js'
+      - 'tests/silm-lab3d-core.test.cjs'
+      - '.github/workflows/silm-lab3d-preview.yml'
+  workflow_dispatch:
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar sintaxe dos módulos
+        run: |
+          node --check domain/silm/lab3d-core.js
+          node --check domain/silm/lab3d.js
+          node --check tests/silm-lab3d-core.test.cjs
+      - name: Testes determinísticos
+        run: node --test tests/silm-lab3d-core.test.cjs

@@ -261,7 +261,7 @@
    if(!reduced()){
     this.thermalTimer+=dt;
     while(this.thermalTimer>=1/24){this.temperature=C.heatStep(this.temperature,{source:this.heat});this.thermalTimer-=1/24;}
-   }else if(this.heat){this.temperature=C.heatStep(this.temperature,{source:true});}
+   }else if(this.heat&&this.temperature[0]===0){this.temperature=C.heatStep(this.temperature,{source:true});}
    try{this.renderer.render(this.items(time),this.eye,this.yaw,this.pitch)}
    catch(e){this.status.textContent='Renderização 3D interrompida: '+e.message;this.close(false);return;}
    this.frame=requestAnimationFrame(t=>this.tick(t));
