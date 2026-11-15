@@ -249,7 +249,7 @@ window.SILM=window.SILM||{};
   }
   const prefix=history(safe.slice(0,-1)),old=privateState.get(prefix),m=safe[safe.length-1];
   let last={record:old,converged:true,iterations:0},allConverged=true;
-  for(const load of [.25,.5,.75,1,.5,0]){
+  for(const load of [.5,1,.5,0]){
    last=equilibrate(last.record,{
     mode:m.mode,position:m.position,width:m.width,
     load,release:load===0
