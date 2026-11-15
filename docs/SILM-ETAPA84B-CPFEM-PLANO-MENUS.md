@@ -50,3 +50,14 @@ Dados laboratoriais devem ser mantidos em suas condições originais (amostra, t
 ## Desenvolvimento posterior
 
 Plasticidade cristalográfica global e J2 continuam modelos distintos. A calibração por material pertence a um marco específico. Grandes deformações, estricção e ruptura exigem formulação de deformação finita, métodos de regularização de localização e dados experimentais de falha; **não estão implementadas** nesta etapa.
+
+## Auditoria adicional da etapa 84B (desenvolvimento)
+
+- O relatório numérico `energy` distingue **energia elástica armazenada** (contração tridimensional tensorial de `sigma : epsilon_e`, incluindo `sigma_zz`), **energia de encruamento isotrópico** (H vezes deslizamento acumulado ao quadrado sobre 2) e **dissipação plástica acumulada** (soma de CRSS por sistema multiplicada pelo deslizamento absoluto). Todas são integrais dos triângulos, em **unidades relativas** do modelo.
+- As reações `topY`, `bottomY`, `contactX`, `netFx`, `netFy` e `freeResidual` permitem auditar equilíbrio global e o tratamento dos graus de liberdade prescritos. Elas não são forças em newtons.
+- O teste `verifyAffinePatch` confere a interpolação de deformação afim constante e a conversão de cisalhamento de engenharia na malha CST. **Não** comprova convergência de malha ou validade física por material.
+- O campo `energyBalanceStatus: NOT_EVALUATED_EXTERNAL_WORK` deixa explícito que o trabalho externo histórico ainda não foi integrado. Portanto, a soma de energias **não** deve ser descrita como balanço experimental fechado.
+- As condições de carga ficam identificadas em `loadCase`: modo, posição, largura, amplitude de deslocamento prescrito e número de incrementos. Uma mudança de deslocamento, descarregamento ou contato **invalida** a prévia existente, evitando resultados com configurações antigas.
+- Os resultados são apenas da prévia técnica, disponibilizada em opt-in no ramo; não alimentam automaticamente Dados, Ver, Montagem, propriedades dos metais nem o solucionador J2.
+
+**Ainda pendente antes de qualquer merge:** análise da sensibilidade a diferentes refinamentos de malha, trabalho externo incremental e comparação quantitativa de soluções com referências independentes, além da homologação de UX dos três menus.
