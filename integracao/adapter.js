@@ -591,7 +591,7 @@
   }
   // Tour da oficina (Etapa 10): coachmark como no SIAB, só na oficina livre; cada passo aponta um controle real e visível.
   const TOUR=[
-   {title:'Prepare a oficina',text:'Abra Montagem → Preparo para escolher o metal e usar Iniciar investigação. A Tabela periódica mostra os metais disponíveis.',left:'preparo',target:()=>$('si-dock-left'),mobile:'[data-open-dock="montagem"]'},
+   {title:'Prepare a oficina',text:'Abra Montagem → Preparo e escolha um objeto na Tabela Periódica. Para construir manualmente, expanda Montagem livre (opcional).',left:'preparo',target:()=>$('si-dock-left'),mobile:'[data-open-dock="montagem"]'},
    {title:'Escolha um módulo',text:'Em Montagem → Módulo, escolha Explorar, Medir ou Calcular. Ver apresenta as ferramentas do módulo ativo.',left:'modulo',target:()=>$('silm-module-cards'),mobile:'[data-open-dock="montagem"]'},
    {title:'Observe',text:'A cena mostra a montagem. Girar, aproximar ou trocar a vista não altera medições nem cálculos.',target:()=>$('si-stage'),mobile:'#si-stage'},
    {title:'Investigue e consulte os dados',text:'Em Ver, observe, meça e analise conforme o módulo. Em Dados, consulte os valores, as fontes e o relatório.',right:'ver',target:()=>$('si-dock-right'),mobile:'[data-open-dock="ver"]'}];
