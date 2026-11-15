@@ -40,8 +40,9 @@ SILM.scientific400=(()=>{
   const iaea=getIAEA(z,p);
   const optical=S.scientificOpticalBatch?.getFor?.(z,p)||[];
   const mechanics=S.scientificMechanicalBatch?.getFor?.(z,p)||[];
+  const compression=S.scientificCompressionBatch?.getFor?.(z,p)||[];
   const batch=S.batch80Research?.getFor?.(z,p)||[];
-  const available=[...original,...mechanics,...optical,...iaea,...batch];
+  const available=[...original,...mechanics,...compression,...optical,...iaea,...batch];
   return Object.freeze({property:p,hasNumeric:available.some(x=>x.values?.some(v=>Number.isFinite(v.value))),
    hasSource:available.some(x=>x.sourceURL&&x.status!=='pending'),
    sourceCount:available.length,
