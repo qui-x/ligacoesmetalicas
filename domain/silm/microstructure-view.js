@@ -264,10 +264,14 @@ SILM.microstructure=(()=>{
    const saveContact=()=>model?.setMechanicalContact?.(contactPosition,contactWidth);
    contactLabel.input.addEventListener('change',saveContact);
    widthLabel.input.addEventListener('change',saveContact);
-   function warpGrains(field,amplitude,marks=[]){
-    const elasticOn=!!field&&amplitude>1e-4;
-    const relief=SILM.specimenRelief,permanentOn=!!relief&&marks.length>0;
-    const map=elasticOn||permanentOn?(x,y)=>{
+   function warpGrains(field,amplitude,marks=[],j2=null){
+    const nonlinear=!!j2?.converged&&(marks.length>0||Number(j2.load)>0);
+    const elasticOn=!nonlinear&&!!field&&amplitude>1e-4;
+    const relief=SILM.specimenRelief,permanentOn=!nonlinear&&!!relief&&marks.length>0;
+    const map=nonlinear?(x,y)=>{
+     const d=j2.sample(x/W,y/H);
+     return{x:x+d.dx*W,y:y+d.dy*H};
+    }:elasticOn||permanentOn?(x,y)=>{
      const u=x/W,v=y/H;
      const elastic=elasticOn?field.sample(u,v,amplitude):{dx:0,dy:0};
      const permanent=permanentOn?relief.residual(marks,u,v):{dx:0,dy:0};
@@ -296,7 +300,7 @@ SILM.microstructure=(()=>{
     for(let i=19;i>=0;i--)border.push([W*i/20,H]);
     for(let i=11;i>=1;i--)border.push([0,H*i/12]);
     if(specimenOutline)specimenOutline.setAttribute('d','M'+border.map(p=>coordinate(p[0],p[1])).join(' L')+' Z');
-    section.dataset.mechanicalResidualField=permanentOn?'localized':'legacy-or-none';
+    section.dataset.mechanicalResidualField=(nonlinear&&marks.length)||permanentOn?'localized':'legacy-or-none';
     surfaceMicro?.setWarp(map);
    }
   const getMode=()=>{
@@ -340,9 +344,9 @@ SILM.microstructure=(()=>{
    // apresentação, sem converter tensão relativa em deformação medida.
    const epElastic=active&&mechanics?Math.abs(mechanics.elasticStrain)/.1:0;
    const amplitude=active?clamp(Math.max(.72*strainFactor,.88*load,epElastic),0,1):0;
+   const kind=mode==='ductility'?'tension':'compression';
    const field=active?SILM.specimenLocal?.field({
-    mode:mode==='malleability'?'compression':'tension',
-    position:contactPosition,width:contactWidth}):null;
+    mode:kind,position:contactPosition,width:contactWidth}):null;
    section.dataset.mechanicalPermanent=residual.hasResidual?'active':'inactive';
    section.dataset.mechanicalRegime=active?(motion.regime||'rest'):residual.hasResidual?'residual':'rest';
    section.dataset.mechanicalElastic=String(Math.round((motion.strain||0)*1000));
@@ -355,16 +359,25 @@ SILM.microstructure=(()=>{
    // Nesta revisão, plasticidade visual depende do local da prensa/garra.
    // Investigações antigas, sem contatos históricos, mantêm o fallback.
    const marks=Array.isArray(st.metadata?.mechanicalImprints)?st.metadata.mechanicalImprints:[];
-   const local=marks.length>0&&!!SILM.specimenRelief;
+   const j2=(active||marks.length)?SILM.specimenJ2?.active(marks,{
+    mode:kind,position:contactPosition,width:contactWidth,load:active?load:0
+   }):null;
+   const j2Ready=!!j2?.converged;
+   section.dataset.mechanicalJ2=j2Ready?'plane-strain-converged':
+    j2?'fallback-elastic':'unavailable';
+   section.dataset.mechanicalJ2Alpha=j2Ready?j2.maxAlpha.toFixed(4):'0';
+   section.dataset.mechanicalSolver=j2Ready?'incremental-j2-plane-strain':
+    field?.converged?'elastic-local-2d':field?'unconverged':'inactive';
+   const local=marks.length>0&&(j2Ready||!!SILM.specimenRelief);
    if(residual.hasResidual&&!local)
     mechanicalField.setAttribute('transform','translate('+CX+' '+CY+
      ') scale('+residual.scaleX+' '+residual.scaleY+') translate('+(-CX)+' '+(-CY)+')');
    else mechanicalField.removeAttribute('transform');
-   warpGrains(field,amplitude,marks);
+   warpGrains(field,amplitude,marks,j2Ready?j2:null);
    surfaceMicro?.setDeformationLight?.({
     mode:active?(mode==='malleability'?'compression':'tension'):null,
     contact:{position:contactPosition,width:contactWidth},
-    field,amplitude,load
+    field,amplitude,load,plasticField:j2Ready?j2:null
    });
    if(active){
     const h=Math.max(4,H*.016),w=Math.max(W*.09,W*contactWidth),px=clamp(W*contactPosition-w/2,0,W-w);
@@ -405,6 +418,12 @@ SILM.microstructure=(()=>{
     motion.regime==='returning'?'retorno elástico':
     residual.hasResidual?'deformação residual':'sem carga';
    const title=mode==='malleability'?'Compressão':'Tração';
+   if(j2Ready)
+    constitutiveReadout.textContent+=' · FEM J2 2D: ε̄p máxima '+
+     j2.maxAlpha.toFixed(4).replace('.',',')+
+     ' (deformação plana, adimensional)';
+   else if(j2)
+    constitutiveReadout.textContent+=' · FEM J2 não convergiu; representação elástica preservada';
    specimenFeedback.textContent=title+' · '+regime+(load?' · carga relativa '+relative+'%':'')+
     (mechanics?.accumulatedPlastic>1e-4?
      ' · plasticidade normalizada '+mechanics.accumulatedPlastic.toFixed(3).replace('.',','):'');
