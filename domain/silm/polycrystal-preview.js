@@ -118,7 +118,9 @@ SILM.polycrystalPreview=(()=>{
         ' · trabalho externo do carregamento '+fmt(a.externalWorkLoading)+
         ' · diferença de quadratura '+fmt(a.loadingWorkEnergyResidual)+
         ' (unidades relativas). '+
-        (response.unloaded?'Descarga sem trajetória de trabalho resolvida.':
+        (response.unloaded?'Descarga incremental controlada: trabalho de retorno '+
+          fmt(a.unloadingExternalWork)+' · trabalho líquido '+fmt(a.externalWorkTotal)+
+          '. Garra mantida em deslocamento zero; não é liberação do contato.':
          'Quadratura trapezoidal aproximada, não validada experimentalmente.')+
         ' O comando não representa força em N nem tensão em MPa.';
        configuration=Object.freeze({synthetic,structure,mode:study,
@@ -130,7 +132,7 @@ SILM.polycrystalPreview=(()=>{
        ' grãos com pontos de integração · '+response.plasticTriangles+
        ' elementos plastificados no último incremento · deslizamento máximo '+
        fmt(response.maxAccumulatedSlip)+' · resíduo FEM '+fmt(response.residual)+
-       (response.unloaded?' · após descarregamento':' · sob carregamento')+
+       (response.unloaded?' · após descarga controlada, garra mantida':' · sob carregamento')+
        '. Sem calibração por metal; NÃO modifica o solucionador J2.';
      }
     }catch(error){
