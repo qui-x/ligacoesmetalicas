@@ -215,7 +215,7 @@
                 <button type="button" data-left-tab="missao" aria-pressed="false" hidden>Roteiro</button>
               </nav>
               <div class="si-dock-scroll" id="si-left-scroll" tabindex="-1">
-                <div data-left-panel="resumo"><h3>Investigação atual</h3><p id="silm-summary"></p><dl id="silm-summary-list" class="silm-summary-list"></dl></div><div data-left-panel="preparo"><section class="silm-dock-group" aria-labelledby="silm-group-metal"><h3 id="silm-group-metal">Metal da investigação</h3><label for="silm-metal">Escolha um metal</label><select id="silm-metal"></select><div class="silm-dock-actions"><button id="silm-open-periodic" type="button" class="button outline">Tabela periódica</button><button id="silm-start" class="button primary" type="button">Iniciar investigação</button><a id="silm-open-presets" class="button outline" href="#/montagens">Montagens prontas</a></div><p id="silm-metal-information"></p></section><section class="silm-dock-group" aria-labelledby="silm-group-structure"><h3 id="silm-group-structure">Estrutura</h3><div class="silm-dock-actions"><button id="silm-add" class="button outline" type="button">Adicionar unidade</button><button id="silm-organize" class="button outline" type="button" aria-describedby="silm-organize-reason">Organizar estrutura</button><p id="silm-organize-reason" class="silm-organize-reason" hidden></p><button id="silm-free" class="button outline" type="button">Retornar à montagem livre</button></div></section></div><div data-left-panel="objetos"><h3>Unidades metálicas</h3><p id="silm-unit-count"></p><p>Mova unidades na montagem livre; na estrutura cristalina, as posições seguem o modelo.</p></div><div data-left-panel="modulo"><h3>Módulos científicos</h3><div id="silm-module-choice"></div><p id="silm-module-context"></p><div id="silm-module-cards"></div></div><div data-left-panel="missao" hidden>
+                <div data-left-panel="resumo"><h3>Investigação atual</h3><p id="silm-summary" hidden></p><dl id="silm-summary-list" class="silm-summary-list"></dl></div><div data-left-panel="preparo"><section class="silm-dock-group" aria-labelledby="silm-group-metal"><h3 id="silm-group-metal">Metal da investigação</h3><label for="silm-metal">Escolha um metal</label><select id="silm-metal"></select><div class="silm-dock-actions"><button id="silm-open-periodic" type="button" class="button outline">Tabela periódica</button><button id="silm-start" class="button primary" type="button">Iniciar investigação</button><a id="silm-open-presets" class="button outline" href="#/montagens">Montagens prontas</a></div><p id="silm-metal-information" hidden></p></section></div><div data-left-panel="objetos"><p id="silm-unit-count" class="silm-unit-count"></p><section class="silm-dock-group" aria-labelledby="silm-group-structure"><h3 id="silm-group-structure">Organizar unidades</h3><div class="silm-dock-actions"><button id="silm-add" class="button outline" type="button">Adicionar unidade</button><button id="silm-organize" class="button outline" type="button" aria-describedby="silm-organize-reason">Organizar estrutura</button><p id="silm-organize-reason" class="silm-organize-reason" hidden></p><button id="silm-free" class="button outline" type="button">Retornar à montagem livre</button></div></section></div><div data-left-panel="modulo"><h3 class="sr-only">Módulos científicos</h3><div id="silm-module-choice"></div><p id="silm-module-context"></p><div id="silm-module-cards"></div></div><div data-left-panel="missao" hidden>
                   <div id="silm-route-guidance"></div>
                   <p id="si-dock-activity-status" role="status">Nenhuma atividade orientada em andamento.</p>
                   </div>
@@ -231,17 +231,17 @@
                 <button type="button" class="silm-module-shortcut" data-silm-module-shortcut="medir" data-silm-module-label="Medir" aria-label="Medir" aria-pressed="false" title="Medir" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m4 17 13-13 3 3L7 20H4ZM8 13l2 2M11 10l2 2M14 7l2 2"/></svg><span class="silm-module-shortcut-label">Medir</span></button>
                 <button type="button" class="silm-module-shortcut" data-silm-module-shortcut="calcular" data-silm-module-label="Calcular" aria-label="Calcular" aria-pressed="false" title="Calcular" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 10h2m4 0h2m-8 4h2m4 0h2m-8 4h2m4 0h2"/></svg><span class="silm-module-shortcut-label">Calcular</span></button>
               </div>
-                    <p id="silm-module-selection-help" class="silm-module-selection-help" role="status">Escolha o módulo para consultar suas ferramentas.</p>
+                    <p id="silm-module-selection-help" class="sr-only" role="status">Escolha o módulo para consultar suas ferramentas.</p>
                   </nav>
                   <section id="silm-direct-tools" aria-label="Ferramentas diretas do módulo">
                     <div id="silm-direct-actionbar" role="toolbar" aria-label="Ferramentas do módulo selecionado"></div>
                     <div id="silm-direct-selection"></div>
                     <div id="silm-direct-tool-context">
                       <div id="silm-tools"></div>
-                      <div id="silm-explore-extras"></div>
+                      
                     </div>
                   </section>
-                  <div id="si-viewer-catalog" class="si-viewer-controls" role="group" aria-label="Visualizações científicas">
+                  <details id="silm-ver-more" class="silm-ver-more"><summary>Mais visualizações</summary><div id="si-viewer-catalog" class="si-viewer-controls" role="group" aria-label="Visualizações científicas">
                     <div id="si-viewer-families" class="si-viewer-family-tabs" role="tablist" aria-label="Famílias do painel Ver"></div>
                     <div id="si-viewer-family-panel" class="si-viewer-family-panel" role="tabpanel" aria-label="Ferramentas da família escolhida">
                       <p id="si-viewer-family-description" class="si-viewer-caption"></p>
@@ -254,18 +254,18 @@
                     <div class="silm-viewer-panel" data-silm-viewer="eletrons" hidden><h3>Elétrons deslocalizados</h3><button type="button" id="silm-electrons" class="button outline">Mostrar elétrons</button><button id="silm-motion" type="button" class="button outline">Movimento eletrônico</button><p>Modelo qualitativo de elétrons de valência deslocalizados.</p></div>
                     <div class="silm-viewer-panel" data-silm-viewer="propriedades" hidden><h3>Propriedades metálicas</h3><div id="silm-properties"></div><p id="silm-property-caption"></p></div>
                     <div class="silm-viewer-panel" data-silm-viewer="instrumentos calculos" hidden></div>
-                  </section>
+                  </section></details>
                 </div>
                 <div data-right-panel="dados" hidden>
                   <button id="silm-data-back" type="button" hidden>← Dados</button>
                   <div id="silm-data-catalog">
-                    <p class="silm-data-intro">Consulte valores, registros e arquivos.</p>
+                    
                     <nav class="silm-data-menu" aria-label="Consultas da investigação">
-                      <button type="button" data-silm-data-open="tabela"><strong>Dados do metal</strong><span>Estrutura de referência, propriedades, fontes e condições.</span></button>
+                      <button type="button" data-silm-data-open="tabela"><strong>Metal e propriedades</strong></button>
                       <button type="button" data-silm-data-open="registros"><strong>Medições e cálculos</strong><span id="silm-record-count">0 medições · 0 cálculos</span></button>
-                      <button type="button" data-silm-data-open="arquivo"><strong>Arquivos da investigação</strong><span>Exporte ou abra uma investigação em JSON.</span></button>
+                      <button type="button" data-silm-data-open="arquivo"><strong>Arquivos</strong></button>
                     </nav>
-                    <section class="silm-data-documents" aria-labelledby="silm-data-documents-title"><h3 id="silm-data-documents-title">Relatório</h3><p>Dados medidos e registro da investigação.</p><a id="silm-report-link" class="button outline" href="#/relatorios">Abrir relatório</a><a class="button outline" href="#/caderno">Abrir Caderno</a></section>
+                    <nav class="silm-data-documents" aria-label="Relatórios e registros"><a id="silm-report-link" class="button outline" href="#/relatorios">Relatório</a><a class="button outline" href="#/caderno">Caderno</a></nav>
                   </div>
                   <section class="silm-data-detail" data-silm-data-panel="tabela" hidden><h3>Dados científicos e fontes</h3><div id="silm-data"></div></section>
                   <section class="silm-data-detail" data-silm-data-panel="registros" hidden><div id="silm-history"></div></section>
