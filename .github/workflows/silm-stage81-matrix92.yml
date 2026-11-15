@@ -1,0 +1,87 @@
+name: 'SILM — Etapa 81: reconciliação dos 92 metais'
+on:
+  push:
+    branches: [feat/silm-stage81-reconcile-92-metals-20261115]
+  pull_request:
+    paths:
+      - 'domain/silm/data/research-stage81-matrix92.js'
+      - 'domain/silm/science-evidence-index.js'
+      - 'domain/silm/science-evidence-view.js'
+      - 'integracao/metallic-experience.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/stage81-matrix92-reconciliation.test.cjs'
+      - 'tests/stage80-unified-evidence.test.cjs'
+      - 'tests/run-stage80-unified-evidence.mjs'
+      - 'tests/run-stage81-matrix92.mjs'
+      - '.github/workflows/silm-stage81-matrix92.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  science:
+    name: 92 metais · matriz e proveniência
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Conferir sintaxe dos módulos e testes
+        run: |
+          node --check domain/silm/data/research-stage81-matrix92.js
+          node --check domain/silm/science-evidence-index.js
+          node --check domain/silm/science-evidence-view.js
+          node --check integracao/metallic-experience.js
+          node --check sw.js
+          node --check tests/run-stage81-matrix92.mjs
+      - name: Rodar contratos científicos sem duplicações nem motores
+        run: |
+          node --test tests/stage81-matrix92-reconciliation.test.cjs \
+            tests/stage80-unified-evidence.test.cjs \
+            tests/stage78-seven-condition-profiles.test.cjs \
+            tests/silm-metal-data-seven.test.cjs
+  browsers:
+    name: Ga/Pm/estimativas · ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Instalar Playwright e navegador
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-playwright/node_modules/playwright" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright" install --with-deps "$BROWSER_NAME"
+      - name: Servir SILM com novo índice em Dados
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-http.log" 2>&1 &
+          for n in $(seq 1 30); do
+            if curl -fsS "$BASE_URL/index.html" > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-http.log"
+          exit 1
+      - name: Testar 92/79/13, Ga, Pm e previsões na investigação real
+        run: node tests/run-stage81-matrix92.mjs
+      - name: Preservar capturas mobile e desktop de Ga e Pm
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-etapa81-${{ matrix.browser }}
+          path: reports/stage81/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
