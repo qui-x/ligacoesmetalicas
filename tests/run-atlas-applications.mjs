@@ -31,6 +31,30 @@ async function check(v){
    await page.waitForFunction(sym=>{const i=document.querySelector('[data-reference-id="atlas-'+sym+'"] img');return i?.complete&&i.naturalWidth===960;},item.symbol,{timeout:15000});
    await card.getByRole('button',{name:'Investigar componente'}).click();
    await page.waitForFunction(z=>window.SILMIntegration?.snapshot?.()?.metal?.atomicNumber===z,item.z,{timeout:30000});
+   // Selecionar objeto prepara a rede científica sem exigir Adicionar unidade.
+   const context=await page.evaluate(()=>{
+    const state=SILMIntegration.snapshot(),metal=SILM.data.get(state.metal.atomicNumber);
+    return {mode:state.structure?.mode,count:state.structure?.units?.length||0,
+     eligibility:SILM.crystal.eligibility(metal).status,
+     workshop:state.metadata?.workshop,scale:document.querySelector('#si-stage')?.dataset.workshopScale};
+   });
+   if(context.eligibility==='available'){
+    assert.equal(context.mode,'crystalline',item.symbol+' não preparou a estrutura ao escolher objeto');
+    assert.ok(context.count>0,item.symbol+' não preparou centros cristalinos');
+   }
+   assert.equal(context.workshop?.referenceId,'atlas-'+item.symbol,'Objeto não associado à investigação');
+   assert.equal(context.scale,'1','A seleção do objeto pulou indevidamente a escala macroscópica');
+   await page.locator('[data-open-dock="montagem"]').click();
+   await page.locator('[data-left-tab="objetos"]').click();
+   if(context.mode==='crystalline'){
+    assert.equal(await page.locator('#silm-add').isVisible(),false,
+     'Adicionar unidade continua exposto na investigação do objeto');
+    assert.equal(await page.locator('#silm-organize').isVisible(),false,
+     'Organizar estrutura continua exposto na investigação do objeto');
+    assert.equal(await page.locator('#silm-free-mode-options').isVisible(),true,
+     'A edição avançada da montagem livre desapareceu');
+   }
+   await page.locator('[data-close-dock="left"]').click();
    const figure=page.locator('.silm-workshop-reference .silm-workshop-atlas-photo img');
    await figure.waitFor({state:'visible',timeout:20000});
    await figure.scrollIntoViewIfNeeded();
