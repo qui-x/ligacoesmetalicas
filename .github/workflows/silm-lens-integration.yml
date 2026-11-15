@@ -1,8 +1,7 @@
 name: SILM — Lente multiescala sobre o motor real
 on:
   push:
-    branches:
-      - design/silm-parte8-lente-travessia-20261109
+    branches: [main]
   pull_request:
     branches: [main]
     paths:
@@ -19,8 +18,6 @@ on:
       - 'integracao/adapter.js'
       - 'tests/run-center-camera-focus.mjs'
       - 'domain/silm/lens-controller.js'
-      - 'integracao/module-shortcuts.js'
-      - 'integracao/module-shortcuts.css'
       - 'integracao/workspace-family.js'
       - 'integracao/scientific-tools.js'
       - 'integracao/direct-ver-tools.css'
@@ -30,6 +27,7 @@ on:
       - 'tests/run-cross-regressions.mjs'
       - 'integracao/dock-focus.js'
       - 'tests/run-lens-integration.mjs'
+      - 'tests/run-object-entry-catalog.mjs'
       - 'index.html'
       - 'sw.js'
       - '.github/workflows/silm-lens-integration.yml'
@@ -70,7 +68,6 @@ jobs:
           node --check domain/silm/microstructure-view.js
           node --check tests/run-center-camera-focus.mjs
           grep -q 'domain/silm/center-focus.css' sw.js
-          node --check integracao/module-shortcuts.js
           node --check integracao/dock-focus.js
           node --check integracao/workspace-family.js
           node --check integracao/scientific-tools.js
