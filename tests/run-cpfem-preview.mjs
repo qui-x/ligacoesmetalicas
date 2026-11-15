@@ -55,7 +55,9 @@ try{
  await viewer.locator('.silm-micro-grain').nth(25).focus();
  await viewer.locator('.silm-micro-grain').nth(25).press('Enter');
  assert.match(await preview.locator('.silm-micro-cpfem-grain').textContent(),
-  /Grão sintético 26/);
+  /Grão sintético 26.*deformação plástica equivalente.*NÃO classificada como residual/);
+ assert.match(await preview.locator('.silm-micro-cpfem-residual').textContent(),
+  /Sem classificação de tensão residual/);
  await show.check();
  assert.equal(await viewer.getAttribute('data-cpfem-presentation'),'synthetic-readout-opt-in');
  assert.equal(await viewer.getAttribute('data-mechanical-solver'),'cpfem-polycrystal-preview');
@@ -115,6 +117,12 @@ try{
   /redução gradual de forças até zero/);
  assert.match(await details.locator('.silm-micro-cpfem-energy').textContent(),
   /Descarga quase-estática de forças nodais: trabalho de retorno .*topo livre de tração prescrita/);
+ assert.match(await preview.locator('.silm-micro-cpfem-residual').textContent(),
+  /deformação plástica equivalente média.*tensão axial residual média.*variação εyy pico–final/);
+ assert.match(await preview.locator('.silm-micro-cpfem-grain').textContent(),
+  /Grão sintético 26.*tensão axial residual.*variação axial pico–final/);
+ const summary=await page.evaluate(()=>document.querySelector('.silm-micro-cpfem-residual')?.textContent);
+ assert.ok(!/NaN|undefined|Infinity/.test(summary),'Resumo residual contém valores inválidos');
  assert.equal(await show.isEnabled(),true);
  await show.check();
  assert.equal(await viewer.getAttribute('data-mechanical-solver'),'cpfem-polycrystal-preview');
