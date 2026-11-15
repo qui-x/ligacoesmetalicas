@@ -1880,7 +1880,7 @@ var BaseDemoSI;
                 const tab = a.tab;
                 if (a.side === "left")
                     return { ...s, left: "open", right: "collapsed", presentation: "standard",
-                        leftTab: tab === "resumo" || tab === "objetos" || tab === "modulo" || tab === "missao" ? tab : "preparo" };
+                        leftTab: tab === "resumo" || tab === "modulo" || tab === "missao" ? tab : "preparo" };
                 return { ...s, right: "open", left: "collapsed",
                     rightTab: tab === "dados" ? "dados" : "ver", presentation: "standard" };
             }
@@ -1916,7 +1916,9 @@ var BaseDemoSI;
             return "preparo";
         if (value === "ajustes")
             return "modulo";
-        return value === "resumo" || value === "preparo" || value === "objetos" || value === "modulo" || value === "missao" ? value : null;
+        if (value === "objetos")
+            return "preparo";
+        return value === "resumo" || value === "preparo" || value === "modulo" || value === "missao" ? value : null;
     }
     BaseDemoSI.normalizeLeftCategory = normalizeLeftCategory;
     function parseWorkspacePreference(raw) {
@@ -2017,7 +2019,7 @@ var BaseDemoSI;
             panel.hidden = panel.dataset.rightPanel !== workspaceState.rightTab;
         const lh = node("si-left-title");
         if (lh)
-            lh.textContent = { resumo: "Montagem", preparo: "Preparo", objetos: "Unidades", modulo: "Módulo", missao: "Roteiro" }[workspaceState.leftTab];
+            lh.textContent = { resumo: "Resumo", preparo: "Preparo", modulo: "Módulo", missao: "Roteiro" }[workspaceState.leftTab];
         const detail = viewerLevel === "detail" && workspaceState.rightTab === "ver";
         const rh = node("si-right-title");
         if (rh)
