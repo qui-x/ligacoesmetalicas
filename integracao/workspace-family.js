@@ -119,12 +119,14 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    refreshScene();renderViewers();
   }});
   }
+  if(stageScale===0||stageScale>=3){
   const interactionActions=actionGroup(root,'Interação metálica');
   const electrons=state.electrons,minimum=SILM.electronModel?.minUnits||2;
   const electronsActive=!!electrons?.representation.visible&&!!electrons?.representation.motion;
   actionButton(interactionActions,{id:'electrons',label:electronsActive?'Ocultar mar de elétrons':'Mostrar mar de elétrons',path:actionIcons.electrons,pressed:electronsActive,disabled:!canExplore||(!structure||structure.units.length<minimum),reason:!structure?'Monte uma estrutura primeiro':structure.units.length<minimum?'São necessárias '+minimum+' unidades':!canExplore?'Disponível no módulo Explorar':'',hint:'Mostra o modelo coletivo dos elétrons de valência e seu movimento ao redor dos centros. Não representa ligações localizadas entre pares.',onClick:()=>{
    quickActions?.toggleElectrons?.();refreshScene();renderViewers();
   }});
+  }
   if(showCrystalControls){
   const crystalActions=actionGroup(root,'Célula e rede cristalina');
   actionButton(crystalActions,{id:'view-toggle',label:crystal?(rep.view==='cell'?'Mostrar rede':'Mostrar célula'):'Célula / rede',path:actionIcons.view,pressed:!!crystal&&rep.view==='lattice',disabled:!crystal||!canObserve,reason:!crystal?'Organize a montagem para habilitar a célula e a rede':activityLocked?'Recurso restrito nesta atividade':'',onClick:()=>{
