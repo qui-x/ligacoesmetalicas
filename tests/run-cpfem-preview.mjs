@@ -83,6 +83,22 @@ try{
  assert.equal(await show.isDisabled(),true,'Mover o contato deve invalidar a previa anterior.');
  assert.equal(await viewer.getAttribute('data-cpfem-presentation'),'j2-default');
  assert.match(await preview.locator('.silm-micro-cpfem-status').textContent(),/Contato alterado/);
+ // Reproduzir uma descarga controlada no mesmo componente, sem publicar menus.
+ await viewer.locator('.silm-micro-contact-position').evaluate(el=>{
+  el.value='50';el.dispatchEvent(new Event('input',{bubbles:true}));
+ });
+ await preview.locator('.silm-micro-cpfem-unload').check();
+ await preview.getByRole('button',{name:'Calcular equilíbrio dos grãos sintéticos na prévia CPFEM'}).click();
+ await page.waitForFunction(()=>/Policristal hipotético|não convergiu|Prévia indisponível/.test(
+  document.querySelector('.silm-micro-cpfem-status')?.textContent||''),undefined,{timeout:90000});
+ assert.match(await preview.locator('.silm-micro-cpfem-status').textContent(),
+  /após descarga controlada, garra mantida/);
+ const details=preview.locator('.silm-micro-cpfem-audit');
+ await details.locator('summary').click();
+ assert.match(await details.locator('.silm-micro-cpfem-energy').textContent(),
+  /Descarga incremental controlada: trabalho de retorno .*Garra mantida em deslocamento zero/);
+ assert.equal(JSON.stringify(await page.evaluate(()=>SILMIntegration.snapshot())),before,
+  'Descarga controlada não deve modificar o estado científico da investigação.');
  assert.deepEqual(errors,[],'Erros JS no ensaio CPFEM opt-in: '+errors.join('; '));
  console.log('CPFEM opt-in: '+browserName+' OK, sem menu novo e sem alterar J2.');
 }finally{await browser.close();}
