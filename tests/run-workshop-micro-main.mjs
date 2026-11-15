@@ -146,6 +146,9 @@ async function test(viewport){
  await demo.check();
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.slipModel==='GEOMETRY_ONLY');
  assert.equal(await viewer.getAttribute('data-slip-orientation'),'demonstration');
+ assert.equal(await viewer.getAttribute('data-crystal-plasticity'),'hypothetical-elastic');
+ assert.match(await slip.locator('.silm-micro-crystal-plasticity').textContent(),
+  /Cristal hipotético isolado.*Não modifica o J2/);
  const max0=Number(await viewer.getAttribute('data-slip-max'));
  const angle=slip.locator('.silm-micro-slip-angle');
  await angle.evaluate(el=>{
@@ -165,10 +168,14 @@ async function test(viewport){
  await page.waitForFunction(()=>Number(document.querySelector('.silm-workshop-micro-viewer')?.dataset.slipStressMax)>.0001);
  const projected=Number(await viewer.getAttribute('data-slip-stress-max'));
  assert.ok(Number.isFinite(projected)&&projected>0);
+ assert.match(await slip.locator('.silm-micro-crystal-plasticity').textContent(),
+  /CRSS=0,045.*unidades relativas.*Não são parâmetros do metal selecionado/);
+ assert.equal(await viewer.getAttribute('data-crystal-plasticity'),'hypothetical-elastic');
  await mech.locator('.silm-micro-force-input').evaluate(el=>{
   el.value='0';el.dispatchEvent(new Event('input',{bubbles:true}));
  });
  await demo.uncheck();
+ assert.equal(await viewer.getAttribute('data-crystal-plasticity'),'unavailable');
  assert.equal(await viewer.getAttribute('data-slip-model'),'ORIENTATION_UNAVAILABLE');
  assert.equal(await viewer.getAttribute('data-slip-max'),null);
  await slip.locator('summary').click();

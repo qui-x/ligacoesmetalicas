@@ -313,6 +313,10 @@ SILM.microstructure=(()=>{
     'Projeção de tensão local indisponível sem J2 e orientação explícita.');
    slipStress.setAttribute('aria-label',
     'Projeção de tensão local J2 normalizada; não é tensão experimental nem causa deslizamento');
+   const crystalPlasticity=node('output','silm-micro-crystal-plasticity',
+    'Ative a orientação hipotética para investigar a plasticidade de um cristal isolado.');
+   crystalPlasticity.setAttribute('aria-label',
+    'Plasticidade incremental de cristal hipotético, independente do J2 e dos grãos medidos');
    const demoLabel=node('label','silm-micro-slip-demo-label');
    const demoToggle=node('input','silm-micro-slip-demo');
    demoToggle.type='checkbox';
@@ -325,7 +329,7 @@ SILM.microstructure=(()=>{
    angleInput.setAttribute('aria-label','Rotacionar cristal hipotético em graus');
    const angleValue=node('output','silm-micro-slip-angle-value','0°');
    angleLabel.append(node('span','','Giro didático em torno de z'),angleInput,angleValue);
-   slipDetails.append(demoLabel,angleLabel,slipInfo,slipStress,
+   slipDetails.append(demoLabel,angleLabel,slipInfo,slipStress,crystalPlasticity,
     node('p','silm-micro-slip-limits',
      'm = |(eixo·normal)(eixo·direção)|, 0 a 0,5. Não fornece tensão de escoamento nem altera a FEM J2. CCC pode violar a lei de Schmid; HC depende das CRSS específicas de cada família.'));
    const slipSource=node('a','','Referência: MTEX — sistemas de deslizamento');
@@ -353,6 +357,10 @@ SILM.microstructure=(()=>{
     section.dataset.slipPhase=structure||'unsupported';
     angleInput.disabled=!demoToggle.checked||hasImported;
     demoToggle.disabled=hasImported;
+    section.dataset.crystalPlasticity='unavailable';
+    crystalPlasticity.textContent=sourceData?
+     'Mapa importado: nenhum modelo plástico é atribuído aos grãos sem dados constitutivos homologados.':
+     'Ative a orientação hipotética para testar um cristal isolado com parâmetros relativos.';
     if(result.status!=='GEOMETRY_ONLY'){
      delete section.dataset.slipMax;
      delete section.dataset.slipStressMax;
@@ -398,6 +406,35 @@ SILM.microstructure=(()=>{
      slipStress.textContent=sourceData?
       'Mapa importado: nenhuma tensão J2 desta amostra foi medida ou homologada; projeção local desabilitada.':
       'Tensor de tensão J2 local indisponível; apenas o fator geométrico de Schmid é mostrado.';
+    }
+    // Motor independente: controle de deformacao axial hipotetica de um
+    // cristal, SEM introduzir plasticidade nao equilibrada no mapa de graos.
+    // J2 e CPFEM so podem ser acoplados mediante nova formulacao global.
+    if(provenance==='demonstration'&&!sourceData&&SILM.crystalPlasticity){
+     try{
+      const crystal=SILM.crystalPlasticity.create({
+       structure,orientationMatrix:matrix,provenance:'hypothetical',
+       parameters:{E:10,nu:.3,crss:.045,hardening:.7}
+      });
+      const mode=getMode()==='ductility'?'tension':'compression';
+      const load=clamp(Number(deformCtl?.reading?.()?.load)||0,0,1);
+      const response=crystal.runAxial({mode,magnitude:.025*load,steps:10});
+      section.dataset.crystalPlasticity=response.converged?
+       'hypothetical-'+response.status.toLowerCase():'nonconverged';
+      if(response.converged){
+       crystalPlasticity.textContent=
+        'Cristal hipotético isolado · '+(response.status==='PLASTIC'?'deslizamento plástico':'resposta elástica')+
+        ' · sistemas ativos '+response.activeSystems+'/'+crystal.systemCount+
+        ' · cisalhamento plástico acumulado '+fmt(response.accumulatedSlip)+
+        ' · ε axial '+fmt(.025*load*(mode==='compression'?-1:1))+
+        ' (εx=εz=0). E=10; ν=0,3; CRSS=0,045; H=0,7: unidades relativas. '+
+        'Não são parâmetros do metal selecionado. Não modifica o J2, os grãos, a iluminação ou a rede.';
+      }else crystalPlasticity.textContent=
+       'Integração cristaloplástica não convergiu; nenhuma resposta é aplicada à amostra.';
+     }catch(error){
+      section.dataset.crystalPlasticity='unavailable';
+      crystalPlasticity.textContent='Cristal hipotético indisponível: configuração ou integração inválida.';
+     }
     }
    };
    demoToggle.addEventListener('change',updateSlip);
