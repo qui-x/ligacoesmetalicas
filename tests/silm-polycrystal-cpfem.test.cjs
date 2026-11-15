@@ -145,3 +145,17 @@ test('contato deslocado altera campo e preserva metadados do carregamento',()=>{
  assert.ok(Math.abs(a.sample(.2,0).dy-b.sample(.2,0).dy)>1e-5,
   'Contato deslocado precisa alterar o campo de deslocamento');
 });
+
+test('patch afim reproduz deformacao constante e cisalhamento de engenharia na malha CST',()=>{
+ const {S}=setup(),engine=S.polycrystalCPFEM;
+ for(const prescribed of [{exx:.001,eyy:-.0005,gammaXY:.0004},
+  {exx:0,eyy:0,gammaXY:.001},{exx:.003,eyy:.002,gammaXY:0}]){
+  const r=engine.verifyAffinePatch(prescribed);
+  assert.equal(r.status,'AFFINE_PATCH_PASS');
+  assert.ok(r.maxStrainError<1e-12,'Patch CST '+JSON.stringify(r));
+  assert.ok(r.areaError<1e-12);
+  assert.equal(r.engineeringShear,true);
+  assert.equal(r.meshConvergenceVerified,false);
+ }
+ assert.throws(()=>engine.verifyAffinePatch({exx:.1}),/pequenas deformacoes/);
+});
