@@ -74,7 +74,7 @@ try{
    assert.match(find('Ga').newText.join(' '),/eixo a/);
    assert.equal(find('Pm').newCount,2);
    assert.match(find('Pm').newText.join(' '),/18 W\/\(m·K\)/);
-   assert.match(find('Pm').newText.join(' '),/ESTIMATIVA HISTÓRICA/);
+   assert.match(find('Pm').newText.join(' '),/ESTIMATIVA/,'Pm possui rho estimada em fonte secundária, não extrapolação NBS 1972');
    assert.equal(find('U').newCount,2);
    assert.match(find('U').newText.join(' '),/22,5 W\/\(m·K\)/);
    assert.match(find('Fr').newText.join(' '),/15 W\/\(m·K\)/);
