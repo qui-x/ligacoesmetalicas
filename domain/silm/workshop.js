@@ -79,7 +79,7 @@ SILM.workshop=(()=>{
    node('p','silm-object-catalog-note',refs.length+' objeto'+(refs.length===1?'':'s')+' disponível'+(refs.length===1?'':'is')+' para investigação. As imagens são ilustrativas; a composição real depende do produto.'));
   if(refs.length){
    const grid=node('div','silm-workshop-grid silm-object-catalog-grid');
-   for(const item of refs)grid.append(itemCard(item,onInvestigate,'Investigar objeto'));
+   for(const item of refs)grid.append(itemCard(item,onInvestigate,'Iniciar montagem'));
    section.append(grid);
   }else{
    // A referência científica pode permitir estrutura sem imagem de objeto.
@@ -89,7 +89,7 @@ SILM.workshop=(()=>{
     'Sem objetos cotidianos homologados. '+(SILM.data.structureEvidence?.(element)?.method==='empirical-geometric'?'A célula é uma hipótese geométrica derivada de raios estimados; não uma estrutura medida ou otimizada por DFT.':SILM.data.structureEvidence?.(element)?.type==='computed'?'A estrutura é prevista computacionalmente; não foi medida experimentalmente.':'A estrutura cristalina possui referência experimental registrada.'):
     'Ainda não há objetos disponíveis para este metal.'));
    if(element.silmEligibility?.scope==='structure-only'){
-    const structural=node('button','button primary','Investigar estrutura cristalina');
+    const structural=node('button','button primary','Iniciar montagem da estrutura');
     structural.type='button';
     structural.setAttribute('aria-label','Investigar estrutura cristalina de '+element.name);
     structural.addEventListener('click',()=>onStartStructure(element));
