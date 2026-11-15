@@ -61,6 +61,28 @@ try{
  assert.equal(await viewer.getAttribute('data-mechanical-solver'),'incremental-j2-plane-strain');
  assert.equal(JSON.stringify(await page.evaluate(()=>SILMIntegration.snapshot())),before,
   'A previa deve ser isolada do estado cientifico e nao alterar a investigacao.');
+ // Um campo calculado para outra intensidade ou contato nao pode ser exibido.
+ await show.check();
+ await preview.locator('.silm-micro-cpfem-load').evaluate(el=>{
+  el.value='15';el.dispatchEvent(new Event('input',{bubbles:true}));
+ });
+ assert.equal(await show.isDisabled(),true,'Mudar deslocamento deve invalidar o CPFEM anterior.');
+ assert.match(await preview.locator('.silm-micro-cpfem-status').textContent(),/Deslocamento alterado/);
+ assert.equal(await viewer.getAttribute('data-cpfem-presentation'),'j2-default');
+ await preview.locator('.silm-micro-cpfem-load').evaluate(el=>{
+  el.value='10';el.dispatchEvent(new Event('input',{bubbles:true}));
+ });
+ await preview.getByRole('button',{name:'Calcular equilíbrio dos grãos sintéticos na prévia CPFEM'}).click();
+ await page.waitForFunction(()=>/Policristal hipotético|não convergiu|Prévia indisponível/.test(
+  document.querySelector('.silm-micro-cpfem-status')?.textContent||''),undefined,{timeout:90000});
+ assert.match(await preview.locator('.silm-micro-cpfem-status').textContent(),/contato 50%.*largura 30%/);
+ await show.check();
+ await viewer.locator('.silm-micro-contact-position').evaluate(el=>{
+  el.value='20';el.dispatchEvent(new Event('input',{bubbles:true}));
+ });
+ assert.equal(await show.isDisabled(),true,'Mover o contato deve invalidar a previa anterior.');
+ assert.equal(await viewer.getAttribute('data-cpfem-presentation'),'j2-default');
+ assert.match(await preview.locator('.silm-micro-cpfem-status').textContent(),/Contato alterado/);
  assert.deepEqual(errors,[],'Erros JS no ensaio CPFEM opt-in: '+errors.join('; '));
  console.log('CPFEM opt-in: '+browserName+' OK, sem menu novo e sem alterar J2.');
 }finally{await browser.close();}
