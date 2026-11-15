@@ -6,6 +6,10 @@ on:
       - 'domain/silm/lab3d.js'
       - 'tests/silm-lab3d-core.test.cjs'
       - '.github/workflows/silm-lab3d-preview.yml'
+      - 'tests/run-silm-lab3d-browser.mjs'
+      - 'domain/silm/lab3d.css'
+      - 'index.html'
+      - 'sw.js'
   workflow_dispatch:
 jobs:
   preview:
@@ -23,3 +27,50 @@ jobs:
           node --check tests/silm-lab3d-core.test.cjs
       - name: Testes determinísticos
         run: node --test tests/silm-lab3d-core.test.cjs
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar Playwright do runner
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-playwright/node_modules/playwright" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright" install --with-deps "$BROWSER_NAME"
+      - name: Subir servidor local
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-lab3d-server.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/silm-lab3d-server.pid"
+          for n in $(seq 1 30); do
+            if curl -sf "$BASE_URL/index.html" >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-lab3d-server.log"
+          exit 1
+      - name: Exercitar a sala 3D no workspace
+        run: node tests/run-silm-lab3d-browser.mjs
+      - name: Guardar capturas 3D ou fallback
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-lab3d-${{ matrix.browser }}
+          path: reports/lab3d-browser/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Encerrar servidor
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/silm-lab3d-server.pid" ]; then kill "$(cat "$RUNNER_TEMP/silm-lab3d-server.pid")" 2>/dev/null || true; fi
