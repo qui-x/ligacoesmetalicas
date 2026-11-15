@@ -20,9 +20,10 @@ try{
  assert.ok(response?.ok(),'Aplicativo indisponível');
  await page.waitForFunction(()=>window.SILM?.lensController&&window.SILM?.workshop?.valid());
  // Estabelecer uma investigação real (Cu), pelo mesmo percurso da oficina.
- await page.locator('#silm-workshop-context').getByRole('button',{name:'Tabela Periódica'}).click();
- await page.locator('#silm-periodic-dialog [data-z="29"]').click();
- await page.locator('#silm-periodic-dialog [id$="-explore"]').click();
+ await page.locator('[data-open-dock="montagem"]').click();
+ await page.locator('#silm-open-periodic').click();
+ await page.locator('#silm-object-entry [data-z="29"]').click();
+ await page.locator('#silm-objects-dialog').waitFor({state:'visible'});
  const discoveryCard=page.locator('.silm-workshop-card[data-reference-id="atlas-cu"]');
  const discoveryLink=discoveryCard.locator('.silm-workshop-manual-link');
  assert.equal(await discoveryCard.locator('details').count(),0,
@@ -31,7 +32,7 @@ try{
   'Manual não preserva a referência do componente');
  const conciseCard=await discoveryCard.locator('.silm-workshop-card-body').innerText();
  assert.ok(conciseCard.length<125,'Cartão introdutório ficou com texto excessivo');
- await discoveryCard.getByRole('button',{name:'Investigar componente'}).click();
+ await discoveryCard.getByRole('button',{name:'Iniciar montagem'}).click();
  await page.waitForFunction(()=>SILMIntegration?.snapshot?.()?.metal?.atomicNumber===29);
  await page.waitForFunction(()=>SILM.lensController.inspect().scale===1&&SILM.lensController.inspect().attached);
  assert.equal(await page.locator('.silm-lens-layer').count(),1,'Lente duplicada na cena');
