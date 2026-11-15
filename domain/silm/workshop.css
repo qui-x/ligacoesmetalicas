@@ -1448,3 +1448,45 @@
   color:CanvasText;background:Canvas;border-color:CanvasText
  }
 }
+
+/* Etapa 84G no ramo: mapa reversível, sobre a cor do material.
+   Os valores numéricos e as legendas são a alternativa ao uso de cor. */
+.silm-micro-cpfem-overlay{
+ pointer-events:none;vector-effect:non-scaling-stroke;stroke-linejoin:round;
+ stroke-linecap:round
+}
+.silm-micro-cpfem-map-mode{
+ min-height:38px;max-width:100%;font:inherit;color:var(--text);
+ background:var(--surface);border:1px solid var(--border);
+ border-radius:4px;padding:5px
+}
+.silm-micro-cpfem-map-legend:not([hidden]){
+ display:grid;gap:6px;margin:6px 8px;padding:8px;
+ border:1px solid var(--border);border-radius:4px;
+ background:var(--surface);color:var(--text)
+}
+.silm-micro-cpfem-map-legend[hidden]{display:none!important}
+.silm-micro-cpfem-map-legend .silm-micro-cpfem-map-title,
+.silm-micro-cpfem-map-legend .silm-micro-cpfem-map-limits,
+.silm-micro-cpfem-map-legend .silm-micro-cpfem-map-note{
+ margin:0;padding:0;background:transparent;border:0;
+ color:var(--text);font-size:.75rem;line-height:1.5
+}
+.silm-micro-cpfem-map-track{
+ height:16px;min-width:0;border:1px solid var(--border);border-radius:2px;
+ background:linear-gradient(90deg,hsl(44 94% 80%),hsl(24 94% 45%))
+}
+.silm-micro-cpfem-map-track[data-kind="residual-von-mises"]{
+ background:linear-gradient(90deg,hsl(199 87% 80%),hsl(216 87% 47%))
+}
+.silm-micro-cpfem-map-track[data-kind="residual-axial"]{
+ background:linear-gradient(90deg,hsl(217 85% 46%),hsl(0 0% 78%) 50%,hsl(13 87% 46%))
+}
+.silm-micro-cpfem-map-track[hidden]{display:none!important}
+:root.si-highcontrast .silm-micro-cpfem-overlay{display:none!important}
+@media(forced-colors:active){
+ .silm-micro-cpfem-overlay,.silm-micro-cpfem-map-track{display:none!important}
+ .silm-micro-cpfem-map-legend:not([hidden]){
+  border:1px solid CanvasText;background:Canvas;color:CanvasText
+ }
+}
