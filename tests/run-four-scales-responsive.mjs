@@ -64,11 +64,11 @@ try{
  const response=await page.goto(base+'/index.html#/ambiente',{waitUntil:'load',timeout:45000});
  assert.ok(response?.ok(),'SILM não abriu');
  await page.waitForFunction(()=>window.SILM?.workshop?.valid()&&!document.querySelector('#silm-workshop-context')?.hidden);
- const table=page.locator('#silm-workshop-context').getByRole('button',{name:'Tabela Periódica'});
- await table.click();
- await page.locator('#silm-periodic-dialog [data-z="29"]').click();
- await page.locator('#silm-periodic-dialog [id$="-explore"]').click();
- await page.locator('.silm-workshop-card[data-reference-id="atlas-cu"]').getByRole('button',{name:'Investigar componente'}).click();
+ await page.locator('[data-open-dock="montagem"]').click();
+ await page.locator('#silm-open-periodic').click();
+ await page.locator('#silm-object-entry [data-z="29"]').click();
+ await page.locator('#silm-objects-dialog [data-reference-id="atlas-cu"]')
+  .getByRole('button',{name:'Iniciar montagem'}).click();
  await page.waitForFunction(()=>window.SILMIntegration?.snapshot?.()?.metal?.atomicNumber===29);
  const scientific=await page.evaluate(()=>JSON.stringify(SILMIntegration.snapshot()));
  // A Travessia atua no motor já existente; teclado e setas não iniciam novo ensaio.

@@ -39,7 +39,12 @@ SILM.createPeriodicTable=(host,{scope,state,teacher=false,onInvestigate,onSource
  const actions=U.element('div',null,'periodic-actions');const clear=U.button('Limpar destaque',()=>{state.selection=null;state.query='';input.value='';updateSearch(false);update();input.focus();},scope,{id:prefix+'-clear'});
  const investigate=U.button(teacher?'Investigar este metal':'Iniciar investigação',()=>{const e=D.get(state.selection);if(e?.silmEligibility.status==='available'&&canInvestigate())return onInvestigate(e);},scope,{id:prefix+'-investigate',primary:true});
  const explore=U.button('Ver aplicações',()=>{const e=D.get(state.selection);if(e?.silmEligibility.status==='available'&&canInvestigate())return onExplore(e);},scope,{id:prefix+'-explore'});
- const sources=U.button('Fontes',()=>{const e=D.get(state.selection);if(e)onSources(e);},scope,{id:prefix+'-sources'});actions.append(clear,investigate,explore,sources);foot.append(actions);root.append(foot);host.append(root);
+ const sources=U.button('Fontes',()=>{const e=D.get(state.selection);if(e)onSources(e);},scope,{id:prefix+'-sources'});actions.append(clear,investigate,explore,sources);
+// O percurso da Oficina é direto: selecionar metal abre as imagens.
+// Não oferecer novamente "Iniciar investigação", "Ver aplicações",
+// "Fontes" ou "Limpar destaque" no rodapé dessa Tabela.
+// Os controles continuam no contexto de apresentação do professor.
+if(!entryObjects)foot.append(actions);root.append(foot);host.append(root);
  function update(){
   const e=D.get(state.selection);for(const [z,b]of buttons){b.setAttribute('aria-pressed',String(z===state.selection));b.classList.toggle('is-selected',z===state.selection);}
   summary.replaceChildren();clear.disabled=!state.selection&&!input.value;sources.hidden=!e;investigate.hidden=entryObjects||!e||e.silmEligibility.status!=='available';investigate.disabled=!canInvestigate();explore.hidden=entryObjects||teacher||!e||e.silmEligibility.status!=='available';explore.disabled=!canInvestigate();

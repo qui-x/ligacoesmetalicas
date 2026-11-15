@@ -116,23 +116,28 @@ async function inspect(phase,name,width,height){
 async function periodic(width,height,label){
  await page.setViewportSize({width,height});
  await page.waitForTimeout(100);
- await page.locator('#silm-workshop-context').getByRole('button',{name:'Tabela Periódica'}).click();
- const dlg=page.locator('#silm-periodic-dialog');
- await dlg.waitFor({state:'visible'});
- const b=await dlg.evaluate(rect);
+ await page.locator('[data-open-dock="montagem"]').click();
+ await page.locator('[data-left-tab="preparo"]').click();
+ await page.locator('#silm-open-periodic').click();
+ const area=page.locator('#silm-object-entry');
+ await area.locator('.periodic-element').first().waitFor({state:'visible'});
+ const b=await area.evaluate(rect);
  if(b.x < -5 || b.right > width+5)
-  add('tabela',label,'error','MODAL_LARGURA',
-   'Tabela periódica fora da janela ('+b.x+'…'+b.right+')',
-   'Usar largura limitada ao viewport e rolagem dentro do diálogo.');
- if(b.bottom>height+5 || b.y<-5)
-  add('tabela',label,'error','MODAL_ALTURA',
-   'Tabela periódica excede a altura da janela.',
-   'Limitar max-height e manter área interna com overflow-y:auto.');
+  add('tabela',label,'error','PALCO_LARGURA',
+   'Tabela periódica fora da área útil ('+b.x+'…'+b.right+')',
+   'Conter a Tabela na área de imagens da Oficina.');
+ if(await page.locator('#silm-periodic-dialog').isVisible())
+  add('tabela',label,'error','MODAL_DUPLICADO',
+   'A Tabela abriu em diálogo nativo em vez do palco.',
+   'Usar o componente periódico integrado na área de imagens.');
+ if(await page.locator('#silm-object-entry .periodic-element').count()!==118)
+  add('tabela',label,'error','ELEMENTOS_AUSENTES',
+   'A Tabela não exibiu os 118 elementos.',
+   'Preservar o catálogo químico sem recortes.');
  try{
   await page.screenshot({path:join(dir,'tabela--'+label+'.jpg'),
    type:'jpeg',quality:68,animations:'disabled'});
- }catch(e){add('tabela',label,'warning','CAPTURA',e.message,'Verificar captura de diálogos.');}
- await page.locator('#silm-close-periodic').click();
+ }catch(e){add('tabela',label,'warning','CAPTURA',e.message,'Verificar captura do palco.');}
 }
 
 try{
@@ -155,11 +160,9 @@ try{
 
  // Investigar um metal do catálogo: as escalas exigem controles diferentes.
  await page.setViewportSize({width:390,height:844});
- await page.locator('#silm-workshop-context').getByRole('button',{name:'Tabela Periódica'}).click();
- await page.locator('#silm-periodic-dialog [data-z="29"]').click();
- await page.locator('#silm-periodic-dialog [id$="-explore"]').click();
- await page.locator('.silm-workshop-card[data-reference-id="atlas-cu"]')
-  .getByRole('button',{name:'Investigar componente'}).click();
+ await page.locator('#silm-object-entry [data-z="29"]').click();
+ await page.locator('#silm-objects-dialog [data-reference-id="atlas-cu"]')
+  .getByRole('button',{name:'Iniciar montagem'}).click();
  await page.waitForFunction(()=>window.SILMIntegration?.snapshot?.()?.metal?.atomicNumber===29,
   undefined,{timeout:30000});
  for(const [name,w,h] of sizes)await inspect('macro',name,w,h);
