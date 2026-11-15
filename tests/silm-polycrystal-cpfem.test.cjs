@@ -159,3 +159,40 @@ test('patch afim reproduz deformacao constante e cisalhamento de engenharia na m
  }
  assert.throws(()=>engine.verifyAffinePatch({exx:.1}),/pequenas deformacoes/);
 });
+
+test('trabalho externo elastico por reacoes coincide aproximadamente com energia armazenada',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const r=m.run({mode:'tension',load:.10,increments:3});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ assert.equal(r.workHistory.length,3);
+ assert.equal(r.energyAudit.status,'TRAPEZOIDAL_ESTIMATE');
+ assert.ok(r.energyAudit.externalWorkLoading>0);
+ assert.ok(r.energyAudit.loadingRelativeResidual<.04,
+  'Balanco elastico fora da tolerancia: '+JSON.stringify(r.energyAudit));
+ assert.equal(r.energyAudit.unloadingExternalWork,null);
+ assert.equal(r.energyAudit.validAsExperimentalBalance,false);
+ assert.ok(r.workHistory.every((s,i)=>s.step===i+1&&
+  Number.isFinite(s.relativeResidual)&&s.externalWorkCumulative>=0));
+ assert.ok(Object.isFrozen(r.workHistory));
+});
+test('trabalho na plastificacao tem historico mas nao e chamado de balanco medido',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const r=m.run({mode:'tension',load:.83,increments:5});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ assert.ok(r.energy.plasticDissipated>0);
+ assert.equal(r.workHistory.length,5);
+ assert.ok(Number.isFinite(r.energyAudit.loadingWorkEnergyResidual));
+ assert.ok(Number.isFinite(r.energyAudit.loadingRelativeResidual));
+ assert.equal(r.energyAudit.calibrated,false);
+ assert.equal(r.energyAudit.status,'TRAPEZOIDAL_ESTIMATE');
+});
+test('descarregamento com liberacao brusca de contato nao fecha trabalho sem rampa',()=>{
+ const {S,synthetic}=setup(),m=make(S,synthetic);
+ const r=m.run({mode:'tension',load:.8,increments:5,unload:true});
+ assert.equal(r.status,'CONVERGED',JSON.stringify(r));
+ assert.equal(r.energyAudit.status,'UNLOADING_PATH_NOT_RESOLVED');
+ assert.equal(r.energyAudit.unloadingExternalWork,null);
+ assert.equal(r.workHistory.length,5);
+ assert.equal(r.stepsCompleted,6);
+ assert.match(r.energyAudit.limitation,/trabalho de descarga desconhecido/);
+});
