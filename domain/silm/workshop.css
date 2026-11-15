@@ -1389,3 +1389,36 @@
  }
  .silm-micro-calibration-source a{color:LinkText}
 }
+
+
+/* Etapa 82: explicação geométrica de sistemas de deslizamento,
+   independente do FEM e recolhida nos controles de aplicação de carga. */
+.silm-micro-slip-details{
+ box-sizing:border-box;margin:4px 6px;
+ border:1px solid var(--border);border-radius:6px;
+ background:var(--surface);color:var(--text);font-size:.72rem;
+}
+.silm-micro-slip-details summary{
+ font-weight:500;cursor:pointer;min-height:44px;
+ display:flex;align-items:center;padding:5px 8px
+}
+.silm-micro-slip-details label{
+ display:flex;gap:8px;align-items:center;
+ flex-wrap:wrap;min-height:40px;padding:3px 8px;
+}
+.silm-micro-slip-details .silm-micro-slip-angle{width:min(240px,100%);accent-color:var(--accent)}
+.silm-micro-slip-details output{
+ display:block;margin:4px 8px;padding:5px 7px;line-height:1.5;
+ color:var(--muted);background:var(--panel2,var(--surface));
+ border:1px solid var(--border);border-radius:5px;overflow-wrap:anywhere
+}
+.silm-micro-slip-details p,.silm-micro-slip-details a{
+ display:block;margin:4px 8px 8px;line-height:1.5;overflow-wrap:anywhere
+}
+.silm-micro-slip-details a{color:var(--accent);text-decoration:underline}
+@media(forced-colors:active){
+ .silm-micro-slip-details,.silm-micro-slip-details output{
+  background:Canvas;color:CanvasText;border-color:CanvasText
+ }
+ .silm-micro-slip-details a{color:LinkText}
+}
