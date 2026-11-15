@@ -122,8 +122,19 @@ async function test(viewport){
  assert.equal(await viewer.getAttribute('data-mechanical-solver'),'incremental-j2-plane-strain',
   'O solver J2 incremental não está dirigindo a microestrutura.');
  assert.equal(await viewer.getAttribute('data-mechanical-j2'),'plane-strain-converged');
+ assert.equal(await viewer.getAttribute('data-mechanical-calibration'),'normalized-only',
+  'Valores experimentais não devem alimentar o motor J2 sem homologação.');
  const contactDetails=mech.locator('.silm-micro-contact-details');
- await contactDetails.locator('summary').click();
+ await contactDetails.locator('summary').first().click();
+ const audit=contactDetails.locator('.silm-micro-calibration-audit');
+ await audit.locator('summary').click();
+ assert.match(await audit.textContent(),/Não combinar amostras, fases ou temperaturas distintas/);
+ assert.match(await audit.textContent(),/Modelo J2 atual: adimensional/);
+ await audit.locator('summary').click();
+ const selectedReadout=mech.locator('.silm-micro-selected-j2');
+ assert.match(await selectedReadout.textContent(),/posição do grão 26.*Campo contínuo da amostra/);
+ assert.ok(Number.isFinite(Number(await map.getAttribute('data-selected-grain-plastic'))),
+  'A seleção não recebeu a leitura regional do campo J2.');
  const position=mech.locator('.silm-micro-contact-position');
  const contactWidth=mech.locator('.silm-micro-contact-width');
  const pressBounds=await viewer.locator('.silm-micro-press-plate').first().boundingBox();
@@ -137,13 +148,13 @@ async function test(viewport){
  assert.ok(newPressBounds.width>pressBounds.width*1.3,
   'A largura de contato não modificou a placa de compressão.');
  assert.equal(await viewer.getAttribute('data-mechanical-contact-width'),'60');
- await contactDetails.locator('summary').click();
+ await contactDetails.locator('summary').first().click();
 
  const grip=viewer.locator('.silm-micro-mechanical-top');
  const mechanicalDir=join('reports','micro-deformation',browserName);
  mkdirSync(mechanicalDir,{recursive:true});
  assert.ok((await grip.boundingBox())?.height>=44,'Alça da prensa não alcança 44 px.');
- await contactDetails.locator('summary').click();
+ await contactDetails.locator('summary').first().click();
  const force=mech.locator('.silm-micro-force-input');
  await force.evaluate(input=>{input.value='50';input.dispatchEvent(new Event('input',{bubbles:true}));});
  await page.waitForFunction(()=>Number(document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalLoad)>=50);
@@ -152,7 +163,7 @@ async function test(viewport){
   'A aplicação contínua de carga não deformou a peça.');
  await mech.getByRole('button',{name:'Retirar carga mantendo deformação plástica'}).click();
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalLoad==='0');
- await contactDetails.locator('summary').click();
+ await contactDetails.locator('summary').first().click();
  const pulse=mech.locator('.silm-micro-mechanical-pulse');
  assert.equal(await pulse.getAttribute('aria-label'),'Aplicar compressão',
   'Botão de compressão não recebeu o nome acessível: '+await pulse.evaluate(n=>n.outerHTML));
@@ -175,7 +186,7 @@ async function test(viewport){
  // Nova lei constitutiva: a amostra deve ter componente plástica
  // normalizada depois de ultrapassar o escoamento e conservá-la ao
  // descarregar. Não é medida em MPa nem dado de laboratório do Fe.
- await contactDetails.locator('summary').click();
+ await contactDetails.locator('summary').first().click();
  const constitutive=mech.locator('.silm-micro-constitutive-reading');
  assert.match(await constitutive.textContent(),/Modelo relativo.*sem MPa/);
  assert.equal(await viewer.getAttribute('data-mechanical-constitutive'),'normalized-uniaxial');
@@ -189,7 +200,7 @@ async function test(viewport){
  const accumulatedAfter=Number(await viewer.getAttribute('data-mechanical-plastic-normalized'));
  assert.ok(accumulatedAfter>=accumulatedBefore-1e-4,
   'A retirada da carga apagou indevidamente o encruamento normalizado.');
- await contactDetails.locator('summary').click();
+ await contactDetails.locator('summary').first().click();
 
  await mech.getByRole('button',{name:'Restaurar deformação'}).click();
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='0');

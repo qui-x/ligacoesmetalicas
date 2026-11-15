@@ -61,6 +61,45 @@ SILM.microstructure=(()=>{
   apparatusField.append(topPlate,bottomPlate);plane.append(apparatusField);
   let paths=[],cells=[],specimenOutline=null;let surfaceMicro=null;
   let chosen=-1,zoom=1,offsetX=0,offsetY=0,drag=null,suppressClick=false;
+  let currentJ2=null,selectedMechanicalReading=null;
+  const grainCenter=poly=>{
+   let a=0,cx=0,cy=0;
+   for(let i=0;i<poly.length;i++){
+    const p=poly[i],q=poly[(i+1)%poly.length],cross=p[0]*q[1]-q[0]*p[1];
+    a+=cross;cx+=(p[0]+q[0])*cross;cy+=(p[1]+q[1])*cross;
+   }
+   if(Math.abs(a)<1e-10)return{
+    x:poly.reduce((s,p)=>s+p[0],0)/poly.length,
+    y:poly.reduce((s,p)=>s+p[1],0)/poly.length
+   };
+   return{x:cx/(3*a),y:cy/(3*a)};
+  };
+  const updateSelectedMechanicalReading=()=>{
+   if(!selectedMechanicalReading)return;
+   const poly=polygons[chosen];
+   if(!poly||poly.length<3){
+    selectedMechanicalReading.textContent='Selecione um grão para consultar o campo mecânico na posição correspondente.';
+    delete svg.dataset.selectedGrainPlastic;return;
+   }
+   if(sourceData){
+    selectedMechanicalReading.textContent='Mapa importado não homologado: a orientação e a plasticidade de cada grão não são medidas pelo SILM.';
+    delete svg.dataset.selectedGrainPlastic;return;
+   }
+   if(!currentJ2?.converged){
+    selectedMechanicalReading.textContent='Campo J2 sem solução convergente ou sem ensaio; orientação cristalográfica não determinada.';
+    delete svg.dataset.selectedGrainPlastic;return;
+   }
+   const p=grainCenter(poly),u=clamp(p.x/W,0,1),v=clamp(p.y/H,0,1);
+   const alpha=currentJ2.samplePlastic(u,v);
+   if(!Number.isFinite(alpha)){
+    selectedMechanicalReading.textContent='Campo mecânico indisponível nesta região.';
+    delete svg.dataset.selectedGrainPlastic;return;
+   }
+   svg.dataset.selectedGrainPlastic=alpha.toFixed(4);
+   selectedMechanicalReading.textContent='Na posição do grão '+(chosen+1)+
+    ': deformação plástica equivalente J2 '+alpha.toFixed(4).replace('.',',')+
+    ' (adimensional). Campo contínuo da amostra, NÃO valor medido do grão nem orientação cristalográfica.';
+  };
   let sourceData=null; // Mapa importado = análise de polígonos fornecidos, não homologação.
   const status=node('span','silm-workshop-micro-status','Selecione um grão · modelo esquemático');
   const dimension=node('span','silm-workshop-micro-dimension','Tamanho real: indisponível (sem escala em µm)');
@@ -91,6 +130,7 @@ SILM.microstructure=(()=>{
    }else status.textContent='Grão '+(i+1)+' selecionado · modelo esquemático';
    svg.setAttribute('data-selected-grain',String(i+1));
    surfaceMicro?.refresh();
+   updateSelectedMechanicalReading();
   };
   function drawGrains(){
    paths=[];cells=[];mechanicalField.replaceChildren();plane.replaceChildren(mechanicalField,apparatusField);
@@ -228,11 +268,40 @@ SILM.microstructure=(()=>{
    });
    const constitutiveReadout=node('output','silm-micro-constitutive-reading','');
    constitutiveReadout.setAttribute('aria-label','Resposta elastoplástica relativa da amostra');
+   selectedMechanicalReading=node('output','silm-micro-selected-j2',
+    'Selecione um grão para consultar o campo mecânico na posição correspondente.');
+   selectedMechanicalReading.setAttribute('aria-label','Deformação equivalente da região do grão selecionado, modelo normalizado');
+   selectedMechanicalReading.setAttribute('aria-live','off');
    constitutiveReadout.title='Modelo uniaxial normalizado, sem parâmetros medidos do metal.';
+   const qualification=SILM.mechanicalQualification?.inspect(element?.atomicNumber);
+   section.dataset.mechanicalCalibration='normalized-only';
+   section.dataset.mechanicalYieldSources=String(qualification?.yieldedSourceCount||0);
+   const audit=node('details','silm-micro-calibration-audit');
+   audit.append(node('summary','','Condições para calibração do metal'));
+   audit.append(node('p','silm-micro-calibration-note',
+    (qualification?.message||'Catálogo de calibração não disponível.')+
+    ' Modelo J2 atual: adimensional; orientação dos grãos não determinada.'));
+   if(qualification?.yieldedSourceCount){
+    const shown=qualification.candidates.slice(0,5);
+    for(const candidate of shown){
+     const entry=node('p','silm-micro-calibration-source',
+      candidate.value.toLocaleString('pt-BR',{maximumFractionDigits:2})+' MPa · '+
+      candidate.sample+' · '+candidate.temperatureText+
+      ' · valor documental, não utilizado no motor.');
+     const link=node('a','','Fonte do ensaio');
+     link.href=candidate.sourceURL;link.target='_blank';link.rel='noopener noreferrer';
+     entry.append(' ',link);audit.append(entry);
+    }
+    if(qualification.yieldedSourceCount>shown.length)
+     audit.append(node('p','','Outros '+(qualification.yieldedSourceCount-shown.length)+' registros disponíveis no painel Dados.'));
+   }
+   audit.append(node('p','','Parâmetros ausentes ou incompatíveis: '+
+    (qualification?.missing.join('; ')||'E, ν, σe e H')+
+    '. Não combinar amostras, fases ou temperaturas distintas.'));
    const contactDetails=node('details','silm-micro-contact-details');
    const contactSummary=node('summary','','Aplicação da carga');
    contactDetails.append(contactSummary,forceLabel,releaseForce,
-    constitutiveReadout,contactLabel,widthLabel);
+    constitutiveReadout,selectedMechanicalReading,audit,contactLabel,widthLabel);
    mechanicalTools.append(mechanicalPulse,mechanicalReset,mechanicalLoadMeter,
     contactDetails,mechanicalStatus);
   toolbar.append(mechanicalTools);
@@ -331,8 +400,8 @@ SILM.microstructure=(()=>{
     delete section.dataset.mechanicalPlasticNormalized;
     constitutiveReadout.textContent='Modelo uniaxial ainda não disponível';
    }
-   // A alteração plástica residual continua no estado geral da investigação.
-   // O modelo de elementos finitos resolve APENAS a parcela elástica local.
+   // O estado anterior conserva a geometria visual; o J2 dirige deslocamentos
+   // e plasticidade da malha quando converge, sem quantificação por metal.
    const residual=SILM.deformation?.specimenResponse?.(surface,{});
    if(!residual)return;
    const load=active?clamp(Number(motion.load)||0,0,1):0;
@@ -363,6 +432,8 @@ SILM.microstructure=(()=>{
     mode:kind,position:contactPosition,width:contactWidth,load:active?load:0
    }):null;
    const j2Ready=!!j2?.converged;
+   currentJ2=j2Ready?j2:null;
+   updateSelectedMechanicalReading();
    section.dataset.mechanicalJ2=j2Ready?'plane-strain-converged':
     j2?'fallback-elastic':'unavailable';
    section.dataset.mechanicalJ2Alpha=j2Ready?j2.maxAlpha.toFixed(4):'0';
