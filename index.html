@@ -217,12 +217,14 @@
                 <div data-left-panel="resumo"><h3>Investigação atual</h3><p id="silm-summary" hidden></p><dl id="silm-summary-list" class="silm-summary-list"></dl></div>
                 <div data-left-panel="preparo">
                   <section class="silm-dock-group" aria-labelledby="silm-group-metal">
-                    <h3 id="silm-group-metal">Escolher metal e forma de montagem</h3>
-                    <label for="silm-metal">Escolha um metal</label><select id="silm-metal"></select>
-                    <div class="silm-dock-actions">
-                      <button id="silm-open-periodic" type="button" class="button primary">Escolher objeto na Tabela Periódica</button>
+                    <h3 id="silm-group-metal">Escolher forma de montagem</h3>
+                    <p class="silm-preparo-intro">Escolha um objeto para investigar o metal e sua estrutura de referência.</p>
+                    <button id="silm-open-periodic" type="button" class="button primary silm-preparo-table">Escolher objeto na Tabela Periódica</button>
+                    <details id="silm-manual-start" class="silm-preparo-secondary">
+                      <summary>Montagem livre (opcional)</summary>
+                      <label for="silm-metal">Metal da montagem livre</label><select id="silm-metal"></select>
                       <button id="silm-start" class="button outline" type="button">Iniciar montagem livre</button>
-                    </div>
+                    </details>
                     <details id="silm-free-assembly" class="silm-preparo-free" hidden>
                       <summary>Montagem livre</summary>
                       <section id="silm-free-tools" aria-labelledby="silm-group-structure" hidden>
