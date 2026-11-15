@@ -156,6 +156,18 @@ async function test(viewport){
  assert.ok(Math.abs(max25-max0)>.03,'Giro hipotético não alterou o fator de Schmid');
  assert.ok(max25>0&&max25<=.5000001,'Fator de Schmid fora do limite geométrico');
  assert.match(await slip.textContent(),/NÃO é orientação medida do grão/);
+ assert.equal(await viewer.getAttribute('data-slip-j2-coupled'),'false');
+ assert.equal(await viewer.getAttribute('data-slip-j2-projection'),'read-only');
+ assert.match(await slip.locator('.silm-micro-slip-stress').textContent(),/Tensor de tensão J2 local.*sem MPa, CRSS/);
+ await mech.locator('.silm-micro-force-input').evaluate(el=>{
+  el.value='40';el.dispatchEvent(new Event('input',{bubbles:true}));
+ });
+ await page.waitForFunction(()=>Number(document.querySelector('.silm-workshop-micro-viewer')?.dataset.slipStressMax)>.0001);
+ const projected=Number(await viewer.getAttribute('data-slip-stress-max'));
+ assert.ok(Number.isFinite(projected)&&projected>0);
+ await mech.locator('.silm-micro-force-input').evaluate(el=>{
+  el.value='0';el.dispatchEvent(new Event('input',{bubbles:true}));
+ });
  await demo.uncheck();
  assert.equal(await viewer.getAttribute('data-slip-model'),'ORIENTATION_UNAVAILABLE');
  assert.equal(await viewer.getAttribute('data-slip-max'),null);
@@ -530,6 +542,8 @@ async function test(viewport){
   'A matriz de orientação declarada não foi associada ao grão importado.');
  assert.equal(await viewer.getAttribute('data-slip-model'),'GEOMETRY_ONLY');
  assert.equal(await viewer.getAttribute('data-slip-j2-coupled'),'false');
+ assert.equal(await viewer.getAttribute('data-slip-j2-projection'),'unavailable');
+ assert.match(await viewer.locator('.silm-micro-slip-stress').textContent(),/Mapa importado/);
  assert.ok(Math.abs(Number(await viewer.getAttribute('data-slip-max'))-1/Math.sqrt(6))<.0002,
   'A orientação identidade CCC deveria reproduzir m=1/√6 para eixo y.');
  assert.match(await viewer.locator('.silm-micro-slip-result').textContent(),/NÃO homologada/,

@@ -102,3 +102,27 @@ test('o HTML inclui o solucionador antes da microestrutura e cache offline',()=>
  assert.ok(html.indexOf(file)<html.indexOf('domain/silm/microstructure-view.js'));
  assert.ok(sw.includes(file));
 });
+
+test('amostragem da tensao J2 inclui sigma zz da deformacao plana e e simetrica',()=>{
+ const j=engine(),empty=j.history([]);
+ const zero=empty.sampleStress(.5,.5);
+ assert.ok(Array.isArray(zero)&&zero.length===3);
+ for(const row of zero)for(const value of row)near(value,0,1e-10);
+ const f=j.active([],{mode:'compression',position:.5,width:.3,load:.6});
+ assert.ok(f.converged);
+ const t=f.sampleStress(.5,.15);
+ assert.ok(t.every(row=>row.every(Number.isFinite)));
+ near(t[0][1],t[1][0],1e-10);
+ near(t[0][2],0);near(t[1][2],0);
+ assert.ok(Math.abs(t[1][1])>.001,'Carga nao aparece no tensor local');
+ assert.ok(Math.abs(t[2][2])>1e-6,'Tensao fora do plano omitida indevidamente');
+ assert.equal(f.calibrated,false);
+});
+test('tensao reconstruida acompanha descarregamento sem inventar MPa',()=>{
+ const j=engine(),f=j.history([mark()]);
+ assert.ok(f.converged);
+ const tensor=f.sampleStress(.5,.2);
+ assert.ok(tensor.flat().every(Number.isFinite));
+ assert.equal('stressMPa' in f,false);
+ assert.equal(Object.isFrozen(tensor),true);
+});

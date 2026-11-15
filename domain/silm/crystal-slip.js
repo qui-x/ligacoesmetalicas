@@ -129,9 +129,48 @@ SILM.crystalSlip=(()=>{
     'CFC: fator geométrico não fornece CRSS nem tensão de escoamento.'
   });
  }
+ // Projecao tau = s . sigma . n, usando um tensor 3x3 SIMETRICO
+ // fornecido por outro motor. A orientacao R transforma cristal -> amostra.
+ // Nao estima CRSS, ativacao de sistema, escoamento ou plasticidade cristalina.
+ const isStressTensor=T=>Array.isArray(T)&&T.length===3&&
+  T.every(r=>Array.isArray(r)&&r.length===3&&r.every(Number.isFinite))&&
+  [0,1,2].every(i=>[0,1,2].every(j=>Math.abs(T[i][j]-T[j][i])<=1e-6));
+ function analyzeStress({structure,orientationMatrix=null,stressTensor=null,
+  provenance='none'}={}){
+  const geometry=analyze({structure,orientationMatrix,provenance});
+  if(geometry.status!=='GEOMETRY_ONLY')
+   return Object.freeze({status:geometry.status,calibratesJ2:false});
+  if(!isStressTensor(stressTensor))
+   return Object.freeze({status:'STRESS_UNAVAILABLE',calibratesJ2:false});
+  const kind=types[structure];
+  const rotate=v=>orientationMatrix.map(row=>dot(row,v));
+  const resolved=systems[kind].map(sys=>{
+   const n=rotate(sys.planeNormal),d=rotate(sys.slipDirection);
+   const traction=stressTensor.map(row=>dot(row,n));
+   const tau=dot(d,traction);
+   return Object.freeze({id:sys.id,family:sys.family,
+    signedShear:tau,absoluteShear:Math.abs(tau)});
+  });
+  const families=[...new Set(resolved.map(x=>x.family))].map(family=>{
+   const rows=resolved.filter(x=>x.family===family).sort((a,b)=>
+    b.absoluteShear-a.absoluteShear||a.id.localeCompare(b.id));
+   return Object.freeze({family,count:rows.length,
+    maxAbsShear:rows[0].absoluteShear,representative:rows[0].id,
+    signedShear:rows[0].signedShear});
+  });
+  return Object.freeze({
+   status:'PROJECTED_J2_STRESS',source:'normalized-plane-strain-j2',
+   units:'relative',structure:kind,provenance,
+   systemCount:resolved.length,families:Object.freeze(families),
+   maxAbsShear:Math.max(...resolved.map(x=>x.absoluteShear)),
+   calibrated:false,calibratesJ2:false,predictsSlipActivation:false,
+   hasVerifiedGrainStress:false,hasMeasuredOrientation:false,
+   caveat:'Leitura projetada de tensor J2 normalizado; sem CRSS, sem orientacao homologada nem previsao de deslizamento.'
+  });
+ }
  return Object.freeze({
   schema:'silm.crystal-slip-geometry.v1',types,systems,
-  isMatrix,identity,rotationZ,analyze,calibratesJ2:false,
+  isMatrix,isStressTensor,identity,rotationZ,analyze,analyzeStress,calibratesJ2:false,
   references:Object.freeze([
    'https://mtex-toolbox.github.io/SlipSystems.html',
    'https://mtex-toolbox.github.io/SchmidFactor.html',

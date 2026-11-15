@@ -236,7 +236,26 @@ window.SILM=window.SILM||{};
     tri=(yy-iy)<=(xx-ix)?0:1;
    return record.history[2*(iy*NX+ix)+tri].alpha;
   };
-  const exposed=Object.freeze({...info,sample,samplePlastic});
+  // Tensao de Cauchy da amostra CONTINUA (normalizada), reconstruida de
+  // epsilon_total - epsilon_plastica no estado J2 ja equilibrado.
+  // Em deformacao plana epsilon_zz=0, mas sigma_zz NAO e zero.
+  // Trata-se de leitura, nao de uma nova integracao constitutiva.
+  const sampleStress=(u,v)=>{
+   const xx=clamp(Number(u)||0,0,1)*NX,yy=clamp(Number(v)||0,0,1)*NY;
+   const ix=Math.min(NX-1,Math.floor(xx)),iy=Math.min(NY-1,Math.floor(yy));
+   const index=2*(iy*NX+ix)+((yy-iy)<=(xx-ix)?0:1);
+   const strain=strainOf(triangles[index],record.u),p=record.history[index].p;
+   const ex=strain[0]-p[0],ey=strain[1]-p[1],ez=-p[2];
+   const shear=strain[2]*.5-p[3],tr=ex+ey+ez;
+   const sxx=lambda*tr+2*G*ex,syy=lambda*tr+2*G*ey,
+    szz=lambda*tr+2*G*ez,sxy=2*G*shear;
+   return Object.freeze([
+    Object.freeze([sxx,sxy,0]),
+    Object.freeze([sxy,syy,0]),
+    Object.freeze([0,0,szz])
+   ]);
+  };
+  const exposed=Object.freeze({...info,sample,samplePlastic,sampleStress});
   privateState.set(exposed,record);
   return exposed;
  }
