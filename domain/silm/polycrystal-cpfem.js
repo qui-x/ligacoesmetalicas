@@ -14,10 +14,14 @@ window.SILM=window.SILM||{};
  */
 SILM.polycrystalCPFEM=(()=>{
  const cp=SILM.crystalPlasticity,slip=SILM.crystalSlip;
- const NX=12,NY=8,NE=2*NX*NY,ND=2*(NX+1)*(NY+1);
+ const DEFAULT_NX=12,DEFAULT_NY=8;
  const MAX_GRAINS=256,MAX_STEPS=12;
  const clip=(x,a,b)=>Math.max(a,Math.min(b,x));
  const finite=Number.isFinite;
+ // A mesma formulacao FEM deve poder ser resolvida em mais de uma malha.
+ // O cache e apenas de geometria/alocacao; cada ensaio e independente.
+ function buildGrid(NX,NY){
+ const NE=2*NX*NY,ND=2*(NX+1)*(NY+1);
  const node=(x,y)=>y*(NX+1)+x;
  const matMul=(A,B)=>A.map(row=>[0,1,2].map(i=>row.reduce((s,v,j)=>s+v*B[j][i],0)));
  const rz=a=>[[Math.cos(a),-Math.sin(a),0],[Math.sin(a),Math.cos(a),0],[0,0,1]];
@@ -409,7 +413,56 @@ SILM.polycrystalCPFEM=(()=>{
    maxStrainError:maxError,integratedArea:area,areaError:Math.abs(area-1),
    triangles:NE,engineeringShear:true,calibrated:false,meshConvergenceVerified:false});
  }
+ return Object.freeze({create,verifyAffinePatch,NX,NY,triangles:NE});
+ }
+ const grids=new Map();
+ const allowedGrids=Object.freeze([[6,4],[12,8],[18,12]].map(p=>Object.freeze(p)));
+ const grid=(nx,ny)=>{
+  if(!allowedGrids.some(([x,y])=>nx===x&&ny===y))
+   throw new RangeError('Malha CPFEM indisponivel; use 6x4, 12x8 ou 18x12.');
+  const key=nx+'x'+ny;
+  if(!grids.has(key))grids.set(key,buildGrid(nx,ny));
+  return grids.get(key);
+ };
+ const create=({meshNX=DEFAULT_NX,meshNY=DEFAULT_NY,...rest}={})=>
+  grid(meshNX,meshNY).create(rest);
+ const verifyAffinePatch=({meshNX=DEFAULT_NX,meshNY=DEFAULT_NY,...rest}={})=>
+  grid(meshNX,meshNY).verifyAffinePatch(rest);
+ function compareMeshSensitivity({structure,synthetic,parameters,
+    mode='compression',position=.5,width=.5,load=.04}={}){
+  // A comparacao registra sensibilidade; nunca certifica convergencia.
+  if(!['tension','compression'].includes(mode)||![position,width,load].every(finite)||
+    position<.1||position>.9||width<.1||width>.8||load<0||load>.2)
+   throw new RangeError('Carga fora da faixa de auditoria de malha.');
+  const readings=allowedGrids.map(([nx,ny])=>{
+   const model=create({structure,synthetic,parameters,meshNX:nx,meshNY:ny});
+   const result=model.run({mode,position,width,load,increments:1});
+   if(!result.converged)return Object.freeze({nx,ny,triangles:2*nx*ny,
+     status:'NONCONVERGED',reason:result.reason||result.status,calibrated:false});
+   const point=result.sample(.5,.3);
+   return Object.freeze({nx,ny,triangles:result.triangles,status:'CONVERGED',
+    displacement:point,contactReactionY:result.reactions.topY,
+    energyTotal:result.energy.total,maxAccumulatedSlip:result.maxAccumulatedSlip,
+    residual:result.residual,calibrated:false});
+  });
+  const complete=readings.every(x=>x.status==='CONVERGED');
+  const compare=(a,b)=>Object.freeze({
+   meshes:[a.nx+'x'+a.ny,b.nx+'x'+b.ny],
+   absoluteDisplacementDifference:Math.hypot(a.displacement.dx-b.displacement.dx,
+    a.displacement.dy-b.displacement.dy),
+   relativeReactionDifference:Math.abs(a.contactReactionY-b.contactReactionY)/
+    Math.max(Math.abs(a.contactReactionY),Math.abs(b.contactReactionY),1e-12),
+   relativeEnergyDifference:Math.abs(a.energyTotal-b.energyTotal)/
+    Math.max(Math.abs(a.energyTotal),Math.abs(b.energyTotal),1e-12)
+  });
+  return Object.freeze({status:complete?'DIAGNOSTIC_ONLY':'INCOMPLETE',
+   grids:Object.freeze(readings),comparisons:complete?Object.freeze([
+    compare(readings[0],readings[1]),compare(readings[1],readings[2])]):Object.freeze([]),
+   meshConvergenceVerified:false,calibrated:false,units:'relative',
+   limitation:'Geometria sintética e atribuição de grãos por centro do triângulo mudam com o refinamento. Comparações não provam convergência nem identificam valores experimentais.'});
+ }
  return Object.freeze({schema:'silm.polycrystal-cpfem.small-strain.v1',
-  create,verifyAffinePatch,calibrated:false,requiresMenuReview:true,canFeedJ2:false,
-  NX,NY,triangles:NE});
+  create,verifyAffinePatch,compareMeshSensitivity,
+  meshPresets:allowedGrids,calibrated:false,requiresMenuReview:true,canFeedJ2:false,
+  NX:DEFAULT_NX,NY:DEFAULT_NY,triangles:2*DEFAULT_NX*DEFAULT_NY});
 })();
