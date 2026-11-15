@@ -167,6 +167,7 @@ SILM.polycrystalCPFEM=(()=>{
    const force=new Float64Array(ND),states=new Array(NE),out=new Array(NE),
     rows=stiffness?newRows():null;
    let total=0,plastic=0,maxSlip=0;
+   let energyElastic=0,energyHardening=0,energyDissipated=0,maxAbsLocalStrain=0;
    let activeIndex=-1,activeStage='start';
    try{
     for(let i=0;i<NE;i++){
@@ -177,6 +178,17 @@ SILM.polycrystalCPFEM=(()=>{
       });
      if(!z.converged)return {failure:'LOCAL_NONCONVERGED',element:i,strain:e};
      states[i]=z.state;out[i]=z;
+     const st=z.state,stress3=st.stress;
+     const elastic3=st.totalStrain.map((x,j)=>x-st.plasticStrain[j]);
+     let strainEnergy=0;
+     for(let j=0;j<6;j++)strainEnergy+=elastic3[j]*stress3[j]*(j<3?1:2);
+     // Energetica 3D incluindo sigma_zz: equilibrio FEM e de deformacao plana.
+     // A dissipacao acumulada refere-se ao modelo relativo, nao ao calor medido.
+     energyElastic+=.5*strainEnergy*t.area;
+     energyHardening+=.5*parameters.hardening*st.accumulatedSlip**2*t.area;
+     for(let a=0;a<st.slipBySystem.length;a++)
+      energyDissipated+=model.parameters.crss[a]*st.slipBySystem[a]*t.area;
+     maxAbsLocalStrain=Math.max(maxAbsLocalStrain,...e.map(Math.abs));
      plastic+=z.activeSystems>0?1:0;
      total+=z.accumulatedSlip*t.area;maxSlip=Math.max(maxSlip,z.accumulatedSlip);
      const sig=vectorStress(z);
@@ -207,7 +219,10 @@ SILM.polycrystalCPFEM=(()=>{
     }
    }catch(error){return {failure:'LOCAL_ERROR',element:activeIndex,stage:activeStage,message:error?.message||String(error)};}
    return{force,rows,states,out,plasticTriangles:plastic,
-    meanSlip:total,maxSlip};
+    meanSlip:total,maxSlip,maxAbsLocalStrain,
+    energy:Object.freeze({elasticStored:energyElastic,
+     hardeningStored:energyHardening,plasticDissipated:energyDissipated,
+     total:energyElastic+energyHardening+energyDissipated})};
   }
   function equilibrate(previous,{mode,position,width,load,release=false}){
    const {mask,values}=fixed(mode,position,width,load,release);
@@ -237,9 +252,20 @@ SILM.polycrystalCPFEM=(()=>{
    if(!last||last.failure)return{converged:false,reason:last?.failure||'CONSTITUTIVE_INTEGRATION',diagnostic:last||null,iterations:iter};
    err=norm(last.force,mask);
    if(err<8e-5)done=true;
+   let netFx=0,netFy=0,topY=0,bottomY=0,contactReactionX=0;
+   for(let i=0;i<ND/2;i++){
+    const x=last.force[2*i],y=last.force[2*i+1],row=Math.floor(i/(NX+1));
+    netFx+=x;netFy+=y;
+    if(mask[2*i]&&row===0)contactReactionX+=x;
+    if(mask[2*i+1]&&row===0)topY+=y;
+    if(mask[2*i+1]&&row===NY)bottomY+=y;
+   }
+   const reactions=Object.freeze({topY,bottomY,contactX:contactReactionX,
+    netFx,netFy,freeResidual:err,units:'relative'});
    return done?{converged:true,record:{u,points:last.states},
     iterations:iter+1,residual:err,plasticTriangles:last.plasticTriangles,
-    meanSlip:last.meanSlip,maxSlip:last.maxSlip}:
+    meanSlip:last.meanSlip,maxSlip:last.maxSlip,maxAbsLocalStrain:last.maxAbsLocalStrain,
+    energy:last.energy,reactions}:
     {converged:false,reason:'EQUILIBRIUM_NOT_CONVERGED',
      iterations:iter,residual:err};
   }
@@ -283,6 +309,9 @@ SILM.polycrystalCPFEM=(()=>{
     grains,plasticTriangles:solved.plasticTriangles,
     meanAccumulatedSlip:solved.meanSlip,maxAccumulatedSlip:solved.maxSlip,
     iterations:solved.iterations,residual:solved.residual,
+    maxAbsLocalStrain:solved.maxAbsLocalStrain,
+    energy:solved.energy,reactions:solved.reactions,
+    energyBalanceStatus:'NOT_EVALUATED_EXTERNAL_WORK',
     sample,samplePlastic,sampleStress,
     calibrated:false,units:'relative',canFeedJ2:false,canFeedMetalProperties:false,
     canClaimMeasuredGrainResponse:false,finiteDeformation:false,
