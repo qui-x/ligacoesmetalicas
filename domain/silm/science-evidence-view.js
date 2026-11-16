@@ -77,11 +77,16 @@ SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
    if(slot.displayEligible){
     section.append(renderMeasurement(slot.best,true));
     if(slot.requiresPrimaryReview)section.append(node('p','Conferência da fonte primária ainda necessária.','silm-unified-evidence-caution'));
-   } else section.append(node('p','Não liberado como número rastreável: fonte ausente ou valor indisponível.','silm-unified-evidence-caution'));
+   } else {
+    section.append(node('p','Não liberado como número rastreável: fonte ausente ou valor principal indisponível.','silm-unified-evidence-caution'));
+    const b=slot.best;
+    if(b&&Number.isFinite(b.value_min)&&Number.isFinite(b.value_max))
+     section.append(node('p','Faixa histórica de processamento (não coeficiente de maleabilidade): '+fmt(b.value_min)+'–'+fmt(b.value_max)+' '+(b.unit||''),'silm-unified-evidence-caution'));
+   }
    const alt=(slot.alternatives||[]).filter(v=>Number.isFinite(v?.value)&&typeof v?.sourceURL==='string'&&v.sourceURL.startsWith('https://'));
    if(alt.length){
     const more=document.createElement('details');
-    more.append(node('summary','Outras condições documentadas ('+alt.length+')'));
+    more.append(node('summary','Outras fontes candidatas (não homologadas) ('+alt.length+')'));
     for(const b of alt)more.append(renderMeasurement(b,false));
     section.append(more);
    }
