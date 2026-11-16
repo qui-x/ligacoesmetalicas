@@ -73,6 +73,13 @@ try{
  const imageArea=await objectImage.boundingBox();
  assert.ok(imageArea?.height>=215,'Objeto: fotografia perdeu espaço no celular');
  assert.ok(imageArea.height>=470,'Objeto: enquadramento alto não ocupou o espaço disponível em 390×844');
+ // Algumas versões do Firefox constroem a moldura antes do decode da foto.
+ // Confirmar dimensões naturais antes de medir a lente; recursos quebrados
+ // continuam falhando com timeout explícito (sem mascarar imagem ausente).
+ await page.waitForFunction(()=>{
+  const img=document.querySelector('.silm-workshop-reference-art img');
+  return !!img&&img.complete&&img.naturalWidth>0&&img.naturalHeight>0;
+ },undefined,{timeout:20000});
  const imageGeometry=await page.evaluate(()=>{
   const img=document.querySelector('.silm-workshop-reference-art img');
   const layer=document.querySelector('.silm-workshop-reference-art>.silm-lens-layer');
