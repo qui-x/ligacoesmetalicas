@@ -50,6 +50,15 @@ try{
    'Corrente precisa produzir dissipação Joule pelo motor existente.');
   assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-joule'))>0);
   assert.match(await page.locator('.silm-lab3d-coupled-status').textContent(),/Rede eletrotérmica 1D relativa/);
+  const lamp=page.locator('[data-lab-action="lamp"]');
+  const bright=await page.screenshot();
+  await lamp.click();
+  assert.equal(await lamp.getAttribute('aria-pressed'),'false');
+  await page.waitForTimeout(160);
+  const dark=await page.screenshot({path:join(dir,'lab3d-lamp-off.png')});
+  assert.ok(!bright.equals(dark),'Desligar a luminária precisa alterar o render da sala.');
+  await lamp.click();
+  assert.equal(await lamp.getAttribute('aria-pressed'),'true');
   const neutralProbe=await page.locator('.silm-lab3d').getAttribute('data-specimen-probe');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-surface'),'j2-plane-strain');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-segments'),'18');
@@ -66,6 +75,23 @@ try{
   assert.ok(await page.locator('.silm-lab3d-map-legend').isVisible());
   assert.match(await page.locator('.silm-lab3d-map-legend').textContent(),/unidades relativas/);
   await page.screenshot({path:join(dir,'lab3d-von-mises.png'),fullPage:false});
+  // A cena deve continuar utilizável em resolução móvel sem controles fora do palco.
+  await page.setViewportSize({width:390,height:844});
+  const responsive=await page.evaluate(()=>{
+   const ui=document.querySelector('.silm-lab3d'),
+    top=ui?.getBoundingClientRect(),
+    close=ui?.querySelector('[data-lab-action="close"]')?.getBoundingClientRect(),
+    bottom=ui?.querySelector('.silm-lab3d-bottom')?.getBoundingClientRect(),
+    map=ui?.querySelector('.silm-lab3d-map-panel')?.getBoundingClientRect();
+   return {ok:!!top&&!!close&&!!bottom&&!!map&&
+    close.left>=top.left-2&&close.right<=top.right+2&&
+    bottom.left>=top.left-2&&bottom.right<=top.right+2&&
+    bottom.bottom<=top.bottom+2&&map.right<=top.right+2,
+    width:top?.width||0,height:top?.height||0};
+  });
+  assert.ok(responsive.ok,'Painéis fora do estágio 3D móvel: '+JSON.stringify(responsive));
+  await page.screenshot({path:join(dir,'lab3d-mobile.png'),fullPage:false});
+  await page.setViewportSize({width:1280,height:800});
   await map.selectOption('hydrostaticMean');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'hydrostaticMean');
   await map.selectOption('plasticIndicator');
