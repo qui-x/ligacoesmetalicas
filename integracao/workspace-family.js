@@ -163,16 +163,17 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   };
   const propertyButtons=new Map();
   const propertyTools=node('div',null,'silm-observer-selection-tools');
-  const propertyHelp=node('p','Ctrl + clique: combinar propriedades.','silm-observer-selection-status');
+  const propertyHelp=node('p','Escolha uma propriedade ou combine duas para investigar efeitos conjuntos.','silm-observer-selection-status');
   propertyHelp.setAttribute('role','status');propertyHelp.setAttribute('aria-live','polite');
-  const touchModeButton=node('button','Selecionar várias','silm-observer-select-mode');
+  const touchModeButton=node('button','Combinar propriedades','silm-observer-select-mode');
   touchModeButton.type='button';touchModeButton.setAttribute('aria-pressed','false');
-  const applySelectionButton=node('button','Aplicar seleção','silm-observer-selection-command');
+  const applySelectionButton=node('button','Ativar combinação','silm-observer-selection-command');
   applySelectionButton.type='button';applySelectionButton.hidden=true;applySelectionButton.disabled=true;
   const clearSelectionButton=node('button','Cancelar','silm-observer-selection-command');
   clearSelectionButton.type='button';clearSelectionButton.hidden=true;
   const touchCapable=(()=>{try{return window.matchMedia('(hover: none) and (pointer: coarse)').matches;}catch{return false;}})();
-  touchModeButton.hidden=!touchCapable;
+  // Visível também no desktop: não exigir conhecimento de Ctrl para combinar efeitos.
+  touchModeButton.hidden=false;
   propertyTools.append(propertyHelp,touchModeButton,applySelectionButton,clearSelectionButton);
   propertyActions.parentElement.insertBefore(propertyTools,propertyActions);
   function selectionSignature(){return [...selectedProperties].sort().join('|');}
@@ -188,12 +189,12 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    const names=[...selectedProperties].map(id=>propertyLabels[id]);
    if(names.length){
     const pending=names.join(' + ');
-    propertyHelp.textContent='Seleção: '+pending+(multiSelectMode?' · toque em Aplicar seleção':' · solte Ctrl para aplicar');
+    propertyHelp.textContent='Efeitos escolhidos: '+pending+(multiSelectMode?' · selecione Ativar combinação':' · solte Ctrl para aplicar');
    }else{
-    propertyHelp.textContent=multiSelectMode?'Selecione duas propriedades compatíveis e toque em Aplicar seleção.':touchCapable?'Elétrica + Térmica: efeito Joule. Use Selecionar várias.':'Elétrica + Térmica: efeito Joule. Ctrl + clique combina.';
+    propertyHelp.textContent=multiSelectMode?'Escolha duas propriedades compatíveis; só os pares validados podem ser aplicados.':'Elétrica + Térmica: efeito Joule. Use Combinar propriedades para outros pares disponíveis.';
    }
    touchModeButton.setAttribute('aria-pressed',String(multiSelectMode));
-   touchModeButton.textContent=multiSelectMode?'Seleção múltipla ativa':'Selecionar várias';
+   touchModeButton.textContent=multiSelectMode?'Cancelar combinação':'Combinar propriedades';
    applySelectionButton.hidden=!multiSelectMode;
    applySelectionButton.disabled=selectedProperties.size===0;
    clearSelectionButton.hidden=!multiSelectMode&&selectedProperties.size===0;
