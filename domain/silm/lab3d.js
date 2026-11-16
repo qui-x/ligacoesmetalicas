@@ -6,8 +6,9 @@
  * Condutividade/efeitos ópticos na sala são prévios e NÃO calibrados.
  */
 (()=>{
- const S=window.SILM||{},C=S.lab3dCore,Surface=S.lab3dSpecimen;
- if(!C||!Surface)return;
+ const S=window.SILM||{},C=S.lab3dCore,Surface=S.lab3dSpecimen,
+  Bridge=S.mechanicsSceneBridge,Overlay=S.lab3dFieldOverlay;
+ if(!C||!Surface||!Bridge||!Overlay)return;
  const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  const reduced=()=>matchMedia('(prefers-reduced-motion:reduce)').matches||
   document.documentElement.classList.contains('si-no-motion');
@@ -106,7 +107,7 @@
    this.keys=new Set();this.eye=[0,1.60,2.35];this.yaw=0;this.pitch=-.06;
    this.inspect=false;this.load=0;this.loadMode='compression';
    this.temperature=C.initialHeat();this.heat=false;this.current=false;this.lamp=true;
-   this.field=null;this.surface=null;this.surfaceSegments=[];this.strain=0;this.last=0;this.thermalTimer=0;this.frame=null;this.destroyed=false;
+   this.field=null;this.surface=null;this.surfaceSegments=[];this.mechanicsBridge=null;this.activeMap=null;this.strain=0;this.last=0;this.thermalTimer=0;this.frame=null;this.destroyed=false;
    this.ui=make('section','silm-lab3d');this.ui.setAttribute('role','dialog');
    this.ui.setAttribute('aria-modal','true');this.ui.setAttribute('aria-label','Laboratório 3D de metais');
    this.canvas=make('canvas');this.canvas.tabIndex=0;this.canvas.setAttribute('aria-label','Sala tridimensional. Use WASD para caminhar, mouse para olhar, E para interagir.');this.ui.append(this.canvas);
@@ -115,7 +116,23 @@
    const inspect=this.button(hud,'Inspecionar','inspect',()=>this.setInspect(!this.inspect));
    const close=this.button(hud,'Fechar','close',()=>this.close());close.setAttribute('aria-label','Fechar laboratório e voltar à investigação');
    this.inspectButton=inspect;
-   this.ui.append(hud,make('div','silm-lab3d-crosshair'));
+   // Um único seletor de observação, separado do estado científico.
+   const maps=make('section','silm-lab3d-map-panel');
+   const mapLabel=make('label','silm-lab3d-map-label','Visualizar amostra');
+   this.mapSelect=make('select');this.mapSelect.id='silm-lab3d-map-kind';
+   this.mapSelect.setAttribute('aria-label','Campo da amostra: aparência, tensão equivalente, tensão média ou plasticidade');
+   for(const kind of Overlay.kinds){
+    const option=make('option','',Overlay.labels[kind]);
+    option.value=kind;this.mapSelect.append(option);
+   }
+   this.mapSelect.value='appearance';this.mapSelect.dataset.mapOwner='lab3d';
+   this.mapSelect.addEventListener('change',()=>this.updateMap(true));
+   mapLabel.append(this.mapSelect);maps.append(mapLabel);
+   this.mapLegend=make('output','silm-lab3d-map-legend');
+   this.mapLegend.setAttribute('role','status');
+   this.mapLegend.setAttribute('aria-live','polite');
+   this.mapLegend.hidden=true;maps.append(this.mapLegend);
+   this.ui.append(hud,maps,make('div','silm-lab3d-crosshair'));
    const bottom=make('div','silm-lab3d-bottom');
    this.button(bottom,'Tração / compressão','mode',()=>{this.loadMode=this.loadMode==='compression'?'tension':'compression';this.setLoad(this.load)});
    this.button(bottom,'− Carga','less',()=>this.setLoad(this.load-.2));
@@ -123,7 +140,8 @@
    this.heatButton=this.button(bottom,'Calor','heat',()=>{this.heat=!this.heat;this.heatButton.setAttribute('aria-pressed',String(this.heat));if(reduced())this.temperature=C.initialHeat().map((_,i)=>this.heat?Math.max(0,1-i/17):0);});
    this.currentButton=this.button(bottom,'Corrente','current',()=>{this.current=!this.current;this.currentButton.setAttribute('aria-pressed',String(this.current));});
    this.lampButton=this.button(bottom,'Luz','lamp',()=>{this.lamp=!this.lamp;this.lampButton.setAttribute('aria-pressed',String(this.lamp));});
-   this.button(bottom,'Microscópio','micro',()=>this.enterScale(2));
+   const micro=this.button(bottom,'Microscópio','micro',()=>this.enterScale(2));
+   micro.title='Passagem didática da bancada à microestrutura por meio do microscópio; não é uma imagem óptica medida';
    this.button(bottom,'Rede','lattice',()=>this.enterScale(3));
    this.status=make('output','silm-lab3d-status','WASD: caminhar · arrastar: olhar · E: interagir · prévia didática sem calibração.');
    this.status.setAttribute('aria-live','polite');bottom.append(this.status);this.ui.append(bottom);
@@ -204,7 +222,11 @@
     if(!surface.ok)throw new Error('Malha visual J2 indisponível.');
     const surfaceSegments=surface.segments.map(seg=>({index:seg.index,
      vertices:new Float32Array(seg.vertices),plasticIndicator:seg.plasticIndicator}));
-    this.field=field;this.surface=surface;this.surfaceSegments=surfaceSegments;this.load=load;
+    const bridge=Bridge.create(field,{source:'j2',amplification:1});
+    if(!bridge.ok)throw new Error('Campo para mapa mecânico indisponível.');
+    // O par campo+superfície só é trocado após validação completa.
+    this.field=field;this.surface=surface;this.surfaceSegments=surfaceSegments;
+    this.mechanicsBridge=bridge;this.load=load;
     this.strain=clamp((upper.dy-lower.dy)*2,-.18,.18);
     this.ui.dataset.specimenSurface='j2-plane-strain';
     this.ui.dataset.specimenSegments=String(surfaceSegments.length);
@@ -212,7 +234,39 @@
     this.ui.dataset.specimenProbe=surface.position(.75,.75,1).map(v=>v.toFixed(7)).join(',');
     this.status.textContent='J2 normalizado · '+(this.loadMode==='compression'?'compressão':'tração')+
      ' · carga '+Math.round(load*100)+'% (unidades relativas). Superfície deformada por campo 2D; espessura apenas visual.';
+    this.updateMap(false);
    }catch(e){this.status.textContent='Amostra original preservada: '+(e?.message||'sem resposta do modelo J2');}
+  }
+  updateMap(announce=true){
+   const kind=this.mapSelect.value;
+   this.ui.dataset.fieldMap=kind;
+   if(kind==='appearance'){
+    this.activeMap=null;this.mapLegend.hidden=true;
+    this.ui.dataset.mapAvailable='0';this.ui.dataset.mapMissing='0';
+    this.ui.dataset.mapRange='';this.ui.dataset.mapSource='none';
+    if(announce)this.status.textContent='Aparência metálica esquemática · calor, corrente e iluminação são camadas visuais relativas.';
+    return;
+   }
+   try{
+    const map=Overlay.create(this.mechanicsBridge,this.surface,{kind});
+    if(!map.ok)throw new Error('Amostra sem campo J2 convergido.');
+    this.activeMap=map;
+    this.ui.dataset.mapAvailable=String(map.available);
+    this.ui.dataset.mapMissing=String(map.missing);
+    this.ui.dataset.mapRange=map.min===null?'none':[map.min,map.max].map(x=>x.toPrecision(7)).join(':');
+    this.ui.dataset.mapSource=map.source;
+    const format=v=>v===null?'indisponível':Number(v).toPrecision(4);
+    this.mapLegend.textContent=map.label+' · mínimo '+format(map.min)+
+     ' · máximo '+format(map.max)+' · '+map.available+' regiões válidas, '+
+     map.missing+' ausentes. Escala local, unidades relativas; não é valor medido em MPa.';
+    this.mapLegend.dataset.kind=kind;
+    this.mapLegend.hidden=false;
+    if(announce)this.status.textContent=map.label+
+     ': mapa local somente para inspeção. Os resultados não substituem o modelo constitutivo J2.';
+   }catch(error){
+    this.activeMap=null;this.mapSelect.value='appearance';this.updateMap(false);
+    this.status.textContent='Mapa não disponível: '+(error.message||'falha de leitura')+'.';
+   }
   }
   interact(){
    const items=[
@@ -255,7 +309,11 @@
    // z permanece constante, pois o campo resolvido é bidimensional.
    const upperY=this.surface?.ok?this.surface.position(.5,1,1)[1]:1.25;
    add([0,upperY+.042,-1.35,1.12,.06,.31],steel,.92,70);
-   if(this.surface?.ok){
+   if(this.activeMap?.ok){
+    for(const patch of this.activeMap.patches){
+     items.push({mesh:patch.vertices,c:patch.color,m:.24,g:20});
+    }
+   }else if(this.surface?.ok){
     for(const seg of this.surfaceSegments){
      const q=this.temperature[Math.min(this.temperature.length-1,seg.index)]||0;
      const p=clamp((seg.plasticIndicator||0)*8,0,1);

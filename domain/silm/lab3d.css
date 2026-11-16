@@ -36,3 +36,24 @@
 }
 @media(prefers-reduced-motion:reduce){.silm-lab3d *{scroll-behavior:auto}}
 @media(forced-colors:active){.silm-lab3d-hud,.silm-lab3d-bottom{border:1px solid CanvasText;background:Canvas;color:CanvasText}}
+
+/* Mapas opt-in somente leitura; valores e metadados legíveis sem codificação por cor. */
+.silm-lab3d-map-panel{position:absolute;right:10px;top:72px;z-index:2;max-width:min(365px,calc(100% - 20px));
+ border:1px solid rgba(185,216,241,.4);border-radius:8px;background:rgba(10,22,37,.94);
+ padding:8px 10px;font-size:.8rem;display:grid;gap:6px}
+.silm-lab3d-map-label{display:grid;gap:4px;font-size:.78rem}
+.silm-lab3d-map-label select{min-width:240px;max-width:100%;width:100%}
+.silm-lab3d-map-legend{font-size:.74rem;line-height:1.4;display:block;max-width:42ch}
+.silm-lab3d-map-legend[hidden]{display:none}
+.silm-lab3d-map-legend::before{content:'';display:block;height:7px;margin-bottom:5px;border-radius:6px;
+ background:linear-gradient(90deg,#2859c4 0%,#f5bd3d 50%,#e6402e 100%)}
+.silm-lab3d-map-legend[data-kind=hydrostaticMean]::before{
+ background:linear-gradient(90deg,#2859c4 0%,#e0e8f5 50%,#e6402e 100%)}
+@media(max-width:690px),(pointer:coarse){
+ .silm-lab3d-map-panel{top:90px;right:6px;max-width:calc(100% - 12px);padding:5px}
+ .silm-lab3d-map-label select{min-width:190px}
+}
+@media(forced-colors:active){
+ .silm-lab3d-map-panel{background:Canvas;color:CanvasText;border:1px solid CanvasText}
+ .silm-lab3d-map-legend::before{display:none}
+}
