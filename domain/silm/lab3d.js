@@ -157,6 +157,7 @@
     for(const type of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(type,()=>this.keys.delete(id));
    }
    this.ui.append(mobile);host.append(this.ui);
+   if(returnButton)returnButton.hidden=true;
    try{this.renderer=makeRenderer(this.canvas)}
    catch(e){this.ui.remove();throw e}
    this.onKey=e=>{
@@ -394,9 +395,11 @@
     });
     this.returnFocus.textContent='Voltar à sala 3D';
     this.returnFocus.title='Retomar a câmera e os controles visuais após a observação em outra escala';
+    if(returnButton)returnButton.hidden=false;
    }else{
     suspended=null;
     this.returnFocus.textContent='Sala 3D';
+    if(returnButton)returnButton.hidden=true;
    }
    this.destroyed=true;cancelAnimationFrame(this.frame);
    if(document.pointerLockElement===this.canvas)document.exitPointerLock();
@@ -412,7 +415,7 @@
    if(active===this)active=null;
   }
  }
- let active=null,suspended=null;
+ let active=null,suspended=null,returnButton=null;
  function boot(){
   const bar=$('#silm-scene-actionbar'),stage=$('#si-stage');
   if(!bar||!stage)return;
@@ -420,6 +423,17 @@
   entry.type='button';entry.setAttribute('aria-label','Entrar na sala tridimensional de investigação do metal');
   entry.title='Prévia navegável 3D integrada à investigação atual';
   const count=$('#scene-count');count?.parentElement?.insertBefore(entry,count);
+  returnButton=make('button','silm-lab3d-return','Voltar à sala 3D');
+  returnButton.type='button';returnButton.hidden=true;
+  returnButton.setAttribute('aria-label','Retomar a sala 3D mantendo câmera e controles visuais da prévia');
+  returnButton.addEventListener('click',()=>entry.click());
+  stage.append(returnButton);
+  window.addEventListener('si-route-changed',()=>{
+   if(!location.hash.startsWith('#/ambiente')){
+    suspended=null;returnButton.hidden=true;
+    entry.textContent='Sala 3D';
+   }
+  });
   entry.addEventListener('click',()=>{
    if(active){active.close();return;}
    const state=window.SILMIntegration?.snapshot?.();
