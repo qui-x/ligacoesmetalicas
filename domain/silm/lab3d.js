@@ -276,6 +276,20 @@
    const microGroup=group('microscope');
    this.button(microGroup,'Observar a microestrutura','open-micro',()=>this.enterScale(2));
    this.ui.append(mobile,this.instrumentPanel);
+   // Um único painel opcional por vez: mapa, ações acessíveis ou
+   // controles do instrumento. O canvas continua como área central.
+   quick.addEventListener('toggle',()=>{
+    if(!quick.open)return;
+    maps.open=false;
+    if(!this.instrumentPanel.hidden)this.hideInstrument({restoreFocus:false});
+   });
+   maps.addEventListener('toggle',()=>{
+    if(!maps.open)return;
+    quick.open=false;
+    if(!this.instrumentPanel.hidden)this.hideInstrument({restoreFocus:false});
+   });
+   this.quickControls=quick;
+   this.mapPanel=maps;
    host.append(this.ui);
    if(returnButton)returnButton.hidden=true;
    try{this.renderer=makeRenderer(this.canvas)}
@@ -528,15 +542,17 @@
    this.instrumentDescription.textContent=descriptions[id];
    for(const [key,node]of this.instrumentGroups)node.hidden=key!==id;
    this.refreshInstrument();
+   this.quickControls.open=false;
+   this.mapPanel.open=false;
    this.instrumentPanel.hidden=false;
    this.status.textContent=I.labels[id]+' selecionado. Use os controles no painel contextual.';
    this.instrumentClose.focus({preventScroll:true});
    return true;
   }
-  hideInstrument(){
+  hideInstrument({restoreFocus=true}={}){
    this.instrumentPanel.hidden=true;this.selectedInstrument=null;
    this.ui.dataset.selectedInstrument='none';
-   this.canvas.focus({preventScroll:true});
+   if(restoreFocus)this.canvas.focus({preventScroll:true});
   }
   interact(){
    const f=I.basis(this.yaw,this.pitch).forward;
