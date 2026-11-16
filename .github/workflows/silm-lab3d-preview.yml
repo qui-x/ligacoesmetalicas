@@ -7,6 +7,7 @@ on:
       - 'domain/silm/lab3d-field-overlay.js'
       - 'domain/silm/lab3d-instruments.js'
       - 'domain/silm/lab3d-geometry.js'
+      - 'domain/silm/lab3d-visuals.js'
       - 'domain/silm/lab3d-electrothermal.js'
       - 'domain/silm/mechanics-scene-bridge.js'
       - 'domain/silm/lab3d.js'
@@ -14,6 +15,7 @@ on:
       - 'tests/silm-lab3d-specimen.test.cjs'
       - 'tests/silm-lab3d-field-overlay.test.cjs'
       - 'tests/silm-lab3d-instruments.test.cjs'
+      - 'tests/silm-lab3d-visuals.test.cjs'
       - 'tests/silm-lab3d-electrothermal.test.cjs'
       - '.github/workflows/silm-lab3d-preview.yml'
       - 'tests/run-silm-lab3d-browser.mjs'
@@ -37,6 +39,8 @@ jobs:
           node --check domain/silm/lab3d-field-overlay.js
           node --check domain/silm/lab3d-instruments.js
           node --check domain/silm/lab3d-geometry.js
+          node --check domain/silm/lab3d-visuals.js
+          node --check tests/silm-lab3d-visuals.test.cjs
           node --check tests/silm-lab3d-instruments.test.cjs
           node --check domain/silm/lab3d-electrothermal.js
           node --check tests/silm-lab3d-electrothermal.test.cjs
@@ -46,7 +50,7 @@ jobs:
           node --check domain/silm/lab3d.js
           node --check tests/silm-lab3d-core.test.cjs
       - name: Testes determinísticos
-        run: node --test tests/silm-lab3d-core.test.cjs tests/silm-lab3d-specimen.test.cjs tests/silm-lab3d-field-overlay.test.cjs tests/silm-lab3d-electrothermal.test.cjs tests/silm-lab3d-instruments.test.cjs
+        run: node --test tests/silm-lab3d-core.test.cjs tests/silm-lab3d-specimen.test.cjs tests/silm-lab3d-field-overlay.test.cjs tests/silm-lab3d-electrothermal.test.cjs tests/silm-lab3d-instruments.test.cjs tests/silm-lab3d-visuals.test.cjs
   browser:
     runs-on: ubuntu-latest
     timeout-minutes: 20

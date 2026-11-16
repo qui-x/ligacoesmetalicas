@@ -8,8 +8,8 @@
 (()=>{
  const S=window.SILM||{},C=S.lab3dCore,Surface=S.lab3dSpecimen,
   Bridge=S.mechanicsSceneBridge,Overlay=S.lab3dFieldOverlay,
-  Electrothermal=S.lab3dElectrothermal,I=S.lab3dInstruments,G=S.lab3dGeometry;
- if(!C||!Surface||!Bridge||!Overlay||!Electrothermal||!I||!G)return;
+  Electrothermal=S.lab3dElectrothermal,I=S.lab3dInstruments,G=S.lab3dGeometry,V=S.lab3dVisuals;
+ if(!C||!Surface||!Bridge||!Overlay||!Electrothermal||!I||!G||!V)return;
  const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  const reduced=()=>matchMedia('(prefers-reduced-motion:reduce)').matches||
   document.documentElement.classList.contains('si-no-motion');
@@ -61,7 +61,9 @@
   const vs=shader(gl,gl.VERTEX_SHADER,
    'attribute vec3 p;attribute vec3 n;uniform mat4 m,vp;varying vec3 N,W;void main(){vec4 world=m*vec4(p,1.);W=world.xyz;N=normalize(vec3(n.x/max(m[0][0],.0001),n.y/max(m[1][1],.0001),n.z/max(m[2][2],.0001)));gl_Position=vp*world;}');
   const fs=shader(gl,gl.FRAGMENT_SHADER,
-   'precision mediump float;varying vec3 N,W;uniform vec3 base,eye;uniform float metallic,shine,lampOn;'+
+   'precision mediump float;varying vec3 N,W;uniform vec3 base,eye;uniform float metallic,shine,lampOn,receiver;'+
+   'uniform vec4 shadow0,shadow1,shadow2,shadow3;'+
+   'float occlusion(vec2 p,vec4 s){vec2 d=(p-s.xy)/max(s.zw,vec2(.001));return exp(-2.4*dot(d,d));}'+
    'void main(){vec3 n=normalize(N),v=normalize(eye-W);'+
    'vec3 l=normalize(vec3(1.2,3.7,1.4)-W),desk=normalize(vec3(-1.63,1.85,-1.32)-W);'+
    'float a=max(dot(n,l),0.),b=max(dot(n,desk),0.);'+
@@ -72,14 +74,26 @@
    'lampOn*pow(max(dot(n,hd),0.),max(6.0,shine))*.8*atten;'+
    'float f=pow(1.0-max(dot(n,v),0.),5.0);'+
    'vec3 specular=mix(vec3(.55,.66,.77),base,.6*metallic);'+
-   'vec3 color=base*light+specular*(metallic*highlight+.08*f);'+
+   'float shade=1.0;if(receiver>.5&&n.y>.82){float oc=max(max(occlusion(W.xz,shadow0),occlusion(W.xz,shadow1)),max(occlusion(W.xz,shadow2),occlusion(W.xz,shadow3)));shade-=(.18+.17*lampOn)*oc;}'+
+   'vec3 color=base*light*shade+specular*(metallic*highlight+.08*f);'+
    'gl_FragColor=vec4(clamp(color,0.0,1.0),1.0);}');
   const program=gl.createProgram();gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);
   if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error('Programa WebGL inválido.');
   gl.useProgram(program);gl.enable(gl.DEPTH_TEST);gl.clearColor(.055,.09,.14,1);
   const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
   gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(verts),gl.STATIC_DRAW);
-  const meshBuffer=gl.createBuffer();
+  // Malhas imutáveis reaproveitadas até mudança de deformação/campo.
+  // Evita gl.bufferData contínuo e vazamento por nova carga durante a sessão.
+  let meshCache=new WeakMap(),meshBuffers=new Set(),uploadCount=0;
+  const cachedBuffer=mesh=>{
+   let buffer=meshCache.get(mesh);
+   if(!buffer){
+    buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
+    gl.bufferData(gl.ARRAY_BUFFER,mesh,gl.STATIC_DRAW);
+    meshCache.set(mesh,buffer);meshBuffers.add(buffer);uploadCount++;
+   }
+   return buffer;
+  };
   const layout=(target)=>{
    gl.bindBuffer(gl.ARRAY_BUFFER,target);
    for(const [name,offset] of [['p',0],['n',3]]){
@@ -91,29 +105,35 @@
   const uniform=k=>gl.getUniformLocation(program,k);
   const U={m:uniform('m'),vp:uniform('vp'),base:uniform('base'),
     eye:uniform('eye'),metallic:uniform('metallic'),shine:uniform('shine'),
-    lampOn:uniform('lampOn')};
+    lampOn:uniform('lampOn'),receiver:uniform('receiver'),
+    shadow0:uniform('shadow0'),shadow1:uniform('shadow1'),
+    shadow2:uniform('shadow2'),shadow3:uniform('shadow3')};
   return {
    resize(){const w=Math.max(1,canvas.clientWidth),h=Math.max(1,canvas.clientHeight);
     const dpr=Math.min(devicePixelRatio||1,1.6);
     const pw=Math.round(w*dpr),ph=Math.round(h*dpr);
     if(canvas.width!==pw||canvas.height!==ph){canvas.width=pw;canvas.height=ph;}
     gl.viewport(0,0,pw,ph);return w/h;},
-   render(items,eye,yaw,pitch,lampOn=true){const aspect=this.resize();gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+   render(items,eye,yaw,pitch,lampOn=true,shadows=V.shadows()){const aspect=this.resize();gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+    for(let i=0;i<4;i++)gl.uniform4fv(U['shadow'+i],shadows[i]);
     gl.uniformMatrix4fv(U.vp,false,matrices(eye,yaw,pitch,aspect));
     gl.uniform1f(U.lampOn,lampOn?1:0);
     gl.uniform3fv(U.eye,new Float32Array(eye));
     let activeBuffer=null;
     for(const a of items){
-     const isMesh=!!a.mesh,target=isMesh?meshBuffer:buffer;
+     const isMesh=!!a.mesh,target=isMesh?cachedBuffer(a.mesh):buffer;
      if(activeBuffer!==target){layout(target);activeBuffer=target;}
-     if(isMesh)gl.bufferData(gl.ARRAY_BUFFER,a.mesh,gl.DYNAMIC_DRAW);
+     gl.uniform1f(U.receiver,a.receiver?1:0);
      gl.uniformMatrix4fv(U.m,false,model(...(a.b||[0,0,0,1,1,1])));
      gl.uniform3fv(U.base,new Float32Array(a.c));gl.uniform1f(U.metallic,a.m);
      gl.uniform1f(U.shine,a.g);
      gl.drawArrays(gl.TRIANGLES,0,isMesh?a.mesh.length/6:36);
     }
    },
-   dispose(){gl.deleteBuffer(meshBuffer);gl.deleteBuffer(buffer);gl.deleteProgram(program);gl.deleteShader(vs);gl.deleteShader(fs)}
+   get uploads(){return uploadCount;},
+   resetMeshes(){for(const b of meshBuffers)gl.deleteBuffer(b);
+    meshBuffers.clear();meshCache=new WeakMap();},
+   dispose(){this.resetMeshes();gl.deleteBuffer(buffer);gl.deleteProgram(program);gl.deleteShader(vs);gl.deleteShader(fs)}
   };
  }
  class Session{
@@ -124,6 +144,7 @@
     '|'+String(state?.metadata?.workshop?.referenceId||'');
    this.keys=new Set();this.eye=[0,1.60,2.35];this.yaw=0;this.pitch=-.06;
    this.inspect=false;this.load=0;this.loadMode='compression';this.fieldMode=null;
+   this.shadows=V.shadows({upperY:1.25});
    this.currentIntensity=.6;this.selectedInstrument=null;
    this.temperature=C.initialHeat();this.potential=C.initialHeat();this.dissipation=C.initialHeat();
    this.heat=false;this.current=false;this.lamp=true;
@@ -407,6 +428,7 @@
     this.ui.dataset.specimenLoad=String(load);
     this.ui.dataset.specimenProbe=surface.position(.75,.75,1).map(v=>v.toFixed(7)).join(',');
     this.ui.dataset.specimenMode=this.loadMode;
+    this.shadows=V.shadows({upperY:surface.position(.5,1,1)[1]});
     this.refreshInstrument();
     this.status.textContent='J2 normalizado · '+(this.loadMode==='compression'?'compressão':'tração')+
      ' · carga '+Math.round(load*100)+'% (unidades relativas). Superfície deformada por campo 2D; espessura apenas visual.';
@@ -414,6 +436,7 @@
    }catch(e){this.status.textContent='Amostra original preservada: '+(e?.message||'sem resposta do modelo J2');}
   }
   updateMap(announce=true){
+   this.renderer?.resetMeshes();
    const kind=this.mapSelect.value;
    this.ui.dataset.fieldMap=kind;
    if(kind==='appearance'){
@@ -500,7 +523,7 @@
    requestAnimationFrame(()=>$('#silm-workshop-context .silm-workshop-scale[data-scale="'+n+'"]')?.focus({preventScroll:true}));
   }
   items(time){
-   const items=[],add=(b,c,m=0,g=20)=>items.push({b,c,m,g}),
+   const items=[],add=(b,c,m=0,g=20,receiver=false)=>items.push({b,c,m,g,receiver}),
     rounded=(b,c,m=.7,g=38)=>items.push({b,c,m,g,mesh:G.round}),
     ring=(b,c,m=.7,g=38)=>items.push({b,c,m,g,mesh:G.ring});
    const steel=[.51,.60,.66],wall=[.21,.3,.4],wood=[.32,.24,.19],dark=[.08,.14,.21];
@@ -509,14 +532,12 @@
    add([-3.88,1.65,0,.18,3.3,7.7],[.18,.25,.32]);
    add([3.88,1.65,0,.18,3.3,7.7],[.18,.25,.32]);
    for(let k=-3;k<=3;k++)add([k,0,0,.01,.01,7.6],[.13,.18,.23]);
-   add([0,.83,-1.36,3.4,.16,1.46],wood,0,12);
+   add([0,.83,-1.36,3.4,.16,1.46],wood,0,12,true);
    for(const x of [-1.48,1.48])for(const z of [-1.86,-.85])
     add([x,.39,z,.14,.75,.14],steel,.5,20);
    add([0,.92,-1.35,1.18,.07,.40],dark);
-   // Sombras de contato locais ilustrativas, sem shadow map/ray tracing.
-   add([0,.917,-1.35,1.23,.008,.40],[.095,.115,.145],.05,10);
-   add([1.06,.917,-1.29,.52,.007,.46],[.11,.125,.145],.05,10);
-   add([-1.15,.917,-1.4,.50,.007,.51],[.11,.125,.145],.05,10);
+   // Sombras analíticas no shader do tampo: centros projetados a partir da altura da prensa.
+   // Não são sombras ray traced nem resposta óptica calibrada.
    // Prensa: guias, ponte, fuso, cabeçote móvel e instrumentos em baixo relevo.
    for(const x of [-.62,.62])add([x,1.28,-1.6,.09,.76,.1],steel,.8,48);
    add([0,1.73,-1.6,1.35,.14,.24],[.37,.49,.59],.8,52);
@@ -603,7 +624,10 @@
      else{this.coupledStatus.textContent='A solução eletrotérmica parou por instabilidade numérica.';this.coupled=null;}
     }
    }
-   try{this.renderer.render(this.items(time),this.eye,this.yaw,this.pitch,this.lamp)}
+   try{this.renderer.render(this.items(time),this.eye,this.yaw,this.pitch,this.lamp,this.shadows);
+    this.ui.dataset.meshUploads=String(this.renderer.uploads);
+    this.ui.dataset.shadowPress=this.shadows[0][0].toFixed(6)+','+this.shadows[0][1].toFixed(6);
+   }
    catch(e){this.status.textContent='Renderização 3D interrompida: '+e.message;this.close(false);return;}
    this.frame=requestAnimationFrame(t=>this.tick(t));
   }
