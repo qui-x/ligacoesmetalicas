@@ -40,6 +40,61 @@ SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
    item.append(link);}
   return item;
  }
+
+ // Pesquisa de 80 metais: exibição DOCUMENTAL dentro da doca atual.
+ // Não modifica ScientificState, ensaios ou qualquer motor físico.
+ function appendScience400(z,selected){
+  const catalog=S.science400Reference;
+  if(!catalog)return 0;
+  const entries=selected.map(p=>catalog.getFor(z,p)).filter(Boolean);
+  if(!entries.length)return 0;
+  const outer=document.createElement('details');
+  outer.className='silm-unified-evidence-more silm-science400-reference';
+  outer.append(node('summary','Pesquisa consolidada · 80 metais · cinco propriedades ('+entries.length+')'));
+  outer.append(node('p','Medições, compilações, previsões e processamento têm condições distintas. Nenhum valor deste catálogo calibra automaticamente um motor.','silm-unified-evidence-note'));
+  const names={electrical:'Elétrica',thermal:'Térmica',ductility:'Ductilidade',malleability:'Maleabilidade/conformação',luster:'Óptica'};
+  function renderMeasurement(b,main){
+   const el=node('div','','silm-science400-measurement'),v=b&&Number.isFinite(b.value);
+   el.append(node('p',v?(b.metric||'Grandeza').replace(/_/g,' ')+': '+fmt(b.value)+' '+(b.unit||''):'Sem valor numérico verificável.'));
+   const c=b?.conditions||{},parts=[];
+   if(Number.isFinite(c.temperature_K))parts.push(fmt(c.temperature_K)+' K');
+   if(c.phase)parts.push('fase: '+c.phase);
+   if(c.specimen)parts.push('amostra: '+c.specimen);
+   if(c.method)parts.push('método: '+c.method);
+   if(Number.isFinite(c.pressure_Pa))parts.push('pressão: '+fmt(c.pressure_Pa)+' Pa');
+   el.append(node('p',parts.join(' · ')||'Condições completas não determinadas','silm-unified-evidence-conditions'));
+   if(c.notes)el.append(node('p',String(c.notes),'silm-unified-evidence-caution'));
+   if(typeof b?.sourceURL==='string'&&b.sourceURL.startsWith('https://')){
+    const a=node('a',main?'Consultar fonte documental':'Fonte da condição alternativa');
+    a.href=b.sourceURL;a.rel='noopener noreferrer';a.target='_blank';el.append(a);
+   }
+   return el;
+  }
+  for(const slot of entries){
+   const section=node('article','','silm-unified-evidence-record');
+   section.dataset.property=slot.property;section.dataset.engineRelease='false';
+   section.append(node('strong',(names[slot.property]||slot.property)+' · '+slot.status.replace(/_/g,' ').toLowerCase()));
+   if(slot.displayEligible){
+    section.append(renderMeasurement(slot.best,true));
+    if(slot.requiresPrimaryReview)section.append(node('p','Conferência da fonte primária ainda necessária.','silm-unified-evidence-caution'));
+   } else {
+    section.append(node('p','Não liberado como número rastreável: fonte ausente ou valor principal indisponível.','silm-unified-evidence-caution'));
+    const b=slot.best;
+    if(b&&Number.isFinite(b.value_min)&&Number.isFinite(b.value_max))
+     section.append(node('p','Faixa histórica de processamento (não coeficiente de maleabilidade): '+fmt(b.value_min)+'–'+fmt(b.value_max)+' '+(b.unit||''),'silm-unified-evidence-caution'));
+   }
+   const alt=(slot.alternatives||[]).filter(v=>Number.isFinite(v?.value)&&typeof v?.sourceURL==='string'&&v.sourceURL.startsWith('https://'));
+   if(alt.length){
+    const more=document.createElement('details');
+    more.append(node('summary','Outras fontes candidatas (não homologadas) ('+alt.length+')'));
+    for(const b of alt)more.append(renderMeasurement(b,false));
+    section.append(more);
+   }
+   if(slot.caution)section.append(node('p',String(slot.caution),'silm-unified-evidence-caution'));
+   outer.append(section);
+  }
+  list.append(outer);return entries.length;
+ }
  function update({atomicNumber=null,active=null}={}){
   const z=Number(atomicNumber);
   const selected=mode==='explore'?[active]:db?.keys||[];
@@ -69,13 +124,15 @@ SILM.createUnifiedElementEvidencePanel=({mode='data'}={})=>{
    }
    list.append(group);
   }
-  root.hidden=!total;
-  if(!total)return;
+  const batchCount=appendScience400(z,selected);
+  root.hidden=!(total+batchCount);
+  if(!total&&!batchCount)return;
   title.textContent=mode==='explore'?
    'Evidências científicas reunidas desta propriedade':'Outras referências científicas do elemento';
   description.textContent=display+' fichas consultáveis'+(pending?' · '+pending+' registros com fonte original pendente':'')+
    '. Estudos podem se referir a amostras e temperaturas diferentes. '+
-   'Valores de ensaios, compilações e estimativas não homologam automaticamente os motores do SILM.';
+   'Valores de ensaios, compilações e estimativas não homologam automaticamente os motores do SILM.'+
+   (batchCount?' Matriz documental: '+batchCount+' campos; valores sem fonte não foram promovidos.':'');
  }
  return Object.freeze({root,update});
 };
