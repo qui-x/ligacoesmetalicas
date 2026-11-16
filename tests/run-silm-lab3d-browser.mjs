@@ -111,6 +111,9 @@ try{
   await page.locator('[data-lab-action="more"]').click();
   const loadedProbe=await page.locator('.silm-lab3d').getAttribute('data-specimen-probe');
   const movedShadow=await page.locator('.silm-lab3d').getAttribute('data-shadow-press');
+  await page.waitForFunction(previous=>
+   document.querySelector('.silm-lab3d')?.dataset.shadowProbe!==previous,
+   neutralLocalShadow,{timeout:5000});
   const movedLocalShadow=await page.locator('.silm-lab3d').getAttribute('data-shadow-probe');
   await page.waitForTimeout(180);
   const uploadsBefore=Number(await page.locator('.silm-lab3d').getAttribute('data-mesh-uploads'));

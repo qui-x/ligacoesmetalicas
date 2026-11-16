@@ -431,6 +431,9 @@
     this.ui.dataset.specimenProbe=surface.position(.75,.75,1).map(v=>v.toFixed(7)).join(',');
     this.ui.dataset.specimenMode=this.loadMode;
     this.shadows=shadows;
+    // O snapshot visual é atualizado junto da malha, sem depender do próximo frame.
+    this.ui.dataset.shadowPress=shadows[0][0].toFixed(9)+','+shadows[0][1].toFixed(9);
+    this.ui.dataset.shadowProbe=shadows[4][0].toFixed(9)+','+shadows[4][1].toFixed(9);
     this.refreshInstrument();
     this.status.textContent='J2 normalizado · '+(this.loadMode==='compression'?'compressão':'tração')+
      ' · carga '+Math.round(load*100)+'% (unidades relativas). Superfície deformada por campo 2D; espessura apenas visual.';
