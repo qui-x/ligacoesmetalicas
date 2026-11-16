@@ -11,7 +11,9 @@ Branch de integração **separada de main**, criada para validar um conjunto coe
 - #181 (mapas, Joule/calor, sombras, toque, prensa J2): `ea00d0d04fe6ab60d098668349a7fb018d1b5bb1`. A branch deste PR já descende da #179 e carrega suas alterações.
 - #180 (ponte mecânica): `675664e80a009ba09329f65949873e4bab05be3d`. O arquivo `domain/silm/mechanics-scene-bridge.js` é byte a byte idêntico no #180 e no #181 (mesmo Git blob SHA-1 `451bd76b0eea3680854a85d6fc47bbd6d1c7a867`), portanto foi mantida a cópia já presente no #181. Os seis arquivos **exclusivos** do PR #180 foram adicionados à branch de integração, incluindo testes, documentação, motor Swift de pesquisa e workflow próprio.
 
-Os PRs **#171** (base científica/80 elementos), **#172** (CPFEM) e **#178** (reformulação das docas) estão fora do conjunto e não devem ser modificados, fechados ou mesclados durante esta preparação. Nenhum novo valor por metal foi incorporado.
+**Adendo solicitado em 16/11:** o PR **#178** também foi incorporado à **branch de integração**, sem mesclar seu PR original na main. Foram conciliadas suas mudanças do painel Montagem (Tabela como entrada principal, montagem livre opcional), ações contextuais de Ver e hierarquia de Dados com o `index.html` já ampliado pela sala 3D. Vieram junto três suítes de paridade, que passaram a integrar o job Node da sala 3D. Os testes browser existentes foram ajustados para abrir explicitamente a seção opcional de montagem livre antes de iniciar a amostra Cu.
+
+Os PRs **#171** (base científica/80 elementos) e **#172** (CPFEM) continuam fora do conjunto e não devem ser modificados, fechados ou mesclados durante esta preparação. Nenhum novo valor por metal foi incorporado.
 
 ## Plano de validação e critérios de liberação
 
