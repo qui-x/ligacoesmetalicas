@@ -45,7 +45,7 @@ async function check(v){
    assert.equal(scientificContext.workshop?.referenceId,'atlas-'+item.symbol,'Objeto não associado à investigação');
    assert.equal(scientificContext.scale,'1','A seleção do objeto pulou indevidamente a escala macroscópica');
    await page.locator('[data-open-dock="montagem"]').click();
-   assert.match(await page.locator('#silm-start').innerText(),/Nova montagem livre/,
+   assert.match(await page.locator('#silm-start').textContent(),/Nova montagem livre/,
     'Preparo continua oferecendo iniciar investigação já iniciada');
    await page.locator('#silm-start > svg.silm-action-icon').waitFor({state:'attached'});
    assert.equal(await page.locator('[data-left-tab="objetos"]').count(),0,
