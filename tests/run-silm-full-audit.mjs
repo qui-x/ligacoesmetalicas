@@ -128,12 +128,15 @@ try{
   const x=page.locator('#si-header-access');
   assert.ok(await x.isVisible());
   await x.click();
-  return await page.evaluate(()=>({
+  const details=await page.evaluate(()=>({
    accessPanel:!!document.querySelector('#si-a11y-panel'),
    panelVisible:!!document.querySelector('#si-a11y-panel')?.getClientRects().length,
    skip:!!document.querySelector('a.skip[href="#conteudo"]'),
    menuLinks:document.querySelectorAll('#si-nav-main [data-route]').length
   }));
+  await page.keyboard.press('Escape');
+  if(await page.locator('#si-nav-close').isVisible())await page.locator('#si-nav-close').click();
+  return details;
  });
  await check('assets.atlas-65-files',async()=>{
   return await page.evaluate(async()=>{
@@ -310,4 +313,5 @@ try{
  await writeFile(join(reportDir,'audit.json'),JSON.stringify(payload,null,2)+'\n');
  console.log('AUDIT_SUMMARY '+JSON.stringify(payload.summary));
  try{await ctx.close();}finally{await browser.close();}
+ if(payload.summary.failed>0)process.exitCode=1;
 }
