@@ -8,8 +8,8 @@
 (()=>{
  const S=window.SILM||{},C=S.lab3dCore,Surface=S.lab3dSpecimen,
   Bridge=S.mechanicsSceneBridge,Overlay=S.lab3dFieldOverlay,
-  Electrothermal=S.lab3dElectrothermal;
- if(!C||!Surface||!Bridge||!Overlay||!Electrothermal)return;
+  Electrothermal=S.lab3dElectrothermal,I=S.lab3dInstruments,G=S.lab3dGeometry;
+ if(!C||!Surface||!Bridge||!Overlay||!Electrothermal||!I||!G)return;
  const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  const reduced=()=>matchMedia('(prefers-reduced-motion:reduce)').matches||
   document.documentElement.classList.contains('si-no-motion');
@@ -107,7 +107,7 @@
      const isMesh=!!a.mesh,target=isMesh?meshBuffer:buffer;
      if(activeBuffer!==target){layout(target);activeBuffer=target;}
      if(isMesh)gl.bufferData(gl.ARRAY_BUFFER,a.mesh,gl.DYNAMIC_DRAW);
-     gl.uniformMatrix4fv(U.m,false,isMesh?model(0,0,0,1,1,1):model(...a.b));
+     gl.uniformMatrix4fv(U.m,false,model(...(a.b||[0,0,0,1,1,1])));
      gl.uniform3fv(U.base,new Float32Array(a.c));gl.uniform1f(U.metallic,a.m);
      gl.uniform1f(U.shine,a.g);
      gl.drawArrays(gl.TRIANGLES,0,isMesh?a.mesh.length/6:36);
@@ -123,7 +123,8 @@
    this.investigationKey=String(state?.investigation?.id||'')+'|'+String(state?.metal?.atomicNumber||'')+
     '|'+String(state?.metadata?.workshop?.referenceId||'');
    this.keys=new Set();this.eye=[0,1.60,2.35];this.yaw=0;this.pitch=-.06;
-   this.inspect=false;this.load=0;this.loadMode='compression';
+   this.inspect=false;this.load=0;this.loadMode='compression';this.fieldMode=null;
+   this.currentIntensity=.6;this.selectedInstrument=null;
    this.temperature=C.initialHeat();this.potential=C.initialHeat();this.dissipation=C.initialHeat();
    this.heat=false;this.current=false;this.lamp=true;
    this.coupled=null;this.coupledReading=null;
@@ -183,12 +184,75 @@
     b.addEventListener('pointerdown',e=>{e.preventDefault();this.keys.add(id);b.setPointerCapture(e.pointerId)});
     for(const type of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(type,()=>this.keys.delete(id));
    }
-   this.ui.append(mobile);host.append(this.ui);
+   // Painel contextual está dentro do palco, mas separado dos módulos Montagem/Ver/Dados.
+   this.instrumentPanel=make('aside','silm-lab3d-instrument-panel');
+   this.instrumentPanel.hidden=true;
+   this.instrumentPanel.setAttribute('aria-label','Controles do instrumento selecionado');
+   const heading=make('header','silm-lab3d-instrument-heading');
+   this.instrumentTitle=make('h3','', '');
+   this.instrumentClose=this.button(heading,'Fechar controles','instrument-close',()=>this.hideInstrument());
+   this.instrumentClose.setAttribute('aria-label','Fechar os controles deste instrumento');
+   heading.prepend(this.instrumentTitle);
+   this.instrumentDescription=make('p','silm-lab3d-instrument-description','');
+   this.instrumentPanel.append(heading,this.instrumentDescription);
+   this.instrumentGroups=new Map();
+   const group=id=>{
+    const g=make('div','silm-lab3d-instrument-group');g.dataset.instrumentGroup=id;
+    g.hidden=true;this.instrumentPanel.append(g);this.instrumentGroups.set(id,g);
+    return g;
+   };
+   const pressGroup=group('press');
+   const modeLabel=make('label','','Ensaio J2 · modo');
+   this.pressMode=make('select');this.pressMode.dataset.control='load-mode';
+   for(const [v,label] of [['compression','Compressão'],['tension','Tração']]){
+    const op=make('option','',label);op.value=v;this.pressMode.append(op);
+   }
+   this.pressMode.value=this.loadMode;
+   this.pressMode.addEventListener('change',()=>{
+    this.loadMode=this.pressMode.value;this.setLoad(this.load);});
+   modeLabel.append(this.pressMode);pressGroup.append(modeLabel);
+   const loadLabel=make('label','','Carga relativa (0–100%)');
+   this.pressLoad=make('input');this.pressLoad.type='range';
+   this.pressLoad.min='0';this.pressLoad.max='1';this.pressLoad.step='.1';
+   this.pressLoad.value='0';this.pressLoad.dataset.control='load';
+   this.pressLoad.addEventListener('input',()=>this.setLoad(Number(this.pressLoad.value)));
+   this.pressLoadValue=make('output','','0%');
+   loadLabel.append(this.pressLoad,this.pressLoadValue);pressGroup.append(loadLabel);
+   this.button(pressGroup,'Retirar carga','unload',()=>this.setLoad(0));
+   const heaterGroup=group('heater');
+   this.instrumentHeaterToggle=this.button(heaterGroup,'Ligar aquecedor','heater-toggle',()=>{
+    this.heatButton.click();this.refreshInstrument();
+   });
+   const powerGroup=group('power');
+   this.instrumentPowerToggle=this.button(powerGroup,'Ligar fonte elétrica','power-toggle',()=>{
+    this.currentButton.click();this.refreshInstrument();
+   });
+   const intensityLabel=make('label','','Alimentação elétrica relativa');
+   this.powerIntensity=make('input');this.powerIntensity.type='range';
+   this.powerIntensity.min='.05';this.powerIntensity.max='1';this.powerIntensity.step='.05';
+   this.powerIntensity.value=String(this.currentIntensity);this.powerIntensity.dataset.control='intensity';
+   this.powerIntensity.addEventListener('input',()=>{
+    this.currentIntensity=Number(this.powerIntensity.value);
+    this.setCoupledSources();this.refreshInstrument();
+   });
+   this.powerIntensityValue=make('output','', '60%');
+   intensityLabel.append(this.powerIntensity,this.powerIntensityValue);powerGroup.append(intensityLabel);
+   const lampGroup=group('lamp');
+   this.instrumentLampToggle=this.button(lampGroup,'Desligar luminária','lamp-toggle',()=>{
+    this.lampButton.click();this.refreshInstrument();
+   });
+   const microGroup=group('microscope');
+   this.button(microGroup,'Observar a microestrutura','open-micro',()=>this.enterScale(2));
+   this.ui.append(mobile,this.instrumentPanel);
+   host.append(this.ui);
    if(returnButton)returnButton.hidden=true;
    try{this.renderer=makeRenderer(this.canvas)}
    catch(e){this.ui.remove();throw e}
    this.onKey=e=>{
-    if(e.key==='Escape'){e.preventDefault();if(document.pointerLockElement===this.canvas)document.exitPointerLock();else this.close();return;}
+    if(e.key==='Escape'){e.preventDefault();
+     if(document.pointerLockElement===this.canvas)document.exitPointerLock();
+     else if(!this.instrumentPanel.hidden)this.hideInstrument();
+     else this.close();return;}
     const k=e.key.toLowerCase();
     if(['w','a','s','d','arrowup','arrowleft','arrowdown','arrowright','e'].includes(k)){
      if(e.target.closest?.('button,input,textarea,select')&&k!=='e')return;
@@ -200,15 +264,28 @@
    this.onUp=e=>this.keys.delete(e.key.toLowerCase());
    this.onMove=e=>{
     if(document.pointerLockElement===this.canvas||this.dragging){
+     if(this.dragging){this.pointerTravel=(this.pointerTravel||0)+Math.abs(e.movementX)+Math.abs(e.movementY);}
      this.yaw+=e.movementX*.0028;this.pitch=clamp(this.pitch-e.movementY*.0028,-1.15,1.0);
     }
    };
-   this.onPointerDown=e=>{if(e.button===0){this.dragging=true;this.canvas.focus({preventScroll:true});}};
+   this.onPointerDown=e=>{if(e.button===0){
+    this.dragging=true;this.pointerTravel=0;
+    this.canvas.focus({preventScroll:true});
+   }};
    this.onPointerUp=()=>{this.dragging=false};
-   this.onClick=()=>{if(this.touchMoved){this.touchMoved=false;return}
-    if(this.canvas.requestPointerLock&&matchMedia('(pointer:fine)').matches&&document.pointerLockElement!==this.canvas){
+   this.onClick=e=>{
+    if(this.touchMoved||(this.pointerTravel||0)>6){this.touchMoved=false;return;}
+    if(document.pointerLockElement===this.canvas){this.interact();return;}
+    const rect=this.canvas.getBoundingClientRect();
+    const x=e.clientX-rect.left,y=e.clientY-rect.top;
+    if(x>=0&&x<=rect.width&&y>=0&&y<=rect.height){
+     const hit=I.pickAt(this.eye,this.yaw,this.pitch,x,y,rect.width,rect.height);
+     if(hit){this.showInstrument(hit.id);return;}
+    }
+    // Clique em área vazia mantém navegação com mouse; E atua no retículo central.
+    if(this.canvas.requestPointerLock&&matchMedia('(pointer:fine)').matches){
      try{const r=this.canvas.requestPointerLock();r?.catch?.(()=>{});}catch{}
-    }else this.interact();
+    }else this.status.textContent='Toque no instrumento para abrir os controles ou use o retículo e a tecla E.';
    };
    this.onWheel=e=>{if(this.inspect){e.preventDefault();this.eye[2]=clamp(this.eye[2]+Math.sign(e.deltaY)*.18,.15,1.85);}};
    this.onRoute=()=>{if(!location.hash.startsWith('#/ambiente'))this.close()};
@@ -244,16 +321,18 @@
     this.inspect=saved.inspect;
     this.inspectButton.setAttribute('aria-pressed',String(this.inspect));
     this.heat=saved.heat;this.current=saved.current;this.lamp=saved.lamp;
+    this.currentIntensity=saved.currentIntensity||.6;
+    this.powerIntensity.value=String(this.currentIntensity);
     if(saved.coupled?.ok){
      this.coupled=saved.coupled;
-     this.coupled.setSources({heat:this.heat,current:this.current});
+     this.coupled.setSources({heat:this.heat,current:this.current,intensity:this.currentIntensity});
      this.applyCoupled(this.coupled.reading(),true);
     }
     this.heatButton.setAttribute('aria-pressed',String(this.heat));
     this.currentButton.setAttribute('aria-pressed',String(this.current));
     this.lampButton.setAttribute('aria-pressed',String(this.lamp));
     this.mapSelect.value=Overlay.kinds.includes(saved.mapKind)?saved.mapKind:'appearance';
-    this.updateMap(false);
+    this.updateMap(false);this.refreshInstrument();
     this.status.textContent='Sala retomada após a observação em outra escala. Carga e estímulos continuam somente visuais, não registrados como medições.';
     this.returnFocus.textContent='Sala 3D';
    }else if(suspended){suspended=null;this.returnFocus.textContent='Sala 3D'}
@@ -295,7 +374,7 @@
   setCoupledSources(){
    if(!this.coupled?.ok)return;
    try{
-    this.coupled.setSources({heat:this.heat,current:this.current,intensity:.6});
+    this.coupled.setSources({heat:this.heat,current:this.current,intensity:this.currentIntensity});
     const result=reduced()?this.coupled.advance(.8):this.coupled.reading();
     if(!result?.ok)throw new Error('Falha no resolvedor eletrotérmico.');
     this.applyCoupled(result,true);
@@ -306,7 +385,7 @@
   }
   setLoad(value){
    const load=clamp(Math.round(value*10)/10,0,1);
-   if(load===this.load&&this.field)return;
+   if(load===this.load&&this.field&&this.fieldMode===this.loadMode)return;
    try{
     const field=S.specimenJ2?.active?.([],{mode:this.loadMode,position:.5,width:.3,load});
     if(!field||!field.converged)throw new Error('Solver J2 não convergiu.');
@@ -320,12 +399,14 @@
     if(!bridge.ok)throw new Error('Campo para mapa mecânico indisponível.');
     // O par campo+superfície só é trocado após validação completa.
     this.field=field;this.surface=surface;this.surfaceSegments=surfaceSegments;
-    this.mechanicsBridge=bridge;this.load=load;
+    this.mechanicsBridge=bridge;this.load=load;this.fieldMode=this.loadMode;
     this.strain=clamp((upper.dy-lower.dy)*2,-.18,.18);
     this.ui.dataset.specimenSurface='j2-plane-strain';
     this.ui.dataset.specimenSegments=String(surfaceSegments.length);
     this.ui.dataset.specimenLoad=String(load);
     this.ui.dataset.specimenProbe=surface.position(.75,.75,1).map(v=>v.toFixed(7)).join(',');
+    this.ui.dataset.specimenMode=this.loadMode;
+    this.refreshInstrument();
     this.status.textContent='J2 normalizado · '+(this.loadMode==='compression'?'compressão':'tração')+
      ' · carga '+Math.round(load*100)+'% (unidades relativas). Superfície deformada por campo 2D; espessura apenas visual.';
     this.updateMap(false);
@@ -362,21 +443,54 @@
     this.status.textContent='Mapa não disponível: '+(error.message||'falha de leitura')+'.';
    }
   }
+  refreshInstrument(){
+   if(this.pressLoad)this.pressLoad.value=String(this.load);
+   if(this.pressMode)this.pressMode.value=this.loadMode;
+   if(this.pressLoadValue)this.pressLoadValue.textContent=Math.round(this.load*100)+'%';
+   if(this.powerIntensity)this.powerIntensity.value=String(this.currentIntensity);
+   if(this.powerIntensityValue)
+    this.powerIntensityValue.textContent=Math.round(this.currentIntensity*100)+'% relativo';
+   if(this.instrumentPowerToggle)this.instrumentPowerToggle.textContent=
+    this.current?'Desligar fonte elétrica':'Ligar fonte elétrica';
+   if(this.instrumentHeaterToggle)this.instrumentHeaterToggle.textContent=
+    this.heat?'Desligar aquecedor':'Ligar aquecedor';
+   if(this.instrumentLampToggle)this.instrumentLampToggle.textContent=
+    this.lamp?'Desligar luminária':'Ligar luminária';
+  }
+  showInstrument(id){
+   if(!this.instrumentGroups.has(id))return false;
+   if(document.pointerLockElement===this.canvas)document.exitPointerLock();
+   this.selectedInstrument=id;
+   this.ui.dataset.selectedInstrument=id;
+   this.instrumentTitle.textContent=I.labels[id];
+   const descriptions={
+    press:'Aplique tração ou compressão ao corpo de prova. O campo J2 e a malha 3D são relativos; sem geometria de fratura.',
+    heater:'Aqueça por fonte externa na rede equivalente 1D; a energia se propaga e pode sair pelos terminais.',
+    power:'Ajuste o nível elétrico da rede equivalente 1D. Corrente, potência Joule e calor compartilham o mesmo resolvedor.',
+    lamp:'A luminária muda a iluminação da cena, não calcula espectro ou refletância medida do metal.',
+    microscope:'Use a objetiva para observar a microestrutura já existente no SILM e retornar à sala.'
+   };
+   this.instrumentDescription.textContent=descriptions[id];
+   for(const [key,node]of this.instrumentGroups)node.hidden=key!==id;
+   this.refreshInstrument();
+   this.instrumentPanel.hidden=false;
+   this.status.textContent=I.labels[id]+' selecionado. Use os controles no painel contextual.';
+   this.instrumentClose.focus({preventScroll:true});
+   return true;
+  }
+  hideInstrument(){
+   this.instrumentPanel.hidden=true;this.selectedInstrument=null;
+   this.ui.dataset.selectedInstrument='none';
+   this.canvas.focus({preventScroll:true});
+  }
   interact(){
-   const items=[
-    {id:'microscope',center:[1.07,1.36,-1.3],radius:.4},
-    {id:'heater',center:[-1.15,1.19,-1.39],radius:.42},
-    {id:'lamp',center:[-1.63,1.35,-1.31],radius:.35},
-    {id:'power',center:[1.65,1.08,-1.5],radius:.38},
-    {id:'press',center:[0,1.25,-1.35],radius:.63}
-   ];
-   const hit=C.pickTarget(this.eye,this.yaw,this.pitch,items);
-   if(!hit){this.status.textContent='Mire um instrumento da bancada com o retículo e pressione E ou clique. Aproximar também está disponível.';return}
-   if(hit.id==='microscope'){this.enterScale(2);return}
-   if(hit.id==='heater'){this.heatButton.click();this.status.textContent='Fonte térmica '+(this.heat?'ligada':'desligada')+' · propagação relativa.';return}
-   if(hit.id==='lamp'){this.lampButton.click();this.status.textContent='Iluminação '+(this.lamp?'ligada':'desligada')+' · superfície esquemática.';return}
-   if(hit.id==='power'){this.currentButton.click();this.status.textContent='Fonte elétrica '+(this.current?'ligada':'desligada')+' · marcadores visuais.';return}
-   this.setLoad(this.load+.2);
+   const f=I.basis(this.yaw,this.pitch).forward;
+   const hit=I.pickRay(this.eye,f);
+   if(!hit){
+    this.status.textContent='Aponte para um instrumento e pressione E, ou clique nele diretamente para abrir os controles.';
+    return false;
+   }
+   return this.showInstrument(hit.id);
   }
   enterScale(n){
    const step=$('#silm-workshop-context .silm-workshop-scale[data-scale="'+n+'"]');
@@ -385,7 +499,9 @@
    requestAnimationFrame(()=>$('#silm-workshop-context .silm-workshop-scale[data-scale="'+n+'"]')?.focus({preventScroll:true}));
   }
   items(time){
-   const items=[],add=(b,c,m=0,g=20)=>items.push({b,c,m,g});
+   const items=[],add=(b,c,m=0,g=20)=>items.push({b,c,m,g}),
+    rounded=(b,c,m=.7,g=38)=>items.push({b,c,m,g,mesh:G.round}),
+    ring=(b,c,m=.7,g=38)=>items.push({b,c,m,g,mesh:G.ring});
    const steel=[.51,.60,.66],wall=[.21,.3,.4],wood=[.32,.24,.19],dark=[.08,.14,.21];
    add([0,-.10,0,7.65,.2,7.65],[.25,.3,.34]);
    add([0,1.65,-3.87,7.7,3.3,.18],wall);
@@ -404,7 +520,9 @@
    for(const x of [-.62,.62])add([x,1.28,-1.6,.09,.76,.1],steel,.8,48);
    add([0,1.73,-1.6,1.35,.14,.24],[.37,.49,.59],.8,52);
    add([0,1.9,-1.6,.16,.22,.16],[.65,.73,.78],.88,74);
-   add([0,2.04,-1.6,.31,.065,.28],[.16,.25,.31],.44,24);
+   ring([0,2.04,-1.6,.48,.22,.48],[.27,.37,.45],.65,60);
+   rounded([0,1.9,-1.6,.115,.26,.115],[.69,.75,.77],.9,70);
+   rounded([-.44,1.65,-1.51,.12,.14,.12],[.10,.24,.36],.58,35);
    for(const x of [-.42,.42])add([x,1.73,-1.45,.13,.09,.07],[.23,.31,.40],.75,46);
    add([-.44,1.57,-1.51,.17,.13,.07],[.21,.35,.45],.4,46);
    // O sólido deformado usa a função sample(u,v) do mesmo campo J2 convergido.
@@ -437,18 +555,23 @@
    // Condensador/objetiva, platina e ocular: silhueta mais reconhecível.
    add([1.06,1.2,-1.25,.27,.055,.27],[.17,.25,.3],.44,28);
    add([1.06,1.48,-1.24,.17,.09,.17],[.41,.49,.52],.8,50);
-   add([1.06,1.60,-1.24,.14,.17,.14],[.13,.19,.24],.52,64);
-   add([1.06,1.69,-1.24,.23,.06,.23],[.12,.17,.22],.54,48);
+   rounded([1.06,1.60,-1.24,.14,.17,.14],[.18,.23,.3],.53,64);
+   rounded([1.06,1.71,-1.24,.24,.06,.24],[.13,.18,.22],.6,45);
+   ring([1.06,1.73,-1.24,.19,.08,.19],[.3,.48,.57],.9,60);
    add([-1.15,1.05,-1.39,.44,.27,.42],[.29,.31,.37],.1);
    add([-1.15,1.19,-1.39,.25,.04,.23],this.heat?[1,.29,.1]:[.3,.48,.59],.4);
    for(const x of [-1.29,-1.15,-1.01])
     add([x,1.23,-1.39,.06,.025,.22],this.heat?[.99,.45,.17]:[.45,.52,.56],.36,26);
+   for(const x of [-1.28,-1.03])
+    rounded([x,1.11,-1.16,.09,.07,.09],[.16,.2,.25],.52,28);
    add([-1.63,1.11,-1.31,.13,.42,.12],[.42,.44,.45],.25);
    add([-1.63,1.34,-1.31,.25,.12,.28],this.lamp?[.98,.89,.57]:[.24,.30,.36],.4);
    add([1.65,1.02,-1.5,.34,.27,.44],[.15,.31,.42],.32);
    add([1.67,1.17,-1.47,.23,.05,.24],[.11,.19,.25],.25,22);
    add([1.58,1.17,-1.32,.055,.08,.06],this.current?[.23,.7,.87]:[.3,.39,.42],.4,24);
    add([1.73,1.17,-1.32,.055,.08,.06],this.current?[.23,.7,.87]:[.3,.39,.42],.4,24);
+   for(const x of [1.58,1.73])
+    rounded([x,1.2,-1.31,.07,.11,.07],this.current?[.26,.75,.92]:[.32,.38,.42],.75,42);
    for(const z of [-1.47,-1.30])add([1.43,.96,z,.42,.035,.035],this.current?[.27,.79,.95]:[.18,.28,.37],.5);
    // Referências de escala e ferramentas do ambiente.
    add([0,2.92,-3.65,1.92,.34,.06],[.11,.27,.41],.35);
@@ -489,7 +612,7 @@
     suspended=Object.freeze({
      key:this.investigationKey,eye:Object.freeze(this.eye.slice()),
      yaw:this.yaw,pitch:this.pitch,inspect:this.inspect,load:this.load,loadMode:this.loadMode,
-     heat:this.heat,current:this.current,lamp:this.lamp,
+     heat:this.heat,current:this.current,lamp:this.lamp,currentIntensity:this.currentIntensity,
      coupled:this.coupled,mapKind:this.mapSelect.value
     });
     this.returnFocus.textContent='Voltar à sala 3D';
