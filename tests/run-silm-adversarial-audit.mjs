@@ -137,6 +137,61 @@ try{
    return result;
   }finally{await ctx.close();}
  });
+ await record('teacher.student-link-and-start-route',async()=>{
+  const ctx=await browser.newContext({viewport:{width:1280,height:820}}),p=await ctx.newPage();
+  let link;
+  try{
+   await open(p,'professor');
+   await p.locator('#teacher-title-input').fill('Auditoria docente-aluno');
+   await p.locator('#teacher-submit').click();
+   link=await p.locator('#teacher-link').inputValue();
+   assert.ok(link.includes('#/atividade?c='),'Configuração do Professor sem token de atividade');
+  }finally{await ctx.close();}
+  const studentContext=await browser.newContext({viewport:{width:1280,height:820}}),
+   student=await studentContext.newPage();
+  try{
+   const response=await student.goto(link,{waitUntil:'domcontentloaded',timeout:25000});
+   assert.ok(response?.ok());
+   await student.locator('#student-start').waitFor({state:'visible',timeout:10000});
+   const text=await student.locator('#silm-student-activity').innerText();
+   assert.match(text,/Auditoria docente-aluno/,'Link não restaurou título da atividade');
+   await student.locator('#student-start').click();
+   await student.waitForFunction(()=>SILMIntegration?.activity?.()?.current!==null&&
+    !!SILMIntegration?.snapshot?.()?.metal,{timeout:12000});
+   const state=await student.evaluate(()=>({
+    hash:location.hash,active:SILMIntegration.activity(),metal:SILMIntegration.snapshot().metal
+   }));
+   assert.equal(state.metal?.atomicNumber>0,true);
+   return {route:state.hash.split('?')[0],metal:state.metal.symbol,
+    active:!!state.active?.current};
+  }finally{await studentContext.close();}
+ });
+ await record('report.archived-document-in-notebook-backup',async()=>{
+  const ctx=await browser.newContext({viewport:{width:1280,height:850},
+   acceptDownloads:true}),p=await ctx.newPage();
+  try{
+   await open(p);await startFreeCu(p);await go(p,'relatorios');
+   await p.locator('#report-name').fill('Auditoria de documento arquivado');
+   await p.locator('#report-observations').fill('Estrutura livre e fonte registrada.');
+   await p.locator('#report-conclusion').fill('Relatório produzido durante ensaio de integridade.');
+   await p.getByRole('button',{name:'Registrar no Caderno'}).click();
+   await p.waitForTimeout(200);
+   await go(p,'caderno');
+   const notebook=await p.locator('.silm-notebook-entries').innerText();
+   assert.ok(notebook.includes('Relatório')||notebook.includes('relatório'),
+    'Relatório não foi registrado no Caderno');
+   const dlPromise=p.waitForEvent('download');
+   await p.locator('#notebook-export-json').click();
+   const dl=await dlPromise;
+   const json=await (await import('node:fs/promises')).readFile(await dl.path(),'utf8'),
+    backup=JSON.parse(json);
+   const ids=Object.keys(backup.reports||{});
+   assert.ok(ids.length>=1,'O backup perdeu o relatório associado');
+   assert.ok(ids.every(id=>backup.reports[id]?.record?.checkpoint?.metal?.atomicNumber===29),
+    'Relatório arquivado divergiu do metal original');
+   return {archived:ids.length,backedUp:backup.document.notes.length,format:backup.format};
+  }finally{await ctx.close();}
+ });
  await record('offline.real-reload-after-sw',async()=>{
   const ctx=await browser.newContext({serviceWorkers:'allow'}),p=await ctx.newPage();
   try{
