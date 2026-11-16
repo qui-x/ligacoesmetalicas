@@ -162,6 +162,21 @@ try{
   assert.equal(await page.locator('.silm-lab3d-map-legend').isVisible(),false);
   await map.selectOption('plasticIndicator');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'plasticIndicator');
+  // A garra de v=0 segue o campo J2, sem alterar sua condição de apoio v=1.
+  const gripInitial=Number(await page.locator('.silm-lab3d').getAttribute('data-press-moving-grip'));
+  const gripFixed=Number(await page.locator('.silm-lab3d').getAttribute('data-press-fixed-grip'));
+  assert.ok(gripInitial<gripFixed,'As garras devem limitar a mesma amostra J2.');
+  // Sem redução de movimento, apenas a INTERPOLAÇÃO visual entre dois
+  // resultados convergidos é animada. A sessão científica não é escrita.
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.locator('[data-lab-action="more"]').click();
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-press-transition'),'active');
+  const gripAfter=Number(await page.locator('.silm-lab3d').getAttribute('data-press-moving-grip'));
+  assert.notEqual(gripAfter,gripInitial,'Garra móvel não seguiu o J2 ao aumentar a carga.');
+  await page.waitForFunction(()=>document.querySelector('.silm-lab3d')?.dataset.pressTransition==='settled',{timeout:5000});
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.locator('[data-lab-action="less"]').click();
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-press-transition'),'settled');
   const reading=await page.locator('.silm-lab3d-status').textContent();
   assert.ok(/J2|converg|amostra|plástica/i.test(reading),reading);
   await page.locator('[data-lab-action="inspect"]').click();
