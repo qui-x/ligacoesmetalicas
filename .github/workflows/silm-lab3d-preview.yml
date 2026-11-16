@@ -3,8 +3,10 @@ on:
   pull_request:
     paths:
       - 'domain/silm/lab3d-core.js'
+      - 'domain/silm/lab3d-specimen.js'
       - 'domain/silm/lab3d.js'
       - 'tests/silm-lab3d-core.test.cjs'
+      - 'tests/silm-lab3d-specimen.test.cjs'
       - '.github/workflows/silm-lab3d-preview.yml'
       - 'tests/run-silm-lab3d-browser.mjs'
       - 'domain/silm/lab3d.css'
@@ -23,10 +25,12 @@ jobs:
       - name: Validar sintaxe dos módulos
         run: |
           node --check domain/silm/lab3d-core.js
+          node --check domain/silm/lab3d-specimen.js
+          node --check tests/silm-lab3d-specimen.test.cjs
           node --check domain/silm/lab3d.js
           node --check tests/silm-lab3d-core.test.cjs
       - name: Testes determinísticos
-        run: node --test tests/silm-lab3d-core.test.cjs
+        run: node --test tests/silm-lab3d-core.test.cjs tests/silm-lab3d-specimen.test.cjs
   browser:
     runs-on: ubuntu-latest
     timeout-minutes: 20

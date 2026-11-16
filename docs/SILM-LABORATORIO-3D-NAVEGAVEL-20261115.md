@@ -33,3 +33,15 @@ tabulação/escape, ponte objeto→grãos→rede, comportamento touch,
 Chromium/Firefox/WebKit, DPR, redução de movimento, CI e PWA offline.
 Manter PR #172 (CPFEM) e PR #178 (remodelação das docas) intactos.
 Sem merge na main até homologação.
+
+## Etapa seguinte: deformação da malha (PR #179)
+A representação troca a barra prismática rígida por uma superfície triangular
+subdividida em 18 setores com 6 linhas de subdivisão transversal. A posição
+de cada vértice usa o campo convergido `SILM.specimenJ2.active().sample(u,v)`.
+A terceira coordenada continua uma extrusão de espessura **constante**;
+o efeito de brilho e a coloração por temperatura/plasticidade são apenas
+camadas didáticas, não resultado de rugosidade ou acoplamento termomecânico.
+A amplificação de 2,5 é visual e explicitamente diferente da deformação
+quantitativa. Se o solver falhar, mantém o campo anterior e informa a falha.
+O ensaio de prova usa J2 da main, nunca importa CPFEM (#172) nem o adaptador
+experimental (#180). Instrumentos e estado científico original permanecem intactos.

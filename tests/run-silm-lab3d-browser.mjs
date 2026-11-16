@@ -42,7 +42,13 @@ try{
   assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
   await page.locator('[data-lab-action="current"]').click();
   assert.equal(await page.locator('[data-lab-action="current"]').getAttribute('aria-pressed'),'true');
+  const neutralProbe=await page.locator('.silm-lab3d').getAttribute('data-specimen-probe');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-surface'),'j2-plane-strain');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-segments'),'18');
   await page.locator('[data-lab-action="more"]').click();
+  const loadedProbe=await page.locator('.silm-lab3d').getAttribute('data-specimen-probe');
+  assert.notEqual(loadedProbe,neutralProbe,'O campo J2 não alterou a malha superficial.');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0.2');
   const reading=await page.locator('.silm-lab3d-status').textContent();
   assert.ok(/J2|converg|amostra/i.test(reading),reading);
   await page.locator('[data-lab-action="inspect"]').click();

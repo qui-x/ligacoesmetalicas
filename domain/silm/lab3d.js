@@ -6,8 +6,8 @@
  * Condutividade/efeitos ópticos na sala são prévios e NÃO calibrados.
  */
 (()=>{
- const S=window.SILM||{},C=S.lab3dCore;
- if(!C)return;
+ const S=window.SILM||{},C=S.lab3dCore,Surface=S.lab3dSpecimen;
+ if(!C||!Surface)return;
  const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  const reduced=()=>matchMedia('(prefers-reduced-motion:reduce)').matches||
   document.documentElement.classList.contains('si-no-motion');
@@ -65,10 +65,15 @@
   gl.useProgram(program);gl.enable(gl.DEPTH_TEST);gl.clearColor(.055,.09,.14,1);
   const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
   gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(verts),gl.STATIC_DRAW);
-  for(const [name,offset] of [['p',0],['n',3]]){
-   const id=gl.getAttribLocation(program,name);gl.enableVertexAttribArray(id);
-   gl.vertexAttribPointer(id,3,gl.FLOAT,false,24,offset*4);
-  }
+  const meshBuffer=gl.createBuffer();
+  const layout=(target)=>{
+   gl.bindBuffer(gl.ARRAY_BUFFER,target);
+   for(const [name,offset] of [['p',0],['n',3]]){
+    const id=gl.getAttribLocation(program,name);gl.enableVertexAttribArray(id);
+    gl.vertexAttribPointer(id,3,gl.FLOAT,false,24,offset*4);
+   }
+  };
+  layout(buffer);
   const uniform=k=>gl.getUniformLocation(program,k);
   const U={m:uniform('m'),vp:uniform('vp'),base:uniform('base'),
     eye:uniform('eye'),metallic:uniform('metallic'),shine:uniform('shine')};
@@ -81,11 +86,18 @@
    render(items,eye,yaw,pitch){const aspect=this.resize();gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
     gl.uniformMatrix4fv(U.vp,false,matrices(eye,yaw,pitch,aspect));
     gl.uniform3fv(U.eye,new Float32Array(eye));
-    for(const a of items){gl.uniformMatrix4fv(U.m,false,model(...a.b));
+    let activeBuffer=null;
+    for(const a of items){
+     const isMesh=!!a.mesh,target=isMesh?meshBuffer:buffer;
+     if(activeBuffer!==target){layout(target);activeBuffer=target;}
+     if(isMesh)gl.bufferData(gl.ARRAY_BUFFER,a.mesh,gl.DYNAMIC_DRAW);
+     gl.uniformMatrix4fv(U.m,false,isMesh?model(0,0,0,1,1,1):model(...a.b));
      gl.uniform3fv(U.base,new Float32Array(a.c));gl.uniform1f(U.metallic,a.m);
-     gl.uniform1f(U.shine,a.g);gl.drawArrays(gl.TRIANGLES,0,36);}
+     gl.uniform1f(U.shine,a.g);
+     gl.drawArrays(gl.TRIANGLES,0,isMesh?a.mesh.length/6:36);
+    }
    },
-   dispose(){gl.deleteBuffer(buffer);gl.deleteProgram(program);gl.deleteShader(vs);gl.deleteShader(fs)}
+   dispose(){gl.deleteBuffer(meshBuffer);gl.deleteBuffer(buffer);gl.deleteProgram(program);gl.deleteShader(vs);gl.deleteShader(fs)}
   };
  }
  class Session{
@@ -94,7 +106,7 @@
    this.keys=new Set();this.eye=[0,1.60,2.35];this.yaw=0;this.pitch=-.06;
    this.inspect=false;this.load=0;this.loadMode='compression';
    this.temperature=C.initialHeat();this.heat=false;this.current=false;this.lamp=true;
-   this.field=null;this.strain=0;this.last=0;this.thermalTimer=0;this.frame=null;this.destroyed=false;
+   this.field=null;this.surface=null;this.surfaceSegments=[];this.strain=0;this.last=0;this.thermalTimer=0;this.frame=null;this.destroyed=false;
    this.ui=make('section','silm-lab3d');this.ui.setAttribute('role','dialog');
    this.ui.setAttribute('aria-modal','true');this.ui.setAttribute('aria-label','Laboratório 3D de metais');
    this.canvas=make('canvas');this.canvas.tabIndex=0;this.canvas.setAttribute('aria-label','Sala tridimensional. Use WASD para caminhar, mouse para olhar, E para interagir.');this.ui.append(this.canvas);
@@ -166,6 +178,7 @@
    };
    this.canvas.addEventListener('touchstart',this.onTouchStart,{passive:true});
    this.canvas.addEventListener('touchmove',this.onTouchMove,{passive:true});
+   this.setLoad(0); // A primeira malha lê o campo J2 de referência, sem carga.
    this.canvas.focus({preventScroll:true});
    this.frame=requestAnimationFrame(t=>this.tick(t));
   }
@@ -187,9 +200,18 @@
     if(!field||!field.converged)throw new Error('Solver J2 não convergiu.');
     const upper=C.sampleField(field,.5,1),lower=C.sampleField(field,.5,0);
     if(!upper||!lower)throw new Error('Deslocamento da amostra não disponível.');
-    this.field=field;this.load=load;
+    const surface=Surface.create(field,{segments:this.temperature.length,rows:6,amplification:2.5});
+    if(!surface.ok)throw new Error('Malha visual J2 indisponível.');
+    const surfaceSegments=surface.segments.map(seg=>({index:seg.index,
+     vertices:new Float32Array(seg.vertices),plasticIndicator:seg.plasticIndicator}));
+    this.field=field;this.surface=surface;this.surfaceSegments=surfaceSegments;this.load=load;
     this.strain=clamp((upper.dy-lower.dy)*2,-.18,.18);
-    this.status.textContent='J2 normalizado · '+(this.loadMode==='compression'?'compressão':'tração')+' · carga '+Math.round(load*100)+'% (unidades relativas).';
+    this.ui.dataset.specimenSurface='j2-plane-strain';
+    this.ui.dataset.specimenSegments=String(surfaceSegments.length);
+    this.ui.dataset.specimenLoad=String(load);
+    this.ui.dataset.specimenProbe=surface.position(.75,.75,1).map(v=>v.toFixed(7)).join(',');
+    this.status.textContent='J2 normalizado · '+(this.loadMode==='compression'?'compressão':'tração')+
+     ' · carga '+Math.round(load*100)+'% (unidades relativas). Superfície deformada por campo 2D; espessura apenas visual.';
    }catch(e){this.status.textContent='Amostra original preservada: '+(e?.message||'sem resposta do modelo J2');}
   }
   interact(){
@@ -229,20 +251,19 @@
    // Prensa com duas colunas, garra superior móvel e célula de prova.
    for(const x of [-.62,.62])add([x,1.28,-1.6,.09,.76,.1],steel,.8,48);
    add([0,1.73,-1.6,1.35,.14,.24],[.37,.49,.59],.8,52);
-   const displacement=clamp(this.strain,-.18,.18);
-   const specimenHeight=.22*(1+displacement);
-   add([0,1.03+specimenHeight*.5,-1.35,1.03,specimenHeight,.24],[.48,.54,.6],.95,65);
-   add([0,1.32+displacement*.2,-1.35,1.12,.06,.31],steel,.92,70);
-   for(let i=0;i<this.temperature.length;i++){
-    const u=i/(this.temperature.length-1),q=this.temperature[i];
-    const deform=C.sampleField(this.field,u,.5);
-    const dx=deform?clamp(deform.dx*1.6,-.07,.07):0;
-    const dy=deform?clamp(deform.dy*1.6,-.05,.05):0;
-    const blink=this.current&&!reduced()?Math.max(0,Math.sin(time*.004-i*.85))*.23:0;
-    const color=[.58+.4*q+.08*blink,.67-.32*q+.08*blink,.74-.57*q+.15*blink];
-    add([-.492+(i+.5)*.984/this.temperature.length+dx,
-      1.03+specimenHeight*.5+dy,-1.35,.984/this.temperature.length+.002,specimenHeight*.93,.252],color,.94,this.lamp?70:15);
-   }
+   // O sólido deformado usa a função sample(u,v) do mesmo campo J2 convergido.
+   // z permanece constante, pois o campo resolvido é bidimensional.
+   const upperY=this.surface?.ok?this.surface.position(.5,1,1)[1]:1.25;
+   add([0,upperY+.042,-1.35,1.12,.06,.31],steel,.92,70);
+   if(this.surface?.ok){
+    for(const seg of this.surfaceSegments){
+     const q=this.temperature[Math.min(this.temperature.length-1,seg.index)]||0;
+     const p=clamp((seg.plasticIndicator||0)*8,0,1);
+     const blink=this.current&&!reduced()?Math.max(0,Math.sin(time*.004-seg.index*.85))*.16:0;
+     const color=[.53+.42*q+.08*p+.05*blink,.62-.32*q-.13*p+.07*blink,.69-.48*q-.16*p+.13*blink];
+     items.push({mesh:seg.vertices,c:color,m:.96,g:this.lamp?Math.max(24,70-40*p):16});
+    }
+   }else add([0,1.14,-1.35,1.03,.22,.24],[.48,.54,.6],.95,65);
    // Microscópio, luminária, resistência e fonte elétrica: modelos 3D preliminares.
    add([1.08,.97,-1.25,.44,.08,.38],dark,.1);
    add([1.07,1.3,-1.4,.11,.61,.11],[.61,.68,.71],.55);
