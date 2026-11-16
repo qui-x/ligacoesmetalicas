@@ -4,9 +4,9 @@
 
 ## 1. Sombras de contato projetadas na bancada
 
-Os anteriores paralelepípedos cinza-escuros de sombra foram substituídos por escurecimento suave **no fragment shader**, aplicado exclusivamente à face superior do tampo da bancada. Quatro focos analíticos representam, sem pretensão de ray tracing, a sombra da prensa, do microscópio, do aquecedor e da fonte elétrica.
+Os anteriores paralelepípedos cinza-escuros de sombra foram substituídos por escurecimento suave **no fragment shader**, aplicado exclusivamente à face superior do tampo da bancada. Cinco focos analíticos representam, sem pretensão de ray tracing, a sombra da prensa, do microscópio, do aquecedor, da fonte elétrica e uma região local do corpo de prova deformado.
 
-O módulo autoral `lab3d-visuals.js` projeta um ponto (x,y,z) até o plano `y=0.91` na reta entre a fonte de luz e o objeto. O tamanho aparente cresce com a altura; a posição da projeção da prensa é recalculada a partir da **superfície convergida J2**, sem recalcular a mecânica ou prever deslocamento em z.
+O módulo autoral `lab3d-visuals.js` projeta um ponto (x,y,z) até o plano `y=0.91` na reta entre a fonte de luz e o objeto. O tamanho aparente cresce com a altura. A sombra do cabeçote depende de sua altura real no cenário; **se a borda superior ficar fixa, a sombra do cabeçote deve permanecer fixa**. Uma quinta sombra localizada lê `surface.position(.75,.75,1)` do campo J2 e acompanha o deslocamento efetivamente calculado nessa região, sem criar deformação fictícia em z.
 
 As sombras são funções gaussianas elípticas no plano xz, com intensidades estilizadas, sem oclusão geométrica real, autocontato, transparências ou material BRDF medido. Portanto, **não representam previsão fotométrica nem geometria de fissuras/deformação 3D**.
 
