@@ -64,6 +64,18 @@ try{
     pendingMetals:metals.filter(m=>index.summary(m.atomicNumber)[k]?.pending>0).length}]));
    const allFive=metals.filter(m=>keys.length===5&&keys.every(k=>
     index.summary(m.atomicNumber)[k]?.traceable>0));
+   const newCatalog=SILM.science400Reference;
+   const catalogStage117=newCatalog?{
+    schema:newCatalog.schema,
+    metals:newCatalog.metadata.audit.metals,
+    slots:newCatalog.slots.length,
+    numeric:newCatalog.metadata.audit.numeric,
+    withURL:newCatalog.metadata.audit.withURL,
+    displayed:newCatalog.slots.filter(x=>x.displayEligible).length,
+    alternatives:newCatalog.metadata.audit.alternatives,
+    engineRelease:newCatalog.engineRelease,
+    calibrationApproved:newCatalog.calibrationApproved
+   }:null;
    const structures=Object.fromEntries([...new Set(metals.map(e=>
     D.structure(e)?.type||'sem estrutura'))].map(k=>[k,metals.filter(e=>
     (D.structure(e)?.type||'sem estrutura')===k).length]));
@@ -71,8 +83,10 @@ try{
     nonInvestigable:rows.length-active.length,atlas:SILM.metalAtlas.entries.length,
     manualTopics:SILM.manual.topics.length,
     themes:SILM.themes.registry.length,missions:SILM.missions.registry.length,
-    routes:SILM.routes.registry.length,presets:SILM.readyAssemblies?.registry?.length??null,
+    routes:SILM.routes.registry.length,presets:SILM.readyAssemblies?.catalog?.length??null,
+    structureOnlyActive:active.filter(e=>e.silmEligibility.scope==='structure-only').length,
     fiveEvidenceCategories:keys,coverage,allFiveTraceable:allFive.length,
+    catalogStage117,
     evidenceRows:index?.rows?.length||0,evidenceIsNotMotorCalibration:index?.evidenceIsNotMotorCalibration,
     structures};
   });
