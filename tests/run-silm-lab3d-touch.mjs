@@ -50,10 +50,14 @@ try{
  };
  await hit('press');
  const slider=page.locator('[data-control="load"]');
+ await slider.scrollIntoViewIfNeeded();
  const box=await slider.boundingBox();
  assert.ok(box?.width>80,'Controle da prensa não cabe na tela');
- await page.touchscreen.tap(box.x+box.width*.7,box.y+box.height/2);
- assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'))>0,
+ await slider.tap({position:{x:box.width*.7,y:box.height/2}});
+ const sliderLevel=await slider.inputValue();
+ const solvedLoad=Number(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'));
+ console.log(JSON.stringify({touchSlider:{sliderLevel,solvedLoad}}));
+ assert.ok(solvedLoad>0,
   'Arrastar/tocar o controle da prensa deve ajustar o campo J2.');
  await page.locator('[data-lab-action="instrument-close"]').tap();
  assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false);

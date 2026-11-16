@@ -86,7 +86,7 @@
 .silm-lab3d-instrument-description{font-size:.76rem;line-height:1.45;margin:0}
 .silm-lab3d-instrument-group{display:grid;gap:10px}
 .silm-lab3d-instrument-group label{display:grid;gap:5px;font-size:.78rem}
-.silm-lab3d-instrument-group input[type=range]{width:100%;min-height:25px;accent-color:#87d5ea}
+.silm-lab3d-instrument-group input[type=range]{width:100%;min-height:25px;accent-color:#87d5ea;touch-action:none}
 .silm-lab3d-instrument-group output{font-variant-numeric:tabular-nums;font-size:.74rem;color:#d0e9f2}
 .silm-lab3d-instrument-group button{justify-self:start}
 @media(max-width:690px),(pointer:coarse){
