@@ -23,6 +23,8 @@ try{
  await page.goto(base+'/#/ambiente',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>typeof window.SILMIntegration?.snapshot==='function',{timeout:25000});
  await page.locator('[data-open-dock="montagem"]').click();
+ await page.locator("#silm-manual-start > summary").click();
+ assert.equal(await page.locator("#silm-manual-start").evaluate(el=>el.open),true);
  await page.locator('#silm-metal').selectOption('29');
  await page.locator('#silm-start').click();
  await page.waitForFunction(()=>window.SILMIntegration.snapshot().metal?.atomicNumber===29);

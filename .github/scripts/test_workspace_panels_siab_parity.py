@@ -81,6 +81,10 @@ with sync_playwright() as pw:
         montagem.click()
         page.locator('[data-left-tab="preparo"]').click()
         assert page.locator("#silm-free-assembly").is_hidden(), (name, "Montagem livre sem investigação ativa")
+        assert page.locator("#silm-open-periodic").is_visible()
+        assert page.locator("#silm-manual-start").count() == 1
+        page.locator("#silm-manual-start > summary").click()
+        assert page.locator("#silm-manual-start").evaluate("(el) => el.open")
         page.locator("#silm-metal").select_option("29")
         page.locator("#silm-start").click()
         page.wait_for_function(
