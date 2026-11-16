@@ -19,6 +19,7 @@ on:
       - 'tests/silm-lab3d-electrothermal.test.cjs'
       - '.github/workflows/silm-lab3d-preview.yml'
       - 'tests/run-silm-lab3d-browser.mjs'
+      - 'tests/run-silm-lab3d-touch.mjs'
       - 'domain/silm/lab3d.css'
       - 'index.html'
       - 'sw.js'
@@ -41,6 +42,7 @@ jobs:
           node --check domain/silm/lab3d-geometry.js
           node --check domain/silm/lab3d-visuals.js
           node --check tests/silm-lab3d-visuals.test.cjs
+          node --check tests/run-silm-lab3d-touch.mjs
           node --check tests/silm-lab3d-instruments.test.cjs
           node --check domain/silm/lab3d-electrothermal.js
           node --check tests/silm-lab3d-electrothermal.test.cjs
@@ -86,6 +88,9 @@ jobs:
           exit 1
       - name: Exercitar a sala 3D no workspace
         run: node tests/run-silm-lab3d-browser.mjs
+      - name: Testar toque em celular emulado
+        if: matrix.browser == 'chromium'
+        run: node tests/run-silm-lab3d-touch.mjs
       - name: Guardar capturas 3D ou fallback
         if: always()
         uses: actions/upload-artifact@v4

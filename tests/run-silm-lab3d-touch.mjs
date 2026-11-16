@@ -17,7 +17,7 @@ const ctx=await browser.newContext({viewport:{width:390,height:844},
 const page=await ctx.newPage(),errors=[];
 page.on('pageerror',e=>errors.push(e.message));
 const base=process.env.BASE_URL||'http://127.0.0.1:8765';
-const dir=join('reports','lab3d-browser','touch-chromium');
+const dir=join('reports','lab3d-browser','chromium','touch');
 await mkdir(dir,{recursive:true});
 try{
  await page.goto(base+'/#/ambiente',{waitUntil:'domcontentloaded'});
