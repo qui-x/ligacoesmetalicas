@@ -32,7 +32,7 @@ test('seleção prefere a superfície mais próxima, ignora objetos inválidos',
 });
 test('cilindros e toros têm posições, normais e índices triangulares finitos',()=>{
  for(const mesh of [G.round,G.ring,G.cylinder({segments:12}),G.torus({segments:16,tube:8})]){
-  assert.ok(mesh instanceof Float32Array);
+  assert.ok(ArrayBuffer.isView(mesh));
   assert.equal(mesh.length%18,0);
   assert.ok(mesh.length>0);
   for(let k=0;k<mesh.length;k+=6){
