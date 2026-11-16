@@ -11,7 +11,7 @@ const surface=(lower=1.03,upper=1.25)=>({ok:true,position(u,v,side){
 test('garra móvel segue a borda carregada; apoio acompanha borda apoiada',()=>{
  const a=P.pose(surface(1.03)),b=P.pose(surface(1.06)),c=P.pose(surface(.99));
  assert.ok(a.ok&&b.ok&&c.ok);
- assert.equal(b.movingGripY-a.movingGripY,.03);
+ assert.ok(Math.abs((b.movingGripY-a.movingGripY)-.03)<1e-10);
  assert.equal(c.fixedGripY,a.fixedGripY);
  assert.equal(a.source,'j2-plane-strain-surface');
  assert.equal(a.calibrated,false);
