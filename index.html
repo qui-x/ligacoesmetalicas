@@ -217,12 +217,14 @@
                 <div data-left-panel="resumo"><h3>Investigação atual</h3><p id="silm-summary" hidden></p><dl id="silm-summary-list" class="silm-summary-list"></dl></div>
                 <div data-left-panel="preparo">
                   <section class="silm-dock-group" aria-labelledby="silm-group-metal">
-                    <h3 id="silm-group-metal">Metal da investigação</h3>
-                    <label for="silm-metal">Escolha um metal</label><select id="silm-metal"></select>
-                    <div class="silm-dock-actions">
-                      <button id="silm-open-periodic" type="button" class="button outline">Tabela periódica</button>
-                      <button id="silm-start" class="button primary" type="button">Iniciar investigação</button>
-                    </div>
+                    <h3 id="silm-group-metal">Escolher forma de montagem</h3>
+                    <p class="silm-preparo-intro">Escolha um objeto para investigar o metal e sua estrutura de referência.</p>
+                    <button id="silm-open-periodic" type="button" class="button primary silm-preparo-table">Escolher objeto na Tabela Periódica</button>
+                    <details id="silm-manual-start" class="silm-preparo-secondary">
+                      <summary>Montagem livre (opcional)</summary>
+                      <label for="silm-metal">Metal da montagem livre</label><select id="silm-metal"></select>
+                      <button id="silm-start" class="button outline" type="button">Iniciar montagem livre</button>
+                    </details>
                     <details id="silm-free-assembly" class="silm-preparo-free" hidden>
                       <summary>Montagem livre</summary>
                       <section id="silm-free-tools" aria-labelledby="silm-group-structure" hidden>
@@ -277,14 +279,14 @@
                   <div id="silm-data-catalog">
                     
                     <nav class="silm-data-menu" aria-label="Consultas da investigação">
-                      <button type="button" data-silm-data-open="tabela"><strong>Metal e propriedades</strong></button>
-                      <button type="button" data-silm-data-open="registros"><strong>Medições e cálculos</strong><span id="silm-record-count">0 medições · 0 cálculos</span></button>
-                      <button type="button" data-silm-data-open="arquivo"><strong>Arquivos</strong></button>
+                      <button type="button" data-silm-data-open="tabela"><strong>Metal e propriedades</strong><span>Estrutura, valores e fontes</span></button>
+                      <button type="button" data-silm-data-open="registros"><strong>Registros da investigação</strong><span id="silm-record-count">0 medições · 0 cálculos</span></button>
+                      <button type="button" data-silm-data-open="arquivo"><strong>Importar e exportar</strong><span>Investigação em JSON</span></button>
                     </nav>
-                    <nav class="silm-data-documents" aria-label="Relatórios e registros"><a id="silm-report-link" class="button outline" href="#/relatorios">Relatório</a><a class="button outline" href="#/caderno">Caderno</a></nav>
+                    <nav class="silm-data-documents" aria-label="Documentos da investigação"><a id="silm-report-link" class="button outline" href="#/relatorios">Relatório</a><a class="button outline" href="#/caderno">Caderno</a></nav>
                   </div>
-                  <section class="silm-data-detail" data-silm-data-panel="tabela" hidden><div id="silm-data"></div></section>
-                  <section class="silm-data-detail" data-silm-data-panel="registros" hidden><div id="silm-history"></div></section>
+                  <section class="silm-data-detail" data-silm-data-panel="tabela" aria-label="Ficha científica e propriedades do metal" hidden><div id="silm-data"></div></section>
+                  <section class="silm-data-detail" data-silm-data-panel="registros" aria-label="Medições e cálculos registrados" hidden><div id="silm-history"></div></section>
                   <section class="silm-data-detail" data-silm-data-panel="arquivo" hidden><h3>Arquivos da investigação</h3><button id="silm-export-legacy" class="button outline" type="button" hidden>Exportar investigação antiga (JSON)</button><button id="silm-export" class="button outline" type="button">Exportar investigação</button><label for="silm-import">Abrir investigação SILM (JSON)</label><input type="file" id="silm-import" accept="application/json,.json"><p id="silm-storage-status" role="status"></p></section>
                 </div>
               </div>
