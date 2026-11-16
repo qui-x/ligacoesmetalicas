@@ -57,3 +57,15 @@
  .silm-lab3d-map-panel{background:Canvas;color:CanvasText;border:1px solid CanvasText}
  .silm-lab3d-map-legend::before{display:none}
 }
+
+/* No estágio de microestrutura a actionbar do SILM se oculta. Esta ação
+   contextual substitui somente o retorno visual à sala, sem trocar escala. */
+.silm-lab3d-return{position:absolute;z-index:32;top:10px;right:12px;
+ min-height:44px;padding:8px 14px;border-radius:9px;
+ background:#123e53;color:#f5faff;border:2px solid #8ec7d8;
+ font:inherit;font-weight:650;cursor:pointer;box-shadow:0 3px 12px #07111b77}
+.silm-lab3d-return[hidden]{display:none}
+.silm-lab3d-return:hover,.silm-lab3d-return:focus-visible{
+ background:#216278;outline:2px solid #dcf4ff;outline-offset:2px}
+@media(max-width:600px){.silm-lab3d-return{right:6px;top:6px;font-size:.83rem}}
+@media(forced-colors:active){.silm-lab3d-return{background:ButtonFace;color:ButtonText;border-color:ButtonText}}

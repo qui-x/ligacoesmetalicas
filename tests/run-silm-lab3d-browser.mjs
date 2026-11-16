@@ -64,9 +64,28 @@ try{
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'plasticIndicator');
   await map.selectOption('appearance');
   assert.equal(await page.locator('.silm-lab3d-map-legend').isVisible(),false);
+  await map.selectOption('plasticIndicator');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'plasticIndicator');
   const reading=await page.locator('.silm-lab3d-status').textContent();
-  assert.ok(/J2|converg|amostra/i.test(reading),reading);
+  assert.ok(/J2|converg|amostra|plástica/i.test(reading),reading);
   await page.locator('[data-lab-action="inspect"]').click();
+  const scale=page.locator('#silm-workshop-context .silm-workshop-scale[data-scale="2"]');
+  if(await scale.count()&&!(await scale.isDisabled())){
+   await page.locator('[data-lab-action="micro"]').click();
+   await page.locator('.silm-lab3d').waitFor({state:'detached'});
+   const returning=page.locator('.silm-lab3d-return');
+   await returning.waitFor({state:'visible'});
+   await page.waitForFunction(()=>document.querySelector('#silm-workshop-context .silm-workshop-scale[data-scale="2"]')?.getAttribute('aria-pressed')==='true');
+   await returning.click();
+   await page.locator('.silm-lab3d canvas').waitFor({state:'visible'});
+   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0.2');
+   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'plasticIndicator');
+   assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
+   assert.equal(await page.locator('[data-lab-action="current"]').getAttribute('aria-pressed'),'true');
+   assert.equal(await returning.isVisible(),false);
+  }else{
+   assert.equal(await page.locator('.silm-lab3d-return').isVisible(),false);
+  }
   await page.locator('[data-lab-action="close"]').click();
   await page.locator('.silm-lab3d').waitFor({state:'detached'});
   assert.equal(await entry.evaluate(e=>document.activeElement===e),true);
