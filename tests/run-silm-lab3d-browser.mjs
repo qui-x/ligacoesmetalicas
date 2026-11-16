@@ -39,7 +39,12 @@ try{
   const canvas=page.locator('.silm-lab3d canvas');
   await canvas.waitFor({state:'visible',timeout:10000});
   await page.waitForFunction(()=>document.querySelector('.silm-lab3d canvas')?.width>100);
+  const quick=page.locator('.silm-lab3d-quick');
+  const readings=page.locator('.silm-lab3d-map-panel');
+  assert.equal(await quick.evaluate(el=>el.open),false,'Atalhos devem começar recolhidos.');
+  assert.equal(await readings.evaluate(el=>el.open),false,'Leituras não devem encobrir a cena por padrão.');
   await page.screenshot({path:join(dir,'lab3d-open.png'),fullPage:false});
+  await quick.locator('summary').click();
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-coupled-model'),'equivalent-1d');
   await page.locator('[data-lab-action="heat"]').click();
   assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
@@ -61,6 +66,7 @@ try{
   assert.ok(!bright.equals(dark),'Desligar a luminária precisa alterar o render da sala.');
   await lamp.click();
   assert.equal(await lamp.getAttribute('aria-pressed'),'true');
+  await quick.locator('summary').click();
   // Clique direto numa peça visível, usando a mesma projeção geométrica da câmera.
   const instrumentClick=async id=>{
    const point=await page.evaluate(id=>{
@@ -110,7 +116,9 @@ try{
   const neutralProbe=await page.locator('.silm-lab3d').getAttribute('data-specimen-probe');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-surface'),'j2-plane-strain');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-segments'),'18');
+  await quick.locator('summary').click();
   await page.locator('[data-lab-action="more"]').click();
+  await quick.locator('summary').click();
   const loadedProbe=await page.locator('.silm-lab3d').getAttribute('data-specimen-probe');
   const movedShadow=await page.locator('.silm-lab3d').getAttribute('data-shadow-press');
   await page.waitForFunction(previous=>
@@ -130,6 +138,7 @@ try{
    'A sombra do cabeçote deve continuar disponível.');
   assert.notEqual(loadedProbe,neutralProbe,'O campo J2 não alterou a malha superficial.');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0.2');
+  await readings.locator('summary').click();
   const map=page.locator('#silm-lab3d-map-kind');
   await map.selectOption('vonMises');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'vonMises');
@@ -171,6 +180,7 @@ try{
   // Sem redução de movimento, apenas a INTERPOLAÇÃO visual entre dois
   // resultados convergidos é animada. A sessão científica não é escrita.
   await page.emulateMedia({reducedMotion:'no-preference'});
+  await quick.locator('summary').click();
   await page.locator('[data-lab-action="more"]').click();
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-press-transition'),'active');
   const gripAfter=Number(await page.locator('.silm-lab3d').getAttribute('data-press-moving-grip'));
@@ -178,6 +188,7 @@ try{
   await page.waitForFunction(()=>document.querySelector('.silm-lab3d')?.dataset.pressTransition==='settled',{timeout:5000});
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.locator('[data-lab-action="less"]').click();
+  await quick.locator('summary').click();
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-press-transition'),'settled');
   const reading=await page.locator('.silm-lab3d-status').textContent();
   assert.ok(/J2|converg|amostra|plástica/i.test(reading),reading);
@@ -186,6 +197,7 @@ try{
   assert.ok(await scale.count(),'A microestrutura deve estar presente no fluxo multiescala.');
   assert.equal(await scale.isDisabled(),false,'A escala de grãos precisa estar habilitada.');
   {
+   await quick.locator('summary').click();
    await page.locator('[data-lab-action="micro"]').click();
    await page.locator('.silm-lab3d').waitFor({state:'detached'});
    const returning=page.locator('.silm-lab3d-return');
