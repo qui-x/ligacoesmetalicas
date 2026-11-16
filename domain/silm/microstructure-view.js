@@ -302,7 +302,7 @@ SILM.microstructure=(()=>{
     (qualification?.missing.join('; ')||'E, ν, σe e H')+
     '. Não combinar amostras, fases ou temperaturas distintas.'));
    const contactDetails=node('details','silm-micro-contact-details');
-   const contactSummary=node('summary','','Aplicação da carga');
+   const contactSummary=node('summary','','Ajustes e leituras do ensaio');
    const slipDetails=node('details','silm-micro-slip-details');
    slipDetails.append(node('summary','','Deslizamento cristalográfico · Schmid'));
    const slipInfo=node('output','silm-micro-slip-result',
@@ -643,11 +643,11 @@ SILM.microstructure=(()=>{
    specimenFeedback.textContent=title+' · '+regime+(load?' · carga relativa '+relative+'%':'')+
     (mechanics?.accumulatedPlastic>1e-4?
      ' · plasticidade normalizada '+mechanics.accumulatedPlastic.toFixed(3).replace('.',','):'');
+   // A leitura imediata é curta; detalhamento J2 e posição da força ficam
+   // no mesmo painel de ajustes, sem competir com o mapa de grãos.
    mechanicalStatus.textContent=title+' · '+regime+
-    ' · contato em '+Math.round(contactPosition*100)+'% · largura '+Math.round(contactWidth*100)+'%'+
-    ' · passo ilustrativo '+step+'/'+max+
     (load?' · carga relativa '+relative+'%':'')+
-    ' · não representa deformação medida por grão; elasticidade plana normalizada, sem MPa; sombras ilustrativas sem profundidade 3D';
+    ' · etapa '+step+'/'+max+' · modelo didático, sem MPa';
   }
   const mechanicalPulseStep=()=>{
    const mode=getMode(),st=model?.state;
