@@ -94,7 +94,15 @@ try{
   await page.screenshot({path:join(dir,'fallback-2d.png')});
  }
  const after=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
- assert.equal(after,before,'A sala alterou o estado científico.');
+ // A travessia de escala registra somente metadata.workshop (estado oficial
+ // da navegação de objeto/grãos); não autoriza alterar física ou propriedades.
+ const scienceOnly=serialized=>{
+  const state=JSON.parse(serialized);
+  if(state.metadata)delete state.metadata.workshop;
+  return JSON.stringify(state);
+ };
+ assert.equal(scienceOnly(after),scienceOnly(before),
+  'A sala alterou o estado científico além do contexto legítimo de escala.');
  assert.deepEqual(pageErrors,[],'Erros JavaScript durante o fluxo: '+pageErrors.join(' | '));
  console.log(JSON.stringify({browser:name,backend,status:available?'LAB3D_SMOKE_OK':'SAFE_FALLBACK_OK'}));
 }finally{await context.close();await browser.close();}
