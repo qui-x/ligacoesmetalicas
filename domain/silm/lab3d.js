@@ -62,7 +62,7 @@
    'attribute vec3 p;attribute vec3 n;uniform mat4 m,vp;varying vec3 N,W;void main(){vec4 world=m*vec4(p,1.);W=world.xyz;N=normalize(vec3(n.x/max(m[0][0],.0001),n.y/max(m[1][1],.0001),n.z/max(m[2][2],.0001)));gl_Position=vp*world;}');
   const fs=shader(gl,gl.FRAGMENT_SHADER,
    'precision mediump float;varying vec3 N,W;uniform vec3 base,eye;uniform float metallic,shine,lampOn,receiver;'+
-   'uniform vec4 shadow0,shadow1,shadow2,shadow3;'+
+   'uniform vec4 shadow0,shadow1,shadow2,shadow3,shadow4;'+
    'float occlusion(vec2 p,vec4 s){vec2 d=(p-s.xy)/max(s.zw,vec2(.001));return exp(-2.4*dot(d,d));}'+
    'void main(){vec3 n=normalize(N),v=normalize(eye-W);'+
    'vec3 l=normalize(vec3(1.2,3.7,1.4)-W),desk=normalize(vec3(-1.63,1.85,-1.32)-W);'+
@@ -74,7 +74,7 @@
    'lampOn*pow(max(dot(n,hd),0.),max(6.0,shine))*.8*atten;'+
    'float f=pow(1.0-max(dot(n,v),0.),5.0);'+
    'vec3 specular=mix(vec3(.55,.66,.77),base,.6*metallic);'+
-   'float shade=1.0;if(receiver>.5&&n.y>.82){float oc=max(max(occlusion(W.xz,shadow0),occlusion(W.xz,shadow1)),max(occlusion(W.xz,shadow2),occlusion(W.xz,shadow3)));shade-=(.18+.17*lampOn)*oc;}'+
+   'float shade=1.0;if(receiver>.5&&n.y>.82){float oc=max(max(occlusion(W.xz,shadow0),occlusion(W.xz,shadow1)),max(max(occlusion(W.xz,shadow2),occlusion(W.xz,shadow3)),occlusion(W.xz,shadow4)));shade-=(.18+.17*lampOn)*oc;}'+
    'vec3 color=base*light*shade+specular*(metallic*highlight+.08*f);'+
    'gl_FragColor=vec4(clamp(color,0.0,1.0),1.0);}');
   const program=gl.createProgram();gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);
@@ -107,7 +107,7 @@
     eye:uniform('eye'),metallic:uniform('metallic'),shine:uniform('shine'),
     lampOn:uniform('lampOn'),receiver:uniform('receiver'),
     shadow0:uniform('shadow0'),shadow1:uniform('shadow1'),
-    shadow2:uniform('shadow2'),shadow3:uniform('shadow3')};
+    shadow2:uniform('shadow2'),shadow3:uniform('shadow3'),shadow4:uniform('shadow4')};
   return {
    resize(){const w=Math.max(1,canvas.clientWidth),h=Math.max(1,canvas.clientHeight);
     const dpr=Math.min(devicePixelRatio||1,1.6);
@@ -115,7 +115,7 @@
     if(canvas.width!==pw||canvas.height!==ph){canvas.width=pw;canvas.height=ph;}
     gl.viewport(0,0,pw,ph);return w/h;},
    render(items,eye,yaw,pitch,lampOn=true,shadows=V.shadows()){const aspect=this.resize();gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-    for(let i=0;i<4;i++)gl.uniform4fv(U['shadow'+i],shadows[i]);
+    for(let i=0;i<5;i++)gl.uniform4fv(U['shadow'+i],shadows[i]);
     gl.uniformMatrix4fv(U.vp,false,matrices(eye,yaw,pitch,aspect));
     gl.uniform1f(U.lampOn,lampOn?1:0);
     gl.uniform3fv(U.eye,new Float32Array(eye));
@@ -419,7 +419,8 @@
      vertices:new Float32Array(seg.vertices),plasticIndicator:seg.plasticIndicator}));
     const bridge=Bridge.create(field,{source:'j2',amplification:1});
     if(!bridge.ok)throw new Error('Campo para mapa mecânico indisponível.');
-    const shadows=V.shadows({upperY:surface.position(.5,1,1)[1]});
+    const shadows=V.shadows({upperY:surface.position(.5,1,1)[1],
+     probe:surface.position(.75,.75,1)});
     // Campo + malha + sombra são validados antes de atualizar a sessão.
     this.field=field;this.surface=surface;this.surfaceSegments=surfaceSegments;
     this.mechanicsBridge=bridge;this.load=load;this.fieldMode=this.loadMode;
@@ -634,7 +635,8 @@
    }
    try{this.renderer.render(this.items(time),this.eye,this.yaw,this.pitch,this.lamp,this.shadows);
     this.ui.dataset.meshUploads=String(this.renderer.uploads);
-    this.ui.dataset.shadowPress=this.shadows[0][0].toFixed(6)+','+this.shadows[0][1].toFixed(6);
+    this.ui.dataset.shadowPress=this.shadows[0][0].toFixed(9)+','+this.shadows[0][1].toFixed(9);
+    this.ui.dataset.shadowProbe=this.shadows[4][0].toFixed(9)+','+this.shadows[4][1].toFixed(9);
    }
    catch(e){this.status.textContent='Renderização 3D interrompida: '+e.message;this.close(false);return;}
    this.frame=requestAnimationFrame(t=>this.tick(t));

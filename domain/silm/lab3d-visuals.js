@@ -21,14 +21,18 @@ SILM.lab3dVisuals=(()=>{
    lightHeight:light[1],receiverY:planeY,
    source:'analytic-contact-preview',calibrated:false});
  }
- function shadows({upperY=1.25,light=LIGHT}={}){
+ function shadows({upperY=1.25,probe=[.26,1.195,-1.23],light=LIGHT}={}){
   if(!finite(upperY)||upperY<PLANE||upperY>=light[1])
    throw new RangeError('Altura da prensa fora do intervalo');
+  if(!Array.isArray(probe)||probe.length!==3||!probe.every(finite)||
+   probe[1]<PLANE||probe[1]>=light[1])
+   throw new RangeError('Amostra deformada fora do plano de sombra');
   const nodes=[
    {point:[0,upperY+.04,-1.35],radiusX:.33,radiusZ:.24},
    {point:[1.07,1.35,-1.25],radiusX:.22,radiusZ:.20},
    {point:[-1.15,1.19,-1.39],radiusX:.27,radiusZ:.22},
-   {point:[1.65,1.08,-1.5],radiusX:.22,radiusZ:.20}
+   {point:[1.65,1.08,-1.5],radiusX:.22,radiusZ:.20},
+   {point:probe,radiusX:.21,radiusZ:.12} // região local obtida da malha J2, não deslocamento fictício do cabeçote
   ];
   return Object.freeze(nodes.map(n=>{
    const f=footprint({...n,light});

@@ -18,9 +18,15 @@ test('sombra analítica é projetada para o lado contrário à luz e aumenta com
 });
 test('deslocamento do cabeçote muda apenas sua sombra, preserva instrumentos fixos',()=>{
  const a=V.shadows({upperY:1.2}),b=V.shadows({upperY:1.4});
- assert.equal(a.length,4);
+ assert.equal(a.length,5);
  assert.notDeepEqual([...a[0]],[...b[0]]);
- for(let i=1;i<a.length;i++)assert.deepEqual([...a[i]],[...b[i]]);
+ for(let i=1;i<4;i++)assert.deepEqual([...a[i]],[...b[i]]);
+ const probeA=V.shadows({probe:[.26,1.195,-1.23]});
+ const probeB=V.shadows({probe:[.38,1.18,-1.23]});
+ assert.notDeepEqual([...probeA[4]],[...probeB[4]],
+  'A sombra da amostra deve se mover com o campo J2.');
+ assert.deepEqual([...probeA[0]],[...probeB[0]],
+  'A sombra do cabeçote não deve mudar se só o interior deformou.');
  for(const row of a)assert.ok(row.every(Number.isFinite));
 });
 test('projeção no plano de recepção não altera posição nem escala no contato',()=>{
