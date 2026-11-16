@@ -419,7 +419,8 @@
      vertices:new Float32Array(seg.vertices),plasticIndicator:seg.plasticIndicator}));
     const bridge=Bridge.create(field,{source:'j2',amplification:1});
     if(!bridge.ok)throw new Error('Campo para mapa mecânico indisponível.');
-    // O par campo+superfície só é trocado após validação completa.
+    const shadows=V.shadows({upperY:surface.position(.5,1,1)[1]});
+    // Campo + malha + sombra são validados antes de atualizar a sessão.
     this.field=field;this.surface=surface;this.surfaceSegments=surfaceSegments;
     this.mechanicsBridge=bridge;this.load=load;this.fieldMode=this.loadMode;
     this.strain=clamp((upper.dy-lower.dy)*2,-.18,.18);
@@ -428,7 +429,7 @@
     this.ui.dataset.specimenLoad=String(load);
     this.ui.dataset.specimenProbe=surface.position(.75,.75,1).map(v=>v.toFixed(7)).join(',');
     this.ui.dataset.specimenMode=this.loadMode;
-    this.shadows=V.shadows({upperY:surface.position(.5,1,1)[1]});
+    this.shadows=shadows;
     this.refreshInstrument();
     this.status.textContent='J2 normalizado · '+(this.loadMode==='compression'?'compressão':'tração')+
      ' · carga '+Math.round(load*100)+'% (unidades relativas). Superfície deformada por campo 2D; espessura apenas visual.';
@@ -599,6 +600,13 @@
    add([0,2.92,-3.65,1.92,.34,.06],[.11,.27,.41],.35);
    add([-2.85,1.42,-3.76,.36,1.5,.08],[.32,.46,.53],.3);
    add([2.85,1.42,-3.76,.36,1.5,.08],[.32,.46,.53],.3);
+   // Marcador visual de seleção. Não é um campo físico nem acrescenta
+   // uma estrutura: só indica qual instrumento tem controles abertos.
+   const selected=I.targets.find(item=>item.id===this.selectedInstrument);
+   if(selected){
+    ring([selected.center[0],.945,selected.center[2],.54,.036,.54],
+     [.22,.76,.86],.48,60);
+   }
    return items;
   }
   tick(time){

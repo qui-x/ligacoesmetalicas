@@ -103,6 +103,7 @@ try{
   assert.equal(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-level')),.65);
   assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-power'))>0);
   await page.locator('[data-lab-action="instrument-close"]').click();
+  const neutralShadow=await page.locator('.silm-lab3d').getAttribute('data-shadow-press');
   const neutralProbe=await page.locator('.silm-lab3d').getAttribute('data-specimen-probe');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-surface'),'j2-plane-strain');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-segments'),'18');
@@ -116,6 +117,8 @@ try{
   assert.ok(uploadsBefore>0,'Malhas renderizadas devem ter buffers gráficos');
   assert.equal(uploadsAfter,uploadsBefore,'Malhas estáticas foram reenviadas à GPU em todo quadro');
   assert.ok(movedShadow?.includes(','),'A projeção de sombra não foi gerada');
+  assert.notEqual(movedShadow,neutralShadow,
+   'A sombra da prensa precisa acompanhar a superfície J2 deformada.');
   assert.notEqual(loadedProbe,neutralProbe,'O campo J2 não alterou a malha superficial.');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0.2');
   const map=page.locator('#silm-lab3d-map-kind');
