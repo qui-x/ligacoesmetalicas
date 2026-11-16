@@ -59,7 +59,7 @@
   const gl=canvas.getContext('webgl2',options)||canvas.getContext('webgl',options);
   if(!gl)throw new Error('WebGL indisponível neste navegador.');
   const vs=shader(gl,gl.VERTEX_SHADER,
-   'attribute vec3 p;attribute vec3 n;uniform mat4 m,vp;varying vec3 N,W;void main(){vec4 world=m*vec4(p,1.);W=world.xyz;N=normalize(mat3(m)*n);gl_Position=vp*world;}');
+   'attribute vec3 p;attribute vec3 n;uniform mat4 m,vp;varying vec3 N,W;void main(){vec4 world=m*vec4(p,1.);W=world.xyz;N=normalize(vec3(n.x/max(m[0][0],.0001),n.y/max(m[1][1],.0001),n.z/max(m[2][2],.0001)));gl_Position=vp*world;}');
   const fs=shader(gl,gl.FRAGMENT_SHADER,
    'precision mediump float;varying vec3 N,W;uniform vec3 base,eye;uniform float metallic,shine,lampOn;'+
    'void main(){vec3 n=normalize(N),v=normalize(eye-W);'+
@@ -255,7 +255,7 @@
      else this.close();return;}
     const k=e.key.toLowerCase();
     if(['w','a','s','d','arrowup','arrowleft','arrowdown','arrowright','e'].includes(k)){
-     if(e.target.closest?.('button,input,textarea,select')&&k!=='e')return;
+     if(e.target.closest?.('button,input,textarea,select'))return;
      e.preventDefault();e.stopPropagation();
      if(k==='e'){this.interact();return}
      this.keys.add(k);

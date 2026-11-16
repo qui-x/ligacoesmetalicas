@@ -84,6 +84,13 @@ try{
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0');
   await page.locator('[data-lab-action="instrument-close"]').click();
   assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false);
+  await canvas.focus();
+  await canvas.press('e');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-selected-instrument'),'press',
+   'A interação por teclado deve selecionar o instrumento no retículo.');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false,
+   'Escape deve fechar os controles sem encerrar a sala.');
   await instrumentClick('heater');
   await page.locator('[data-lab-action="heater-toggle"]').click();
   assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'false');
