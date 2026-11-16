@@ -70,7 +70,9 @@ try{
   assert.ok(/J2|converg|amostra|plástica/i.test(reading),reading);
   await page.locator('[data-lab-action="inspect"]').click();
   const scale=page.locator('#silm-workshop-context .silm-workshop-scale[data-scale="2"]');
-  if(await scale.count()&&!(await scale.isDisabled())){
+  assert.ok(await scale.count(),'A microestrutura deve estar presente no fluxo multiescala.');
+  assert.equal(await scale.isDisabled(),false,'A escala de grãos precisa estar habilitada.');
+  {
    await page.locator('[data-lab-action="micro"]').click();
    await page.locator('.silm-lab3d').waitFor({state:'detached'});
    const returning=page.locator('.silm-lab3d-return');
@@ -83,8 +85,6 @@ try{
    assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
    assert.equal(await page.locator('[data-lab-action="current"]').getAttribute('aria-pressed'),'true');
    assert.equal(await returning.isVisible(),false);
-  }else{
-   assert.equal(await page.locator('.silm-lab3d-return').isVisible(),false);
   }
   await page.locator('[data-lab-action="close"]').click();
   await page.locator('.silm-lab3d').waitFor({state:'detached'});
@@ -109,5 +109,5 @@ try{
  assert.equal(scienceOnly(after),scienceOnly(before),
   'A sala alterou o estado científico além do contexto legítimo de escala.');
  assert.deepEqual(pageErrors,[],'Erros JavaScript durante o fluxo: '+pageErrors.join(' | '));
- console.log(JSON.stringify({browser:name,backend,status:available?'LAB3D_SMOKE_OK':'SAFE_FALLBACK_OK'}));
+ console.log(JSON.stringify({browser:name,backend,microscopeRoundTrip:available,status:available?'LAB3D_SMOKE_OK':'SAFE_FALLBACK_OK'}));
 }finally{await context.close();await browser.close();}
