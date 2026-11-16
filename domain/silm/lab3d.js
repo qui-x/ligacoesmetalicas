@@ -356,6 +356,7 @@
    this.potential=Array.from(result.visiblePotential);
    this.dissipation=Array.from(result.visibleJoule);
    this.ui.dataset.coupledModel=result.geometry;
+   this.ui.dataset.coupledLevel=String(result.level);
    this.ui.dataset.coupledPower=String(result.power);
    this.ui.dataset.coupledStored=String(result.storedEnergy);
    this.ui.dataset.coupledJoule=String(result.jouleEnergy);

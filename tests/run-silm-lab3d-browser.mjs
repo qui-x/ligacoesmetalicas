@@ -59,6 +59,43 @@ try{
   assert.ok(!bright.equals(dark),'Desligar a luminária precisa alterar o render da sala.');
   await lamp.click();
   assert.equal(await lamp.getAttribute('aria-pressed'),'true');
+  // Clique direto numa peça visível, usando a mesma projeção geométrica da câmera.
+  const instrumentClick=async id=>{
+   const point=await page.evaluate(id=>{
+    const canvas=document.querySelector('.silm-lab3d canvas'),I=window.SILM.lab3dInstruments;
+    const target=I.targets.find(t=>t.id===id);
+    const p=I.project([0,1.6,2.35],0,-.06,target.center,canvas.clientWidth,canvas.clientHeight);
+    return {x:p.x,y:p.y,within:p.within};
+   },id);
+   assert.equal(point.within,true,id+' não está na cena.');
+   await canvas.click({position:{x:point.x,y:point.y}});
+   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-selected-instrument'),id);
+   assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),true);
+  };
+  await instrumentClick('press');
+  const loadSlider=page.locator('[data-control="load"]');
+  await loadSlider.focus();await loadSlider.press('ArrowRight');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0.1');
+  await page.locator('[data-control="load-mode"]').selectOption('tension');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-mode'),'tension',
+   'Alternar para tração deve forçar um novo cálculo J2 mesmo na mesma carga.');
+  await page.locator('[data-control="load-mode"]').selectOption('compression');
+  await loadSlider.press('Home');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0');
+  await page.locator('[data-lab-action="instrument-close"]').click();
+  assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false);
+  await instrumentClick('heater');
+  await page.locator('[data-lab-action="heater-toggle"]').click();
+  assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'false');
+  await page.locator('[data-lab-action="heater-toggle"]').click();
+  assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
+  await page.locator('[data-lab-action="instrument-close"]').click();
+  await instrumentClick('power');
+  const sourceSlider=page.locator('[data-control="intensity"]');
+  await sourceSlider.focus();await sourceSlider.press('ArrowRight');
+  assert.equal(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-level')),.65);
+  assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-power'))>0);
+  await page.locator('[data-lab-action="instrument-close"]').click();
   const neutralProbe=await page.locator('.silm-lab3d').getAttribute('data-specimen-probe');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-surface'),'j2-plane-strain');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-segments'),'18');
@@ -118,6 +155,7 @@ try{
    assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'plasticIndicator');
    assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
    assert.equal(await page.locator('[data-lab-action="current"]').getAttribute('aria-pressed'),'true');
+   assert.equal(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-level')),.65);
    assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-joule'))>0,
     'Retorno do microscópio precisa recuperar o mesmo histórico Joule.');
    assert.equal(await returning.isVisible(),false);
