@@ -104,6 +104,9 @@
  class Session{
   constructor(host,metal,returnFocus){
    this.host=host;this.metal=metal;this.returnFocus=returnFocus;
+   const state=window.SILMIntegration?.snapshot?.();
+   this.investigationKey=String(state?.investigation?.id||'')+'|'+String(state?.metal?.atomicNumber||'')+
+    '|'+String(state?.metadata?.workshop?.referenceId||'');
    this.keys=new Set();this.eye=[0,1.60,2.35];this.yaw=0;this.pitch=-.06;
    this.inspect=false;this.load=0;this.loadMode='compression';
    this.temperature=C.initialHeat();this.heat=false;this.current=false;this.lamp=true;
@@ -197,6 +200,25 @@
    this.canvas.addEventListener('touchstart',this.onTouchStart,{passive:true});
    this.canvas.addEventListener('touchmove',this.onTouchMove,{passive:true});
    this.setLoad(0); // A primeira malha lê o campo J2 de referência, sem carga.
+   // Recupera SOMENTE estado de visualização transitório após travessia de escala.
+   // Nunca serializa a investigação nem aplica um campo mecânico ao ScientificState.
+   if(suspended?.key===this.investigationKey){
+    const saved=suspended;suspended=null;
+    this.loadMode=saved.loadMode;
+    this.setLoad(saved.load);
+    this.eye=saved.eye.slice();this.yaw=saved.yaw;this.pitch=saved.pitch;
+    this.inspect=saved.inspect;
+    this.inspectButton.setAttribute('aria-pressed',String(this.inspect));
+    this.heat=saved.heat;this.current=saved.current;this.lamp=saved.lamp;
+    this.temperature=saved.temperature.slice();
+    this.heatButton.setAttribute('aria-pressed',String(this.heat));
+    this.currentButton.setAttribute('aria-pressed',String(this.current));
+    this.lampButton.setAttribute('aria-pressed',String(this.lamp));
+    this.mapSelect.value=Overlay.kinds.includes(saved.mapKind)?saved.mapKind:'appearance';
+    this.updateMap(false);
+    this.status.textContent='Sala retomada após a observação em outra escala. Carga e estímulos continuam somente visuais, não registrados como medições.';
+    this.returnFocus.textContent='Sala 3D';
+   }else if(suspended){suspended=null;this.returnFocus.textContent='Sala 3D'}
    this.canvas.focus({preventScroll:true});
    this.frame=requestAnimationFrame(t=>this.tick(t));
   }
@@ -287,7 +309,7 @@
   enterScale(n){
    const step=$('#silm-workshop-context .silm-workshop-scale[data-scale="'+n+'"]');
    if(!step||step.disabled){this.status.textContent='Selecione primeiro um objeto de investigação com estrutura disponível.';return}
-   this.close(false);step.click();
+   this.close(false,true);step.click();
    requestAnimationFrame(()=>$('#silm-workshop-context .silm-workshop-scale[data-scale="'+n+'"]')?.focus({preventScroll:true}));
   }
   items(time){
@@ -361,8 +383,21 @@
    catch(e){this.status.textContent='Renderização 3D interrompida: '+e.message;this.close(false);return;}
    this.frame=requestAnimationFrame(t=>this.tick(t));
   }
-  close(restore=true){
+  close(restore=true,preserveForScale=false){
    if(this.destroyed)return;
+   if(preserveForScale){
+    suspended=Object.freeze({
+     key:this.investigationKey,eye:Object.freeze(this.eye.slice()),
+     yaw:this.yaw,pitch:this.pitch,inspect:this.inspect,load:this.load,loadMode:this.loadMode,
+     heat:this.heat,current:this.current,lamp:this.lamp,
+     temperature:Object.freeze(this.temperature.slice()),mapKind:this.mapSelect.value
+    });
+    this.returnFocus.textContent='Voltar à sala 3D';
+    this.returnFocus.title='Retomar a câmera e os controles visuais após a observação em outra escala';
+   }else{
+    suspended=null;
+    this.returnFocus.textContent='Sala 3D';
+   }
    this.destroyed=true;cancelAnimationFrame(this.frame);
    if(document.pointerLockElement===this.canvas)document.exitPointerLock();
    document.removeEventListener('keydown',this.onKey,true);document.removeEventListener('keyup',this.onUp,true);
@@ -377,7 +412,7 @@
    if(active===this)active=null;
   }
  }
- let active=null;
+ let active=null,suspended=null;
  function boot(){
   const bar=$('#silm-scene-actionbar'),stage=$('#si-stage');
   if(!bar||!stage)return;
