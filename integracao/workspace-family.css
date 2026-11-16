@@ -662,6 +662,9 @@ body.si-structure-expanded #si-workspace:not(.si-workspace-fullscreen) #workspac
  gap:8px;padding:10px 12px;min-height:46px;border-radius:9px
 }
 #silm-data-catalog .silm-data-menu>button strong{font-size:.84rem}
+#silm-data-catalog .silm-data-menu>button span:not(#silm-record-count){font-size:.74rem;color:var(--muted);line-height:1.35;text-align:right}
+#silm-data-catalog .silm-data-menu>button{flex-wrap:wrap}
+#silm-data-catalog .silm-data-menu>button>span{max-width:100%;overflow-wrap:anywhere}
 #silm-data-catalog .silm-data-menu #silm-record-count{
  font-size:.75rem;line-height:1.3;text-align:right;color:var(--muted)
 }
@@ -718,6 +721,10 @@ body.si-structure-expanded #si-workspace:not(.si-workspace-fullscreen) #workspac
 #si-dock-left .silm-preparo-free>summary:focus-visible{
  outline:3px solid var(--ring);outline-offset:2px
 }
+#si-dock-left .silm-preparo-table{display:block;box-sizing:border-box;width:100%;min-height:44px;text-align:center;margin:8px 0}
+#si-dock-left .silm-preparo-intro{margin:7px 0 9px;font-size:.84rem;line-height:1.4;color:var(--muted)}
+#si-dock-left .silm-preparo-secondary label{display:block;margin:6px 0;font-size:.82rem}
+#si-dock-left .silm-preparo-secondary #silm-metal{display:block;width:100%;max-width:100%;min-height:44px;box-sizing:border-box}
 #si-dock-left .silm-preparo-secondary>.button{
  box-sizing:border-box;display:flex;width:100%;min-height:44px;
  align-items:center;justify-content:center;margin:5px 0 9px

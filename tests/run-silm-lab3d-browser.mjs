@@ -1,0 +1,229 @@
+'use strict';
+/* E2E da sala na investigação verdadeira; nunca cria estado científico paralelo. */
+import assert from 'node:assert/strict';
+import {mkdir} from 'node:fs/promises';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const name=process.env.BROWSER_NAME||'chromium';
+const modulePath=process.env.PLAYWRIGHT_MODULE;
+const pw=modulePath?await import(pathToFileURL(join(modulePath,'index.mjs')).href):await import('playwright');
+const browserType=pw[name];
+if(!browserType)throw new Error('Navegador desconhecido: '+name);
+const browser=await browserType.launch({headless:true,
+ args:name==='chromium'?['--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']:[]});
+const context=await browser.newContext({viewport:{width:1280,height:800},reducedMotion:'reduce'});
+const page=await context.newPage(),pageErrors=[];
+page.on('pageerror',error=>pageErrors.push(error.message));
+const base=process.env.BASE_URL||'http://127.0.0.1:8765';
+const dir=join('reports','lab3d-browser',name);
+await mkdir(dir,{recursive:true});
+try{
+ await page.goto(base+'/#/ambiente',{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>typeof window.SILMIntegration?.snapshot==='function',{timeout:25000});
+ const entry=page.locator('.silm-lab3d-entry');
+ await entry.waitFor({state:'attached'});
+ assert.equal(await page.evaluate(()=>window.SILMIntegration.snapshot().metal),null);
+ await page.locator('[data-open-dock="montagem"]').click();
+ await page.locator("#silm-manual-start > summary").click();
+ assert.equal(await page.locator("#silm-manual-start").evaluate(el=>el.open),true);
+ await page.locator('#silm-metal').selectOption('29');
+ await page.locator('#silm-start').click();
+ await page.waitForFunction(()=>window.SILMIntegration.snapshot().metal?.atomicNumber===29);
+ const closeDock=page.locator('[data-close-dock="left"]');
+ if(await closeDock.isVisible())await closeDock.click();
+ const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
+ const backend=await page.evaluate(()=>{const c=document.createElement('canvas');return c.getContext('webgl2')?'webgl2':c.getContext('webgl')?'webgl1':'none'});
+ const available=backend!=='none';
+ await entry.click();
+ if(available){
+  const canvas=page.locator('.silm-lab3d canvas');
+  await canvas.waitFor({state:'visible',timeout:10000});
+  await page.waitForFunction(()=>document.querySelector('.silm-lab3d canvas')?.width>100);
+  await page.screenshot({path:join(dir,'lab3d-open.png'),fullPage:false});
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-coupled-model'),'equivalent-1d');
+  await page.locator('[data-lab-action="heat"]').click();
+  assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
+  assert.equal(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-power')),0,
+   'Calor externo isolado não pode gerar potência Joule.');
+  assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-external'))>0);
+  await page.locator('[data-lab-action="current"]').click();
+  assert.equal(await page.locator('[data-lab-action="current"]').getAttribute('aria-pressed'),'true');
+  assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-power'))>0,
+   'Corrente precisa produzir dissipação Joule pelo motor existente.');
+  assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-joule'))>0);
+  assert.match(await page.locator('.silm-lab3d-coupled-status').textContent(),/Rede eletrotérmica 1D relativa/);
+  const lamp=page.locator('[data-lab-action="lamp"]');
+  const bright=await page.screenshot();
+  await lamp.click();
+  assert.equal(await lamp.getAttribute('aria-pressed'),'false');
+  await page.waitForTimeout(160);
+  const dark=await page.screenshot({path:join(dir,'lab3d-lamp-off.png')});
+  assert.ok(!bright.equals(dark),'Desligar a luminária precisa alterar o render da sala.');
+  await lamp.click();
+  assert.equal(await lamp.getAttribute('aria-pressed'),'true');
+  // Clique direto numa peça visível, usando a mesma projeção geométrica da câmera.
+  const instrumentClick=async id=>{
+   const point=await page.evaluate(id=>{
+    const canvas=document.querySelector('.silm-lab3d canvas'),I=window.SILM.lab3dInstruments;
+    const target=I.targets.find(t=>t.id===id);
+    const p=I.project([0,1.6,2.35],0,-.06,target.center,canvas.clientWidth,canvas.clientHeight);
+    return {x:p.x,y:p.y,within:p.within};
+   },id);
+   assert.equal(point.within,true,id+' não está na cena.');
+   await canvas.click({position:{x:point.x,y:point.y}});
+   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-selected-instrument'),id);
+   assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),true);
+  };
+  await instrumentClick('press');
+  const loadSlider=page.locator('[data-control="load"]');
+  await loadSlider.focus();await loadSlider.press('ArrowRight');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0.1');
+  await page.locator('[data-control="load-mode"]').selectOption('tension');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-mode'),'tension',
+   'Alternar para tração deve forçar um novo cálculo J2 mesmo na mesma carga.');
+  await page.locator('[data-control="load-mode"]').selectOption('compression');
+  await loadSlider.press('Home');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0');
+  await page.locator('[data-lab-action="instrument-close"]').click();
+  assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false);
+  await canvas.focus();
+  await canvas.press('e');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-selected-instrument'),'press',
+   'A interação por teclado deve selecionar o instrumento no retículo.');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false,
+   'Escape deve fechar os controles sem encerrar a sala.');
+  await instrumentClick('heater');
+  await page.locator('[data-lab-action="heater-toggle"]').click();
+  assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'false');
+  await page.locator('[data-lab-action="heater-toggle"]').click();
+  assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
+  await page.locator('[data-lab-action="instrument-close"]').click();
+  await instrumentClick('power');
+  const sourceSlider=page.locator('[data-control="intensity"]');
+  await sourceSlider.focus();await sourceSlider.press('ArrowRight');
+  assert.equal(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-level')),.65);
+  assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-power'))>0);
+  await page.locator('[data-lab-action="instrument-close"]').click();
+  const neutralShadow=await page.locator('.silm-lab3d').getAttribute('data-shadow-press');
+  const neutralLocalShadow=await page.locator('.silm-lab3d').getAttribute('data-shadow-probe');
+  const neutralProbe=await page.locator('.silm-lab3d').getAttribute('data-specimen-probe');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-surface'),'j2-plane-strain');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-segments'),'18');
+  await page.locator('[data-lab-action="more"]').click();
+  const loadedProbe=await page.locator('.silm-lab3d').getAttribute('data-specimen-probe');
+  const movedShadow=await page.locator('.silm-lab3d').getAttribute('data-shadow-press');
+  await page.waitForFunction(previous=>
+   document.querySelector('.silm-lab3d')?.dataset.shadowProbe!==previous,
+   neutralLocalShadow,{timeout:5000});
+  const movedLocalShadow=await page.locator('.silm-lab3d').getAttribute('data-shadow-probe');
+  await page.waitForTimeout(180);
+  const uploadsBefore=Number(await page.locator('.silm-lab3d').getAttribute('data-mesh-uploads'));
+  await page.waitForTimeout(180);
+  const uploadsAfter=Number(await page.locator('.silm-lab3d').getAttribute('data-mesh-uploads'));
+  assert.ok(uploadsBefore>0,'Malhas renderizadas devem ter buffers gráficos');
+  assert.equal(uploadsAfter,uploadsBefore,'Malhas estáticas foram reenviadas à GPU em todo quadro');
+  assert.ok(movedShadow?.includes(','),'A projeção de sombra não foi gerada');
+  assert.notEqual(movedLocalShadow,neutralLocalShadow,
+   'A sombra da região deformada deve acompanhar deslocamentos J2 locais.');
+  assert.ok(neutralShadow?.length>0&&movedShadow?.length>0,
+   'A sombra do cabeçote deve continuar disponível.');
+  assert.notEqual(loadedProbe,neutralProbe,'O campo J2 não alterou a malha superficial.');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0.2');
+  const map=page.locator('#silm-lab3d-map-kind');
+  await map.selectOption('vonMises');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'vonMises');
+  const validCount=Number(await page.locator('.silm-lab3d').getAttribute('data-map-available'));
+  assert.ok(validCount>0,'Mapas mecânicos precisam ter regiões com dados do J2.');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-map-source'),'j2-plane-strain');
+  assert.ok(await page.locator('.silm-lab3d-map-legend').isVisible());
+  assert.match(await page.locator('.silm-lab3d-map-legend').textContent(),/unidades relativas/);
+  await page.screenshot({path:join(dir,'lab3d-von-mises.png'),fullPage:false});
+  // A cena deve continuar utilizável em resolução móvel sem controles fora do palco.
+  await page.setViewportSize({width:390,height:844});
+  const responsive=await page.evaluate(()=>{
+   const ui=document.querySelector('.silm-lab3d'),
+    top=ui?.getBoundingClientRect(),
+    close=ui?.querySelector('[data-lab-action="close"]')?.getBoundingClientRect(),
+    bottom=ui?.querySelector('.silm-lab3d-bottom')?.getBoundingClientRect(),
+    map=ui?.querySelector('.silm-lab3d-map-panel')?.getBoundingClientRect();
+   return {ok:!!top&&!!close&&!!bottom&&!!map&&
+    close.left>=top.left-2&&close.right<=top.right+2&&
+    bottom.left>=top.left-2&&bottom.right<=top.right+2&&
+    bottom.bottom<=top.bottom+2&&map.right<=top.right+2,
+    width:top?.width||0,height:top?.height||0};
+  });
+  assert.ok(responsive.ok,'Painéis fora do estágio 3D móvel: '+JSON.stringify(responsive));
+  await page.screenshot({path:join(dir,'lab3d-mobile.png'),fullPage:false});
+  await page.setViewportSize({width:1280,height:800});
+  await map.selectOption('hydrostaticMean');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'hydrostaticMean');
+  await map.selectOption('plasticIndicator');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'plasticIndicator');
+  await map.selectOption('appearance');
+  assert.equal(await page.locator('.silm-lab3d-map-legend').isVisible(),false);
+  await map.selectOption('plasticIndicator');
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'plasticIndicator');
+  // A garra de v=0 segue o campo J2, sem alterar sua condição de apoio v=1.
+  const gripInitial=Number(await page.locator('.silm-lab3d').getAttribute('data-press-moving-grip'));
+  const gripFixed=Number(await page.locator('.silm-lab3d').getAttribute('data-press-fixed-grip'));
+  assert.ok(gripInitial<gripFixed,'As garras devem limitar a mesma amostra J2.');
+  // Sem redução de movimento, apenas a INTERPOLAÇÃO visual entre dois
+  // resultados convergidos é animada. A sessão científica não é escrita.
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.locator('[data-lab-action="more"]').click();
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-press-transition'),'active');
+  const gripAfter=Number(await page.locator('.silm-lab3d').getAttribute('data-press-moving-grip'));
+  assert.notEqual(gripAfter,gripInitial,'Garra móvel não seguiu o J2 ao aumentar a carga.');
+  await page.waitForFunction(()=>document.querySelector('.silm-lab3d')?.dataset.pressTransition==='settled',{timeout:5000});
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.locator('[data-lab-action="less"]').click();
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-press-transition'),'settled');
+  const reading=await page.locator('.silm-lab3d-status').textContent();
+  assert.ok(/J2|converg|amostra|plástica/i.test(reading),reading);
+  await page.locator('[data-lab-action="inspect"]').click();
+  const scale=page.locator('#silm-workshop-context .silm-workshop-scale[data-scale="2"]');
+  assert.ok(await scale.count(),'A microestrutura deve estar presente no fluxo multiescala.');
+  assert.equal(await scale.isDisabled(),false,'A escala de grãos precisa estar habilitada.');
+  {
+   await page.locator('[data-lab-action="micro"]').click();
+   await page.locator('.silm-lab3d').waitFor({state:'detached'});
+   const returning=page.locator('.silm-lab3d-return');
+   await returning.waitFor({state:'visible'});
+   await page.waitForFunction(()=>document.querySelector('#silm-workshop-context .silm-workshop-scale[data-scale="2"]')?.getAttribute('aria-pressed')==='true');
+   await returning.click();
+   await page.locator('.silm-lab3d canvas').waitFor({state:'visible'});
+   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0.2');
+   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'plasticIndicator');
+   assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
+   assert.equal(await page.locator('[data-lab-action="current"]').getAttribute('aria-pressed'),'true');
+   assert.equal(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-level')),.65);
+   assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-joule'))>0,
+    'Retorno do microscópio precisa recuperar o mesmo histórico Joule.');
+   assert.equal(await returning.isVisible(),false);
+  }
+  await page.locator('[data-lab-action="close"]').click();
+  await page.locator('.silm-lab3d').waitFor({state:'detached'});
+  assert.equal(await page.evaluate(()=>{
+   const focused=document.activeElement,entry=document.querySelector('.silm-lab3d-entry');
+   const scale=document.querySelector('#silm-workshop-context .silm-workshop-scale[aria-pressed="true"]');
+   return focused===entry&&!!entry?.getClientRects().length||
+    focused===scale&&!!scale?.getClientRects().length;
+  }),true,'O foco deve retornar a um controle visível após fechar a sala.');
+ }else{
+  assert.equal(await page.locator('.silm-lab3d').count(),0);
+  await page.screenshot({path:join(dir,'fallback-2d.png')});
+ }
+ const after=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
+ // A travessia de escala registra somente metadata.workshop (estado oficial
+ // da navegação de objeto/grãos); não autoriza alterar física ou propriedades.
+ const scienceOnly=serialized=>{
+  const state=JSON.parse(serialized);
+  if(state.metadata)delete state.metadata.workshop;
+  return JSON.stringify(state);
+ };
+ assert.equal(scienceOnly(after),scienceOnly(before),
+  'A sala alterou o estado científico além do contexto legítimo de escala.');
+ assert.deepEqual(pageErrors,[],'Erros JavaScript durante o fluxo: '+pageErrors.join(' | '));
+ console.log(JSON.stringify({browser:name,backend,microscopeRoundTrip:available,status:available?'LAB3D_SMOKE_OK':'SAFE_FALLBACK_OK'}));
+}finally{await context.close();await browser.close();}

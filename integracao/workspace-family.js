@@ -108,8 +108,10 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   const editableStructure=canObserve;
   // Centro é uma vista local: a célula não aparece nela, e a primeira
   // vizinhança já é mostrada. Não oferecer botões sem efeito perceptível.
-  const localCenter=document.getElementById('si-stage')?.dataset.workshopScale==='4';
-  if(!localCenter){
+  const stageScale=Number(document.getElementById('si-stage')?.dataset.workshopScale||0);
+  const showCenterControls=stageScale===0||stageScale===3;
+  const showCrystalControls=stageScale===3;
+  if(showCenterControls){
   const structureActions=actionGroup(root,'Centros metálicos');
   actionButton(structureActions,{id:'centers',label:observer.centers?'Ocultar identificação':'Identificar centros',path:actionIcons.centers,pressed:observer.centers,disabled:!editableStructure,reason:!structure?'Monte uma estrutura primeiro':activityLocked?'Recurso restrito nesta atividade':'',hint:'Destaca todos os centros. Na montagem livre, identifica cada unidade; na célula cristalina, mostra o papel de cada sítio.',onClick:()=>{
    observer.centers=!observer.centers;B.storage.write(observerKey,{centers:observer.centers});
@@ -117,13 +119,15 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
    refreshScene();renderViewers();
   }});
   }
+  if(stageScale===0||stageScale>=3){
   const interactionActions=actionGroup(root,'Interação metálica');
   const electrons=state.electrons,minimum=SILM.electronModel?.minUnits||2;
   const electronsActive=!!electrons?.representation.visible&&!!electrons?.representation.motion;
   actionButton(interactionActions,{id:'electrons',label:electronsActive?'Ocultar mar de elétrons':'Mostrar mar de elétrons',path:actionIcons.electrons,pressed:electronsActive,disabled:!canExplore||(!structure||structure.units.length<minimum),reason:!structure?'Monte uma estrutura primeiro':structure.units.length<minimum?'São necessárias '+minimum+' unidades':!canExplore?'Disponível no módulo Explorar':'',hint:'Mostra o modelo coletivo dos elétrons de valência e seu movimento ao redor dos centros. Não representa ligações localizadas entre pares.',onClick:()=>{
    quickActions?.toggleElectrons?.();refreshScene();renderViewers();
   }});
-  if(!localCenter){
+  }
+  if(showCrystalControls){
   const crystalActions=actionGroup(root,'Célula e rede cristalina');
   actionButton(crystalActions,{id:'view-toggle',label:crystal?(rep.view==='cell'?'Mostrar rede':'Mostrar célula'):'Célula / rede',path:actionIcons.view,pressed:!!crystal&&rep.view==='lattice',disabled:!crystal||!canObserve,reason:!crystal?'Organize a montagem para habilitar a célula e a rede':activityLocked?'Recurso restrito nesta atividade':'',onClick:()=>{
    if(!crystal||!canObserve)return;
@@ -313,7 +317,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   $('silm-data-catalog').hidden=!!id;
   for(const panel of document.querySelectorAll('[data-silm-data-panel]'))panel.hidden=panel.dataset.silmDataPanel!==id;
   const back=$('silm-data-back');back.hidden=!id;
-  if(id){$('si-right-title').textContent={tabela:'Dados do metal',registros:'Medições e cálculos',arquivo:'Arquivos da investigação'}[id];if(focus)back.focus({preventScroll:true});}
+  if(id){$('si-right-title').textContent={tabela:'Dados do metal',registros:'Registros da investigação',arquivo:'Importar e exportar'}[id];if(focus)back.focus({preventScroll:true});}
   else{if($('si-workspace').dataset.rightOpen==='true'&&document.querySelector('[data-open-dock="dados"]').getAttribute('aria-expanded')==='true')$('si-right-title').textContent='Dados';}
   $('si-right-scroll').scrollTop=0;
  }
@@ -336,7 +340,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   $('silm-module-context').textContent=locked?'Módulo definido pelo roteiro.':'';
   {const m=model.state.measurements.length,c=model.state.calculations.length;$('silm-record-count').textContent=m+(m===1?' medição':' medições')+' · '+c+(c===1?' cálculo':' cálculos');}
   const active=B.activeViewer();if(active&&document.querySelector('[data-open-dock="ver"]').getAttribute('aria-expanded')==='true'&&!$('si-viewer-detail').hidden)$('si-right-title').textContent=active.title;
-  if(dataPage&&document.querySelector('[data-open-dock="dados"]').getAttribute('aria-expanded')==='true')$('si-right-title').textContent={tabela:'Dados do metal',registros:'Medições e cálculos',arquivo:'Arquivos da investigação'}[dataPage];
+  if(dataPage&&document.querySelector('[data-open-dock="dados"]').getAttribute('aria-expanded')==='true')$('si-right-title').textContent={tabela:'Dados do metal',registros:'Registros da investigação',arquivo:'Importar e exportar'}[dataPage];
  }
  // Como no SIAB, os painéis abertos por Ver e Dados se chamam "Investigar" e "Dados da investigação". A Base reescreve o
  // título a cada desenho da doca; o observador troca só esses rótulos genéricos e deixa os títulos de detalhe como estão.

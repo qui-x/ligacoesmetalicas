@@ -218,6 +218,7 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
  const row=(dl,label,text)=>{dl.append(el('dt',label),el('dd',text));};
  const registry=S.engineAdapters,Data=registry.resolve('data.reference-catalog').api,Calculations=registry.resolve('calculation.formula-service').api,Properties=registry.resolve('properties.eligibility-catalog').api;
  const structure=Data.structure(e),dl=el('dl');
+ host.append(el('h3','Identificação e estrutura'));
  row(dl,'Metal',e.name+' ('+e.symbol+') · Z = '+e.atomicNumber);
  row(dl,'Estrutura de referência',structure?.label||structure?.type||'Não homologada');
  row(dl,'Massa molar',(Calculations.tabulated(e,'M')?.display||'Sem massa molar homologada'));
@@ -229,6 +230,7 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
  for(const [key,label]of [['temperature','Temperatura de referência'],['pressure','Pressão de referência'],['phase','Fase de referência']]){const d=condition?.[key];if(d)row(dl,label,d.display||String(d.value)+' '+(d.unit||''));}
  host.append(dl);
  const heading=el('h3','Propriedades do metal');host.append(heading);
+ host.append(el('p','Os valores abaixo pertencem às fontes e condições indicadas. Dados condicionais não calibram automaticamente as simulações.'));
  // Etapas 78–79: a aba Dados deve consultar a MESMA fonte de pesquisa que
  // Explorar, sem fazer um dado de referência passar por calibração do motor.
  // Não exigir CNTP: registrar a condição exata da amostra/fonte, quando houver.

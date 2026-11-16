@@ -1,0 +1,100 @@
+/* Camada 3D opt-in dentro do palco, sem modificar docas nem estado científico. */
+#si-stage{position:relative}
+.silm-lab3d-entry{white-space:nowrap;min-height:36px}
+.silm-lab3d{position:absolute;inset:0;z-index:30;overflow:hidden;background:#101b2a;
+ color:#f4f7fc;isolation:isolate;border-radius:10px;display:flex;flex-direction:column}
+.silm-lab3d[hidden]{display:none}
+.silm-lab3d canvas{display:block;width:100%;height:100%;min-height:0;flex:1;touch-action:none;outline-offset:-4px}
+.silm-lab3d canvas:focus-visible{outline:3px solid #79d8ff}
+.silm-lab3d-hud{position:absolute;top:8px;left:10px;right:10px;z-index:2;display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+ background:rgba(11,22,36,.88);border:1px solid rgba(189,219,255,.28);border-radius:8px;padding:7px 10px;max-width:calc(100% - 20px)}
+.silm-lab3d-title{font-size:.89rem;font-weight:700;margin:0;margin-right:auto}
+.silm-lab3d button,.silm-lab3d select{font:inherit;font-size:.82rem;min-height:36px;border:1px solid #90b7ce;
+ background:#193247;color:#fff;border-radius:6px;padding:5px 10px;cursor:pointer}
+.silm-lab3d button:hover,.silm-lab3d button:focus-visible{background:#315574;outline-offset:2px}
+.silm-lab3d button[aria-pressed=true]{background:#195a67;border-color:#88e5de}
+.silm-lab3d-bottom{position:absolute;bottom:7px;left:10px;right:10px;z-index:2;
+ background:rgba(11,22,36,.9);border:1px solid rgba(189,219,255,.3);border-radius:8px;padding:8px;
+ display:flex;flex-wrap:wrap;justify-content:center;gap:6px;align-items:center}
+.silm-lab3d-label{font-size:.77rem;max-width:30ch}
+.silm-lab3d-status{font-size:.76rem;display:block;flex:1 1 100%;text-align:center;line-height:1.35}
+.silm-lab3d-crosshair{position:absolute;top:50%;left:50%;width:10px;height:10px;transform:translate(-50%,-50%);
+ border:1px solid rgba(255,255,255,.8);border-radius:50%;pointer-events:none}
+.silm-lab3d-controls{position:absolute;bottom:94px;left:10px;display:none;gap:5px;z-index:2}
+.silm-lab3d-controls button{width:44px;height:44px;font-size:1.1rem;padding:0;background:#162c40e8}
+.silm-lab3d-reduced .silm-lab3d-crosshair{display:none}
+@media(max-width:690px),(pointer:coarse){
+ .silm-lab3d-hud{padding:5px 6px;gap:4px}
+ .silm-lab3d-hud button{min-height:34px}
+ .silm-lab3d-bottom{gap:4px;padding:5px}
+ .silm-lab3d-bottom button{min-height:38px;font-size:.77rem;padding:4px 6px}
+ .silm-lab3d-controls{display:grid;grid-template-columns:repeat(3,44px)}
+ .silm-lab3d-controls [data-move=forward]{grid-column:2}
+ .silm-lab3d-controls [data-move=left]{grid-row:2;grid-column:1}
+ .silm-lab3d-controls [data-move=backward]{grid-row:2;grid-column:2}
+ .silm-lab3d-controls [data-move=right]{grid-row:2;grid-column:3}
+}
+@media(prefers-reduced-motion:reduce){.silm-lab3d *{scroll-behavior:auto}}
+@media(forced-colors:active){.silm-lab3d-hud,.silm-lab3d-bottom{border:1px solid CanvasText;background:Canvas;color:CanvasText}}
+
+/* Mapas opt-in somente leitura; valores e metadados legíveis sem codificação por cor. */
+.silm-lab3d-map-panel{position:absolute;right:10px;top:72px;z-index:2;max-width:min(365px,calc(100% - 20px));
+ border:1px solid rgba(185,216,241,.4);border-radius:8px;background:rgba(10,22,37,.94);
+ padding:8px 10px;font-size:.8rem;display:grid;gap:6px}
+.silm-lab3d-map-label{display:grid;gap:4px;font-size:.78rem}
+.silm-lab3d-map-label select{min-width:240px;max-width:100%;width:100%}
+.silm-lab3d-map-legend{font-size:.74rem;line-height:1.4;display:block;max-width:42ch}
+.silm-lab3d-map-legend[hidden]{display:none}
+.silm-lab3d-map-legend::before{content:'';display:block;height:7px;margin-bottom:5px;border-radius:6px;
+ background:linear-gradient(90deg,#2859c4 0%,#f5bd3d 50%,#e6402e 100%)}
+.silm-lab3d-map-legend[data-kind=hydrostaticMean]::before{
+ background:linear-gradient(90deg,#2859c4 0%,#e0e8f5 50%,#e6402e 100%)}
+@media(max-width:690px),(pointer:coarse){
+ .silm-lab3d-map-panel{top:90px;right:6px;max-width:calc(100% - 12px);padding:5px}
+ .silm-lab3d-map-label select{min-width:190px}
+}
+@media(forced-colors:active){
+ .silm-lab3d-map-panel{background:Canvas;color:CanvasText;border:1px solid CanvasText}
+ .silm-lab3d-map-legend::before{display:none}
+}
+
+/* No estágio de microestrutura a actionbar do SILM se oculta. Esta ação
+   contextual substitui somente o retorno visual à sala, sem trocar escala. */
+.silm-lab3d-return{position:absolute;z-index:32;top:10px;right:12px;
+ min-height:44px;padding:8px 14px;border-radius:9px;
+ background:#123e53;color:#f5faff;border:2px solid #8ec7d8;
+ font:inherit;font-weight:650;cursor:pointer;box-shadow:0 3px 12px #07111b77}
+.silm-lab3d-return[hidden]{display:none}
+.silm-lab3d-return:hover,.silm-lab3d-return:focus-visible{
+ background:#216278;outline:2px solid #dcf4ff;outline-offset:2px}
+@media(max-width:600px){.silm-lab3d-return{right:6px;top:6px;font-size:.83rem}}
+@media(forced-colors:active){.silm-lab3d-return{background:ButtonFace;color:ButtonText;border-color:ButtonText}}
+
+/* Leituras relativas do mesmo resolvedor Joule/condução, não do metal real. */
+.silm-lab3d-coupled-status{display:block;font-size:.72rem;line-height:1.45;color:#c8e7eb;
+ border-top:1px solid rgba(205,227,245,.24);padding-top:6px;max-width:42ch}
+@media(forced-colors:active){.silm-lab3d-coupled-status{color:CanvasText;border-color:CanvasText}}
+
+/* Interação direta: painel do instrumento, dentro da mesma investigação. */
+.silm-lab3d-instrument-panel{position:absolute;top:80px;left:10px;z-index:4;
+ width:min(320px,calc(100% - 20px));max-height:calc(100% - 225px);overflow:auto;
+ background:rgba(10,27,44,.96);border:1px solid #84b5c9;border-radius:9px;
+ padding:10px;color:#f2f8fc;display:grid;gap:9px;box-shadow:0 5px 18px #02091499}
+.silm-lab3d-instrument-panel[hidden],.silm-lab3d-instrument-group[hidden]{display:none}
+.silm-lab3d-instrument-heading{display:flex;gap:7px;align-items:center;justify-content:space-between}
+.silm-lab3d-instrument-heading h3{font-size:.92rem;margin:0;line-height:1.25}
+.silm-lab3d-instrument-description{font-size:.76rem;line-height:1.45;margin:0}
+.silm-lab3d-instrument-group{display:grid;gap:10px}
+.silm-lab3d-instrument-group label{display:grid;gap:5px;font-size:.78rem}
+.silm-lab3d-instrument-group input[type=range]{width:100%;min-height:25px;accent-color:#87d5ea;touch-action:none}
+.silm-lab3d-instrument-group output{font-variant-numeric:tabular-nums;font-size:.74rem;color:#d0e9f2}
+.silm-lab3d-instrument-group button{justify-self:start}
+@media(max-width:690px),(pointer:coarse){
+ .silm-lab3d-instrument-panel{top:35%;left:6px;width:min(245px,calc(100% - 12px));
+ max-height:38%;padding:7px;gap:6px}
+ .silm-lab3d-instrument-group button{min-height:42px}
+}
+@media(forced-colors:active){
+ .silm-lab3d-instrument-panel{background:Canvas;color:CanvasText;border-color:CanvasText}
+ .silm-lab3d-instrument-group output{color:CanvasText}
+}
