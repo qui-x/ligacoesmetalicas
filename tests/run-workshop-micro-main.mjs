@@ -273,7 +273,7 @@ async function test(viewport){
  await pulse.click();
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='1');
  assert.match(await mech.locator('.silm-micro-mechanical-reading').textContent(),
-  /Tração.*passo ilustrativo 1\/4.*não representa deformação medida/);
+  /Tração.*etapa 1\/4.*modelo didático, sem MPa/);
  await viewer.screenshot({path:join(mechanicalDir,'tracao-'+viewport.width+'.png'),animations:'disabled'});
  await mech.getByRole('button',{name:'Restaurar deformação'}).click();
  await page.waitForFunction(()=>document.querySelector('.silm-workshop-micro-viewer')?.dataset.mechanicalStep==='0');
