@@ -44,3 +44,35 @@ test('interface compatível com amostras CPFEM e ausência de plástico',()=>{
  assert.ok(x.query(.1,.2).stress);
  assert.equal(x.source,'cpfem');assert.equal(x.calibrated,false);
 });
+test('invariantes de tensão: uniaxial, hidrostático e cisalhamento',()=>{
+ const diag=x=>[[x,0,0],[0,x,0],[0,0,x]];
+ const hydro=api.stressInvariants(diag(2));
+ assert.equal(hydro.vonMises,0);assert.equal(hydro.hydrostaticMean,2);
+ const axial=api.stressInvariants([[3,0,0],[0,0,0],[0,0,0]]);
+ assert.equal(axial.vonMises,3);assert.equal(axial.hydrostaticMean,1);
+ const shear=api.stressInvariants([[0,3,0],[3,0,0],[0,0,0]]);
+ assert.ok(Math.abs(shear.vonMises-3*Math.sqrt(3))<1e-12);
+ assert.throws(()=>api.stressInvariants([[0,2,0],[0,0,0],[0,0,0]]),{name:'TypeError'});
+});
+test('mapa escalar relativo sem valores artificiais e com resíduo ausente',()=>{
+ const b=api.create(field);
+ const map=b.scalarMap({kind:'vonMises',nx:3,ny:2});
+ assert.equal(map.available,6);assert.equal(map.missing,0);
+ assert.equal(map.min,Math.sqrt(3));assert.equal(map.max,Math.sqrt(3));
+ const incomplete=api.create({converged:true,sample:()=>({dx:0,dy:0})});
+ const noStress=incomplete.scalarMap({kind:'vonMises',nx:3,ny:2});
+ assert.equal(noStress.available,0);assert.equal(noStress.missing,6);
+ assert.equal(noStress.min,null);assert.equal(noStress.validAsMeasuredStress,false);
+ const noPlastic=incomplete.scalarMap({kind:'plasticIndicator',nx:2,ny:2});
+ assert.equal(noPlastic.missing,4);
+ assert.throws(()=>b.scalarMap({kind:'stressPa'}),{name:'RangeError'});
+});
+test('CPFEM lê tensor de mechanics.stress sem exigir sampleStress',()=>{
+ const cp=api.create({converged:true,
+   sample:()=>({dx:0,dy:0}),
+   sampleMechanics:()=>({stress:[[4,0,0],[0,1,0],[0,0,1]],vonMisesStress:3})},
+  {source:'cpfem'});
+ const q=cp.query(.5,.5);
+ assert.equal(q.stressInvariants.vonMises,3);
+ assert.equal(q.calibrated,false);
+});

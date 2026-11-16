@@ -29,3 +29,12 @@ não cria uma investigação paralela e NÃO está autorizado para merge à main
 Teste: `node --test tests/silm-mechanics-scene-bridge.test.cjs`.
 A integração na sala 3D deve ocorrer por contrato de leitura e será objeto
 de homologação conjunta de menu, fonte e acessibilidade.
+
+## Etapa B — invariantes e mapas relativos
+`stressInvariants(tensor3x3)` valida simetria e finitude e calcula a
+média hidrostática, traço e tensão equivalente de von Mises sem inserir
+novos parâmetros constitutivos. `scalarMap({kind,nx,ny})` lê a saída dos
+motores já convergidos (`sampleStress` ou `sampleMechanics.stress`).
+Não inventa valores ausentes: registra `null`, `missing` e limites apenas
+quando há valores. Todos os mapas são locais ao campo, em unidades
+relativas, e nunca são apresentados como tensão experimental em MPa.
