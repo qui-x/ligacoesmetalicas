@@ -1,0 +1,67 @@
+name: SILM — Auditoria transversal da RC
+
+on:
+  pull_request:
+    paths:
+      - 'tests/run-silm-full-audit.mjs'
+      - '.github/workflows/silm-full-audit.yml'
+      - 'index.html'
+      - 'domain/silm/**'
+      - 'integracao/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  traverse:
+    name: Percorrer SILM / ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
+      AUDIT_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validar sintaxe da auditoria
+        run: node --check tests/run-silm-full-audit.mjs
+      - name: Preparar navegador de homologação
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-audit-playwright" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-audit-playwright/node_modules/playwright" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/silm-audit-playwright/node_modules/.bin/playwright" install --with-deps "$BROWSER_NAME"
+      - name: Executar SILM por HTTP local a partir do HEAD
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-audit-http.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/silm-audit-http.pid"
+          for n in $(seq 1 30); do
+            if curl -sf "$BASE_URL/index.html" >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-audit-http.log"
+          exit 1
+      - name: Percorrer 12 áreas, oficina e recursos
+        run: node tests/run-silm-full-audit.mjs
+      - name: Guardar evidências e capturas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-full-audit-${{ matrix.browser }}
+          path: reports/full-audit/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 21
+      - name: Finalizar servidor
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/silm-audit-http.pid" ]; then kill "$(cat "$RUNNER_TEMP/silm-audit-http.pid")" 2>/dev/null || true; fi
