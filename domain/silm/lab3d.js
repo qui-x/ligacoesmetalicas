@@ -61,7 +61,19 @@
   const vs=shader(gl,gl.VERTEX_SHADER,
    'attribute vec3 p;attribute vec3 n;uniform mat4 m,vp;varying vec3 N,W;void main(){vec4 world=m*vec4(p,1.);W=world.xyz;N=normalize(mat3(m)*n);gl_Position=vp*world;}');
   const fs=shader(gl,gl.FRAGMENT_SHADER,
-   'precision mediump float;varying vec3 N,W;uniform vec3 base,eye;uniform float metallic,shine;void main(){vec3 L=normalize(vec3(-.35,.9,.5));vec3 normal=normalize(N);float d=max(dot(normal,L),0.);vec3 V=normalize(eye-W);float spec=pow(max(dot(reflect(-L,normal),V),0.),shine)*metallic;vec3 color=base*(.25+.74*d)+vec3(.84,.92,1.)*spec*.66;gl_FragColor=vec4(color,1.);}');
+   'precision mediump float;varying vec3 N,W;uniform vec3 base,eye;uniform float metallic,shine,lampOn;'+
+   'void main(){vec3 n=normalize(N),v=normalize(eye-W);'+
+   'vec3 l=normalize(vec3(1.2,3.7,1.4)-W),desk=normalize(vec3(-1.63,1.85,-1.32)-W);'+
+   'float a=max(dot(n,l),0.),b=max(dot(n,desk),0.);'+
+   'float distanceDesk=length(vec3(-1.63,1.85,-1.32)-W);float atten=1.0/(1.0+.26*distanceDesk*distanceDesk);'+
+   'float light=.19+.57*a+.95*lampOn*b*atten;'+
+   'vec3 h=normalize(l+v),hd=normalize(desk+v);'+
+   'float highlight=pow(max(dot(n,h),0.),max(6.0,shine))*.38+'+
+   'lampOn*pow(max(dot(n,hd),0.),max(6.0,shine))*.8*atten;'+
+   'float f=pow(1.0-max(dot(n,v),0.),5.0);'+
+   'vec3 specular=mix(vec3(.55,.66,.77),base,.6*metallic);'+
+   'vec3 color=base*light+specular*(metallic*highlight+.08*f);'+
+   'gl_FragColor=vec4(clamp(color,0.0,1.0),1.0);}');
   const program=gl.createProgram();gl.attachShader(program,vs);gl.attachShader(program,fs);gl.linkProgram(program);
   if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw new Error('Programa WebGL inválido.');
   gl.useProgram(program);gl.enable(gl.DEPTH_TEST);gl.clearColor(.055,.09,.14,1);
@@ -78,15 +90,17 @@
   layout(buffer);
   const uniform=k=>gl.getUniformLocation(program,k);
   const U={m:uniform('m'),vp:uniform('vp'),base:uniform('base'),
-    eye:uniform('eye'),metallic:uniform('metallic'),shine:uniform('shine')};
+    eye:uniform('eye'),metallic:uniform('metallic'),shine:uniform('shine'),
+    lampOn:uniform('lampOn')};
   return {
    resize(){const w=Math.max(1,canvas.clientWidth),h=Math.max(1,canvas.clientHeight);
     const dpr=Math.min(devicePixelRatio||1,1.6);
     const pw=Math.round(w*dpr),ph=Math.round(h*dpr);
     if(canvas.width!==pw||canvas.height!==ph){canvas.width=pw;canvas.height=ph;}
     gl.viewport(0,0,pw,ph);return w/h;},
-   render(items,eye,yaw,pitch){const aspect=this.resize();gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+   render(items,eye,yaw,pitch,lampOn=true){const aspect=this.resize();gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
     gl.uniformMatrix4fv(U.vp,false,matrices(eye,yaw,pitch,aspect));
+    gl.uniform1f(U.lampOn,lampOn?1:0);
     gl.uniform3fv(U.eye,new Float32Array(eye));
     let activeBuffer=null;
     for(const a of items){
@@ -382,9 +396,17 @@
    for(const x of [-1.48,1.48])for(const z of [-1.86,-.85])
     add([x,.39,z,.14,.75,.14],steel,.5,20);
    add([0,.92,-1.35,1.18,.07,.40],dark);
-   // Prensa com duas colunas, garra superior móvel e célula de prova.
+   // Sombras de contato locais ilustrativas, sem shadow map/ray tracing.
+   add([0,.917,-1.35,1.23,.008,.40],[.095,.115,.145],.05,10);
+   add([1.06,.917,-1.29,.52,.007,.46],[.11,.125,.145],.05,10);
+   add([-1.15,.917,-1.4,.50,.007,.51],[.11,.125,.145],.05,10);
+   // Prensa: guias, ponte, fuso, cabeçote móvel e instrumentos em baixo relevo.
    for(const x of [-.62,.62])add([x,1.28,-1.6,.09,.76,.1],steel,.8,48);
    add([0,1.73,-1.6,1.35,.14,.24],[.37,.49,.59],.8,52);
+   add([0,1.9,-1.6,.16,.22,.16],[.65,.73,.78],.88,74);
+   add([0,2.04,-1.6,.31,.065,.28],[.16,.25,.31],.44,24);
+   for(const x of [-.42,.42])add([x,1.73,-1.45,.13,.09,.07],[.23,.31,.40],.75,46);
+   add([-.44,1.57,-1.51,.17,.13,.07],[.21,.35,.45],.4,46);
    // O sólido deformado usa a função sample(u,v) do mesmo campo J2 convergido.
    // z permanece constante, pois o campo resolvido é bidimensional.
    const upperY=this.surface?.ok?this.surface.position(.5,1,1)[1]:1.25;
@@ -412,11 +434,21 @@
    add([1.07,1.3,-1.4,.11,.61,.11],[.61,.68,.71],.55);
    add([1.07,1.52,-1.26,.43,.09,.16],steel,.55);
    add([1.06,1.32,-1.24,.15,.25,.15],[.13,.19,.24],.85,30);
+   // Condensador/objetiva, platina e ocular: silhueta mais reconhecível.
+   add([1.06,1.2,-1.25,.27,.055,.27],[.17,.25,.3],.44,28);
+   add([1.06,1.48,-1.24,.17,.09,.17],[.41,.49,.52],.8,50);
+   add([1.06,1.60,-1.24,.14,.17,.14],[.13,.19,.24],.52,64);
+   add([1.06,1.69,-1.24,.23,.06,.23],[.12,.17,.22],.54,48);
    add([-1.15,1.05,-1.39,.44,.27,.42],[.29,.31,.37],.1);
    add([-1.15,1.19,-1.39,.25,.04,.23],this.heat?[1,.29,.1]:[.3,.48,.59],.4);
+   for(const x of [-1.29,-1.15,-1.01])
+    add([x,1.23,-1.39,.06,.025,.22],this.heat?[.99,.45,.17]:[.45,.52,.56],.36,26);
    add([-1.63,1.11,-1.31,.13,.42,.12],[.42,.44,.45],.25);
    add([-1.63,1.34,-1.31,.25,.12,.28],this.lamp?[.98,.89,.57]:[.24,.30,.36],.4);
    add([1.65,1.02,-1.5,.34,.27,.44],[.15,.31,.42],.32);
+   add([1.67,1.17,-1.47,.23,.05,.24],[.11,.19,.25],.25,22);
+   add([1.58,1.17,-1.32,.055,.08,.06],this.current?[.23,.7,.87]:[.3,.39,.42],.4,24);
+   add([1.73,1.17,-1.32,.055,.08,.06],this.current?[.23,.7,.87]:[.3,.39,.42],.4,24);
    for(const z of [-1.47,-1.30])add([1.43,.96,z,.42,.035,.035],this.current?[.27,.79,.95]:[.18,.28,.37],.5);
    // Referências de escala e ferramentas do ambiente.
    add([0,2.92,-3.65,1.92,.34,.06],[.11,.27,.41],.35);
@@ -447,7 +479,7 @@
      else{this.coupledStatus.textContent='A solução eletrotérmica parou por instabilidade numérica.';this.coupled=null;}
     }
    }
-   try{this.renderer.render(this.items(time),this.eye,this.yaw,this.pitch)}
+   try{this.renderer.render(this.items(time),this.eye,this.yaw,this.pitch,this.lamp)}
    catch(e){this.status.textContent='Renderização 3D interrompida: '+e.message;this.close(false);return;}
    this.frame=requestAnimationFrame(t=>this.tick(t));
   }
