@@ -1,0 +1,31 @@
+name: SILM science400 documentary validation
+on:
+  pull_request:
+    paths:
+      - 'domain/silm/data/science400-reference-stage117.js'
+      - 'domain/silm/science-evidence-view.js'
+      - 'tests/science400-reference-stage117.test.cjs'
+      - 'index.html'
+      - 'sw.js'
+      - '.github/workflows/silm-science400-stage117.yml'
+  push:
+    paths:
+      - 'domain/silm/data/science400-reference-stage117.js'
+      - 'domain/silm/science-evidence-view.js'
+      - 'tests/science400-reference-stage117.test.cjs'
+      - 'index.html'
+      - 'sw.js'
+jobs:
+  validate-documentary-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate scientific reference and existing evidence panel
+        run: node --test tests/science400-reference-stage117.test.cjs tests/stage80-unified-evidence.test.cjs
+      - name: JS syntax checks
+        run: |
+          node --check domain/silm/data/science400-reference-stage117.js
+          node --check domain/silm/science-evidence-view.js
