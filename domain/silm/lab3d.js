@@ -424,7 +424,12 @@
     if(!bridge.ok)throw new Error('Campo para mapa mecânico indisponível.');
     const shadows=V.shadows({upperY:surface.position(.5,1,1)[1],
      probe:surface.position(.75,.75,1)});
-    // Campo + malha + sombra são validados antes de atualizar a sessão.
+    const pose=P.pose(surface);
+    if(!pose.ok)throw new Error('Geometria das garras J2 indisponível.');
+    const previous=this.rigPose&&this.surfaceSegments?.length===surfaceSegments.length?
+     {pose:this.rigPose,segments:this.surfaceSegments,activeMap:this.activeMap,
+      mapKind:this.mapSelect.value,shadows:this.shadows}:null;
+    // Campo, malha, garras e sombra são validados antes de atualizar a sessão.
     this.field=field;this.surface=surface;this.surfaceSegments=surfaceSegments;
     this.mechanicsBridge=bridge;this.load=load;this.fieldMode=this.loadMode;
     this.strain=clamp((upper.dy-lower.dy)*2,-.18,.18);
@@ -433,7 +438,10 @@
     this.ui.dataset.specimenLoad=String(load);
     this.ui.dataset.specimenProbe=surface.position(.75,.75,1).map(v=>v.toFixed(7)).join(',');
     this.ui.dataset.specimenMode=this.loadMode;
-    this.shadows=shadows;
+    this.shadows=shadows;this.rigPose=pose;
+    this.ui.dataset.pressMovingGrip=pose.movingGripY.toFixed(9);
+    this.ui.dataset.pressFixedGrip=pose.fixedGripY.toFixed(9);
+    this.ui.dataset.pressGap=pose.gap.toFixed(9);
     // O snapshot visual é atualizado junto da malha, sem depender do próximo frame.
     this.ui.dataset.shadowPress=shadows[0][0].toFixed(9)+','+shadows[0][1].toFixed(9);
     this.ui.dataset.shadowProbe=shadows[4][0].toFixed(9)+','+shadows[4][1].toFixed(9);
@@ -441,9 +449,16 @@
     this.status.textContent='J2 normalizado · '+(this.loadMode==='compression'?'compressão':'tração')+
      ' · carga '+Math.round(load*100)+'% (unidades relativas). Superfície deformada por campo 2D; espessura apenas visual.';
     this.updateMap(false);
+    this.transition=!reduced()&&previous?Object.freeze({
+     fromPose:previous.pose,fromSegments:previous.segments,
+     fromMap:previous.activeMap,fromMapKind:previous.mapKind,
+     fromShadows:previous.shadows,start:performance.now(),duration:280
+    }):null;
+    this.ui.dataset.pressTransition=this.transition?'active':'settled';
    }catch(e){this.status.textContent='Amostra original preservada: '+(e?.message||'sem resposta do modelo J2');}
   }
   updateMap(announce=true){
+   if(announce){this.transition=null;this.ui.dataset.pressTransition='settled';}
    this.renderer?.resetMeshes();
    const kind=this.mapSelect.value;
    this.ui.dataset.fieldMap=kind;
