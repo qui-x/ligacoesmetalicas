@@ -69,3 +69,8 @@
  background:#216278;outline:2px solid #dcf4ff;outline-offset:2px}
 @media(max-width:600px){.silm-lab3d-return{right:6px;top:6px;font-size:.83rem}}
 @media(forced-colors:active){.silm-lab3d-return{background:ButtonFace;color:ButtonText;border-color:ButtonText}}
+
+/* Leituras relativas do mesmo resolvedor Joule/condução, não do metal real. */
+.silm-lab3d-coupled-status{display:block;font-size:.72rem;line-height:1.45;color:#c8e7eb;
+ border-top:1px solid rgba(205,227,245,.24);padding-top:6px;max-width:42ch}
+@media(forced-colors:active){.silm-lab3d-coupled-status{color:CanvasText;border-color:CanvasText}}

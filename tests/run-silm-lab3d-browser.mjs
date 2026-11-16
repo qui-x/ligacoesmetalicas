@@ -38,10 +38,18 @@ try{
   await canvas.waitFor({state:'visible',timeout:10000});
   await page.waitForFunction(()=>document.querySelector('.silm-lab3d canvas')?.width>100);
   await page.screenshot({path:join(dir,'lab3d-open.png'),fullPage:false});
+  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-coupled-model'),'equivalent-1d');
   await page.locator('[data-lab-action="heat"]').click();
   assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
+  assert.equal(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-power')),0,
+   'Calor externo isolado não pode gerar potência Joule.');
+  assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-external'))>0);
   await page.locator('[data-lab-action="current"]').click();
   assert.equal(await page.locator('[data-lab-action="current"]').getAttribute('aria-pressed'),'true');
+  assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-power'))>0,
+   'Corrente precisa produzir dissipação Joule pelo motor existente.');
+  assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-joule'))>0);
+  assert.match(await page.locator('.silm-lab3d-coupled-status').textContent(),/Rede eletrotérmica 1D relativa/);
   const neutralProbe=await page.locator('.silm-lab3d').getAttribute('data-specimen-probe');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-surface'),'j2-plane-strain');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-segments'),'18');
@@ -84,6 +92,8 @@ try{
    assert.equal(await page.locator('.silm-lab3d').getAttribute('data-field-map'),'plasticIndicator');
    assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
    assert.equal(await page.locator('[data-lab-action="current"]').getAttribute('aria-pressed'),'true');
+   assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-joule'))>0,
+    'Retorno do microscópio precisa recuperar o mesmo histórico Joule.');
    assert.equal(await returning.isVisible(),false);
   }
   await page.locator('[data-lab-action="close"]').click();

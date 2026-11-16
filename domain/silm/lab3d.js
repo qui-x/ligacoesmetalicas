@@ -7,8 +7,9 @@
  */
 (()=>{
  const S=window.SILM||{},C=S.lab3dCore,Surface=S.lab3dSpecimen,
-  Bridge=S.mechanicsSceneBridge,Overlay=S.lab3dFieldOverlay;
- if(!C||!Surface||!Bridge||!Overlay)return;
+  Bridge=S.mechanicsSceneBridge,Overlay=S.lab3dFieldOverlay,
+  Electrothermal=S.lab3dElectrothermal;
+ if(!C||!Surface||!Bridge||!Overlay||!Electrothermal)return;
  const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  const reduced=()=>matchMedia('(prefers-reduced-motion:reduce)').matches||
   document.documentElement.classList.contains('si-no-motion');
@@ -109,7 +110,9 @@
     '|'+String(state?.metadata?.workshop?.referenceId||'');
    this.keys=new Set();this.eye=[0,1.60,2.35];this.yaw=0;this.pitch=-.06;
    this.inspect=false;this.load=0;this.loadMode='compression';
-   this.temperature=C.initialHeat();this.heat=false;this.current=false;this.lamp=true;
+   this.temperature=C.initialHeat();this.potential=C.initialHeat();this.dissipation=C.initialHeat();
+   this.heat=false;this.current=false;this.lamp=true;
+   this.coupled=null;this.coupledReading=null;
    this.field=null;this.surface=null;this.surfaceSegments=[];this.mechanicsBridge=null;this.activeMap=null;this.strain=0;this.last=0;this.thermalTimer=0;this.frame=null;this.destroyed=false;
    this.ui=make('section','silm-lab3d');this.ui.setAttribute('role','dialog');
    this.ui.setAttribute('aria-modal','true');this.ui.setAttribute('aria-label','Laboratório 3D de metais');
@@ -135,13 +138,23 @@
    this.mapLegend.setAttribute('role','status');
    this.mapLegend.setAttribute('aria-live','polite');
    this.mapLegend.hidden=true;maps.append(this.mapLegend);
+   this.coupledStatus=make('output','silm-lab3d-coupled-status',
+    'Eletrotérmico: preparando rede didática 1D relativa.');
+   this.coupledStatus.setAttribute('aria-label','Leitura eletrotérmica relativa da rede equivalente à amostra');
+   maps.append(this.coupledStatus);
    this.ui.append(hud,maps,make('div','silm-lab3d-crosshair'));
    const bottom=make('div','silm-lab3d-bottom');
    this.button(bottom,'Tração / compressão','mode',()=>{this.loadMode=this.loadMode==='compression'?'tension':'compression';this.setLoad(this.load)});
    this.button(bottom,'− Carga','less',()=>this.setLoad(this.load-.2));
    this.button(bottom,'+ Carga','more',()=>this.setLoad(this.load+.2));
-   this.heatButton=this.button(bottom,'Calor','heat',()=>{this.heat=!this.heat;this.heatButton.setAttribute('aria-pressed',String(this.heat));if(reduced())this.temperature=C.initialHeat().map((_,i)=>this.heat?Math.max(0,1-i/17):0);});
-   this.currentButton=this.button(bottom,'Corrente','current',()=>{this.current=!this.current;this.currentButton.setAttribute('aria-pressed',String(this.current));});
+   this.heatButton=this.button(bottom,'Calor','heat',()=>{
+    this.heat=!this.heat;this.heatButton.setAttribute('aria-pressed',String(this.heat));
+    this.setCoupledSources();
+   });
+   this.currentButton=this.button(bottom,'Corrente','current',()=>{
+    this.current=!this.current;this.currentButton.setAttribute('aria-pressed',String(this.current));
+    this.setCoupledSources();
+   });
    this.lampButton=this.button(bottom,'Luz','lamp',()=>{this.lamp=!this.lamp;this.lampButton.setAttribute('aria-pressed',String(this.lamp));});
    const micro=this.button(bottom,'Microscópio','micro',()=>this.enterScale(2));
    micro.title='Passagem didática da bancada à microestrutura por meio do microscópio; não é uma imagem óptica medida';
@@ -200,6 +213,12 @@
    };
    this.canvas.addEventListener('touchstart',this.onTouchStart,{passive:true});
    this.canvas.addEventListener('touchmove',this.onTouchMove,{passive:true});
+   this.coupled=Electrothermal.create({segments:this.temperature.length});
+   if(this.coupled.ok)this.applyCoupled(this.coupled.reading(),true);
+   else{
+    this.heatButton.disabled=true;this.currentButton.disabled=true;
+    this.coupledStatus.textContent='Modelo eletrotérmico indisponível nesta sessão. Sem valores inventados.';
+   }
    this.setLoad(0); // A primeira malha lê o campo J2 de referência, sem carga.
    // Recupera SOMENTE estado de visualização transitório após travessia de escala.
    // Nunca serializa a investigação nem aplica um campo mecânico ao ScientificState.
@@ -211,7 +230,11 @@
     this.inspect=saved.inspect;
     this.inspectButton.setAttribute('aria-pressed',String(this.inspect));
     this.heat=saved.heat;this.current=saved.current;this.lamp=saved.lamp;
-    this.temperature=saved.temperature.slice();
+    if(saved.coupled?.ok){
+     this.coupled=saved.coupled;
+     this.coupled.setSources({heat:this.heat,current:this.current});
+     this.applyCoupled(this.coupled.reading(),true);
+    }
     this.heatButton.setAttribute('aria-pressed',String(this.heat));
     this.currentButton.setAttribute('aria-pressed',String(this.current));
     this.lampButton.setAttribute('aria-pressed',String(this.lamp));
@@ -232,6 +255,40 @@
    this.yaw=0;this.pitch=on?-.16:-.06;
    this.inspectButton.setAttribute('aria-pressed',String(on));
    this.status.textContent=on?'Inspeção: gire a câmera e use a roda para aproximar.':'Caminhe com WASD, observe a bancada e pressione E para interagir.';
+  }
+  applyCoupled(result,announce=false){
+   if(!result?.ok)return;
+   this.coupledReading=result;
+   this.temperature=Array.from(result.visibleHeat);
+   this.potential=Array.from(result.visiblePotential);
+   this.dissipation=Array.from(result.visibleJoule);
+   this.ui.dataset.coupledModel=result.geometry;
+   this.ui.dataset.coupledPower=String(result.power);
+   this.ui.dataset.coupledStored=String(result.storedEnergy);
+   this.ui.dataset.coupledJoule=String(result.jouleEnergy);
+   this.ui.dataset.coupledExternal=String(result.externalEnergy);
+   this.ui.dataset.coupledRemoved=String(result.removedEnergy);
+   this.ui.dataset.coupledTime=String(result.time);
+   if(announce){
+    const fmt=v=>Number(v).toPrecision(3);
+    this.coupledStatus.textContent=
+     'Rede eletrotérmica 1D relativa · Potência Joule '+fmt(result.power)+
+     ' · calor acumulado '+fmt(result.storedEnergy)+' · calor externo '+fmt(result.externalEnergy)+
+     ' · calor removido '+fmt(result.removedEnergy)+
+     '. Sem V, A, W, °C ou parâmetros medidos por metal.';
+   }
+  }
+  setCoupledSources(){
+   if(!this.coupled?.ok)return;
+   try{
+    this.coupled.setSources({heat:this.heat,current:this.current,intensity:.6});
+    const result=reduced()?this.coupled.advance(.8):this.coupled.reading();
+    if(!result?.ok)throw new Error('Falha no resolvedor eletrotérmico.');
+    this.applyCoupled(result,true);
+   }catch(error){
+    this.coupledStatus.textContent='Acoplamento indisponível: '+(error.message||'falha numérica')+
+     '. Sem substituir grandezas por efeitos decorativos.';
+   }
   }
   setLoad(value){
    const load=clamp(Math.round(value*10)/10,0,1);
@@ -340,8 +397,13 @@
     for(const seg of this.surfaceSegments){
      const q=this.temperature[Math.min(this.temperature.length-1,seg.index)]||0;
      const p=clamp((seg.plasticIndicator||0)*8,0,1);
-     const blink=this.current&&!reduced()?Math.max(0,Math.sin(time*.004-seg.index*.85))*.16:0;
-     const color=[.53+.42*q+.08*p+.05*blink,.62-.32*q-.13*p+.07*blink,.69-.48*q-.16*p+.13*blink];
+     const electric=this.current?(this.potential[seg.index]||0):0;
+     const joule=this.current?(this.dissipation[seg.index]||0):0;
+     const color=[
+      clamp(.53+.39*q+.08*p+.03*joule,0,1),
+      clamp(.62-.30*q-.13*p+.10*electric,0,1),
+      clamp(.69-.45*q-.16*p+.19*electric+.04*joule,0,1)
+     ];
      items.push({mesh:seg.vertices,c:color,m:.96,g:this.lamp?Math.max(24,70-40*p):16});
     }
    }else add([0,1.14,-1.35,1.03,.22,.24],[.48,.54,.6],.95,65);
@@ -376,9 +438,14 @@
     if(C.canWalk(this.eye[0]+dx,this.eye[2]))this.eye[0]+=dx;
     if(C.canWalk(this.eye[0],this.eye[2]+dz))this.eye[2]+=dz;
    }
-   if(!reduced()){
+   if(!reduced()&&this.coupled?.ok){
     this.thermalTimer+=dt;
-    while(this.thermalTimer>=1/24){this.temperature=C.heatStep(this.temperature,{source:this.heat});this.thermalTimer-=1/24;}
+    if(this.thermalTimer>=.15){
+     const duration=Math.min(this.thermalTimer,.35);this.thermalTimer=0;
+     const result=this.coupled.advance(duration);
+     if(result?.ok)this.applyCoupled(result,Math.floor(result.time*2)!==Math.floor(this.coupledReading?.time*2));
+     else{this.coupledStatus.textContent='A solução eletrotérmica parou por instabilidade numérica.';this.coupled=null;}
+    }
    }
    try{this.renderer.render(this.items(time),this.eye,this.yaw,this.pitch)}
    catch(e){this.status.textContent='Renderização 3D interrompida: '+e.message;this.close(false);return;}
@@ -391,7 +458,7 @@
      key:this.investigationKey,eye:Object.freeze(this.eye.slice()),
      yaw:this.yaw,pitch:this.pitch,inspect:this.inspect,load:this.load,loadMode:this.loadMode,
      heat:this.heat,current:this.current,lamp:this.lamp,
-     temperature:Object.freeze(this.temperature.slice()),mapKind:this.mapSelect.value
+     coupled:this.coupled,mapKind:this.mapSelect.value
     });
     this.returnFocus.textContent='Voltar à sala 3D';
     this.returnFocus.title='Retomar a câmera e os controles visuais após a observação em outra escala';
