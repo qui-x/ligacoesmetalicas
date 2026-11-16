@@ -546,6 +546,21 @@
    requestAnimationFrame(()=>$('#silm-workshop-context .silm-workshop-scale[data-scale="'+n+'"]')?.focus({preventScroll:true}));
   }
   items(time){
+   let pose=this.rigPose,blend=null;
+   this.frameShadows=this.shadows;
+   if(this.transition&&!reduced()){
+    const progress=clamp((time-this.transition.start)/this.transition.duration,0,1);
+    if(progress>=1){this.transition=null;this.ui.dataset.pressTransition='settled';}
+    else{
+     const alpha=P.ease(progress);
+     pose=P.blendPose(this.transition.fromPose,this.rigPose,alpha);
+     this.frameShadows=P.blendShadows(this.transition.fromShadows,this.shadows,alpha);
+     blend={alpha,previous:this.transition};
+     this.ui.dataset.pressTransition='active';
+    }
+   }else if(this.transition){
+    this.transition=null;this.ui.dataset.pressTransition='settled';
+   }
    const items=[],add=(b,c,m=0,g=20,receiver=false)=>items.push({b,c,m,g,receiver}),
     rounded=(b,c,m=.7,g=38)=>items.push({b,c,m,g,mesh:G.round}),
     ring=(b,c,m=.7,g=38)=>items.push({b,c,m,g,mesh:G.ring});
@@ -562,7 +577,10 @@
    // Sombras analíticas no shader do tampo: centros projetados a partir da altura da prensa.
    // Não são sombras ray traced nem resposta óptica calibrada.
    // Prensa: guias, ponte, fuso, cabeçote móvel e instrumentos em baixo relevo.
-   for(const x of [-.62,.62])add([x,1.28,-1.6,.09,.76,.1],steel,.8,48);
+   for(const x of [-.62,.62]){
+    rounded([x,1.28,-1.6,.11,.78,.11],steel,.84,50);
+    rounded([x,1.69,-1.6,.18,.09,.18],[.21,.29,.36],.61,32);
+   }
    add([0,1.73,-1.6,1.35,.14,.24],[.37,.49,.59],.8,52);
    add([0,1.9,-1.6,.16,.22,.16],[.65,.73,.78],.88,74);
    ring([0,2.04,-1.6,.48,.22,.48],[.27,.37,.45],.65,60);
@@ -572,11 +590,24 @@
    add([-.44,1.57,-1.51,.17,.13,.07],[.21,.35,.45],.4,46);
    // O sólido deformado usa a função sample(u,v) do mesmo campo J2 convergido.
    // z permanece constante, pois o campo resolvido é bidimensional.
-   const upperY=this.surface?.ok?this.surface.position(.5,1,1)[1]:1.25;
-   add([0,upperY+.042,-1.35,1.12,.06,.31],steel,.92,70);
+   const upperY=pose?.supportedY||1.25,movingY=pose?.movingGripY||.992;
+   add([0,pose?.fixedGripY||1.288,-1.35,1.12,.065,.31],steel,.92,70);
+   add([0,movingY,-1.35,1.10,.065,.34],[.39,.49,.58],.87,52);
+   for(const x of [-.48,.48]){
+    rounded([x,movingY+.055,-1.49,.12,.11,.12],[.31,.41,.48],.78,38);
+    add([x,movingY+.095,-1.3,.17,.045,.13],[.62,.69,.72],.84,54);
+   }
+   const spindleTop=1.66;
+   rounded([0,(spindleTop+movingY)/2,-1.73,.09,Math.max(.06,spindleTop-movingY),.09],
+    [.61,.70,.73],.87,65);
+   add([0,movingY+.03,-1.73,.26,.11,.22],[.26,.38,.46],.65,40);
    if(this.activeMap?.ok){
-    for(const patch of this.activeMap.patches){
-     items.push({mesh:patch.vertices,c:patch.color,m:.24,g:20});
+    for(let i=0;i<this.activeMap.patches.length;i++){
+     const patch=this.activeMap.patches[i],old=blend?.previous.fromMap;
+     const compatible=blend&&blend.previous.fromMapKind===this.mapSelect.value&&
+      old?.ok&&old.patches?.[i]?.vertices?.length===patch.vertices.length;
+     const mesh=compatible?P.blendMesh(old.patches[i].vertices,patch.vertices,blend.alpha):patch.vertices;
+     items.push({mesh,c:patch.color,m:.24,g:20,transient:!!compatible});
     }
    }else if(this.surface?.ok){
     for(const seg of this.surfaceSegments){
@@ -589,7 +620,11 @@
       clamp(.62-.30*q-.13*p+.10*electric,0,1),
       clamp(.69-.45*q-.16*p+.19*electric+.04*joule,0,1)
      ];
-     items.push({mesh:seg.vertices,c:color,m:.96,g:this.lamp?Math.max(24,70-40*p):16});
+     const old=blend?.previous.fromSegments?.[seg.index]?.vertices;
+     const compatible=old?.length===seg.vertices.length;
+     const mesh=compatible?P.blendMesh(old,seg.vertices,blend.alpha):seg.vertices;
+     items.push({mesh,c:color,m:.96,g:this.lamp?Math.max(24,70-40*p):16,
+      transient:!!compatible});
     }
    }else add([0,1.14,-1.35,1.03,.22,.24],[.48,.54,.6],.95,65);
    // Microscópio, luminária, resistência e fonte elétrica: modelos 3D preliminares.
@@ -654,7 +689,8 @@
      else{this.coupledStatus.textContent='A solução eletrotérmica parou por instabilidade numérica.';this.coupled=null;}
     }
    }
-   try{this.renderer.render(this.items(time),this.eye,this.yaw,this.pitch,this.lamp,this.shadows);
+   try{const objects=this.items(time);
+     this.renderer.render(objects,this.eye,this.yaw,this.pitch,this.lamp,this.frameShadows);
     this.ui.dataset.meshUploads=String(this.renderer.uploads);
     this.ui.dataset.shadowPress=this.shadows[0][0].toFixed(9)+','+this.shadows[0][1].toFixed(9);
     this.ui.dataset.shadowProbe=this.shadows[4][0].toFixed(9)+','+this.shadows[4][1].toFixed(9);
