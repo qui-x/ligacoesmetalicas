@@ -88,7 +88,12 @@ try{
   }
   await page.locator('[data-lab-action="close"]').click();
   await page.locator('.silm-lab3d').waitFor({state:'detached'});
-  assert.equal(await entry.evaluate(e=>document.activeElement===e),true);
+  assert.equal(await page.evaluate(()=>{
+   const focused=document.activeElement,entry=document.querySelector('.silm-lab3d-entry');
+   const scale=document.querySelector('#silm-workshop-context .silm-workshop-scale[aria-pressed="true"]');
+   return focused===entry&&!!entry?.getClientRects().length||
+    focused===scale&&!!scale?.getClientRects().length;
+  }),true,'O foco deve retornar a um controle visível após fechar a sala.');
  }else{
   assert.equal(await page.locator('.silm-lab3d').count(),0);
   await page.screenshot({path:join(dir,'fallback-2d.png')});

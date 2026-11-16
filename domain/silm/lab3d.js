@@ -411,7 +411,15 @@
    this.canvas.removeEventListener('touchstart',this.onTouchStart);this.canvas.removeEventListener('touchmove',this.onTouchMove);
    this.renderer.dispose();this.ui.remove();
    document.body.classList.remove('silm-lab3d-open');
-   if(restore&&this.returnFocus?.isConnected)this.returnFocus.focus({preventScroll:true});
+   if(restore){
+    const preferred=this.returnFocus?.isConnected&&this.returnFocus.getClientRects().length?
+     this.returnFocus:null;
+    const fallback=$('#silm-workshop-context .silm-workshop-scale[aria-pressed="true"]')||
+     $('#silm-workshop-context .silm-workshop-scale:not(:disabled)');
+    const target=preferred||fallback;
+    if(target?.isConnected&&target.getClientRects().length)
+     target.focus({preventScroll:true});
+   }
    if(active===this)active=null;
   }
  }
