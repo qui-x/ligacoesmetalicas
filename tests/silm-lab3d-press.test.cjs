@@ -49,3 +49,28 @@ test('não inventa movimento quando a geometria J2 falha',()=>{
  assert.equal(P.pose(surface(1.3,1.2)).ok,false);
  assert.throws(()=>P.ease(NaN),{name:'RangeError'});
 });
+
+test('compressão e tração reais do J2 deslocam a garra carregada em sentidos opostos',()=>{
+ const physical={SILM:{}};
+ for(const file of ['specimen-j2.js','lab3d-specimen.js','lab3d-press.js'])
+  runInNewContext(readFileSync(join(__dirname,'../domain/silm',file),'utf8'),
+   {window:physical,SILM:physical.SILM});
+ const {specimenJ2,lab3dSpecimen,lab3dPress}=physical.SILM;
+ const getPose=(mode,load)=>{
+  const field=specimenJ2.active([],{mode,position:.5,width:.3,load});
+  assert.equal(field.converged,true,mode+' não convergiu');
+  const surface=lab3dSpecimen.create(field,{segments:18,rows:6,amplification:2.5});
+  assert.equal(surface.ok,true);
+  return lab3dPress.pose(surface);
+ };
+ const neutral=getPose('compression',0);
+ const compression=getPose('compression',.2);
+ const tension=getPose('tension',.2);
+ assert.ok(compression.loadedY>neutral.loadedY,'Compressão não avançou a garra.');
+ assert.ok(tension.loadedY<neutral.loadedY,'Tração não afastou a garra.');
+ assert.ok(Math.abs(compression.supportedY-neutral.supportedY)<1e-9,
+  'A extremidade verticalmente apoiada não deve mover.');
+ assert.ok(Math.abs(tension.supportedY-neutral.supportedY)<1e-9,
+  'O apoio não deve mover sob tração.');
+ assert.ok(compression.gap<neutral.gap&&tension.gap>neutral.gap);
+});
