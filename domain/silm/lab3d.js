@@ -8,8 +8,8 @@
 (()=>{
  const S=window.SILM||{},C=S.lab3dCore,Surface=S.lab3dSpecimen,
   Bridge=S.mechanicsSceneBridge,Overlay=S.lab3dFieldOverlay,
-  Electrothermal=S.lab3dElectrothermal,I=S.lab3dInstruments,G=S.lab3dGeometry,V=S.lab3dVisuals;
- if(!C||!Surface||!Bridge||!Overlay||!Electrothermal||!I||!G||!V)return;
+  Electrothermal=S.lab3dElectrothermal,I=S.lab3dInstruments,G=S.lab3dGeometry,V=S.lab3dVisuals,P=S.lab3dPress;
+ if(!C||!Surface||!Bridge||!Overlay||!Electrothermal||!I||!G||!V||!P)return;
  const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  const reduced=()=>matchMedia('(prefers-reduced-motion:reduce)').matches||
   document.documentElement.classList.contains('si-no-motion');
@@ -84,6 +84,7 @@
   gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(verts),gl.STATIC_DRAW);
   // Malhas imutáveis reaproveitadas até mudança de deformação/campo.
   // Evita gl.bufferData contínuo e vazamento por nova carga durante a sessão.
+  const animationBuffer=gl.createBuffer();
   let meshCache=new WeakMap(),meshBuffers=new Set(),uploadCount=0;
   const cachedBuffer=mesh=>{
    let buffer=meshCache.get(mesh);
@@ -121,8 +122,9 @@
     gl.uniform3fv(U.eye,new Float32Array(eye));
     let activeBuffer=null;
     for(const a of items){
-     const isMesh=!!a.mesh,target=isMesh?cachedBuffer(a.mesh):buffer;
+     const isMesh=!!a.mesh,target=a.transient?animationBuffer:isMesh?cachedBuffer(a.mesh):buffer;
      if(activeBuffer!==target){layout(target);activeBuffer=target;}
+     if(a.transient)gl.bufferData(gl.ARRAY_BUFFER,a.mesh,gl.DYNAMIC_DRAW);
      gl.uniform1f(U.receiver,a.receiver?1:0);
      gl.uniformMatrix4fv(U.m,false,model(...(a.b||[0,0,0,1,1,1])));
      gl.uniform3fv(U.base,new Float32Array(a.c));gl.uniform1f(U.metallic,a.m);
@@ -133,7 +135,7 @@
    get uploads(){return uploadCount;},
    resetMeshes(){for(const b of meshBuffers)gl.deleteBuffer(b);
     meshBuffers.clear();meshCache=new WeakMap();},
-   dispose(){this.resetMeshes();gl.deleteBuffer(buffer);gl.deleteProgram(program);gl.deleteShader(vs);gl.deleteShader(fs)}
+   dispose(){this.resetMeshes();gl.deleteBuffer(animationBuffer);gl.deleteBuffer(buffer);gl.deleteProgram(program);gl.deleteShader(vs);gl.deleteShader(fs)}
   };
  }
  class Session{
@@ -145,6 +147,7 @@
    this.keys=new Set();this.eye=[0,1.60,2.35];this.yaw=0;this.pitch=-.06;
    this.inspect=false;this.load=0;this.loadMode='compression';this.fieldMode=null;
    this.shadows=V.shadows({upperY:1.25});
+   this.rigPose=null;this.transition=null;this.frameShadows=null;
    this.currentIntensity=.6;this.selectedInstrument=null;
    this.temperature=C.initialHeat();this.potential=C.initialHeat();this.dissipation=C.initialHeat();
    this.heat=false;this.current=false;this.lamp=true;
@@ -493,7 +496,7 @@
    this.ui.dataset.selectedInstrument=id;
    this.instrumentTitle.textContent=I.labels[id];
    const descriptions={
-    press:'Aplique tração ou compressão ao corpo de prova. O campo J2 e a malha 3D são relativos; sem geometria de fratura.',
+    press:'Aplique tração ou compressão. As garras seguem as bordas calculadas pelo J2; quadros intermediários são apenas animações, não soluções FEM.',
     heater:'Aqueça por fonte externa na rede equivalente 1D; a energia se propaga e pode sair pelos terminais.',
     power:'Ajuste o nível elétrico da rede equivalente 1D. Corrente, potência Joule e calor compartilham o mesmo resolvedor.',
     lamp:'A luminária muda a iluminação da cena, não calcula espectro ou refletância medida do metal.',
