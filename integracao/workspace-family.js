@@ -317,7 +317,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   $('silm-data-catalog').hidden=!!id;
   for(const panel of document.querySelectorAll('[data-silm-data-panel]'))panel.hidden=panel.dataset.silmDataPanel!==id;
   const back=$('silm-data-back');back.hidden=!id;
-  if(id){$('si-right-title').textContent={tabela:'Dados do metal',registros:'Medições e cálculos',arquivo:'Arquivos da investigação'}[id];if(focus)back.focus({preventScroll:true});}
+  if(id){$('si-right-title').textContent={tabela:'Dados do metal',registros:'Registros da investigação',arquivo:'Importar e exportar'}[id];if(focus)back.focus({preventScroll:true});}
   else{if($('si-workspace').dataset.rightOpen==='true'&&document.querySelector('[data-open-dock="dados"]').getAttribute('aria-expanded')==='true')$('si-right-title').textContent='Dados';}
   $('si-right-scroll').scrollTop=0;
  }
@@ -340,7 +340,7 @@ SILM.createWorkspaceFamily=({model,activity=()=>null,quickActions=null,refreshSc
   $('silm-module-context').textContent=locked?'Módulo definido pelo roteiro.':'';
   {const m=model.state.measurements.length,c=model.state.calculations.length;$('silm-record-count').textContent=m+(m===1?' medição':' medições')+' · '+c+(c===1?' cálculo':' cálculos');}
   const active=B.activeViewer();if(active&&document.querySelector('[data-open-dock="ver"]').getAttribute('aria-expanded')==='true'&&!$('si-viewer-detail').hidden)$('si-right-title').textContent=active.title;
-  if(dataPage&&document.querySelector('[data-open-dock="dados"]').getAttribute('aria-expanded')==='true')$('si-right-title').textContent={tabela:'Dados do metal',registros:'Medições e cálculos',arquivo:'Arquivos da investigação'}[dataPage];
+  if(dataPage&&document.querySelector('[data-open-dock="dados"]').getAttribute('aria-expanded')==='true')$('si-right-title').textContent={tabela:'Dados do metal',registros:'Registros da investigação',arquivo:'Importar e exportar'}[dataPage];
  }
  // Como no SIAB, os painéis abertos por Ver e Dados se chamam "Investigar" e "Dados da investigação". A Base reescreve o
  // título a cada desenho da doca; o observador troca só esses rótulos genéricos e deixa os títulos de detalhe como estão.
