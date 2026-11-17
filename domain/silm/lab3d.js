@@ -162,7 +162,9 @@
    const close=this.button(hud,'Fechar','close',()=>this.close());close.setAttribute('aria-label','Fechar laboratório e voltar à investigação');
    this.inspectButton=inspect;
    // Um único seletor de observação, separado do estado científico.
-   const maps=make('section','silm-lab3d-map-panel');
+   const maps=make('details','silm-lab3d-map-panel');
+   const mapSummary=make('summary','silm-lab3d-map-summary','Leituras da amostra');
+   maps.append(mapSummary);
    const mapLabel=make('label','silm-lab3d-map-label','Visualizar amostra');
    this.mapSelect=make('select');this.mapSelect.id='silm-lab3d-map-kind';
    this.mapSelect.setAttribute('aria-label','Campo da amostra: aparência, tensão equivalente, tensão média ou plasticidade');
@@ -183,22 +185,28 @@
    maps.append(this.coupledStatus);
    this.ui.append(hud,maps,make('div','silm-lab3d-crosshair'));
    const bottom=make('div','silm-lab3d-bottom');
-   this.button(bottom,'Tração / compressão','mode',()=>{this.loadMode=this.loadMode==='compression'?'tension':'compression';this.setLoad(this.load)});
-   this.button(bottom,'− Carga','less',()=>this.setLoad(this.load-.2));
-   this.button(bottom,'+ Carga','more',()=>this.setLoad(this.load+.2));
-   this.heatButton=this.button(bottom,'Calor','heat',()=>{
+   // Instrumentos são a interação primária. Ações alternativas ficam recolhidas
+   // para teclado, testes e acesso sem manipulação direta no palco.
+   const quick=make('details','silm-lab3d-quick');
+   quick.append(make('summary','silm-lab3d-quick-summary','Ações alternativas'));
+   const quickItems=make('div','silm-lab3d-quick-items');
+   quick.append(quickItems);bottom.append(quick);
+   this.button(quickItems,'Alternar tração e compressão','mode',()=>{this.loadMode=this.loadMode==='compression'?'tension':'compression';this.setLoad(this.load)});
+   this.button(quickItems,'Diminuir carga','less',()=>this.setLoad(this.load-.2));
+   this.button(quickItems,'Aumentar carga','more',()=>this.setLoad(this.load+.2));
+   this.heatButton=this.button(quickItems,'Calor','heat',()=>{
     this.heat=!this.heat;this.heatButton.setAttribute('aria-pressed',String(this.heat));
     this.setCoupledSources();
    });
-   this.currentButton=this.button(bottom,'Corrente','current',()=>{
+   this.currentButton=this.button(quickItems,'Corrente','current',()=>{
     this.current=!this.current;this.currentButton.setAttribute('aria-pressed',String(this.current));
     this.setCoupledSources();
    });
-   this.lampButton=this.button(bottom,'Luz','lamp',()=>{this.lamp=!this.lamp;this.lampButton.setAttribute('aria-pressed',String(this.lamp));});
-   const micro=this.button(bottom,'Microscópio','micro',()=>this.enterScale(2));
+   this.lampButton=this.button(quickItems,'Luz','lamp',()=>{this.lamp=!this.lamp;this.lampButton.setAttribute('aria-pressed',String(this.lamp));});
+   const micro=this.button(quickItems,'Microscópio','micro',()=>this.enterScale(2));
    micro.title='Passagem didática da bancada à microestrutura por meio do microscópio; não é uma imagem óptica medida';
-   this.button(bottom,'Rede','lattice',()=>this.enterScale(3));
-   this.status=make('output','silm-lab3d-status','WASD: caminhar · arrastar: olhar · E: interagir · prévia didática sem calibração.');
+   this.button(quickItems,'Rede','lattice',()=>this.enterScale(3));
+   this.status=make('output','silm-lab3d-status','Selecione um instrumento na cena. Teclado: E para interagir. Modelo relativo.');
    this.status.setAttribute('aria-live','polite');bottom.append(this.status);this.ui.append(bottom);
    this.heatButton.setAttribute('aria-pressed','false');this.currentButton.setAttribute('aria-pressed','false');
    this.lampButton.setAttribute('aria-pressed','true');
@@ -226,7 +234,7 @@
     return g;
    };
    const pressGroup=group('press');
-   const modeLabel=make('label','','Ensaio J2 · modo');
+   const modeLabel=make('label','','Tipo de esforço');
    this.pressMode=make('select');this.pressMode.dataset.control='load-mode';
    for(const [v,label] of [['compression','Compressão'],['tension','Tração']]){
     const op=make('option','',label);op.value=v;this.pressMode.append(op);
@@ -235,7 +243,7 @@
    this.pressMode.addEventListener('change',()=>{
     this.loadMode=this.pressMode.value;this.setLoad(this.load);});
    modeLabel.append(this.pressMode);pressGroup.append(modeLabel);
-   const loadLabel=make('label','','Carga relativa (0–100%)');
+   const loadLabel=make('label','','Intensidade da carga (relativa, 0–100%)');
    this.pressLoad=make('input');this.pressLoad.type='range';
    this.pressLoad.min='0';this.pressLoad.max='1';this.pressLoad.step='.1';
    this.pressLoad.value='0';this.pressLoad.dataset.control='load';
@@ -268,6 +276,20 @@
    const microGroup=group('microscope');
    this.button(microGroup,'Observar a microestrutura','open-micro',()=>this.enterScale(2));
    this.ui.append(mobile,this.instrumentPanel);
+   // Um único painel opcional por vez: mapa, ações acessíveis ou
+   // controles do instrumento. O canvas continua como área central.
+   quick.addEventListener('toggle',()=>{
+    if(!quick.open)return;
+    maps.open=false;
+    if(!this.instrumentPanel.hidden)this.hideInstrument({restoreFocus:false});
+   });
+   maps.addEventListener('toggle',()=>{
+    if(!maps.open)return;
+    quick.open=false;
+    if(!this.instrumentPanel.hidden)this.hideInstrument({restoreFocus:false});
+   });
+   this.quickControls=quick;
+   this.mapPanel=maps;
    host.append(this.ui);
    if(returnButton)returnButton.hidden=true;
    try{this.renderer=makeRenderer(this.canvas)}
@@ -520,15 +542,17 @@
    this.instrumentDescription.textContent=descriptions[id];
    for(const [key,node]of this.instrumentGroups)node.hidden=key!==id;
    this.refreshInstrument();
+   this.quickControls.open=false;
+   this.mapPanel.open=false;
    this.instrumentPanel.hidden=false;
    this.status.textContent=I.labels[id]+' selecionado. Use os controles no painel contextual.';
    this.instrumentClose.focus({preventScroll:true});
    return true;
   }
-  hideInstrument(){
+  hideInstrument({restoreFocus=true}={}){
    this.instrumentPanel.hidden=true;this.selectedInstrument=null;
    this.ui.dataset.selectedInstrument='none';
-   this.canvas.focus({preventScroll:true});
+   if(restoreFocus)this.canvas.focus({preventScroll:true});
   }
   interact(){
    const f=I.basis(this.yaw,this.pitch).forward;

@@ -1,0 +1,36 @@
+name: SILM Explorar — cena limpa e controles
+on:
+  pull_request:
+    paths:
+      - 'domain/silm/lab3d.js'
+      - 'domain/silm/lab3d.css'
+      - 'domain/silm/microstructure-view.js'
+      - 'integracao/workspace-family.js'
+      - 'tests/run-silm-lab3d-browser.mjs'
+      - 'tests/explore-scene-clean-contract.test.cjs'
+      - '.github/workflows/silm-explorar-cena-limpa.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'domain/silm/lab3d.js'
+      - 'domain/silm/lab3d.css'
+      - 'domain/silm/microstructure-view.js'
+      - 'integracao/workspace-family.js'
+      - 'tests/explore-scene-clean-contract.test.cjs'
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar a cena mínima e o estado das propriedades
+        run: node --test tests/explore-scene-clean-contract.test.cjs tests/property-active-state.test.cjs
+      - name: Conferir sintaxe dos controladores
+        run: |
+          node --check domain/silm/lab3d.js
+          node --check domain/silm/microstructure-view.js
+          node --check integracao/workspace-family.js
+          node --check tests/run-silm-lab3d-browser.mjs
