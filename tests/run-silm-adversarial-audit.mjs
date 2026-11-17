@@ -201,9 +201,35 @@ try{
     assert.deepEqual(roundTrip.reports,backup.reports,'Conteúdo dos relatórios após restaurar e reexportar');
     assert.deepEqual(roundTrip.document.notes,backup.document.notes,'Vínculos no Caderno após recarga');
     await b.locator('.silm-notebook-entries .silm-notebook-open').first().click();
-    await b.waitForURL('**/#/relatorios?**');
+    await b.waitForURL(/#\/relatorios\?arquivo=/);
+    assert.equal(await b.locator('#report-observations').inputValue(),'Estrutura livre e fonte registrada.');
     return {restoredReports:ids.length,backedUp:backup.document.notes.length,format:backup.format};
    }finally{await restored.close();}
+  }finally{await ctx.close();}
+ });
+ await record('pwa.install-menu-and-preferences',async()=>{
+  const ctx=await browser.newContext(),p=await ctx.newPage();
+  try{
+   await open(p,'configuracoes');
+   const offer=async()=>p.evaluate(()=>{
+    window.__installCalls=0;
+    const event=new Event('beforeinstallprompt',{cancelable:true});
+    event.prompt=async()=>{window.__installCalls++;};
+    event.userChoice=Promise.resolve({outcome:'dismissed'});
+    window.dispatchEvent(event);return event.defaultPrevented;
+   });
+   assert.equal(await offer(),true);
+   await p.locator('#distribution-install').click();
+   assert.equal(await p.evaluate(()=>window.__installCalls),1);
+   await offer();
+   await p.locator('#si-drawer-install').evaluate(button=>button.click());
+   assert.equal(await p.evaluate(()=>window.__installCalls),1);
+   assert.equal(await p.evaluate(()=>location.hash),'#/configuracoes');
+   await p.locator('#si-drawer-install').evaluate(button=>button.click());
+   await p.waitForURL(/#\/manual\?topico=offline/);
+   await p.evaluate(()=>window.dispatchEvent(new Event('appinstalled')));
+   assert.equal(await p.locator('#si-drawer-install').evaluate(button=>button.hidden),true);
+   return {nativePromptDelegation:true,menuFallback:true,installedHidden:true};
   }finally{await ctx.close();}
  });
  await record('offline.real-reload-after-sw',async()=>{
