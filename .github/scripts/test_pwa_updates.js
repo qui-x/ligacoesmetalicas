@@ -3,9 +3,10 @@
    Não acessa armazenamento de investigações/IndexedDB. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const scope='https://example.org/ligacoesmetalicas/';
-const normalized=k=>new URL(typeof k==='string'?k:k.url,scope).pathname;
+const normalized=k=>new URL(k instanceof Request?k.url:k,scope).pathname;
 class Cache{
  constructor(){this.entries=new Map();}
+ async keys(){return [...this.entries.keys()].map(path=>new Request(new URL(path,scope)));}
  async put(key,response){this.entries.set(normalized(key),response.clone());}
  async match(key){return this.entries.get(normalized(key))?.clone()||undefined;}
 }
@@ -49,6 +50,20 @@ const perform=async(name,request)=>{
  const active=[...db.keys()].find(x=>x.includes('offline-revalidation-r1')&&!x.includes('domains'));
  assert.ok(active,'Novo cache não foi criado');
  const cache=await caches.open(active);
+ async function inspect(){
+  let pending,result;
+  events.message({data:{type:'SILM_OFFLINE_STATUS'},ports:[{postMessage:r=>{result=r;}}],waitUntil:p=>{pending=p;}});
+  await pending;return result;
+ }
+ const counts=await inspect();
+ assert.equal(counts.ok,true);assert.equal(counts.core,counts.coreTotal);
+ assert.equal(counts.images,counts.imagesTotal-1,'Imagem opcional ausente deve ser contada separadamente');
+ const indexKey=normalized('index.html'),savedIndex=cache.entries.get(indexKey);
+ cache.entries.delete(indexKey);
+ const obsolete=await caches.open('silm@'+scope+'::anterior');
+ await obsolete.put('index.html',savedIndex);
+ assert.equal((await inspect()).core,counts.coreTotal-1,'Versão antiga não completa o cache atual');
+ await cache.put('index.html',savedIndex);
  const script=new Request(scope+'domain/silm/routes.js');
  await cache.put(script,new Response('ANTIGO'));
  const result=await perform('fetch',script);

@@ -1,7 +1,7 @@
 // Complemento da auditoria: integridade adversa, Caderno e ciclos de Professor.
 // Rodar em Chromium com contexto isolado e registrar PASS/FAIL por contrato.
 import assert from 'node:assert/strict';
-import {mkdir,writeFile} from 'node:fs/promises';
+import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import {pathToFileURL} from 'node:url';
 const pw=process.env.PLAYWRIGHT_MODULE?
@@ -189,7 +189,21 @@ try{
    assert.ok(ids.length>=1,'O backup perdeu o relatório associado');
    assert.ok(ids.every(id=>backup.reports[id]?.record?.checkpoint?.metal?.atomicNumber===29),
     'Relatório arquivado divergiu do metal original');
-   return {archived:ids.length,backedUp:backup.document.notes.length,format:backup.format};
+   const restored=await browser.newContext({acceptDownloads:true});
+   try{
+    const b=await restored.newPage();await open(b,'caderno');
+    await b.locator('#notebook-import').setInputFiles({name:'caderno.json',mimeType:'application/json',buffer:Buffer.from(json)});
+    await b.getByRole('button',{name:'Restaurar',exact:true}).click();
+    await b.locator('.silm-notebook-entries .silm-notebook-open').first().waitFor();
+    await b.reload({waitUntil:'domcontentloaded'});
+    const download=b.waitForEvent('download');await b.locator('#notebook-export-json').click();
+    const roundTrip=JSON.parse(await readFile(await (await download).path(),'utf8'));
+    assert.deepEqual(roundTrip.reports,backup.reports,'Conteúdo dos relatórios após restaurar e reexportar');
+    assert.deepEqual(roundTrip.document.notes,backup.document.notes,'Vínculos no Caderno após recarga');
+    await b.locator('.silm-notebook-entries .silm-notebook-open').first().click();
+    await b.waitForURL('**/#/relatorios?**');
+    return {restoredReports:ids.length,backedUp:backup.document.notes.length,format:backup.format};
+   }finally{await restored.close();}
   }finally{await ctx.close();}
  });
  await record('offline.real-reload-after-sw',async()=>{
@@ -198,11 +212,15 @@ try{
    await open(p,'inicio');
    await p.evaluate(()=>navigator.serviceWorker?.ready);
    await p.waitForFunction(()=>navigator.serviceWorker?.controller!==null,undefined,{timeout:15000});
+   await go(p,'configuracoes');
+   await p.locator('#distribution-check').click();
+   await p.waitForFunction(()=>/Cache offline completo/.test(document.getElementById('distribution-status').textContent));
    await ctx.setOffline(true);
    await p.reload({waitUntil:'domcontentloaded',timeout:18000});
    await p.waitForFunction(()=>typeof SILMIntegration?.snapshot==='function',undefined,{timeout:20000});
-   assert.ok(await p.locator('h1').count());
-   return {offlineReload:true,title:await p.title()};
+   await p.locator('#distribution-check').click();
+   await p.waitForFunction(()=>/Cache offline completo/.test(document.getElementById('distribution-status').textContent));
+   return {offlineReload:true,cache:await p.locator('#distribution-status').innerText()};
   }finally{await ctx.close();}
  });
 }finally{

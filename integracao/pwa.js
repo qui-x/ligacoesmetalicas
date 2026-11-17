@@ -3,14 +3,65 @@
    (manifesto, service worker e contexto seguro) e o SILM ainda não está instalado. Quando o navegador não oferece o
    pedido de instalação (Safari/iOS, ou depois de um pedido recusado), o botão abre as instruções do Manual. */
 (()=>{
- const button=document.getElementById('si-drawer-install');
- const publishable=!!document.querySelector('link[rel="manifest"]')&&'serviceWorker' in navigator&&window.isSecureContext;
- let installed=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true,offered=false;
- const sync=()=>{if(button)button.hidden=!publishable||installed;};
- window.addEventListener('beforeinstallprompt',()=>{offered=true;sync();});
- window.addEventListener('appinstalled',()=>{installed=true;offered=false;sync();});
- button?.addEventListener('click',()=>{if(!offered)location.hash='#/manual?topico=offline';offered=false;setTimeout(sync,0);});
- sync();
+ const menuInstall=document.getElementById('si-drawer-install');
+ const install=document.getElementById('distribution-install');
+ const status=document.getElementById('distribution-status');
+ const checkButton=document.getElementById('distribution-check');
+ const localFile=location.protocol==='file:';
+ const publishable=!localFile&&!!document.querySelector('link[rel="manifest"]')&&'serviceWorker' in navigator&&window.isSecureContext;
+ let installed=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+ let installPrompt=null, revision=0;
+ const setStatus=message=>{if(status)status.textContent=message;};
+ const syncInstall=()=>{
+  if(menuInstall)menuInstall.hidden=!publishable||installed;
+  if(install)install.hidden=!publishable||installed||!installPrompt;
+ };
+ window.addEventListener('beforeinstallprompt',event=>{
+  event.preventDefault();installPrompt=event;syncInstall();
+ });
+ window.addEventListener('appinstalled',()=>{installed=true;installPrompt=null;syncInstall();});
+ // O Menu da base já encaminha o clique ao botão de Preferências.
+ install?.addEventListener('click',async()=>{
+  const offer=installPrompt;
+  if(!offer){if(publishable&&!installed)location.hash='#/manual?topico=offline';return;}
+  installPrompt=null;syncInstall();
+  try{await offer.prompt();await offer.userChoice;}
+  catch{location.hash='#/manual?topico=offline';}
+ });
+ syncInstall();
+ function readInventory(worker){
+  return new Promise((resolve,reject)=>{
+   const {port1,port2}=new MessageChannel();
+   const finish=(fn,result)=>{clearTimeout(timer);port1.close();fn(result);};
+   const timer=setTimeout(()=>finish(reject,new Error('worker timeout')),5000);
+   port1.onmessage=event=>finish(resolve,event.data);
+   port1.onmessageerror=()=>finish(reject,new Error('invalid response'));
+   try{worker.postMessage({type:'SILM_OFFLINE_STATUS'},[port2]);}
+   catch(error){finish(reject,error);}
+  });
+ }
+ async function checkOffline(){
+  const current=++revision;
+  if(!publishable){
+   setStatus(localFile?'Execução em arquivo local. O cache da PWA requer HTTPS ou localhost.':'O navegador precisa de HTTPS ou localhost e suporte ao modo offline.');
+   return;
+  }
+  setStatus('Conferindo os recursos offline do SILM…');
+  try{
+   const registration=await navigator.serviceWorker.getRegistration('./');
+   const worker=navigator.serviceWorker.controller||registration?.active;
+   if(current!==revision)return;
+   if(!worker){setStatus('Preparando o cache do SILM. A primeira abertura precisa de conexão.');return;}
+   const result=await readInventory(worker);
+   if(current!==revision)return;
+   if(!result?.ok)throw new Error('cache unavailable');
+   const {core,coreTotal,images,imagesTotal}=result;
+   const label=core<coreTotal?'Cache essencial incompleto':images<imagesTotal?'Recursos essenciais disponíveis; algumas imagens ainda faltam':'Cache offline completo';
+   setStatus(`${label}. Recursos essenciais: ${core}/${coreTotal}. Imagens: ${images}/${imagesTotal}.`);
+  }catch{if(current===revision)setStatus('Não foi possível conferir o cache desta versão. Reabra o SILM com conexão e tente novamente.');}
+ }
+ checkButton?.addEventListener('click',checkOffline);
+ void checkOffline();
  /* Como no SIAB: quando uma versão nova assume, a página aberta ainda é a antiga. O aviso fica na tela (não some sozinho)
     e só recarrega quando a pessoa pedir, para nada se perder no meio de uma atividade. Os dados salvos continuam. */
  function updateNotice(){
@@ -21,11 +72,12 @@
   const later=document.createElement('button');later.type='button';later.textContent='×';later.setAttribute('aria-label','Dispensar aviso de atualização');later.addEventListener('click',()=>item.remove());
   item.append(text,reload,later);rail.append(item);
  }
- if('serviceWorker' in navigator){
+ if(publishable){
   let controlled=!!navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
    if(controlled)updateNotice();
    controlled=true;
+   void checkOffline();
   });
   navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
    // Verificar uma revisão nova ao abrir, ao voltar à aba e quando a conexão retorna.
@@ -38,6 +90,6 @@
    check();
    document.addEventListener('visibilitychange',()=>{if(!document.hidden)check();});
    window.addEventListener('online',check);
-  }).catch(()=>BaseDemoSI.notify('Modo offline indisponível nesta sessão.','warning'));
+  }).catch(()=>{++revision;setStatus('Falha ao preparar o cache. Confira a conexão e reabra o SILM.');BaseDemoSI.notify('Modo offline indisponível nesta sessão.','warning');});
  }
 })();
