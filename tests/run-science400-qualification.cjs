@@ -90,7 +90,7 @@ const lines=['# SILM — Homologação documental de uso condicionado','',
  'Aprovação automática de **estrutura de evidências para consulta**; não certifica experimentalmente fontes nem calibra motores.',
  'Todos os 400 campos são classificados, sem imputar dados ausentes. Condições originais preservadas; CNTP não é filtro.','',
  '| Indicador | Quantidade |','|---|---:|',
- ['Examinados',summary.scanned],['Metais',summary.metals],['Numéricos',summary.numeric],
+ [['Examinados',summary.scanned],['Metais',summary.metals],['Numéricos',summary.numeric],
  ['Consultáveis com URL',summary.published],['Rastreáveis sem revisão pendente',summary.catalogReady],
  ['Rastreáveis com revisão primária pendente',summary.provisional],['Numéricos sem fonte',summary.unsourced],
  ['Sem número',summary.missing],['Inconsistências',issues.length]
