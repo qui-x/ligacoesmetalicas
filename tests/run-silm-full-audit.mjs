@@ -281,14 +281,49 @@ try{
   const measured=JSON.parse(await snapshot()).measurements.at(-1);
   assert.equal(measured.type,'coordination');
   assert.equal(measured.source.kind,'MODEL_MEASUREMENT');
+  // O cálculo seguinte precisa consumir um valor realmente medido nesta investigação.
+  const edge=await page.evaluate(()=>{
+   const s=SILMIntegration.snapshot(),g=SILM.crystal.geometry(SILM.data.get(s.metal.atomicNumber));
+   const units=s.structure.units;
+   for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){
+    const result=SILM.measurement.compute('latticeParameter',g,[units[i].site,units[j].site]);
+    if(result.ok&&result.parameter==='a')return [units[i].id,units[j].id];
+   }
+   return null;
+  });
+  assert.ok(edge,'A rede não contém dois centros disponíveis para medir a');
+  await page.locator('[data-silm-direct-tool="medir:latticeParameter"]').click();
+  for(const unitId of edge){
+   const atom=page.locator('#si-stage .silm-crystal-unit[data-unit-id="'+unitId+'"]');
+   assert.equal(await atom.count(),1,'Sítio da aresta não está na cena');
+   await atom.focus();await atom.press('Enter');
+  }
+  await page.waitForFunction(n=>SILMIntegration.snapshot().measurements.length===n+2,
+   before.measurements.length,{timeout:10000});
+  const lattice=JSON.parse(await snapshot()).measurements.at(-1);
+  assert.equal(lattice.type,'latticeParameter');
+  assert.equal(lattice.parameter,'a');
+  assert.equal(lattice.source.kind,'MODEL_MEASUREMENT');
   await page.locator('[data-close-dock="right"]').click();
   await chooseModule('calcular');
   await page.locator('[data-open-dock="ver"]').click();
+  await page.locator('[data-silm-direct-tool="calcular:cell-volume-cubic"]').click();
+  assert.equal(await page.locator('#silm-origin-a').inputValue(),lattice.id,
+   'Calcular não sugeriu a medição real do parâmetro a');
+  await page.locator('#silm-tools').getByRole('button',{name:'Calcular',exact:true}).click();
+  await page.waitForFunction(n=>SILMIntegration.snapshot().calculations.length===n+1,
+   before.calculations.length,{timeout:10000});
+  const volume=JSON.parse(await snapshot()).calculations.at(-1);
+  assert.equal(volume.formulaId,'cell-volume-cubic');
+  assert.equal(volume.inputs[0].origin,'MODEL_MEASUREMENT');
+  assert.equal(volume.inputs[0].ref.measurementId,lattice.id);
+  assert.ok(Math.abs(volume.result.value-lattice.value**3)<1e-7,
+   'Volume calculado não corresponde ao parâmetro a medido');
   const formula=page.locator('[data-silm-direct-tool="calcular:effective-atoms-fcc"]');
   assert.equal(await formula.count(),1,'Fórmula geométrica CFC ausente do Calcular');
   await formula.click();
   await page.locator('#silm-tools').getByRole('button',{name:'Calcular',exact:true}).click();
-  await page.waitForFunction(n=>SILMIntegration.snapshot().calculations.length===n+1,
+  await page.waitForFunction(n=>SILMIntegration.snapshot().calculations.length===n+2,
    before.calculations.length,{timeout:10000});
   const calculated=JSON.parse(await snapshot()).calculations.at(-1);
   assert.equal(calculated.formulaId,'effective-atoms-fcc');
@@ -299,12 +334,16 @@ try{
   await page.locator('[data-silm-data-open="registros"]').click();
   const history=await page.locator('#silm-history').innerText();
   assert.match(history,/coordenação/i,'Doca Dados não mostra a medição');
-  assert.match(history,/número efetivo/i,'Doca Dados não mostra o cálculo');
+  assert.match(history,/parâmetro de rede/i,'Doca Dados não mostra a medição de a');
+  assert.match(history,/volume/i,'Doca Dados não mostra o cálculo derivado da medição');
+  assert.match(history,/número efetivo/i,'Doca Dados não mostra a contagem geométrica');
   await screenshot('medir-calcular-dados-cobre');
   await page.locator('[data-close-dock="right"]').click();
   await chooseModule('explorar');
-  return {measurement:{type:measured.type,value:measured.value,unit:measured.unit},
-   calculation:{id:calculated.formulaId,value:calculated.result.value},historyChars:history.length};
+  return {coordination:{type:measured.type,value:measured.value,unit:measured.unit},
+   parameterA:{value:lattice.value,unit:lattice.unit,id:lattice.id},
+   derivedVolume:{value:volume.result.value,origin:volume.inputs[0].origin},
+   effectiveAtoms:{id:calculated.formulaId,value:calculated.result.value},historyChars:history.length};
  });
  await check('workshop.3d-option-and-probe',async()=>{
   const entry=page.locator('.silm-lab3d-entry');
