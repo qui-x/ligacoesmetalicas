@@ -747,3 +747,45 @@ body.si-structure-expanded #si-workspace:not(.si-workspace-fullscreen) #workspac
 #si-dock-left [data-left-panel="resumo"] .silm-summary-list{
  margin-top:6px
 }
+
+/* Dados: primeiro a leitura científica, depois a documentação integral.
+   Valor, unidade e classificação não dependem de cor nem de hover. */
+#silm-data-preview{margin:0 0 12px;min-width:0}
+.silm-data-quick{min-width:0;display:grid;gap:10px}
+.silm-data-identity{display:grid;gap:3px;border-bottom:1px solid var(--border);padding:0 0 9px}
+.silm-data-identity h3{font-size:1.07rem;line-height:1.3;margin:0;overflow-wrap:anywhere}
+.silm-data-identity p{margin:0;color:var(--muted);font-size:.81rem;line-height:1.45}
+.silm-data-quick h4{margin:0;font-size:.91rem}
+.silm-data-quick .silm-data-intro{margin:0;font-size:.76rem;line-height:1.35}
+.silm-data-readings{display:grid;grid-template-columns:minmax(0,1fr);gap:7px}
+.silm-data-reading{min-width:0;border:1px solid var(--border);border-radius:10px;
+ background:var(--surface);padding:10px 11px;display:grid;gap:4px;overflow-wrap:anywhere}
+.silm-data-reading h5{font-size:.8rem;font-weight:650;line-height:1.35;margin:0}
+.silm-data-reading-value{font-size:1rem;line-height:1.35;font-variant-numeric:tabular-nums;
+ letter-spacing:-.012em;color:var(--text)}
+.silm-data-reading-origin{font-size:.74rem;line-height:1.3;font-weight:650;color:var(--accent)}
+.silm-data-reading-condition{color:var(--muted);font-size:.73rem;line-height:1.4}
+.silm-data-reading[data-evidence="qualitative"] .silm-data-reading-value{font-size:.87rem;font-weight:600}
+.silm-data-complete{margin-top:14px;border:1px solid var(--border);border-radius:10px;min-width:0}
+.silm-data-complete>summary{cursor:pointer;font-size:.84rem;font-weight:650;
+ padding:12px;min-height:44px;display:list-item;line-height:1.45}
+.silm-data-complete>summary:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.silm-data-complete-body{padding:0 12px 14px;min-width:0;overflow-wrap:anywhere}
+.silm-data-complete-body dl{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.silm-data-preview .silm-data-reading{padding:7px 9px}
+.silm-data-preview .silm-data-reading-value{font-size:.9rem}
+.silm-data-preview .silm-data-reading-condition{font-size:.71rem}
+.silm-data-preview .silm-data-quick{gap:7px}
+.silm-data-preview .silm-data-quick .silm-data-intro{display:none}
+@media(min-width:900px){
+ #silm-data-preview .silm-data-readings{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:540px){
+ .silm-data-reading{padding:9px}
+ .silm-data-reading-value{font-size:.96rem}
+ .silm-data-complete-body{padding:0 9px 12px}
+}
+@media(forced-colors:active){
+ .silm-data-reading,.silm-data-complete{border:1px solid CanvasText}
+ .silm-data-reading-origin{color:CanvasText}
+}

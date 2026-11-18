@@ -1,0 +1,109 @@
+name: SILM — Portão de usabilidade e acessibilidade
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      a11y_strict:
+        description: Bloquear também violações sérias WCAG (além das críticas)
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    - cron: '0 9 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: silm-usability-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Utilidade + WCAG / ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      BROWSER_NAME: ${{ matrix.browser }}
+      BASE_URL: http://127.0.0.1:8765
+      AUDIT_SHA: ${{ github.sha }}
+      A11Y_STRICT: ${{ inputs.a11y_strict || 'false' }}
+    steps:
+      - name: Obter a revisão exata do SILM
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validar sintaxe e contratos do painel Dados
+        run: |
+          node --check integracao/metallic-experience.js
+          node --check integracao/adapter.js
+          node --check tests/run-silm-usability-a11y.mjs
+          node --test tests/dados-hierarchy-parity.test.cjs
+      - name: Instalar motores de navegador e axe-core
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-playwright" --no-audit --no-fund playwright@1.64.1 @axe-core/playwright@4.14.0
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-playwright/node_modules/playwright" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/silm-playwright/node_modules/.bin/playwright" install --with-deps "$BROWSER_NAME"
+      - name: Servir a aplicação real por localhost
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-usability-http.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/silm-usability-http.pid"
+          for n in $(seq 1 40); do
+            if curl -fsS "$BASE_URL/index.html" > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-usability-http.log"
+          exit 1
+      - name: Percorrer quatro telas, Dados, fontes, teclado e WCAG 2.2
+        run: node tests/run-silm-usability-a11y.mjs
+      - name: Publicar relatório de casos e acessibilidade
+        if: always()
+        run: |
+          FILE="reports/usability/$BROWSER_NAME/report.md"
+          if [ -f "$FILE" ]; then
+            cat "$FILE" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Falha de infraestrutura ou preparação: auditoria não produziu dados." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Guardar JSON, violações WCAG e capturas reais
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-usability-${{ matrix.browser }}
+          path: reports/usability/${{ matrix.browser }}/
+          if-no-files-found: warn
+          retention-days: 21
+      - name: Encerrar servidor local
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/silm-usability-http.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/silm-usability-http.pid")" 2>/dev/null || true
+          fi
+
+  gate:
+    name: Portão funcional e acessibilidade crítica
+    runs-on: ubuntu-latest
+    needs: [audit]
+    if: always()
+    steps:
+      - name: Exigir aprovação dos três motores
+        env:
+          AUDIT: ${{ needs.audit.result }}
+        run: |
+          echo "Chrome/Firefox/WebKit + quatro resoluções + leitura científica + axe-core: $AUDIT" >> "$GITHUB_STEP_SUMMARY"
+          echo "A ausência de violações automatizadas não substitui testes com pessoas e leitores de tela." >> "$GITHUB_STEP_SUMMARY"
+          test "$AUDIT" = "success"

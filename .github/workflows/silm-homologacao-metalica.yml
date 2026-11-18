@@ -1,0 +1,56 @@
+name: SILM — Homologação documental das cinco propriedades
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * 2'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: silm-homologacao-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  homologacao:
+    name: Verificar 80 metais × 5 propriedades
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Obter revisão do repositório
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar sintaxe de catálogos e validador
+        run: |
+          node --check domain/silm/data/science400-reference-stage117.js
+          node --check domain/silm/science-evidence-index.js
+          node --check tests/run-science400-qualification.cjs
+      - name: Inspecionar todos os 400 campos do catálogo
+        run: node tests/run-science400-qualification.cjs
+      - name: Conferir a integridade dos campos e exibição documental existentes
+        run: node --test tests/science400-reference-stage117.test.cjs
+      - name: Conferir contratos dos cinco motores didáticos sem confundir com calibração
+        run: node --test tests/property-active-state.test.cjs tests/explore-property-narratives.test.mjs tests/silm-mechanical-qualification.test.cjs
+      - name: Publicar quadro de homologação científica
+        if: always()
+        run: |
+          REPORT=reports/homologacao-metalica/qualification.md
+          if [ -f "$REPORT" ]; then cat "$REPORT" >> "$GITHUB_STEP_SUMMARY"
+          else echo "A verificação foi interrompida antes de classificar os campos." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Arquivar matriz por elemento, propriedade, fonte e condição
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-homologacao-metalica-400
+          path: reports/homologacao-metalica/
+          if-no-files-found: warn
+          retention-days: 30

@@ -218,6 +218,96 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
  const row=(dl,label,text)=>{dl.append(el('dt',label),el('dd',text));};
  const registry=S.engineAdapters,Data=registry.resolve('data.reference-catalog').api,Calculations=registry.resolve('calculation.formula-service').api,Properties=registry.resolve('properties.eligibility-catalog').api;
  const structure=Data.structure(e),dl=el('dl');
+ // Consulta em primeiro plano: números, unidades, classe da evidência e condição.
+ // A ficha integral permanece acessível, mas não compete com a leitura rápida.
+ const originalHost=host,summary=el('section'),readings=el('div');
+ summary.className='silm-data-quick';summary.ariaLabel='Resumo dos dados do metal';
+ const identity=el('header');identity.className='silm-data-identity';
+ const title=el('h3',e.symbol+' · '+e.name);identity.append(title);
+ const subtitle=el('p','Z = '+e.atomicNumber+' · '+(structure?.label||structure?.type||'Estrutura não homologada'));
+ identity.append(subtitle);summary.append(identity);
+ summary.append(el('h4','Propriedades do metal · cinco categorias'));
+ const intro=el('p','Valor e unidade em destaque. A origem e a condição acompanham cada informação.');
+ intro.className='silm-data-intro';summary.append(intro);
+ readings.className='silm-data-readings';
+ const readNumber=v=>{const n=Number(v);return n!==0&&Math.abs(n)<0.0001?
+  n.toLocaleString('pt-BR',{notation:'scientific',maximumSignificantDigits:4}):
+  n.toLocaleString('pt-BR',{maximumSignificantDigits:6});};
+ for(const id of Properties.ids){
+  const label=Properties.catalog[id].title;
+  const ref=Properties.data(e,id);
+  const research=S.sevenConditionResearch?.get?.(e.atomicNumber,id)||null;
+  const qualified=S.science400Reference?.getFor?.(e.atomicNumber,id)||null;
+  const indexed=!ref&&!research?S.scienceEvidenceIndex?.getFor?.(e.atomicNumber,id,{excludeSeven:true,includePending:false})||[]:[];
+  const item=el('article');item.className='silm-data-reading';item.dataset.property=id;
+  const labelNode=el('h5',label);item.append(labelNode);
+  const value=el('strong');value.className='silm-data-reading-value';
+  const category=el('span');category.className='silm-data-reading-origin';
+  const condition=el('small');condition.className='silm-data-reading-condition';
+  let classification='qualitative';
+  if(ref){
+   value.textContent=String(ref.display??ref.value)+' '+ref.unit;
+   category.textContent=ref.kind==='CALCULATED'?'Calculado pelo SILM':'Dado tabelado';
+   condition.textContent='Valor de referência. Consulte fonte e condições na ficha completa.';
+   classification='reference';
+   if(research)condition.textContent+=' Há também observação específica de outra amostra.';
+  }else if(research){
+   let v=readNumber(research.value)+' '+research.unit;
+   if(id==='electrical'){
+    const rho=research.unit==='µΩ·cm'?research.value*1e-8:
+     research.unit==='Ω·m'?research.value:null;
+    if(rho!==null&&rho>0&&Number.isFinite(rho))v=readNumber(1/rho)+' S/m';
+   }
+   value.textContent=research.grade==='primary-bound'?'Maior que '+v:v;
+   category.textContent=id==='electrical'&&research.quantity?.toLowerCase().includes('resistividade')?
+    'Derivado da resistividade da fonte':'Referência sob condições específicas';
+   condition.textContent=(Number.isFinite(research.temperatureK)?readNumber(research.temperatureK)+' K':'Temperatura não informada')+
+    ' · '+research.quantity+' · valor não usado automaticamente para calibrar o motor';
+   classification='conditional';
+  }else if(qualified?.displayEligible&&qualified.best&&Number.isFinite(qualified.best.value)&&qualified.best.sourceURL){
+   // A pesquisa rastreável fica visível, mas conserva a classe e a grandeza originais.
+   const evidence=qualified.best,cond=evidence.conditions||{};
+   value.textContent=readNumber(evidence.value)+' '+evidence.unit;
+   // Resistividade (ρ) e condutividade (σ) não são a mesma grandeza.
+   // Não converter o número nem a unidade sem identificar derivação.
+   if(id==='electrical'&&/resistividade/i.test(String(evidence.metric)))
+    labelNode.textContent='Resistividade elétrica (ρ)';
+   else if(id==='electrical'&&/condutividade/i.test(String(evidence.metric)))
+    labelNode.textContent='Condutividade elétrica (σ)';
+   category.textContent=qualified.requiresPrimaryReview?
+    'Candidato documental rastreável · revisão primária pendente':
+    qualified.status==='ENSAIO_CONDICIONADO'?'Ensaio documentado sob condições específicas':'Compilação científica rastreável';
+   const t=Number.isFinite(cond.temperature_K)?readNumber(cond.temperature_K)+' K':
+    typeof cond.temperature==='string'?cond.temperature:'Temperatura não informada';
+   const provenance=[String(evidence.metric).replaceAll('_',' '),t,cond.specimen||cond.phase||'Amostra não especificada'];
+   condition.textContent=provenance.join(' · ')+' · não calibra automaticamente o motor';
+   classification=qualified.requiresPrimaryReview?'research':'documentary';
+   const link=el('a','Consultar fonte original');link.href=evidence.sourceURL;
+   link.target='_blank';link.rel='noopener noreferrer';link.className='silm-data-reading-source';
+   item.append(link);
+  }else if(indexed.length&&indexed[0].values?.length){
+   const hit=indexed[0],metric=hit.values[0];
+   value.textContent=metric.label+': '+readNumber(metric.value)+' '+metric.unit;
+   category.textContent=hit.evidenceIsModelEstimate?'Estimativa de pesquisa':
+    hit.status==='candidate'?'Candidato de pesquisa':'Referência condicionada';
+   condition.textContent=(Number.isFinite(hit.temperatureK)?readNumber(hit.temperatureK)+' K':'Temperatura não informada')+
+    ' · não é calibração experimental do simulador';
+   classification='research';
+  }else{
+   value.textContent='Sem valor documental rastreável';
+   category.textContent=qualified?.available?'Número sem fonte verificável':'Lacuna documental';
+   condition.textContent=qualified?.available?
+    'O número pesquisado fica arquivado, sem ser apresentado como referência científica.':
+    'Não há valor numérico disponível; a experiência visual não é medição experimental.';
+  }
+  item.dataset.evidence=classification;item.append(value,category,condition);readings.append(item);
+ }
+ summary.append(readings);originalHost.append(summary);
+ const disclosure=el('details');disclosure.className='silm-data-complete';
+ disclosure.append(el('summary','Ficha completa: estrutura, parâmetros, condições e fontes'));
+ const detailBody=el('div');detailBody.className='silm-data-complete-body';
+ disclosure.append(detailBody);originalHost.append(disclosure);
+ host=detailBody;
  host.append(el('h3','Identificação e estrutura'));
  row(dl,'Metal',e.name+' ('+e.symbol+') · Z = '+e.atomicNumber);
  row(dl,'Estrutura de referência',structure?.label||structure?.type||'Não homologada');

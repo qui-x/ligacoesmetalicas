@@ -526,6 +526,15 @@
    if(e)S.renderIntegrationMetalData(data,e,state);
    else data.textContent='Inicie uma investigação para consultar os dados do metal.';
    if(sameMetal)[...data.querySelectorAll('details')].forEach((d,i)=>{if(openDetails[i])d.open=true;});
+   // A abertura de Dados mostra imediatamente as cinco propriedades; os
+   // atalhos abaixo continuam levando à ficha, aos registros e aos arquivos.
+   const preview=$('silm-data-preview');
+   if(preview){
+    preview.replaceChildren();
+    const quick=data.querySelector('.silm-data-quick');
+    if(quick){const copy=quick.cloneNode(true);copy.setAttribute('aria-label','Leitura rápida das propriedades');preview.append(copy);}
+    else preview.textContent='Escolha um metal na Tabela Periódica para consultar as propriedades.';
+   }
    data.dataset.renderKey=dataKey;data.dataset.metal=String(e?.atomicNumber??'');
   }
   comparison.update(state);

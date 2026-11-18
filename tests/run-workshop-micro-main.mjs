@@ -934,7 +934,12 @@ async function test(viewport){
   // Clicar em Térmica novamente retira apenas o acoplamento, mantendo Elétrica.
   await page.getByRole('button',{name:'Ver',exact:true}).click();
   await direct.locator('[data-action="property-thermal"]').click();
+  // A atualização do palco pode ocorrer após o clique (especialmente WebKit).
+  // Verifica o desaparecimento EFETIVO do controle Joule, sem falsear o estado.
+  await step.waitFor({state:'hidden',timeout:10000});
   assert.equal(await step.isVisible(),false,'Retirar Térmica não desligou o acoplamento.');
+  assert.equal(await direct.locator('[data-action="property-thermal"]').getAttribute('aria-pressed'),'false',
+   'O botão Térmica permaneceu acionado depois de retirar o efeito Joule.');
   assert.equal(await direct.locator('[data-action="property-electrical"]').getAttribute('aria-pressed'),'true');
   await page.getByRole('button',{name:'Fechar painel',exact:true}).click();
  }
