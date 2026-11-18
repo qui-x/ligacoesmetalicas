@@ -230,7 +230,9 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
  const intro=el('p','Valor e unidade em destaque. A origem e a condição acompanham cada informação.');
  intro.className='silm-data-intro';summary.append(intro);
  readings.className='silm-data-readings';
- const readNumber=v=>Number(v).toLocaleString('pt-BR',{maximumSignificantDigits:6});
+ const readNumber=v=>{const n=Number(v);return n!==0&&Math.abs(n)<0.0001?
+  n.toLocaleString('pt-BR',{notation:'scientific',maximumSignificantDigits:4}):
+  n.toLocaleString('pt-BR',{maximumSignificantDigits:6});};
  for(const id of Properties.ids){
   const label=Properties.catalog[id].title;
   const ref=Properties.data(e,id);
@@ -266,6 +268,12 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
    // A pesquisa rastreável fica visível, mas conserva a classe e a grandeza originais.
    const evidence=qualified.best,cond=evidence.conditions||{};
    value.textContent=readNumber(evidence.value)+' '+evidence.unit;
+   // Resistividade (ρ) e condutividade (σ) não são a mesma grandeza.
+   // Não converter o número nem a unidade sem identificar derivação.
+   if(id==='electrical'&&/resistividade/i.test(String(evidence.metric)))
+    labelNode.textContent='Resistividade elétrica (ρ)';
+   else if(id==='electrical'&&/condutividade/i.test(String(evidence.metric)))
+    labelNode.textContent='Condutividade elétrica (σ)';
    category.textContent=qualified.requiresPrimaryReview?
     'Candidato documental rastreável · revisão primária pendente':
     qualified.status==='ENSAIO_CONDICIONADO'?'Ensaio documentado sob condições específicas':'Compilação científica rastreável';
