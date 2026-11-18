@@ -1,0 +1,78 @@
+name: SILM — Auditoria visual tela a tela (#191)
+
+on:
+  pull_request:
+    paths:
+      - 'tests/run-silm-screen-review.mjs'
+      - '.github/workflows/silm-auditoria-tela-a-tela.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: silm-screen-review-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capturas:
+    name: Telas e evidências / ${{ matrix.section }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        section: [routes, workshop]
+    env:
+      AUDIT_SECTION: ${{ matrix.section }}
+      BASE_URL: http://127.0.0.1:8765
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Conferir sintaxe do inventário de telas
+        run: node --check tests/run-silm-screen-review.mjs
+      - name: Instalar Playwright Chromium para capturas verificáveis
+        run: |
+          npm install --prefix "$RUNNER_TEMP/silm-screen-review" --no-audit --no-fund playwright@1.64.1
+          echo "PLAYWRIGHT_MODULE=$RUNNER_TEMP/silm-screen-review/node_modules/playwright" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/silm-screen-review/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Servir aplicação real a partir do commit
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > "$RUNNER_TEMP/silm-screen-http.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/silm-screen-http.pid"
+          for n in $(seq 1 30); do
+            if curl -sf "$BASE_URL/index.html" >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/silm-screen-http.log"
+          exit 1
+      - name: Fotografar telas e gerar relatório para revisão humana
+        run: node tests/run-silm-screen-review.mjs
+      - name: Publicar resumo por categoria
+        if: always()
+        run: |
+          FILE="reports/tela-a-tela/$AUDIT_SECTION/report.md"
+          if [ -f "$FILE" ]; then
+            head -n 18 "$FILE" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Baixe o artefato 'silm-review-$AUDIT_SECTION' para navegar na galeria HTML e examinar fotos/JSON." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Falha antes da geração do relatório de $AUDIT_SECTION." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Arquivar imagens, galeria HTML e medições
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silm-review-${{ matrix.section }}
+          path: reports/tela-a-tela/${{ matrix.section }}/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Encerrar servidor
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/silm-screen-http.pid" ]; then kill "$(cat "$RUNNER_TEMP/silm-screen-http.pid")" 2>/dev/null || true; fi
