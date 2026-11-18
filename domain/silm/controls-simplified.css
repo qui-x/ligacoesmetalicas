@@ -370,3 +370,82 @@
 @media(prefers-reduced-motion:reduce){
  #silm-scene-actionbar .silm-joule-controls *{transition:none!important;animation:none!important}
 }
+
+
+/* SILM #191 — barra inferior: câmera por gestos + uma gaveta contextual. */
+#silm-scene-actionbar{
+ box-sizing:border-box;position:relative!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ flex-wrap:nowrap!important;gap:8px!important;min-height:60px;height:60px;
+ overflow:visible!important;padding:4px 8px!important
+}
+#silm-view-controls{min-width:0;flex:0 0 auto}
+#silm-view-controls .silm-camera-bar.silm-camera-compact{flex-wrap:nowrap!important}
+#silm-scene-toolbox{display:block;flex:0 0 auto;position:relative;z-index:121}
+#silm-scene-toolbox>summary{
+ box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+ min-width:44px;min-height:44px;padding:6px 12px;
+ border:1px solid var(--border);border-radius:9px;background:var(--surface);
+ color:var(--text);cursor:pointer;font:inherit;font-size:.78rem;font-weight:750;list-style:none
+}
+#silm-scene-toolbox>summary::-webkit-details-marker{display:none}
+#silm-scene-toolbox>summary::after{content:' ▾';white-space:pre;color:var(--muted)}
+#silm-scene-toolbox[open]>summary::after{content:' ▴'}
+#silm-scene-toolbox>summary:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px
+}
+#silm-scene-toolbox-panel{
+ box-sizing:border-box;position:fixed!important;top:0;left:0;z-index:3200!important;
+ display:grid;align-content:start;gap:10px;padding:12px;
+ background:var(--panel,var(--surface));color:var(--text);
+ border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 22px #0003;
+ overflow-y:auto;overscroll-behavior:contain;
+ width:min(360px,calc(100vw - 24px));max-height:min(420px,72dvh)
+}
+#silm-scene-toolbox-panel[hidden]{display:none!important}
+#silm-scene-toolbox-panel #silm-view-quick-actions{
+ display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;
+ gap:7px;min-width:0;max-width:100%
+}
+#silm-scene-toolbox-panel #silm-view-quick-actions[hidden]{display:none!important}
+#silm-scene-toolbox-panel .silm-quick-icon,
+#silm-scene-toolbox-panel .silm-lattice-more>summary,
+#silm-scene-toolbox-panel button.silm-toolbox-expand{min-width:44px;min-height:44px}
+#silm-scene-toolbox-panel .silm-lattice-nav{
+ display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0;max-width:100%
+}
+#silm-scene-toolbox-panel .silm-lattice-more{position:relative}
+#silm-scene-toolbox-panel .silm-scene-toolbox-actions{
+ display:flex;align-items:center;flex-wrap:wrap;gap:8px
+}
+#silm-scene-toolbox-panel .silm-scene-toolbox-actions button{min-height:44px;min-width:44px}
+#silm-scene-toolbox-panel .scene-count{
+ font-size:.76rem;color:var(--muted);margin:0!important;white-space:normal
+}
+#silm-scene-toolbox-panel .si-toolmenu-wrap{
+ position:relative!important;right:auto!important;display:flex;flex-wrap:wrap;gap:6px;
+ padding:0!important;background:transparent!important
+}
+#silm-scene-toolbox-panel #scene-menu-toggle{min-height:44px}
+#silm-scene-toolbox-panel #scene-tools-menu:not([hidden]){
+ position:static!important;display:flex;flex-direction:column;gap:5px;max-width:100%;box-shadow:none
+}
+#silm-scene-toolbox-panel .silm-toolbox-expand{
+ padding:6px 12px;border:1px solid var(--border);border-radius:9px;
+ background:var(--surface);color:var(--text);font:inherit;cursor:pointer
+}
+#silm-scene-toolbox-panel .silm-toolbox-expand:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px
+}
+@media(max-width:600px){
+ #silm-scene-actionbar{gap:6px!important;justify-content:center!important}
+ #silm-scene-toolbox-panel{max-height:min(420px,72dvh)}
+}
+@media(forced-colors:active){
+ #silm-scene-toolbox>summary,#silm-scene-toolbox-panel{
+  border:2px solid ButtonText;background:Canvas;color:CanvasText
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #silm-scene-toolbox-panel *,#silm-scene-toolbox>summary{transition:none!important;animation:none!important}
+}

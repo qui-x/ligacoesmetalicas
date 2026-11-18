@@ -259,7 +259,10 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
  }
  root.insertBefore(navigator.status,area);
  // Os comandos acompanham a câmera inclusive na vista expandida.
- if(cameraHost)cameraHost.after(navigator.root);
+ // Navegação cristalográfica é contextual; a câmera mantém só a vista.
+ const secondaryTools=document.getElementById('silm-scene-toolbox-panel');
+ if(secondaryTools)secondaryTools.append(navigator.root);
+ else if(cameraHost)cameraHost.after(navigator.root);
  else root.append(navigator.root);
  scope.cleanup(()=>navigator.root.remove());
  const fieldNames={temperature:'Temperatura',potential:'Potencial elétrico',dissipation:'Dissipação Joule'};
@@ -319,7 +322,10 @@ SILM.createCrystalView=(host,{scope,model,element,geometry:g,actions,moduleTitle
   const note=U.element('p','Balanço: energia elétrica + calor externo = energia armazenada + energia removida, em unidades relativas.','silm-joule-explanation');
   panel.append(interpretation,reading,note);advanced.append(summary);
   jouleControls.append(live,supply,playback,step,advanced);
-  navigator.root.after(jouleControls);
+  // Fonte/Pausa/Avançar continuam visíveis enquanto Joule está ativo.
+  const sceneActionbar=document.getElementById('silm-scene-actionbar');
+  if(sceneActionbar)sceneActionbar.append(jouleControls);
+  else navigator.root.after(jouleControls);
   // Portal para fora da faixa rolável: WebKit recorta descendentes fixed
   // de barras com overflow, mesmo quando o <details> está aberto.
   document.body.append(panel);

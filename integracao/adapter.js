@@ -128,7 +128,9 @@
   if(!button||!toolbar)return;
   button.closest('.silm-camera-bar')?.classList.remove('silm-camera-bar-has-expand');
   button.classList.remove('si-tab','secondary-btn','silm-camera-btn','si-structure-expand-in-camera','si-structure-expand-in-tools');
-  if(inCameraBar&&phone.matches&&tools){button.classList.add('secondary-btn','si-structure-expand-in-tools');tools.append(button);}
+  const toolbox=$('silm-scene-toolbox-panel');
+  if(inCameraBar&&toolbox){button.classList.add('secondary-btn','silm-toolbox-expand');toolbox.append(button);}
+  else if(inCameraBar&&phone.matches&&tools){button.classList.add('secondary-btn','si-structure-expand-in-tools');tools.append(button);}
   else if(inCameraBar&&bar){button.classList.add('secondary-btn','silm-camera-btn','si-structure-expand-in-camera');bar.classList.add('silm-camera-bar-has-expand');
    // Tela cheia ao lado de Restaurar vista (par da grade de duas colunas), antes dos controles 3D.
    const anchor=bar.classList.contains('silm-camera-compact')?

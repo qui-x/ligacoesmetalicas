@@ -1,53 +1,53 @@
 'use strict';
-// SILM R09: a faixa de ferramentas permanece em uma única linha e rola
-// horizontalmente; as setas tornam explícitos os comandos fora da tela.
+// SILM #191: menu contextual no lugar das setas de rolagem da barra inferior.
+// Ações originais preservadas; o portal evita recorte por overflow no WebKit.
 (()=>{
  function init(){
   const bar=document.getElementById('silm-scene-actionbar');
-  if(!bar||bar.dataset.toolbarNavigation==='ready')return;
-  bar.dataset.toolbarNavigation='ready';
-  const make=(side,label,glyph)=>{
-   const button=document.createElement('button');
-   button.type='button';button.className='silm-toolbar-scroll-arrow silm-toolbar-scroll-'+side;
-   button.setAttribute('aria-label',label);
-   button.setAttribute('title',label);
-   button.textContent=glyph;
-   button.hidden=true;
-   return button;
-  };
-  const prev=make('prev','Mostrar ferramentas anteriores','‹');
-  const next=make('next','Mostrar próximas ferramentas','›');
-  bar.prepend(prev);bar.append(next);
-  let frame=0;
-  function update(){
-   const overflow=bar.scrollWidth>bar.clientWidth+4;
-   const canLeft=overflow&&bar.scrollLeft>3;
-   const canRight=overflow&&bar.scrollLeft+bar.clientWidth<bar.scrollWidth-3;
-   if(prev.hidden===canLeft)prev.hidden=!canLeft;
-   if(next.hidden===canRight)next.hidden=!canRight;
-   if(bar.dataset.toolbarOverflow!==String(overflow))bar.dataset.toolbarOverflow=String(overflow);
+  const tools=document.getElementById('silm-scene-toolbox');
+  const panel=document.getElementById('silm-scene-toolbox-panel');
+  if(!bar||!tools||!panel||bar.dataset.toolbarNavigation==='compact')return;
+  const summary=tools.querySelector(':scope > summary');
+  if(!summary)return;
+  bar.dataset.toolbarNavigation='compact';
+  document.body.append(panel);
+  panel.hidden=true;
+  summary.setAttribute('aria-controls',panel.id);
+  function position(){
+   if(!tools.open)return;
+   const v=window.visualViewport,w=v?.width||window.innerWidth,h=v?.height||window.innerHeight;
+   const rect=summary.getBoundingClientRect();
+   const width=Math.min(360,Math.max(180,w-24));
+   panel.style.width=width+'px';panel.style.maxHeight=Math.max(120,Math.min(420,h-24))+'px';
+   const height=Math.min(panel.scrollHeight,420,h-24);
+   panel.style.left=Math.max(12,Math.min(rect.right-width,w-width-12))+'px';
+   const above=rect.top-height-8,below=rect.bottom+8;
+   panel.style.top=Math.max(8,above>=8?above:Math.min(below,Math.max(8,h-height-8)))+'px';
   }
-  function schedule(){
-   if(frame)return;
-   frame=requestAnimationFrame(()=>{frame=0;update();});
+  function close(focus=false){
+   if(!tools.open)return;
+   tools.open=false;panel.hidden=true;
+   if(focus)summary.focus({preventScroll:true});
   }
-  const scroll=direction=>{
-   bar.scrollBy({left:direction*Math.max(128,bar.clientWidth*.62),
-    behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
-   schedule();
-  };
-  prev.addEventListener('click',()=>scroll(-1));
-  next.addEventListener('click',()=>scroll(1));
-  bar.addEventListener('scroll',schedule,{passive:true});
-  window.addEventListener('resize',schedule,{passive:true});
-  const resize=typeof ResizeObserver!=='undefined'?new ResizeObserver(schedule):null;
-  resize?.observe(bar);
-  for(const id of ['silm-view-controls','silm-view-quick-actions']){const child=document.getElementById(id);if(child)resize?.observe(child);}
-  const mutation=new MutationObserver(schedule);
-  mutation.observe(bar,{subtree:true,childList:true,attributes:true,
-   attributeFilter:['hidden','class','aria-expanded','aria-pressed']});
-  schedule();
+  tools.addEventListener('toggle',()=>{
+   panel.hidden=!tools.open;
+   if(tools.open)position();
+   else if(panel.contains(document.activeElement))summary.focus({preventScroll:true});
+  });
+  panel.addEventListener('keydown',e=>{
+   if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close(true);}
+  });
+  document.addEventListener('pointerdown',e=>{
+   if(tools.open&&!tools.contains(e.target)&&!panel.contains(e.target)&&
+      !e.target.closest?.('#silm-crystal-projection-list'))close();
+  });
+  document.addEventListener('si-route-changed',()=>close());
+  window.addEventListener('resize',position,{passive:true});
+  window.addEventListener('scroll',position,{capture:true,passive:true});
+  if(window.visualViewport){
+   window.visualViewport.addEventListener('resize',position,{passive:true});
+   window.visualViewport.addEventListener('scroll',position,{passive:true});
+  }
  }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
- else init();
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
