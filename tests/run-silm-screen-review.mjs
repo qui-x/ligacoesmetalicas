@@ -109,9 +109,13 @@ try{
  }
  else if(section==='workshop'){
   await go('ambiente');
+  // Primeiro fotografar o estado inicial sem mudar a cena entre viewports.
   for(const v of sizes){
    await setSize(v);
    await optional('oficina-entrada',v,async()=>{await go('ambiente');await shut('montagem');await shut('ver');});
+  }
+  for(const v of sizes){
+   await setSize(v);
    await optional('montagem-preparo-inicial',v,async()=>{await dock('montagem');await tap('[data-left-tab="preparo"]');});
    await optional('tabela-no-palco',v,async()=>{await dock('montagem');await tap('[data-left-tab="preparo"]');await tap('#silm-open-periodic');
     await page.locator('#silm-object-entry .periodic-element[data-z="29"]').waitFor({state:'visible'});});
