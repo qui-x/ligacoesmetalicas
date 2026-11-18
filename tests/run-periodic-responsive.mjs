@@ -81,8 +81,13 @@ try{
  await page.locator('#silm-objects-close').click();
  await page.locator('#silm-objects-dialog').waitFor({state:'hidden'});
  const gold=table.locator('.periodic-element[data-z="79"]');
- await gold.focus();await gold.press('Home');
- assert.equal(await table.locator('.periodic-element:focus').count(),1);
+ await gold.focus();
+ await gold.press('Home');
+ // A devolução assíncrona de foco do catálogo não pode roubar o foco
+ // da célula alcançada por teclado após o fechamento do diálogo.
+ await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+ assert.equal(await table.locator('.periodic-element[data-z="1"]:focus').count(),1,
+  'Home deve manter o foco no hidrogênio mesmo após a restauração do catálogo');
  assert.deepEqual(errors,[],'Erros JS: '+errors.join('; '));
  console.log('OK '+browserName+': 118 elementos, 7 viewports, Tabela no palco, imagens em modal e início de montagem');
  await ctx.close();

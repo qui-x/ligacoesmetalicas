@@ -668,6 +668,11 @@
   objectDialog?.addEventListener('close',()=>{if(catalogNavigating)return;
    const target=catalogOpener;
    requestAnimationFrame(()=>{
+    // O retorno do foco não deve sobrescrever uma navegação que já ocorreu
+    // após fechar o catálogo (por exemplo, Home/End nas células da Tabela).
+    const current=document.activeElement;
+    if(current?.isConnected&&current!==target&&current!==document.body&&
+       current!==document.documentElement&&!objectDialog.contains(current))return;
     if(target?.isConnected&&target.getClientRects().length)target.focus({preventScroll:true});
     else $('silm-workshop-context')?.querySelector('.silm-workshop-browse-objects')?.focus({preventScroll:true});
    });
