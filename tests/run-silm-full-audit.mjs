@@ -256,6 +256,95 @@ try{
   await page.locator('[data-close-dock="left"]').click();
   return results;
  });
+ await check('workshop.measure-calculate-and-data-history',async()=>{
+  // Paridade SIAB: ação real → registro → módulo seguinte → consulta em Dados.
+  const chooseModule=async name=>{
+   await page.locator('[data-open-dock="montagem"]').click();
+   await page.locator('[data-left-tab="modulo"]').click();
+   const card=page.locator('.silm-module-card[data-module="'+name+'"]');
+   if(!await card.evaluate(el=>el.open))await card.locator('summary').click();
+   await page.locator('#silm-module-activate-'+name).click();
+   await page.waitForFunction(n=>SILMIntegration.snapshot().module.active===n,name);
+   await page.locator('[data-close-dock="left"]').click();
+  };
+  await page.locator('.silm-workshop-scale[data-scale="3"]').click();
+  await page.waitForFunction(()=>document.querySelector('#si-stage')?.dataset.workshopScale==='3');
+  const before=JSON.parse(await snapshot());
+  await chooseModule('medir');
+  await page.locator('[data-open-dock="ver"]').click();
+  await page.locator('[data-silm-direct-tool="medir:coordination"]').click();
+  const center=page.locator('#si-stage .silm-crystal-unit').first();
+  assert.ok(await center.count(),'Cena da rede não oferece centros selecionáveis');
+  await center.focus();await center.press('Enter');
+  await page.waitForFunction(n=>SILMIntegration.snapshot().measurements.length===n+1,
+   before.measurements.length,{timeout:10000});
+  const measured=JSON.parse(await snapshot()).measurements.at(-1);
+  assert.equal(measured.type,'coordination');
+  assert.equal(measured.source.kind,'MODEL_MEASUREMENT');
+  // O cálculo seguinte precisa consumir um valor realmente medido nesta investigação.
+  const edge=await page.evaluate(()=>{
+   const s=SILMIntegration.snapshot(),g=SILM.crystal.geometry(SILM.data.get(s.metal.atomicNumber));
+   const units=s.structure.units;
+   for(let i=0;i<units.length;i++)for(let j=i+1;j<units.length;j++){
+    const result=SILM.measurement.compute('latticeParameter',g,[units[i].site,units[j].site]);
+    if(result.ok&&result.parameter==='a')return [units[i].id,units[j].id];
+   }
+   return null;
+  });
+  assert.ok(edge,'A rede não contém dois centros disponíveis para medir a');
+  await page.locator('[data-silm-direct-tool="medir:latticeParameter"]').click();
+  for(const unitId of edge){
+   const atom=page.locator('#si-stage .silm-crystal-unit[data-unit-id="'+unitId+'"]');
+   assert.equal(await atom.count(),1,'Sítio da aresta não está na cena');
+   await atom.focus();await atom.press('Enter');
+  }
+  await page.waitForFunction(n=>SILMIntegration.snapshot().measurements.length===n+2,
+   before.measurements.length,{timeout:10000});
+  const lattice=JSON.parse(await snapshot()).measurements.at(-1);
+  assert.equal(lattice.type,'latticeParameter');
+  assert.equal(lattice.parameter,'a');
+  assert.equal(lattice.source.kind,'MODEL_MEASUREMENT');
+  await page.locator('[data-close-dock="right"]').click();
+  await chooseModule('calcular');
+  await page.locator('[data-open-dock="ver"]').click();
+  await page.locator('[data-silm-direct-tool="calcular:cell-volume-cubic"]').click();
+  assert.equal(await page.locator('#silm-origin-a').inputValue(),lattice.id,
+   'Calcular não sugeriu a medição real do parâmetro a');
+  await page.locator('#silm-tools').getByRole('button',{name:'Calcular',exact:true}).click();
+  await page.waitForFunction(n=>SILMIntegration.snapshot().calculations.length===n+1,
+   before.calculations.length,{timeout:10000});
+  const volume=JSON.parse(await snapshot()).calculations.at(-1);
+  assert.equal(volume.formulaId,'cell-volume-cubic');
+  assert.equal(volume.inputs[0].origin,'MODEL_MEASUREMENT');
+  assert.equal(volume.inputs[0].ref.measurementId,lattice.id);
+  assert.ok(Math.abs(volume.result.value-lattice.value**3)<1e-7,
+   'Volume calculado não corresponde ao parâmetro a medido');
+  const formula=page.locator('[data-silm-direct-tool="calcular:effective-atoms-fcc"]');
+  assert.equal(await formula.count(),1,'Fórmula geométrica CFC ausente do Calcular');
+  await formula.click();
+  await page.locator('#silm-tools').getByRole('button',{name:'Calcular',exact:true}).click();
+  await page.waitForFunction(n=>SILMIntegration.snapshot().calculations.length===n+2,
+   before.calculations.length,{timeout:10000});
+  const calculated=JSON.parse(await snapshot()).calculations.at(-1);
+  assert.equal(calculated.formulaId,'effective-atoms-fcc');
+  assert.equal(calculated.provenance.kind,'CALCULATED');
+  assert.equal(calculated.result.value,4,'Célula CFC deve conter 4 átomos efetivos');
+  await page.locator('[data-close-dock="right"]').click();
+  await page.locator('[data-open-dock="dados"]').click();
+  await page.locator('[data-silm-data-open="registros"]').click();
+  const history=await page.locator('#silm-history').innerText();
+  assert.match(history,/coordenação/i,'Doca Dados não mostra a medição');
+  assert.match(history,/parâmetro de rede/i,'Doca Dados não mostra a medição de a');
+  assert.match(history,/volume/i,'Doca Dados não mostra o cálculo derivado da medição');
+  assert.match(history,/número efetivo/i,'Doca Dados não mostra a contagem geométrica');
+  await screenshot('medir-calcular-dados-cobre');
+  await page.locator('[data-close-dock="right"]').click();
+  await chooseModule('explorar');
+  return {coordination:{type:measured.type,value:measured.value,unit:measured.unit},
+   parameterA:{value:lattice.value,unit:lattice.unit,id:lattice.id},
+   derivedVolume:{value:volume.result.value,origin:volume.inputs[0].origin},
+   effectiveAtoms:{id:calculated.formulaId,value:calculated.result.value},historyChars:history.length};
+ });
  await check('workshop.3d-option-and-probe',async()=>{
   const entry=page.locator('.silm-lab3d-entry');
   assert.ok(await entry.count(),'Entrada 3D ausente');
@@ -284,7 +373,10 @@ try{
   const after=JSON.parse(await snapshot());
   assert.equal(after.metal?.atomicNumber,before.metal?.atomicNumber,'Metal perdido ao atualizar');
   assert.deepEqual(after.structure,before.structure,'Estrutura mudou após atualização');
-  return {metal:after.metal?.atomicNumber,units:after.structure?.units.length};
+  assert.deepEqual(after.measurements,before.measurements,'Medições desapareceram após atualização');
+  assert.deepEqual(after.calculations,before.calculations,'Cálculos desapareceram após atualização');
+  return {metal:after.metal?.atomicNumber,units:after.structure?.units.length,
+   measurements:after.measurements.length,calculations:after.calculations.length};
  });
  await check('mobile.390-layout-and-navigation',async()=>{
   await page.setViewportSize({width:390,height:844});
