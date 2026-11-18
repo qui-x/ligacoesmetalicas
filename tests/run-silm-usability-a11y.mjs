@@ -108,7 +108,7 @@ try{
    const details=page.locator('#silm-data .silm-data-complete');
    assert.equal(await details.count(),1);
    assert.equal(await details.evaluate(el=>el.open),false,'A documentação deve iniciar recolhida');
-   await details.locator('summary').click();
+   await details.locator(':scope > summary').click();
    assert.match(await details.innerText(),/estrutura/i);
    assert.match(await details.innerText(),/Fontes e condições/i);
    const capture=await take(id+'-dados');
