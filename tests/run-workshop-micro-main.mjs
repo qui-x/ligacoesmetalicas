@@ -642,6 +642,11 @@ async function test(viewport){
  // Faixa de ferramentas científicas: dimensões constantes e mesma linha
  // nos estados normal e expandido; barra móvel preserva alvos e rolagem.
  const sceneTools=page.locator('#silm-scene-actionbar');
+ const toolbox=page.locator('#silm-scene-toolbox');
+ const revealTools=async()=>{
+  if(await toolbox.getAttribute('open')===null)await toolbox.locator(':scope > summary').click();
+  await page.locator('#silm-scene-toolbox-panel').waitFor({state:'visible'});
+ };
  await sceneTools.waitFor({state:'visible'});
  const sampleSceneButtons=async()=>sceneTools.evaluate(bar=>{
   const items=[...bar.querySelectorAll('#silm-view-quick-actions .silm-quick-icon,#silm-view-controls .silm-camera-btn,#silm-view-controls #si-expand-structure.si-structure-expand-in-camera')]
@@ -663,26 +668,19 @@ async function test(viewport){
   await page.setViewportSize({width:343,height:768});
   const toolbarNav=page.locator('#silm-scene-actionbar');
   await toolbarNav.waitFor({state:'visible'});
-  await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar')?.dataset.toolbarNavigation==='ready');
-  const overflow=await toolbarNav.evaluate(n=>n.scrollWidth>n.clientWidth+2);
-  if(overflow){
-   const nextTool=toolbarNav.getByRole('button',{name:'Mostrar próximas ferramentas'});
-   await nextTool.waitFor({state:'visible'});
-   await nextTool.click();
-   await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar').scrollLeft>10);
-   const prevTool=toolbarNav.getByRole('button',{name:'Mostrar ferramentas anteriores'});
-   await prevTool.waitFor({state:'visible'});
-   await prevTool.click();
-   await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar').scrollLeft<10);
-  }else{
-   assert.equal(await toolbarNav.locator('#silm-view-controls [id$="-camera-fit"]').isVisible(),true,
-    'Sem rolagem, Enquadrar precisa continuar visível e acessível.');
-  }
-  const barBox=await toolbarNav.boundingBox();
+  await page.waitForFunction(()=>document.querySelector('#silm-scene-actionbar')?.dataset.toolbarNavigation==='compact');
+   assert.equal(await toolbarNav.evaluate(el=>el.scrollWidth>el.clientWidth+3),false,
+    'A barra simplificada não deve exigir rolagem horizontal.');
+   await revealTools();
+   assert.equal(await page.locator('#silm-scene-toolbox-panel #silm-view-quick-actions').count(),1,
+    'Ferramentas perdeu representação científica.');
+   await toolbox.locator(':scope > summary').click();
+   const barBox=await toolbarNav.boundingBox();
   assert.ok(barBox.height<=62,'A barra instrumental aumentou de altura no celular.');
   await page.setViewportSize(previousSize);
  }
  if(viewport.width>900){
+  await revealTools();
   const expand=page.locator('#si-expand-structure');
   assert.ok(await expand.isVisible(),'Botão expandir/recolher não aparece na faixa científica.');
   assert.equal(await expand.isEnabled(),true,'A estrutura construída deveria permitir expansão.');
@@ -804,7 +802,8 @@ async function test(viewport){
  const sites=()=>units.evaluateAll(nodes=>nodes.map(n=>n.dataset.site));
  const original=await sites();
  // Translação por eixos é ação avançada na escala Centro.
- const details=page.locator('#silm-scene-actionbar .silm-lattice-more');
+ await revealTools();
+ const details=page.locator('#silm-scene-toolbox-panel .silm-lattice-more');
  await details.locator('summary').click();
  assert.equal(await details.getAttribute('open'),'','Navegação acessível não abriu.');
  for(const [axis,letter] of ['a','b','c'].entries()){
@@ -818,7 +817,7 @@ async function test(viewport){
   assert.deepEqual(await sites(),original);
  }
  assert.match(await status.textContent(),/Célula \[0, 0, 0\]/);
- assert.equal(await page.locator('#silm-scene-actionbar .silm-lattice-nav').count(),1);
+ assert.equal(await page.locator('#silm-scene-toolbox-panel .silm-lattice-nav').count(),1);
  // Joule é uma combinação direta: sem iniciar um simulador separado.
  await page.locator('[data-open-dock="ver"]').click();
  await page.waitForFunction(()=>document.querySelector('#si-dock-right')?.hidden===false);
@@ -865,7 +864,8 @@ async function test(viewport){
  const value=async label=>Number((await reading.textContent()).split(' · '+label+' ')[1].split(' · ')[0].replace(',','.'));
  const timeBeforeNavigation=await value('t');
  // A translação do cristal não pode afetar o avanço da malha térmica.
- if(await details.getAttribute('open')===null)await details.locator('summary').click();
+ await revealTools();
+  if(await details.getAttribute('open')===null)await details.locator('summary').click();
  await page.getByRole('button',{name:'Avançar uma célula no eixo a'}).click();
  assert.equal(await value('t'),timeBeforeNavigation,'Navegar não deve avançar o ensaio.');
  await page.getByRole('button',{name:'Recuar uma célula no eixo a'}).click();

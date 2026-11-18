@@ -51,16 +51,19 @@ try{
   assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),true);
  };
  await hit('press');
- const slider=page.locator('[data-control="load"]');
- await slider.scrollIntoViewIfNeeded();
- const box=await slider.boundingBox();
- assert.ok(box?.width>80,'Controle da prensa não cabe na tela');
- await slider.tap({position:{x:box.width*.7,y:box.height/2}});
- const sliderLevel=await slider.inputValue();
+ const precise=page.locator('[data-control="load"]');
+ assert.equal(await precise.getAttribute('type'),'number','Ajuste fino deve ser numérico, não slider.');
+ const dev=await ctx.newCDPSession(page);
+ const pressPoint=await coordinate('press');
+ await dev.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:pressPoint.x,y:pressPoint.y,id:11}]});
+ for(let i=1;i<=4;i++)await dev.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:pressPoint.x,y:pressPoint.y-i*15,id:11}]});
+ await dev.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ await page.waitForFunction(()=>Number(document.querySelector('.silm-lab3d')?.dataset.specimenLoad)>0,{timeout:10000});
  const solvedLoad=Number(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'));
- console.log(JSON.stringify({touchSlider:{sliderLevel,solvedLoad}}));
- assert.ok(solvedLoad>0,
-  'Arrastar/tocar o controle da prensa deve ajustar o campo J2.');
+ assert.ok(solvedLoad>0,'Arrastar a prensa por toque deve atualizar o solver J2.');
+ await precise.fill('0.2');
+ assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0.2',
+  'A entrada numérica alternativa não alterou a resposta J2.');
  await page.locator('[data-lab-action="instrument-close"]').tap();
  assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false);
  await hit('heater');
@@ -70,7 +73,6 @@ try{
  await page.screenshot({path:join(dir,'touch-instruments.png')});
  const snapshot=await page.screenshot();
  const c=await canvas.boundingBox(),x=c.x+c.width*.62,y=c.y+c.height*.49;
- const dev=await ctx.newCDPSession(page);
  await dev.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}]});
  for(let i=1;i<=4;i++){
   await dev.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[
