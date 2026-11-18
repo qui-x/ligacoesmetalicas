@@ -328,6 +328,9 @@
     }
    };
    this.onPointerDown=e=>{if(e.button===0){
+    // Um novo touchstart no canvas é um gesto intencional, não o click
+    // fantasma do botão que acabou de desaparecer.
+    if(e.pointerType==='touch')this.suppressInstrumentTapUntil=0;
     const active=this.selectedInstrument,rect=this.canvas.getBoundingClientRect();
     const hit=I.pickAt(this.eye,this.yaw,this.pitch,e.clientX-rect.left,e.clientY-rect.top,rect.width,rect.height);
     if((active==='press'||active==='power')&&hit?.id===active){
