@@ -590,7 +590,7 @@
   }
   hideInstrument({restoreFocus=true}={}){
    this.instrumentPanel.hidden=true;this.selectedInstrument=null;
-   this.suppressInstrumentTapUntil=performance.now()+300;
+   this.suppressInstrumentTapUntil=matchMedia('(pointer:coarse)').matches?performance.now()+300:0;
    this.ui.dataset.selectedInstrument='none';
    if(restoreFocus)this.canvas.focus({preventScroll:true});
   }
