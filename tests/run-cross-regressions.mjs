@@ -101,19 +101,46 @@ async function checkModes(label,scale,width,height){
  assert.equal(f.nav,4,desc+': navegação incompleta');
  assert.deepEqual(f.selectedScales,[String(scale)],desc+': escala ativa perdida');
  if(scale>=3){
-  const controls=await page.locator('#silm-scene-actionbar').evaluate(n=>{
+  // Câmera na faixa principal; navegação/projeção dentro de Ferramentas.
+  const bar=page.locator('#silm-scene-actionbar');
+  const toolbox=page.locator('#silm-scene-toolbox');
+  const panel=page.locator('#silm-scene-toolbox-panel');
+  const beforeTools=await scientific();
+  const compact=await bar.evaluate(n=>{
    const rect=n.getBoundingClientRect();
-   return {width:rect.width,height:rect.height,
-    buttons:[...n.querySelectorAll('#silm-view-controls button,#silm-view-quick-actions button')]
-     .filter(b=>!b.hidden&&getComputedStyle(b).display!=='none'&&
-      b.getBoundingClientRect().width>0&&b.getBoundingClientRect().height>0)
-     .map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height,
-      name:b.getAttribute('aria-label')||b.textContent?.trim()}))};
+   const visible=b=>!b.hidden&&getComputedStyle(b).display!=='none'&&b.getBoundingClientRect().width>0;
+   return {width:rect.width,height:rect.height,overflow:n.scrollWidth>n.clientWidth+3,
+    buttons:[...n.querySelectorAll('#silm-view-controls button')].filter(visible)
+     .map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height}))};
   });
-  assert.ok(controls.width>100&&controls.height>=40,desc+': faixa de ferramentas desapareceu');
-  assert.ok(controls.buttons.length>=2,desc+': faltam ferramentas científicas');
-  assert.ok(controls.buttons.every(b=>b.width>=42&&b.height>=42),
-   desc+': alvos menores que 44px: '+JSON.stringify(controls.buttons.filter(b=>b.width<42||b.height<42)));
+  assert.ok(compact.width>100&&compact.height>=40,desc+': câmera indisponível');
+  assert.equal(compact.overflow,false,desc+': a faixa exige rolagem horizontal');
+  assert.ok(compact.buttons.length>=1,desc+': Enquadrar não está disponível');
+  assert.ok(compact.buttons.every(b=>b.width>=43.5&&b.height>=43.5),
+   desc+': botões da câmera menores que 44px');
+  const summary=toolbox.locator(':scope > summary');
+  assert.ok(await summary.isVisible(),desc+': Ferramentas está inacessível');
+  assert.equal(await toolbox.getAttribute('open'),null,desc+': Ferramentas inicia expandida');
+  const triggerBox=await summary.boundingBox();
+  assert.ok(triggerBox?.width>=43.5&&triggerBox.height>=43.5,desc+': Ferramentas tem alvo pequeno');
+  await summary.click();
+  await panel.waitFor({state:'visible'});
+  const secondary=await panel.evaluate(n=>{
+   const visible=e=>!!e&&!e.hidden&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'&&e.getBoundingClientRect().width>0;
+   return {navigation:visible(n.querySelector('.silm-lattice-nav')),
+    navSummary:visible(n.querySelector('.silm-lattice-more > summary')),
+    actions:[...n.querySelectorAll('button:not([disabled]),summary,select:not([disabled])')]
+     .filter(visible).map(e=>({name:e.getAttribute('aria-label')||e.textContent?.trim(),
+      width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height}))};
+  });
+  assert.ok(secondary.navigation&&secondary.navSummary,
+   desc+': navegação cristalográfica não está acessível em Ferramentas');
+  assert.ok(secondary.actions.length>=2,desc+': Ferramentas não abriu ações utilizáveis');
+  assert.ok(secondary.actions.every(b=>b.width>=43.5&&b.height>=43.5),
+   desc+': Ferramentas contém alvos pequenos: '+JSON.stringify(secondary.actions));
+  await summary.click();
+  await panel.waitFor({state:'hidden'});
+  assert.equal(await scientific(),beforeTools,desc+': abrir/fechar Ferramentas alterou a investigação');
  }
 }
 async function checkDock(panel){
