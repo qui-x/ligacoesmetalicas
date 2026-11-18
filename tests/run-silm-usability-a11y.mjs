@@ -7,8 +7,10 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 const require=createRequire(import.meta.url);
 const runtime=process.env.PLAYWRIGHT_MODULE||'playwright';
-const pw=require(runtime),AxeBuilder=require(process.env.PLAYWRIGHT_MODULE?
- join(process.env.PLAYWRIGHT_MODULE,'..','@axe-core/playwright'):'@axe-core/playwright').default;
+const pw=require(runtime);
+const axePackage=require(process.env.PLAYWRIGHT_MODULE?
+ join(process.env.PLAYWRIGHT_MODULE,'..','@axe-core/playwright'):'@axe-core/playwright');
+const AxeBuilder=axePackage.default||axePackage;
 const browserName=process.env.BROWSER_NAME||'chromium';
 const url=(process.env.BASE_URL||'http://127.0.0.1:8765')+'/index.html';
 const root=join('reports','usability',browserName);
