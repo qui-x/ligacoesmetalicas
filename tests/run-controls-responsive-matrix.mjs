@@ -73,6 +73,12 @@ try{
  // A construção da primeira geometria é uma mudança científica esperada.
  // A partir dela, apenas câmera/navegação podem mudar, nunca os resultados.
  const initial=await scientific();
+  const toolbox=page.locator('#silm-scene-toolbox');
+  const revealTools=async()=>{
+   if(await toolbox.getAttribute('open')===null)await toolbox.locator(':scope > summary').click();
+   await page.locator('#silm-scene-toolbox-panel').waitFor({state:'visible'});
+  };
+  assert.equal(await toolbox.getAttribute('open'),null,'Ferramentas devem iniciar recolhidas.');
  // Ações da câmera existem, mas só Enquadrar e um disclosure são primários.
  const bar=page.locator('#silm-view-controls .silm-camera-compact');
  assert.equal(await bar.count(),1,'A barra compacta não foi montada');
@@ -93,7 +99,8 @@ try{
 
  // Navegar por eixos não é pan: desloca a referência cristalográfica sem
  // redesenhar o metal nem eliminar os comandos de acessibilidade.
- const nav=page.locator('#silm-scene-actionbar .silm-lattice-nav');
+ await revealTools();
+  const nav=page.locator('#silm-scene-toolbox-panel .silm-lattice-nav');
  const axes=nav.locator('details.silm-lattice-more');
  assert.equal(await axes.count(),1,'Navegação avançada não existe');
  assert.equal(await axes.getAttribute('open'),null,'Eixos ocupam espaço sem necessidade');
@@ -114,8 +121,9 @@ try{
  // O Centro mantém vizinhos e coordenação científica sem símbolos repetidos.
  await scale(4);
  await page.waitForFunction(()=>document.querySelector('.silm-crystal[data-local-focus="true"]'));
- const center=page.locator('.silm-crystal[data-local-focus="true"]');
- const centerNav=page.locator('#silm-scene-actionbar .silm-center-navigation');
+ await revealTools();
+  const center=page.locator('.silm-crystal[data-local-focus="true"]');
+ const centerNav=page.locator('#silm-scene-toolbox-panel .silm-center-navigation');
  assert.equal(await centerNav.locator('details.silm-lattice-more').count(),1);
  assert.equal(await centerNav.locator('select.silm-lattice-neighbors').isVisible(),false,
   'O Centro continua com seletor duplicado permanente');
@@ -299,7 +307,8 @@ try{
  const target=propertyOverlay.locator('.silm-optical-surface-marker');
  assert.equal(await target.count(),1,
   'A região de reflexão não foi ancorada à mesma projeção da rede.');
- const toolbar=page.locator('#silm-view-quick-actions .silm-optical-inline-actions');
+ await revealTools();
+  const toolbar=page.locator('#silm-view-quick-actions .silm-optical-inline-actions');
  assert.equal(await toolbar.isVisible(),true,
   'Acabamento e raios não foram incorporados à barra inferior existente.');
  const lamp=interaction.locator('.silm-optical-lamp');

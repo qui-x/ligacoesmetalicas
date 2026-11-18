@@ -265,7 +265,7 @@ SILM.microstructure=(()=>{
    releaseForce.addEventListener('click',()=>{
     deformCtl?.setLoad(0);forceInput.value='0';refreshMechanical();
    });
-   forceInput.addEventListener('change',()=>{
+   forceInput.addEventListener('input',()=>{
     deformCtl?.setLoad(clamp(Number(forceInput.value)/100,0,1));
     refreshMechanical();
    });
@@ -438,7 +438,7 @@ SILM.microstructure=(()=>{
     }
    };
    demoToggle.addEventListener('change',updateSlip);
-   angleInput.addEventListener('change',()=>{
+   angleInput.addEventListener('input',()=>{
     angleValue.textContent=angleInput.value+'°';
     updateSlip();
    });
