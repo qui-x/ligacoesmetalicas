@@ -18,11 +18,19 @@
    const v=window.visualViewport,w=v?.width||window.innerWidth,h=v?.height||window.innerHeight;
    const rect=summary.getBoundingClientRect();
    const width=Math.min(360,Math.max(180,w-24));
-   panel.style.width=width+'px';panel.style.maxHeight=Math.max(120,Math.min(420,h-24))+'px';
-   const height=Math.min(panel.scrollHeight,420,h-24);
+   panel.style.width=width+'px';
    panel.style.left=Math.max(12,Math.min(rect.right-width,w-width-12))+'px';
-   const above=rect.top-height-8,below=rect.bottom+8;
-   panel.style.top=Math.max(8,above>=8?above:Math.min(below,Math.max(8,h-height-8)))+'px';
+   const roomAbove=Math.max(0,rect.top-12);
+   const roomBelow=Math.max(0,h-rect.bottom-12);
+   const placeAbove=roomAbove>=roomBelow;
+   // O painel nunca pode cobrir o gatilho. Se faltar espaço, limitar a
+   // altura e rolar o conteúdo dentro da gaveta, não a barra inferior.
+   const available=placeAbove?roomAbove:roomBelow;
+   const maxHeight=Math.min(420,Math.max(80,available));
+   panel.style.maxHeight=maxHeight+'px';
+   const height=Math.min(panel.scrollHeight,maxHeight);
+   const top=placeAbove?rect.top-height-8:rect.bottom+8;
+   panel.style.top=Math.max(8,Math.min(top,h-height-8))+'px';
   }
   function close(focus=false){
    if(!tools.open)return;

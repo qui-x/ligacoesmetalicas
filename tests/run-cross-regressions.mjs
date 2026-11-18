@@ -147,6 +147,12 @@ async function checkModes(label,scale,width,height){
   assert.ok(secondary.actions.length>=2,desc+': Ferramentas não abriu ações utilizáveis');
   assert.ok(secondary.actions.every(b=>b.width>=43.5&&b.height>=43.5),
    desc+': Ferramentas contém alvos pequenos: '+JSON.stringify(secondary.actions));
+  const triggerPosition=await summary.boundingBox();
+  const panelPosition=await panel.boundingBox();
+  assert.ok(panelPosition.bottom<=triggerPosition.top-3 ||
+   panelPosition.top>=triggerPosition.bottom+3,
+   desc+': a gaveta cobre o próprio botão de fechar: '+
+   JSON.stringify({trigger:triggerPosition,panel:panelPosition}));
   await summary.click();
   await panel.waitFor({state:'hidden'});
   assert.equal(await scientific(),beforeTools,desc+': abrir/fechar Ferramentas alterou a investigação');
