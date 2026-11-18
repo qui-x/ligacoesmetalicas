@@ -39,6 +39,10 @@
    }
    else if(panel.contains(document.activeElement))summary.focus({preventScroll:true});
   });
+  panel.addEventListener('click',e=>{
+   // Iniciar a sala 3D não troca a rota; não deixar a gaveta sobre o WebGL.
+   if(e.target.closest?.('.silm-lab3d-entry'))close();
+  });
   panel.addEventListener('keydown',e=>{
    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close(true);}
   });

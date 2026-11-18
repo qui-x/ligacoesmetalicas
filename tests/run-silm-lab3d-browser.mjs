@@ -34,7 +34,11 @@ try{
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  const backend=await page.evaluate(()=>{const c=document.createElement('canvas');return c.getContext('webgl2')?'webgl2':c.getContext('webgl')?'webgl1':'none'});
  const available=backend!=='none';
+ const toolbox=page.locator('#silm-scene-toolbox');
+ await toolbox.locator(':scope > summary').click();
+ await page.locator('#silm-scene-toolbox-panel').waitFor({state:'visible'});
  await entry.click();
+ assert.equal(await toolbox.getAttribute('open'),null,'Ferramentas não fechou ao iniciar a sala 3D.');
  if(available){
   const canvas=page.locator('.silm-lab3d canvas');
   await canvas.waitFor({state:'visible',timeout:10000});

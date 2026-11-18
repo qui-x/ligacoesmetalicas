@@ -32,7 +32,11 @@ try{
  if(await dock.isVisible())await dock.click();
  const before=JSON.stringify(await page.evaluate(()=>window.SILMIntegration.snapshot()));
  const entry=page.locator('.silm-lab3d-entry');
- await entry.click();
+ const toolbox=page.locator('#silm-scene-toolbox');
+ await toolbox.locator(':scope > summary').tap();
+ await page.locator('#silm-scene-toolbox-panel').waitFor({state:'visible'});
+ await entry.tap();
+ assert.equal(await toolbox.getAttribute('open'),null,'Ferramentas não fechou ao iniciar a sala 3D.');
  const canvas=page.locator('.silm-lab3d canvas');
  await canvas.waitFor({state:'visible',timeout:15000});
  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-surface'),'j2-plane-strain');
