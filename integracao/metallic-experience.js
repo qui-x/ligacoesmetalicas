@@ -221,12 +221,12 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
  // Consulta em primeiro plano: números, unidades, classe da evidência e condição.
  // A ficha integral permanece acessível, mas não compete com a leitura rápida.
  const originalHost=host,summary=el('section'),readings=el('div');
- summary.className='silm-data-quick';summary.setAttribute('aria-label','Resumo dos dados do metal');
+ summary.className='silm-data-quick';summary.ariaLabel='Resumo dos dados do metal';
  const identity=el('header');identity.className='silm-data-identity';
  const title=el('h3',e.symbol+' · '+e.name);identity.append(title);
  const subtitle=el('p','Z = '+e.atomicNumber+' · '+(structure?.label||structure?.type||'Estrutura não homologada'));
  identity.append(subtitle);summary.append(identity);
- summary.append(el('h4','Cinco propriedades metálicas'));
+ summary.append(el('h4','Propriedades do metal · cinco categorias'));
  const intro=el('p','Valor e unidade em destaque. A origem e a condição acompanham cada informação.');
  intro.className='silm-data-intro';summary.append(intro);
  readings.className='silm-data-readings';
@@ -235,6 +235,7 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
   const label=Properties.catalog[id].title;
   const ref=Properties.data(e,id);
   const research=S.sevenConditionResearch?.get?.(e.atomicNumber,id)||null;
+  const qualified=S.science400Reference?.getFor?.(e.atomicNumber,id)||null;
   const indexed=!ref&&!research?S.scienceEvidenceIndex?.getFor?.(e.atomicNumber,id,{excludeSeven:true,includePending:false})||[]:[];
   const item=el('article');item.className='silm-data-reading';item.dataset.property=id;
   const labelNode=el('h5',label);item.append(labelNode);
@@ -261,6 +262,21 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
    condition.textContent=(Number.isFinite(research.temperatureK)?readNumber(research.temperatureK)+' K':'Temperatura não informada')+
     ' · '+research.quantity+' · valor não usado automaticamente para calibrar o motor';
    classification='conditional';
+  }else if(qualified?.displayEligible&&qualified.best&&Number.isFinite(qualified.best.value)&&qualified.best.sourceURL){
+   // A pesquisa rastreável fica visível, mas conserva a classe e a grandeza originais.
+   const evidence=qualified.best,cond=evidence.conditions||{};
+   value.textContent=readNumber(evidence.value)+' '+evidence.unit;
+   category.textContent=qualified.requiresPrimaryReview?
+    'Candidato documental rastreável · revisão primária pendente':
+    qualified.status==='ENSAIO_CONDICIONADO'?'Ensaio documentado sob condições específicas':'Compilação científica rastreável';
+   const t=Number.isFinite(cond.temperature_K)?readNumber(cond.temperature_K)+' K':
+    typeof cond.temperature==='string'?cond.temperature:'Temperatura não informada';
+   const provenance=[String(evidence.metric).replaceAll('_',' '),t,cond.specimen||cond.phase||'Amostra não especificada'];
+   condition.textContent=provenance.join(' · ')+' · não calibra automaticamente o motor';
+   classification=qualified.requiresPrimaryReview?'research':'documentary';
+   const link=el('a','Consultar fonte original');link.href=evidence.sourceURL;
+   link.target='_blank';link.rel='noopener noreferrer';link.className='silm-data-reading-source';
+   item.append(link);
   }else if(indexed.length&&indexed[0].values?.length){
    const hit=indexed[0],metric=hit.values[0];
    value.textContent=metric.label+': '+readNumber(metric.value)+' '+metric.unit;
@@ -270,9 +286,11 @@ SILM.renderIntegrationMetalData=(host,e,state)=>{
     ' · não é calibração experimental do simulador';
    classification='research';
   }else{
-   value.textContent='Sem valor numérico homologado';
-   category.textContent='Representação qualitativa';
-   condition.textContent='A simulação não fornece uma medição experimental desta propriedade.';
+   value.textContent='Sem valor documental rastreável';
+   category.textContent=qualified?.available?'Número sem fonte verificável':'Lacuna documental';
+   condition.textContent=qualified?.available?
+    'O número pesquisado fica arquivado, sem ser apresentado como referência científica.':
+    'Não há valor numérico disponível; a experiência visual não é medição experimental.';
   }
   item.dataset.evidence=classification;item.append(value,category,condition);readings.append(item);
  }
