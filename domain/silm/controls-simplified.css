@@ -449,3 +449,50 @@
 @media(prefers-reduced-motion:reduce){
  #silm-scene-toolbox-panel *,#silm-scene-toolbox>summary{transition:none!important;animation:none!important}
 }
+
+
+/* Gaveta de rede movida para Ferramentas: a lógica de movimento é a mesma. */
+#silm-scene-toolbox-panel .silm-lattice-more>summary{
+ box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+ min-height:44px;min-width:44px;padding:6px 10px;border:1px solid var(--border);
+ border-radius:9px;background:var(--surface);color:var(--text);
+ cursor:pointer;font-size:.75rem;font-weight:700
+}
+#silm-scene-toolbox-panel .silm-lattice-more-controls{
+ position:fixed!important;z-index:3300;top:0;left:0;right:auto;bottom:auto;
+ display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px;
+ min-width:220px;width:min(335px,calc(100vw - 24px));max-width:calc(100vw - 24px);
+ max-height:65dvh;overflow-y:auto;padding:8px;
+ border:1px solid var(--border);border-radius:12px;
+ background:var(--panel,var(--surface));box-shadow:0 5px 16px #0003
+}
+#silm-scene-toolbox-panel .silm-lattice-more:not([open]) .silm-lattice-more-controls{
+ display:none!important
+}
+#silm-scene-toolbox-panel .silm-lattice-more-controls select{
+ flex:1 1 100%;max-width:100%;min-height:44px
+}
+#silm-scene-toolbox-panel .silm-lattice-more-controls button{min-width:44px;min-height:44px}
+#silm-scene-toolbox-panel .silm-center-navigation>strong{display:none}
+#silm-scene-toolbox-panel .silm-lattice-more>summary:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px
+}
+/* O efeito Joule é a exceção contextual: controles de ensaio somente
+   quando ativo; em telas curtas eles ocupam uma segunda linha, sem rolagem. */
+@media(max-width:800px){
+ #silm-scene-actionbar:has(.silm-joule-controls:not([hidden])){
+  height:auto!important;min-height:60px;flex-wrap:wrap!important;
+ }
+ #silm-scene-actionbar .silm-joule-controls:not([hidden]){
+  display:flex!important;justify-content:center;flex:1 1 100%;width:100%;
+ }
+}
+@media(max-width:650px){
+ #silm-scene-actionbar .silm-joule-live{
+  position:absolute!important;clip-path:inset(50%);width:1px!important;
+  height:1px!important;overflow:hidden;white-space:nowrap
+ }
+ #silm-scene-actionbar .silm-joule-controls:not([hidden]){gap:4px}
+ #silm-scene-actionbar .silm-joule-controls .silm-joule-supply,
+ #silm-scene-actionbar .silm-joule-controls .silm-joule-play{min-width:70px}
+}
