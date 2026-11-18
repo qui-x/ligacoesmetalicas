@@ -93,6 +93,9 @@ try{
       SILM.stage81Reconciliation.getFor(z,'thermal').length>0;
    },liveZ,{timeout:20000});
    const panel=page.locator('#silm-data');
+   // Na nova leitura objetiva, fontes e estudos permanecem íntegros,
+   // porém são consultados ao expandir a ficha completa.
+   await panel.locator('.silm-data-complete > summary').click();
    const text=await panel.innerText();
    assert.ok(text.includes('Fontes e condições'));
    assert.ok(text.includes(liveZ===31?'41 W/(m·K)':'18 W/(m·K)'));
