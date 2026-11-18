@@ -353,6 +353,9 @@
     this.dragging=false;
    };
    this.onClick=e=>{
+    // O toque que fecha o painel pode produzir um click sintético no canvas:
+    // não reabrir o instrumento sob o dedo.
+    if(performance.now()<(this.suppressInstrumentTapUntil||0))return;
     if(this.touchMoved||(this.pointerTravel||0)>6){this.touchMoved=false;return;}
     if(document.pointerLockElement===this.canvas){this.interact();return;}
     const rect=this.canvas.getBoundingClientRect();
@@ -587,6 +590,7 @@
   }
   hideInstrument({restoreFocus=true}={}){
    this.instrumentPanel.hidden=true;this.selectedInstrument=null;
+   this.suppressInstrumentTapUntil=performance.now()+300;
    this.ui.dataset.selectedInstrument='none';
    if(restoreFocus)this.canvas.focus({preventScroll:true});
   }

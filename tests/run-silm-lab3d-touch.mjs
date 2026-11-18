@@ -69,7 +69,10 @@ try{
  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0.2',
   'A entrada numérica alternativa não alterou a resposta J2.');
  await page.locator('[data-lab-action="instrument-close"]').tap();
- assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false);
+ await page.waitForFunction(()=>document.querySelector('.silm-lab3d-instrument-panel')?.hidden===true,
+  undefined,{timeout:3000});
+ assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false,
+  'Fechar a prensa não deve reabrir o painel por um toque fantasma.');
  await hit('heater');
  await page.locator('[data-lab-action="heater-toggle"]').tap();
  assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');

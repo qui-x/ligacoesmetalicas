@@ -109,12 +109,21 @@ async function checkModes(label,scale,width,height){
   const compact=await bar.evaluate(n=>{
    const rect=n.getBoundingClientRect();
    const visible=b=>!b.hidden&&getComputedStyle(b).display!=='none'&&b.getBoundingClientRect().width>0;
-   return {width:rect.width,height:rect.height,overflow:n.scrollWidth>n.clientWidth+3,
+   const controls=[...n.querySelectorAll('#silm-view-controls button, #silm-view-controls .silm-camera-advanced-summary, #silm-scene-toolbox > summary')]
+    .filter(visible).map(b=>{const box=b.getBoundingClientRect();
+     return {label:b.getAttribute('aria-label')||b.textContent?.trim(),
+      left:box.left,right:box.right,width:box.width,height:box.height};});
+   return {width:rect.width,height:rect.height,viewport:window.innerWidth,
     buttons:[...n.querySelectorAll('#silm-view-controls button')].filter(visible)
-     .map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height}))};
+     .map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height})),
+    controls};
   });
   assert.ok(compact.width>100&&compact.height>=40,desc+': câmera indisponível');
-  assert.equal(compact.overflow,false,desc+': a faixa exige rolagem horizontal');
+  assert.ok(compact.controls.length>=3,desc+': a câmera e Ferramentas não aparecem juntas');
+  assert.ok(compact.controls.every(b=>b.left>=-2&&b.right<=compact.viewport+2),
+   desc+': controle essencial ultrapassa a largura da tela: '+JSON.stringify(compact.controls));
+  assert.ok(compact.controls.every(b=>b.width>=43.5&&b.height>=43.5),
+   desc+': controle essencial ficou menor que o alvo tátil: '+JSON.stringify(compact.controls));
   assert.ok(compact.buttons.length>=1,desc+': Enquadrar não está disponível');
   assert.ok(compact.buttons.every(b=>b.width>=43.5&&b.height>=43.5),
    desc+': botões da câmera menores que 44px');
