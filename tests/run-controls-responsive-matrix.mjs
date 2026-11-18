@@ -260,6 +260,7 @@ try{
  // Tipografia ampliada em tela pequena: mesmo conteúdo e comandos usáveis.
  await page.setViewportSize({width:390,height:844});
  await page.evaluate(()=>document.documentElement.style.fontSize='150%');
+  await revealTools();
  await page.waitForTimeout(100);
  const zoomedFont=await page.evaluate(()=>({width:innerWidth,pageWidth:document.documentElement.scrollWidth,
   camera:document.querySelector('.silm-camera-advanced-summary')?.getBoundingClientRect().width,
