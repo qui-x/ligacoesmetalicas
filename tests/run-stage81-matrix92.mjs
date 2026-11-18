@@ -92,10 +92,14 @@ try{
     return box?.querySelector('.silm-unified-evidence-record[data-source="stage81-matrix92"]')&&
       SILM.stage81Reconciliation.getFor(z,'thermal').length>0;
    },liveZ,{timeout:20000});
+   // A ficha científica só é interativa após abrir Dados e Metal e propriedades.
+   // Evita clicar em um <summary> que existe no DOM, mas está oculto na doca.
+   const dados=page.locator('[data-open-dock="dados"]');
+   if(await dados.getAttribute('aria-expanded')!=='true')await dados.click();
+   await page.locator('[data-silm-data-open="tabela"]').click();
    const panel=page.locator('#silm-data');
-   // Na nova leitura objetiva, fontes e estudos permanecem íntegros,
-   // porém são consultados ao expandir a ficha completa.
    await panel.locator('.silm-data-complete > summary').click();
+   assert.equal(await panel.locator('.silm-data-complete').evaluate(el=>el.open),true);
    const text=await panel.innerText();
    assert.ok(text.includes('Fontes e condições'));
    assert.ok(text.includes(liveZ===31?'41 W/(m·K)':'18 W/(m·K)'));

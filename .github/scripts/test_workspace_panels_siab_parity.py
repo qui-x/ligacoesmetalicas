@@ -149,11 +149,14 @@ with sync_playwright() as pw:
         page.locator('[data-silm-data-open="tabela"]').click()
         panel = page.locator("#silm-data")
         assert "Propriedades do metal" in panel.inner_text()
-        assert "Estrutura de referência" in panel.inner_text()
-        details = panel.locator("details")
-        assert details.count() >= 1
-        details.first.locator("summary").click()
+        # A leitura rápida vem primeiro. A ficha completa permanece recolhida
+        # até o usuário expandi-la; o teste precisa seguir o fluxo visível.
+        details = panel.locator("details.silm-data-complete")
+        assert details.count() == 1
+        assert not details.first.evaluate("(el) => el.open")
+        details.first.locator(":scope > summary").click()
         assert details.first.evaluate("(el) => el.open")
+        assert "Estrutura de referência" in panel.inner_text()
         # Atualização científica não pode fechar os dados e suas fontes
         # enquanto o estudante os lê no painel direito.
         page.evaluate("document.querySelector('#silm-add').click()")
