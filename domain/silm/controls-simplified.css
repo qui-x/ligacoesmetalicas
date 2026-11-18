@@ -520,3 +520,16 @@
   color:var(--text);font-weight:750;
  }
 }
+
+
+/* Auditoria 320px: botões secundários devem cumprir o mesmo alvo de
+   44px da barra principal, sem alargar o palco nem criar segunda doca. */
+#silm-scene-toolbox-panel .silm-projection-trigger,
+#silm-scene-toolbox-panel .silm-lattice-nav select.silm-lattice-neighbors{
+ box-sizing:border-box!important;height:44px!important;min-height:44px!important;
+ padding-block:6px!important;
+}
+#silm-scene-toolbox-panel .silm-projection-trigger:focus-visible,
+#silm-scene-toolbox-panel .silm-lattice-nav select.silm-lattice-neighbors:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px;
+}
