@@ -167,3 +167,18 @@
   outline:3px solid Highlight
  }
 }
+
+/* SILM #191: precisão como entrada numérica, não slider persistente. */
+.silm-lab3d-instrument-group input[type=number]{
+ box-sizing:border-box;min-height:44px;width:min(160px,100%);
+ padding:8px 10px;border:1px solid #84b5c9;border-radius:7px;
+ background:#123e53;color:#f5faff;font:inherit;font-variant-numeric:tabular-nums
+}
+.silm-lab3d-instrument-group input[type=number]:focus-visible{
+ outline:3px solid #dcf4ff;outline-offset:2px
+}
+@media(forced-colors:active){
+ .silm-lab3d-instrument-group input[type=number]{
+  border:2px solid ButtonText;background:Canvas;color:CanvasText
+ }
+}
