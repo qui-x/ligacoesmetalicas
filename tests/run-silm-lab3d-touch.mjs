@@ -73,6 +73,8 @@ try{
   undefined,{timeout:3000});
  assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false,
   'Fechar a prensa não deve reabrir o painel por um toque fantasma.');
+ assert.equal(await page.locator('.silm-lab3d').getAttribute('data-selected-instrument'),'none',
+  'Ao fechar, a prensa não deve permanecer como instrumento ativo.');
  await hit('heater');
  await page.locator('[data-lab-action="heater-toggle"]').tap();
  assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');

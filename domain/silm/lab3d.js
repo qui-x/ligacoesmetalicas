@@ -224,6 +224,15 @@
    this.instrumentTitle=make('h3','', '');
    this.instrumentClose=this.button(heading,'Fechar controles','instrument-close',()=>this.hideInstrument());
    this.instrumentClose.setAttribute('aria-label','Fechar os controles deste instrumento');
+   // O touchend é tratado no próprio botão: após arrastar um instrumento,
+   // um click sintético pode ser retargeted pelo pointer capture do canvas.
+   // Fechamento é idempotente e o canvas ignora o click fantasma subsequente.
+   this.instrumentClose.addEventListener('pointerup',event=>{
+    if(event.pointerType==='touch'){event.stopPropagation();this.hideInstrument({restoreFocus:false});}
+   });
+   this.instrumentClose.addEventListener('touchend',event=>{
+    event.stopPropagation();this.hideInstrument({restoreFocus:false});
+   },{passive:true});
    heading.prepend(this.instrumentTitle);
    this.instrumentDescription=make('p','silm-lab3d-instrument-description','');
    this.instrumentPanel.append(heading,this.instrumentDescription);
