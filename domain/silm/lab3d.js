@@ -224,6 +224,15 @@
    this.instrumentTitle=make('h3','', '');
    this.instrumentClose=this.button(heading,'Fechar controles','instrument-close',()=>this.hideInstrument());
    this.instrumentClose.setAttribute('aria-label','Fechar os controles deste instrumento');
+   // O touchend é tratado no próprio botão: após arrastar um instrumento,
+   // um click sintético pode ser retargeted pelo pointer capture do canvas.
+   // Fechamento é idempotente e o canvas ignora o click fantasma subsequente.
+   this.instrumentClose.addEventListener('pointerup',event=>{
+    if(event.pointerType==='touch'){event.stopPropagation();this.hideInstrument({restoreFocus:false});}
+   });
+   this.instrumentClose.addEventListener('touchend',event=>{
+    event.stopPropagation();this.hideInstrument({restoreFocus:false});
+   },{passive:true});
    heading.prepend(this.instrumentTitle);
    this.instrumentDescription=make('p','silm-lab3d-instrument-description','');
    this.instrumentPanel.append(heading,this.instrumentDescription);
@@ -244,7 +253,7 @@
     this.loadMode=this.pressMode.value;this.setLoad(this.load);});
    modeLabel.append(this.pressMode);pressGroup.append(modeLabel);
    const loadLabel=make('label','','Intensidade da carga (relativa, 0–100%)');
-   this.pressLoad=make('input');this.pressLoad.type='range';
+   this.pressLoad=make('input');this.pressLoad.type='number';this.pressLoad.inputMode='decimal';
    this.pressLoad.min='0';this.pressLoad.max='1';this.pressLoad.step='.1';
    this.pressLoad.value='0';this.pressLoad.dataset.control='load';
    this.pressLoad.addEventListener('input',()=>this.setLoad(Number(this.pressLoad.value)));
@@ -260,11 +269,14 @@
     this.currentButton.click();this.refreshInstrument();
    });
    const intensityLabel=make('label','','Alimentação elétrica relativa');
-   this.powerIntensity=make('input');this.powerIntensity.type='range';
+   this.powerIntensity=make('input');this.powerIntensity.type='number';this.powerIntensity.inputMode='decimal';
    this.powerIntensity.min='.05';this.powerIntensity.max='1';this.powerIntensity.step='.05';
    this.powerIntensity.value=String(this.currentIntensity);this.powerIntensity.dataset.control='intensity';
    this.powerIntensity.addEventListener('input',()=>{
-    this.currentIntensity=Number(this.powerIntensity.value);
+    if(!this.powerIntensity.value)return;
+    const entered=Number(this.powerIntensity.value);
+    if(!Number.isFinite(entered))return;
+    this.currentIntensity=Math.round(clamp(entered,.05,1)*20)/20;
     this.setCoupledSources();this.refreshInstrument();
    });
    this.powerIntensityValue=make('output','', '60%');
@@ -309,17 +321,53 @@
    };
    this.onUp=e=>this.keys.delete(e.key.toLowerCase());
    this.onMove=e=>{
+    if(this.instrumentDrag)return;
     if(document.pointerLockElement===this.canvas||this.dragging){
      if(this.dragging){this.pointerTravel=(this.pointerTravel||0)+Math.abs(e.movementX)+Math.abs(e.movementY);}
      this.yaw+=e.movementX*.0028;this.pitch=clamp(this.pitch-e.movementY*.0028,-1.15,1.0);
     }
    };
    this.onPointerDown=e=>{if(e.button===0){
+    // Um novo touchstart no canvas é um gesto intencional, não o click
+    // fantasma do botão que acabou de desaparecer.
+    if(e.pointerType==='touch')this.suppressInstrumentTapUntil=0;
+    const active=this.selectedInstrument,rect=this.canvas.getBoundingClientRect();
+    const hit=I.pickAt(this.eye,this.yaw,this.pitch,e.clientX-rect.left,e.clientY-rect.top,rect.width,rect.height);
+    if((active==='press'||active==='power')&&hit?.id===active){
+     this.instrumentDrag={id:e.pointerId,kind:active,x:e.clientX,y:e.clientY,
+      load:this.load,intensity:this.currentIntensity};
+     this.pointerTravel=0;
+     try{this.canvas.setPointerCapture(e.pointerId);}catch{}
+     e.preventDefault();this.canvas.focus({preventScroll:true});return;
+    }
     this.dragging=true;this.pointerTravel=0;
     this.canvas.focus({preventScroll:true});
    }};
-   this.onPointerUp=()=>{this.dragging=false};
+   this.onInstrumentPointerMove=e=>{
+    const d=this.instrumentDrag;
+    if(!d||e.pointerId!==d.id)return;
+    e.preventDefault();
+    this.pointerTravel=Math.max(this.pointerTravel||0,Math.hypot(e.clientX-d.x,e.clientY-d.y));
+    if(d.kind==='press')this.setLoad(clamp(d.load+(d.y-e.clientY)/Math.max(100,this.canvas.clientHeight*.5),0,1));
+    else{
+     const intensity=Math.round(clamp(d.intensity+(e.clientX-d.x)/Math.max(120,this.canvas.clientWidth*.55),.05,1)*20)/20;
+     if(intensity!==this.currentIntensity){
+      this.currentIntensity=intensity;this.setCoupledSources();this.refreshInstrument();
+      this.status.textContent='Fonte elétrica: '+Math.round(intensity*100)+'% relativo; rede não calibrada por metal.';
+     }
+    }
+   };
+   this.onPointerUp=e=>{
+    if(this.instrumentDrag&&(!e?.pointerId||e.pointerId===this.instrumentDrag.id)){
+     const id=this.instrumentDrag.id;this.instrumentDrag=null;
+     try{this.canvas.releasePointerCapture(id);}catch{}
+    }
+    this.dragging=false;
+   };
    this.onClick=e=>{
+    // O toque que fecha o painel pode produzir um click sintético no canvas:
+    // não reabrir o instrumento sob o dedo.
+    if(performance.now()<(this.suppressInstrumentTapUntil||0))return;
     if(this.touchMoved||(this.pointerTravel||0)>6){this.touchMoved=false;return;}
     if(document.pointerLockElement===this.canvas){this.interact();return;}
     const rect=this.canvas.getBoundingClientRect();
@@ -338,11 +386,14 @@
    document.addEventListener('keydown',this.onKey,true);document.addEventListener('keyup',this.onUp,true);
    document.addEventListener('mousemove',this.onMove);window.addEventListener('mouseup',this.onPointerUp);
    this.canvas.addEventListener('pointerdown',this.onPointerDown);
+   this.canvas.addEventListener('pointermove',this.onInstrumentPointerMove);
+   this.canvas.addEventListener('pointerup',this.onPointerUp);
+   this.canvas.addEventListener('pointercancel',this.onPointerUp);
    this.canvas.addEventListener('click',this.onClick);this.canvas.addEventListener('wheel',this.onWheel,{passive:false});
    window.addEventListener('hashchange',this.onRoute);
    this.touch=null;
    this.onTouchStart=e=>{this.touchMoved=false;if(e.touches.length===1)this.touch={x:e.touches[0].clientX,y:e.touches[0].clientY}};
-   this.onTouchMove=e=>{if(!this.touch||e.touches.length!==1)return;
+   this.onTouchMove=e=>{if(this.instrumentDrag||!this.touch||e.touches.length!==1)return;
     const x=e.touches[0].clientX,y=e.touches[0].clientY;
     if(Math.hypot(x-this.touch.x,y-this.touch.y)>2)this.touchMoved=true;
     this.yaw+=(x-this.touch.x)*.005;this.pitch=clamp(this.pitch-(y-this.touch.y)*.005,-1.1,1);
@@ -533,9 +584,9 @@
    this.ui.dataset.selectedInstrument=id;
    this.instrumentTitle.textContent=I.labels[id];
    const descriptions={
-    press:'Aplique tração ou compressão. As garras seguem as bordas calculadas pelo J2; quadros intermediários são apenas animações, não soluções FEM.',
+    press:'Arraste a prensa na cena para aplicar tração ou compressão, calculadas pelo J2. Use a entrada numérica para precisão.',
     heater:'Aqueça por fonte externa na rede equivalente 1D; a energia se propaga e pode sair pelos terminais.',
-    power:'Ajuste o nível elétrico da rede equivalente 1D. Corrente, potência Joule e calor compartilham o mesmo resolvedor.',
+    power:'Arraste a fonte na cena para ajustar a alimentação; a entrada numérica é alternativa de precisão. Rede 1D relativa.',
     lamp:'A luminária muda a iluminação da cena, não calcula espectro ou refletância medida do metal.',
     microscope:'Use a objetiva para observar a microestrutura já existente no SILM e retornar à sala.'
    };
@@ -545,12 +596,13 @@
    this.quickControls.open=false;
    this.mapPanel.open=false;
    this.instrumentPanel.hidden=false;
-   this.status.textContent=I.labels[id]+' selecionado. Use os controles no painel contextual.';
+   this.status.textContent=I.labels[id]+' selecionado. Arraste o instrumento na cena ou use ajustes numéricos.';
    this.instrumentClose.focus({preventScroll:true});
    return true;
   }
   hideInstrument({restoreFocus=true}={}){
    this.instrumentPanel.hidden=true;this.selectedInstrument=null;
+   this.suppressInstrumentTapUntil=matchMedia('(pointer:coarse)').matches?performance.now()+300:0;
    this.ui.dataset.selectedInstrument='none';
    if(restoreFocus)this.canvas.focus({preventScroll:true});
   }
@@ -745,6 +797,9 @@
    document.removeEventListener('mousemove',this.onMove);window.removeEventListener('mouseup',this.onPointerUp);
    window.removeEventListener('hashchange',this.onRoute);
    this.canvas.removeEventListener('pointerdown',this.onPointerDown);
+   this.canvas.removeEventListener('pointermove',this.onInstrumentPointerMove);
+   this.canvas.removeEventListener('pointerup',this.onPointerUp);
+   this.canvas.removeEventListener('pointercancel',this.onPointerUp);
    this.canvas.removeEventListener('click',this.onClick);this.canvas.removeEventListener('wheel',this.onWheel);
    this.canvas.removeEventListener('touchstart',this.onTouchStart);this.canvas.removeEventListener('touchmove',this.onTouchMove);
    this.renderer.dispose();this.ui.remove();

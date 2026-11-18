@@ -198,12 +198,19 @@
               </section>
             </div>
             <div class="si-actionbar" id="silm-scene-actionbar" role="toolbar" aria-label="Ações e visualização da cena">
-              <button id="scene-clear" type="button" class="button outline" disabled>Limpar estrutura</button>
-              <button id="scene-undo" type="button" class="button outline" disabled aria-label="Desfazer">↶</button>
-              <div id="silm-view-quick-actions" class="silm-view-quick-actions" role="toolbar" aria-label="Comandos rápidos da estrutura" hidden></div>
               <div id="silm-view-controls" class="silm-view-controls" role="toolbar" aria-label="Câmera e enquadramento"></div>
-              <span id="scene-count" class="scene-count" aria-live="polite">0 / 60 objetos</span>
-              <div class="si-toolmenu-wrap"><button class="button outline si-more-trigger" id="scene-menu-toggle" type="button" aria-haspopup="menu" aria-controls="scene-tools-menu" aria-expanded="false">Mais ▾</button><div id="scene-tools-menu" class="si-toolmenu" role="menu" aria-label="Mais ações da estrutura" hidden><button role="menuitem" type="button" data-menu-action="clear" id="si-compact-clear">Limpar estrutura</button><button role="menuitem" type="button" data-menu-action="help">Como usar</button></div></div>
+              <details id="silm-scene-toolbox" class="silm-scene-toolbox">
+                <summary aria-label="Abrir ferramentas e representação da cena">Ferramentas</summary>
+                <div id="silm-scene-toolbox-panel" class="silm-scene-toolbox-panel" role="group" aria-label="Representação, montagem e ações secundárias">
+                  <div id="silm-view-quick-actions" class="silm-view-quick-actions" role="group" aria-label="Representação e opções da estrutura" hidden></div>
+                  <div class="silm-scene-toolbox-actions">
+                    <button id="scene-undo" type="button" class="button outline" disabled aria-label="Desfazer">↶</button>
+                    <button id="scene-clear" type="button" class="button outline" disabled>Limpar estrutura</button>
+                  </div>
+                  <span id="scene-count" class="scene-count" aria-live="polite">0 / 60 objetos</span>
+                  <div class="si-toolmenu-wrap"><button class="button outline si-more-trigger" id="scene-menu-toggle" type="button" aria-haspopup="menu" aria-controls="scene-tools-menu" aria-expanded="false">Ajuda e opções ▾</button><div id="scene-tools-menu" class="si-toolmenu" role="menu" aria-label="Ações adicionais da estrutura" hidden><button role="menuitem" type="button" data-menu-action="clear" id="si-compact-clear">Limpar estrutura</button><button role="menuitem" type="button" data-menu-action="help">Como usar</button></div></div>
+                </div>
+              </details>
             </div>
             <aside id="si-dock-left" class="si-dock si-dock-left" aria-label="Montagem" role="region" hidden>
               <header class="si-dock-header"><h2 id="si-left-title">Montagem</h2><button type="button" class="si-dock-help" data-dock-help="left" aria-label="Ajuda deste painel" title="Ajuda deste painel">?</button><button type="button" class="si-dock-close" data-close-dock="left" aria-label="Fechar Montagem">Fechar</button></header>

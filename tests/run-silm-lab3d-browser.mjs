@@ -34,7 +34,11 @@ try{
  const before=await page.evaluate(()=>JSON.stringify(window.SILMIntegration.snapshot()));
  const backend=await page.evaluate(()=>{const c=document.createElement('canvas');return c.getContext('webgl2')?'webgl2':c.getContext('webgl')?'webgl1':'none'});
  const available=backend!=='none';
+ const toolbox=page.locator('#silm-scene-toolbox');
+ await toolbox.locator(':scope > summary').click();
+ await page.locator('#silm-scene-toolbox-panel').waitFor({state:'visible'});
  await entry.click();
+ assert.equal(await toolbox.getAttribute('open'),null,'Ferramentas não fechou ao iniciar a sala 3D.');
  if(available){
   const canvas=page.locator('.silm-lab3d canvas');
   await canvas.waitFor({state:'visible',timeout:10000});
@@ -81,14 +85,15 @@ try{
    assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),true);
   };
   await instrumentClick('press');
-  const loadSlider=page.locator('[data-control="load"]');
-  await loadSlider.focus();await loadSlider.press('ArrowRight');
+  const loadInput=page.locator('[data-control="load"]');
+   assert.equal(await loadInput.getAttribute('type'),'number','A carga não deve depender de slider.');
+  await loadInput.fill('0.1');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0.1');
   await page.locator('[data-control="load-mode"]').selectOption('tension');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-mode'),'tension',
    'Alternar para tração deve forçar um novo cálculo J2 mesmo na mesma carga.');
   await page.locator('[data-control="load-mode"]').selectOption('compression');
-  await loadSlider.press('Home');
+  await loadInput.fill('0');
   assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0');
   await page.locator('[data-lab-action="instrument-close"]').click();
   assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false);
@@ -106,8 +111,9 @@ try{
   assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
   await page.locator('[data-lab-action="instrument-close"]').click();
   await instrumentClick('power');
-  const sourceSlider=page.locator('[data-control="intensity"]');
-  await sourceSlider.focus();await sourceSlider.press('ArrowRight');
+  const sourceInput=page.locator('[data-control="intensity"]');
+   assert.equal(await sourceInput.getAttribute('type'),'number','A fonte não deve depender de slider.');
+  await sourceInput.fill('0.65');
   assert.equal(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-level')),.65);
   assert.ok(Number(await page.locator('.silm-lab3d').getAttribute('data-coupled-power'))>0);
   await page.locator('[data-lab-action="instrument-close"]').click();

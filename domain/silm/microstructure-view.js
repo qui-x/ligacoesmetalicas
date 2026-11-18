@@ -243,7 +243,7 @@ SILM.microstructure=(()=>{
    contactLabel.append(node('span','','Posição do contato'),
     (()=>{
      const input=node('input','silm-micro-contact-position');
-     input.type='range';input.min='10';input.max='90';input.step='5';input.value='50';
+     input.type='number';input.inputMode='numeric';input.min='10';input.max='90';input.step='5';input.value='50';
      input.setAttribute('aria-label','Posição da prensa ou garra na amostra, em porcentagem');
      contactLabel.input=input;return input;
     })());
@@ -251,13 +251,13 @@ SILM.microstructure=(()=>{
    widthLabel.append(node('span','','Largura da área de contato'),
     (()=>{
      const input=node('input','silm-micro-contact-width');
-     input.type='range';input.min='10';input.max='80';input.step='5';input.value='30';
+     input.type='number';input.inputMode='numeric';input.min='10';input.max='80';input.step='5';input.value='30';
      input.setAttribute('aria-label','Largura do contato da prensa ou garra, em porcentagem');
      widthLabel.input=input;return input;
     })());
    const forceLabel=node('label','silm-micro-contact-control silm-micro-force-control');
    const forceInput=node('input','silm-micro-force-input');
-   forceInput.type='range';forceInput.min='0';forceInput.max='100';forceInput.step='5';
+   forceInput.type='number';forceInput.inputMode='numeric';forceInput.min='0';forceInput.max='100';forceInput.step='5';
    forceInput.value='0';forceInput.setAttribute('aria-label','Carga relativa aplicada ao corpo de prova');
    forceLabel.append(node('span','','Carga aplicada'),forceInput);
    const releaseForce=node('button','silm-workshop-micro-control silm-micro-force-release','Retirar força');
@@ -324,7 +324,7 @@ SILM.microstructure=(()=>{
    demoLabel.append(demoToggle,node('span','','Exemplo hipotético, não pertence ao grão'));
    const angleLabel=node('label','silm-micro-slip-angle-label');
    const angleInput=node('input','silm-micro-slip-angle');
-   angleInput.type='range';angleInput.min='0';angleInput.max='90';
+   angleInput.type='number';angleInput.inputMode='numeric';angleInput.min='0';angleInput.max='90';
    angleInput.step='5';angleInput.value='0';angleInput.disabled=true;
    angleInput.setAttribute('aria-label','Rotacionar cristal hipotético em graus');
    const angleValue=node('output','silm-micro-slip-angle-value','0°');
@@ -455,7 +455,7 @@ SILM.microstructure=(()=>{
   const topGrip=node('button','silm-micro-mechanical-grip silm-micro-mechanical-top','↓');
   const bottomGrip=node('button','silm-micro-mechanical-grip silm-micro-mechanical-bottom','↑');
   for(const grip of [topGrip,bottomGrip]){
-   grip.type='button';grip.hidden=true;grip.title='Arraste para aplicar força; Enter ou Espaço aplica um passo';
+   grip.type='button';grip.hidden=true;grip.title='Arraste verticalmente: carga; horizontalmente: posição; Shift + horizontal: largura. Enter/Espaço: passo';
    grip.style.touchAction='none';
   }
   const specimenFeedback=node('output','silm-micro-specimen-feedback','');
@@ -467,12 +467,14 @@ SILM.microstructure=(()=>{
    contactLabel.input.value=String(Math.round(contactPosition*100));
    widthLabel.input.value=String(Math.round(contactWidth*100));
    const updateContact=()=>{
+    if(contactLabel.input.value==='')contactLabel.input.value=String(Math.round(contactPosition*100));
+    if(widthLabel.input.value==='')widthLabel.input.value=String(Math.round(contactWidth*100));
     contactPosition=clamp(Number(contactLabel.input.value)/100,.1,.9);
     contactWidth=clamp(Number(widthLabel.input.value)/100,.1,.8);
     refreshMechanical();
    };
-   contactLabel.input.addEventListener('input',updateContact);
-   widthLabel.input.addEventListener('input',updateContact);
+   contactLabel.input.addEventListener('change',updateContact);
+   widthLabel.input.addEventListener('change',updateContact);
    const saveContact=()=>model?.setMechanicalContact?.(contactPosition,contactWidth);
    contactLabel.input.addEventListener('change',saveContact);
    widthLabel.input.addEventListener('change',saveContact);
@@ -670,14 +672,14 @@ SILM.microstructure=(()=>{
    grip.addEventListener('pointerdown',event=>{
     if(event.button!==0||!getMode()||!deformCtl)return;
     event.preventDefault();event.stopPropagation();
-    dragged={id:event.pointerId,x:event.clientX,y:event.clientY,origin:contactPosition,axis:null,moved:false};
+    dragged={id:event.pointerId,x:event.clientX,y:event.clientY,origin:contactPosition,originWidth:contactWidth,axis:null,moved:false};
     try{grip.setPointerCapture(event.pointerId);}catch{}
    });
    grip.addEventListener('pointermove',event=>{
     if(!dragged||event.pointerId!==dragged.id)return;
     event.preventDefault();event.stopPropagation();
     const dx=event.clientX-dragged.x,dy=event.clientY-dragged.y;
-    if(!dragged.axis&&Math.hypot(dx,dy)>5)dragged.axis=Math.abs(dx)>Math.abs(dy)*1.3?'position':'load';
+    if(!dragged.axis&&Math.hypot(dx,dy)>5)dragged.axis=Math.abs(dx)>Math.abs(dy)*1.3?(event.shiftKey?'width':'position'):'load';
     if(!dragged.axis)return;
     dragged.moved=true;
     if(dragged.axis==='position'){
@@ -685,6 +687,10 @@ SILM.microstructure=(()=>{
      contactPosition=Math.round(ratio*20)/20;
      contactLabel.input.value=String(Math.round(contactPosition*100));
      deformCtl.setLoad(0);
+    }else if(dragged.axis==='width'){
+     const ratio=clamp(dragged.originWidth+dx/Math.max(120,viewport.clientWidth),.1,.8);
+     contactWidth=Math.round(ratio*20)/20;
+     widthLabel.input.value=String(Math.round(contactWidth*100));
     }else{
      deformCtl.setLoad(clamp(dy*direction()/Math.max(44,viewport.clientHeight*.25),0,1));
     }
@@ -693,7 +699,7 @@ SILM.microstructure=(()=>{
    const release=event=>{
     if(!dragged||event.pointerId!==dragged.id)return;
     event.preventDefault();event.stopPropagation();
-    const tap=!dragged.moved,relocated=dragged.axis==='position';dragged=null;
+    const tap=!dragged.moved,relocated=dragged.axis==='position'||dragged.axis==='width';dragged=null;
     deformCtl?.setLoad(0);
     if(relocated)saveContact();
     if(tap&&event.type==='pointerup')mechanicalPulseStep();
@@ -703,7 +709,18 @@ SILM.microstructure=(()=>{
    grip.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();});
    grip.addEventListener('keydown',event=>{
     if(!getMode())return;
-    if(['Enter',' ','ArrowUp','ArrowDown'].includes(event.key)){
+    if(['ArrowLeft','ArrowRight'].includes(event.key)){
+     event.preventDefault();event.stopPropagation();
+     const delta=event.key==='ArrowRight'?.05:-.05;
+     if(event.shiftKey){
+      contactWidth=clamp(contactWidth+delta,.1,.8);
+      widthLabel.input.value=String(Math.round(contactWidth*100));
+     }else{
+      contactPosition=clamp(contactPosition+delta,.1,.9);
+      contactLabel.input.value=String(Math.round(contactPosition*100));
+     }
+     saveContact();refreshMechanical();
+    }else if(['Enter',' ','ArrowUp','ArrowDown'].includes(event.key)){
      event.preventDefault();event.stopPropagation();mechanicalPulseStep();
     }else if(event.key==='Escape'){event.preventDefault();deformCtl?.setLoad(0);refreshMechanical();}
    });

@@ -32,7 +32,11 @@ try{
  if(await dock.isVisible())await dock.click();
  const before=JSON.stringify(await page.evaluate(()=>window.SILMIntegration.snapshot()));
  const entry=page.locator('.silm-lab3d-entry');
- await entry.click();
+ const toolbox=page.locator('#silm-scene-toolbox');
+ await toolbox.locator(':scope > summary').tap();
+ await page.locator('#silm-scene-toolbox-panel').waitFor({state:'visible'});
+ await entry.tap();
+ assert.equal(await toolbox.getAttribute('open'),null,'Ferramentas não fechou ao iniciar a sala 3D.');
  const canvas=page.locator('.silm-lab3d canvas');
  await canvas.waitFor({state:'visible',timeout:15000});
  assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-surface'),'j2-plane-strain');
@@ -51,18 +55,26 @@ try{
   assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),true);
  };
  await hit('press');
- const slider=page.locator('[data-control="load"]');
- await slider.scrollIntoViewIfNeeded();
- const box=await slider.boundingBox();
- assert.ok(box?.width>80,'Controle da prensa não cabe na tela');
- await slider.tap({position:{x:box.width*.7,y:box.height/2}});
- const sliderLevel=await slider.inputValue();
+ const precise=page.locator('[data-control="load"]');
+ assert.equal(await precise.getAttribute('type'),'number','Ajuste fino deve ser numérico, não slider.');
+ const dev=await ctx.newCDPSession(page);
+ const pressPoint=await coordinate('press');
+ await dev.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:pressPoint.x,y:pressPoint.y,id:11}]});
+ for(let i=1;i<=4;i++)await dev.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:pressPoint.x,y:pressPoint.y-i*15,id:11}]});
+ await dev.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ await page.waitForFunction(()=>Number(document.querySelector('.silm-lab3d')?.dataset.specimenLoad)>0,undefined,{timeout:10000});
  const solvedLoad=Number(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'));
- console.log(JSON.stringify({touchSlider:{sliderLevel,solvedLoad}}));
- assert.ok(solvedLoad>0,
-  'Arrastar/tocar o controle da prensa deve ajustar o campo J2.');
+ assert.ok(solvedLoad>0,'Arrastar a prensa por toque deve atualizar o solver J2.');
+ await precise.fill('0.2');
+ assert.equal(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'),'0.2',
+  'A entrada numérica alternativa não alterou a resposta J2.');
  await page.locator('[data-lab-action="instrument-close"]').tap();
- assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false);
+ await page.waitForFunction(()=>document.querySelector('.silm-lab3d-instrument-panel')?.hidden===true,
+  undefined,{timeout:3000});
+ assert.equal(await page.locator('.silm-lab3d-instrument-panel').isVisible(),false,
+  'Fechar a prensa não deve reabrir o painel por um toque fantasma.');
+ assert.equal(await page.locator('.silm-lab3d').getAttribute('data-selected-instrument'),'none',
+  'Ao fechar, a prensa não deve permanecer como instrumento ativo.');
  await hit('heater');
  await page.locator('[data-lab-action="heater-toggle"]').tap();
  assert.equal(await page.locator('[data-lab-action="heat"]').getAttribute('aria-pressed'),'true');
@@ -70,7 +82,6 @@ try{
  await page.screenshot({path:join(dir,'touch-instruments.png')});
  const snapshot=await page.screenshot();
  const c=await canvas.boundingBox(),x=c.x+c.width*.62,y=c.y+c.height*.49;
- const dev=await ctx.newCDPSession(page);
  await dev.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}]});
  for(let i=1;i<=4;i++){
   await dev.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[

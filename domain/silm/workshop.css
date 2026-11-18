@@ -1422,3 +1422,21 @@
  }
  .silm-micro-slip-details a{color:LinkText}
 }
+
+/* SILM #191: ajuste numérico preciso, sem barras de arraste duplicadas. */
+.silm-micro-contact-details input[type=number],
+.silm-micro-slip-details input[type=number]{
+ box-sizing:border-box;min-width:70px;width:min(130px,100%);min-height:44px;
+ padding:8px;border:1px solid var(--border);border-radius:8px;
+ background:var(--surface);color:var(--text);font:inherit;font-variant-numeric:tabular-nums
+}
+.silm-micro-contact-details input[type=number]:focus-visible,
+.silm-micro-slip-details input[type=number]:focus-visible{
+ outline:3px solid var(--ring,var(--focus,#3478b8));outline-offset:2px
+}
+@media(forced-colors:active){
+ .silm-micro-contact-details input[type=number],
+ .silm-micro-slip-details input[type=number]{
+  border:2px solid ButtonText;background:Canvas;color:CanvasText
+ }
+}
