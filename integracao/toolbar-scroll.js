@@ -31,7 +31,12 @@
   }
   tools.addEventListener('toggle',()=>{
    panel.hidden=!tools.open;
-   if(tools.open)position();
+   if(tools.open){
+    position();
+    // O conteúdo foi portado ao body: transferir o foco de teclado para
+    // a gaveta evita que Tab percorra a página fora da sequência lógica.
+    requestAnimationFrame(()=>panel.querySelector('button:not([disabled]):not([hidden]), select:not([disabled]), [tabindex="0"]')?.focus({preventScroll:true}));
+   }
    else if(panel.contains(document.activeElement))summary.focus({preventScroll:true});
   });
   panel.addEventListener('keydown',e=>{

@@ -58,7 +58,7 @@ try{
  await dev.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:pressPoint.x,y:pressPoint.y,id:11}]});
  for(let i=1;i<=4;i++)await dev.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:pressPoint.x,y:pressPoint.y-i*15,id:11}]});
  await dev.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
- await page.waitForFunction(()=>Number(document.querySelector('.silm-lab3d')?.dataset.specimenLoad)>0,{timeout:10000});
+ await page.waitForFunction(()=>Number(document.querySelector('.silm-lab3d')?.dataset.specimenLoad)>0,undefined,{timeout:10000});
  const solvedLoad=Number(await page.locator('.silm-lab3d').getAttribute('data-specimen-load'));
  assert.ok(solvedLoad>0,'Arrastar a prensa por toque deve atualizar o solver J2.');
  await precise.fill('0.2');
