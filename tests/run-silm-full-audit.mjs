@@ -263,7 +263,11 @@ try{
   const canvasSupported=await page.evaluate(()=>{
    const c=document.createElement('canvas');return !!(c.getContext('webgl2')||c.getContext('webgl'));
   });
+  const toolbox=page.locator('#silm-scene-toolbox');
+  if(await toolbox.getAttribute('open')===null)await toolbox.locator(':scope > summary').click();
+  await page.locator('#silm-scene-toolbox-panel').waitFor({state:'visible'});
   await entry.click();
+  assert.equal(await toolbox.getAttribute('open'),null,'Ferramentas deve fechar ao entrar na Sala 3D.');
   const scene=page.locator('.silm-lab3d');
   if(canvasSupported){
    await scene.waitFor({state:'visible',timeout:12000});

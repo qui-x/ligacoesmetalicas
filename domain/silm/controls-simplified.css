@@ -496,3 +496,12 @@
  #silm-scene-actionbar .silm-joule-controls .silm-joule-supply,
  #silm-scene-actionbar .silm-joule-controls .silm-joule-play{min-width:70px}
 }
+
+/* No Centro, as translações por eixo antes ocultas em center-focus.css
+   reaparecem apenas quando o estudante pede navegação avançada. */
+#silm-scene-toolbox-panel .silm-center-navigation .silm-lattice-more[open]
+ .silm-lattice-more-controls button[aria-label^="Avançar uma célula"],
+#silm-scene-toolbox-panel .silm-center-navigation .silm-lattice-more[open]
+ .silm-lattice-more-controls button[aria-label^="Recuar uma célula"]{
+ display:inline-flex!important;align-items:center;justify-content:center
+}
